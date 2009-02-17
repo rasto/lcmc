@@ -1,0 +1,105 @@
+
+package drbd.gui;
+
+import drbd.data.Host;
+import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
+import drbd.AddHostDialog;
+
+import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
+import javax.swing.ImageIcon;
+
+import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+/**
+ * An implementation of a host tab, that contains view of one host.
+ *
+ * @author Rasto Levrinc
+ * @version $Id$
+ *
+ */
+public class HostTab extends JPanel {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
+    /** Host data object. */
+    private final Host host;
+    /** 'Add host' button. */
+    private MyButton addHostButton = null;
+    /** Host icon. */
+    private static final ImageIcon HOST_ICON =
+                                Tools.createImageIcon(
+                                        Tools.getDefault("HostTab.HostIcon"));
+    /** Size of the 'Add host' button. */
+    private static final Dimension ADD_BUTTON_DIMENSION =
+                                                    new Dimension(300, 100);
+    /**
+     * Prepares a new <code>HostTab</code> object.
+     */
+    public HostTab(final Host host) {
+        super(new BorderLayout());
+        setBackground(Tools.getDefaultColor("ViewPanel.Background"));
+        this.host = host;
+        if (host == null) {
+            setLayout(new FlowLayout());
+            addHostButton = new MyButton("add new host", HOST_ICON);
+            addHostButton.setPreferredSize(ADD_BUTTON_DIMENSION);
+            addHostButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    enableButtons(false);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            final AddHostDialog ahd = new AddHostDialog();
+                            ahd.showDialogs();
+                            enableButtons(true);
+                        }
+                    });
+                }
+            });
+            add(addHostButton);
+        } else {
+            final TerminalPanel terminalPanel = new TerminalPanel(host);
+            Tools.getGUIData().setTerminalPanel(terminalPanel);
+        }
+    }
+
+    /**
+     * Enable add host buttons.
+     */
+    public final void enableButtons(final boolean enable) {
+        if (addHostButton != null) {
+            addHostButton.setEnabled(enable);
+        }
+    }
+
+    /**
+     * Adds a host view.
+     */
+    public final void addHostView() {
+        final HostViewPanel hostViewPanel = new HostViewPanel(host);
+        add(hostViewPanel);
+        host.setHostViewPanel(hostViewPanel);
+    }
+
+    /**
+     * Returns the host data object.
+     */
+    public final Host getHost() {
+        return host;
+    }
+
+    /**
+     * Returns the name of the host.
+     */
+    public final String getName() {
+        if (host == null) {
+            return null;
+        }
+        return host.getName();
+    }
+}

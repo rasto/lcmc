@@ -1,0 +1,126 @@
+<project name="DMC" basedir="." default="main">
+
+    <property name="src.dir"     value="src"/>
+
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir"     value="${build.dir}/jar"/>
+    <property name="build.coverage.dir"     value="build-coverage"/>
+
+    <property name="main-class"  value="drbd.DrbdGui"/>
+    <property name="lib.dir"     value="lib"/>
+    <tstamp/>
+    <property name="now" value="${DSTAMP}-${TSTAMP}" />
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <!-- <fileset dir="/usr/share/lg3d-jdk/jre/lib/ext/" includes="**/*.jar" /> -->
+    </path>
+
+
+    <target name="clean">
+        <delete dir="${build.dir}/classes/drbd/"/>
+    </target>
+
+    <target name="superclean">
+        <delete dir="${build.dir}/classes/"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <copy todir="${classes.dir}/images">
+              <fileset dir="${src.dir}/drbd/images"/>
+        </copy>
+
+        <copy todir="${classes.dir}/help-progs">
+              <fileset dir="${src.dir}/drbd/help-progs"/>
+	</copy>
+
+        <copy tofile="${classes.dir}/drbd/release.properties"
+              file="release"
+	      overwrite="yes"/>
+        <!-- verbose="true" -->
+        <!--          <compilerarg value="-Xlint:unchecked"/> -->
+        <!-- target="jsr14" for java runtime 1.4 -->
+        <!-- debug="true" -->
+        <!-- fork="true" -->
+
+        <javac 
+         fork="true" 
+	 debug="true"
+	 deprecation="true"
+         memoryInitialSize="512m"
+	 memoryMaximumSize="512m"
+         srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"
+	 encoding="utf8"
+        >
+          <compilerarg value="-g"/> 
+          <compilerarg value="-Xlint"/> 
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="runprof" depends="jar">
+        <java fork="true" classname="${main-class}">
+            <jvmarg value="-Xdebug"/>
+          <!--  <jvmarg value="-verbose:gc"/>  -->
+          <!--  <jvmarg value="-verbose:class"/> -->
+          <!--  <jvmarg value="-verbose:jni"/> -->
+          <!--  <jvmarg value="-agentlib:hprof=heap=sites"/> -->
+            <!-- <jvmarg value="-Xrunhprof"/> -->
+	    <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
+            <classpath>
+                <path refid="classpath"/>
+                <path location="${jar.dir}/${ant.project.name}.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runjmp" depends="jar">
+        <java fork="true" classname="${main-class}">
+	    <jvmarg value="-Xrunjmp"/>
+            <classpath>
+                <path refid="classpath"/>
+                <path location="${jar.dir}/${ant.project.name}.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run" depends="jar">
+        <java fork="true" classname="${main-class}">
+            <jvmarg value="-Xdebug"/>
+	    <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
+            <classpath>
+                <path refid="classpath"/>
+                <path location="${jar.dir}/${ant.project.name}.jar"/>
+            </classpath>
+    	    <arg value="-load"/>
+        </java>
+    </target>
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean,run"/>
+
+    <target name="init">
+        <property name="project" value="drbd-gui" />
+	<property name="tarball.tar" value="${project}-${now}.tar" />  
+	<property name="tarball.tar.gz" value="${tarball.tar}.gz" />  
+    </target>
+
+    <target name="dist" depends="init">
+    	<tar tarfile="${tarball.tar}"
+	     basedir=".."
+	     includes="drbd-gui/src/** drbd-gui/build.xml drbd-gui/release drbd-gui/lib/**" />
+	<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
+	<delete file="${tarball.tar}"/>
+    </target>
+</project>

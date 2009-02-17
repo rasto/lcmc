@@ -1,0 +1,1013 @@
+/*
+ * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
+ * written by Rasto Levrinc.
+ *
+ * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+ *
+ * DRBD Management Console is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * DRBD Management Console is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with drbd; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+package drbd.gui;
+
+import drbd.utilities.Tools;
+import drbd.utilities.Unit;
+import drbd.utilities.PatternDocument;
+import drbd.gui.Browser.Info;
+
+import javax.swing.JPanel;
+import javax.swing.JComponent;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.JButton;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.Document;
+import javax.swing.JRadioButton;
+import javax.swing.JCheckBox;
+import javax.swing.ButtonGroup;
+import javax.swing.Box;
+import javax.swing.ComboBoxEditor;
+
+import java.awt.BorderLayout;
+
+import java.awt.GridLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
+import java.awt.Component;
+import javax.swing.SpringLayout;
+
+import javax.swing.event.DocumentListener;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+/**
+ * An implementation of a field where user can enter new value. The
+ * field can be Textfield or combo box, depending if there are values
+ * too choose from.
+ * TODO: rename it to GuiWidget or something
+ *
+ * @author Rasto Levrinc
+ * @version $Id$
+ *
+ */
+public class GuiComboBox extends JPanel {
+
+    /** Widget type. */
+    public enum Type {TEXTFIELD,
+                      PASSWDFIELD,
+                      COMBOBOX,
+                      RADIOGROUP,
+                      CHECKBOX,
+                      TEXTFIELDWITHUNIT};
+
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
+    /** Component of this widget. */
+    private JComponent component;
+    /** Type of the widget. */
+    private Type type;
+    /** Whether the field is editable. */
+    private boolean editable = false;
+    /** Value of the radio group. */
+    private String radioGroupValue;
+    /** Whether the field should be always editable. */
+    private boolean alwaysEditable = false;
+    /** Array of unit objects. */
+    private Unit[] units = null;
+    /** Text field in widget with units. */
+    private JTextField textFieldWithoutUnit = null;
+    /** Combo box with units. */
+    private JComboBox unitComboBox = null;
+    /** Pattern that matches value and unit. */
+    private final Pattern unitPattern = Pattern.compile("^(\\d+)(\\D*)$");
+    /** Name for the 'true' value. */
+    private String checkBoxTrue = Tools.getString("Boolean.True");
+    /** Name for the 'false' value. */
+    private String checkBoxFalse = Tools.getString("Boolean.False");
+    /** Background of the field if the value is wrong. */
+    private static final Color ERROR_VALUE_BACKGROUND =
+                            Tools.getDefaultColor("GuiComboBox.ErrorValue");
+    /** No scrollbar ever. */
+    private static final int SCROLLBAR_MAX_ROWS = 10000;
+    /** Widget default height. */
+    private static final int WIDGET_HEIGHT = 28;
+    /** Widget enclosing component default height. */
+    private static final int WIDGET_COMPONENT_HEIGHT = 30;
+    /**
+     * Prepares a new <code>GuiComboBox</code> object with specified units.
+     */
+    public GuiComboBox(final String selectedValue,
+                       final Object[] items,
+                       final Unit[] units,
+                       final Type type,
+                       final String regexp,
+                       final int width) {
+        super();
+        this.units = units;
+        //setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
+        setLayout(new BorderLayout(0, 0));
+
+        if (type == null) {
+            if (items == null) {
+                this.type = Type.TEXTFIELD;
+            } else if (items.length == 0) {
+                this.type = Type.TEXTFIELD;
+            } else if (items.length == 2) {
+                if (items[0].toString().equalsIgnoreCase(
+                            Tools.getString("Boolean.True"))
+                    && items[1].toString().equalsIgnoreCase(
+                                        Tools.getString("Boolean.False"))) {
+                    this.type = type.CHECKBOX;
+                } else {
+                    this.type = Type.COMBOBOX;
+                }
+            } else {
+                this.type = Type.COMBOBOX;
+            }
+        } else {
+            this.type = type;
+        }
+
+        switch(this.type) {
+            case TEXTFIELD:
+                component = getTextField(selectedValue, regexp);
+                break;
+            case PASSWDFIELD:
+                component = getPasswdField(selectedValue, regexp);
+                break;
+            case COMBOBOX:
+                component = getComboBox(selectedValue, items, regexp);
+                break;
+            case TEXTFIELDWITHUNIT:
+                component = new JPanel();
+                component.setLayout(new SpringLayout());
+
+                final Matcher m = unitPattern.matcher(selectedValue);
+                String number = "";
+                String unit = "";
+                if (m.matches()) {
+                    number = m.group(1);
+                    final String parsedUnit = m.group(2);
+                    if (!"".equals(parsedUnit)) {
+                        unit = parsedUnit;
+                    }
+                }
+
+                /* text field */
+                textFieldWithoutUnit = (JTextField) getTextField(number,
+                                                                 regexp);
+                component.add(textFieldWithoutUnit);
+
+                /* unit combo box */
+                unitComboBox = (JComboBox) getComboBox(unit, units, regexp);
+
+                component.add(unitComboBox);
+                SpringUtilities.makeCompactGrid(component, 1, 2,
+                                                           0, 0,
+                                                           0, 0);
+                break;
+            case RADIOGROUP:
+                component = getRadioGroup(selectedValue, items);
+                break;
+            case CHECKBOX:
+                if (items != null && items.length == 2) {
+                    checkBoxTrue  = (String) items[0];
+                    checkBoxFalse = (String) items[1];
+                }
+                component = getCheckBox(selectedValue);
+                break;
+            default:
+        }
+        if (this.type == Type.TEXTFIELDWITHUNIT) {
+            textFieldWithoutUnit.setMinimumSize(new Dimension(width / 3,
+                                                              WIDGET_HEIGHT));
+            textFieldWithoutUnit.setMaximumSize(new Dimension(width / 3,
+                                                              WIDGET_HEIGHT));
+            textFieldWithoutUnit.setPreferredSize(new Dimension(width / 3,
+                                                                WIDGET_HEIGHT));
+            unitComboBox.setMinimumSize(new Dimension(width / 3 * 2,
+                                                      WIDGET_HEIGHT));
+            unitComboBox.setMaximumSize(new Dimension(width / 3 * 2,
+                                                      WIDGET_HEIGHT));
+            unitComboBox.setPreferredSize(new Dimension(width / 3 * 2,
+                                                        WIDGET_HEIGHT));
+        }
+        component.setPreferredSize(new Dimension(width,
+                                                 WIDGET_HEIGHT));
+        setPreferredSize(new Dimension(width, WIDGET_COMPONENT_HEIGHT));
+        if (width != 0) {
+            component.setMaximumSize(new Dimension(width,
+                                                   WIDGET_HEIGHT));
+            setMaximumSize(new Dimension(width, WIDGET_COMPONENT_HEIGHT));
+        }
+
+        add(Box.createRigidArea(new Dimension(0, 1)), BorderLayout.PAGE_START);
+        add(component, BorderLayout.CENTER);
+        add(Box.createRigidArea(new Dimension(0, 1)), BorderLayout.PAGE_END);
+    }
+
+    /**
+     * Prepares a new <code>GuiComboBox</code> object.
+     */
+    public GuiComboBox(final String selectedValue,
+                       final Object[] items,
+                       final Type typeOfBox,
+                       final String regexp,
+                       final int width) {
+        this(selectedValue, items, null, typeOfBox, regexp, width);
+    }
+
+    /**
+     * Returns whether this field is a check box.
+     */
+    public final boolean isCheckBox() {
+        return (type == Type.CHECKBOX);
+    }
+
+    /**
+     * Returns new JPasswordField with default value.
+     */
+    private JComponent getPasswdField(final String value,
+                                      final String regexp) {
+        JPasswordField pf;
+        if (regexp == null) {
+            pf = new JPasswordField(value);
+        } else {
+            pf = new JPasswordField(new PatternDocument(regexp), value, 0);
+        }
+        return pf;
+    }
+
+    /**
+     * Returns new JTextField with default value.
+     */
+    private JComponent getTextField(final String value, final String regexp) {
+        JTextField tf;
+        if (regexp == null) {
+            tf = new JTextField(value);
+        } else {
+            tf = new JTextField(new PatternDocument(regexp), value, 0);
+        }
+        return tf;
+    }
+
+    /**
+     * Returns combo box with items in the combo and selectedValue on top.
+     */
+    private JComponent getComboBox(final String selectedValue,
+                                   final Object[] items,
+                                   final String regexp) {
+        final List<Object> comboList = new ArrayList<Object>();
+
+        final Object selectedValueInfo = addItems(comboList,
+                                                  selectedValue,
+                                                  items);
+        final JComboBox cb = new JComboBox(comboList.toArray(
+                                            new Object[comboList.size()]));
+        final JTextComponent editor =
+                        (JTextComponent) cb.getEditor().getEditorComponent();
+        if (regexp != null) {
+            editor.setDocument(new PatternDocument(regexp));
+        }
+        cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
+        if (selectedValueInfo != null) {
+            cb.setSelectedItem(selectedValueInfo);
+        }
+        /* workround, so that default button works */
+        editor.addKeyListener(new ActivateDefaultButtonListener(cb));
+
+        /* removing select... keyword */
+        editor.addFocusListener(new FocusListener() {
+            public void focusGained(final FocusEvent e) {
+                Object o = getValue();
+                if (o != null && !Tools.isStringClass(o)
+                    && ((Info) o).getStringValue() == null) {
+                    o = null;
+                }
+                if (o == null) {
+                    editor.setText("");
+                }
+            }
+
+            public void focusLost(final FocusEvent e) {
+                /* do nothing */
+            }
+        });
+        return cb;
+    }
+
+    /**
+     * Reloads combo box with items and selects supplied value.
+     */
+    public final void reloadComboBox(final String selectedValue,
+                                     final Object[] items) {
+        if (type != Type.COMBOBOX) {
+            return;
+        }
+
+        component.setPreferredSize(null);
+        /* removing dupicates */
+        final HashSet<String> itemCache = new HashSet<String>();
+
+        final List<Object> comboList = new ArrayList<Object>();
+        final Object selectedValueInfo = addItems(comboList,
+                                                  selectedValue,
+                                                  items);
+
+        final JComboBox cb = (JComboBox) component;
+        cb.setSelectedIndex(-1);
+        for (final Object item : comboList) {
+            if (!itemCache.contains((String) item)) {
+                cb.addItem(item);
+                itemCache.add((String) item);
+            }
+        }
+        if (selectedValueInfo != null) {
+            cb.setSelectedItem(selectedValueInfo);
+        }
+    }
+
+    /**
+     * Adds items to the combo box.
+     */
+    private Object addItems(final List<Object> comboList,
+                            final String selectedValue,
+                            final Object[] items) {
+        Object selectedValueInfo = null;
+        if (items != null) {
+            for (int i = 0; i < items.length; i++) {
+                if (items[i] == null) {
+                    Tools.appError("item: " + i + " is null");
+                    continue;
+                }
+                if (items[i].equals(selectedValue)) {
+                    selectedValueInfo = items[i];
+                }
+                comboList.add(items[i]);
+            }
+        }
+        return selectedValueInfo;
+    }
+
+    /**
+     * Returns radio group with selected value.
+     */
+    private JComponent getRadioGroup(final String selectedValue,
+                                     final Object[] items) {
+        final ButtonGroup group = new ButtonGroup();
+        final JPanel radioPanel = new JPanel(new GridLayout(1, 0));
+
+        for (int i = 0; i < items.length; i++) {
+            final String item = items[i].toString();
+            final JRadioButton rb = new JRadioButton(item);
+            rb.setActionCommand(item);
+            group.add(rb);
+            radioPanel.add(rb);
+
+            if (items[i].equals(selectedValue)) {
+                rb.setSelected(true);
+                radioGroupValue = selectedValue;
+            }
+
+            rb.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    radioGroupValue = e.getActionCommand();
+                }
+            });
+        }
+
+        return radioPanel;
+    }
+
+    /**
+     * Returns check box for boolean values.
+     */
+    private JComponent getCheckBox(final String selectedValue) {
+        final JCheckBox cb = new JCheckBox();
+        if (selectedValue != null) {
+            cb.setSelected(selectedValue.equals(checkBoxTrue));
+        }
+        return cb;
+    }
+
+    /**
+     * Sets the tooltip text.
+     */
+    public final void setToolTipText(final String text) {
+        component.setToolTipText(text);
+    }
+
+    /**
+     * Sets the field editable.
+     */
+    public final void setEditable() {
+        setEditable(editable);
+    }
+
+    /**
+     * Sets combo box editable.
+     */
+    public final void setEditable(final boolean editable) {
+        this.editable = editable;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                switch(type) {
+                    case TEXTFIELD:
+                        break;
+                    case PASSWDFIELD:
+                        break;
+                    case COMBOBOX:
+                        Object o = getValue();
+                        if (o != null
+                            && !Tools.isStringClass(o)
+                            && ((Info) o).getStringValue() == null) {
+                            o = null;
+                        }
+                        if (alwaysEditable) {
+                            ((JComboBox) component).setEditable(true);
+                            final JTextComponent editor = getTextComponent();
+                            if (o == null) {
+                                editor.selectAll();
+                            }
+                        } else {
+                            if (o == null) {
+                                ((JComboBox) component).setEditable(false);
+                            } else {
+                                ((JComboBox) component).setEditable(editable);
+                            }
+                        }
+                        break;
+                    case RADIOGROUP:
+                        break;
+                    case CHECKBOX:
+                        break;
+                    default:
+                }
+            }
+        });
+    }
+
+    /**
+     * Returns string value. If object value is null, returns empty string (not
+     * null).
+     */
+    public final String getStringValue() {
+        final Object o = getValue();
+        if (o == null) {
+            return "";
+        } else {
+            return o.toString();
+        }
+    }
+
+    /**
+     * Returns value, that use chose in the combo box or typed in.
+     */
+    public final Object getValue() {
+        Object value = null;
+        switch(type) {
+            case TEXTFIELD:
+                value = ((JTextField) component).getText();
+                break;
+            case PASSWDFIELD:
+                value = new String(((JPasswordField) component).getPassword());
+                break;
+            case COMBOBOX:
+                final JComboBox cb = (JComboBox) component;
+                if (cb.isEditable()) {
+                    final JTextComponent editor =
+                        (JTextComponent) cb.getEditor().getEditorComponent();
+                    final String text = editor.getText();
+                    value = cb.getSelectedItem();
+                    if (value == null || !text.equals(value.toString())) {
+                        value = text;
+                    }
+
+                    if ("".equals(value)) {
+                        return null;
+                    }
+                } else {
+                    value = cb.getSelectedItem();
+                }
+                break;
+            case RADIOGROUP:
+                value = radioGroupValue;
+                break;
+            case CHECKBOX:
+                final JCheckBox cbox = (JCheckBox) component;
+                if (cbox.getSelectedObjects() == null) {
+                    value = checkBoxFalse;
+                } else {
+                    value = checkBoxTrue;
+                }
+                break;
+            case TEXTFIELDWITHUNIT:
+                final StringBuffer s = new StringBuffer(
+                                            textFieldWithoutUnit.getText());
+                final Object unit = unitComboBox.getSelectedItem();
+                if (!Tools.isStringClass(unit)) {
+                    final Unit u = (Unit) unit;
+                    if (u.isPlural() == "1".equals(s.toString())) {
+                        u.setPlural(!"1".equals(s.toString()));
+                        unitComboBox.repaint();
+                    }
+
+                    s.append(u.getShortName());
+                }
+                value = s.toString();
+                break;
+            default:
+                // error
+        }
+        return value;
+    }
+
+    /**
+     * Clears the combo box.
+     */
+    public final void clear() {
+        switch(type) {
+            case TEXTFIELD:
+                break;
+            case PASSWDFIELD:
+                break;
+
+            case COMBOBOX:
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ((JComboBox) component).removeAllItems();
+                    }
+                });
+                break;
+
+            case RADIOGROUP:
+                break;
+
+            case CHECKBOX:
+                break;
+            default:
+                // nothing
+        }
+    }
+
+    /**
+     * Sets component editable or unsets.
+     */
+    public final void setEnabled(final boolean enabled) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                component.setEnabled(enabled);
+            }
+        });
+    }
+
+    /**
+     * Returns whether component is editable or not.
+     */
+    public final boolean isEditable() {
+        switch(type) {
+            case TEXTFIELD:
+                return true;
+            case PASSWDFIELD:
+                return true;
+            case COMBOBOX:
+                return ((JComboBox) component).isEditable();
+            case RADIOGROUP:
+                return false;
+            case CHECKBOX:
+                return false;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    /**
+     * Sets item/value in the component.
+     */
+    public final void setValue(final Object item) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                switch(type) {
+                    case TEXTFIELD:
+                        ((JTextField) component).setText((String) item);
+                        break;
+                    case PASSWDFIELD:
+                        ((JPasswordField) component).setText((String) item);
+                        break;
+                    case COMBOBOX:
+                        final JComboBox cb = (JComboBox) component;
+                        cb.setSelectedItem(item);
+                        if (cb.isEditable()) {
+                            final JTextComponent tc =
+                                (JTextComponent) cb.getEditor().getEditorComponent();
+                            tc.setText((String) item);
+                        } else if (Tools.isStringClass(item)) {
+                            for (int i = 0; i < cb.getItemCount(); i++) {
+                                final Object it = cb.getItemAt(i);
+                                if (it.equals(item)) {
+                                    cb.setSelectedItem(it);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+
+                    case RADIOGROUP:
+                        break;
+
+                    case CHECKBOX:
+                        if (item != null) {
+                            ((JCheckBox) component).setSelected(
+                                                        item.equals(checkBoxTrue));
+                        }
+                        break;
+
+                    case TEXTFIELDWITHUNIT:
+                        final Matcher m = unitPattern.matcher((String) item);
+                        String number = "";
+                        String unit = "";
+                        if (m.matches()) {
+                            number = m.group(1);
+                            unit = m.group(2);
+                        }
+
+                        textFieldWithoutUnit.setText(number);
+
+                        Object selectedUnitInfo = null;
+                        for (Unit u : units) {
+                            if (u.equals(unit)) {
+                                selectedUnitInfo = u;
+                            }
+                        }
+
+                        unitComboBox.setSelectedItem(selectedUnitInfo);
+                        break;
+                    default:
+                        Tools.appError("impossible type");
+                }
+            }
+        });
+    }
+
+    /**
+     * Returns document object of the component.
+     */
+    public final Document getDocument() {
+        switch(type) {
+            case TEXTFIELD:
+                return ((JTextField) component).getDocument();
+            case PASSWDFIELD:
+                return ((JPasswordField) component).getDocument();
+            case COMBOBOX:
+                final JTextComponent tc = getTextComponent();
+                return tc.getDocument();
+            case RADIOGROUP:
+                return null;
+            case CHECKBOX:
+                return null;
+            case TEXTFIELDWITHUNIT:
+                return null;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Returns the text component of the combo box.
+     */
+    private JTextComponent getTextComponent() {
+        final ComboBoxEditor editor = ((JComboBox) component).getEditor();
+        return (JTextComponent) editor.getEditorComponent();
+    }
+
+    /**
+     * Selects part after first '*' in the ip.
+     */
+    public final void selectSubnet() {
+        switch(type) {
+            case TEXTFIELD:
+                //ip = ((JTextField) component).getText();
+                break;
+            case PASSWDFIELD:
+                break;
+            case COMBOBOX:
+                final JTextComponent tc = getTextComponent();
+                final String ip = tc.getText();
+                final int pos = ip.indexOf('*');
+                if (pos >= 0) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            tc.select(pos, ip.length());
+                        }
+                    });
+                }
+                break;
+            case RADIOGROUP:
+                break;
+            case CHECKBOX:
+                break;
+            default:
+                Tools.appError("impossible type");
+        }
+    }
+
+    /**
+     * Adds item listener to the component.
+     */
+    public final void addListeners(final ItemListener il,
+                             final DocumentListener dl) {
+        switch(type) {
+            case TEXTFIELD:
+                if (dl != null) {
+                    getDocument().addDocumentListener(dl);
+                }
+                break;
+            case PASSWDFIELD:
+                if (dl != null) {
+                    getDocument().addDocumentListener(dl);
+                }
+                break;
+            case COMBOBOX:
+                if (il != null) {
+                    ((JComboBox) component).addItemListener(il);
+                }
+                if (dl != null) {
+                    getDocument().addDocumentListener(dl);
+                }
+                break;
+            case RADIOGROUP:
+                break;
+            case CHECKBOX:
+                if (il != null) {
+                    ((JCheckBox) component).addItemListener(il);
+                }
+                break;
+            case TEXTFIELDWITHUNIT:
+                if (dl != null) {
+                    textFieldWithoutUnit.getDocument().addDocumentListener(dl);
+                }
+                if (il != null) {
+                    unitComboBox.addItemListener(il);
+                }
+                break;
+            default:
+                // error
+        }
+    }
+
+    /**
+     * Sets the background for the component which value is incorrect (failed).
+     */
+    public final void wrongValue() {
+        switch(type) {
+            case TEXTFIELD:
+                component.setBackground(ERROR_VALUE_BACKGROUND);
+                break;
+            case PASSWDFIELD:
+                component.setBackground(ERROR_VALUE_BACKGROUND);
+                break;
+            case COMBOBOX:
+                setBackground(ERROR_VALUE_BACKGROUND);
+                break;
+            case RADIOGROUP:
+                component.setBackground(ERROR_VALUE_BACKGROUND);
+                break;
+            case CHECKBOX:
+                component.setBackground(ERROR_VALUE_BACKGROUND);
+                break;
+            case TEXTFIELDWITHUNIT:
+                textFieldWithoutUnit.setBackground(ERROR_VALUE_BACKGROUND);
+                break;
+            default:
+                // error
+        }
+    }
+
+    /**
+     * Sets background of the component depending if the value is the same
+     * as its default value and if it is a required argument.
+     * Must be called after combo box was already added to some panel.
+     */
+    public final void setBackground(final String defaultValue,
+                              final boolean required) {
+        final String value = getStringValue();
+
+        Color compColor = Color.WHITE;
+        if (getParent() == null) {
+            Tools.appError("wrong call to setBackground");
+        }
+        final Color backgroundColor = getParent().getBackground();
+        if (value.equals(defaultValue)) {
+            compColor = Tools.getDefaultColor("GuiComboBox.DefaultValue");
+        }
+        switch(type) {
+            case TEXTFIELD:
+                /* change color possibly set by wrongValue() */
+                component.setBackground(compColor);
+                break;
+            case PASSWDFIELD:
+                component.setBackground(compColor);
+                break;
+            case COMBOBOX:
+                setBackground(Color.WHITE);
+                break;
+            case RADIOGROUP:
+                component.setBackground(backgroundColor);
+                break;
+            case CHECKBOX:
+                component.setBackground(backgroundColor);
+                break;
+            case TEXTFIELDWITHUNIT:
+                textFieldWithoutUnit.setBackground(Color.WHITE);
+                break;
+            default:
+                // error
+        }
+        Color c;
+        if (required && false) {
+            //TODO: required fields should be marked differently
+            c = Color.GREEN;
+        } else  {
+            c = backgroundColor;
+        }
+
+        switch(type) {
+            case TEXTFIELD:
+                setBackground(c);
+                break;
+            case PASSWDFIELD:
+                setBackground(c);
+                break;
+            case COMBOBOX:
+                setBackground(c);
+                break;
+            case RADIOGROUP:
+                setBackground(c);
+                break;
+            case CHECKBOX:
+                setBackground(c);
+                break;
+            case TEXTFIELDWITHUNIT:
+                setBackground(c);
+                break;
+            default:
+                // error
+        }
+    }
+
+    /**
+     * Workaround for jcombobox so that it works with default button.
+     */
+    public class ActivateDefaultButtonListener extends KeyAdapter
+                                               implements ActionListener {
+        /** Combobox, that should work with default button. */
+        private final JComboBox box;
+
+        /** Creates new ActivateDefaultButtonListener. */
+        public ActivateDefaultButtonListener(final JComboBox box) {
+            super();
+            this.box = box;
+        }
+
+        /**
+         * Is called when a key was pressed.
+         */
+        public final void keyPressed(final KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                // Simulte click on default button.
+                doClick(e);
+            }
+        }
+
+        /**
+         * Is called when an action was performed.
+         */
+        public final void actionPerformed(final ActionEvent e) {
+            doClick(e);
+        }
+
+        /**
+         * Do click.
+         */
+        private void doClick(final java.util.EventObject e) {
+            final Component c = (Component) e.getSource();
+
+            final JRootPane rootPane = SwingUtilities.getRootPane(c);
+
+            if (rootPane != null) {
+                final JButton defaultButton = rootPane.getDefaultButton();
+
+                if (defaultButton != null && !box.isPopupVisible()) {
+                    final Object selection = box.getEditor().getItem();
+                    box.setSelectedItem(selection);
+                    defaultButton.doClick();
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets flag that determines whether the combo box is always editable.
+     */
+    public final void setAlwaysEditable(final boolean alwaysEditable) {
+        this.alwaysEditable = alwaysEditable;
+        setEditable(alwaysEditable);
+    }
+
+    /**
+     * Requests focus if applicable.
+     */
+    public final void requestFocus() {
+
+        switch(type) {
+            case TEXTFIELD:
+                ((JTextField) component).requestFocus();
+                break;
+            case PASSWDFIELD:
+                ((JPasswordField) component).requestFocus();
+                break;
+            case COMBOBOX:
+                break;
+            case RADIOGROUP:
+                break;
+            case CHECKBOX:
+                break;
+            case TEXTFIELDWITHUNIT:
+                textFieldWithoutUnit.requestFocus();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Selects the whole text in the widget if applicable.
+     */
+    public final void selectAll() {
+
+        switch(type) {
+            case TEXTFIELD:
+                ((JTextField) component).selectAll();
+                break;
+            case PASSWDFIELD:
+                ((JPasswordField) component).selectAll();
+                break;
+            case COMBOBOX:
+                break;
+            case RADIOGROUP:
+                break;
+            case CHECKBOX:
+                break;
+            case TEXTFIELDWITHUNIT:
+                textFieldWithoutUnit.selectAll();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Sets the width of the widget.
+     */
+    public final void setWidth(final int newWidth) {
+        final int hc = (int) component.getPreferredSize().getHeight();
+        final int h = (int) getPreferredSize().getHeight();
+        component.setMinimumSize(new Dimension(newWidth, hc));
+        component.setPreferredSize(new Dimension(newWidth, hc));
+        component.setMaximumSize(new Dimension(newWidth, hc));
+        setMinimumSize(new Dimension(newWidth, h));
+        setPreferredSize(new Dimension(newWidth, h));
+        setMaximumSize(new Dimension(newWidth, h));
+        revalidate();
+        component.revalidate();
+        repaint();
+        component.repaint();
+    }
+}

@@ -1,0 +1,185 @@
+
+package drbd.gui.dialog;
+
+import drbd.data.Host;
+import drbd.data.Cluster;
+import drbd.utilities.Tools;
+import drbd.utilities.DRBD;
+import drbd.utilities.Heartbeat;
+import drbd.utilities.SSH.ExecCommandThread;
+import drbd.utilities.MyButton;
+import drbd.gui.SpringUtilities;
+import drbd.utilities.ExecCallback;
+import drbd.gui.ProgressBar;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.ArrayList;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.JLabel;
+import javax.swing.JComponent;
+import java.awt.Component;
+import java.awt.GridLayout;
+import javax.swing.border.TitledBorder;
+import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
+
+/**
+ * An implementation of a dialog where heartbeat is initialized on all hosts.
+ *
+ * @author Rasto Levrinc
+ * @version $Id$
+ */
+public class ClusterHbChangePasswd extends DialogCluster {
+    /** Serial Version UID. */
+    private static final long serialVersionUID = 1L;
+    private final Host changeHbPasswordOnHost = null;
+
+    /**
+     * Prepares a new <code>ClusterHbChangePasswd</code> object.
+     */
+    public ClusterHbChangePasswd(final WizardDialog previousDialog,
+                                 final Cluster cluster,
+                                 final Host changeHbPasswordOnHost) {
+
+        super(previousDialog, cluster);
+        this.changeHbPasswordOnHost = changeHbPasswordOnHost;
+    }
+
+    /**
+     * Returns the next dialog.
+     */
+    public final WizardDialog nextDialog() {
+        return getPreviousDialog();
+    }
+
+    /**
+     * Returns the title of the dialog.
+     */
+    protected final String getClusterDialogTitle() {
+        return Tools.getString("Dialog.ClusterHbChangePasswd.Title");
+    }
+
+    /**
+     * Returns the description of the dialog.
+     */
+    protected final String getDescription() {
+        return Tools.getString("Dialog.ClusterHbChangePasswd.Description");
+    }
+
+    /**
+     * Inits the dialog.
+     */
+    protected final void initDialog() {
+        super.initDialog();
+
+        enableComponentsLater(new JComponent[]{});
+        buttonClass(nextButton()).setEnabled(true); // TODO: remove this
+    }
+
+    /**
+     * Returns the input pane with status information about drbd and heartbeat
+     * and some buttons.
+     */
+    protected final JComponent getInputPane() {
+        mainPanel = new JPanel(new GridLayout(1, 0));
+            pane.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            final TitledBorder titledBorder =
+                            BorderFactory.createTitledBorder(host.getName());
+            titledBorder.setTitleJustification(TitledBorder.LEFT);
+            pane.setBorder(titledBorder);
+
+            drbdLoadedInfos.add(new JLabel(
+                        Tools.getString("Dialog.ClusterHbChangePasswd.CheckingDrbd")));
+            drbdLoadButtons.add(new MyButton(
+                        Tools.getString("Dialog.ClusterHbChangePasswd.LoadDrbdButton")));
+            drbdLoadButtons.get(i).setVisible(false);
+
+            drbdLoadButtons.get(i).addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(
+                            new Runnable() {
+                                public void run() {
+                                    drbdLoadButtons.get(index).setVisible(false);
+                                    DRBD.load(host);
+                                    if (host.isDrbdUpgraded()) {
+                                        DRBD.adjust(host, "all");
+                                    }
+                                    checkCluster();
+                                }
+                            }
+                        );
+                        thread.start();
+                    }
+                });
+
+            pane.add(drbdLoadedInfos.get(i));
+            pane.add(drbdLoadButtons.get(i));
+
+            hbStartedInfos.add(new JLabel(
+                        Tools.getString(
+                                "Dialog.ClusterHbChangePasswd.CheckingHb")));
+            hbStartButtons.add(new MyButton(
+                        Tools.getString(
+                                "Dialog.ClusterHbChangePasswd.StartHbButton")));
+            hbStartButtons.get(i).setVisible(false);
+
+            hbStartButtons.get(i).addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(
+                            new Runnable() {
+                                public void run() {
+                                    hbStartButtons.get(index).setVisible(false);
+                                    Heartbeat.start(host);
+                                    checkCluster();
+                                }
+                            }
+                        );
+                        thread.start();
+                    }
+                });
+
+            pane.add(hbStartedInfos.get(i));
+            pane.add(hbStartButtons.get(i));
+
+            hbStatusInfos.add(new JLabel(
+                    Tools.getString(
+                            "Dialog.ClusterHbChangePasswd.CheckingHbStatus")));
+            enterPasswdButton.add(new MyButton(
+                    Tools.getString(
+                        "Dialog.ClusterHbChangePasswd.EnterPasswordButton")));
+            enterPasswdButton.get(i).setVisible(false);
+
+            enterPasswdButton.get(i).addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(
+                            new Runnable() {
+                                public void run() {
+                                    enterPasswdButton.get(index).setVisible(false);
+                                    changeHbPasswordOnHost = host;
+                                    ((MyButton) buttonClass(
+                                                    nextButton())).pressButton();
+                                }
+                            }
+                        );
+                        thread.start();
+                    }
+                });
+
+            pane.add(hbStatusInfos.get(i));
+            pane.add(enterPasswdButton.get(i));
+
+            i++;
+            SpringUtilities.makeCompactGrid(pane, 3, 2,  //rows, cols
+                                                  1, 1,  //initX, initY
+                                                  1, 0); //xPad, yPad
+            mainPanel.add(pane);
+        }
+        return new JScrollPane(mainPanel);
+    }
+}

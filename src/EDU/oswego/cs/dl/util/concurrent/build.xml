@@ -1,0 +1,65 @@
+ 
+<!-- Build Script provided by Travell Perkins, tlperkins@dev.java.net with improvements by Mike.Miller@jda.com -->
+
+<project name="Concurrent by Doug Lea" default="help" basedir=".">
+
+<property name="src"      location="src/EDU/oswego/cs/dl/util/concurrent"/>
+<property name="src.path" value="${basedir}/src"/>
+<property name="docs"     value="${basedir}/docs"/>
+
+<target name="help">
+	<echo message="To build concurrent.jar which contains the core library and misc classes: ant dist"/>
+	<echo message="To clean the build created files: ant clean"/>
+</target>
+
+
+<target name="clean">
+	<delete dir="build"/>
+	<delete dir="lib"/>
+	<delete dir="src"/>
+</target>
+
+<target name="init">
+	<mkdir dir="build"/>
+	<mkdir dir="lib"/>
+	<mkdir dir="${src}"/>
+	<mkdir dir="${src}/misc"/>
+	<mkdir dir="${docs}"/>
+</target>
+
+
+<target name="setup.packages" depends="init">
+	<copy toDir="${src}" flatten="true">
+            <fileset dir=".">
+                <include name="*.java"/>
+            </fileset>
+        </copy>
+	<copy toDir="${src}/misc" flatten="true">
+            <fileset dir="misc">
+                <include name="*.java"/>
+            </fileset>
+        </copy>
+</target>
+
+<target name="compile" depends="setup.packages">
+        <javac srcdir="src" destdir="build" optimize="true"/>
+</target>
+
+<target name="dist" depends="compile">
+	<jar jarfile="lib/concurrent.jar">
+            <fileset dir="build"/>
+        </jar>
+</target>
+
+
+<target name="javadoc" depends="init">
+    <delete includeEmptyDirs="true" quiet="true">
+        <fileset dir="${src}/docs" />
+    </delete>
+
+    <mkdir dir="${docs}" />
+
+    <javadoc maxmemory="256m" packagenames="EDU.oswego.*" sourcepath="${src.path}" destdir="${docs}" defaultexcludes="yes">
+    </javadoc>
+</target>
+</project>

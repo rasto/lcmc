@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+
+  @(#)package.html
+
+ Copyright © 2003 The Regents of the University of California. All Rights Reserved. Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice, this paragraph and the following two paragraphs appear in all copies. This software program and documentation are copyrighted by The Regents of the University of California ("The University of California").
+
+THE SOFTWARE PROGRAM AND DOCUMENTATION ARE SUPPLIED "AS IS," WITHOUT ANY ACCOMPANYING SERVICES FROM THE UNIVERSITY OF CALFORNIA. FURTHERMORE, THE UNIVERSITY OF CALIFORNIA DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE UNINTERRUPTED OR ERROR-FREE. THE END-USER UNDERSTANDS THAT THE PROGRAM WAS DEVELOPED FOR RESEARCH PURPOSES AND IS ADVISED NOT TO RELY EXCLUSIVELY ON THE PROGRAM FOR ANY REASON.
+
+IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+-->
+</head>
+<body>
+
+Implementations of a notion of graph equivalence for blockmodeling, and a mechanism for collapsing blocks.
+<P/>
+The definition of "equivalence" used here is <b>different from</b> the equivalence functions defined
+between graphs. This equivalence refers to the network measure forms of equivalence used for blockmodeling. 
+In blockmodeling, groups of vertices are clustered together by similarity (as if "blocked" together on the
+diagonal of a matrix). 
+<p/>
+This implementation provides:
+<dl>
+<dt>{@link EquivalenceAlgorithm EquivalenceAlgorithm}</dt>
+<dd>An interface for an algorithm that returns an EquivalenceRelation.</dd>
+<dt>{@link EquivalenceRelation EquivalenceRelation}</dt>
+<dd>A class that represents several mutually-exclusive partitions of a set. The object is constructed with a Set of Sets; the 
+members of each set are all vertices from the graph. The ER needn't cover all vertices; it contains a funtion called
+"getSingletons" that returns vertices that are not equivalent to any other vertex.</dd>
+<dt>{@link StructurallyEquivalent StructurallyEquivalent}</dt>
+<dd>An algorithm that finds sets of vertices that are structurally equivalent. In order for
+two vertices <i>i</i> and <i>j</i> to be structurally equivalent, the set of <i>i</i>'s
+neighbors must be identical to the set of <i>j</i>'s neighbors, with the exception of <i>i</i> and
+<i>j</i> themselves. (In those cases, a directed edge may join <i>i</i> to <i>j</i> only if another
+directed edge runs the other way.)
+<dt>{@link GraphCollapser GraphCollapser}</dt>
+<dd>Runs through an EquivalenceRelation, replacing all the vertices in each set of the relation
+with one vertex of type {@link GraphCollapser.CollapsedVertex GraphCollapser.CollapsedVertex}. 
+It also replaces all the edges from 
+each vertex to the graph with a {@link GraphCollapser.CollapsedEdge GraphCollapser.CollapsedEdge}. 
+(See the class documentation to see 
+how this is done.)</dd>
+<dt>{@link BipartiteGraphCollapser BipartiteGraphCollapser}</dt>
+<dd>Extends the GraphCollapser to work for BipartiteGraphs.</dd>
+</dl> 
+
+<p/>
+</body>
+</html>

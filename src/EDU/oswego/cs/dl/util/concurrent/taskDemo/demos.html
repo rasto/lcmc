@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+ <head>
+  <title>Task framework demo programs</title>
+ </head>
+
+ <body bgcolor="#ffffee" vlink="#0000aa" link="#cc0000">
+
+  <h1>Task framework demo programs</h1>
+
+  The programs in this directory include ones that I've used to test
+  and experiment with the task framework. You may also find
+  them useful as demonstrations of various constructions and
+  techniques that can be used with Tasks. However, most of
+  these programs are not themselves particularly useful, and
+  have not been constructed or documented with any concern for reuse
+  or extensibility. They are not properly packaged (i.e., they
+  do not declare to be in any package). They can be compiled
+  via: <code>javac *.java</code>
+  <p>
+   These programs are intended to show interesting variations in
+   techniques, and do not necessarily demonstrate optimal performance.
+   But some of the programs have been adapted from other common demo
+   and benchmark programs used in parallel processing packages. To
+   make comparisons with them fairer, I've usually tried to keep
+   faithful to original quirks. (In fact a few were constructed by
+   taking original C code and mangling it until javac declared that it
+   was legal java code :-)
+
+   <p>
+  <p>
+   All of the programs are run by:
+  <pre>java Prog #threads [any other arguments]
+  </pre>
+  where <code>#threads</code> is the number of threads to establish in
+  a TaskGroupRunner that runs the tasks. All of the programs print out
+  ThreadGroup.stats(), normally at the ends of their runs.  Some of
+  the programs do not bother printing out any further results.  Some
+  programs, at some parameter settings deal with huge arrays and
+  matrices that require a lot of memory, so you might need to use
+  <code>-Xmx</code> switches; for example <code>-Xmx64m</code> to use
+  a maximum of 64Mbytes of memory. 
+  
+  <h2>Contents</h2>
+
+  <dl>
+   <dt><a href="Fib.java">Fib</a> #threads number [sequential-threshold]
+   <dd>A fibonacci program similar to the one listed in the 
+    documentation for the Task
+    class. Invoke with an number to compute the fibonacci number
+    for. For example <code>java Fib 2 35</code> computes the 35th
+    fibonacci number with two threads. The optional sequential
+    threshold value controls the argument size under which it
+    uses a sequential version of fib (default is 0, meaning it
+    never does). See also <a href="FibVCB.java">FibVCB</a>, a
+    callback-based version with same usage parameters.
+    <p>
+
+   <dt><a href="MatrixMultiply.java">MatrixMultiply</a> #threads matrix-size granularity
+   <dd>A parallel divide-and-conquer matrix multiplication.
+    The matrix size must be a power of two. The granularity
+    controls the matrix size under which it stops recursively generating
+    parallel tasks and performs a sequential multiply. It must
+    also be a power of two and be at least 2. Default if not given is 16.
+    <p>
+
+   <dt><a href="Jacobi.java">Jacobi</a> #threads matrix-size
+   max-iterations granularity <dd> Performs Jacobi iteration of a mesh
+   of matrix-size for either max-iterations or until converged. For
+   demonstration, it is just applied to a square matrix of side
+   matrix-size with all zeroes in the interior and all ones along
+   edges. Default granularity if not given is 256 cells.  See also <a
+   href="BarrierJacobi.java">BarrierJacobi</a>, a different
+   implementation using cyclic barriers (but not Tasks).  It takes the
+   same parameters except there is no first #threads argument.
+    <p>
+
+   <dt><a href="Heat.java">Heat</a> #threads 0-4
+   <dd>A standard parallel processing benchmark program that
+    simulates heat diffusion across a mesh. 
+    The argument
+    between 0 and 4 just selects among sets of parameter settings
+    that you can find more about by reading the code.
+    <p>
+
+   <dt><a href="LU.java">LU</a> #threads matrix-size #runs
+   <dd>LU matrix decomposition of randomly filled matrix. 
+    The matrix size must be
+    a power of two, and at least 16. A granularity constant
+    of 16 is built-in as a compile-time final constant.
+    The optional #runs parameter optionally repeats the
+    compuation on a new matrix.
+    <p>
+
+
+   <dt><a href="Integrate.java">Integrate</a> #threads low high e
+   <dd>Computes integrals using recursive Gaussian Quadrature.  A
+   sample function to integrate (the sum of <code>(2*i-1)*power(x,
+   (2*i-1))</code>) for odd values of i up through e) is
+   pre-loaded. Call with lower and upper bounds. The <code>e</code>
+   value is a parameter of the function. Higher values cause the
+   function to both be slower to compute and take more iterations
+   (subdivisions) for its integral to converge.  If not given, it
+   defaults to 5.  For example, one reasonable set of test parameters
+   is: <code> java Integrate 4 1 48 5</code>.
+    <p>
+
+   <dt><a href="MSort.java">MSort</a> #threads input-size
+   <dd>Performs a parallel merge/quick sort of input-size
+    random integers.
+    <p>
+
+   <dt><a href="Microscope.java">Microscope</a> #threads
+   <dd>An adaptation of the <a
+   href="http://gee.cs.oswego.edu/dl/applets/micro.html">
+   Microscope</a> game. It uses tasks
+    in a parallel exhaustive best-move finder with an adjustable
+    look-ahead level. (Warning: because of the large fan-out of moves in
+    this game, levels greater than 4 are still very slow.)
+    By default, it is in Demo mode, where it just plays against
+    itself until one side wins. If a second argument is given,
+    it is interpreted as the level to play at, upon which it starts
+    automatically and exits automatically when the game is over.
+    <p>
+
+   <dt><a href="NQueens.java">NQueens</a> #threads board-size
+   <dd>Finds a placement of N queens that do not attack each other for
+   a given NxN board size (where the board size must be at least
+   4). Since there are multiple solutions, the outcome is
+   nondeterminstic when more than one thread is used. Results and
+   timings may vary across runs.
+    <p>
+
+   <dt><a href="BufferTasks.java">BufferTasks</a> #threads
+   <dd>A demo showing that you can, but probably shouldn't, use
+    Tasks for classic producer-consumer programs. It sets up varying
+    number of producer and consumer tasks, each operating on
+    selected buffer sizes. If any producer cannot put, or consumer
+    cannot take, it creates a whole new task to take over where
+    it left off, starts it, and terminates. While this process
+    cannot infinitely livelock, it can come pretty close.
+    
+
+  </dl>
+
+  <hr>
+  <address><A HREF="http://gee.cs.oswego.edu/dl">Doug Lea</A></address>
+  <!-- Created: Wed Jan  6 19:50:55 EST 1999 -->
+  <!-- hhmts start -->
+Last modified: Tue Jan 18 07:12:03 EST 2000
+<!-- hhmts end -->
+ </body>
+</html>
+<!-- Keep this comment at the end of the file
+Local variables:
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:1
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

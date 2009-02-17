@@ -1,0 +1,324 @@
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+<TITLE></TITLE>
+</HEAD>
+<BODY>
+<P>Interfaces for compact, extensible, modular and performant histogramming functionality. 
+</P>
+<h1><a name="Overview"></a>Getting Started</h1>
+<h2>1. Overview</h2>
+Aida itself offers the histogramming features of HTL and HBOOK, the <em>de-facto</em> 
+standard for histogramming for many years. It also offers a number of useful extensions, 
+with an object-oriented approach. These features include the following: 
+<p></p>
+<ul>
+  <li>creating and filling of 1D, 2D (and profile histograms, in the future)</li>
+  <li>computation of statistics such as the mean, rms, etc. of a histogram</li>
+  <li>support for operations between histograms (in the future)</li>
+  <li>browsing of and access to characteristics of individual histograms</li>
+</ul>
+<p> File-based I/O can be achieved through the standard Java built-in serialization 
+  mechanism. All classes implement the {@link java.io.Serializable} interface. 
+  However, the toolkit is entirely decoupled from advanced I/O and visualisation 
+  techniques. It provides data structures and algorithms only. 
+<p> This toolkit borrows many concepts from HBOOK and the CERN <a href="http://wwwinfo.cern.ch/asd/lhc++/HTL"> 
+  HTL</a> package (C++) largely written by Savrak Sar.
+<p> The definition of an abstract histogram interface allows functionality that 
+  is provided by external packages, such as plotting or fitting, to be decoupled 
+  from the actual implementation of the histogram. This feature paves the way 
+  for co-existence of different histogram packages that conform to the abstract 
+  interface. </p>
+<p>A reference implementation of the interfaces is provided by package {@link 
+  hep.aida.ref}. </p>
+<h2>2. AIDA at a glance</h2>
+<h3>Fixed-width histogram</h3>
+<p>The following code snippet demonstrates example usage: </p>
+<h4> 
+  <table>
+      <td class="PRE"> 
+        <pre>
+ IHistogram1D h1 = new Histogram1D("my histo 1",10, -2, +2); // 10 bins, min=-2, max=2<br> IHistogram2D h2 = new Histogram2D("my histo 2",10, -2, +2,    5, -2, +2);
+ IHistogram2D h3 = new Histogram3D("my histo 3",10, -2, +2,    5, -2, +2,    3, -2, +2);
+
+ // equivalent
+ // IHistogram1D h1 = new Histogram1D("my histo 1",new FixedAxis(10, -2, +2)); <br> // IHistogram2D h2 = new Histogram2D("my histo 2",new FixedAxis(10, -2, +2),new FixedAxis(5, -2, +2));<br><br> // your favourite distribution goes here
+ cern.jet.random.AbstractDistribution gauss = new cern.jet.random.Normal(0,1,new cern.jet.random.engine.MersenneTwister());
+<br> for (int i=0; i &lt; 10000; i++) {    <br>    h1.{@link hep.aida.IHistogram1D#fill fill}(gauss.nextDouble());
+    h2.{@link hep.aida.IHistogram2D#fill fill}(gauss.nextDouble(),gauss.nextDouble());
+    h3.{@link hep.aida.IHistogram3D#fill fill}(gauss.nextDouble(),gauss.nextDouble(),gauss.nextDouble());
+ }
+
+ System.out.println(h1);
+ System.out.println(h2);
+ System.out.println(h3);
+ rms=h1.rms();
+ sum=h1.sumBinHeights();
+ ...</pre>
+      </td>
+  </table>
+</h4>
+<h3>Variable-width histogram</h3>
+<p>The following code snippet demonstrates example usage: </p>
+<h4> 
+  <table>
+      <td class="PRE"> 
+        <pre>
+ double[] xedges = { -5, -1, 0, 1, 5 };
+ double[] yedges = { -5, -1, 0.2, 0, 0.2, 1, 5 };
+ double[] zedges = { -5, 0, 7 };
+ IHistogram1D h1 = new Histogram1D("my histo 1",xedges); //<br> IHistogram2D h2 = new Histogram2D("my histo 2",xedges,yedges);
+ IHistogram2D h3 = new Histogram3D("my histo 3",xedges,yedges,zedges);
+
+ // equivalent
+ // IHistogram1D h1 = new Histogram1D("my histo 1",new VariableAxis(xedges)); <br> // IHistogram2D h2 = new Histogram2D("my histo 2",new VariableAxis(xedges),new VariableAxis(yedges));<br><br> // your favourite distribution goes here
+ cern.jet.random.AbstractDistribution gauss = new cern.jet.random.Normal(0,1,new cern.jet.random.engine.MersenneTwister());
+<br> for (int i=0; i &lt; 10000; i++) {    <br>    h1.{@link hep.aida.IHistogram1D#fill fill}(gauss.nextDouble());
+    h2.{@link hep.aida.IHistogram2D#fill fill}(gauss.nextDouble(),gauss.nextDouble());
+    h3.{@link hep.aida.IHistogram3D#fill fill}(gauss.nextDouble(),gauss.nextDouble(),gauss.nextDouble());
+ }
+
+ System.out.println(h1);
+ System.out.println(h2);
+ System.out.println(h3);
+ rms=h1.rms();
+ sum=h1.sumBinHeights();
+ ...</pre>
+      </td>
+  </table>
+</h4>
+<p>Here are some example histograms, as rendered by <a href="http://www-sldnt.slac.stanford.edu/jasweb/">Java 
+  Analysis Studio</a>. </p>
+<table width="75%" border="0">
+  <tr>
+    <td valign="bottom"><img 
+  src="ref/doc-files/aida1.gif" width="322" height="230"></td>
+    <td valign="bottom"><img 
+  src="ref/doc-files/aida2.gif" width="316" height="270"></td>
+  </tr>
+</table>
+<p>And here is an example output of {@link hep.aida.ref.Converter#toString(IHistogram2D)}. 
+</p>
+<blockquote style="MARGIN-RIGHT: 0px"> 
+  <table>
+    <td class="PRE"> 
+        <pre>
+my histo 2:
+&nbsp;&nbsp;&nbsp;Entries=5000, ExtraEntries=0
+&nbsp;&nbsp;&nbsp;MeanX=4.9838, RmsX=NaN
+&nbsp;&nbsp;&nbsp;MeanY=2.5304, RmsY=NaN
+&nbsp;&nbsp;&nbsp;xAxis: Bins=11, Min=0, Max=11<br>&nbsp;&nbsp;&nbsp;yAxis: Bins=6, Min=0, Max=6
+Heights:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| X
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 0   1   2   3   4   5   6   7   8   9   10  | Sum 
+----------------------------------------------------------
+Y 5   |  30  53  51  52  57  39  65  61  55  49  22 |  534
+&nbsp;&nbsp;4   |  43 106 112  96  92  94 107  98  98 110  47 | 1003
+&nbsp;&nbsp;3   |  39 134  87  93 102 103 110  90 114  98  51 | 1021
+&nbsp;&nbsp;2   |  44  81 113  96 101  86 109  83 111  93  42 |  959
+&nbsp;&nbsp;1   |  54  94 103  99 115  92  98  97 103  90  44 |  989
+&nbsp;&nbsp;0   |  24  54  52  44  42  56  46  47  56  53  20 |  494
+----------------------------------------------------------
+&nbsp;&nbsp;Sum | 234 522 518 480 509 470 535 476 537 493 226 |     
+</pre>
+    </td>
+  </table>
+</blockquote>
+<p>And <a href="doc-files/hist3d.txt">here</a> is a sample 3d histogram output.</p>
+<h2>3. Histograms</h2>
+<h3>3.1 Axes</h3>
+<p>An <i>axis</i> ({@link hep.aida.IAxis}) describes how one dimension of the problem 
+  space is divided into intervals. Consider the case of a 10 bin histogram in 
+  the range <tt>[0,100]</tt>. An axis object containing the number of bins 
+  and the interval limits will describe completely how we divide such an interval: 
+  a set of 10 sub-intervals of equal width. This is termed a {@link hep.aida.ref.FixedAxis} 
+  and can be constructed as follows </p>
+<table>
+  <td class="PRE"> 
+      <pre>
+IAxis axis = new FixedAxis(10, 0.0, 100.0); 
+</pre>
+  </td>
+</table>
+It may be required to work with an histogram over the same range as the example 
+above, but with bins of variable widths. In this case, an axis containing the 
+bin edges will describe completely how the interval <tt>[0,100]</tt> is divided. 
+Such an axis is termed a {@link hep.aida.ref.VariableAxis} and can be constructed 
+as follows 
+<table>
+  <td class="PRE"> 
+      <pre>
+double[] edges = { 0.0, 10.0, 40.0, 49.0, 50.0, 51.0, 60.0, 100.0 };
+IAxis axis = new VariableAxis(edges); 
+</pre>
+  </td>
+</table>
+An <tt>n</tt>-dimensional histogram thus contains <tt>n</tt> axes, one for each 
+dimension. The only concern of an axis is to associate any ordered 1D space with 
+a discrete numbered space. Thus it associates an interval to an integer. Hence, 
+an axis knows about the width of the intervals and their lower point/bound or 
+upper point/bound. An axis can be asked for such information as follows: 
+<table>
+    <td class="PRE"> 
+      <pre>
+IAxis axis = new FixedAxis(2, 0.0, 20.0); // 2 bins, min=0, max=20<br>... 
+axis.{@link hep.aida.IAxis#bins bins()};          // Number of in-range bins (excluding underflow and overflow bins) 
+axis.{@link hep.aida.IAxis#binLowerEdge binLowerEdge(i)}; // and the lower edge of bin i
+axis.{@link hep.aida.IAxis#binWidth binWidth(i)};     // and its width
+axis.{@link hep.aida.IAxis#binUpperEdge binUpperEdge(i)}; // and its upper edge
+double point = 1.23;
+int binIndex = axis.{@link hep.aida.Iaxis#coordToIndex coordToIndex(point)}; // Obtain index of bin the point falls into (maps to)
+</pre>
+  </td>
+</table>
+<p> In this package, a histogram delegates to its axes the task of locating a 
+  bin. In other words, information about the lower and upper edges of a bin or 
+  the width of a given bin are obtained from the corresponding axis. This is shown 
+  in the following code fragment, which demonstrates how the lower and upper edges 
+  and width of a given bin can be obtained. 
+<table>
+  <tr> 
+    <td class="PRE"> 
+      <pre>
+IHistogram1D histo = new Histogram1D("Histo1D", 10, 0.0, 100.0 ); 
+... 
+histo.{@link hep.aida.IHistogram1D#xAxis xAxis()}.bins()           // Obtain the number of bins (excluding underflow and overflow bins)
+histo.xAxis().binLowerEdge(i)  // and the lower edge of bin i
+histo.xAxis().binWidth(i)      // and its width
+histo.xAxis().binUpperEdge(i)  // and its upper edge
+</pre>
+    </td>
+  </tr>
+</table>
+<p>An axis always sucessfully maps any arbitrary point drawn from the universe 
+  <tt>[-infinity,+infinity]</tt> to a bin index, because it implicitly defines 
+  an additional <i>underflow</i> and <i>overflow</i> bin, both together called 
+  <i>extra bins</i>. </p>
+<table>
+  <td class="LISTING"> 
+      <pre>
+ IHistogram2D h = new Histogram2D(new FixedAxis(2, 0.0, 100.0), new FixedAxis(2, 0.0, 100.0), ...);
+
+	   y ^                          i ... in-range bin, e .. extra bins
+	     |                           
+	+inf |                           
+	     |   e | e | e | e           
+	 100 -  ---------------
+	     |   e | i | i | e          --> in-range == [0,100]<sup>2</sup>
+	     |  ---------------         --> universe == [-infinity,+infinity]<sup>2</sup>
+	     |   e | i | i | e          --> extra bins == universe - inrange
+	   0 -  ---------------         
+	     |   e | e | e | e          
+	 -inf|  
+	      -----|-------|------> x
+	      -inf 0      100   +inf
+</pre>
+  </td>
+</table>
+<p>For example if an axis is defined to be <tt>new FixedAxis(2, 0.0, 20.0)</tt>, 
+  it has 2 in-range bins plus one for underflow and one for overflow. <tt>axis.bins()==2</tt>. 
+  Its boundaries are <tt>[Double.NEGATIVE_INFINITY,0.0), [0.0, 10.0), [10.0, 20.0), 
+  [20.0, Double.POSITIVE_INFINITY]</tt>. As a consequence point -5.0 maps to bin 
+  index <tt>IHistogram.UNDERFLOW</tt>, point 5.0 maps to bin index 0, 15.0 maps 
+  to bin index 1 and 25.0 maps to bin index <tt>IHistogram.OVERFLOW</tt>. </p>
+<p> As a further example, consider the following case: <tt>new VariableAxis(new 
+  double[] { 10.0, 20.0 })</tt>. The axis has 1 in-range bin: <tt>axis.bins()==1</tt>. 
+  Its boundaries are <tt>[Double.NEGATIVE_INFINITY,10.0), [10.0, 20.0), [20.0, 
+  Double.POSITIVE_INFINITY]</tt>. Point 5.0 maps to bin index <tt>IHistogram.UNDERFLOW</tt>, 
+  point 15.0 maps to bin index 0 and 25.0 maps to bin index <tt>IHistogram.OVERFLOW</tt>.
+<p> As can be seen, underflow bins always have an index of <tt>IHistogram.UNDERFLOW</tt>, 
+  whereas overflow outlier bins always have an index of <tt>IHistogram.OVERFLOW</tt>. 
+<h3>3.2 Bins</h3>
+<p> Bins themselves contain information about the data filled into them. They 
+  can be asked for various descriptive statistical measures, such as the minimum, 
+  maximum, size, mean, rms, variance, etc. 
+<p> Note that bins (of any kind) only know about their contents. They do not know 
+  where they are are located in the histogram to which they belong, nor about 
+  their widths or bounds - this information is stored in the axis to which they 
+  belong, which also defines the bin layout within a histogram. 
+<h2>4. Advanced Histogramming</h2>
+TODO. 
+<h1><a name="Comparison"></a>Comparison with the old AIDA interfaces</h1>
+<h2></h2>
+<P>A proposed simpler alternative to the current hep.aida.flat classes.</P>
+<P>The classes in this directory have been proposed by Mark Donselmann, Wolfgang 
+Hoschek and Tony Johnson as a simpler, easier to use alternative to the classes 
+orignally proposed as the AIDA standard. </P>
+<P>Our goals were:</P>
+<OL>
+  <LI>Eliminate methods that are primarily for developers 
+  writing display packages, they should not be complicating the public user 
+  interfaces. 
+  <LI>Reduce unnecessary duplication which makes the 
+  interfaces very long without adding any additional functionality or 
+  ease-of-use 
+  <LI> Eliminate methods that are hard to use (we 
+  could not think of any occasion where the 8 separate methods for getting the 2D 
+  overflows bins would be convenient for anyone).</LI></OL>
+Note that 
+ease of implementation was <STRONG>NOT </STRONG>a primary goal. 
+Following these goals we were able to reduce the number of methods as 
+follows:
+
+<TABLE border=1 cellPadding=1 cellSpacing=1>
+  
+  <TR>
+    <TD>OLD</TD>
+    <TD># methods</TD>
+    <TD>NEW</TD>
+    <TD>#methods</TD></TR>
+  <TR>
+    <TD>IHistogram1D</TD>
+    <TD>45</TD>
+    <TD>IHistogram</TD>
+    <TD>
+      <DIV><FONT face=Arial size=2>9</FONT></DIV></TD></TR>
+  <TR>
+    <TD>IHistogram2D</TD>
+    <TD>89</TD>
+    <TD>IHistogram1D</TD>
+    <TD>9 (+ inherited from IHistogram)</TD></TR>
+  <TR>
+    <TD></TD>
+    <TD></TD>
+    <TD>IHistogram2D</TD>
+    <TD>23(+9 inherited from IHistogram)</TD></TR>
+  <TR>
+    <TD></TD>
+    <TD></TD>
+    <TD>Axis</TD>
+    <TD>8</TD></TR></TABLE>
+<DIV></DIV>The primary differences between the old classes and the new classes 
+are: 
+<OL>
+  <LI>Introduction of an IAxis class, to describe the X 
+  axis for 1D histograms, and the X and Y axes of 2D histograms. We understand 
+  that the desire is to keep the interfaces as flat as possible, but feel this 
+  introduces a significant improvement in terms of reducing complexity, and is 
+  an abstraction that is easy for even the most object-phobic physicist to 
+  grasp. 
+  <LI>We define constants OVERFLOW and UNDERFLOW to 
+  represent the underflow and overflow bins on an axis. This eliminates the need 
+  for special routines that deal with overflows/underflows. It also improves the 
+  interface since it exposes the full set of overflow/underflow bins for 2D 
+  histograms. Under the previous proposal it was necessary for the 
+  implementation to keep the full set of overflow/underflow bins, in order to be 
+  able to do the projections correctly, but there was no way for the end-user to 
+  access them (they were restricted to the 8 overflow bins N,E,S,W,NE,SE,SW,NW). 
+
+  <LI>We eliminated the methods which return information 
+  about bins based on coordinate (as opposed to index). We felt these functions 
+  were rarely used, were in some cases ambiguous (for example when 
+  projections/slices were specified in terms of coordinates what exactly was the 
+  meaning) and the same functionality with less ambiguity was available by 
+  calling coordToIndex() first.</LI></OL>
+<P>A UML diagram of the classes is given below:</P>
+<P><U><FONT color=#0000ff><IMG 
+src="doc-files/simpleaida.png"></FONT></U></P>       
+               
+             
+              
+           
+ 
+</BODY>
+</HTML>

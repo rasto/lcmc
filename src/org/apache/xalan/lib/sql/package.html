@@ -1,0 +1,89 @@
+<!--
+ * Copyright 2000-2004 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<!-- $Id: package.html,v 1.11 2004/02/17 16:44:00 minchau Exp $ -->
+<html>
+  <title>Xalan SQL Extension</title>
+  <body>
+<p>Provides extension functions for connecting to a JDBC data source, executing a query,
+and working incrementally through a "streamable" result set. Streaming (reuse of a single row node to traverse the result set) is the default mode of operation. If you want unlimited access to the entire result set, you can cache the query result set (1 row node for each row in the result set).</p>
+<p><em>If you use streaming mode (the default), you can only access row elements one at a time moving forward through the result set. The use of XPath expressions in your stylesheet, for example, that attempt to return nodes from the result set in any other manner may produce unpredictable results.</em></p>   
+    <p>XConnection provides three extension functions that you can use in your stylesheet.</p>
+    <ol>
+      <li><p>new() -- Use one of the XConnection constructors to connect to a data source, and return an XConnection
+       object.</p></li>
+      <li><p>query() -- Use the XConnection object query() method to return a "streamable" result set in the form of a row-set
+       node. Work your way through the row-set one row at a time. The same row element is used over and over again, so you can
+       begin "transforming" the row-set before the entire result set has been returned.</p></li>
+      <li>close() -- Use the XConnection object close() method to terminate the connection.</li>      
+    </ol>
+    <p>The query() extension function returns a Document node that contains (as needed) an array of column-header elements, 
+    a single row element that is used repeatedly, and an array of col elements. Each column-header element (one per column in the
+    row-set) contains an attribute (ColumnAttribute) for each of the column descriptors in the ResultSetMetaData object. 
+    Each col element contains a text node with a textual representation of the value for that column in the current row.</p>
+    <h2>Example</h2>
+    <p>This example displays the result set from a table in a sample InstantDB database.</p>
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                version="1.0"
+                xmlns:sql="org.apache.xalan.lib.sql.XConnection"
+                extension-element-prefixes="sql"&gt;
+  &lt;xsl:output method="html" indent="yes"/&gt;
+  &lt;xsl:param name="query" select="'SELECT * FROM import1'"/&gt;
+ 
+  &lt;xsl:template match="/"&gt;
+    &lt;!-- 1. Make the connection --&gt;
+    &lt;xsl:variable name="products"
+                  select="sql:new('org.enhydra.instantdb.jdbc.idbDriver',
+                                'jdbc:idb:D:\instantdb\Examples\sample.prp')"/&gt;
+    &lt;HTML&gt;
+      &lt;HEAD&gt;
+      &lt;/HEAD&gt;
+      &lt;BODY&gt;
+        &lt;TABLE border="1"&gt;
+        &lt;!--2. Execute the query --&gt;
+        &lt;xsl:variable name="table" select='sql:query($products, $query)'/&gt;
+          &lt;TR&gt;
+          &lt;!-- Get column-label attribute from each column-header--&gt;
+          &lt;xsl:for-each select="$table/sql/metadata/column-header"&gt;
+            &lt;TH&gt;&lt;xsl:value-of select="@column-label"/&gt;&lt;/TH&gt;
+          &lt;/xsl:for-each&gt;
+          &lt;/TR&gt;
+          &lt;xsl:apply-templates select="$table/sql/row-set/row"/&gt;
+          &lt;xsl:text&gt;&amp;#10;&lt;/xsl:text&gt;
+        &lt;/TABLE&gt;
+      &lt;/BODY&gt;
+    &lt;/HTML&gt; 
+    &lt;!-- 3. Close the connection --&gt;
+    &lt;xsl:value-of select="sql:close($products)"/&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="row"&gt;
+        &lt;TR&gt;
+          &lt;xsl:apply-templates select="col"/&gt;
+        &lt;/TR&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="col"&gt;
+    &lt;TD&gt;
+      &lt;!-- Here is the column data -->
+      &lt;xsl:value-of select="text()"/>
+    &lt;/TD>
+  &lt;/xsl:template>
+
+&lt;/xsl:stylesheet&gt;
+</pre>    
+ </body>
+</html>

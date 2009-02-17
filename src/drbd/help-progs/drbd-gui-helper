@@ -1,0 +1,911 @@
+#!/usr/bin/perl
+
+# This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH,
+# written by Rasto Levrinc.
+#
+# Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+#
+# DRBD Management Console is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# DRBD Management Console is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with drbd; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+use strict;
+use warnings;
+
+$ENV{LANG}="c";
+$ENV{LANGUAGE}="c";
+$ENV{LC_LANG}="c";
+
+our $DEBUG = 0;
+my $option = shift || die;
+
+if ($option eq "all") {
+	print "net-info\n";
+	get_net_info();
+	print "disk-info\n";
+	get_disk_info();
+	print "filesystems-info\n";
+	get_filesystems_info();
+	print "mount-points-info\n";
+	get_mount_points_info();
+	print "gui-info\n";
+	get_gui_info();
+	print "installation-info\n";
+	get_installation_info();
+} elsif ($option eq "get-net-info") {
+	get_net_info();
+} elsif ($option eq "get-disk-info") {
+	get_disk_info();
+} elsif ($option eq "get-filesystems-info") {
+	get_filesystems_info();
+} elsif ($option eq "get-gui-info") {
+	get_gui_info();
+} elsif ($option eq "save-gui-info") {
+	save_gui_info(@ARGV);
+} elsif ($option eq "get-mount-point-info") {
+	get_mount_points_info();
+} elsif ($option eq "get-drbd-info") {
+	get_drbd_info();
+} elsif ($option eq "get-drbd-events") {
+	get_drbd_events();
+} elsif ($option eq "mgmt") {
+	mgmt(@ARGV);
+} elsif ($option eq "get-mgmt-events") {
+	get_mgmt_events(@ARGV);
+} elsif ($option eq "get-old-style-resources") {
+	get_old_style_resources(@ARGV);
+} elsif ($option eq "get-lsb-resources") {
+	get_lsb_resources(@ARGV);
+} elsif ($option eq "get-drbd-xml") {
+	get_drbd_xml();
+} else {
+	die "unknown command";
+}
+
+sub print_debug {
+	print "$_[0]\n" if $DEBUG;
+}
+
+sub net_info_error {
+	my $error = shift;
+	print STDERR "cannot parse ifconfig: $error\n";
+	exit 1;
+}
+
+# get_net_info()
+#
+# parses ifconfig output and prints out interface, ip and mac address one
+# interface per line. "lo" interface is skipped.
+sub get_net_info {
+	my $dev  = "";
+	my $mac  = "";
+	my $ip   = "";
+	my $mask = "";
+	for (`/sbin/ifconfig`) {
+		if (!$dev) {
+			($dev) = /^(\S+)/ or net_info_error("no dev");
+			last if $dev eq "lo";
+			($mac) = /\sHWaddr\s+(\S+)/ or net_info_error("no mac address ($dev)");
+		} else {
+			if (/^\s+inet addr:(\S+).*?\s+Mask:(\S+)/) {
+				$ip = $1;
+				$mask = $2;
+			}
+		}
+		if (/^$/) {
+			if ($dev && $ip && $mac && $mask) {
+				print "$dev $ip $mac $mask\n";
+			}
+			$dev = "";
+		}
+	}
+}
+
+sub disk_info_error {
+	my $error = shift;
+	print STDERR "ERROR: problem getting disk info: $error\n";
+	exit 1;
+}
+
+sub disk_info_warning {
+	my $warning = shift;
+	print STDERR "WARNING: $warning\n";
+}
+
+# get_mount
+#
+# returns hash with block device as a key and mount point with filesystem as
+# value. LVM device name is converted to the /dev/group/name from
+# /dev/group-name. If there is - in the group or name, it is escaped as --, so
+# it is unescaped here. /bin/mount is used rather than cat /proc/mounts,
+# because in the output from /bin/mount is lvm device name always in the same
+# form.
+sub get_mount {
+	my $lvm_devs = shift;
+	my %dev_to_mount;
+	for (`/bin/mount`) {
+		# /dev/md1 on / type xfs (rw)
+		# /dev/mapper/vg00--sepp-sources on /mnt/local-src type xfs (rw)
+		if (m!/dev/(\S+)\s+on\s+(\S+)\s+type\s+(\S+)!) {
+			my ($dev, $mountpoint, $filesystem) = ($1, $2, $3);
+			if ($dev =~ m!^mapper/(.+)!) {
+				# convert mapper/vg00--sepp-sources to vg00-sepp/sources
+				my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
+				if ($group && $name && !$$lvm_devs{"$group/$name"}) {
+					$dev = "$group/$name";
+				}
+			}
+			$dev = "/dev/$dev";
+			print_debug("mount: $dev, $mountpoint, $filesystem");
+			$dev_to_mount{$dev} = "$mountpoint $filesystem";
+		}
+	}
+	return \%dev_to_mount;
+}
+
+# get_lvm
+#
+# returns 4 hashes. One hash that maps lvm group to the physical volume. A hash
+# that maps major and minor kernel numbers to the lvm device name. Major and
+# minor numbers are separated with ":". And a hash that contains block devices
+# that have lvm on top of them.
+sub get_lvm {
+	return ({}, {}, {}, {}) if ! -e "/sbin/pvdisplay";
+
+	# create physical volume to volume group hash
+	my %group_to_pv;
+	for (`/sbin/pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null`) {
+		my ($pv_name, $vg_name) = split;
+		$pv_name =~ s!^/dev/!!;
+		print_debug("pv: $pv_name, $vg_name");
+		$group_to_pv{$vg_name} = $pv_name;
+	}
+
+	my %major_minor_to_dev;
+	my %devs_with_lvm;
+	my %lvm_devs;
+
+	# create major:minor kernel number to device hash
+	for (`/sbin/lvdisplay -C --noheadings -o lv_kernel_major,lv_kernel_minor,vg_name,lv_name 2>/dev/null`) {
+		my ($major, $minor, $group, $name) = split;
+		print_debug("get_lvm: ($major, $minor, $group, $name, $group_to_pv{$group})");
+		$major_minor_to_dev{"$major:$minor"} = "$group/$name";
+		$devs_with_lvm{$group_to_pv{$group}}++;
+		$lvm_devs{"$group/$name"}++;
+
+	}
+	return (\%group_to_pv,
+		\%major_minor_to_dev,
+		\%devs_with_lvm,
+		\%lvm_devs);
+}
+
+# get_raid()
+#
+# returns hash with devices that are in the raid.
+sub get_raid {
+	return if !-e "/proc/mdstat";
+	open MDSTAT, "/proc/mdstat" or disk_info_error("cannot open /proc/mdstat");
+	# md1 : active raid1 sdb2[1] sda2[0]
+	#	   9775488 blocks [2/2] [UU]
+	my %devs_in_raid;
+
+	# create hash with devices that are in the raid.
+	while (<MDSTAT>) {
+		if (/^(md\d+)\s+:\s+(.+)/) {
+			 my $dev = $1;
+			 my ($active, $type, @members) = split /\s+/, $2;
+			 print_debug("get_raid: $dev ($active, $type, @members)");
+			 for my $member (@members) {
+				$member =~ s/\[\d+\]$//;
+				$devs_in_raid{"$member"}++;
+			 }
+		}
+	}
+	return \%devs_in_raid;
+}
+
+sub get_device_mapper_major {
+	my $m = 253;
+	open DM, "/proc/devices" or disk_info_error("cannot open /proc/devices");
+	while (<DM>) {
+		$m = $1 if /^(\d+)\s+device-mapper/;
+	}
+	return $m;
+	close DM;
+}
+
+# get_disk_info()
+#
+# parses /proc/partitions and writes device and size of one block device per
+# line separated by one space. If block device is mounted, mount point and 
+# file system type is attached. 
+# It doesn't show block devices, that are in raid or there is lvm on top of
+# them. In this case only device names of raid or lvm are used.
+sub get_disk_info {
+	my $devs_in_raid = get_raid();
+	my ($group_to_pv, $major_minor_to_dev, $devs_with_lvm, $lvm_devs) = get_lvm();
+	my $dev_to_mount = get_mount($lvm_devs);
+	# read partition table
+	open PT, "/proc/partitions" or disk_info_error("cannot open /proc/partitions");
+	my @raids;
+	my @lvms;
+	my @disks;
+	my @partitions;
+	my @info;
+	my $device_mapper_major = get_device_mapper_major();
+	while (<PT>) {
+		next if /^major / || /^$/; # skip header
+		chomp;
+		my ($major, $minor, $blocks, $name) = split;
+		next if $$devs_with_lvm{$name} || $$devs_in_raid{$name};
+		my $device;
+		if ($major == 3
+		    || $major == 8
+		    || $major == 72
+		    || $major == 202
+		    || $major == 104) { # ide and scsi disks
+		    	# 104 cciss0
+			if ($_ !~ /\d$/) { # whole disk
+				push @disks, $name;
+				next;
+			} elsif ($blocks == 1) { # extended partition
+				next;
+			} else {
+				$device = "/dev/$name";
+			}
+		} elsif ($major == 9) { # raid
+			$device = "/dev/$name";
+		} elsif ($major == $device_mapper_major) {
+			# skipping except lvm devices
+			next if !$$major_minor_to_dev{"$major:$minor"};
+			$device = "/dev/".$$major_minor_to_dev{"$major:$minor"};
+			my $dev = $$major_minor_to_dev{"$major:$minor"};
+			$dev = $name if !$dev;
+			$device = "/dev/".$dev;
+
+		} elsif ($name =~ /^drbd/) {
+			# disk_info_warning("skiping: $_");
+			next;
+		} else {
+			disk_info_warning("unknown partition: $_");
+			next;
+		}
+		my $info = "$device $blocks";
+		$info.= " ".$$dev_to_mount{$device} if $$dev_to_mount{$device};
+		$info.= "\n";
+		push @info, $info;
+	}
+	close PT;
+	
+	print join "", map { $_->[0] } 
+			   sort { 
+			    ($a->[1] =~ /(^\D+)/)[0] cmp ($b->[1]  =~ /(^\D+)/)[0] 
+			  			||
+			    (($a->[1] =~ /(\d+$)/)[0] || 0) <=> (($b->[1]  =~ /(\d+$)/)[0] || 0) 
+			   } map { [$_, /([^\/]+?) /] } @info;
+}
+
+# get_filesystems_info
+#
+# prints available filesystems on this host.
+sub get_filesystems_info {
+        for (`ls /sbin/mkfs.* 2>/dev/null`) {
+                chomp;
+                my ($fs) = /([^\.]+)$/;
+                `modinfo $fs >/dev/null 2>&1 || grep '\\<$fs\\>' /proc/filesystems`;
+                print "$fs\n" if !$?;
+        }
+}
+
+# get_mount_points_info
+# 
+# prints directories in the /mnt directory
+sub get_mount_points_info {
+	my $dir = "/mnt";
+	if (opendir(DIR, $dir)) {
+		print "$dir/$_\n" for (grep { $_ !~ /^\./ && -d "$dir/$_" } readdir(DIR));
+		closedir DIR;
+	}
+}
+
+# get_gui_info()
+#
+sub get_gui_info {
+	if (open FH, "/var/lib/heartbeat/drbdgui.cf") {
+		while (<FH>) {
+			print;
+		}
+		close FH;
+	}
+}
+
+# get_installation_info()
+#
+sub get_installation_info {
+	my $hb_version = `/usr/lib/heartbeat/heartbeat -V 2>&1`;
+	if ($hb_version) {
+		chomp $hb_version;
+		print "hb:$hb_version\n";
+	} else {
+		print "hb:not installed\n";
+	}
+	my $hn = `hostname`;
+	chomp $hn;
+	print "hn:$hn\n";
+}
+
+# save_gui_info()
+#
+sub save_gui_info {
+	if (open FH, ">/var/lib/heartbeat/drbdgui.cf") {
+		for (@ARGV) {
+			print FH $_;
+		}
+		close FH;
+	}
+}
+
+sub get_drbd_events {
+	my $kidpid;
+	my $pid = $$;
+	die "can’t fork: $!" unless defined($kidpid = fork());
+	# TODO: 
+	if ($kidpid) {
+		exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
+	} else {
+		sleep 20;
+		kill("TERM", $pid);
+	}
+}
+
+sub get_drbd_info {
+	my ($version, $api) = `echo|drbdadm help` =~ /Version:\s+(\S+)\s+\(api:(\d+)\)/;
+	if ($version && $api) {
+		print "<drbd-status version=\"$version\" api=\"$api\">\n";
+	} else {
+		print "<drbd-status>unknown</drbd-status>\n";
+		return;
+	}
+	print "	<resources>\n";
+	# since 8.3 drbdadm status can be used
+	my @resources = split /\s+/, `drbdadm sh-resources`; 
+	chomp (my @cstates = `drbdadm cstate all`);
+	chomp (my @roles  = `drbdadm state all || drbdadm role all`);
+	chomp (my @dstates = `drbdadm dstate all`);
+	my @sync_progress;
+	for (my $i = 0; $i<@resources; $i++) {
+		my $res = $resources[$i];
+		my $cs = $cstates[$i];
+		my ($ro1, $ro2) = split /\//, $roles[$i];
+		my ($ds1, $ds2) = split /\//, $dstates[$i];
+
+		print "		<resource res=\"$res\"";
+		print " cs=\"$cs\"";
+		print " ro1=\"$ro1\"";
+		print " ro2=\"$ro2\"";
+		print " ds1=\"$ds1\"";
+		print " ds2=\"$ds2\"";
+
+		if (defined $sync_progress[$i]) {
+			print " synced=\"$sync_progress[$i]\"";
+		} elsif ($cs =~ /^Sync/) {
+			if (open my $proc, "/proc/drbd") {
+				my $index = -1;
+				while (<$proc>) {
+					if (/^\s*(\d+):/) {
+						$index++;
+					} elsif (m!\s+sync'ed:\s+(\d+\.\d+)\%!) {
+						$sync_progress[$index] = $1;
+						if ($i == $index) {
+							print " synced=\"$sync_progress[$i]\"";
+						}
+					}
+				}
+			}
+		}
+		print " />\n";
+	}
+	print "	</resources>\n";
+	print "</drbd-status>\n";
+}
+
+#sub create_hb_conf {
+#	if (!-e '/etc/ha.d/ha.cf') {
+#		print <<CONF;
+#keepalive 1
+#deadtime 10
+#warntime 5
+#initdead 60
+#udpport 694
+#baud 19200
+#serial /dev/ttyS0
+#ucast eth0 10.0.0.20
+#auto_failback off
+#watchdog /dev/watchdog
+#node node-a
+#node node-b
+#CONF
+#	}
+#}
+
+#TODO: sys.path.append is distribution specific...
+sub is_smaller_v {
+	my $v 	   = shift;
+	my $than_v = shift;
+	my @v_parts = split /\./, $v;
+	my @than_v_parts = split /\./, $than_v;
+
+	return 0 if @v_parts != @than_v_parts;
+
+	for (@v_parts) {
+		my $than_v_part = shift @than_v_parts;
+		return 0 if $_ > $than_v_part;
+		return 1 if $_ < $than_v_part;
+	}
+	return 0;
+}
+
+sub mgmt {
+	my $passwd = shift;
+	my $hb_version = `/usr/lib/heartbeat/heartbeat -V`;
+	return if !$hb_version;
+	chomp $hb_version;
+	my $mgmt_connect_cmd;
+	if (is_smaller_v($hb_version, "2.1.0")) {
+		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\")";
+	} else {
+		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", None)";
+	}
+
+	my @args = @_;
+	# TODO python versions
+	system(<<PYTHON);
+/usr/bin/python -c '
+
+import sys, string
+sys.path.append("/usr/lib64/heartbeat-gui")
+sys.path.append("/usr/share/heartbeat-gui")
+sys.path.append("/usr/lib/heartbeat-gui")
+sys.path.append("/usr/lib/heartbeat")
+from pymgmt import *
+
+command = ""
+for arg in sys.argv[1:]:
+	command = command + "\\n"
+	if arg == "..none.." :
+		arg = ""
+	command = command + arg
+command = command.lstrip("\\n")
+ret = $mgmt_connect_cmd
+if ret != 0 :
+	sys.exit(ret)
+ret_str = mgmt_sendmsg(command);
+mgmt_disconnect()
+print ret_str
+' @args
+PYTHON
+	my $ex = $? / 256;
+	exit $ex;
+}
+
+# waits for mgmt events, there is timeout on purpose and it must be restarted.
+sub get_mgmt_events {
+	my $passwd = shift;
+	my $hb_version = `/usr/lib/heartbeat/heartbeat -V`;
+	if (!$hb_version) {
+		return;
+	}
+	chomp $hb_version;
+	
+	my $mgmt_connect_cmd;
+	if (is_smaller_v($hb_version, "2.1.0")) {
+		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\")";
+	} else {
+		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", None)";
+	}
+
+	# TODO python versions
+	my $p = <<PYTHON;
+/usr/bin/python -c '
+
+import sys, string, gobject, thread, time
+sys.path.append("/usr/lib64/heartbeat-gui")
+sys.path.append("/usr/share/heartbeat-gui")
+sys.path.append("/usr/lib/heartbeat-gui")
+sys.path.append("/usr/lib/heartbeat")
+from pymgmt import *
+
+cmds=[
+	"all_nodes", 
+	"active_nodes",
+	"crm_nodes",
+	"hb_config",
+PYTHON
+	if (is_smaller_v($hb_version, "2.1.3")) {
+		$p.='"crm_config",';
+	} else {
+		$p.= <<PYTHON;
+        "crm_config\\nno-quorum-policy",
+        "crm_config\\nsymmetric-cluster",
+        "crm_config\\nstonith-enabled",
+        "crm_config\\nstonith-action",
+        "crm_config\\ndefault-resource-stickiness",
+        "crm_config\\ndefault-resource-failure-stickiness",
+        "crm_config\\nis-managed-default",
+        "crm_config\\ncluster-delay",
+        "crm_config\\nbatch-limit",
+        "crm_config\\ndefault-action-timeout",
+        "crm_config\\nstop-orphan-resources",
+        "crm_config\\nstop-orphan-actions",
+        "crm_config\\nremove-after-stop",
+        "crm_config\\npe-error-series-max",
+        "crm_config\\npe-warn-series-max",
+        "crm_config\\npe-input-series-max",
+        "crm_config\\nstartup-fencing",
+        "crm_config\\nstart-failure-is-fatal",
+        "crm_config\\ndc_deadtime",
+        "crm_config\\ncluster_recheck_interval",
+        "crm_config\\nelection_timeout",
+        "crm_config\\nshutdown_escalation",
+        "crm_config\\ncrmd-integration-timeout",
+        "crm_config\\ncrmd-finalization-timeout",
+PYTHON
+	}
+	$p.= <<PYTHON;
+	"dc",
+
+	"node_config",
+	"running_rsc",
+
+	"all_rsc",
+	"sub_rsc",
+	"rsc_type",
+	"rsc_status",
+	"rsc_attrs",
+	"rsc_metaattrs",
+	"rsc_params",
+	"rsc_full_ops",
+	"rsc_running_on",
+	# "rsc_metadata\\nheartbeat\\ndrbddisk\\nheartbeat",
+
+	"get_cos\\nrsc_location",
+	"get_co\\nrsc_location",
+
+	"get_cos\\nrsc_order",
+	"get_co\\nrsc_order",
+
+	"get_cos\\nrsc_colocation",
+	"get_co\\nrsc_colocation",
+	"crm_metadata\\npengine",
+	"crm_metadata\\ncrmd",
+	 ]
+
+
+host_cmds = {
+		"node_config" 			: 1,
+		"running_rsc" 			: 1,
+		}
+rsc_cmds = {
+		"rsc_type" 			: 1,
+		"rsc_status" 			: 1,
+		"rsc_running_on"		: 1,
+		"rsc_attrs" 			: 1,
+		"rsc_params" 			: 1,
+		"rsc_full_ops" 			: 1,
+		"sub_rsc" 			: 1,
+		"rsc_metadata" 			: 1,
+		"rsc_metaattrs"			: 1,
+		}
+loc_cmds = {
+      		"get_co\\nrsc_location" 	: 1,
+	   }
+ord_cmds = {
+      		"get_co\\nrsc_order" 		: 1,
+	   }
+col_cmds = {
+      		"get_co\\nrsc_colocation" 	: 1,
+	   }
+PYTHON
+
+	if (is_smaller_v($hb_version, "2.1.4")) {
+		$p.= <<PYTHON;
+extra_attrs = {
+      		  "get_co\\nrsc_colocation" 	: "",
+      		  "get_co\\nrsc_order" 		: "",
+	      }
+PYTHON
+	} else {
+		# version => 2.1.4
+		$p.= <<PYTHON;
+extra_attrs = {
+      		  "get_co\\nrsc_colocation" 	: "\\nid\\nfrom\\nto\\nscore\\nfrom_role\\nto_role\\nsymmetrical\\nnode_attribute",
+      		  "get_co\\nrsc_order" 		: "\\nid\\nfrom\\ntype\\nto\\naction\\nto_action\\nscore\\nsymmetrical",
+	      }
+PYTHON
+	}
+
+		$p.= <<PYTHON;
+timeout_func = -1
+
+def timeout_exit() :
+	sys.exit(0);
+
+def on_event(source, condition, event_str) :
+	msg = mgmt_recvmsg()
+	if msg != None :
+		get_status()
+        return True
+
+def sendmsg(cmd) :
+	ret = mgmt_sendmsg(cmd)
+	if ret == None :
+		return "None"
+	while len(ret)>=4 and ret[:4] == "evt:" :
+		# gobject.idle_add(self.on_event, None, None, ret)
+		ret = mgmt_recvmsg()
+	return ret
+
+def get_status() :
+	global timeout_func
+	mutex.acquire();
+	if timeout_func != -1 :
+		gobject.source_remove(timeout_func)
+	ret = "---start---\\n"
+	for cmd in cmds :
+		if host_cmds.has_key(cmd) :
+			for node in nodes :
+				ret += cmd + "<<<>>>" + node + "\\n"
+				ret += sendmsg(cmd + "\\n" + node) + "\\n"
+				ret += ">>>" + cmd + "<<<>>>" + node + "\\n"
+		elif rsc_cmds.has_key(cmd) :
+			for rsc in rscs :
+				ret += cmd + "<<<>>>" + rsc + "\\n"
+				res = sendmsg(cmd + "\\n" + rsc)
+				ret += res + "\\n"
+
+				ret += ">>>" + cmd + "<<<>>>" + rsc + "\\n"
+				if cmd == "sub_rsc" :
+					for r in string.split(res, "\\n")[1:] :
+						rscs.append(r)
+		elif loc_cmds.has_key(cmd) :
+			for loc in locs :
+				tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
+				ret += tcmd + "<<<>>>" + loc + "\\n"
+				ret += sendmsg(cmd + "\\n" + loc) + "\\n"
+				ret += ">>>" + tcmd + "<<<>>>" + loc + "\\n"
+		elif ord_cmds.has_key(cmd) :
+			for ord in ords :
+				tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
+				ret += tcmd + "<<<>>>" + ord + "\\n"
+				ret += sendmsg(cmd + "\\n" + ord + extra_attrs[cmd]) + "\\n"
+				ret += ">>>" + tcmd + "<<<>>>" + ord + "\\n"
+		elif col_cmds.has_key(cmd) :
+			for col in cols :
+				tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
+				ret += tcmd + "<<<>>>" + col + "\\n"
+				ret += sendmsg(cmd + "\\n" + col + extra_attrs[cmd]) + "\\n"
+				ret += ">>>" + tcmd + "<<<>>>" + col + "\\n"
+		else :
+			tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
+			if (string.split(cmd, "\\n")[0] == "get_cos" or 
+			    string.split(cmd, "\\n")[0] == "crm_config" or
+			    string.split(cmd, "\\n")[0] == "crm_metadata") :
+				res = sendmsg(cmd);
+			else :
+				res = sendmsg(cmd + "\\n");
+			if cmd == "all_nodes" and res == "None" :
+				ret += "error" + "\\n"
+				break
+			ret += tcmd + "\\n"
+			ret += res + "\\n"
+			ret += ">>>" + tcmd + "\\n"
+
+			if cmd == "all_nodes" :
+				nodes = string.split(res, "\\n")[1:]
+			elif cmd == "all_rsc" :
+				rscs = string.split(res, "\\n")[1:]
+			elif cmd == "get_cos\\nrsc_location" :
+				locs = string.split(res, "\\n")[1:]
+			elif cmd == "get_cos\\nrsc_order" :
+				ords = string.split(res, "\\n")[1:]
+			elif cmd == "get_cos\\nrsc_colocation" :
+				cols = string.split(res, "\\n")[1:]
+	print ret
+	timeout_func = gobject.timeout_add(20000, timeout_exit)
+	mutex.release();
+	time.sleep(1)
+	mutex.acquire();
+	print "---done---"
+	mutex.release();
+
+mutex = thread.allocate_lock()
+
+ret = $mgmt_connect_cmd
+
+if ret != 0 :
+	sys.exit(ret)
+get_status()
+
+if mgmt_sendmsg("regevt\\nevt:cib_changed") != "ok" :
+	sys.exit(10)
+mgmt_sendmsg("regevt\\nevt:disconnected")
+fd = mgmt_inputfd()
+if fd < 0 :
+	sys.exit(11)
+gobject.io_add_watch(fd, gobject.IO_IN, on_event, None)
+main_loop = gobject.MainLoop ()
+main_loop.run ()
+
+mgmt_disconnect()
+'
+PYTHON
+	system($p);
+	my $ex = $? / 256;
+	#print "$ex\n";
+	exit $ex;
+}
+
+sub get_old_style_resources {
+	my $dir = "/etc/ha.d/resource.d/";
+	for (`ls $dir`) {
+		chomp;
+		print get_ocf_like_xml($_, $dir, "heartbeat");
+	}
+}
+
+sub get_lsb_resources {
+	my $dir = "/etc/init.d/";
+	for (`find $dir -perm -a=x -type f -printf "%f\n"`) {
+		chomp;
+		print get_ocf_like_xml($_, $dir, "lsb");
+	}
+}
+
+
+sub get_ocf_like_xml {
+	my $resource = shift;
+	my $dir      = shift;
+	my $class    = shift;
+	my $xml      = <<XML;
+<!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
+<resource-agent name="$resource" class="$class">
+<version>0.0</version>
+
+<longdesc lang="en">
+$class resource.
+</longdesc>
+<shortdesc lang="en">$dir$resource</shortdesc>
+
+<parameters>
+XML
+	for (1..10) {
+		$xml .= <<XML;
+<parameter name="$_" required="0" unique="0">
+<longdesc lang="en">
+$_
+</longdesc>
+<shortdesc lang="en">$_</shortdesc>
+<content type="string" default="" />
+</parameter>
+XML
+	}
+	$xml .= <<XML;
+</parameters>
+
+</resource-agent>
+XML
+	return $xml;
+}
+
+sub get_drbd_xml {
+	my %missing; # handlers and startup don't come from drbdsetup xml, so
+		     # we parse them out of the man page.
+	my @missing;
+	my $manpage = `zcat /usr/share/man/man5/drbd.conf.5.gz || cat /usr/share/man/man5/drbd.conf.5`;
+	#my $from = "on-io-error";
+	my $from = "";
+
+	for my $section ("global", "handlers", "startup") {
+		my ($part) = $manpage=~/^\\fB$section\\fR$(.*?)\.TP/sm;
+		my @options = $part =~ /\\fB(.*?)\\fR(?!\()/g;
+		push @missing, $section;
+		$missing{$section} = \@options;
+	}
+
+	my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+\\fI|\\fR$).*?(?:\.RS.*?\.RE\n)?)\.TP/msg;
+	my %descs;
+	while (@a) {
+		if ($from && $a[1] ne "on-io-error") {
+			shift @a;
+			next;
+		}
+		$from = "";
+		my $desc = shift @a;
+		my $command = shift @a;
+		for ($desc, $command) {
+			s/\\&\././g;
+			s/&/&amp;/g;
+			s/\\fI(.*?)\\fR/&lt;u&gt;&lt;i&gt;$1&lt;\/i&gt;&lt;\/u&gt;/g; # italic
+			s/\\fB(.*?)\\fR/&lt;b&gt;$1&lt;\/b&gt;/g; # bold
+			s/\</&lt;/g;
+			s/\>/&gt;/g;
+			s/\\fB//g;
+			s/\.fR//g;
+			s/\\fR//g;
+			s/\.RS//g;
+			s/\.RE//g;
+			s/\.TP//g;
+			s/\n/&lt;br&gt;\n/g;
+		}
+		$descs{$command} = "<desc>&lt;html&gt;$desc&lt;/html&gt;</desc>";
+	}
+
+	for (@missing) {
+		print "<command name=\"$_\">\n";
+		for my $option (@{$missing{$_}}) {
+			my $desc = $descs{$option};
+			my $type = "string";
+			my $handlers = "";
+			my $default;
+			my $min;
+			my $max;
+
+			if ($desc) {
+				my ($arg) = $desc =~ /^.*?&lt;i&gt;(.*?)&lt;/;
+				if (!$arg) {
+					$type = "boolean";
+				} elsif ($arg eq "count" || $arg eq "time") {
+					$type = "numeric";
+				}
+				my ($part) = $desc =~ /valid options are:(.*)/si;
+				my @hs = $part =~ /&lt;b&gt;(.*?)&lt;\/b&gt;/g;
+				if (@hs > 0) {
+					$type = "handler";
+					for my $h (@hs) {
+						$handlers .= "<handler>$h</handler>";
+					}
+				}
+				if ($type eq "numeric") {
+					($default) = $desc =~ /default\s+.*?is\s+(\d+)/i;
+					($min, $max) = $desc =~ /from (\d+) to (\d+)/;
+				}
+			}
+			print "\t<option name=\"$option\" type=\"$type\">\n";
+			if ($handlers) {
+				print "\t\t$handlers\n";
+			}
+			if (defined $default) {
+				print "\t\t<default>$default</default>\n";
+			}
+			if (defined $min) {
+				print "\t\t<min>$min</min>\n";
+			}
+			if (defined $max) {
+				print "\t\t<max>$max</max>\n";
+			}
+			if ($desc) {
+				print "\t\t$desc\n";
+			}
+			print "\t</option>\n";
+		}
+		print "</command>\n";
+	}
+
+	for ("net", "disk", "syncer") {
+		my $xml = `/sbin/drbdsetup xml $_`;
+		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.$descs{$2}.$3/egs;
+		print $xml;
+	}
+}
+
