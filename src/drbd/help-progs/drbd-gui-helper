@@ -631,6 +631,7 @@ PYTHON
 extra_attrs = {
       		  "get_co\\nrsc_colocation" 	: "\\nid\\nfrom\\nto\\nscore\\nfrom_role\\nto_role\\nsymmetrical\\nnode_attribute",
       		  "get_co\\nrsc_order" 		: "\\nid\\nfrom\\ntype\\nto\\naction\\nto_action\\nscore\\nsymmetrical",
+      		  "get_co\\nrsc_location"       : "\\nid\\nrsc\\nscore",
 	      }
 PYTHON
 	}
@@ -682,7 +683,7 @@ def get_status() :
 			for loc in locs :
 				tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
 				ret += tcmd + "<<<>>>" + loc + "\\n"
-				ret += sendmsg(cmd + "\\n" + loc) + "\\n"
+				ret += sendmsg(cmd + "\\n" + loc + extra_attrs[cmd]) + "\\n"
 				ret += ">>>" + tcmd + "<<<>>>" + loc + "\\n"
 		elif ord_cmds.has_key(cmd) :
 			for ord in ords :

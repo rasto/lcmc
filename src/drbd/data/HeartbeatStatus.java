@@ -545,8 +545,17 @@ public class HeartbeatStatus {
                             expr1 = data.get(4);
                             expr2 = data.get(5);
                             onHost = data.get(6);
+                        } else if (data.size() == 4) {
+                            /* heartbeat 2.1.4, TODO: expresions are ignored.*/
+                            locId = data.get(0);
+                            rscId = data.get(1);
+                            score = data.get(2);
+                            expr1 = "#uname"; // TODO
+                            expr2 = "eq"; // TODO
+                            onHost = data.get(3);
+                            System.out.println("loc: " + locId + ", rsc: " + 
+                             rscId + ", score: " + score + ", onHost: " + onHost);
                         } else {
-                            /* heartbeat >= 2.1.3 */
                             locId = data.get(0);
                             rscId = data.get(1);
                             score = data.get(2);
