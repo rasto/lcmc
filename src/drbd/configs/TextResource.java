@@ -36,7 +36,7 @@ public class TextResource extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"DrbdGui.Title",                     "DRBD Management Console (Beta)"},
+        {"DrbdMC.Title",                     "DRBD Management Console (Beta)"},
 
         /* Main Menu */
         {"MainMenu.Session",                  "Session"},

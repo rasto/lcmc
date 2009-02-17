@@ -7,16 +7,9 @@
     <property name="jar.dir"     value="${build.dir}/jar"/>
     <property name="build.coverage.dir"     value="build-coverage"/>
 
-    <property name="main-class"  value="drbd.DrbdGui"/>
-    <property name="lib.dir"     value="lib"/>
+    <property name="main-class"  value="drbd.DrbdMC"/>
     <tstamp/>
     <property name="now" value="${DSTAMP}-${TSTAMP}" />
-
-    <path id="classpath">
-        <fileset dir="${lib.dir}" includes="**/*.jar"/>
-        <!-- <fileset dir="/usr/share/lg3d-jdk/jre/lib/ext/" includes="**/*.jar" /> -->
-    </path>
-
 
     <target name="clean">
         <delete dir="${build.dir}/classes/drbd/"/>
@@ -51,7 +44,7 @@
 	 deprecation="true"
          memoryInitialSize="512m"
 	 memoryMaximumSize="512m"
-         srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"
+         srcdir="${src.dir}" destdir="${classes.dir}"
 	 encoding="utf8"
         >
           <compilerarg value="-g"/> 
@@ -78,7 +71,6 @@
             <!-- <jvmarg value="-Xrunhprof"/> -->
 	    <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
             <classpath>
-                <path refid="classpath"/>
                 <path location="${jar.dir}/${ant.project.name}.jar"/>
             </classpath>
         </java>
@@ -88,7 +80,6 @@
         <java fork="true" classname="${main-class}">
 	    <jvmarg value="-Xrunjmp"/>
             <classpath>
-                <path refid="classpath"/>
                 <path location="${jar.dir}/${ant.project.name}.jar"/>
             </classpath>
         </java>
@@ -99,7 +90,6 @@
             <jvmarg value="-Xdebug"/>
 	    <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
             <classpath>
-                <path refid="classpath"/>
                 <path location="${jar.dir}/${ant.project.name}.jar"/>
             </classpath>
     	    <arg value="-load"/>
@@ -119,7 +109,7 @@
     <target name="dist" depends="init">
     	<tar tarfile="${tarball.tar}"
 	     basedir=".."
-	     includes="drbd-gui/src/** drbd-gui/build.xml drbd-gui/release drbd-gui/lib/**" />
+	     includes="drbd-gui/src/** drbd-gui/build.xml drbd-gui/release" />
 	<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
 	<delete file="${tarball.tar}"/>
     </target>

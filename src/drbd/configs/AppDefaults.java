@@ -71,8 +71,8 @@ public class AppDefaults extends
         /*
          * dimensions of gui
          */
-        {"DrbdGui.width",                        1000},
-        {"DrbdGui.height",                       800},
+        {"DrbdMC.width",                        1000},
+        {"DrbdMC.height",                       800},
 
         {"MainPanel.TerminalPanelDivider",       600},
 
