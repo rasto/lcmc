@@ -262,6 +262,7 @@ public class HeartbeatStatus {
      * Returns score for resource and host.
      */
     public final String getScore(final String hbId, final String onHost) {
+        System.out.println("get score: " + hbId);
         final Map<String, String> hostToScoreMap = locationMap.get(hbId);
         if (hostToScoreMap != null) {
             return hostToScoreMap.get(onHost);
@@ -535,7 +536,7 @@ public class HeartbeatStatus {
                         String expr2;
                         String onHost;
                         /* String booleanOp; TODO: ? */
-
+                        System.out.println("data size: " + data.size());
                         if (data.size() == 7) {
                             /* heartbeat < 2.1.3 */
                             locId = data.get(0);
@@ -545,6 +546,8 @@ public class HeartbeatStatus {
                             expr1 = data.get(4);
                             expr2 = data.get(5);
                             onHost = data.get(6);
+                            System.out.println(" 2.1.3 loc: " + locId + ", rsc: " + 
+                             rscId + ", score: " + score + ", onHost: " + onHost);
                         } else if (data.size() == 4) {
                             /* heartbeat 2.1.4, TODO: expresions are ignored.*/
                             locId = data.get(0);
@@ -565,6 +568,8 @@ public class HeartbeatStatus {
                             expr1 = data.get(5);
                             expr2 = data.get(6);
                             onHost = data.get(7);
+                            System.out.println("2.1.4? loc: " + locId + ", rsc: " + 
+                             rscId + ", score: " + score + ", onHost: " + onHost);
                         }
                         List<String> locs = locationsIdMap.get(rscId);
                         if (locs == null) {
@@ -578,6 +583,7 @@ public class HeartbeatStatus {
                             if (hostScoreMap == null) {
                                 hostScoreMap = new HashMap<String, String>();
                                 locationMap.put(rscId, hostScoreMap);
+                                System.out.println("put score: " + rscId + ", score: " + score);
                             }
                             hostScoreMap.put(onHost, score);
                         }

@@ -3665,6 +3665,7 @@ public class ClusterBrowser extends Browser {
                 String score = heartbeatStatus.getScore(
                                             getService().getHeartbeatId(),
                                             hi.getName());
+                System.out.println("1 host: " + host + ", id: " + getService().getHeartbeatId() + " score: " + score);
                 if (score == null) {
                     score = "0";
                 }
@@ -5771,6 +5772,7 @@ public class ClusterBrowser extends Browser {
                 for (final String hbId : heartbeatStatus.getGroupResources(group)) {
                     final HeartbeatService newHbService =
                                         heartbeatStatus.getResourceType(hbId);
+                    System.out.println("setallreasources: " + hbId);
                     if (newHbService == null) {
                         /* This is bad. There is a service but we do not have
                          * the heartbeat script of this service.
@@ -5791,6 +5793,9 @@ public class ClusterBrowser extends Browser {
                             newGi.getService().setNew(false);
                             addToHeartbeatIdList(newGi);
                         } else {
+                            final Map<String, String> resourceNode =
+                                            heartbeatStatus.getParamValuePairs(hbId);
+                            newGi.setParameters(resourceNode);
                             heartbeatGraph.repaint();
                         }
                         heartbeatGraph.setVertexIsPresent(newGi);
