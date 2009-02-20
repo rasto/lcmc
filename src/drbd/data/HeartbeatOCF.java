@@ -45,6 +45,8 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * of services in the hashes and provides methods to get this
  * information.
  *
+ * TODO: it's not only OCF so it needs to be renamed
+ *
  * @author Rasto Levrinc
  * @version $Id$
  *
@@ -832,5 +834,55 @@ public class HeartbeatOCF extends XML {
      */
     public final HeartbeatService getHbGroup() {
         return hbGroup;
+    }
+
+    /**
+     * Returns hash with information from the cib node.
+     */
+    public final Map<String,Map<String,String>> parseCibQuery(final String query) {
+        final Document document = getXMLDocument(query);
+        if (document == null) {
+            return null;
+        }
+
+
+        /* get root <cib> */
+        final Node cibNode = getChildNode(document, "cib");
+        if (cibNode == null) {
+            return null;
+        }
+
+        final Map<String,Map<String,String>> cibQueryMap =
+                                      new HashMap<String,Map<String,String>>();
+
+        /* <configuration> */
+        final Node confNode = getChildNode(cibNode, "configuration");
+        if (confNode == null) {
+            return null;
+        }
+
+        /* <crm_config> */
+        final Node crmConfNode = getChildNode(confNode, "crm_config");
+        if (crmConfNode == null) {
+            return null;
+        }
+        /* <cluster_property_set> */
+        final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
+        if (cpsNode == null) {
+            return null;
+        }
+        Map<String,String> crmConfMap = new HashMap<String,String>();
+        cibQueryMap.put("crm_config", crmConfMap);
+        /* <nvpair...> */
+        final NodeList nvpairs = cpsNode.getChildNodes();
+        for (int i = 0; i < nvpairs.getLength(); i++) {
+            final Node optionNode = nvpairs.item(i);
+            if (optionNode.getNodeName().equals("nvpair")) {
+                final String name = getAttribute(optionNode, "name");
+                final String value = getAttribute(optionNode, "value");
+                crmConfMap.put(name, value);
+            }
+        }
+        return cibQueryMap;
     }
 }

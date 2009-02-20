@@ -3665,7 +3665,6 @@ public class ClusterBrowser extends Browser {
                 String score = heartbeatStatus.getScore(
                                             getService().getHeartbeatId(),
                                             hi.getName());
-                System.out.println("1 host: " + host + ", id: " + getService().getHeartbeatId() + " score: " + score);
                 if (score == null) {
                     score = "0";
                 }
@@ -5737,10 +5736,10 @@ public class ClusterBrowser extends Browser {
             for (String param : params) {
                 String value = heartbeatStatus.getGlobalParam(param);
                 final String oldValue = getResource().getValue(param);
-                if (value == null) {
-                    value = "";
-                }
-                if (!value.equals(oldValue)) {
+                //if (value == null) {
+                //    value = "";
+                //}
+                if (value != null && !value.equals(oldValue)) {
                     getResource().setValue(param, value);
                     final GuiComboBox cb = paramComboBoxGet(param, null);
                     if (cb != null) {
@@ -5772,7 +5771,6 @@ public class ClusterBrowser extends Browser {
                 for (final String hbId : heartbeatStatus.getGroupResources(group)) {
                     final HeartbeatService newHbService =
                                         heartbeatStatus.getResourceType(hbId);
-                    System.out.println("setallreasources: " + hbId);
                     if (newHbService == null) {
                         /* This is bad. There is a service but we do not have
                          * the heartbeat script of this service.

@@ -62,7 +62,7 @@ public class HeartbeatStatus {
     private final Map<String, Map<String, String>> locationMap =
                                     new HashMap<String, Map<String, String>>();
     /** Map from global config parameter to the value. */
-    private final Map<String, String> globalConfigMap =
+    private Map<String, String> globalConfigMap =
                                                 new HashMap<String, String>();
     /** Map from service to its heartbeat service object. */
     private final Map<String, HeartbeatService> resourceTypeMap =
@@ -262,7 +262,6 @@ public class HeartbeatStatus {
      * Returns score for resource and host.
      */
     public final String getScore(final String hbId, final String onHost) {
-        System.out.println("get score: " + hbId);
         final Map<String, String> hostToScoreMap = locationMap.get(hbId);
         if (hostToScoreMap != null) {
             return hostToScoreMap.get(onHost);
@@ -362,7 +361,14 @@ public class HeartbeatStatus {
                 dc = data.get(0);
             }
         } else if (commands.length == 2) {
-            if ("crm_config".equals(cmd) && data != null && !data.isEmpty()) {
+            if ("cib_query".equals(cmd)) {
+                /* pacemaker, hb >=2.99, second command is cib and it means
+                 * everything */
+                parseCibQuery(hbOCF,
+                              Tools.join("\n", data.toArray(
+                                                   new String[data.size()])));
+
+            } else if ("crm_config".equals(cmd) && data != null && !data.isEmpty()) {
                 /* heartbeat >= 2.1.3 */
                 globalConfigMap.put(commands[1], data.get(0));
 
@@ -536,7 +542,6 @@ public class HeartbeatStatus {
                         String expr2;
                         String onHost;
                         /* String booleanOp; TODO: ? */
-                        System.out.println("data size: " + data.size());
                         if (data.size() == 7) {
                             /* heartbeat < 2.1.3 */
                             locId = data.get(0);
@@ -546,8 +551,6 @@ public class HeartbeatStatus {
                             expr1 = data.get(4);
                             expr2 = data.get(5);
                             onHost = data.get(6);
-                            System.out.println(" 2.1.3 loc: " + locId + ", rsc: " + 
-                             rscId + ", score: " + score + ", onHost: " + onHost);
                         } else if (data.size() == 4) {
                             /* heartbeat 2.1.4, TODO: expresions are ignored.*/
                             locId = data.get(0);
@@ -556,8 +559,6 @@ public class HeartbeatStatus {
                             expr1 = "#uname"; // TODO
                             expr2 = "eq"; // TODO
                             onHost = data.get(3);
-                            System.out.println("loc: " + locId + ", rsc: " + 
-                             rscId + ", score: " + score + ", onHost: " + onHost);
                         } else {
                             locId = data.get(0);
                             rscId = data.get(1);
@@ -568,8 +569,6 @@ public class HeartbeatStatus {
                             expr1 = data.get(5);
                             expr2 = data.get(6);
                             onHost = data.get(7);
-                            System.out.println("2.1.4? loc: " + locId + ", rsc: " + 
-                             rscId + ", score: " + score + ", onHost: " + onHost);
                         }
                         List<String> locs = locationsIdMap.get(rscId);
                         if (locs == null) {
@@ -583,7 +582,6 @@ public class HeartbeatStatus {
                             if (hostScoreMap == null) {
                                 hostScoreMap = new HashMap<String, String>();
                                 locationMap.put(rscId, hostScoreMap);
-                                System.out.println("put score: " + rscId + ", score: " + score);
                             }
                             hostScoreMap.put(onHost, score);
                         }
@@ -697,5 +695,15 @@ public class HeartbeatStatus {
                                Tools.join("\n",
                                           data.toArray(
                                                     new String[data.size()])));
+    }
+    
+    /**
+     * Parses output from cib_query\ncib command.
+     */
+    private final void parseCibQuery(final HeartbeatOCF hbOCF,
+                                     final String query) {
+        Map<String,Map<String,String>> cibQueryMap =
+                                                    hbOCF.parseCibQuery(query);
+        globalConfigMap = cibQueryMap.get("crm_config");
     }
 }
