@@ -1664,7 +1664,7 @@ public class Host implements Serializable {
      * Parses the installation info.
      */
     private void parseInstallationInfo(final String line) {
-        final String[] tokens = line.split(":");
+        final String[] tokens = line.split(":|\\s+");
         if (tokens[0].equals("hb")) {
             final String version = tokens[1].trim();
             if (!"".equals(version)) {

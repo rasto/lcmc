@@ -452,13 +452,37 @@ public final class Heartbeat {
      * Sets global heartbeat parameters.
      */
     public static void setGlobalParameters(final Host host,
-                                           final String[] args) {
-        for (String arg : args) {
+                                           final Map<String,String> args) {
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<crm_config\\>\\<cluster_property_set\\ id=\\\"cib-bootstrap-options\\\"\\>");
+            for (String arg : args.keySet()) {
+                String id = "cib-bootstrap-options-" + arg;
+                xml.append("\\<nvpair\\ id=\\\""
+                           + id
+                           + "\\\"\\ name=\\\""
+                           + arg
+                           + "\\\"\\ value=\\\""
+                           + args.get(arg)
+                           + "\\\"/\\>");
+            }
+            xml.append("\\</cluster_property_set\\>\\</crm_config\\>'");
             final String command = getMgmtCommand(
+                                          "cib_replace crm_config",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            for (String arg : args.keySet()) {
+                final String command = getMgmtCommand(
                                               "up_crm_config",
                                               host.getCluster().getHbPasswd(),
-                                              arg);
-            execCommand(host, command, true);
+                                              arg
+                                              + " \"" + args.get(arg) + "\"");
+                execCommand(host, command, true);
+            }
         }
     }
 

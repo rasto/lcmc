@@ -5705,7 +5705,7 @@ public class ClusterBrowser extends Browser {
 
 
             /* update heartbeat */
-            final List<String> args = new ArrayList<String>();
+            final Map<String,String> args = new HashMap<String,String>();
             for (String param : params) {
                 final String oldValue = getResource().getValue(param);
                 String value = getComboBoxValue(param);
@@ -5719,11 +5719,11 @@ public class ClusterBrowser extends Browser {
                 if ("".equals(value)) {
                     value = getParamDefault(param);
                 }
-                args.add(param + " \"" + value + "\"");
+                args.put(param, value);
             }
             if (!args.isEmpty()) {
                 Heartbeat.setGlobalParameters(getDCHost(),
-                                    args.toArray(new String[args.size()]));
+                                    args);
             }
             storeComboBoxValues(params);
         }
