@@ -416,7 +416,9 @@ public class HostCheckInstallation extends DialogHost {
                 }
             });
         }
-        if (drbdOk && heartbeatOk && heartbeatGUIOk && udevOk) {
+        if (heartbeatOk && heartbeatGUIOk) {
+            /* drbd is not required. */
+            enableComponents();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     answerPaneSetText(Tools.getString(
@@ -427,7 +429,6 @@ public class HostCheckInstallation extends DialogHost {
             printErrorAndRetry(Tools.getString(
                                 "Dialog.HostCheckInstallation.SomeFailed"));
         }
-        enableComponents();
     }
 
     /**
