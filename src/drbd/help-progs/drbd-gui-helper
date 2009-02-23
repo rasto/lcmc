@@ -333,7 +333,7 @@ sub get_gui_info {
 # get_installation_info()
 #
 sub get_installation_info {
-	my $hb_version = `/usr/lib/heartbeat/heartbeat -V 2>&1`;
+	my $hb_version = `/usr/lib/heartbeat/heartbeat -V 2>&1` || "";
 	$hb_version =~ s/\s+.*//;
 	if ($hb_version) {
 		chomp $hb_version;
@@ -459,7 +459,7 @@ sub is_smaller_v {
 
 sub mgmt {
 	my $passwd = shift;
-	my $hb_version = `/usr/lib/heartbeat/heartbeat -V`;
+	my $hb_version = `/usr/lib/heartbeat/heartbeat -V` || "";
 	$hb_version =~ s/\s+.*//;
 	return if !$hb_version;
 	chomp $hb_version;
@@ -504,7 +504,7 @@ PYTHON
 # waits for mgmt events, there is timeout on purpose and it must be restarted.
 sub get_mgmt_events {
 	my $passwd = shift;
-	my $hb_version = `/usr/lib/heartbeat/heartbeat -V`;
+	my $hb_version = `/usr/lib/heartbeat/heartbeat -V` || "";
 	$hb_version =~ s/\s+.*//;
 	if (!$hb_version) {
 		return;

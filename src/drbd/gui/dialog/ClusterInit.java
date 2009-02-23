@@ -294,14 +294,14 @@ public class ClusterInit extends DialogCluster {
                 if (changed) {
                     drbdLoadedInfos.get(i).setText(
                             Tools.getString("Dialog.ClusterInit.DrbdIsLoaded"));
-                    drbdLoadedInfos.get(i).setBackground(Color.BLACK);
+                    drbdLoadedInfos.get(i).setForeground(Color.BLACK);
                 }
             } else {
                 oneFailed = true;
                 if (changed) {
                     drbdLoadedInfos.get(i).setText(
                         Tools.getString("Dialog.ClusterInit.DrbdIsNotLoaded"));
-                    drbdLoadedInfos.get(i).setBackground(Color.RED);
+                    drbdLoadedInfos.get(i).setForeground(Color.RED);
                     drbdLoadButtons.get(i).setVisible(true);
                 }
             }
@@ -338,7 +338,7 @@ public class ClusterInit extends DialogCluster {
                 if (changed) {
                     hbStartedInfos.get(i).setText(
                             Tools.getString("Dialog.ClusterInit.HbIsRunning"));
-                    hbStartedInfos.get(i).setBackground(Color.BLACK);
+                    hbStartedInfos.get(i).setForeground(Color.BLACK);
                     hbStartButtons.get(i).setVisible(false);
                 }
             } else {
@@ -347,7 +347,7 @@ public class ClusterInit extends DialogCluster {
                     hbStartedInfos.get(i).setText(
                             Tools.getString("Dialog.ClusterInit.HbIsStopped"));
                     hbStartButtons.get(i).setVisible(true);
-                    hbStartedInfos.get(i).setBackground(Color.RED);
+                    hbStartedInfos.get(i).setForeground(Color.RED);
                 }
             }
             i++;
@@ -396,7 +396,7 @@ public class ClusterInit extends DialogCluster {
                     hbStatusInfos.get(i).setText(
                         Tools.getString("Dialog.ClusterInit.HbStatusWorks"));
                     enterPasswdButton.get(i).setVisible(false);
-                    hbStatusInfos.get(i).setBackground(Color.BLACK);
+                    hbStatusInfos.get(i).setForeground(Color.BLACK);
                 }
             } else {
                 oneFailed = true;
@@ -411,7 +411,7 @@ public class ClusterInit extends DialogCluster {
                           Tools.getString("Dialog.ClusterInit.HbStatusDoesntWork"));
                         enterPasswdButton.get(i).setVisible(false);
                     }
-                    hbStatusInfos.get(i).setBackground(Color.RED);
+                    hbStatusInfos.get(i).setForeground(Color.RED);
                 }
             }
             i++;

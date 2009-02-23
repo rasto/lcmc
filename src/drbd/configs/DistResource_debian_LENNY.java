@@ -41,7 +41,7 @@ public class DistResource_debian_LENNY extends
 
 
         /* distribution name that is used in the download url */
-        {"distributiondir", "debian-etch"},
+        {"distributiondir", "debian-lenny"},
 
         /* support */
         // TODO: use flags for this

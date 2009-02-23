@@ -417,7 +417,6 @@ public class HostCheckInstallation extends DialogHost {
             });
         }
         if (drbdOk && heartbeatOk && heartbeatGUIOk && udevOk) {
-            enableComponents();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     answerPaneSetText(Tools.getString(
@@ -428,6 +427,7 @@ public class HostCheckInstallation extends DialogHost {
             printErrorAndRetry(Tools.getString(
                                 "Dialog.HostCheckInstallation.SomeFailed"));
         }
+        enableComponents();
     }
 
     /**
