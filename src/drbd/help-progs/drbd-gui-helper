@@ -631,6 +631,7 @@ PYTHON
 extra_attrs = {
       		  "get_co\\nrsc_colocation" 	: "",
       		  "get_co\\nrsc_order" 		: "",
+      		  "get_co\\nrsc_location" 	: "",
 	      }
 PYTHON
 	} else {
