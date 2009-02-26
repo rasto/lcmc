@@ -52,20 +52,24 @@ public class HeartbeatStatus {
                                                 new HashMap<String, String>();
     /** Map from resource to the list of resources to which this resource is
      * colocated. This is not symetrical. */
-    private final Map<String, List<String>> colocationMap =
+    private Map<String, List<String>> colocationMap =
                                             new HashMap<String, List<String>>();
     /** Map from resource to the list of resources to which this resource is
      * in ordered relation. */
-    private final Map<String, List<String>> orderMap =
+    private Map<String, List<String>> orderMap =
                                             new HashMap<String, List<String>>();
     /** Map from resource and host to the location score. */
-    private final Map<String, Map<String, String>> locationMap =
+    private Map<String, Map<String, String>> locationMap =
                                     new HashMap<String, Map<String, String>>();
+    /** Map from location id to the location score. */
+    private Map<String,String> locationScoreMap = new HashMap<String, String>();
+    /** Map from resource and host to location id. */
+    private MultiKeyMap resHostToLocIdMap = new MultiKeyMap();
     /** Map from global config parameter to the value. */
     private Map<String, String> globalConfigMap =
                                                 new HashMap<String, String>();
     /** Map from service to its heartbeat service object. */
-    private final Map<String, HeartbeatService> resourceTypeMap =
+    private Map<String, HeartbeatService> resourceTypeMap =
                                         new HashMap<String, HeartbeatService>();
     /** Map from service to its type. group / native. */
     private final Map<String, String> resourceItemTypeMap =
@@ -74,23 +78,28 @@ public class HeartbeatStatus {
     private final Map<String, String> resourceStatusMap =
                                                 new HashMap<String, String>();
     /** Map from service and its parameters to the values. */
-    private final Map<String, Map<String, String>> parametersMap =
+    private Map<String, Map<String, String>> parametersMap =
                                     new HashMap<String, Map<String, String>>();
     /** Whether the crmd or pengine was already parsed. */
     private final List<String> alreadyParsed = new ArrayList<String>();
 
     /** Map from resource id to the list of locations ids. */
-    private final Map<String, List<String>> locationsIdMap =
-                                            new HashMap<String, List<String>>();
+    private Map<String, List<String>> locationsIdMap =
+                                           new HashMap<String, List<String>>();
     /** Map from resource 1 and resource 2 to the colocation id. */
-    private final MultiKeyMap colocationIdMap = new MultiKeyMap();
+    private MultiKeyMap colocationIdMap = new MultiKeyMap();
     /** Map from resource 1 and resource 2 to the score. */
-    private final MultiKeyMap colocationScoreMap = new MultiKeyMap();
+    private MultiKeyMap colocationScoreMap = new MultiKeyMap();
     /** Map from resource 1 and resource 2 to the order id. */
-    private final MultiKeyMap orderIdMap = new MultiKeyMap();
+    private MultiKeyMap orderIdMap = new MultiKeyMap();
+    /** Map from resource 1 and resource 2 to the order score. */
+    private MultiKeyMap orderScoreMap = new MultiKeyMap();
+    /** Map from resource 1 and resource 2 to the string if the order is
+     * symmetrical. */
+    private MultiKeyMap orderSymmetricalMap = new MultiKeyMap();
     /** Map from resource 1 and resource 2 to the direction of the order.
      * (before, after) */
-    private final MultiKeyMap orderDirectionMap = new MultiKeyMap();
+    private MultiKeyMap orderDirectionMap = new MultiKeyMap();
     /** Operations map. */
     private final MultiKeyMap operationsMap = new MultiKeyMap();
     /** All nodes. */
@@ -178,7 +187,6 @@ public class HeartbeatStatus {
     /**
      * Returns type of the service, e.g. IPAddr
      */
-     // TODO: resource type good name? (its name of the service)
     public final HeartbeatService getResourceType(final String hbId) {
         return resourceTypeMap.get(hbId);
     }
@@ -224,12 +232,49 @@ public class HeartbeatStatus {
     }
 
     /**
+     * Returns colocation score.
+     */
+    public final String getColocationScore(final String rsc1,
+                                           final String rsc2) {
+        final String ret = (String) colocationScoreMap.get(rsc1, rsc2);
+        if (ret == null) {
+            return (String) colocationScoreMap.get(rsc2, rsc1);
+        }
+        return ret;
+    }
+
+
+    /**
      * Returns order id of two resources.
      */
     public final String getOrderId(final String rsc1, final String rsc2) {
         final String ret = (String) orderIdMap.get(rsc1, rsc2);
         if (ret == null) {
             return (String) orderIdMap.get(rsc2, rsc1);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns order score of two resources.
+     */
+    public final String getOrderScore(final String rsc1, final String rsc2) {
+        final String ret = (String) orderScoreMap.get(rsc1, rsc2);
+        if (ret == null) {
+            return (String) orderScoreMap.get(rsc2, rsc1);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns a string that takes "true" or "false" value, whether order is
+     * symmetrical.
+     */
+    public final String getOrderSymmetrical(final String rsc1,
+                                            final String rsc2) {
+        final String ret = (String) orderSymmetricalMap.get(rsc1, rsc2);
+        if (ret == null) {
+            return (String) orderSymmetricalMap.get(rsc2, rsc1);
         }
         return ret;
     }
@@ -267,6 +312,20 @@ public class HeartbeatStatus {
             return hostToScoreMap.get(onHost);
         }
         return null;
+    }
+
+    /**
+     * Returns score from location id.
+     */
+    public final String getLocationScore(final String locationId) {
+        return locationScoreMap.get(locationId);
+    }
+
+    /**
+     * Returns location id for specified resource and host.
+     */
+    public final String getLocationId(final String rsc, final String node) {
+        return (String) resHostToLocIdMap.get(rsc, node);
     }
 
     /**
@@ -584,7 +643,11 @@ public class HeartbeatStatus {
                                 locationMap.put(rscId, hostScoreMap);
                             }
                             hostScoreMap.put(onHost, score);
+                            resHostToLocIdMap.put(rscId,
+                                                  onHost,
+                                                  locId);
                         }
+                        locationScoreMap.put(locId, score);
                     } catch (IndexOutOfBoundsException e) {
                         Tools.appError("could not get " + cmd, "", e);
                         return;
@@ -604,7 +667,7 @@ public class HeartbeatStatus {
         final String[] lines = status.split("\n");
         String command    = null;
         List<String> data = null;
-
+        /* TODO: some of this does not have to be cleared in pacemaker. */
         allNodes.clear();
         activeNodes.clear();
         crmNodes.clear();
@@ -619,6 +682,8 @@ public class HeartbeatStatus {
         orderIdMap.clear();
         orderDirectionMap.clear();
         locationMap.clear();
+        resHostToLocIdMap.clear();
+        locationScoreMap.clear();
         globalConfigMap.clear();
         resourceTypeMap.clear();
         resourceItemTypeMap.clear();
@@ -696,14 +761,30 @@ public class HeartbeatStatus {
                                           data.toArray(
                                                     new String[data.size()])));
     }
-    
+
     /**
      * Parses output from cib_query\ncib command.
      */
     private final void parseCibQuery(final HeartbeatOCF hbOCF,
                                      final String query) {
-        Map<String,Map<String,String>> cibQueryMap =
-                                                    hbOCF.parseCibQuery(query);
-        globalConfigMap = cibQueryMap.get("crm_config");
+        CibQuery cibQueryMap = hbOCF.parseCibQuery(query);
+        globalConfigMap    = cibQueryMap.getCrmConfig();
+        parametersMap      = cibQueryMap.getParameters();
+        resourceTypeMap    = cibQueryMap.getResourceType();
+
+        colocationMap      = cibQueryMap.getColocation();
+        colocationScoreMap = cibQueryMap.getColocationScore();
+        colocationIdMap    = cibQueryMap.getColocationId();
+
+        orderMap          = cibQueryMap.getOrder();
+        orderScoreMap     = cibQueryMap.getOrderScore();
+        orderSymmetricalMap = cibQueryMap.getOrderSymmetrical();
+        orderIdMap        = cibQueryMap.getOrderId();
+        orderDirectionMap = cibQueryMap.getOrderDirection(); /* not in pacemaker */
+
+        locationMap       = cibQueryMap.getLocation();
+        locationsIdMap    = cibQueryMap.getLocationsId();
+        locationScoreMap  = cibQueryMap.getLocationScore();
+        resHostToLocIdMap = cibQueryMap.getResHostToLocId();
     }
 }

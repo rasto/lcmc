@@ -811,7 +811,7 @@ public class HeartbeatOCF extends XML {
             }
         }
     }
- 
+
     /**
      * Returns the heartbeat service object for the specified service name and
      * heartbeat class.
@@ -839,12 +839,11 @@ public class HeartbeatOCF extends XML {
     /**
      * Returns hash with information from the cib node.
      */
-    public final Map<String,Map<String,String>> parseCibQuery(final String query) {
+    public final CibQuery parseCibQuery(final String query) {
         final Document document = getXMLDocument(query);
         if (document == null) {
             return null;
         }
-
 
         /* get root <cib> */
         final Node cibNode = getChildNode(document, "cib");
@@ -852,8 +851,7 @@ public class HeartbeatOCF extends XML {
             return null;
         }
 
-        final Map<String,Map<String,String>> cibQueryMap =
-                                      new HashMap<String,Map<String,String>>();
+        final CibQuery cibQueryData = new CibQuery();
 
         /* <configuration> */
         final Node confNode = getChildNode(cibNode, "configuration");
@@ -866,14 +864,13 @@ public class HeartbeatOCF extends XML {
         if (crmConfNode == null) {
             return null;
         }
-        /* <cluster_property_set> */
+        /*      <cluster_property_set> */
         final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
         if (cpsNode == null) {
             return null;
         }
         Map<String,String> crmConfMap = new HashMap<String,String>();
-        cibQueryMap.put("crm_config", crmConfMap);
-        /* <nvpair...> */
+        /*              <nvpair...> */
         final NodeList nvpairs = cpsNode.getChildNodes();
         for (int i = 0; i < nvpairs.getLength(); i++) {
             final Node optionNode = nvpairs.item(i);
@@ -883,6 +880,144 @@ public class HeartbeatOCF extends XML {
                 crmConfMap.put(name, value);
             }
         }
-        return cibQueryMap;
+        cibQueryData.setCrmConfig(crmConfMap);
+
+        /* <nodes> */
+        /* <resources> */
+        final Node resourcesNode = getChildNode(confNode, "resources");
+        if (resourcesNode == null) {
+            return null;
+        }
+        /*      <primitive> */
+        //Map<String,String> resourceItemTypeMap = new HashMap<String,String>();
+        final Map<String, Map<String, String>> parametersMap =
+                                    new HashMap<String, Map<String, String>>();
+        final Map<String, HeartbeatService> resourceTypeMap =
+                                      new HashMap<String, HeartbeatService>();
+
+        final NodeList primitives = resourcesNode.getChildNodes();
+        for (int i = 0; i < primitives.getLength(); i++) {
+            final Node primitiveNode = primitives.item(i);
+            if (primitiveNode.getNodeName().equals("primitive")) {
+                final String hbClass = getAttribute(primitiveNode, "class");
+                final String id = getAttribute(primitiveNode, "id");
+                final String provider = getAttribute(primitiveNode, "provider");
+                final String type = getAttribute(primitiveNode, "type");
+                resourceTypeMap.put(id, getHbService(type, hbClass));
+                final Map<String,String> params = new HashMap<String,String>();
+                parametersMap.put(id, params);
+                /* <instance_attributes> */
+                final Node instanceAttrNode =
+                                           getChildNode(primitiveNode,
+                                                        "instance_attributes");
+                /* <nvpair...> */
+                final NodeList nvpairsRes = instanceAttrNode.getChildNodes();
+                for (int j = 0; j < nvpairsRes.getLength(); j++) {
+                    final Node optionNode = nvpairsRes.item(j);
+                    if (optionNode.getNodeName().equals("nvpair")) {
+                        final String name = getAttribute(optionNode, "name");
+                        final String value = getAttribute(optionNode, "value");
+                        params.put(name, value);
+                    }
+                }
+            }
+        }
+
+        /* <constraints> */
+        final Map<String, List<String>> colocationMap =
+                                          new HashMap<String, List<String>>();
+        final MultiKeyMap colocationIdMap = new MultiKeyMap();
+        final MultiKeyMap colocationScoreMap = new MultiKeyMap();
+
+        final Map<String, List<String>> orderMap =
+                                           new HashMap<String, List<String>>();
+        final MultiKeyMap orderIdMap = new MultiKeyMap();
+        final MultiKeyMap orderDirectionMap = new MultiKeyMap();
+        final MultiKeyMap orderScoreMap = new MultiKeyMap();
+        final MultiKeyMap orderSymmetricalMap = new MultiKeyMap();
+
+        final Map<String, Map<String, String>> locationMap =
+                                    new HashMap<String, Map<String, String>>();
+        final Map<String, List<String>> locationsIdMap =
+                                           new HashMap<String, List<String>>();
+        final MultiKeyMap resHostToLocIdMap = new MultiKeyMap();
+        final Node constraintsNode = getChildNode(confNode, "constraints");
+        if (constraintsNode != null) {
+            final NodeList constraints = constraintsNode.getChildNodes();
+            for (int i = 0; i < constraints.getLength(); i++) {
+                final Node constraintNode = constraints.item(i);
+                if (constraintNode.getNodeName().equals("rsc_colocation")) {
+                    final String colId = getAttribute(constraintNode, "id");
+                    final String rsc = getAttribute(constraintNode, "rsc");
+                    final String withRsc = getAttribute(constraintNode,
+                                                        "with-rsc");
+                    final String score = getAttribute(constraintNode, "score");
+                    List<String> tos = colocationMap.get(rsc);
+                    if (tos == null) {
+                        tos = new ArrayList<String>();
+                    }
+                    tos.add(withRsc);
+                    colocationMap.put(rsc, tos);
+                    colocationScoreMap.put(rsc, withRsc, score);
+                    colocationIdMap.put(rsc, withRsc, colId);
+                } else if (constraintNode.getNodeName().equals("rsc_order")) {
+                    final String ordId = getAttribute(constraintNode, "id");
+                    final String rscFrom = getAttribute(constraintNode,
+                                                        "first");
+                    final String rscTo = getAttribute(constraintNode, "then");
+                    final String score = getAttribute(constraintNode, "score");
+                    // TODO: symmetrical order stuff
+                    final String symmetrical = getAttribute(constraintNode,
+                                                            "symmetrical");
+                    List<String> tos = orderMap.get(rscFrom);
+                    if (tos == null) {
+                        tos = new ArrayList<String>();
+                    }
+                    tos.add(rscTo);
+                    orderMap.put(rscFrom, tos);
+                    orderDirectionMap.put(rscFrom, rscTo, "before"); //TODO: not needed in pacemaker anymore
+                    orderScoreMap.put(rscFrom, rscTo, score);
+                    orderSymmetricalMap.put(rscFrom, rscTo, symmetrical);
+                    orderIdMap.put(rscFrom, rscTo, ordId);
+                } else if (constraintNode.getNodeName().equals("rsc_location")) {
+                    final String locId = getAttribute(constraintNode, "id");
+                    final String node  = getAttribute(constraintNode, "node");
+                    final String rsc   = getAttribute(constraintNode, "rsc");
+                    final String score = getAttribute(constraintNode, "score");
+
+                    List<String> locs = locationsIdMap.get(rsc);
+                    if (locs == null) {
+                        locs = new ArrayList<String>();
+                        locationsIdMap.put(rsc, locs);
+                    }
+                    Map<String, String> hostScoreMap =
+                                                locationMap.get(rsc);
+                    if (hostScoreMap == null) {
+                        hostScoreMap = new HashMap<String, String>();
+                        locationMap.put(rsc, hostScoreMap);
+                    }
+                    hostScoreMap.put(node, score);
+                    resHostToLocIdMap.put(rsc, node, locId);
+                }
+            }
+        }
+
+        cibQueryData.setParameters(parametersMap);
+        cibQueryData.setResourceType(resourceTypeMap);
+
+        cibQueryData.setColocation(colocationMap);
+        cibQueryData.setColocationScore(colocationScoreMap);
+        cibQueryData.setColocationId(colocationIdMap);
+
+        cibQueryData.setOrder(orderMap);
+        cibQueryData.setOrderId(orderIdMap);
+        cibQueryData.setOrderScore(orderScoreMap);
+        cibQueryData.setOrderSymmetrical(orderSymmetricalMap);
+        cibQueryData.setOrderDirection(orderDirectionMap);
+
+        cibQueryData.setLocation(locationMap);
+        cibQueryData.setLocationsId(locationsIdMap);
+        cibQueryData.setResHostToLocId(resHostToLocIdMap);
+        return cibQueryData;
     }
 }

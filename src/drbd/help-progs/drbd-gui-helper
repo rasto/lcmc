@@ -563,6 +563,11 @@ PYTHON
         "crm_config\\nshutdown_escalation",
         "crm_config\\ncrmd-integration-timeout",
         "crm_config\\ncrmd-finalization-timeout",
+
+	"rsc_attrs",
+	"rsc_metaattrs",
+	"rsc_params",
+	"rsc_full_ops",
 PYTHON
 	} else {
 		# Pacemaker
@@ -580,10 +585,6 @@ PYTHON
 	"sub_rsc",
 	"rsc_type",
 	"rsc_status",
-	"rsc_attrs",
-	"rsc_metaattrs",
-	"rsc_params",
-	"rsc_full_ops",
 	"rsc_running_on",
 	# "rsc_metadata\\nheartbeat\\ndrbddisk\\nheartbeat",
 

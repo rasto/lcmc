@@ -221,29 +221,53 @@ public final class Heartbeat {
     public static void setLocation(final Host host,
                                    final String heartbeatId,
                                    final String onHost,
-                                   final String score) {
-        final String locationId = "loc_" + heartbeatId + "_" + onHost;
+                                   final String score,
+                                   String locationId) {
+        if (locationId == null) {
+            locationId = "loc_" + heartbeatId + "_" + onHost;
+        }
         /* boolean operation is from heartbeat 2.1.3 (not anymore) */
         final String hbVersion = host.getHeartbeatVersion();
-        String booleanOperation;
-        if (Tools.compareVersions(hbVersion, "2.1.3") >= 0) {
-            booleanOperation = "and ";
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<rsc_location\\ id=\\\"");
+            xml.append(locationId);
+            xml.append("\\\"\\ rsc=\\\"");
+            xml.append(heartbeatId);
+            xml.append("\\\"\\ node=\\\"");
+            xml.append(onHost);
+            if (score != null) {
+                xml.append("\\\"\\ score=\\\"");
+                xml.append(score);
+            }
+            xml.append("\\\"/\\>'");
+            final String command = getMgmtCommand(
+                                          "cib_update constraints",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
         } else {
-            booleanOperation = "";
+            String booleanOperation;
+            if (Tools.compareVersions(hbVersion, "2.1.3") >= 0) {
+                booleanOperation = "and ";
+            } else {
+                booleanOperation = "";
+            }
+            final String args = "rsc_location "
+                                + locationId + " "
+                                + heartbeatId + " "
+                                + "\"" + score + "\" "
+                                + booleanOperation
+                                + "expr_" + locationId + " "
+                                + "\\\\#uname "
+                                + "eq "
+                                + onHost;
+            final String command = getMgmtCommand("up_co",
+                                                  host.getCluster().getHbPasswd(),
+                                                  args);
+            execCommand(host, command, true);
         }
-        final String args = "rsc_location "
-                            + locationId + " "
-                            + heartbeatId + " "
-                            + "\"" + score + "\" "
-                            + booleanOperation
-                            + "expr_" + locationId + " "
-                            + "\\\\#uname "
-                            + "eq "
-                            + onHost;
-        final String command = getMgmtCommand("up_co",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
     }
 
     /**
@@ -286,12 +310,35 @@ public final class Heartbeat {
      * Removes location constraint.
      */
     public static void removeLocation(final Host host,
-                                      final String locationId) {
-        final String args = "rsc_location " + locationId;
-        final String command = getMgmtCommand("del_co",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+                                      final String locationId,
+                                      final String heartbeatId,
+                                      final String score) {
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<rsc_location\\ id=\\\"");
+            xml.append(locationId);
+            xml.append("\\\"\\ rsc=\\\"");
+            xml.append(heartbeatId);
+            if (score != null) {
+                xml.append("\\\"\\ score=\\\"");
+                xml.append(score);
+            }
+            xml.append("\\\"/\\>'");
+            final String command = getMgmtCommand(
+                                          "cib_remove constraints",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            final String args = "rsc_location " + locationId;
+            final String command = getMgmtCommand(
+                                               "del_co",
+                                               host.getCluster().getHbPasswd(),
+                                               args);
+            execCommand(host, command, true);
+        }
     }
 
 
@@ -460,13 +507,13 @@ public final class Heartbeat {
             xml.append("'\\<crm_config\\>\\<cluster_property_set\\ id=\\\"cib-bootstrap-options\\\"\\>");
             for (String arg : args.keySet()) {
                 String id = "cib-bootstrap-options-" + arg;
-                xml.append("\\<nvpair\\ id=\\\""
-                           + id
-                           + "\\\"\\ name=\\\""
-                           + arg
-                           + "\\\"\\ value=\\\""
-                           + args.get(arg)
-                           + "\\\"/\\>");
+                xml.append("\\<nvpair\\ id=\\\"");
+                xml.append(id);
+                xml.append("\\\"\\ name=\\\"");
+                xml.append(arg);
+                xml.append("\\\"\\ value=\\\"");
+                xml.append(args.get(arg));
+                xml.append("\\\"/\\>");
             }
             xml.append("\\</cluster_property_set\\>\\</crm_config\\>'");
             final String command = getMgmtCommand(
@@ -490,12 +537,38 @@ public final class Heartbeat {
      * Removes colocation with specified colocation id.
      */
     public static void removeColocation(final Host host,
-                                        final String colocationId) {
-        final String args = "rsc_colocation " + colocationId;
-        final String command = getMgmtCommand("del_co",
+                                        final String colocationId,
+                                        final String rsc1,
+                                        final String rsc2,
+                                        final String score) {
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<rsc_colocation\\ id=\\\"");
+            xml.append(colocationId);
+            xml.append("\\\"\\ rsc=\\\"");
+            xml.append(rsc1);
+            if (score != null) {
+                xml.append("\\\"\\ score=\\\"");
+                xml.append(score);
+            }
+            xml.append("\\\"\\ with-rsc=\\\"");
+            xml.append(rsc2);
+            xml.append("\\\"/\\>'");
+            final String command = getMgmtCommand(
+                                          "cib_delete constraints",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            final String args = "rsc_colocation " + colocationId;
+            final String command = getMgmtCommand(
+                                              "del_co",
                                               host.getCluster().getHbPasswd(),
                                               args);
-        execCommand(host, command, true);
+            execCommand(host, command, true);
+        }
     }
 
     /**
@@ -510,43 +583,96 @@ public final class Heartbeat {
         } else {
             colocationId = "col_" + parentHbId + "_" + heartbeatId;
         }
-
-        String id_str   = "";
-        String from_str = "";
-        String to_str   = "";
-        String score_str = "";
+        final String score = "INFINITY";
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
-            id_str   = "id ";
-            from_str = "from ";
-            to_str   = "to ";
-            score_str = "score ";
-        }
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<rsc_colocation\\ id=\\\"");
+            xml.append(colocationId);
+            xml.append("\\\"\\ rsc=\\\"");
+            xml.append(parentHbId);
+            if (score != null) {
+                xml.append("\\\"\\ score=\\\"");
+                xml.append(score);
+            }
+            xml.append("\\\"\\ with-rsc=\\\"");
+            xml.append(heartbeatId);
+            xml.append("\\\"/\\>'");
+            final String command = getMgmtCommand(
+                                          "cib_update constraints",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            String id_str   = "";
+            String from_str = "";
+            String to_str   = "";
+            String score_str = "";
+            if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
+                id_str   = "id ";
+                from_str = "from ";
+                to_str   = "to ";
+                score_str = "score ";
+            }
 
-        final String args = "rsc_colocation "
-                            + id_str
-                            + colocationId + " "
-                            + from_str
-                            + parentHbId   + " "
-                            + to_str
-                            + heartbeatId  + " "
-                            + score_str
-                            + "INFINITY";
-        final String command = getMgmtCommand("up_co",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+            final String args = "rsc_colocation "
+                                + id_str
+                                + colocationId + " "
+                                + from_str
+                                + parentHbId   + " "
+                                + to_str
+                                + heartbeatId  + " "
+                                + score_str
+                                + score;
+            final String command =
+                                getMgmtCommand("up_co",
+                                               host.getCluster().getHbPasswd(),
+                                               args);
+            execCommand(host, command, true);
+        }
     }
 
     /**
      * Removes order constraint with specified order id.
      */
-    public static void removeOrder(final Host host, final String orderId) {
-        final String args = "rsc_order " + orderId;
-        final String command = getMgmtCommand("del_co",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+    public static void removeOrder(final Host host,
+                                   final String orderId,
+                                   final String rscFrom,
+                                   final String rscTo,
+                                   final String score,
+                                   final String symmetrical) {
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<rsc_order\\ id=\\\"");
+            xml.append(orderId);
+            xml.append("\\\"\\ first=\\\"");
+            xml.append(rscFrom);
+            if (score != null) {
+                xml.append("\\\"\\ score=\\\"");
+                xml.append(score);
+            }
+            if (symmetrical != null) {
+                xml.append("\\\"\\ symmetrical=\\\"");
+                xml.append(symmetrical);
+            }
+            xml.append("\\\"\\ then=\\\"");
+            xml.append(rscTo);
+            xml.append("\\\"/\\>'");
+            final String command = getMgmtCommand(
+                                          "cib_delete constraints",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            final String args = "rsc_order " + orderId;
+            final String command = getMgmtCommand("del_co",
+                                                  host.getCluster().getHbPasswd(),
+                                                  args);
+            execCommand(host, command, true);
+        }
     }
 
     /**
@@ -556,30 +682,57 @@ public final class Heartbeat {
                                 final String heartbeatId,
                                 final String parentHbId) {
         final String orderId = "ord_" + parentHbId + "_" + heartbeatId;
-        String id_str   = "";
-        String from_str = "";
-        String to_str   = "";
-        String type_str = "";
+        final String score = "INFINITY";
+        final String symmetrical = null; // TODO:
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
-            id_str   = "id ";
-            from_str = "from ";
-            to_str   = "to ";
-            type_str = "type ";
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<rsc_order\\ id=\\\"");
+            xml.append(orderId);
+            xml.append("\\\"\\ first=\\\"");
+            xml.append(parentHbId);
+            if (score != null) {
+                xml.append("\\\"\\ score=\\\"");
+                xml.append(score);
+            }
+            if (symmetrical != null) {
+                xml.append("\\\"\\ symmetrical=\\\"");
+                xml.append(symmetrical);
+            }
+            xml.append("\\\"\\ then=\\\"");
+            xml.append(heartbeatId);
+            xml.append("\\\"/\\>'");
+            final String command = getMgmtCommand(
+                                          "cib_update constraints",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            String id_str   = "";
+            String from_str = "";
+            String to_str   = "";
+            String type_str = "";
+            if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
+                id_str   = "id ";
+                from_str = "from ";
+                to_str   = "to ";
+                type_str = "type ";
+            }
+            final String args = "rsc_order "
+                                + id_str
+                                + orderId    + " "
+                                + from_str
+                                + parentHbId + " "
+                                + type_str
+                                + "before "
+                                + to_str
+                                + heartbeatId;
+            final String command = getMgmtCommand("up_co",
+                                                  host.getCluster().getHbPasswd(),
+                                                  args);
+            execCommand(host, command, true);
         }
-        final String args = "rsc_order "
-                            + id_str
-                            + orderId    + " "
-                            + from_str
-                            + parentHbId + " "
-                            + type_str
-                            + "before "
-                            + to_str
-                            + heartbeatId;
-        final String command = getMgmtCommand("up_co",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
     }
 
     /**

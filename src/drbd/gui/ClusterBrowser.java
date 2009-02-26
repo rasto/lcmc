@@ -4621,10 +4621,15 @@ public class ClusterBrowser extends Browser {
                 if (!hsi.equals(hsiSaved)) {
                     final String onHost = hi.getName();
                     final String score = hsi.getScore();
+                    final String locationId =
+                              heartbeatStatus.getLocationId(
+                                                getService().getHeartbeatId(),
+                                                onHost);
                     Heartbeat.setLocation(getDCHost(),
-                                          heartbeatId,
+                                          getService().getHeartbeatId(),
                                           onHost,
-                                          score);
+                                          score,
+                                          locationId);
                 }
             }
             storeHostScoreInfos();
@@ -4794,6 +4799,9 @@ public class ClusterBrowser extends Browser {
                 for (String param : params) {
                     final String oldValue = getResource().getValue(param);
                     String value = getComboBoxValue(param);
+                    System.out.println("value: " + value + ", oldValue: "
+                                       + oldValue + ", default: " + 
+                                       getParamDefault(param));
                     if (value.equals(oldValue)) {
                         continue;
                     }
@@ -4843,7 +4851,20 @@ public class ClusterBrowser extends Browser {
             final String orderId =
                     heartbeatStatus.getOrderId(parentHbId,
                                                getService().getHeartbeatId());
-            Heartbeat.removeOrder(getDCHost(), orderId);
+            final String score =
+                heartbeatStatus.getOrderScore(
+                                    parent.getService().getHeartbeatId(), 
+                                    getService().getHeartbeatId());
+            final String symmetrical =
+                heartbeatStatus.getOrderSymmetrical(
+                                    parent.getService().getHeartbeatId(), 
+                                    getService().getHeartbeatId());
+            Heartbeat.removeOrder(getDCHost(),
+                                  orderId,
+                                  parentHbId,
+                                  getService().getHeartbeatId(),
+                                  score,
+                                  symmetrical);
         }
 
         /**
@@ -4864,7 +4885,16 @@ public class ClusterBrowser extends Browser {
             final String colocationId =
                 heartbeatStatus.getColocationId(parentHbId,
                                                 getService().getHeartbeatId());
-            Heartbeat.removeColocation(getDCHost(), colocationId);
+            final String score =
+                heartbeatStatus.getColocationScore(
+                                    parent.getService().getHeartbeatId(), 
+                                    getService().getHeartbeatId());
+            Heartbeat.removeColocation(getDCHost(),
+                                       colocationId,
+                                       parentHbId, /* from */
+                                       getService().getHeartbeatId(), /* to */
+                                       score
+                                       );
         }
 
         /**
@@ -5023,11 +5053,33 @@ public class ClusterBrowser extends Browser {
                         final String colocationId =
                             heartbeatStatus.getColocationId(
                                     parent, getService().getHeartbeatId());
-                        Heartbeat.removeColocation(getDCHost(), colocationId);
+                        final String colScore =
+                            heartbeatStatus.getColocationScore(
+                                           parent, 
+                                           getService().getHeartbeatId());
+                        Heartbeat.removeColocation(getDCHost(),
+                                                   colocationId,
+                                                   parent,
+                                                   getService().getHeartbeatId(),
+                                                   colScore);
                         final String orderId =
                                     heartbeatStatus.getOrderId(
                                         parent, getService().getHeartbeatId());
-                        Heartbeat.removeOrder(getDCHost(), orderId);
+
+                        final String ordScore =
+                            heartbeatStatus.getOrderScore(
+                                           parent, 
+                                           getService().getHeartbeatId());
+                        final String symmetrical =
+                            heartbeatStatus.getOrderSymmetrical(
+                                           parent, 
+                                           getService().getHeartbeatId());
+                        Heartbeat.removeOrder(getDCHost(),
+                                              orderId,
+                                              parent,
+                                              getService().getHeartbeatId(),
+                                              ordScore,
+                                              symmetrical);
                     }
 
                     final String[] children = heartbeatGraph.getChildren(this);
@@ -5035,14 +5087,40 @@ public class ClusterBrowser extends Browser {
                         final String colocationId =
                                        heartbeatStatus.getColocationId(
                                           child, getService().getHeartbeatId());
-                        Heartbeat.removeColocation(getDCHost(), colocationId);
+                        final String colScore =
+                            heartbeatStatus.getColocationScore(
+                                           getService().getHeartbeatId(),
+                                           child);
+                        Heartbeat.removeColocation(getDCHost(),
+                                                   colocationId,
+                                                   getService().getHeartbeatId(),
+                                                   child,
+                                                   colScore);
                         final String orderId = heartbeatStatus.getOrderId(child,
                                                 getService().getHeartbeatId());
-                        Heartbeat.removeOrder(getDCHost(), orderId);
+                        final String ordScore =
+                            heartbeatStatus.getOrderScore(
+                                           getService().getHeartbeatId(),
+                                           child);
+                        final String symmetrical =
+                            heartbeatStatus.getOrderSymmetrical(
+                                           getService().getHeartbeatId(),
+                                           child);
+                        Heartbeat.removeOrder(getDCHost(),
+                                              orderId,
+                                              getService().getHeartbeatId(),
+                                              child,
+                                              ordScore,
+                                              symmetrical);
                     }
 
                     for (String locId : heartbeatStatus.getLocationIds(getService().getHeartbeatId())) {
-                        Heartbeat.removeLocation(getDCHost(), locId);
+                        final String locScore =
+                            heartbeatStatus.getLocationScore(locId);
+                        Heartbeat.removeLocation(getDCHost(),
+                                                 locId,
+                                                 getService().getHeartbeatId(),
+                                                 locScore);
                     }
                 }
                 Heartbeat.removeResource(getDCHost(),
