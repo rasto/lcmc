@@ -101,7 +101,7 @@ public class HeartbeatStatus {
      * (before, after) */
     private MultiKeyMap orderDirectionMap = new MultiKeyMap();
     /** Operations map. */
-    private final MultiKeyMap operationsMap = new MultiKeyMap();
+    private MultiKeyMap operationsMap = new MultiKeyMap();
     /** All nodes. */
     private final Set<String> allNodes = new HashSet<String>();
     /** All active nodes. */
@@ -786,5 +786,6 @@ public class HeartbeatStatus {
         locationsIdMap    = cibQueryMap.getLocationsId();
         locationScoreMap  = cibQueryMap.getLocationScore();
         resHostToLocIdMap = cibQueryMap.getResHostToLocId();
+        operationsMap     = cibQueryMap.getOperations();
     }
 }

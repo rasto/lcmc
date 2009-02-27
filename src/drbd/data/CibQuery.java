@@ -70,6 +70,8 @@ public class CibQuery {
                                            new HashMap<String, String>();
     /** Map from resource and host to location id. */
     private MultiKeyMap resHostToLocId = new MultiKeyMap();
+    /** Operations map. */
+    private MultiKeyMap operations = new MultiKeyMap();
 
     /**
      * Sets crm config map.
@@ -283,5 +285,19 @@ public class CibQuery {
      */
     public final MultiKeyMap getResHostToLocId() {
         return resHostToLocId;
+    }
+
+    /**
+     * Sets operations map.
+     */
+    public final void setOperations(MultiKeyMap operations) {
+        this.operations = operations;
+    }
+
+    /**
+     * Returns operations map.
+     */
+    public final MultiKeyMap getOperations() {
+        return operations;
     }
 }

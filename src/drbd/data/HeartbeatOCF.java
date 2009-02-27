@@ -937,18 +937,20 @@ public class HeartbeatOCF extends XML {
                                     new HashMap<String, Map<String, String>>();
         final Map<String, HeartbeatService> resourceTypeMap =
                                       new HashMap<String, HeartbeatService>();
+        final MultiKeyMap operationsMap =
+                                      new MultiKeyMap();
 
         final NodeList primitives = resourcesNode.getChildNodes();
         for (int i = 0; i < primitives.getLength(); i++) {
             final Node primitiveNode = primitives.item(i);
             if (primitiveNode.getNodeName().equals("primitive")) {
                 final String hbClass = getAttribute(primitiveNode, "class");
-                final String id = getAttribute(primitiveNode, "id");
+                final String hbId = getAttribute(primitiveNode, "id");
                 final String provider = getAttribute(primitiveNode, "provider");
                 final String type = getAttribute(primitiveNode, "type");
-                resourceTypeMap.put(id, getHbService(type, hbClass));
+                resourceTypeMap.put(hbId, getHbService(type, hbClass));
                 final Map<String,String> params = new HashMap<String,String>();
-                parametersMap.put(id, params);
+                parametersMap.put(hbId, params);
                 /* <instance_attributes> */
                 final Node instanceAttrNode =
                                            getChildNode(primitiveNode,
@@ -961,6 +963,41 @@ public class HeartbeatOCF extends XML {
                         final String name = getAttribute(optionNode, "name");
                         final String value = getAttribute(optionNode, "value");
                         params.put(name, value);
+                    }
+                }
+
+                /* <operations> */
+                final Node operationsNode =
+                                           getChildNode(primitiveNode,
+                                                        "operations");
+                if (operationsNode != null) {
+                    /* <op> */
+                    final NodeList ops = operationsNode.getChildNodes();
+                    for (int k = 0; k < nvpairsRes.getLength(); k++) {
+                        final Node opNode = ops.item(k);
+                        if (opNode.getNodeName().equals("op")) {
+                            final String operationId = getAttribute(opNode,
+                                                                    "id");
+                            final String name = getAttribute(opNode, "name");
+                            final String timeout = getAttribute(opNode,
+                                                                "timeout");
+                            final String interval = getAttribute(opNode,
+                                                                 "interval");
+                            final String startDelay = getAttribute(opNode,
+                                                                   "start-delay");
+                            operationsMap.put(hbId,
+                                              name,
+                                              "interval",
+                                              interval);
+                            operationsMap.put(hbId,
+                                              name,
+                                              "timeout",
+                                              timeout);
+                            operationsMap.put(hbId,
+                                              name,
+                                              "start-delay",
+                                              startDelay);
+                        }
                     }
                 }
             }
@@ -1061,6 +1098,7 @@ public class HeartbeatOCF extends XML {
         cibQueryData.setLocation(locationMap);
         cibQueryData.setLocationsId(locationsIdMap);
         cibQueryData.setResHostToLocId(resHostToLocIdMap);
+        cibQueryData.setOperations(operationsMap);
         return cibQueryData;
     }
 }
