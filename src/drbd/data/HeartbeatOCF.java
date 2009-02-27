@@ -45,13 +45,15 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * of services in the hashes and provides methods to get this
  * information.
  *
- * TODO: it's not only OCF so it needs to be renamed
+ * TODO: it's not only OCF anymore so it needs to be renamed
  *
  * @author Rasto Levrinc
  * @version $Id$
  *
  */
 public class HeartbeatOCF extends XML {
+    /** Host */
+    private final Host host;
     /** List of global parameters. */
     private final List<String> globalParams = new ArrayList<String>();
     /** List of required global parameters. */
@@ -106,6 +108,7 @@ public class HeartbeatOCF extends XML {
      */
     public HeartbeatOCF(final Host host) {
         super();
+        this.host = host;
         // TODO: check for drbddisk resource ?
         final String command = host.getCommand("Heartbeat.getOCFParameters");
         final String output =
@@ -153,14 +156,7 @@ public class HeartbeatOCF extends XML {
 
 
         final String hbV = host.getHeartbeatVersion();
-        String[] booleanValues = new String[2];
-        if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
-            booleanValues[0] = Tools.getString("Heartbeat.2.1.3.Boolean.True");
-            booleanValues[1] = Tools.getString("Heartbeat.2.1.3.Boolean.False");
-        } else {
-            booleanValues[0] = HB_BOOLEAN_TRUE;
-            booleanValues[1] = HB_BOOLEAN_FALSE;
-        }
+        String[] booleanValues = getGlobalCheckBoxChoices();
 
         /* hardcoding global params */
         /* symmetric cluster */
@@ -301,6 +297,53 @@ public class HeartbeatOCF extends XML {
                                                             HB_BOOLEAN_FALSE);
             paramGlobalPossibleChoices.put("start-failure-is-fatal",
                                            booleanValues);
+        }
+    }
+
+    /**
+     * Returns choices for check boxes in the global config. (True, False).
+     */
+    public final String[] getGlobalCheckBoxChoices() {
+        final String hbV = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
+            return new String[]{
+                Tools.getString("Heartbeat.2.1.3.Boolean.True"),
+                Tools.getString("Heartbeat.2.1.3.Boolean.False")};
+        } else {
+            return new String[]{HB_BOOLEAN_TRUE, HB_BOOLEAN_FALSE};
+        }
+    }
+
+
+    /**
+     * Returns choices for check box. (True, False).
+     * The problem is, that heartbeat kept changing the lower and upper case in
+     * the true and false values.
+     */
+    public final String[] getCheckBoxChoices(final HeartbeatService hbService,
+                                             final String param) {
+        final String paramDefault = getParamDefault(hbService, param);
+        if (paramDefault != null) {
+            if ("yes".equals(paramDefault) || "no".equals(paramDefault)) {
+                return new String[]{"yes", "no"};
+            } else if ("Yes".equals(paramDefault)
+                       || "No".equals(paramDefault)) {
+                return new String[]{"Yes", "No"};
+            } else if ("true".equals(paramDefault)
+                       || "false".equals(paramDefault)) {
+                return new String[]{"true", "false"};
+            } else if ("True".equals(paramDefault)
+                       || "False".equals(paramDefault)) {
+                return new String[]{"True", "False"};
+            }
+        }
+        final String hbV = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
+            return new String[]{
+                Tools.getString("Heartbeat.2.1.3.Boolean.True"),
+                Tools.getString("Heartbeat.2.1.3.Boolean.False")};
+        } else {
+            return new String[]{HB_BOOLEAN_TRUE, HB_BOOLEAN_FALSE};
         }
     }
 
@@ -452,7 +495,7 @@ public class HeartbeatOCF extends XML {
     public final String[] getParamPossibleChoices(
                                             final HeartbeatService hbService,
                                             final String param) {
-        return hbService.getParamPossibleChoices(param);
+        return hbService.getParamPossibleChoices(param); // TODO: dead code
     }
 
     /**

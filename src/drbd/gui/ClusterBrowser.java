@@ -4286,8 +4286,12 @@ public class ClusterBrowser extends Browser {
          * Returns possible choices for drop down lists.
          */
         protected Object[] getParamPossibleChoices(final String param) {
-            return hbOCF.getParamPossibleChoices(hbService,
-                                                 param);
+            if (isCheckBox(param)) {
+                return hbOCF.getCheckBoxChoices(hbService, param);
+            } else {
+                // TODO: this does nothing, I think
+                return hbOCF.getParamPossibleChoices(hbService, param);
+            }
         }
 
         /**
