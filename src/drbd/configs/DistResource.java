@@ -194,7 +194,10 @@ public class DistResource extends
         {"Heartbeat.getCrmMon",     "crm_mon -1"},
         {"Heartbeat.getProcesses",  "ps aux|grep heartbeat|grep -v regevt"},
 
-        {"UdevCheck.version", "udevinfo -V 2>/dev/null | grep 'version '|sed 's/udevinfo, version //'"},
+        //{"UdevCheck.version", "udevinfo -V 2>/dev/null | grep 'version '|sed 's/udevinfo, version //'"},
+        //{"UdevCheck.version", "udevinfo -V 2>/dev/null | grep 'version '|sed 's/udevinfo, version //'"},
+        {"UdevCheck.version", "udevadm version 2>/dev/null"},
+        
         {"Logs.hbLog",     "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null || grep @GREPPATTERN@ /var/log/syslog)|tail -500"},
         {"DrbdLog.log",    "grep @GREPPATTERN@ /var/log/kern.log | tail -500"},
     };
