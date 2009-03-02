@@ -492,6 +492,7 @@ public class HeartbeatStatus {
                 try {
                     final String itemType = data.get(0);
                     resourceItemTypeMap.put(hbId, itemType);
+                    System.out.println(hbId + " resourceItemType: " + itemType);
                 } catch (IndexOutOfBoundsException e) {
                     Tools.appError("could not get " + cmd, "", e);
                     return;

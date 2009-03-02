@@ -564,6 +564,9 @@ PYTHON
         "crm_config\\ncrmd-integration-timeout",
         "crm_config\\ncrmd-finalization-timeout",
 
+	"all_rsc",
+	"sub_rsc",
+	"rsc_type",
 	"rsc_attrs",
 	"rsc_metaattrs",
 	"rsc_params",
@@ -581,9 +584,6 @@ PYTHON
 	"node_config",
 	"running_rsc",
 
-	"all_rsc",
-	"sub_rsc",
-	"rsc_type",
 	"rsc_status",
 	"rsc_running_on",
 	# "rsc_metadata\\nheartbeat\\ndrbddisk\\nheartbeat",

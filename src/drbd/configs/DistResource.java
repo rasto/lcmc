@@ -54,6 +54,7 @@ public class DistResource extends
         {"dist:ubuntu",               "ubuntu"},
         {"dist:ubuntu-dapper-server", "ubuntu"},
         {"dist:ubuntu-hardy-server",  "ubuntu"},
+        {"dist:ubuntu-jaunty-server",  "ubuntu"},
 
         {"kerneldir",                 "(.*)"},
 

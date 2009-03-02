@@ -38,6 +38,7 @@ public class DistResource_ubuntu extends
     private static Object[][] contents = {
         {"Support",            "generic ubuntu"},
         {"version:7.04",       ""},
+        {"version:9.04",       "JAUNTY"},
         {"version:8.04",       "HARDY"},
         {"version:6.06",       "DAPPER"},
         {"arch:x86_64",        "amd64"}, // convert arch to arch in the drbd download file
