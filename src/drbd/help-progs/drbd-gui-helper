@@ -576,6 +576,9 @@ PYTHON
 		# Pacemaker
 		$p.= <<PYTHON
 	"cib_query\\ncib",
+	"all_rsc",
+	"sub_rsc",
+	"rsc_type",
 PYTHON
 	}
 	$p.= <<PYTHON;

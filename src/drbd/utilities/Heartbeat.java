@@ -173,7 +173,10 @@ public final class Heartbeat {
      *          argument string
      */
     public static void addResource(final Host host,
-                                   final String args) {
+                                   final String args,
+                                   final String heartbeatId,
+                                   final Map<String,String> pacemakerResAttrs,
+                                   final Map<String,String> pacemakerResArgs) {
         if (args == null) {
             return;
         }
@@ -196,10 +199,15 @@ public final class Heartbeat {
         if (args == null) {
             return;
         }
-        final String command = getMgmtCommand("add_grp",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+        } else {
+            final String command = getMgmtCommand("add_grp",
+                                                  host.getCluster().getHbPasswd(),
+                                                  args);
+            execCommand(host, command, true);
+        }
     }
 
     /**

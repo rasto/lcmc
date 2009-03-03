@@ -4722,6 +4722,9 @@ public class ClusterBrowser extends Browser {
                 in heartbeat 2.1.3 there is additional new_group parameter (sometimes it is, sometime not 2.1.3-2)
             */
             String heartbeatId = null;
+            Map<String,String> pacemakerResAttrs =
+                                                new HashMap<String,String>();
+            Map<String,String> pacemakerResArgs = new HashMap<String,String>();
             if (getService().isNew()) {
                 heartbeatId     = getService().getHeartbeatId();
                 final String hbClass         = getService().getHeartbeatClass();
@@ -4766,6 +4769,13 @@ public class ClusterBrowser extends Browser {
                 args.append(' ');
                 args.append(masterNodeMax);
 
+                /* for pacemaker */
+                pacemakerResAttrs.put("id",       heartbeatId);
+                pacemakerResAttrs.put("class",    hbClass);
+                pacemakerResAttrs.put("provider", provider);
+                pacemakerResAttrs.put("type",     type);
+                /* TODO: there are more attributes. */
+
                 final String hbV = getDCHost().getHeartbeatVersion();
                 if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
                     args.append(' ');
@@ -4778,6 +4788,9 @@ public class ClusterBrowser extends Browser {
                     }
                     if ("".equals(value)) {
                         value = HB_NONE_ARG;
+                    } else {
+                        /* for pacemaker */
+                        pacemakerResArgs.put(param, value);
                     }
                     args.append(' ');
                     args.append(heartbeatId);
@@ -4788,8 +4801,14 @@ public class ClusterBrowser extends Browser {
                     args.append(" \"");
                     args.append(value);
                     args.append('"');
+
+                    pacemakerResArgs.put(param, value);
                 }
-                Heartbeat.addResource(getDCHost(), args.toString());
+                Heartbeat.addResource(getDCHost(),
+                                      args.toString(),
+                                      heartbeatId,
+                                      pacemakerResAttrs,
+                                      pacemakerResArgs);
                 if (groupInfo == null) {
                     final String[] parents = heartbeatGraph.getParents(this);
                     Heartbeat.setOrderAndColocation(getDCHost(),
