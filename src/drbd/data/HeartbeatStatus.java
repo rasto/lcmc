@@ -71,6 +71,9 @@ public class HeartbeatStatus {
     /** Map from service to its heartbeat service object. */
     private Map<String, HeartbeatService> resourceTypeMap =
                                         new HashMap<String, HeartbeatService>();
+    /** Map from service to the instance_attributes id. */
+    private Map<String, String> resourceInstanceAttrIdMap =
+                                                 new HashMap<String, String>();
     /** Map from service to its type. group / native. */
     private final Map<String, String> resourceItemTypeMap =
                                                 new HashMap<String, String>();
@@ -79,6 +82,9 @@ public class HeartbeatStatus {
                                                 new HashMap<String, String>();
     /** Map from service and its parameters to the values. */
     private Map<String, Map<String, String>> parametersMap =
+                                    new HashMap<String, Map<String, String>>();
+    /** Map from service and its parameters to the nvpairs ids. */
+    private Map<String, Map<String, String>> parametersNvpairsIdsMap =
                                     new HashMap<String, Map<String, String>>();
     /** Whether the crmd or pengine was already parsed. */
     private final List<String> alreadyParsed = new ArrayList<String>();
@@ -141,6 +147,13 @@ public class HeartbeatStatus {
     }
 
     /**
+     * Returns hash with parameter name and nvpair id of the specified service.
+     */
+    public final Map<String, String> getParametersNvpairsIds(final String hbId) {
+        return parametersNvpairsIdsMap.get(hbId);
+    }
+
+    /**
      * Returns the dc host.
      */
     public final String getDC() {
@@ -189,6 +202,13 @@ public class HeartbeatStatus {
      */
     public final HeartbeatService getResourceType(final String hbId) {
         return resourceTypeMap.get(hbId);
+    }
+
+    /**
+     * Returns instance_attributes id the service.
+     */
+    public final String getResourceInstanceAttrId(final String hbId) {
+        return resourceInstanceAttrIdMap.get(hbId);
     }
 
     /**
@@ -492,7 +512,6 @@ public class HeartbeatStatus {
                 try {
                     final String itemType = data.get(0);
                     resourceItemTypeMap.put(hbId, itemType);
-                    System.out.println(hbId + " resourceItemType: " + itemType);
                 } catch (IndexOutOfBoundsException e) {
                     Tools.appError("could not get " + cmd, "", e);
                     return;
@@ -687,6 +706,7 @@ public class HeartbeatStatus {
         locationScoreMap.clear();
         globalConfigMap.clear();
         resourceTypeMap.clear();
+        resourceInstanceAttrIdMap.clear();
         resourceItemTypeMap.clear();
         resourceStatusMap.clear();
         parametersMap.clear();
@@ -768,25 +788,27 @@ public class HeartbeatStatus {
      */
     private final void parseCibQuery(final HeartbeatOCF hbOCF,
                                      final String query) {
-        CibQuery cibQueryMap = hbOCF.parseCibQuery(query);
-        globalConfigMap    = cibQueryMap.getCrmConfig();
-        parametersMap      = cibQueryMap.getParameters();
-        resourceTypeMap    = cibQueryMap.getResourceType();
+        CibQuery cibQueryMap    = hbOCF.parseCibQuery(query);
+        globalConfigMap         = cibQueryMap.getCrmConfig();
+        parametersMap           = cibQueryMap.getParameters();
+        parametersNvpairsIdsMap = cibQueryMap.getParametersNvpairsIds();
+        resourceTypeMap         = cibQueryMap.getResourceType();
+        resourceInstanceAttrIdMap = cibQueryMap.getResourceInstanceAttrId();
 
-        colocationMap      = cibQueryMap.getColocation();
-        colocationScoreMap = cibQueryMap.getColocationScore();
-        colocationIdMap    = cibQueryMap.getColocationId();
+        colocationMap           = cibQueryMap.getColocation();
+        colocationScoreMap      = cibQueryMap.getColocationScore();
+        colocationIdMap         = cibQueryMap.getColocationId();
 
-        orderMap          = cibQueryMap.getOrder();
-        orderScoreMap     = cibQueryMap.getOrderScore();
-        orderSymmetricalMap = cibQueryMap.getOrderSymmetrical();
-        orderIdMap        = cibQueryMap.getOrderId();
-        orderDirectionMap = cibQueryMap.getOrderDirection(); /* not in pacemaker */
+        orderMap                = cibQueryMap.getOrder();
+        orderScoreMap           = cibQueryMap.getOrderScore();
+        orderSymmetricalMap     = cibQueryMap.getOrderSymmetrical();
+        orderIdMap              = cibQueryMap.getOrderId();
+        orderDirectionMap       = cibQueryMap.getOrderDirection(); /* not in pacemaker */
 
-        locationMap       = cibQueryMap.getLocation();
-        locationsIdMap    = cibQueryMap.getLocationsId();
-        locationScoreMap  = cibQueryMap.getLocationScore();
-        resHostToLocIdMap = cibQueryMap.getResHostToLocId();
-        operationsMap     = cibQueryMap.getOperations();
+        locationMap             = cibQueryMap.getLocation();
+        locationsIdMap          = cibQueryMap.getLocationsId();
+        locationScoreMap        = cibQueryMap.getLocationScore();
+        resHostToLocIdMap       = cibQueryMap.getResHostToLocId();
+        operationsMap           = cibQueryMap.getOperations();
     }
 }

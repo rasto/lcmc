@@ -41,8 +41,12 @@ public class CibQuery {
     private Map<String, String> crmConfig;
     /** Map with resources and its parameters. */
     private Map<String, Map<String, String>> parameters;
+    /** Map with resources and parameters nvpair ids. */
+    private Map<String, Map<String, String>> parametersNvpairsIds;
     /** Map with resource type. */
     private Map<String, HeartbeatService> resourceType;
+    /** Map with resource instance_attributes id. */
+    private Map<String, String> resourceInstanceAttrId;
     /** Colocation map. */
     private Map<String, List<String>> colocation;
     /** Colocation score map. */
@@ -104,7 +108,23 @@ public class CibQuery {
     }
 
     /**
-     * Sets the resource map.
+     * Sets the parameters nvpairs id map, with the first key being the
+     * resource id and the second key being the parameter name.
+     */
+    public final void setParametersNvpairsIds(
+                       final Map<String, Map<String, String>> parametersNvpairsIds) {
+        this.parametersNvpairsIds = parametersNvpairsIds;
+    }
+
+    /**
+     * Returns the parameters nvpairs id map.
+     */
+    public final Map<String ,Map<String, String>> getParametersNvpairsIds() {
+        return parametersNvpairsIds;
+    }
+
+    /**
+     * Sets the resource type map.
      */
     public final void setResourceType(
                                 Map<String, HeartbeatService> resourceType) {
@@ -112,11 +132,28 @@ public class CibQuery {
     }
 
     /**
-     * Returns the resource type.
+     * Returns the resource type map.
      */
     public final Map<String, HeartbeatService> getResourceType() {
         return resourceType;
     }
+
+
+    /**
+     * Sets the resource instance_attributes id map.
+     */
+    public final void setResourceInstanceAttrId(
+                                Map<String, String> resourceInstanceAttrId) {
+        this.resourceInstanceAttrId = resourceInstanceAttrId;
+    }
+
+    /**
+     * Returns the resource instance_attributes map.
+     */
+    public final Map<String, String> getResourceInstanceAttrId() {
+        return resourceInstanceAttrId;
+    }
+
 
     /**
      * Sets the colocation map with one resource as a key and list of resources

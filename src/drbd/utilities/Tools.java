@@ -921,7 +921,7 @@ public final class Tools {
             return ret;
         } catch (Exception e) {
             //appError("AppError.Unresolved.Command", text + "\n", e);
-            return "command not defined: " + text;
+            return "# command not defined: " + text;
         }
     }
 

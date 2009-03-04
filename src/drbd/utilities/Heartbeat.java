@@ -173,17 +173,67 @@ public final class Heartbeat {
      *          argument string
      */
     public static void addResource(final Host host,
-                                   final String args,
                                    final String heartbeatId,
-                                   final Map<String,String> pacemakerResAttrs,
-                                   final Map<String,String> pacemakerResArgs) {
+                                   final String args,
+                                   final Map<String, String> pacemakerResAttrs,
+                                   final Map<String, String> pacemakerResArgs,
+                                   String instanceAttrId,
+                                   final Map<String, String> nvpairIdsHash) {
         if (args == null) {
             return;
         }
-        final String command = getMgmtCommand("add_rsc",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            if (instanceAttrId == null) {
+                instanceAttrId = heartbeatId + "-instance_attributes";
+            }
+            /* pacemaker */
+            final StringBuffer attrsString = new StringBuffer(100);
+            for (final String attrName : pacemakerResAttrs.keySet()) {
+                final String value = pacemakerResAttrs.get(attrName);
+                attrsString.append(attrName);
+                attrsString.append("=\\\"");
+                attrsString.append(value);
+                attrsString.append("\\\"\\ ");
+            }
+            
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append("'\\<primitive\\ ");
+            xml.append(attrsString);
+            xml.append("\\>");
+
+            xml.append("\\<instance_attributes\\ id=\\\"");
+            xml.append(instanceAttrId);
+            xml.append("\\\"\\>");
+
+            for (final String paramName : pacemakerResArgs.keySet()) {
+                final String value = pacemakerResArgs.get(paramName);
+                String nvpairId = nvpairIdsHash.get(paramName);
+                if (nvpairId == null) {
+                    nvpairId = "nvpair-" + heartbeatId + "-" + paramName;
+                }
+                xml.append("\\<nvpair\\ id=\\\"");
+                xml.append(nvpairId);
+                xml.append("\\\"\\ name=\\\"");
+                xml.append(paramName);
+                xml.append("\\\"\\ value=\\\"");
+                xml.append(value);
+                xml.append("\\\"/\\>");
+            }
+            xml.append("\\</instance_attributes\\>");
+            xml.append("\\</primitive\\>'");
+
+            final String command = getMgmtCommand(
+                                          "cib_update resources",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            final String command = getMgmtCommand("add_rsc",
+                                                  host.getCluster().getHbPasswd(),
+                                                  args);
+            execCommand(host, command, true);
+        }
     }
 
     /**
@@ -474,12 +524,29 @@ public final class Heartbeat {
      */
     public static void setParameters(final Host host,
                                      final String heartbeatId,
-                                     final String args) {
+                                     final String args,
+                                   final Map<String, String> pacemakerResAttrs,
+                                   final Map<String, String> pacemakerResArgs,
+                                   final String instanceAttrId,
+                                   final Map<String, String> nvpairIdsHash) {
 
-        final String command = getMgmtCommand("up_rsc_params",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            addResource(host,
+                        heartbeatId,
+                        args,
+                        pacemakerResAttrs,
+                        pacemakerResArgs,
+                        instanceAttrId,
+                        nvpairIdsHash);
+        } else {
+            final String command = getMgmtCommand(
+                                               "up_rsc_params",
+                                               host.getCluster().getHbPasswd(),
+                                               args);
+            execCommand(host, command, true);
+        }
     }
 
     /**

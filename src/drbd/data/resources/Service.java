@@ -96,6 +96,10 @@ public class Service extends Resource {
      * Sets the id and heartbeat id.
      */
     public final void setId(final String id) {
+        if (id != null) {
+            /* set id only once */
+            return;
+        }
         this.id = id;
         if ("Group".equals(getName())) {
             if (id.startsWith(GRP_ID_PREFIX)) {
@@ -111,7 +115,6 @@ public class Service extends Resource {
             }
         }
         setValue("id", id);
-
     }
 
     /**

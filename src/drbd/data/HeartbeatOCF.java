@@ -935,8 +935,12 @@ public class HeartbeatOCF extends XML {
         //Map<String,String> resourceItemTypeMap = new HashMap<String,String>();
         final Map<String, Map<String, String>> parametersMap =
                                     new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> parametersNvpairsIdsMap =
+                                    new HashMap<String, Map<String, String>>();
         final Map<String, HeartbeatService> resourceTypeMap =
                                       new HashMap<String, HeartbeatService>();
+        final Map<String, String> resourceInstanceAttrIdMap =
+                                      new HashMap<String, String>();
         final MultiKeyMap operationsMap =
                                       new MultiKeyMap();
 
@@ -949,20 +953,28 @@ public class HeartbeatOCF extends XML {
                 final String provider = getAttribute(primitiveNode, "provider");
                 final String type = getAttribute(primitiveNode, "type");
                 resourceTypeMap.put(hbId, getHbService(type, hbClass));
-                final Map<String,String> params = new HashMap<String,String>();
+                final Map<String, String> params =
+                                                new HashMap<String, String>();
                 parametersMap.put(hbId, params);
+                final Map<String, String> nvpairIds =
+                                                new HashMap<String, String>();
+                parametersNvpairsIdsMap.put(hbId, nvpairIds);
                 /* <instance_attributes> */
                 final Node instanceAttrNode =
                                            getChildNode(primitiveNode,
                                                         "instance_attributes");
                 /* <nvpair...> */
+                final String iAId = getAttribute(instanceAttrNode, "id");
+                resourceInstanceAttrIdMap.put(hbId, iAId);
                 final NodeList nvpairsRes = instanceAttrNode.getChildNodes();
                 for (int j = 0; j < nvpairsRes.getLength(); j++) {
                     final Node optionNode = nvpairsRes.item(j);
                     if (optionNode.getNodeName().equals("nvpair")) {
+                        final String nvpairId = getAttribute(optionNode, "id");
                         final String name = getAttribute(optionNode, "name");
                         final String value = getAttribute(optionNode, "value");
                         params.put(name, value);
+                        nvpairIds.put(name, nvpairId);
                     }
                 }
 
@@ -1083,7 +1095,9 @@ public class HeartbeatOCF extends XML {
         }
 
         cibQueryData.setParameters(parametersMap);
+        cibQueryData.setParametersNvpairsIds(parametersNvpairsIdsMap);
         cibQueryData.setResourceType(resourceTypeMap);
+        cibQueryData.setResourceInstanceAttrId(resourceInstanceAttrIdMap);
 
         cibQueryData.setColocation(colocationMap);
         cibQueryData.setColocationScore(colocationScoreMap);

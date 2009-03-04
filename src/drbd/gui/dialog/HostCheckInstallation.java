@@ -316,7 +316,13 @@ public class HostCheckInstallation extends DialogHost {
             });
         } else {
             heartbeatOk = true;
-            final String version = ans.trim();
+            final int i = ans.indexOf(' ');
+            String version;
+            if (i < 0) {
+                version = ans;
+            } else {
+                version = ans.substring(0, i);
+            }
             /* hide heartbeat gui package if version is < 2.1.0 TODO: Don't
              * know exact version */
             if (Tools.compareVersions(version, "2.1.0") < 0) {
@@ -326,7 +332,7 @@ public class HostCheckInstallation extends DialogHost {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     heartbeatIcon.setIcon(INSTALLED_ICON);
-                    heartbeatLabel.setText(": " + version);
+                    heartbeatLabel.setText(": " + getHost().getHeartbeatVersion());
                 }
             });
 
@@ -416,7 +422,7 @@ public class HostCheckInstallation extends DialogHost {
                 }
             });
         }
-        if (heartbeatOk && heartbeatGUIOk) {
+        if (true || (heartbeatOk && heartbeatGUIOk)) { // TODO
             /* drbd is not required. */
             enableComponents();
             SwingUtilities.invokeLater(new Runnable() {

@@ -4721,15 +4721,18 @@ public class ClusterBrowser extends Browser {
 
                 in heartbeat 2.1.3 there is additional new_group parameter (sometimes it is, sometime not 2.1.3-2)
             */
-            String heartbeatId = null;
             Map<String,String> pacemakerResAttrs =
                                                 new HashMap<String,String>();
             Map<String,String> pacemakerResArgs = new HashMap<String,String>();
+            final String hbClass         = getService().getHeartbeatClass();
+            final String type            = getResource().getName();
+            String heartbeatId     = getService().getHeartbeatId();
+            pacemakerResAttrs.put("id",       heartbeatId);
+            pacemakerResAttrs.put("class",    hbClass);
+            pacemakerResAttrs.put("type",     type);
             if (getService().isNew()) {
-                heartbeatId     = getService().getHeartbeatId();
-                final String hbClass         = getService().getHeartbeatClass();
-                final String type            = getResource().getName();
-                final String provider        = HB_HEARTBEAT_PROVIDER;
+                final String provider = HB_HEARTBEAT_PROVIDER;
+                pacemakerResAttrs.put("provider", provider);
                 String group;
                 if (groupInfo == null) {
                     group = HB_NONE_ARG;
@@ -4769,11 +4772,6 @@ public class ClusterBrowser extends Browser {
                 args.append(' ');
                 args.append(masterNodeMax);
 
-                /* for pacemaker */
-                pacemakerResAttrs.put("id",       heartbeatId);
-                pacemakerResAttrs.put("class",    hbClass);
-                pacemakerResAttrs.put("provider", provider);
-                pacemakerResAttrs.put("type",     type);
                 /* TODO: there are more attributes. */
 
                 final String hbV = getDCHost().getHeartbeatVersion();
@@ -4801,14 +4799,14 @@ public class ClusterBrowser extends Browser {
                     args.append(" \"");
                     args.append(value);
                     args.append('"');
-
-                    pacemakerResArgs.put(param, value);
                 }
                 Heartbeat.addResource(getDCHost(),
-                                      args.toString(),
                                       heartbeatId,
+                                      args.toString(),
                                       pacemakerResAttrs,
-                                      pacemakerResArgs);
+                                      pacemakerResArgs,
+                                      null,
+                                      null);
                 if (groupInfo == null) {
                     final String[] parents = heartbeatGraph.getParents(this);
                     Heartbeat.setOrderAndColocation(getDCHost(),
@@ -4817,24 +4815,18 @@ public class ClusterBrowser extends Browser {
                 }
             } else {
                 // update parameters
-                heartbeatId = getService().getHeartbeatId();
                 final StringBuffer args = new StringBuffer("");
                 for (String param : params) {
                     final String oldValue = getResource().getValue(param);
                     String value = getComboBoxValue(param);
-                    System.out.println("value: " + value + ", oldValue: "
-                                       + oldValue + ", default: " + 
-                                       getParamDefault(param));
                     if (value.equals(oldValue)) {
-                        continue;
-                    }
-                    if (value.equals(getParamDefault(param))) {
-                        // TODO: is this bug?
                         continue;
                     }
 
                     if ("".equals(value)) {
                         value = getParamDefault(param);
+                    } else {
+                        pacemakerResArgs.put(param, value);
                     }
                     args.append(' ');
                     args.append(heartbeatId);
@@ -4847,9 +4839,14 @@ public class ClusterBrowser extends Browser {
                     args.append('"');
                 }
                 args.insert(0, heartbeatId);
-                Heartbeat.setParameters(getDCHost(),
-                                        heartbeatId,
-                                        args.toString());
+                Heartbeat.setParameters(
+                        getDCHost(),
+                        heartbeatId,
+                        args.toString(),
+                        pacemakerResAttrs,
+                        pacemakerResArgs,
+                        heartbeatStatus.getResourceInstanceAttrId(heartbeatId),
+                        heartbeatStatus.getParametersNvpairsIds(heartbeatId));
             }
             if (groupInfo != null && groupInfo.getService().isNew()) {
                 groupInfo.apply();
