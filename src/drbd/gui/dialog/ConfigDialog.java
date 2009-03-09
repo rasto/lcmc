@@ -37,6 +37,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
+import javax.swing.JCheckBox;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -53,6 +54,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.util.concurrent.CountDownLatch;
 
 import java.beans.PropertyChangeEvent;
@@ -88,6 +90,8 @@ public abstract class ConfigDialog {
     private static final int INPUT_PANE_HEIGHT = 200;
     /** Gate to synchronize the non-modal dialog and the answer.*/
     private CountDownLatch dialogGate;
+    /** Skip button, can be null, if there is no skip button. */
+    private JCheckBox skipButton = null;
 
     /**
      * Gets dialogPanel.
@@ -363,6 +367,40 @@ public abstract class ConfigDialog {
     }
 
     /**
+     * Whether the skip button is enabled.
+     */
+    protected boolean skipButtonEnabled() {
+        return false;
+    }
+
+    /**
+     * Returns the listener for the skip button.
+     */
+    protected ItemListener skipButtonListener() {
+        return null;
+    }
+
+    /**
+     * Returns whether skip button is selected.
+     */
+    protected final boolean skipButtonIsSelected() {
+        if (skipButton != null) {
+            return skipButton.isSelected();
+        }
+        return false;
+    }
+
+    protected final void skipButtonSetEnabled(final boolean enable) {
+        if (skipButton != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    skipButton.setEnabled(enable);
+                }
+            });
+        }
+    }
+
+    /**
      * Shows dialog and wait for answer.
      * Returns next dialog, or null if it there is no next dialog.
      */
@@ -371,10 +409,20 @@ public abstract class ConfigDialog {
         final ImageIcon[] icons = getIcons();
         MyButton[] options = new MyButton[buttons.length];
         MyButton defaultButtonClass = null;
+        List<JComponent> allOptions = new ArrayList<JComponent>();
+        if (skipButtonEnabled()) {
+            skipButton = new JCheckBox(Tools.getString(
+                                           "Dialog.ConfigDialog.SkipButton"));
+            skipButton.setBackground(
+                    Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+            skipButton.addItemListener(skipButtonListener());
+            allOptions.add(skipButton);
 
+        }
         /* populate buttonToObjectMap */
         for (int i = 0; i < buttons.length; i++) {
             options[i] = new MyButton(buttons[i], icons[i]);
+            allOptions.add(options[i]);
             buttonToObjectMap.put(buttons[i], options[i]);
             if (buttons[i].equals(defaultButton())) {
                 defaultButtonClass = options[i];
@@ -386,7 +434,8 @@ public abstract class ConfigDialog {
                                 getMessageType(),
                                 JOptionPane.DEFAULT_OPTION,
                                 icon(),
-                                options,
+                                allOptions.toArray(
+                                            new JComponent[allOptions.size()]),
                                 defaultButtonClass);
         /* making non modal dialog */
         dialogGate = new CountDownLatch(1);

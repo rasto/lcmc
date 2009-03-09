@@ -195,7 +195,7 @@ public class HostCheckInstallation extends DialogHost {
             }
         );
 
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(new JComponent[]{});
 
         udevButton.addActionListener(
             new ActionListener() {
@@ -422,8 +422,9 @@ public class HostCheckInstallation extends DialogHost {
                 }
             });
         }
-        if (true || (heartbeatOk && heartbeatGUIOk)) { // TODO
+        if (udevOk && drbdOk && heartbeatOk && heartbeatGUIOk) { 
             /* drbd is not required. */
+            nextButtonSetEnabled(true);
             enableComponents();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -503,5 +504,12 @@ public class HostCheckInstallation extends DialogHost {
                                               1, 1); //xPad, yPad
 
         return pane;
+    }
+
+    /**
+     * Enable skip button.
+     */
+    protected boolean skipButtonEnabled() {
+        return true;
     }
 }

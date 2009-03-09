@@ -227,6 +227,7 @@ public class TextResource extends
         {"Dialog.Dialog.Ok",                   "OK"},
         {"Dialog.ConfigDialog.Ok",                   "OK"},
         {"Dialog.ConfigDialog.NoMatch",              "No Match"},
+        {"Dialog.ConfigDialog.SkipButton",           "Skip"},
 
         {"Dialog.ConnectDialog.Title",               "SSH Connection"},
         {"Dialog.ConnectDialog.Description",         "Trying to establish an SSH connection."},

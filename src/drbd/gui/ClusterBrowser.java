@@ -690,7 +690,7 @@ public class ClusterBrowser extends Browser {
                                        }
 
                                        public void doneError(final String ans, final int exitCode) {
-                                           Tools.debug(this, "drbd status failed: " + host.getName() + "exit code: " + exitCode);
+                                           Tools.debug(this, "drbd status failed: " + host.getName() + "exit code: " + exitCode, 2);
                                            if (exitCode != 143) {
                                                /* was killed intentionally */
                                                host.setDrbdStatus(false);

@@ -31,6 +31,8 @@ import java.awt.FlowLayout;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 /**
  * An implementation of a wizard dialog with next, back, finish and cancel
@@ -148,6 +150,38 @@ public abstract class WizardDialog extends ConfigDialog {
                                finishButton(), 
                                cancelButton()};
         return btns;
+    }
+
+    /**
+     * Returns the listener for the skip button, that enables "next" button if
+     * it is checked.
+     */
+    protected final ItemListener skipButtonListener() {
+        return new ItemListener() {
+            public void itemStateChanged(final ItemEvent e) {
+                buttonClass(nextButton()).setEnabled(true);
+                skipButtonSetEnabled(false);
+            }
+        };
+    }
+
+    /**
+     * Enable next button, with skip button logic. */
+    protected final void nextButtonSetEnabled(final boolean enable) {
+        if (skipButtonIsSelected()) {
+            return;
+        } else {
+            if (enable) {
+                skipButtonSetEnabled(false);
+            } else {
+                skipButtonSetEnabled(true);
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    buttonClass(nextButton()).setEnabled(enable);
+                }
+            });
+        }
     }
 
     /**
@@ -358,7 +392,7 @@ public abstract class WizardDialog extends ConfigDialog {
             }
         }
     }
-    
+
     /**
      * adds the retry button.
      */

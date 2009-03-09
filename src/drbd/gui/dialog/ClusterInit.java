@@ -103,8 +103,6 @@ public class ClusterInit extends DialogCluster {
     public ClusterInit(final WizardDialog previousDialog,
                        final Cluster cluster) {
         super(previousDialog, cluster);
-        //setButton(nextButton()); // TODO:
-
         setButton(finishButton());
     }
 
@@ -172,7 +170,7 @@ public class ClusterInit extends DialogCluster {
     protected final void initDialog() {
         super.initDialog();
 
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(new JComponent[]{});
         lastDrbdLoaded = null;
         lastHbStarted  = null;
         lastHbStatus   = null;
@@ -194,7 +192,6 @@ public class ClusterInit extends DialogCluster {
                 }
             });
         checkClusterThread.start();
-        //buttonClass(nextButton()).setEnabled(true); // TODO: remove this
     }
 
     /**
@@ -424,11 +421,12 @@ public class ClusterInit extends DialogCluster {
 
             if (oneFailed) {
                 buttonClass(button).setEnabled(false);
+                nextButtonSetEnabled(false);
             } else {
-                buttonClass(button).setEnabled(true);
+                nextButtonSetEnabled(true);
             }
-
             enableComponents();
+
         }
     }
 
@@ -560,5 +558,12 @@ public class ClusterInit extends DialogCluster {
             mainPanel.add(pane);
         }
         return new JScrollPane(mainPanel);
+    }
+
+    /**
+     * Enable skip button.
+     */
+    protected boolean skipButtonEnabled() {
+        return true;
     }
 }
