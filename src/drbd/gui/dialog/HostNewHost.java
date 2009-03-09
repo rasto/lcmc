@@ -124,18 +124,33 @@ public class HostNewHost extends DialogHost {
         }
 
         if (hf) {
-            hostField.setBackground(getHost().getHostnameEntered(), true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    hostField.setBackground(getHost().getHostnameEntered(),
+                                            true);
+                }
+            });
         } else {
             hostField.wrongValue();
         }
 
         if (uf) {
-            usernameField.setBackground(getHost().getUsername(), true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    usernameField.setBackground(getHost().getUsername(), true);
+                }
+            });
         } else {
             usernameField.wrongValue();
         }
 
-        buttonClass(nextButton()).setEnabled(hf && uf);
+        final boolean hostField = hf;
+        final boolean userField = hf;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(hostField && userField);
+            }
+        });
     }
 
     /**
@@ -163,10 +178,12 @@ public class HostNewHost extends DialogHost {
 
         enableComponents();
         checkFields((GuiComboBox) null);
-        SwingUtilities.invokeLater(new Runnable() { public void run() {
-            hostField.requestFocus();
-            hostField.selectAll();
-        } });
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                hostField.requestFocus();
+                hostField.selectAll();
+            }
+        });
     }
 
     /**
