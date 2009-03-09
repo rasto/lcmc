@@ -792,6 +792,8 @@ sub get_ocf_like_xml {
 	my $resource = shift;
 	my $dir      = shift;
 	my $class    = shift;
+	# TODO: mgmt rsc_metadata heartbeat IPaddr2 heartbeat returns
+	# something like this too.
 	my $xml      = <<XML;
 <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
 <resource-agent name="$resource" class="$class">
@@ -817,7 +819,13 @@ XML
 	}
 	$xml .= <<XML;
 </parameters>
-
+<actions>
+<action name="start"   timeout="15" />
+<action name="stop"    timeout="15" />
+<action name="status"  timeout="15" />
+<action name="monitor" timeout="15" interval="15" start-delay="15" />
+<action name="meta-data"  timeout="5" />
+</actions>
 </resource-agent>
 XML
 	return $xml;

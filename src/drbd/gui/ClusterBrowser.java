@@ -1305,20 +1305,21 @@ public class ClusterBrowser extends Browser {
             }
         } else {
             if (service.getId() == null) {
-                // TODO: check this
-                // final Iterator it = idToInfoHash.keySet().iterator();
-                // int index = 0;
-                // while (it.hasNext()) {
-                //     final String id =
-                //       idToInfoHash.get((String) it.next()).getService().getId();
-                //     final int i = Integer.parseInt(id);
-                //     if (i > index) {
-                //         index = i;
-                //     }
-                // }
-                // service.setId(Integer.toString(index + 1));
-
-                service.setId("");
+                final Iterator it = idToInfoHash.keySet().iterator();
+                int index = 0;
+                while (it.hasNext()) {
+                    final String id =
+                      idToInfoHash.get((String) it.next()).getService().getId();
+                    try {
+                        final int i = Integer.parseInt(id);
+                        if (i > index) {
+                            index = i;
+                        }
+                    } catch (NumberFormatException nfe) {
+                        /* not a number */
+                    }
+                }
+                service.setId(Integer.toString(index + 1));
             }
         }
         idToInfoHash.remove(service.getId());
@@ -4810,7 +4811,9 @@ public class ClusterBrowser extends Browser {
 
             if (getService().isNew()) {
                 final String provider = HB_HEARTBEAT_PROVIDER;
-                pacemakerResAttrs.put("provider", provider);
+                if (hbClass.equals("ocf")) {
+                    pacemakerResAttrs.put("provider", provider);
+                }
                 final String advance       = HB_NONE_ARG;
                 final String advanceId     = HB_NONE_ARG;
                 final String cloneMax      = HB_NONE_ARG;

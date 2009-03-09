@@ -101,7 +101,7 @@
     <target name="main" depends="clean,run"/>
 
     <target name="init">
-        <property name="project" value="drbd-gui" />
+        <property name="project" value="drbd-mc" />
 	<property name="tarball.tar" value="${project}-${now}.tar" />  
 	<property name="tarball.tar.gz" value="${tarball.tar}.gz" />  
     </target>
@@ -109,7 +109,7 @@
     <target name="dist" depends="init">
     	<tar tarfile="${tarball.tar}"
 	     basedir=".."
-	     includes="drbd-gui/src/** drbd-gui/build.xml drbd-gui/release" />
+	     includes="drbd-mc/src/** drbd-mc/build.xml drbd-mc/release" />
 	<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
 	<delete file="${tarball.tar}"/>
     </target>
