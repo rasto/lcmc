@@ -122,11 +122,22 @@ public final class Heartbeat {
      * @return command as string
      */
     private static String getRoleCommand(final String role,
+                                         final Host host,
                                          final String hbPasswd,
                                          final String heartbeatId) {
-        return getMgmtCommand("set_target_role",
-                              hbPasswd,
-                              heartbeatId + " " + role);
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            /* it returns "failed", but it works. */
+            return getMgmtCommand("set_rsc_attr",
+                                  hbPasswd,
+                                  heartbeatId
+                                  + " meta target-role " + role);
+        } else {
+            return getMgmtCommand("set_target_role",
+                                  hbPasswd,
+                                  heartbeatId+ " " + role);
+        }
     }
 
     /**
@@ -172,13 +183,17 @@ public final class Heartbeat {
      * @param args
      *          argument string
      */
-    public static void addResource(final Host host,
-                                   final String heartbeatId,
-                                   final String args,
-                                   final Map<String, String> pacemakerResAttrs,
-                                   final Map<String, String> pacemakerResArgs,
-                                   String instanceAttrId,
-                                   final Map<String, String> nvpairIdsHash) {
+    public static void addResource(
+                           final Host host,
+                           final String heartbeatId,
+                           final String groupId,
+                           final String args,
+                           final Map<String, String> pacemakerResAttrs,
+                           final Map<String, String> pacemakerResArgs,
+                           String instanceAttrId,
+                           final Map<String, String> nvpairIdsHash,
+                           final Map<String, Map<String, String>> pacemakerOps,
+                           String operationsId) {
         if (args == null) {
             return;
         }
@@ -198,30 +213,72 @@ public final class Heartbeat {
             }
             
             final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<primitive\\ ");
+            xml.append('\'');
+            if (groupId != null) {
+                xml.append("\\<group\\ id=\\\"");
+                xml.append(groupId);
+                xml.append("\\\"\\>");
+            }
+            xml.append("\\<primitive\\ ");
             xml.append(attrsString);
             xml.append("\\>");
+            /* instance_attributes */
+            if (pacemakerResArgs.size() > 0) {
+                xml.append("\\<instance_attributes\\ id=\\\"");
+                xml.append(instanceAttrId);
+                xml.append("\\\"\\>");
 
-            xml.append("\\<instance_attributes\\ id=\\\"");
-            xml.append(instanceAttrId);
-            xml.append("\\\"\\>");
-
-            for (final String paramName : pacemakerResArgs.keySet()) {
-                final String value = pacemakerResArgs.get(paramName);
-                String nvpairId = nvpairIdsHash.get(paramName);
-                if (nvpairId == null) {
-                    nvpairId = "nvpair-" + heartbeatId + "-" + paramName;
+                for (final String paramName : pacemakerResArgs.keySet()) {
+                    final String value = pacemakerResArgs.get(paramName);
+                    String nvpairId = null;
+                    if (nvpairIdsHash != null) {
+                        nvpairId = nvpairIdsHash.get(paramName);
+                    }
+                    if (nvpairId == null) {
+                        nvpairId = "nvpair-"
+                                   + heartbeatId
+                                   + "-"
+                                   + paramName;
+                    }
+                    xml.append("\\<nvpair\\ id=\\\"");
+                    xml.append(nvpairId);
+                    xml.append("\\\"\\ name=\\\"");
+                    xml.append(paramName);
+                    xml.append("\\\"\\ value=\\\"");
+                    xml.append(value);
+                    xml.append("\\\"/\\>");
                 }
-                xml.append("\\<nvpair\\ id=\\\"");
-                xml.append(nvpairId);
-                xml.append("\\\"\\ name=\\\"");
-                xml.append(paramName);
-                xml.append("\\\"\\ value=\\\"");
-                xml.append(value);
-                xml.append("\\\"/\\>");
+                xml.append("\\</instance_attributes\\>");
             }
-            xml.append("\\</instance_attributes\\>");
-            xml.append("\\</primitive\\>'");
+            /* operations */
+            if (pacemakerOps.size() > 0) {
+                xml.append("\\<operations\\ id=\\\"");
+                if (operationsId == null) {
+                    operationsId = heartbeatId + "-operations";
+                }
+                xml.append(operationsId);
+                xml.append("\\\"\\>");
+                for (final String op : pacemakerOps.keySet()) {
+                    Map<String, String> opHash = pacemakerOps.get(op);
+                    xml.append("\\<op"); //id=\\\"");
+                    //xml.append(opId);
+                    for (final String name : opHash.keySet()) {
+                        final String value = opHash.get(name);
+                        xml.append("\\ ");
+                        xml.append(name);
+                        xml.append("=\\\"");
+                        xml.append(value);
+                        xml.append("\\\"");
+                    }
+                    xml.append("/\\>");
+                }
+                xml.append("\\</operations\\>");
+            }
+            xml.append("\\</primitive\\>");
+            if (groupId != null) {
+                xml.append("\\</group\\>");
+            }
+            xml.append('\'');
 
             final String command = getMgmtCommand(
                                           "cib_update resources",
@@ -261,7 +318,7 @@ public final class Heartbeat {
     }
 
     /**
-     * Sets colocation and order constraint between service with heartbeatid
+     * Sets colocation and order constraint between service with heartbeatId
      * and parents.
      */
     public static void setOrderAndColocation(final Host host,
@@ -330,17 +387,41 @@ public final class Heartbeat {
 
     /**
      * Adds operation (start, stop, etc. ) in the heartbeat.
+     * Does nothing in newer pacemaker versions. The operations are added in
+     * addResource.
      */
     public static void addOperation(final Host host,
                                     final String heartbeatId,
                                     final String operation,
                                     final List<String> args) {
-        final String argsString = Integer.toString(args.size() + 1) + " " 
-                            + heartbeatId + " "
-                            + heartbeatId + "_" + operation + " "
-                            + Tools.join(" ",
-                                         args.toArray(new String[args.size()])); 
-        final String command = getMgmtCommand("up_rsc_full_ops",
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            final String argsString = Integer.toString(args.size() + 1) + " " 
+                                + heartbeatId + " "
+                                + heartbeatId + "_" + operation + " "
+                                + Tools.join(" ",
+                                             args.toArray(new String[args.size()])); 
+            final String command = getMgmtCommand("up_rsc_full_ops",
+                                                  host.getCluster().getHbPasswd(),
+                                                  argsString);
+            execCommand(host, command, true);
+        }
+    }
+
+    /**
+     * Adds meta attribute (e.g. target_role, is_managed) in the heartbeat.
+     * Target_role can be added also differently. See getRoleCommand.
+     * Works till heartbeat 2.1.4
+     */
+    public static void addMetaAttributeOld(final Host host,
+                                        final String heartbeatId,
+                                        final String attribute,
+                                        final String value) {
+        final String argsString = heartbeatId + " "
+                                  + heartbeatId + "_metaattr_" + attribute
+                                  + " " + attribute + " "
+                                  + value;
+        final String command = getMgmtCommand("up_rsc_metaattrs",
                                               host.getCluster().getHbPasswd(),
                                               argsString);
         execCommand(host, command, true);
@@ -354,11 +435,10 @@ public final class Heartbeat {
                                         final String heartbeatId,
                                         final String attribute,
                                         final String value) {
-        final String argsString = heartbeatId + " "
-                                  + heartbeatId + "_metaattr_" + attribute
-                                  + " " + attribute + " "
+        final String argsString = heartbeatId + " meta "
+                                  + attribute + " "
                                   + value;
-        final String command = getMgmtCommand("up_rsc_metaattrs",
+        final String command = getMgmtCommand("set_rsc_attr",
                                               host.getCluster().getHbPasswd(),
                                               argsString);
         execCommand(host, command, true);
@@ -385,7 +465,7 @@ public final class Heartbeat {
             }
             xml.append("\\\"/\\>'");
             final String command = getMgmtCommand(
-                                          "cib_remove constraints",
+                                          "cib_delete constraints",
                                           host.getCluster().getHbPasswd(),
                                           xml.toString()); 
             execCommand(host, command, true);
@@ -409,27 +489,69 @@ public final class Heartbeat {
      *          heartbeat id
      */
     public static void removeResource(final Host host,
-                                      final String heartbeatId) {
-        /* cleanup is for unmanaged resources, but it also removes managed
-           resources */
-        final String command = getRoleCommand("stopped",
+                                      final String heartbeatId,
+                                      final String groupId) {
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            final StringBuffer xml = new StringBuffer(360);
+            xml.append('\'');
+            if (groupId != null) {
+                /* when removing the last resource in a group, remove the
+                 * whole group. */
+                xml.append("\\<group\\ id=\\\"");
+                xml.append(groupId);
+                xml.append("\\\"\\>");
+            }
+            xml.append("\\<primitive\\ id=\\\"");
+            xml.append(heartbeatId);
+            xml.append("\\\"\\>");
+            xml.append("\\</primitive\\>");
+            if (groupId != null) {
+                xml.append("\\</group\\>");
+            }
+            xml.append('\'');
+            final String command = getMgmtCommand(
+                                          "cib_delete resources",
+                                          host.getCluster().getHbPasswd(),
+                                          xml.toString()); 
+            execCommand(host, command, true);
+        } else {
+            final String command = getRoleCommand(
+                                              "stopped",
+                                              host,
                                               host.getCluster().getHbPasswd(),
                                               heartbeatId) + "; "
                                + getMgmtCommand("del_rsc",
                                               host.getCluster().getHbPasswd(),
                                               heartbeatId);
-        execCommand(host, command, true);
+            execCommand(host, command, true);
+        }
     }
 
     /**
      * Cleans up resource in crm.
      */
     public static void cleanupResource(final Host host,
-                                       final String heartbeatId) {
-        final String command = getMgmtCommand("cleanup_rsc",
-                                              host.getCluster().getHbPasswd(),
-                                              heartbeatId);
-        execCommand(host, command, true);
+                                       final String heartbeatId,
+                                       final Host[] clusterHosts) {
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* make cleanup on all cluster hosts. */
+            for (Host clusterHost : clusterHosts) {
+                final String command = getMgmtCommand(
+                                               "cleanup_rsc",
+                                               host.getCluster().getHbPasswd(),
+                                               clusterHost.getName()
+                                               + " " + heartbeatId);
+                execCommand(host, command, true);
+            }
+        } else {
+            final String command = getMgmtCommand("cleanup_rsc",
+                                                  host.getCluster().getHbPasswd(),
+                                                  heartbeatId);
+            execCommand(host, command, true);
+        }
     }
 
     /**
@@ -443,6 +565,7 @@ public final class Heartbeat {
     public static void startResource(final Host host,
                                      final String heartbeatId) {
         final String command = getRoleCommand("started",
+                                              host,
                                               host.getCluster().getHbPasswd(),
                                               heartbeatId);
         execCommand(host, command, true);
@@ -454,7 +577,13 @@ public final class Heartbeat {
     public static void setManaged(final Host host,
                                   final String heartbeatId,
                                   final String isManaged) {
-        addMetaAttribute(host, heartbeatId, "is_managed", isManaged);
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+            /* pacemaker */
+            addMetaAttribute(host, heartbeatId, "is-managed", isManaged);
+        } else {
+            addMetaAttributeOld(host, heartbeatId, "is_managed", isManaged);
+        }
     }
 
     /**
@@ -468,6 +597,7 @@ public final class Heartbeat {
     public static void stopResource(final Host host,
                                     final String heartbeatId) {
         final String command = getRoleCommand("stopped",
+                                              host,
                                               host.getCluster().getHbPasswd(),
                                               heartbeatId);
         execCommand(host, command, true);
@@ -524,22 +654,28 @@ public final class Heartbeat {
      */
     public static void setParameters(final Host host,
                                      final String heartbeatId,
+                                     final String groupId,
                                      final String args,
                                    final Map<String, String> pacemakerResAttrs,
                                    final Map<String, String> pacemakerResArgs,
                                    final String instanceAttrId,
-                                   final Map<String, String> nvpairIdsHash) {
+                                   final Map<String, String> nvpairIdsHash,
+                                   final Map<String, Map<String, String>> pacemakerOps,
+                                   final String operationsId) {
 
         final String hbVersion = host.getHeartbeatVersion();
         if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
             /* pacemaker */
             addResource(host,
                         heartbeatId,
+                        groupId,
                         args,
                         pacemakerResAttrs,
                         pacemakerResArgs,
                         instanceAttrId,
-                        nvpairIdsHash);
+                        nvpairIdsHash,
+                        pacemakerOps,
+                        operationsId);
         } else {
             final String command = getMgmtCommand(
                                                "up_rsc_params",

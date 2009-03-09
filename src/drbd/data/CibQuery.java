@@ -76,6 +76,11 @@ public class CibQuery {
     private MultiKeyMap resHostToLocId = new MultiKeyMap();
     /** Operations map. */
     private MultiKeyMap operations = new MultiKeyMap();
+    /** Operations id map. */
+    private Map<String, String> operationsId = new HashMap<String, String>();
+    /** <op> tag id map. */
+    private Map<String, Map<String, String>> resOpIds =
+                                    new HashMap<String, Map<String, String>>();
 
     /**
      * Sets crm config map.
@@ -336,5 +341,33 @@ public class CibQuery {
      */
     public final MultiKeyMap getOperations() {
         return operations;
+    }
+
+    /**
+     * Sets operations id map.
+     */
+    public final void setOperationsId(Map<String, String> operationsId) {
+        this.operationsId = operationsId;
+    }
+
+    /**
+     * Returns operations id map.
+     */
+    public final Map<String, String> getOperationsId() {
+        return operationsId;
+    }
+
+    /**
+     * Sets <op> tag id map.
+     */
+    public final void setResOpIds(Map<String, Map<String, String>> resOpIds) {
+        this.resOpIds = resOpIds;
+    }
+
+    /**
+     * Returns <op> tag id map.
+     */
+    public final Map<String, Map<String, String>> getResOpIds() {
+        return resOpIds;
     }
 }

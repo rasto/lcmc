@@ -108,6 +108,11 @@ public class HeartbeatStatus {
     private MultiKeyMap orderDirectionMap = new MultiKeyMap();
     /** Operations map. */
     private MultiKeyMap operationsMap = new MultiKeyMap();
+    /** Operations id map. */
+    private Map<String, String> operationsIdMap = new HashMap<String, String>();
+    /** <op> tag id map. */
+    private Map<String, Map<String, String>> resOpIdsMap =
+                                    new HashMap<String, Map<String, String>>();
     /** All nodes. */
     private final Set<String> allNodes = new HashSet<String>();
     /** All active nodes. */
@@ -356,6 +361,25 @@ public class HeartbeatStatus {
                                      final String param) {
         return (String) operationsMap.get(hbId, op, param);
     }
+
+    /**
+     * Returns id from operations tag.
+     */
+    public final String getOperationsId(final String hbId) {
+        return operationsIdMap.get(hbId);
+    }
+
+    /**
+     * Returns id from heartbeat id and operation name.
+     */
+    public final String getOpId(final String hbId, final String op) {
+        Map<String, String> opIds = resOpIdsMap.get(hbId);
+        if (opIds == null) {
+            return null;
+        }
+        return opIds.get(op);
+    }
+
 
     /**
      * Returns on which node the resource is running.
@@ -710,6 +734,7 @@ public class HeartbeatStatus {
         resourceItemTypeMap.clear();
         resourceStatusMap.clear();
         parametersMap.clear();
+        operationsMap.clear();
         dc = null;
         boolean failed = false;
 
@@ -810,5 +835,7 @@ public class HeartbeatStatus {
         locationScoreMap        = cibQueryMap.getLocationScore();
         resHostToLocIdMap       = cibQueryMap.getResHostToLocId();
         operationsMap           = cibQueryMap.getOperations();
+        operationsIdMap         = cibQueryMap.getOperationsId();
+        resOpIdsMap             = cibQueryMap.getResOpIds();
     }
 }

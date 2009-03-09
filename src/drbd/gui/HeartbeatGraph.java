@@ -476,13 +476,15 @@ public class HeartbeatGraph extends ResourceGraph {
             str = vertexToHostMap.get(v).toString();
         } else {
             final ServiceInfo si = (ServiceInfo) getInfo((Vertex) v);
-            if (vertexIsPresentList.contains(v)) {
+            if (si.getService().isRemoved()) {
+                str = Tools.getString("HeartbeatGraph.Removing");
+            } else if (vertexIsPresentList.contains(v)) {
                 str = si.toString();
             } else {
                 if (si.getService().isNew()) {
                     str = si.toString();
                 } else {
-                    str = Tools.getString("HeartbeatGraph.Removing");
+                    str = Tools.getString("HeartbeatGraph.Unconfigured");
                 }
             }
         }
@@ -897,7 +899,7 @@ public class HeartbeatGraph extends ResourceGraph {
     public final void setVertexIsPresent(final ServiceInfo si) {
         final Vertex v = getVertex(si);
         if (v == null) {
-            //Tools.appError("no vertex associated with service info");
+            //Tools.Toolsrror("no vertex associated with service info");
             /* group vertices */
             return;
         }

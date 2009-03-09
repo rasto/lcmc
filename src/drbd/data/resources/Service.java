@@ -38,6 +38,14 @@ public class Service extends Resource {
     private String heartbeatId = null;
     /** Whether the service is newly allocated. */
     private boolean newService = false;
+    /** Whether the service is removed. */
+    private boolean removed = false;
+    /** Whether the service is being removed. */
+    private boolean removing = false;
+    /** Whether the service is modified. */
+    private boolean modified = false;
+    /** Whether the service is being modified. */
+    private boolean modifying = false;
     /** Heartbeat class:  heartbeat, ocf, lsb. */
     private String heartbeatClass = null;
     /** Heartbeat id prefix for resource. */
@@ -76,7 +84,9 @@ public class Service extends Resource {
     public final void setHeartbeatId(final String heartbeatId) {
         this.heartbeatId = heartbeatId;
         if ("Group".equals(getName())) {
-            if (heartbeatId.startsWith(GRP_ID_PREFIX)) {
+            if (heartbeatId.equals(GRP_ID_PREFIX)) {
+                id = "";
+            } else if (heartbeatId.startsWith(GRP_ID_PREFIX)) {
                 id = heartbeatId.substring(GRP_ID_PREFIX.length() + 1);
             } else {
                 id = heartbeatId;
@@ -96,7 +106,7 @@ public class Service extends Resource {
      * Sets the id and heartbeat id.
      */
     public final void setId(final String id) {
-        if (id != null) {
+        if (this.id != null) {
             /* set id only once */
             return;
         }
@@ -129,6 +139,65 @@ public class Service extends Resource {
      */
     public final boolean isNew() {
         return newService;
+    }
+
+    /**
+     * Sets whether the service was removed.
+     */
+    public final void setRemoved(final boolean removed) {
+        this.removed = removed;
+        if (removed) {
+            removing = true;
+        }
+    }
+
+    /**
+     * Returns whether the service was removed.
+     */
+    public final boolean isRemoved() {
+        return removed || removing;
+    }
+
+    /**
+     * Sets that the service was done being removed.
+     */
+    public final void doneRemoving() {
+        this.removing = removing;
+    }
+
+    /**
+     * Sets whether the service was modified.
+     */
+    public final void setModified(final boolean modified) {
+        this.modified = modified;
+        if (modified) {
+            modifying = true;
+        }
+    }
+
+    /**
+     * Sets that the service is done being modified.
+     */
+    public final void doneModifying() {
+        modifying = false;
+    }
+
+    /**
+     * Makes the service available, after the status as seen in the gui was
+     * confirmed from the heartbeat.
+     */
+    public final void setAvailable() {
+        newService      = false;
+        modified = false;
+        removed  = false;
+    }
+
+    /**
+     * Returns whether the service is available. It is not available if it was
+     * just created, it was just removed or modified.
+     */
+    public final boolean isAvailable() {
+        return !newService && !modified && !removed && !modifying && !removing;
     }
 
     /**

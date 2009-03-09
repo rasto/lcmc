@@ -880,6 +880,111 @@ public class HeartbeatOCF extends XML {
     }
 
     /**
+     * Parses the <primitive> node.
+     */
+    private final void parsePrimitive(
+                final Node primitiveNode,
+                final String groupId, /* null, if it is not in group */
+                final Map<String, HeartbeatService> resourceTypeMap,
+                final Map<String, Map<String, String>> parametersMap,
+                final Map<String, Map<String, String>> parametersNvpairsIdsMap,
+                final Map<String, String> resourceInstanceAttrIdMap,
+                final MultiKeyMap operationsMap,
+                final Map<String, String> operationsIdMap,
+                final Map<String, Map<String, String>> resOpIdsMap) {
+        // TODO: group id is not used at the moment, because we get group id
+        // from sub_rsc mgmt command
+        final String hbClass = getAttribute(primitiveNode, "class");
+        final String hbId = getAttribute(primitiveNode, "id");
+        final String provider = getAttribute(primitiveNode, "provider");
+        final String type = getAttribute(primitiveNode, "type");
+        resourceTypeMap.put(hbId, getHbService(type, hbClass));
+        final Map<String, String> params =
+                                        new HashMap<String, String>();
+        parametersMap.put(hbId, params);
+        final Map<String, String> nvpairIds =
+                                        new HashMap<String, String>();
+        parametersNvpairsIdsMap.put(hbId, nvpairIds);
+        /* <instance_attributes> */
+        final Node instanceAttrNode =
+                                   getChildNode(primitiveNode,
+                                                "instance_attributes");
+        /* <nvpair...> */
+        final String iAId = getAttribute(instanceAttrNode, "id");
+        resourceInstanceAttrIdMap.put(hbId, iAId);
+        final NodeList nvpairsRes = instanceAttrNode.getChildNodes();
+        for (int j = 0; j < nvpairsRes.getLength(); j++) {
+            final Node optionNode = nvpairsRes.item(j);
+            if (optionNode.getNodeName().equals("nvpair")) {
+                final String nvpairId = getAttribute(optionNode, "id");
+                final String name = getAttribute(optionNode, "name");
+                final String value = getAttribute(optionNode, "value");
+                params.put(name, value);
+                nvpairIds.put(name, nvpairId);
+            }
+        }
+
+        /* <operations> */
+        final Node operationsNode = getChildNode(primitiveNode,
+                                                 "operations");
+        if (operationsNode != null) {
+            final String operationsId = getAttribute(operationsNode,
+                                                     "id");
+            operationsIdMap.put(hbId, operationsId);
+            Map<String, String> opIds = new HashMap<String, String>();
+            resOpIdsMap.put(hbId, opIds);
+            /* <op> */
+            final NodeList ops = operationsNode.getChildNodes();
+            for (int k = 0; k < ops.getLength(); k++) {
+                final Node opNode = ops.item(k);
+                if (opNode.getNodeName().equals("op")) {
+                    final String opId = getAttribute(opNode,
+                                                            "id");
+                    final String name = getAttribute(opNode, "name");
+                    final String timeout = getAttribute(opNode,
+                                                        "timeout");
+                    final String interval = getAttribute(opNode,
+                                                         "interval");
+                    final String startDelay = getAttribute(opNode,
+                                                           "start-delay");
+                    operationsMap.put(hbId,
+                                      name,
+                                      "interval",
+                                      interval);
+                    operationsMap.put(hbId,
+                                      name,
+                                      "timeout",
+                                      timeout);
+                    operationsMap.put(hbId,
+                                      name,
+                                      "start-delay",
+                                      startDelay);
+                    opIds.put(name, opId);
+                }
+            }
+        }
+
+        /* <meta_attributtes> */
+        final Node metaAttrsNode = getChildNode(primitiveNode,
+                                                 "meta_attributes");
+        if (metaAttrsNode != null) {
+            final String metaAttrsId = getAttribute(metaAttrsNode, "id");
+            /* <nvpair...> */
+            /* target-role and is-managed */
+            final NodeList nvpairsMA = metaAttrsNode.getChildNodes();
+            for (int l = 0; l < nvpairsMA.getLength(); l++) {
+                final Node maNode = nvpairsMA.item(l);
+                if (maNode.getNodeName().equals("nvpair")) {
+                    final String nvpairId = getAttribute(maNode, "id");
+                    final String name = getAttribute(maNode, "name");
+                    final String value = getAttribute(maNode, "value");
+                    // TODO: for now I get this info from rsc_status mgmt command
+                }
+            }
+        }
+    }
+
+    /**
      * Returns hash with information from the cib node.
      */
     public final CibQuery parseCibQuery(final String query) {
@@ -943,73 +1048,39 @@ public class HeartbeatOCF extends XML {
                                       new HashMap<String, String>();
         final MultiKeyMap operationsMap =
                                       new MultiKeyMap();
-
-        final NodeList primitives = resourcesNode.getChildNodes();
-        for (int i = 0; i < primitives.getLength(); i++) {
-            final Node primitiveNode = primitives.item(i);
-            if (primitiveNode.getNodeName().equals("primitive")) {
-                final String hbClass = getAttribute(primitiveNode, "class");
-                final String hbId = getAttribute(primitiveNode, "id");
-                final String provider = getAttribute(primitiveNode, "provider");
-                final String type = getAttribute(primitiveNode, "type");
-                resourceTypeMap.put(hbId, getHbService(type, hbClass));
-                final Map<String, String> params =
+        final Map<String, String> operationsIdMap =
                                                 new HashMap<String, String>();
-                parametersMap.put(hbId, params);
-                final Map<String, String> nvpairIds =
-                                                new HashMap<String, String>();
-                parametersNvpairsIdsMap.put(hbId, nvpairIds);
-                /* <instance_attributes> */
-                final Node instanceAttrNode =
-                                           getChildNode(primitiveNode,
-                                                        "instance_attributes");
-                /* <nvpair...> */
-                final String iAId = getAttribute(instanceAttrNode, "id");
-                resourceInstanceAttrIdMap.put(hbId, iAId);
-                final NodeList nvpairsRes = instanceAttrNode.getChildNodes();
-                for (int j = 0; j < nvpairsRes.getLength(); j++) {
-                    final Node optionNode = nvpairsRes.item(j);
-                    if (optionNode.getNodeName().equals("nvpair")) {
-                        final String nvpairId = getAttribute(optionNode, "id");
-                        final String name = getAttribute(optionNode, "name");
-                        final String value = getAttribute(optionNode, "value");
-                        params.put(name, value);
-                        nvpairIds.put(name, nvpairId);
-                    }
-                }
+        final Map<String, Map<String, String>> resOpIdsMap =
+                                    new HashMap<String, Map<String, String>>();
 
-                /* <operations> */
-                final Node operationsNode =
-                                           getChildNode(primitiveNode,
-                                                        "operations");
-                if (operationsNode != null) {
-                    /* <op> */
-                    final NodeList ops = operationsNode.getChildNodes();
-                    for (int k = 0; k < nvpairsRes.getLength(); k++) {
-                        final Node opNode = ops.item(k);
-                        if (opNode.getNodeName().equals("op")) {
-                            final String operationId = getAttribute(opNode,
-                                                                    "id");
-                            final String name = getAttribute(opNode, "name");
-                            final String timeout = getAttribute(opNode,
-                                                                "timeout");
-                            final String interval = getAttribute(opNode,
-                                                                 "interval");
-                            final String startDelay = getAttribute(opNode,
-                                                                   "start-delay");
-                            operationsMap.put(hbId,
-                                              name,
-                                              "interval",
-                                              interval);
-                            operationsMap.put(hbId,
-                                              name,
-                                              "timeout",
-                                              timeout);
-                            operationsMap.put(hbId,
-                                              name,
-                                              "start-delay",
-                                              startDelay);
-                        }
+        final NodeList primitivesGroups = resourcesNode.getChildNodes();
+        for (int i = 0; i < primitivesGroups.getLength(); i++) {
+            final Node primitiveGroupNode = primitivesGroups.item(i);
+            if (primitiveGroupNode.getNodeName().equals("primitive")) {
+                parsePrimitive(primitiveGroupNode,
+                               null,
+                               resourceTypeMap,
+                               parametersMap,
+                               parametersNvpairsIdsMap,
+                               resourceInstanceAttrIdMap,
+                               operationsMap,
+                               operationsIdMap,
+                               resOpIdsMap);
+            } else if (primitiveGroupNode.getNodeName().equals("group")) {
+                final NodeList primitives = primitiveGroupNode.getChildNodes();
+                final String groupId = getAttribute(primitiveGroupNode, "id");
+                for (int j = 0; j < primitives.getLength(); j++) {
+                    final Node primitiveNode = primitives.item(j);
+                    if (primitiveNode.getNodeName().equals("primitive")) {
+                        parsePrimitive(primitiveNode,
+                                       groupId,
+                                       resourceTypeMap,
+                                       parametersMap,
+                                       parametersNvpairsIdsMap,
+                                       resourceInstanceAttrIdMap,
+                                       operationsMap,
+                                       operationsIdMap,
+                                       resOpIdsMap);
                     }
                 }
             }
@@ -1090,6 +1161,7 @@ public class HeartbeatOCF extends XML {
                     }
                     hostScoreMap.put(node, score);
                     resHostToLocIdMap.put(rsc, node, locId);
+                    locs.add(locId);
                 }
             }
         }
@@ -1113,6 +1185,8 @@ public class HeartbeatOCF extends XML {
         cibQueryData.setLocationsId(locationsIdMap);
         cibQueryData.setResHostToLocId(resHostToLocIdMap);
         cibQueryData.setOperations(operationsMap);
+        cibQueryData.setOperationsId(operationsIdMap);
+        cibQueryData.setResOpIds(resOpIdsMap);
         return cibQueryData;
     }
 }
