@@ -910,17 +910,19 @@ public class HeartbeatOCF extends XML {
                                    getChildNode(primitiveNode,
                                                 "instance_attributes");
         /* <nvpair...> */
-        final String iAId = getAttribute(instanceAttrNode, "id");
-        resourceInstanceAttrIdMap.put(hbId, iAId);
-        final NodeList nvpairsRes = instanceAttrNode.getChildNodes();
-        for (int j = 0; j < nvpairsRes.getLength(); j++) {
-            final Node optionNode = nvpairsRes.item(j);
-            if (optionNode.getNodeName().equals("nvpair")) {
-                final String nvpairId = getAttribute(optionNode, "id");
-                final String name = getAttribute(optionNode, "name");
-                final String value = getAttribute(optionNode, "value");
-                params.put(name, value);
-                nvpairIds.put(name, nvpairId);
+        if (instanceAttrNode != null) {
+            final String iAId = getAttribute(instanceAttrNode, "id");
+            resourceInstanceAttrIdMap.put(hbId, iAId);
+            final NodeList nvpairsRes = instanceAttrNode.getChildNodes();
+            for (int j = 0; j < nvpairsRes.getLength(); j++) {
+                final Node optionNode = nvpairsRes.item(j);
+                if (optionNode.getNodeName().equals("nvpair")) {
+                    final String nvpairId = getAttribute(optionNode, "id");
+                    final String name = getAttribute(optionNode, "name");
+                    final String value = getAttribute(optionNode, "value");
+                    params.put(name, value);
+                    nvpairIds.put(name, nvpairId);
+                }
             }
         }
 

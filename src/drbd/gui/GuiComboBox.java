@@ -609,69 +609,76 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
+     * Sets item/value in the component and waits till it is set
+     */
+    public final void setValueAndWait(final Object item) {
+        switch(type) {
+            case TEXTFIELD:
+                ((JTextField) component).setText((String) item);
+                break;
+            case PASSWDFIELD:
+                ((JPasswordField) component).setText((String) item);
+                break;
+            case COMBOBOX:
+                final JComboBox cb = (JComboBox) component;
+                cb.setSelectedItem(item);
+                if (cb.isEditable()) {
+                    final JTextComponent tc =
+                        (JTextComponent) cb.getEditor().getEditorComponent();
+                    tc.setText((String) item);
+                } else if (Tools.isStringClass(item)) {
+                    for (int i = 0; i < cb.getItemCount(); i++) {
+                        final Object it = cb.getItemAt(i);
+                        if (it.equals(item)) {
+                            cb.setSelectedItem(it);
+                            break;
+                        }
+                    }
+                }
+                break;
+
+            case RADIOGROUP:
+                break;
+
+            case CHECKBOX:
+                if (item != null) {
+                    ((JCheckBox) component).setSelected(
+                                                item.equals(checkBoxTrue));
+                }
+                break;
+
+            case TEXTFIELDWITHUNIT:
+                final Matcher m = unitPattern.matcher((String) item);
+                String number = "";
+                String unit = "";
+                if (m.matches()) {
+                    number = m.group(1);
+                    unit = m.group(2);
+                }
+
+                textFieldWithoutUnit.setText(number);
+
+                Object selectedUnitInfo = null;
+                for (Unit u : units) {
+                    if (u.equals(unit)) {
+                        selectedUnitInfo = u;
+                    }
+                }
+
+                unitComboBox.setSelectedItem(selectedUnitInfo);
+                break;
+            default:
+                Tools.appError("impossible type");
+        }
+    }
+
+    /**
      * Sets item/value in the component.
      */
     public final void setValue(final Object item) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                switch(type) {
-                    case TEXTFIELD:
-                        ((JTextField) component).setText((String) item);
-                        break;
-                    case PASSWDFIELD:
-                        ((JPasswordField) component).setText((String) item);
-                        break;
-                    case COMBOBOX:
-                        final JComboBox cb = (JComboBox) component;
-                        cb.setSelectedItem(item);
-                        if (cb.isEditable()) {
-                            final JTextComponent tc =
-                                (JTextComponent) cb.getEditor().getEditorComponent();
-                            tc.setText((String) item);
-                        } else if (Tools.isStringClass(item)) {
-                            for (int i = 0; i < cb.getItemCount(); i++) {
-                                final Object it = cb.getItemAt(i);
-                                if (it.equals(item)) {
-                                    cb.setSelectedItem(it);
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case RADIOGROUP:
-                        break;
-
-                    case CHECKBOX:
-                        if (item != null) {
-                            ((JCheckBox) component).setSelected(
-                                                        item.equals(checkBoxTrue));
-                        }
-                        break;
-
-                    case TEXTFIELDWITHUNIT:
-                        final Matcher m = unitPattern.matcher((String) item);
-                        String number = "";
-                        String unit = "";
-                        if (m.matches()) {
-                            number = m.group(1);
-                            unit = m.group(2);
-                        }
-
-                        textFieldWithoutUnit.setText(number);
-
-                        Object selectedUnitInfo = null;
-                        for (Unit u : units) {
-                            if (u.equals(unit)) {
-                                selectedUnitInfo = u;
-                            }
-                        }
-
-                        unitComboBox.setSelectedItem(selectedUnitInfo);
-                        break;
-                    default:
-                        Tools.appError("impossible type");
-                }
+                setValueAndWait(item);
             }
         });
     }

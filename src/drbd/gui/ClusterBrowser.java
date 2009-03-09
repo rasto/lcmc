@@ -2353,7 +2353,7 @@ public class ClusterBrowser extends Browser {
             addToHeartbeatIdList(di);
             fi.setDrbddiskInfo(di);
             di.getInfoPanel();
-            di.paramComboBoxGet("1", null).setValue(getName());
+            di.paramComboBoxGet("1", null).setValueAndWait(getName());
             di.apply();
             fi.addColocation(di);
             fi.addOrder(di);
