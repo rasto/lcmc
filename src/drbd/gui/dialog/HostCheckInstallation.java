@@ -319,7 +319,7 @@ public class HostCheckInstallation extends DialogHost {
             final int i = ans.indexOf(' ');
             String version;
             if (i < 0) {
-                version = ans;
+                version = ans.trim();
             } else {
                 version = ans.substring(0, i);
             }
