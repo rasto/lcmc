@@ -48,7 +48,7 @@ public class DistResource extends
         {"dist:opensuse",             "suse"},
         {"dist:centos",               "redhat"}, // TODO: have to check this one
         {"dist:rhas",                 "redhat"},
-        {"dist:rhel",                 "redhat"},
+        {"dist:rhel",                 "rhel"},
         {"dist:fc",                   "fedora"},
         {"dist:debian-etch",          "debian"},
         {"dist:ubuntu",               "ubuntu"},
