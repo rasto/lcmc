@@ -536,7 +536,7 @@ public final class Heartbeat {
                                        final String heartbeatId,
                                        final Host[] clusterHosts) {
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+        if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
             /* make cleanup on all cluster hosts. */
             for (Host clusterHost : clusterHosts) {
                 final String command = getMgmtCommand(
