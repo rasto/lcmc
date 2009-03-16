@@ -267,6 +267,8 @@ public class HostDrbdAvailFiles extends DialogHost {
             public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     //drbdBuildCombo.setEnabled(false);
+                    enableComponentsLater(
+                            new JComponent[]{buttonClass(nextButton())});
                     disableComponents(new JComponent[]{drbdBuildCombo});
                     final String item = drbdVersionCombo.getStringValue();
                     SwingUtilities.invokeLater(
