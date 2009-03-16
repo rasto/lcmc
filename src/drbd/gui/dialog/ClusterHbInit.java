@@ -508,6 +508,24 @@ public class ClusterHbInit extends DialogCluster {
     }
 
     /**
+     * Returns the part of the config that turns on mgmt. To turn it off, the
+     * mgmt config is commented out.
+     * TODO: for newer heartbeats it must be turned on.
+     */
+    private StringBuffer hbConfigMgmt(final boolean useMgmt) {
+        final StringBuffer config = new StringBuffer(120);
+        if (!useMgmt) {
+            config.append("# ");
+        }
+        config.append("respawn root /usr/lib/heartbeat/mgmtd -v\n");
+        if (!useMgmt) {
+            config.append("# ");
+        }
+        config.append("apiauth mgmtd uid=root\n");
+        return config;
+    }
+
+    /**
      * Returns panel where user can edit the config.
      */
     protected final JComponent getInputPane() {
@@ -535,6 +553,7 @@ public class ClusterHbInit extends DialogCluster {
                                 config.append(hbConfigAddr());
                                 config.append(hbConfigDopd(
                                                     dopdCB.isSelected()));
+                                config.append(hbConfigMgmt(false));
 
                                 Heartbeat.createHBConfig(hosts, config);
                                 updateOldHbConfig();
