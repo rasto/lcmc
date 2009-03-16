@@ -26,7 +26,7 @@ import java.util.Arrays;
 /**
  * Here are commands for all redhats.
  */
-public class DistResource_rhel extends
+public class DistResource_redhatenterpriseserver extends
             java.util.ListResourceBundle {
 
     /** Get contents. */
@@ -37,11 +37,14 @@ public class DistResource_rhel extends
     /** Contents. */
     private static Object[][] contents = {
         {"Support", "generic rhel"},
+        {"arch:i686", "i686"},
         {"distribution", "rhel"},
-        {"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},
-        {"version:redhatenterpriseserver", "5"},
+        //{"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},
+        {"version:4", "4"},
+        {"version:5", "5"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
+        {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
     };
 }

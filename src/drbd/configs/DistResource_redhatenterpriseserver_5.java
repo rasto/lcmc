@@ -24,9 +24,9 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for redhat verson 5.
+ * Here are commands for rhel version 5.
  */
-public class DistResource_rhel_5 extends
+public class DistResource_redhatenterpriseserver_5 extends
             java.util.ListResourceBundle {
 
     /** Get contents. */

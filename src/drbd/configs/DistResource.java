@@ -93,7 +93,7 @@ public class DistResource extends
         },
 
         {"DrbdAvailArchs",
-         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O - |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:km|module)-.+?(i386|x86_64|amd64|486|686|k7)\\.(?:rpm|deb)\"! or goto LINE'"
+         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O - |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:km|module)-.+?(i386|x86_64|amd64|i486|i686|k7)\\.(?:rpm|deb)\"! or goto LINE'"
         },
 
         {"DrbdAvailBuilds",
