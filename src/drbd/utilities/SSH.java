@@ -280,7 +280,7 @@ public class SSH {
                                             ChannelCondition.STDOUT_DATA
                                             | ChannelCondition.STDERR_DATA
                                             | ChannelCondition.EOF,
-                                            28000);
+                                            240000);
                         }
                         if (cancelIt) {
                             throw new IOException(

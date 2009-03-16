@@ -276,7 +276,7 @@ public class AppDefaults extends
          */
         //{"SSH.User",                          "rasto,root"},
         {"SSH.User",           "root"},
-        {"SSH.ConnectTimeout", 0}, /* milliseconds, 0 no timeout */
+        {"SSH.ConnectTimeout", 30000}, /* milliseconds, 0 no timeout */
         {"SSH.KexTimeout",     0},     /* milliseconds, 0 no timeout */
         {"ProgressBar.Sleep",  100},   /* milliseconds */
         {"ProgressBar.Delay",  50},    /* milliseconds */
