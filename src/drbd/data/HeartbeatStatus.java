@@ -395,7 +395,7 @@ public class HeartbeatStatus {
      * Returns whether the node is active.
      */
     public final boolean isActiveNode(final String node) {
-        return activeNodes.contains(node);
+        return activeNodes.contains(node.toLowerCase());
     }
 
     /**
@@ -415,15 +415,15 @@ public class HeartbeatStatus {
             if ("all_nodes".equals(cmd)) {
                 // TODO: check if all nodes are in cluster
                 for (int i = 0; i < data.size(); i++) {
-                    allNodes.add(data.get(i));
+                    allNodes.add(data.get(i).toLowerCase());
                 }
             } else if ("active_nodes".equals(cmd)) {
                 for (int i = 0; i < data.size(); i++) {
-                    activeNodes.add(data.get(i));
+                    activeNodes.add(data.get(i).toLowerCase());
                 }
             } else if ("crm_nodes".equals(cmd)) {
                 for (int i = 0; i < data.size(); i++) {
-                    crmNodes.add(data.get(i));
+                    crmNodes.add(data.get(i).toLowerCase());
                 }
             } else if ("crm_config".equals(cmd) && data.size() == 7) {
                 /* heartbeat < 2.1.3 */
@@ -579,7 +579,7 @@ public class HeartbeatStatus {
                 if (!isGroup(hbId)) {
                     try {
                         if (!data.isEmpty()) {
-                            final String onHost = data.get(0);
+                            final String onHost = data.get(0).toLowerCase();
                             runningOnNodeHash.put(hbId, onHost);
                         }
                     } catch (IndexOutOfBoundsException e) {

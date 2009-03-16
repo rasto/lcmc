@@ -3338,7 +3338,7 @@ public class ClusterBrowser extends Browser {
                     final String n = heartbeatStatus.getRunningOnNode(hbId);
                     if (node == null) {
                         node = n;
-                    } else if (!node.equals(n)) {
+                    } else if (!node.toLowerCase().equals(n.toLowerCase())) {
                         return null;
                     }
                 }
@@ -5599,8 +5599,13 @@ public class ClusterBrowser extends Browser {
                         }
 
                         public boolean enablePredicate() {
+                            String runningOnNode = getRunningOnNode();
+                            if (runningOnNode != null) {
+                                runningOnNode = runningOnNode.toLowerCase();
+                            }
                             return getService().isAvailable()
-                                   && !hostName.equals(getRunningOnNode())
+                                   && !hostName.toLowerCase().equals(
+                                             runningOnNode)
                                    && isActiveNode(hostName);
                         }
 
