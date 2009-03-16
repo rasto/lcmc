@@ -264,7 +264,7 @@ public class Cluster {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
         }
         for (final Host host : hosts) {
-            if (node.equals(host.getName())) {
+            if (node.toLowerCase().equals(host.getName().toLowerCase())) {
                 return host.getColor();
             }
         }
