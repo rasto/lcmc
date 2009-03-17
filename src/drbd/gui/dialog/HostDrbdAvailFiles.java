@@ -101,21 +101,35 @@ public class HostDrbdAvailFiles extends DialogHost {
                           null,
                           new ExecCallback() {
                             public void done(final String ans) {
-                                final String defaultValue =
+                                String defaultValue =
                                             getHost().getDrbdBuildToInstall();
                                 final String[] items = ans.split("\\r?\\n");
+                                boolean found = false;
+                                for (final String item : items) {
+                                    if (item.equals(defaultValue)) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) {
+                                    /* try it with underscores */
+                                    defaultValue =
+                                            defaultValue.replaceAll("-", "_");
+                                }
+                                final String defaultValueCopy = defaultValue;
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        drbdBuildCombo.reloadComboBox(defaultValue,
-                                                                      items);
+                                        drbdBuildCombo.reloadComboBox(
+                                                              defaultValueCopy,
+                                                              items);
                                         final String selectedItem =
-                                                    drbdBuildCombo.getStringValue();
+                                               drbdBuildCombo.getStringValue();
                                         drbdBuildCombo.setEnabled(true);
                                         if (selectedItem == null) {
                                             allDone();
                                         } else {
                                             getHost().setDrbdBuildToInstall(
-                                                                        selectedItem);
+                                                                 selectedItem);
                                             if (!listenersAdded) {
                                                 availFiles();
                                             }
