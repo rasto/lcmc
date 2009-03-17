@@ -109,6 +109,8 @@ public class HostCheckInstallation extends DialogHost {
     private boolean heartbeatGUIOk = false;
     /** Whether udev installation was ok. */
     private boolean udevOk = false;
+    /** Version that appears in the dialog. */
+    private String versionText;
 
     /**
      * Prepares a new <code>HostCheckInstallation</code> object.
@@ -328,11 +330,19 @@ public class HostCheckInstallation extends DialogHost {
             if (Tools.compareVersions(version, "2.1.0") < 0) {
                 checkhbGUI = false;
             }
+            if ("2.1.3".equals(version)
+                && "sles10".equals(getHost().getDistVersion())) {
+                /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
+                version = "2.1.4";
+                versionText = "2.1.3 (2.1.4)";
+            } else {
+                versionText = version;
+            }
             getHost().setHeartbeatVersion(version);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     heartbeatIcon.setIcon(INSTALLED_ICON);
-                    heartbeatLabel.setText(": " + getHost().getHeartbeatVersion());
+                    heartbeatLabel.setText(": " + versionText);
                 }
             });
 

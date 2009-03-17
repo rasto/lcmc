@@ -333,16 +333,15 @@ sub get_gui_info {
 # get_installation_info()
 #
 sub get_installation_info {
-	my $hb_version = `/usr/lib/heartbeat/heartbeat -V 2>&1` || "";
-	$hb_version =~ s/\s+.*//;
+	my $hb_version = get_hb_version();
 	if ($hb_version) {
-		chomp $hb_version;
 		print "hb:$hb_version\n";
 	} else {
 		print "hb:not installed\n";
 	}
 	my $hn = `hostname`;
 	chomp $hn;
+	$hn =~ s/\..*//;
 	print "hn:$hn\n";
 }
 
@@ -459,15 +458,13 @@ sub is_smaller_v {
 
 sub mgmt {
 	my $passwd = shift;
-	my $hb_version = `/usr/lib/heartbeat/heartbeat -V` || "";
-	$hb_version =~ s/\s+.*//;
+	my $hb_version = get_hb_version();
 	return if !$hb_version;
-	chomp $hb_version;
 	my $mgmt_connect_cmd;
 	if (is_smaller_v($hb_version, "2.1.0")) {
 		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\")";
 	} else {
-		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", None)";
+		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", \"\")";
 	}
 
 	my @args = @_;
@@ -504,18 +501,16 @@ PYTHON
 # waits for mgmt events, there is timeout on purpose and it must be restarted.
 sub get_mgmt_events {
 	my $passwd = shift;
-	my $hb_version = `/usr/lib/heartbeat/heartbeat -V` || "";
-	$hb_version =~ s/\s+.*//;
+	my $hb_version = get_hb_version();
 	if (!$hb_version) {
 		return;
 	}
-	chomp $hb_version;
 	
 	my $mgmt_connect_cmd;
 	if (is_smaller_v($hb_version, "2.1.0")) {
 		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\")";
 	} else {
-		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", None)";
+		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", \"\")";
 	}
 
 	# TODO python versions
@@ -639,7 +634,7 @@ extra_attrs = {
 	      }
 PYTHON
 	} else {
-		# version => 2.1.4
+		# version => 2.1.4 oder sles10 2.1.3
 		$p.= <<PYTHON;
 extra_attrs = {
       		  "get_co\\nrsc_colocation" 	: "\\nid\\nfrom\\nto\\nscore\\nfrom_role\\nto_role\\nsymmetrical\\nnode_attribute",
@@ -932,3 +927,18 @@ sub get_drbd_xml {
 	}
 }
 
+sub get_hb_version {
+	my $hb_version = `/usr/lib/heartbeat/heartbeat -V 2>&1` || "";
+	$hb_version =~ s/\s+.*//;
+	if ($hb_version) {
+		chomp $hb_version;
+	}
+	if ($hb_version eq "2.1.3") {
+		# sles10 hb 2.1.3 looks like 2.1.4 to me
+		my $desc = `/usr/bin/lsb_release -d`;
+		if ($desc =~ /SUSE Linux Enterprise Server 10/) {
+			$hb_version = "2.1.4";
+		}
+	}
+	return $hb_version;
+}
