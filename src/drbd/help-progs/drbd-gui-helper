@@ -935,8 +935,8 @@ sub get_hb_version {
 	}
 	if ($hb_version eq "2.1.3") {
 		# sles10 hb 2.1.3 looks like 2.1.4 to me
-		my $desc = `/usr/bin/lsb_release -d`;
-		if ($desc =~ /SUSE Linux Enterprise Server 10/) {
+		my $desc = `/usr/bin/lsb_release -d 2>/dev/null`;
+		if ( $desc && $desc =~ /SUSE Linux Enterprise Server 10/) {
 			$hb_version = "2.1.4";
 		}
 	}
