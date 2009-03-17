@@ -40,7 +40,7 @@ public class DistResource_redhat_5 extends
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
 
         /* distribution name that is used in the download url */
-        {"distributiondir", "rhas5"},
+        {"distributiondir", "rhel5"},
 
         /* support */
         {"Support", "full"},

@@ -46,7 +46,7 @@ public class DistResource extends
         {"dist:sles",                 "suse"},
         {"dist:suse",                 "suse"},
         {"dist:opensuse",             "suse"},
-        {"dist:centos",               "redhat"}, // TODO: have to check this one
+        {"dist:centos",               "rhel"},
         {"dist:rhas",                 "redhat"},
         {"dist:rhel",                 "rhel"},
         {"dist:fc",                   "fedora"},
@@ -97,7 +97,6 @@ public class DistResource extends
         },
 
         {"DrbdAvailBuilds",
-        //  "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O - |perl -ple '($_) = m!href=\"drbd8?-(?:km|module)-.+?(bigsmp|default|smp).+?(\\.|_)@ARCH@\\..+?\"! or goto LINE'"
          "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O - |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:km|module)-(.*?)[-_]@DRBDVERSION@.+?[._]@ARCH@\\..+?\"! or goto LINE'"
         },
 
