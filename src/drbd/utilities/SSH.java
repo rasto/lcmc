@@ -280,7 +280,7 @@ public class SSH {
                                             ChannelCondition.STDOUT_DATA
                                             | ChannelCondition.STDERR_DATA
                                             | ChannelCondition.EOF,
-                                            240000);
+                                            90000);
                         }
                         if (cancelIt) {
                             throw new IOException(
@@ -885,7 +885,7 @@ public class SSH {
                 callback.done(1);
             }
             Tools.debug(this, "getting connection");
-            final Connection conn = new Connection(hostname);
+            final Connection conn = new Connection(hostname, 22);
             disconnectForGood = false;
 
             try {
