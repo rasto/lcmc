@@ -23,7 +23,6 @@
 package drbd.gui.dialog;
 
 import drbd.data.Host;
-import drbd.utilities.Tools;
 import drbd.utilities.CancelCallback;
 import drbd.utilities.SSH.ExecCommandThread;
 import drbd.gui.ProgressBar;

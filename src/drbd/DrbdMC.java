@@ -32,8 +32,6 @@ import drbd.gui.ProgressIndicatorPanel;
 
 import drbd.utilities.Tools;
 import javax.swing.JFrame;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIManager;
 import javax.swing.JPanel;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;

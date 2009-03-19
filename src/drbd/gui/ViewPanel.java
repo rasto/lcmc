@@ -165,6 +165,9 @@ public class ViewPanel extends JPanel {
                                     Tools.getString("ClusterBrowser.Services")))
                         || (path.length > 1
                          && path[1].toString().equals(
+                                    Tools.getString("ClusterBrowser.AllHosts")))
+                        || (path.length > 1
+                         && path[1].toString().equals(
                                     Tools.getString("ClusterBrowser.Drbd")))) {
                         final TreePath tp = new TreePath(path);
                         tree.expandPath(tp);

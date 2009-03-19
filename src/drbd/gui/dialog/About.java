@@ -26,9 +26,7 @@ import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import drbd.gui.SpringUtilities;
-import java.awt.Point;
 
 /**
  * An implementation of an About dialog.

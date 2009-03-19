@@ -39,7 +39,6 @@ import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.impl.SparseVertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.visualization.Coordinates;
 import edu.uci.ics.jung.visualization.PickedState;
 import edu.uci.ics.jung.visualization.VertexShapeFactory;
 

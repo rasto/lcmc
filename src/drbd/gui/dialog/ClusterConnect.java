@@ -26,8 +26,6 @@ import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
 
-import java.util.Iterator;
-
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import drbd.gui.SpringUtilities;

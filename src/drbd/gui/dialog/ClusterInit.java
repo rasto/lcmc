@@ -40,7 +40,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.Color;

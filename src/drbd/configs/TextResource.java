@@ -283,9 +283,8 @@ public class TextResource extends
         {"Dialog.About.Title",                "DRBD Management Console (Beta). Release: "},
         {"Dialog.About.Description",          
          "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br>"
-         + "Please visit our website http://www.linbit.com<br><br>"
-         + "DRBD Management Console was written by Rasto Levrinc<br><br>"
-         + "DRBD was written by Philipp Reisner and Lars Ellenberg.<br>"},
+         + "Please visit the website http://www.drbd.org/mc/management-console/<br><br>"
+         + "DRBD Management Console was written by Rasto Levrinc.<br>"},
 
 
         {"Dialog.About.Licences",       

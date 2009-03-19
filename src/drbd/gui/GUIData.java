@@ -22,15 +22,12 @@
 
 package drbd.gui;
 
-import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
-import drbd.utilities.MyButton;
+import drbd.utilities.AllHostsUpdatable;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
-import javax.swing.JMenuItem;
-import javax.swing.JMenu;
 import javax.swing.JComponent;
 import java.awt.Component;
 import java.util.List;
@@ -59,15 +56,22 @@ public class GUIData  {
     private ProgressIndicatorPanel mainGlassPane;
     /** Main menu. */
     private MainMenu mainMenu;
-    /** 'Add Cluster' button. */
-    private MyButton addClusterButton = null;
-    /** 'Add Cluster' menu item. */
-    private JMenuItem addClusterMenuItem = null;
+    /** 'Add Cluster' buttons. */
+    private List<JComponent> addClusterButtonList =
+                                                   new ArrayList<JComponent>();
+    /** 'Add Host' buttons. */
+    private List<JComponent> addHostButtonList =
+                                                   new ArrayList<JComponent>();
     /** Components that can be enabled and disabled in and out of the god mode.
      */
     private List<JComponent> visibleInGodModeList =
                                             new ArrayList<JComponent>();
-
+    /**
+     * List of components that have allHostsUpdate method that must be called
+     * when a host is added.
+     */
+    private List<AllHostsUpdatable> allHostsUpdateList =
+                                            new ArrayList<AllHostsUpdatable>();
     /**
      * Sets main frame of this application.
      */
@@ -186,28 +190,6 @@ public class GUIData  {
         clustersPanel.repaintTabs();
     }
 
-    ///**
-    // * Adds tab with new host to the hosts panel.
-    // */
-    //public final void addHostTab(final Host host) {
-    //    hostsPanel.addTab(host);
-    //}
-
-    ///**
-    // * changes name of the selected host tab.
-    // */
-    //public final void renameSelectedHostTab(final String newName) {
-    //    hostsPanel.renameSelectedTab(newName);
-    //}
-
-    ///**
-    // * Removes selected tab. This is used, if host was added, but than
-    // * it was canceled.
-    // */
-    //public final void removeSelectedHostTab() {
-    //    hostsPanel.removeTab();
-    //}
-
     /**
      * Adds tab with new cluster to the clusters panel.
      */
@@ -238,18 +220,34 @@ public class GUIData  {
     }
 
     /**
-     * Sets the 'Add Cluster' button, so that it can be enabled or disabled.
+     * Adds the 'Add Cluster' button to the list, so that it can be enabled or
+     * disabled.
      */
-    public final void setAddClusterButton(final MyButton addClusterButton) {
-        this.addClusterButton = addClusterButton;
+    public final void registerAddClusterButton(
+                                           final JComponent addClusterButton) {
+        if (!addClusterButtonList.contains(addClusterButton)) {
+            addClusterButtonList.add(addClusterButton);
+            addClusterButton.setEnabled(
+                             Tools.getConfigData().danglingHostsCount() >= 2);
+        }
     }
 
     /**
-     * Sets the 'Add Cluster' menu item, so that it can be enabled or disabled.
+     * Adds the 'Add Host' button to the list, so that it can be enabled or
+     * disabled.
      */
-    public final void setAddClusterMenuItem(
-                                        final JMenuItem addClusterMenuItem) {
-        this.addClusterMenuItem = addClusterMenuItem;
+    public final void registerAddHostButton(
+                                           final JComponent addHostButton) {
+        if (!addHostButtonList.contains(addHostButton)) {
+            addHostButtonList.add(addHostButton);
+        }
+    }
+    /**
+     * Removes the 'Add Cluster' button from the list.
+     */
+    public final void unregisterAddClusterButton(
+                                           final JComponent addClusterButton) {
+        addClusterButtonList.remove(addClusterButton);
     }
 
     /**
@@ -259,14 +257,29 @@ public class GUIData  {
     public final void checkAddClusterButtons() {
         final boolean enabled =
                             Tools.getConfigData().danglingHostsCount() >= 2;
-
-        if (addClusterButton != null) {
+        for (JComponent addClusterButton : addClusterButtonList) {
             addClusterButton.setEnabled(enabled);
         }
-        if (addClusterMenuItem != null) {
-            addClusterMenuItem.setEnabled(enabled);
+    }
+    
+    /**
+     * Enable/Disable all 'Add Cluster' buttons.
+     */
+    public final void enableAddClusterButtons(final boolean enable) {
+        for (JComponent addClusterButton : addClusterButtonList) {
+            addClusterButton.setEnabled(enable);
         }
     }
+
+    /**
+     * Enable/Disable all 'Add Host' buttons.
+     */
+    public final void enableAddHostButtons(final boolean enable) {
+        for (JComponent addHostButton : addHostButtonList) {
+            addHostButton.setEnabled(enable);
+        }
+    }
+
 
     /**
      * Add to the list of components that are visible only in god mode.
@@ -286,5 +299,33 @@ public class GUIData  {
         }
         Tools.startProgressIndicator("OH MY GOD!!!");
         Tools.stopProgressIndicator("OH MY GOD!!!");
+    }
+
+    /**
+     * Adds a component to the list of components that have allHostsUpdate
+     * method that must be called when a host is added.
+     */
+    public final void registerAllHostsUpdate(AllHostsUpdatable component) {
+        if (!allHostsUpdateList.contains(component)) {
+            allHostsUpdateList.add(component);
+        }
+    }
+
+    /**
+     * Adds a component from the list of components that have allHostsUpdate
+     * method that must be called when a host is added.
+     */
+    public final void unregisterAllHostsUpdate(AllHostsUpdatable component) {
+        allHostsUpdateList.remove(component);
+    }
+
+    /**
+     * Calls allHostsUpdate method on all registered components.
+     */
+    public final void allHostsUpdate() {
+        for (AllHostsUpdatable component : allHostsUpdateList) {
+            component.allHostsUpdate();
+        }
+        checkAddClusterButtons();
     }
 }

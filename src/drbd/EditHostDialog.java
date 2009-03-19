@@ -23,7 +23,6 @@
 package drbd;
 
 import drbd.data.Host;
-import drbd.utilities.Tools;
 
 import drbd.gui.dialog.DialogHost;
 import drbd.gui.dialog.HostNewHost;

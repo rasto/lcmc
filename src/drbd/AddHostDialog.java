@@ -27,7 +27,6 @@ import drbd.utilities.Tools;
 
 import drbd.gui.dialog.DialogHost;
 import drbd.gui.dialog.HostNewHost;
-import drbd.gui.dialog.HostFinish;
 
 /**
  * AddHostDialog.
@@ -43,6 +42,7 @@ public class AddHostDialog {
      * Shows step by step dialogs that add and configure new host.
      */
     public void showDialogs() {
+        Tools.getGUIData().enableAddHostButtons(false);
         final Host host = new Host();
         DialogHost dialog = new HostNewHost(null, host);
         while (true) {
@@ -52,8 +52,10 @@ public class AddHostDialog {
                 host.disconnect();
                 Tools.getConfigData().removeHostFromHosts(host);
                 dialog.cancelDialog();
+                Tools.getGUIData().enableAddHostButtons(true);
                 return;
             } else if (dialog.isPressedFinishButton()) {
+                Tools.getGUIData().allHostsUpdate();
                 Tools.getGUIData().checkAddClusterButtons();
                 break;
             }
@@ -62,6 +64,6 @@ public class AddHostDialog {
                 dialog = newdialog;
             }
         }
-        //Tools.getGUIData().getMainFrame().requestFocus();
+        Tools.getGUIData().enableAddHostButtons(true);
     }
 }

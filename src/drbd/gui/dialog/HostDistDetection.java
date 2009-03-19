@@ -31,10 +31,7 @@ import drbd.utilities.SSH.ExecCommandThread;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.Box;

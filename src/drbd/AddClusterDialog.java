@@ -47,6 +47,7 @@ public class AddClusterDialog {
      * Shows step by step dialogs that add and configure new cluster.
      */
     public void showDialogs() {
+        Tools.getGUIData().enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
         DialogCluster dialog = new ClusterName(null, cluster);
         while (true) {
@@ -57,6 +58,7 @@ public class AddClusterDialog {
                 Tools.getConfigData().removeClusterFromClusters(cluster);
                 canceled = true;
                 dialog.cancelDialog();
+                Tools.getGUIData().checkAddClusterButtons();
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;

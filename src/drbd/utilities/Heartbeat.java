@@ -223,7 +223,7 @@ public final class Heartbeat {
             xml.append(attrsString);
             xml.append("\\>");
             /* instance_attributes */
-            if (pacemakerResArgs.size() > 0) {
+            if (!pacemakerResArgs.isEmpty()) {
                 xml.append("\\<instance_attributes\\ id=\\\"");
                 xml.append(instanceAttrId);
                 xml.append("\\\"\\>");
@@ -251,7 +251,7 @@ public final class Heartbeat {
                 xml.append("\\</instance_attributes\\>");
             }
             /* operations */
-            if (pacemakerOps.size() > 0) {
+            if (!pacemakerOps.isEmpty()) {
                 xml.append("\\<operations\\ id=\\\"");
                 if (operationsId == null) {
                     operationsId = heartbeatId + "-operations";

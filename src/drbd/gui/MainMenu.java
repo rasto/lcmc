@@ -87,12 +87,13 @@ public class MainMenu extends JPanel implements ActionListener {
         /* session */
         submenu = addMenu(Tools.getString("MainMenu.Session"), KeyEvent.VK_S);
         menuNew = addMenu(Tools.getString("MainMenu.New"), KeyEvent.VK_E);
-        addMenuItem(Tools.getString("MainMenu.Host"),
-                    menuNew,
-                    KeyEvent.VK_H,
-                    KeyEvent.VK_N,
-                    newHostActionListener(),
-                    HOST_ICON);
+        final JMenuItem hostItem = addMenuItem(Tools.getString("MainMenu.Host"),
+                                               menuNew,
+                                               KeyEvent.VK_H,
+                                               KeyEvent.VK_N,
+                                               newHostActionListener(),
+                                               HOST_ICON);
+        Tools.getGUIData().registerAddHostButton(hostItem);
 
         final JMenuItem cmi = addMenuItem(Tools.getString("MainMenu.Cluster"),
                                           menuNew,
@@ -101,7 +102,7 @@ public class MainMenu extends JPanel implements ActionListener {
                                           newClusterActionListener(),
                                           CLUSTER_ICON);
 
-        Tools.getGUIData().setAddClusterMenuItem(cmi);
+        Tools.getGUIData().registerAddClusterButton(cmi);
         Tools.getGUIData().checkAddClusterButtons();
 
 

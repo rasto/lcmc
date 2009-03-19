@@ -24,6 +24,7 @@ package drbd.gui;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
+import drbd.utilities.AllHostsUpdatable;
 import drbd.EditClusterDialog;
 
 
@@ -39,7 +40,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 
@@ -51,7 +51,7 @@ import javax.swing.border.TitledBorder;
  * @version $Id$
  *
  */
-public class ClusterViewPanel extends ViewPanel {
+public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
@@ -102,6 +102,9 @@ public class ClusterViewPanel extends ViewPanel {
         hbPlayStopButton.setForeground(Color.RED);
 
         final JPanel buttonPanel = new JPanel(new FlowLayout());
+        //buttonPanel.setMinimumSize(new Dimension(0, 50));
+        //buttonPanel.setPreferredSize(new Dimension(0, 50));
+        //buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
         buttonPanel.setBackground(STATUS_BACKGROUND);
 
         final JPanel hbStatusPanel = new JPanel();
@@ -151,7 +154,7 @@ public class ClusterViewPanel extends ViewPanel {
         clusterWizardButton.setPreferredSize(new Dimension(130, 20));
         clusterWizardButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                Thread t = new Thread(new Runnable() {
+                final Thread t = new Thread(new Runnable() {
                     public void run() {
                         final EditClusterDialog dialog =
                                         new EditClusterDialog(cluster);
@@ -161,8 +164,6 @@ public class ClusterViewPanel extends ViewPanel {
                 t.start();
             }
         });
-        
-        
 
         final JPanel clusterButtonsPanel = new JPanel();
         clusterButtonsPanel.setBackground(STATUS_BACKGROUND);
@@ -186,6 +187,7 @@ public class ClusterViewPanel extends ViewPanel {
         add(buttonArea, BorderLayout.NORTH);
 
         createClusterView();
+        Tools.getGUIData().registerAllHostsUpdate(this);
     }
 
     /**
@@ -200,6 +202,13 @@ public class ClusterViewPanel extends ViewPanel {
                                                 cluster.getCommonFileSystems(),
                                                 cluster.getCommonMountPoints(),
                                                 this);
+    }
+
+    /**
+     * This is called when there was added a new host.
+     */
+    public final void allHostsUpdate() {
+        createClusterView(); // TODO: should reload just all hosts
     }
 
     /**

@@ -691,6 +691,7 @@ public final class Tools {
         } finally {
             drbdGuiXML.loadXML(xml.toString());
             Tools.stopProgressIndicator(getString("Tools.Loading"));
+            Tools.getGUIData().allHostsUpdate();
             if (in != null)  {
                 try {
                         in.close();
