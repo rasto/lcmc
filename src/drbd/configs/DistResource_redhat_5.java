@@ -41,9 +41,9 @@ public class DistResource_redhat_5 extends
 
         /* distribution name that is used in the download url */
         {"distributiondir", "rhel5"},
+        {"arch:i686", "i686"},
 
         /* support */
-        {"Support", "full"},
-
+        {"Support", "redhat-5"},
     };
 }

@@ -36,7 +36,7 @@ public class DistResource_redhatenterpriseserver extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support", "generic rhel"},
+        {"Support", "redhatenterpriseserver"},
         {"arch:i686", "i686"},
         {"distribution", "rhel"},
         //{"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},
@@ -45,6 +45,9 @@ public class DistResource_redhatenterpriseserver extends
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
+
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+        {"HbInst.install", "/usr/bin/yum -y install heartbeat && /usr/bin/yum -y install heartbeat-gui"},
+        {"HbGUIInst.install", "/usr/bin/yum -y install heartbeat-gui"},
     };
 }

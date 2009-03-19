@@ -40,7 +40,7 @@ public class DistResource_redhatenterpriseserver_5 extends
         {"distributiondir", "rhel5"},
 
         /* support */
-        {"Support", "full"},
+        {"Support", "redhatenterpriseserver-5"},
 
     };
 }
