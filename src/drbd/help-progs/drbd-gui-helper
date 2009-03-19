@@ -341,7 +341,6 @@ sub get_installation_info {
 	}
 	my $hn = `hostname`;
 	chomp $hn;
-	$hn =~ s/\..*//;
 	print "hn:$hn\n";
 }
 
