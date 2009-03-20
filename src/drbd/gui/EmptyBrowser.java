@@ -47,6 +47,8 @@ public class EmptyBrowser extends Browser {
     private DefaultMutableTreeNode allHostsNode;
     /** Panel that holds this browser. */
     private EmptyViewPanel emptyViewPanel = null;
+    /** Tree menu root. */
+    private JTree treeMenu;
 
     /** Color of the most of backgrounds. */
     private static final Color PANEL_BACKGROUND =
@@ -119,7 +121,7 @@ public class EmptyBrowser extends Browser {
      */
     public class AllHostsInfo extends Info {
         /** getInfoPanel() cache. */
-        private final JComponent infoPanel = null;
+        private JComponent infoPanel = null;
         /** Possibly selected host or null. */
         private final Host host;
 
