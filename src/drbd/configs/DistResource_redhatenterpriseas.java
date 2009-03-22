@@ -40,6 +40,12 @@ public class DistResource_redhatenterpriseas extends
         {"arch:i686", "i686"},
         {"distribution", "redhatenterpriseas"},
         {"version:4", "4"},
+        {"version:4.1", "4"},
+        {"version:4.2", "4"},
+        {"version:4.3", "4"},
+        {"version:4.4", "4"},
+        {"version:4.5", "4"},
+        {"version:4.6", "4"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?EL\\d*).*"},

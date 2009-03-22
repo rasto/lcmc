@@ -42,6 +42,11 @@ public class DistResource_redhatenterpriseserver extends
         //{"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},
         {"version:4", "4"},
         {"version:5", "5"},
+        {"version:5.1", "5"},
+        {"version:5.2", "5"},
+        {"version:5.3", "5"},
+        {"version:5.4", "5"},
+        {"version:5.5", "5"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
