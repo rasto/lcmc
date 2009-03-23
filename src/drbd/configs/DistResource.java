@@ -47,6 +47,7 @@ public class DistResource extends
         {"dist:suse",                 "suse"},
         {"dist:opensuse",             "suse"},
         {"dist:centos",               "rhel"},
+        {"dist:fedora",               "redhat"},
         {"dist:rhas",                 "redhat"},
         {"dist:rhel",                 "rhel"},
         {"dist:fc",                   "fedora"},
