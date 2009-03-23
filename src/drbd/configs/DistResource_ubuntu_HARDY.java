@@ -36,7 +36,7 @@ public class DistResource_ubuntu_HARDY extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "ubuntu hardy"},
+        {"Support",            "ubuntu-HARDY"},
         {"distributiondir",    "ubuntu-hardy-server"},
     };
 }

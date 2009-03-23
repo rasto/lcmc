@@ -37,7 +37,7 @@ public class DistResource_ubuntu_DAPPER extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "ubuntu dapper"},
+        {"Support",            "ubuntu-DAPPER"},
         {"distributiondir",    "ubuntu-dapper-server"},
     };
 }

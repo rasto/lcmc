@@ -36,7 +36,7 @@ public class DistResource_ubuntu extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "generic ubuntu"},
+        {"Support",            "ubuntu"},
         {"version:7.04",       ""},
         {"version:9.04",       "JAUNTY"},
         {"version:8.04",       "HARDY"},

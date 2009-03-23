@@ -40,7 +40,7 @@ public class DistResource_debian_4 extends
         {"distributiondir", "debian-etch"},
 
         /* support */
-        {"Support", "debian 4.0"},
+        {"Support", "debian-4"},
         {"HbInst.install", "/usr/bin/apt-get -y -q install heartbeat-2 python-gtk2 python-gtk-1.2"},
 
     };

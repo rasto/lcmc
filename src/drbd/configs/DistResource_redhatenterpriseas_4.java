@@ -40,7 +40,7 @@ public class DistResource_redhatenterpriseas_4 extends
         {"distributiondir", "rhel4"},
 
         /* support */
-        {"Support", "full"},
+        {"Support", "redhatenterpriseas-4"},
 
         {"DrbdAvailVersions",
          "/usr/bin/wget -q http://www.linbit.com/@SUPPORTDIR@/ -O - |perl -ple '($_) = /href=\"@DRBDDIR@-(\\d.*?)\\/\"/ or goto LINE'"

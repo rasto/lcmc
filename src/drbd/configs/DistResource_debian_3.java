@@ -36,6 +36,6 @@ public class DistResource_debian_3 extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support", "maybe"},
+        {"Support", "debian-3"},
     };
 }

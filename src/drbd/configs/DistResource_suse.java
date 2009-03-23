@@ -36,7 +36,7 @@ public class DistResource_suse extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support", "generic suse"},
+        {"Support", "suse"},
         {"version:SUSE LINUX Enterprise Server 9 (i586)", "SLES9"}, // detected
         //{"version:SUSE LINUX Enterprise Server 10 (i586)", "SLES10"}, // detected
         {"version:10",     "SLES10"}, // from lsb_release

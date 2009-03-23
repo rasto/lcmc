@@ -36,7 +36,7 @@ public class DistResource_debian extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",             "generic debian"},
+        {"Support",             "debian"},
         //{"distribution",        "debian"},
         {"version:3.1",         "3_1"},
         {"version:3.2",         "3_2"},

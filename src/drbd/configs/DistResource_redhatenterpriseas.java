@@ -36,7 +36,7 @@ public class DistResource_redhatenterpriseas extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support", "generic rhel"},
+        {"Support", "redhatenterpriseas"},
         {"arch:i686", "i686"},
         {"distribution", "redhatenterpriseas"},
         {"version:4", "4"},

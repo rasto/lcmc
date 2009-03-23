@@ -45,6 +45,6 @@ public class DistResource_debian_LENNY extends
 
         /* support */
         // TODO: use flags for this
-        {"Support", "LENNY"},
+        {"Support", "debian-LENNY"},
     };
 }

@@ -41,6 +41,6 @@ public class DistResource_suse_SLES10 extends
 
         /* distribution name that is used in the download url */
         {"distributiondir", "sles10"},
-        {"Support", "full"},
+        {"Support", "suse-SLES10"},
     };
 }
