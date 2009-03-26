@@ -61,6 +61,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class DrbdGuiXML extends XML {
     /** Host name attribute string. */
     private static final String HOST_NAME_ATTR = "name";
+    /** Host ssh port attribute string. */
+    private static final String HOST_SSHPORT_ATTR = "ssh";
     /** Cluster name attribute string. */
     private static final String CLUSTER_NAME_ATTR = "name";
     /** Heartbeat password attribute string. */
@@ -88,12 +90,14 @@ public class DrbdGuiXML extends XML {
         final Element hosts = (Element) root.appendChild(
                                                 doc.createElement("hosts"));
         for (final Host host : Tools.getConfigData().getHosts().getHostSet()) {
-            final String hostName = host.getName();
+            final String hostName = host.getHostname();
             final String ip = host.getIp();
             final String username = host.getUsername();
+            final String sshPort = host.getSSHPort();
             final Element hostNode = (Element) hosts.appendChild(
                                         doc.createElement(HOST_NODE_STRING));
             hostNode.setAttribute(HOST_NAME_ATTR, hostName);
+            hostNode.setAttribute(HOST_SSHPORT_ATTR, sshPort);
             if (ip != null) {
                 final Node ipNode = (Element) hostNode.appendChild(
                                                        doc.createElement("ip"));
@@ -122,7 +126,7 @@ public class DrbdGuiXML extends XML {
             clusterNode.setAttribute(CLUSTER_NAME_ATTR, clusterName);
             clusterNode.setAttribute(HB_PASSWD_ATTR, hbPasswd);
             for (final Host host : cluster.getHosts()) {
-                final String hostName = host.getName();
+                final String hostName = host.getHostname();
                 final Element hostNode =
                                 (Element) clusterNode.appendChild(
                                         doc.createElement(HOST_NODE_STRING));
@@ -207,6 +211,9 @@ public class DrbdGuiXML extends XML {
                             final String nodeName =
                                                 getAttribute(hostNode,
                                                              HOST_NAME_ATTR);
+                            final String sshPort =
+                                                getAttribute(hostNode,
+                                                             HOST_SSHPORT_ATTR);
                             final Node ipNode = getChildNode(hostNode, "ip");
                             final String ip = getText(ipNode);
                             final Node usernameNode = getChildNode(hostNode,
@@ -214,6 +221,9 @@ public class DrbdGuiXML extends XML {
                             final String username = getText(usernameNode);
                             final Host host = new Host();
                             host.setHostname(nodeName);
+                            if (sshPort != null) {
+                                host.setSSHPort(sshPort);
+                            }
                             Tools.getConfigData().addHostToHosts(host);
 
                             new TerminalPanel(host);

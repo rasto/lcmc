@@ -51,6 +51,8 @@ public class HostNewHost extends DialogHost {
     private GuiComboBox hostField;
     /** User name field. */
     private GuiComboBox usernameField;
+    /** SSH Port field. */
+    private GuiComboBox sshPortField;
     /** Whether the fields are big (if more hops are being used). */
     private boolean bigFields = false;
     /** Normal widths of the fields. */
@@ -73,6 +75,7 @@ public class HostNewHost extends DialogHost {
         final String hostnameEntered = hostField.getStringValue().trim();
         getHost().setHostnameEntered(hostnameEntered);
         getHost().setUsername(usernameField.getStringValue().trim());
+        getHost().setSSHPort(sshPortField.getStringValue().trim());
         if (!Tools.getConfigData().existsHost(getHost())) {
             Tools.getConfigData().addHostToHosts(getHost());
             final TerminalPanel terminalPanel = new TerminalPanel(getHost());
@@ -94,8 +97,10 @@ public class HostNewHost extends DialogHost {
     protected void checkFields(final GuiComboBox field) {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
+        final String ps = sshPortField.getStringValue().trim();
         boolean hf = (hs.length() > 0);
         boolean uf = (us.length() > 0);
+        boolean pf = (ps.length() > 0);
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
         if (hf && uf) {
@@ -144,11 +149,24 @@ public class HostNewHost extends DialogHost {
             usernameField.wrongValue();
         }
 
+        if (pf) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    sshPortField.setBackground(getHost().getSSHPort(), true);
+                }
+            });
+        } else {
+            sshPortField.wrongValue();
+        }
+
         final boolean hostField = hf;
         final boolean userField = hf;
+        final boolean sshPortField = pf;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                buttonClass(nextButton()).setEnabled(hostField && userField);
+                buttonClass(nextButton()).setEnabled(hostField
+                                                     && userField
+                                                     && sshPortField);
             }
         });
     }
@@ -211,6 +229,23 @@ public class HostNewHost extends DialogHost {
         inputPane.add(hostField);
         hostField.setBackground(getHost().getHostnameEntered(), true);
 
+        /* SSH Port */
+        final JLabel sshPortLabel = new JLabel(
+                        Tools.getString("Dialog.HostNewHost.SSHPort"));
+
+        inputPane.add(sshPortLabel);
+        sshPortField = new GuiComboBox(getHost().getSSHPort(),
+                                        null,
+                                        null,
+                                        "^\\d+$",
+                                        50);
+        addCheckField(sshPortField);
+        sshPortField.selectAll();
+        sshPortLabel.setLabelFor(sshPortField);
+        inputPane.add(sshPortField);
+        sshPortField.setBackground(getHost().getSSHPort(), true);
+
+
         /* Username */
         final JLabel usernameLabel = new JLabel(
                         Tools.getString("Dialog.HostNewHost.EnterUsername"));
@@ -223,8 +258,10 @@ public class HostNewHost extends DialogHost {
         usernameLabel.setLabelFor(usernameField);
         inputPane.add(usernameField);
         usernameField.setBackground(getHost().getUsername(), true);
+        inputPane.add(new JLabel(""));
+        inputPane.add(new JLabel(""));
 
-        SpringUtilities.makeCompactGrid(inputPane, 2, 2,  // rows, cols
+        SpringUtilities.makeCompactGrid(inputPane, 2, 4,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad
         p.add(inputPane, BorderLayout.SOUTH);

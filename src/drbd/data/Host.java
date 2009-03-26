@@ -149,10 +149,8 @@ public class Host implements Serializable {
     private final SSH ssh = new SSH();
     /** Terminal panel of this host. */
     private TerminalPanel terminalPanel = null;
-    ///** View panel of this host. */
-    //private HostViewPanel hostViewPanel = null;
-    ///** Tab panel of this host. */
-    //private HostTab hostTab = null;
+    /** SSH port. */
+    private String sshPort = "22";
     /** Browser panel (the one with menus and all the logic) of this host. */
     private HostBrowser browser;
     /** Timeout after which the drbd status is considered hanging and will be
@@ -171,11 +169,9 @@ public class Host implements Serializable {
      * host's resources.
      */
     public Host() {
-        //!!!!!!!! FOR TESTING
         if (Tools.getConfigData().getHosts().size() == 1) {
             hostnameEntered = Tools.getDefault("SSH.SecHost");
         }
-        //!!!!!!!! FOR TESTING
         browser = new HostBrowser(this);
         browser.initHostResources();
         addMountPoint("/mnt/");
@@ -900,7 +896,8 @@ public class Host implements Serializable {
                                                 distVersionString),
                                execCallback,
                                outputVisible,
-                               true);
+                               true,
+                               Tools.getDefaultInt("SSH.Command.Timeout"));
     }
 
     /**
@@ -924,7 +921,8 @@ public class Host implements Serializable {
                                execCallback,
                                newOutputCallback,
                                outputVisible,
-                               true);
+                               true,
+                               Tools.getDefaultInt("SSH.Command.Timeout"));
     }
 
 
@@ -943,7 +941,8 @@ public class Host implements Serializable {
         return ssh.execCommand(command,
                                callback,
                                outputVisible,
-                               commandVisible);
+                               commandVisible,
+                               Tools.getDefaultInt("SSH.Command.Timeout"));
     }
 
     /**
@@ -964,7 +963,8 @@ public class Host implements Serializable {
                                                 distVersionString) + params,
                                callback,
                                outputVisible,
-                               true);
+                               true,
+                               Tools.getDefaultInt("SSH.Command.Timeout"));
     }
 
     /**
@@ -985,7 +985,8 @@ public class Host implements Serializable {
                                progressBar,
                                callback,
                                outputVisible,
-                               true);
+                               true,
+                               Tools.getDefaultInt("SSH.Command.Timeout"));
     }
 
     /**
@@ -1005,7 +1006,8 @@ public class Host implements Serializable {
                                progressBar,
                                execCallback,
                                outputVisible,
-                               commandVisible);
+                               commandVisible,
+                               Tools.getDefaultInt("SSH.Command.Timeout"));
     }
 
     /**
@@ -1028,7 +1030,8 @@ public class Host implements Serializable {
                                callback,
                                true,
                                outputVisible,
-                               true);
+                               true,
+                               Tools.getDefaultInt("SSH.Command.Timeout"));
     }
 
     /**
@@ -1046,7 +1049,8 @@ public class Host implements Serializable {
                                         execCallback,
                                         outputCallback,
                                         false,
-                                        false);
+                                        false,
+                                        28000);
         } else {
             Tools.appWarning("trying to start started drbd status");
         }
@@ -1095,7 +1099,8 @@ public class Host implements Serializable {
                                 execCallback,
                                 outputCallback,
                                 false,
-                                false);
+                                false,
+                                28000);
         } else {
             Tools.appWarning("trying to start started hb status");
         }
@@ -1784,4 +1789,24 @@ public class Host implements Serializable {
     public final void setLoadingError() {
         isLoadingGate.countDown();
     }
+
+    /**
+     * Returns ssh port.
+     */
+    public final String getSSHPort() {
+        return sshPort;
+    }
+    
+    /**
+     * Returns ssh port as integer.
+     */
+    public final int getSSHPortInt() {
+        return new Integer(sshPort);
+    }
+    /**
+     * Sets ssh port.
+     */
+     public final void setSSHPort(final String sshPort) {
+         this.sshPort = sshPort;
+     }
 }

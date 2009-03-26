@@ -283,6 +283,7 @@ public class AppDefaults extends
         {"SSH.User",           "root"},
         {"SSH.ConnectTimeout", 30000}, /* milliseconds, 0 no timeout */
         {"SSH.KexTimeout",     0},     /* milliseconds, 0 no timeout */
+        {"SSH.Command.Timeout", 0},     /* milliseconds, 0 no timeout */
         {"ProgressBar.Sleep",  100},   /* milliseconds */
         {"ProgressBar.Delay",  50},    /* milliseconds */
 

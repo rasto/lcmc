@@ -106,6 +106,7 @@ public class TextResource extends
 
         {"Dialog.HostNewHost.EnterHost",        "Host:"},
         {"Dialog.HostNewHost.EnterUsername",    "Username:"},
+        {"Dialog.HostNewHost.SSHPort",          "SSH Port:"},
         {"Dialog.HostNewHost.EnterPassword",    "Password:"},
 
         {"Dialog.HostConfiguration.Title",          "Host configuration"},
