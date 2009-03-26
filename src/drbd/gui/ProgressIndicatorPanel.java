@@ -263,20 +263,20 @@ public class ProgressIndicatorPanel extends JComponent
      */
     public final void stop(final String text) {
         try {
-            mTextsLock.acquire();
+            mAnimatorLock.acquire();
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         try {
-            mAnimatorLock.acquire();
+            mTextsLock.acquire();
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         if (!texts.containsKey(text)) {
             Tools.appWarning("progress indicator already stopped for: "
                              + text);
-            mAnimatorLock.release();
             mTextsLock.release();
+            mAnimatorLock.release();
             return;
         }
         texts.put(text, 250);
@@ -284,8 +284,8 @@ public class ProgressIndicatorPanel extends JComponent
             final int a = texts.get(t).intValue();
             if (a == MAX_ALPHA_LEVEL) {
                 /* at least one is going up */
-                mAnimatorLock.release();
                 mTextsLock.release();
+                mAnimatorLock.release();
                 return;
             }
         }
@@ -317,7 +317,6 @@ public class ProgressIndicatorPanel extends JComponent
             removeMouseListener(this);
             removeKeyListener(this);
             setVisible(false);
-            System.out.println("interrupt");
         }
     }
 
