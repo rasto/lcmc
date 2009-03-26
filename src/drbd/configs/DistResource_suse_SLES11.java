@@ -42,5 +42,6 @@ public class DistResource_suse_SLES11 extends
         /* distribution name that is used in the download url */
         {"distributiondir", "sles11"},
         {"Support", "suse-SLES11"},
+        {"DRBD.load",          "modprobe --allow-unsupported drbd"},
     };
 }
