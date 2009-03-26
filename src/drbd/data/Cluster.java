@@ -128,6 +128,17 @@ public class Cluster {
     }
 
     /**
+     * Returns names of the hosts in this cluster.
+     */
+    public final String[] getHostNames() {
+        List<String> hostNames = new ArrayList<String>();
+        for (Host host : hosts) {
+            hostNames.add(host.getName());
+        }
+        return hostNames.toArray(new String[hostNames.size()]);
+    }
+
+    /**
      * Removes all hosts.
      */
     public final void clearHosts() {

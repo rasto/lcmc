@@ -92,7 +92,7 @@ public class ClustersPanel extends JPanel {
         final MyTabbedPaneUI mtpui = new MyTabbedPaneUI();
         tabbedPane.setUI(mtpui);
 
-        addAllTabs();
+        addEmptyTab();
         add(tabbedPane);
         this.setBorder(javax.swing.BorderFactory.createLineBorder(
                         Tools.getDefaultColor("ClustersPanel.Background"),
@@ -123,10 +123,6 @@ public class ClustersPanel extends JPanel {
                                     Tools.getConfigData().danglingHostsCount();
                     if (cluster != null) {
                         refresh();
-                    } else if (tabbedPane.getTabCount() > 0
-                               && danglingHostsCount >= 2) {
-                        final AddClusterDialog acd = new AddClusterDialog();
-                        acd.showDialogs();
                     }
                 }
             }
@@ -145,7 +141,7 @@ public class ClustersPanel extends JPanel {
         tabbedPane.addTab(cluster.getName(),
                           CLUSTER_ICON,
                           ct,
-                          ""); // TODO: list of hosts maybe instead ""
+                          Tools.join(" ", cluster.getHostNames()));
         tabbedPane.setSelectedComponent(ct);
         addEmptyTab();
         refresh();

@@ -24,7 +24,6 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.gui.TerminalPanel;
-//import drbd.utilities.States;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,7 +35,8 @@ import org.w3c.dom.Node;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -48,7 +48,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -154,6 +153,40 @@ public class DrbdGuiXML extends XML {
     }
 
     /**
+     * Starts specified clusters and connects to the hosts of this clusters.
+     */
+    public final void startClusters(final List<String> selectedClusters) {
+        final Set<Cluster> clusters =
+                        Tools.getConfigData().getClusters().getClusterSet();
+        if (clusters != null) {
+            /* clusters */
+            for (final Cluster cluster : clusters) {
+                if (selectedClusters != null
+                    && !selectedClusters.contains(cluster.getName())) {
+                    continue;
+                }
+                Tools.getGUIData().addClusterTab(cluster);
+                for (final Host host : cluster.getHosts()) {
+                    host.setIsLoading();
+                    host.connect();
+                }
+
+                final Runnable runnable = new Runnable() {
+                    public void run() {
+                        for (final Host host : cluster.getHosts()) {
+                            host.waitOnLoading();
+                        }
+                        cluster.getClusterTab().addClusterView();
+                        cluster.getClusterTab().requestFocus();
+                    }
+                };
+                final Thread thread = new Thread(runnable);
+                thread.start();
+            }
+        }
+    }
+
+    /**
      * Loads info from xml that is supplied as an argument to the internal
      * data objects.
      */
@@ -161,7 +194,7 @@ public class DrbdGuiXML extends XML {
         final Document document = getXMLDocument(xml);
         /* get root <drbdgui> */
         final Node rootNode = getChildNode(document, "drbdgui");
-        final Map<String, Host> hostMap = new HashMap<String, Host>();
+        final Map<String, Host> hostMap = new LinkedHashMap<String, Host>();
         if (rootNode != null) {
             /* hosts */
             final Node hostsNode = getChildNode(rootNode, "hosts");
@@ -171,24 +204,19 @@ public class DrbdGuiXML extends XML {
                     for (int i = 0; i < hosts.getLength(); i++) {
                         final Node hostNode = hosts.item(i);
                         if (hostNode.getNodeName().equals(HOST_NODE_STRING)) {
+                            final String nodeName =
+                                                getAttribute(hostNode,
+                                                             HOST_NAME_ATTR);
                             final Node ipNode = getChildNode(hostNode, "ip");
                             final String ip = getText(ipNode);
                             final Node usernameNode = getChildNode(hostNode,
                                                                    "user");
                             final String username = getText(usernameNode);
-                            final String nodeName =
-                                                getAttribute(hostNode,
-                                                             HOST_NAME_ATTR);
                             final Host host = new Host();
-                            //host.setHostnameEntered(nodeName);
-                            //host.setIp(ip);
-                            //host.setName(nodeName);
                             host.setHostname(nodeName);
                             Tools.getConfigData().addHostToHosts(host);
 
-                            //Tools.getGUIData().addHostTab(host);
-                            final TerminalPanel terminalPanel = new TerminalPanel(host);
-                            Tools.getGUIData().setTerminalPanel(terminalPanel);
+                            new TerminalPanel(host);
                             host.setIp(ip);
                             host.setUsername(username);
                             hostMap.put(nodeName, host);
@@ -208,7 +236,6 @@ public class DrbdGuiXML extends XML {
                             final String clusterName =
                                                getAttribute(clusterNode,
                                                             CLUSTER_NAME_ATTR);
-
                             final String hbPasswd =
                                                   getAttribute(clusterNode,
                                                                HB_PASSWD_ATTR);
@@ -217,22 +244,7 @@ public class DrbdGuiXML extends XML {
                             cluster.setName(clusterName);
                             cluster.setHbPasswd(hbPasswd);
                             Tools.getConfigData().addClusterToClusters(cluster);
-                            Tools.getGUIData().addClusterTab(cluster);
                             loadClusterHosts(clusterNode, cluster, hostMap);
-
-                            final Runnable runnable = new Runnable() {
-                                public void run() {
-                                    for (final Host host : cluster.getHosts()) {
-                                        host.waitOnLoading();
-                                        //States.wait("load:" + host.getName(),
-                                        //            0);
-                                    }
-                                    cluster.getClusterTab().addClusterView();
-                                    cluster.getClusterTab().requestFocus();
-                                }
-                            };
-                            final Thread thread = new Thread(runnable);
-                            thread.start();
                         }
                     }
                 }
@@ -244,11 +256,10 @@ public class DrbdGuiXML extends XML {
      * Loads info about hosts from the specified cluster to the internal data
      * objects.
      */
-    private boolean loadClusterHosts(final Node clusterNode,
-                                     final Cluster cluster,
-                                     final Map<String, Host> hostMap) {
+    private void loadClusterHosts(final Node clusterNode,
+                                  final Cluster cluster,
+                                  final Map<String, Host> hostMap) {
         final NodeList hosts = clusterNode.getChildNodes();
-        final boolean ok = true;
         if (hosts != null) {
             for (int i = 0; i < hosts.getLength(); i++) {
                 final Node hostNode = hosts.item(i);
@@ -256,16 +267,11 @@ public class DrbdGuiXML extends XML {
                     final String nodeName = getText(hostNode);
                     final Host host = hostMap.get(nodeName);
                     if (host != null) {
-                        host.setIsLoading();
-                        //States.init("load:" + host.getName());
                         host.setCluster(cluster);
                         cluster.addHost(host);
-                        //host.getHostViewPanel().connect();
-                        host.connect();
                     }
                 }
             }
         }
-        return ok; // TODO: is not used?
     }
 }

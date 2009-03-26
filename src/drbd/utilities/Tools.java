@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 import java.util.Properties;
 import java.util.Locale;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -658,60 +659,78 @@ public final class Tools {
     }
 
     /**
-     * Loads config data.
-     *
-     * @param filename
-     *          filename where are the data stored.
+     * Loads the save file and returns its content as string. Return null, if
+     * nothing was loaded.
      */
-    public static void loadConfigData(final String filename) {
-        //String dir = System.getProperty("user.home") + "/";
-
-        debug("load", 0);
+    public static String loadSaveFile(final String filename,
+                                      final boolean showError) {
         BufferedReader in = null;
         final StringBuffer xml = new StringBuffer("");
+        //Tools.startProgressIndicator(getString("Tools.Loading"));
         try {
             in = new BufferedReader(new FileReader(filename));
             String line = "";
             while ((line = in.readLine()) != null) {
                 xml.append(line);
             }
-
-            //removeEverything();
-            //Tools.getConfigData().disconnectAllHosts();
-            //getGUIData().getClustersPanel().removeAllTabs();
-            //getGUIData().getHostsPanel().removeAllTabs();
-            Tools.startProgressIndicator(getString("Tools.Loading"));
-
-
         } catch (Exception ex) {
-            Tools.printStackTrace();
-            infoDialog("Load Error",
-                       "The file " + filename + " failed to load",
-                       ex.getMessage());
-        } finally {
-            drbdGuiXML.loadXML(xml.toString());
-            Tools.stopProgressIndicator(getString("Tools.Loading"));
-            Tools.getGUIData().allHostsUpdate();
-            if (in != null)  {
-                try {
-                        in.close();
-                } catch (IOException ex) {
-                    Tools.appError("Could not close: " + filename, ex);
-                }
+            //Tools.stopProgressIndicator(getString("Tools.Loading"));
+            //Tools.progressIndicatorFailed(getString("Tools.Loading")
+            //                              + " failed");
+            if (showError) {
+                infoDialog("Load Error",
+                           "The file " + filename + " failed to load",
+                           ex.getMessage());
+            }
+            return null;
+        }
+        //Tools.stopProgressIndicator(getString("Tools.Loading"));
+        if (in != null)  {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                Tools.appError("Could not close: " + filename, ex);
             }
         }
+        return xml.toString();
+    }
+
+    /**
+     * Loads config data from the specified file.
+     */
+    public static void loadConfigData(final String filename) {
+        debug("load", 0);
+        final String xml = loadSaveFile(filename, true);
+        if (xml == null) {
+            return;
+        }
+        drbdGuiXML.startClusters(null);
+        Tools.getGUIData().allHostsUpdate();
+    }
+
+    /**
+     * Starts the specified clusters and connects to the hosts of these
+     * clusters.
+     */
+    public static void startClusters(final List<String> selectedClusters) {
+        drbdGuiXML.startClusters(selectedClusters);
+    }
+
+    /**
+     * Returns cluster names from the parsed save file.
+     */
+    public static void loadXML(final String xml) {
+        drbdGuiXML.loadXML(xml);
     }
 
     /**
      * Removes all the hosts and clusters from all the panels and data.
      */
     public static void removeEverything() {
-            //Tools.startProgressIndicator(null, getString("Tools.Loading"));
-            Tools.startProgressIndicator("Removing Everything");
-            Tools.getConfigData().disconnectAllHosts();
-            getGUIData().getClustersPanel().removeAllTabs();
-            //getGUIData().getHostsPanel().removeAllTabs();
-            Tools.stopProgressIndicator("Removing Everything");
+        Tools.startProgressIndicator("Removing Everything");
+        Tools.getConfigData().disconnectAllHosts();
+        getGUIData().getClustersPanel().removeAllTabs();
+        Tools.stopProgressIndicator("Removing Everything");
     }
 
 
@@ -722,16 +741,11 @@ public final class Tools {
      *          filename where are the data stored.
      */
     public static void save(final String filename) {
-        //String dir = System.getProperty("user.home") + "/";
         debug("save");
         startProgressIndicator(getString("Tools.Saving"));
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
-            //FileWriter fileWriter = new FileWriter( dir + filename );
-            //BufferedWriter bufferedWriter = new BufferedWriter( fileWriter );
-            //FileWriter outputStream = fileWriter;
             drbdGuiXML.saveXML(fileOut);
-            //bufferedWriter.close();
             debug("saved: " + filename, 0);
         } catch (IOException e) {
             appError("error saving: " + filename, "", e);

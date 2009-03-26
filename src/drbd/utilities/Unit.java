@@ -63,7 +63,6 @@ public class Unit {
     /**
      * Sets that the unit should be in plural.
      */
-    // TODO: it does not work though
     public final void setPlural(final boolean plural) {
         this.plural = plural;
     }
@@ -71,6 +70,7 @@ public class Unit {
     /**
      * Returns the unit, plural if it should be in plural.
      */
+    @Override
     public final String toString() {
         if (plural) {
             return pluralName;
@@ -79,8 +79,9 @@ public class Unit {
     }
 
     /**
-     * Returns true if short names are equal.
+     * Returns true if units are equals.
      */
+    @Override
     public final boolean equals(final Object o) {
         if (o == null) {
             return false;
@@ -93,6 +94,14 @@ public class Unit {
 
         return name.equals(((Unit) o).toString())
                || pluralName.equals(((Unit) o).toString());
+    }
+
+    /**
+     * Hash code.
+     */
+    @Override
+    public final int hashCode() {
+        return name.hashCode();
     }
 
     /**

@@ -96,17 +96,29 @@ public class HostBrowser extends Browser {
     private final HostInfo hostInfo;
 
     /** Harddisc icon. */
-    private static final ImageIcon HARDDISC_ICON = Tools.createImageIcon(Tools.getDefault("DrbdGraph.HarddiscIcon"));
+    private static final ImageIcon HARDDISC_ICON = Tools.createImageIcon(
+                                   Tools.getDefault("DrbdGraph.HarddiscIcon"));
     /** No harddisc icon. */
-    private static final ImageIcon NO_HARDDISC_ICON = Tools.createImageIcon(Tools.getDefault("DrbdGraph.NoHarddiscIcon"));
+    private static final ImageIcon NO_HARDDISC_ICON = Tools.createImageIcon(
+                                 Tools.getDefault("DrbdGraph.NoHarddiscIcon"));
     /** Block device harddisc icon. */
-    private static final ImageIcon BD_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.BlockDeviceIcon"));
+    private static final ImageIcon BD_ICON = Tools.createImageIcon(
+                              Tools.getDefault("HostBrowser.BlockDeviceIcon"));
     /** Net interface icon. */
-    private static final ImageIcon NET_I_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIcon"));
+    private static final ImageIcon NET_I_ICON = Tools.createImageIcon(
+                                   Tools.getDefault("HostBrowser.NetIntIcon"));
     /** File system icon. */
-    private static final ImageIcon FS_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.FileSystemIcon"));
+    private static final ImageIcon FS_ICON = Tools.createImageIcon(
+                               Tools.getDefault("HostBrowser.FileSystemIcon"));
     /** Host icon. */
-    private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.HostIcon"));
+    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
+                                  Tools.getDefault("ClusterBrowser.HostIcon"));
+    private static final ImageIcon HOST_ICON_LARGE = Tools.createImageIcon(
+                                  Tools.getDefault("HostBrowser.HostIcon"));
+    /** Remove icon. */
+    private static final ImageIcon HOST_REMOVE_ICON =
+        Tools.createImageIcon(
+                Tools.getDefault("HostBrowser.RemoveIcon"));
     /** Keyword that denotes flexible meta-disk. */
     private static final String DRBD_MD_TYPE_FLEXIBLE = "Flexible";
     /** Internal parameter name of drbd meta-disk. */
@@ -437,7 +449,7 @@ public class HostBrowser extends Browser {
             p.add(drbdProcsButton);
             p.add(crmMonButton);
             p.add(hbProcsButton);
-            SpringUtilities.makeCompactGrid(p, 4, 1,  // rows, cols
+            SpringUtilities.makeCompactGrid(p, 2, 2,  // rows, cols
                                                1, 1,  // initX, initY
                                                1, 1); // xPad, yPad
             //JPanel panel = new JPanel();
@@ -502,7 +514,7 @@ public class HostBrowser extends Browser {
             /* host wizard */
             final MyMenuItem hostWizardItem =
                 new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
-                               null,
+                               HOST_ICON_LARGE,
                                null) {
                     private static final long serialVersionUID = 1L;
 
@@ -517,6 +529,7 @@ public class HostBrowser extends Browser {
                 };
             items.add(hostWizardItem);
             registerMenuItem(hostWizardItem);
+            Tools.getGUIData().registerAddHostButton(hostWizardItem);
             /* load drbd */
             final MyMenuItem loadItem =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
@@ -525,7 +538,8 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return !getHost().isDrbdStatus();
+                        return getHost().isConnected()
+                               && !getHost().isDrbdStatus();
                     }
 
                     public void action() {
@@ -568,7 +582,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return true;
+                        return getHost().isConnected();
                     }
 
                     public void action() {
@@ -608,7 +622,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return true;
+                        return getHost().isConnected();
                     }
 
                     public void action() {
@@ -764,6 +778,26 @@ public class HostBrowser extends Browser {
                 };
             registerMenuItem(standByOffItem);
             items.add(standByOffItem);
+
+            /* remove host from gui */
+            final MyMenuItem removeHostItem =
+                new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
+                               HOST_REMOVE_ICON,
+                               null) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return getHost().getCluster() == null;
+                    }
+
+                    public void action() {
+                        getHost().disconnect();
+                        Tools.getConfigData().removeHostFromHosts(getHost());
+                        Tools.getGUIData().allHostsUpdate();
+                    }
+                };
+            registerMenuItem(removeHostItem);
+            items.add(removeHostItem);
 
             return items;
         }

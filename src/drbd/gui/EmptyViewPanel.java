@@ -19,8 +19,8 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.gui;
+
 import drbd.AddClusterDialog;
 import drbd.AddHostDialog;
 import drbd.utilities.Tools;
@@ -41,21 +41,17 @@ import java.awt.BorderLayout;
 
 import javax.swing.ImageIcon;
 
-
-
 /**
  * An implementation of an empty tab panel with new cluster and host button.
  *
  * @author Rasto Levrinc
  * @version $Id$
- *
  */
 public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Browser. */
-    private EmptyBrowser browser;
-
+    private final EmptyBrowser browser;
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
@@ -68,6 +64,8 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Dimension of the big buttons. */
     private static final Dimension BIG_BUTTON_DIMENSION =
                                                     new Dimension(300, 100);
+    /** Menu tree object. */
+    private JTree tree;
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.
      */
@@ -75,6 +73,8 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         super();
         /* add new cluster button */
         browser = new EmptyBrowser();
+        Tools.getGUIData().setEmptyBrowser(browser);
+        browser.setEmptyViewPanel(this);
         browser.initHosts();
 
         final JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -132,13 +132,14 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                                                     "startpage_head.jpg"));
         add(logo, BorderLayout.SOUTH);
         Tools.getGUIData().registerAllHostsUpdate(this);
+        Tools.getGUIData().allHostsUpdate();
     }
 
     /**
      * creates cluster view and updates the tree.
      */
     private void createEmptyView() {
-        final JTree tree = getTree(browser);
+        tree = getTree(browser);
         browser.updateHosts(tree);
     }
 
@@ -146,7 +147,6 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
      * Updates the all hosts menu item.
      */
     public final void allHostsUpdate() {
-        final JTree tree = getTree(browser);
         browser.updateHosts(tree);
     }
 }

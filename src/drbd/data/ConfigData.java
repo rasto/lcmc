@@ -25,7 +25,8 @@ import java.io.Serializable;
 import java.io.IOException;
 import java.io.File;
 import drbd.utilities.Tools;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.List;
 import com.trilead.ssh2.KnownHosts;
 
 /**
@@ -102,10 +103,8 @@ public class ConfigData implements Serializable {
      */
     public final int danglingHostsCount() {
         final Hosts hosts = Tools.getConfigData().getHosts();
-        final Iterator it = hosts.getHostSet().iterator();
         int c = 0;
-        while (it.hasNext()) {
-            final Host host = (Host) it.next();
+        for (final Host host : hosts.getHostSet()) {
             if (!host.isInCluster()) {
                 c++;
             }

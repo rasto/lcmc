@@ -42,6 +42,7 @@ public class DistResource_suse extends
         {"version:10",     "SLES10"}, // from lsb_release
         {"version:sles9",  "SLES9"}, // chosen
         {"version:sles10", "SLES10"}, // chosen
+        {"version:sles11", "SLES11"}, // chosen
 
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+\\.\\d+-[.0-9]+).*"},
         /* drbd donwload and installation */

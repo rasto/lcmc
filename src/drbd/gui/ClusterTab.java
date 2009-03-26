@@ -24,13 +24,9 @@ package drbd.gui;
 
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
-import drbd.utilities.MyButton;
-
 import javax.swing.JPanel;
-import javax.swing.ImageIcon;
-
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,
@@ -45,19 +41,7 @@ public class ClusterTab extends JPanel {
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
     private final Cluster cluster;
-    /** Add cluster button. */
-    private MyButton addClusterButton = null;
-    /** Add host button. */
-    private MyButton addHostButton = null;
-    /** Add cluster icon. */
-    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
-                                    Tools.getDefault("ClusterTab.ClusterIcon"));
-    /** Add host icon. */
-    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
-                                        Tools.getDefault("HostTab.HostIcon"));
-    /** Dimension of the big buttons. */
-    private static final Dimension BIG_BUTTON_DIMENSION =
-                                                    new Dimension(300, 100);
+
     /**
      * Prepares a new <code>ClusterTab</code> object.
      */
@@ -67,76 +51,19 @@ public class ClusterTab extends JPanel {
         this.cluster = cluster;
         if (cluster == null) {
             add(new EmptyViewPanel());
-            /* add new cluster button */
-            //setLayout(new FlowLayout());
-            //addClusterButton =
-            //        new MyButton(Tools.getString("ClusterTab.AddNewCluster"),
-            //                     CLUSTER_ICON);
-            //addClusterButton.setBackground(
-            //                Tools.getDefaultColor("DefaultButton.Background"));
-            //addClusterButton.setPreferredSize(BIG_BUTTON_DIMENSION);
-            //addClusterButton.addActionListener(new ActionListener() {
-            //    public void actionPerformed(final ActionEvent e) {
-            //        final Thread thread = new Thread(
-            //            new Runnable() {
-            //                public void run() {
-            //                    AddClusterDialog acd = new AddClusterDialog();
-            //                }
-            //            });
-            //        thread.start();
-            //    }
-            //});
-            //Tools.getGUIData().setAddClusterButton(addClusterButton);
-            //Tools.getGUIData().checkAddClusterButtons();
-            //add(addClusterButton);
-
-            ///* add new host button */
-            //addHostButton = new MyButton(
-            //                        Tools.getString("ClusterTab.AddNewHost"),
-            //                        HOST_ICON);
-            //addHostButton.setBackground(
-            //                Tools.getDefaultColor("DefaultButton.Background"));
-            //addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
-            //addHostButton.addActionListener(new ActionListener() {
-            //    public void actionPerformed(final ActionEvent e) {
-            //        final Thread thread = new Thread(
-            //            new Runnable() {
-            //                public void run() {
-            //                    enableButtons(false);
-            //                    final AddHostDialog ahd = new AddHostDialog();
-            //                    ahd.showDialogs();
-            //                    enableButtons(true);
-            //                }
-            //            });
-            //        thread.start();
-            //    }
-            //});
-            //add(addHostButton);
-            //final JLabel logo = new JLabel(
-            //                            Tools.createImageIcon(
-            //                                            "startpage_head.jpg"));
-            //add(logo);
         }
     }
-
-    ///**
-    // * Enables or disables add cluster and add host buttons.
-    // */
-    //public void enableButtons(final boolean enable) {
-    //    if (addClusterButton != null) {
-    //        addClusterButton.setEnabled(enable);
-    //    }
-    //    if (addHostButton != null) {
-    //        addHostButton.setEnabled(enable);
-    //    }
-    //}
 
     /**
      * adds host views to the desktop.
      */
     public void addClusterView() {
         if (cluster.hostsCount() > 1) {
-            add(new ClusterViewPanel(cluster));
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    add(new ClusterViewPanel(cluster));
+                }
+            });
         }
         repaint();
     }

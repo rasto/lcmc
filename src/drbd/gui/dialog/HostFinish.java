@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Dimension;
@@ -58,6 +59,11 @@ public class HostFinish extends DialogHost {
                             Tools.getDefault("Dialog.HostFinish.ClusterIcon"));
     /** Dimensions of the buttons. */
     private static final Dimension BUTTON_DIMENSION = new Dimension(300, 100);
+    /** Save checkbox. */
+    final JCheckBox saveCB = new JCheckBox(
+                                    Tools.getString("Dialog.HostFinish.Save"),
+                                    true);
+
     /**
      * Prepares a new <code>HostFinish</code> object.
      */
@@ -74,6 +80,16 @@ public class HostFinish extends DialogHost {
     }
 
     /**
+     * Finishes the dialog, and saves the host.
+     */
+    protected void finishDialog() {
+        if (saveCB.isSelected()) {
+            final String saveFile = Tools.getConfigData().getSaveFile();
+            Tools.save(saveFile);
+        }
+    }
+
+    /**
      * Inits the dialog.
      */
     protected void initDialog() {
@@ -81,8 +97,7 @@ public class HostFinish extends DialogHost {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
 
-        enableComponents(new JComponent[]{buttonClass(nextButton()),
-                                          buttonClass(finishButton())});
+        enableComponents(new JComponent[]{buttonClass(nextButton())});
         if (Tools.getConfigData().danglingHostsCount() < 2) {
             /* workaround, TODO: is it necessary? */
             requestFocusLater(addAnotherHostButton);
@@ -113,6 +128,7 @@ public class HostFinish extends DialogHost {
      */
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
+        /* host wizard button */
         addAnotherHostButton = new MyButton(
                     Tools.getString("Dialog.HostFinish.AddAnotherHostButton"),
                     HOST_ICON);
@@ -121,19 +137,20 @@ public class HostFinish extends DialogHost {
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
                     public void run() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                addAnotherHostButton.setEnabled(false);
+                                ((MyButton) buttonClass(finishButton())).pressButton();
+                            }
+                        });
                         final AddHostDialog h = new AddHostDialog();
                         h.showDialogs();
                     }
                 });
                 t.start();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        addAnotherHostButton.setEnabled(false);
-                        ((MyButton) buttonClass(finishButton())).pressButton();
-                    }
-                });
             }
         });
+        /* cluster wizard button */
         confClusterButton = new MyButton(
                     Tools.getString("Dialog.HostFinish.ConfigureClusterButton"),
                     CLUSTER_ICON);
@@ -142,28 +159,26 @@ public class HostFinish extends DialogHost {
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
                     public void run() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                confClusterButton.setEnabled(false);
+                                ((MyButton) buttonClass(finishButton())).pressButton();
+                            }
+                        });
                         final AddClusterDialog c = new AddClusterDialog();
                         c.showDialogs();
                     }
                 });
                 t.start();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        confClusterButton.setEnabled(false);
-                        ((MyButton) buttonClass(finishButton())).pressButton();
-                    }
-                });
             }
         });
         pane.add(addAnotherHostButton);
         if (Tools.getConfigData().danglingHostsCount() < 2) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    confClusterButton.setEnabled(false);
-                }
-            });
+            confClusterButton.setEnabled(false);
         }
         pane.add(confClusterButton);
+        /* Save checkbox */
+        pane.add(saveCB); 
         return pane;
     }
 }

@@ -71,6 +71,9 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Menu tree object. */
+    private JTree tree;
+
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.
      */
@@ -186,29 +189,21 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         buttonArea.add(l, BorderLayout.EAST);
         add(buttonArea, BorderLayout.NORTH);
 
-        createClusterView();
+        tree = getTree(cluster.getBrowser());
+        allHostsUpdate();
         Tools.getGUIData().registerAllHostsUpdate(this);
-    }
-
-    /**
-     * creates cluster view and updates the tree.
-     */
-    private void createClusterView() {
-
-        final JTree tree = getTree(cluster.getBrowser());
-        cluster.getBrowser().updateClusterResources(
-                                                tree,
-                                                cluster.getHostsArray(),
-                                                cluster.getCommonFileSystems(),
-                                                cluster.getCommonMountPoints(),
-                                                this);
     }
 
     /**
      * This is called when there was added a new host.
      */
     public final void allHostsUpdate() {
-        createClusterView(); // TODO: should reload just all hosts
+        cluster.getBrowser().updateClusterResources(
+                                                tree,
+                                                cluster.getHostsArray(),
+                                                cluster.getCommonFileSystems(),
+                                                cluster.getCommonMountPoints(),
+                                                this);
     }
 
     /**

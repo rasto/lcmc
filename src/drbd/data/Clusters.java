@@ -22,7 +22,7 @@
 package drbd.data;
 
 import java.util.Set;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -39,7 +39,7 @@ public class Clusters implements Serializable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Set of cluster objects. */
-    private final Set<Cluster> clusters = new HashSet<Cluster>();
+    private final Set<Cluster> clusters = new LinkedHashSet<Cluster>();
 
     /**
      * Adds cluster to the set of clusters.

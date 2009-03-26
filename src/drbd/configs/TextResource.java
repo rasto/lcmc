@@ -216,6 +216,7 @@ public class TextResource extends
         {"Dialog.HostFinish.Description",  "Configuration of the host is now complete. You can now add another host or configure a cluster."},
         {"Dialog.HostFinish.AddAnotherHostButton", "Add Another Host"},
         {"Dialog.HostFinish.ConfigureClusterButton", "Configure Cluster"},
+        {"Dialog.HostFinish.Save",           "Save"},
 
         {"ExecCommandDialog.Title",           "Executing command"},
         {"ExecCommandDialog.Description",     "Executing command."},
@@ -282,9 +283,10 @@ public class TextResource extends
 
         {"Dialog.About.Title",                "DRBD Management Console (Beta). Release: "},
         {"Dialog.About.Description",          
-         "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br>"
-         + "Please visit the website http://www.drbd.org/mc/management-console/<br><br>"
-         + "DRBD Management Console was written by Rasto Levrinc.<br>"},
+         "<b>DRBD Management Console was written by Rasto Levrinc (rasto@linbit.com).</b><br>"
+         + "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br><br>"
+         + "Please visit the website http://www.drbd.org/mc/management-console/<br>"
+         + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
 
 
         {"Dialog.About.Licences",       
@@ -316,6 +318,7 @@ public class TextResource extends
 
         {"Dialog.ClusterFinish.Title",     "Finish"},
         {"Dialog.ClusterFinish.Description",  "Configuration of the cluster is now complete. You can now configure DRBD and Heartbeat services from the menu in the cluster view."},
+        {"Dialog.ClusterFinish.Save",           "Save"},
 
         {"AppError.Title",                    "Application Error"},
         {"AppError.Text", "An error in application was detected. Please "
@@ -326,6 +329,12 @@ public class TextResource extends
         {"ConfirmDialog.Description",         "Are you sure?"},
         {"ConfirmDialog.Yes",                 "Yes"},
         {"ConfirmDialog.No",                  "No"},
+
+        {"EmptyBrowser.StartMarkedClusters",  "Start Marked Clusters"},
+        {"EmptyBrowser.MarkAllClusters",      "Mark All"},
+        {"EmptyBrowser.UnmarkAllClusters",    "Unmark All"},
+        {"EmptyBrowser.StartClusterButton",   "Start"},
+        {"EmptyBrowser.NewHostWizard",        "New Host Wizard"},
 
         {"ClusterBrowser.confirmRemoveAllServices.Title", "Remove All Services"},
         {"ClusterBrowser.confirmRemoveAllServices.Description", "All services and constraints will be removed. Are you sure?"},
@@ -514,6 +523,7 @@ public class TextResource extends
         {"HostBrowser.Drbd.SetAllSecondary",            "Set All DRBDs Secondary"},
         {"HostBrowser.Heartbeat.StandByOn",             "Heartbeat Standby On"},
         {"HostBrowser.Heartbeat.StandByOff",            "Heartbeat Standby Off"},
+        {"HostBrowser.RemoveHost",                      "Remove"},
 
         /* Host Browser */
         {"HostBrowser.idDrbdNode",            "is DRBD node"},

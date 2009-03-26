@@ -184,6 +184,8 @@ public class AppDefaults extends
         {"ClusterBrowser.Background",             new Color(255, 255, 255) },
         {"Browser.Background",                    new Color(255, 255, 255) },
 
+        {"EmptyBrowser.StartPanelTitleBorder",    Color.BLACK },
+
         /*
          * Images
          */
@@ -204,6 +206,7 @@ public class AppDefaults extends
 
         {"HostBrowser.NetIntIcon", "Icons/tango/16x16/netzwk_16x16.png"},
         {"HostBrowser.FileSystemIcon", "Icons/tango/16x16/filesys_16x16.png"},
+        {"HostBrowser.RemoveIcon", "Icons/tango/32x32/cancel_32x32.png"},
         {"ClusterBrowser.CommonBlockDeviceIcon",
                                     "Icons/tango/16x16/blockdevice_16x16.png"},
 
@@ -222,6 +225,8 @@ public class AppDefaults extends
         {"ClusterBrowser.RemoveIcon",  "Icons/tango/32x32/cancel_32x32.png"},
         {"HostViewPanel.HostIcon",     "Icons/tango/32x32/host_32x32.png"},
         {"HostTab.HostIcon",           "Icons/tango/32x32/host_32x32.png"},
+        {"HostBrowser.HostIcon",        "Icons/tango/32x32/host_32x32.png"},
+        {"EmptyBrowser.HostIcon",        "Icons/tango/32x32/host_32x32.png"},
 
         {"MainMenu.ClusterIcon",       "Icons/tango/16x16/cluster_16x16.png"},
         {"MainMenu.HostIcon",          "Icons/tango/16x16/host_16x16.png"},
@@ -296,5 +301,6 @@ public class AppDefaults extends
          * other
          */
         {"MaxHops",                           20},
+
     };
 }

@@ -25,10 +25,12 @@ package drbd.gui;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
 import drbd.utilities.AllHostsUpdatable;
+import drbd.gui.EmptyBrowser;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.util.List;
 import java.util.ArrayList;
@@ -72,6 +74,9 @@ public class GUIData  {
      */
     private List<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
+    /** Empty browser object. */
+    private EmptyBrowser emptyBrowser;
+
     /**
      * Sets main frame of this application.
      */
@@ -186,22 +191,33 @@ public class GUIData  {
      * Repaints hosts and clusters panels.
      */
     public final void repaintWithNewData() {
-        //hostsPanel.repaintTabs();
-        clustersPanel.repaintTabs();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                clustersPanel.repaintTabs();
+            }
+        });
     }
 
     /**
      * Adds tab with new cluster to the clusters panel.
      */
     public final void addClusterTab(final Cluster cluster) {
-        clustersPanel.addTab(cluster);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                clustersPanel.addTab(cluster);
+            }
+        });
     }
 
     /**
      * changes name of the selected cluster tab.
      */
     public final void renameSelectedClusterTab(final String newName) {
-        clustersPanel.renameSelectedTab(newName);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                clustersPanel.renameSelectedTab(newName);
+            }
+        });
     }
 
     /**
@@ -209,14 +225,22 @@ public class GUIData  {
      * it was canceled.
      */
     public final void removeSelectedClusterTab() {
-        clustersPanel.removeTab();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                clustersPanel.removeTab();
+            }
+        });
     }
 
     /**
      * Revalidates and repaints clusters panel.
      */
     public final void refreshClustersPanel() {
-        clustersPanel.refresh();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                clustersPanel.refresh();
+            }
+        });
     }
 
     /**
@@ -327,5 +351,19 @@ public class GUIData  {
             component.allHostsUpdate();
         }
         checkAddClusterButtons();
+    }
+
+    /**
+     * Sets empty browser object.
+     */
+    public final void setEmptyBrowser(final EmptyBrowser emptyBrowser) {
+        this.emptyBrowser = emptyBrowser;
+    }
+
+    /**
+     * Returns empty browser object.
+     */
+    public final EmptyBrowser getEmptyBrowser() {
+        return emptyBrowser;
     }
 }

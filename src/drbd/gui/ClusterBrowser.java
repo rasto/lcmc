@@ -57,6 +57,8 @@ import drbd.utilities.MyMenuItem;
 
 import drbd.gui.HostBrowser.BlockDevInfo;
 import drbd.gui.HostBrowser.HostInfo;
+import drbd.gui.EmptyBrowser;
+import drbd.gui.EmptyBrowser.AllHostsInfo;
 
 import java.awt.Color;
 
@@ -455,8 +457,10 @@ public class ClusterBrowser extends Browser {
      */
     public final void initClusterResources() {
 
+        final EmptyBrowser emptyBrowser = Tools.getGUIData().getEmptyBrowser();
         /* all hosts */
-        allHostsNode = new DefaultMutableTreeNode(new AllHostsInfo());
+        allHostsNode = new DefaultMutableTreeNode(
+                emptyBrowser.getAllHostsInfo());
         setNode(allHostsNode);
         topAdd(allHostsNode);
         /* hosts */
@@ -1441,113 +1445,6 @@ public class ClusterBrowser extends Browser {
             i++;
         }
         return cfs;
-    }
-
-    /**
-     * This class holds all hosts that are added to the GUI as opposite to all
-     * hosts in a cluster.
-     */
-    public class AllHostsInfo extends Info {
-        /** getInfoPanel() cache. */
-        private JComponent infoPanel = null;
-        /** Possibly selected host or null. */
-        private final Host host;
-
-        /**
-         * Creates a new AllHostsInfo instance.
-         */
-        public AllHostsInfo() {
-            super(Tools.getString("ClusterBrowser.AllHosts"));
-            host = null;
-        }
-
-        /**
-         * Creates a new AllHostsInfo instance, with selected host.
-         *
-         */
-        public AllHostsInfo(final Host host) {
-            super(host.getName());
-            this.host = host;
-        }
-
-        /**
-         * Returns info panel of all hosts menu item. If a host is selected,
-         * its tab is selected.
-         */
-        public final JComponent getInfoPanel() {
-            //if (infoPanel == null) {
-            //    infoPanel = Tools.getGUIData().getHostsPanel();
-            //}
-            //if (host != null) {
-            //    ((HostsPanel) infoPanel).setSelectedTab(host);
-            //}
-            final MyButton addHostButton = new MyButton(
-                               Tools.getString("ClusterBrowser.AddNewHost"),
-                               HOST_ICON);
-            addHostButton.setBackground(
-                            Tools.getDefaultColor("DefaultButton.Background"));
-            addHostButton.addActionListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    Thread thread = new Thread(new Runnable() {
-                        public void run() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    addHostButton.setEnabled(false);
-                                }
-                            });
-
-                            final AddHostDialog ahd = new AddHostDialog();
-                            ahd.showDialogs();
-
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    addHostButton.setEnabled(true);
-                                }
-                            });
-                        }
-                    });
-                    thread.start();
-                }
-            });
-            final JPanel mainPanel = new JPanel();
-            mainPanel.setBackground(PANEL_BACKGROUND);
-            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
-            final JPanel buttonPanel = new JPanel(new BorderLayout());
-            buttonPanel.setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
-            buttonPanel.setMinimumSize(new Dimension(0, 50));
-            buttonPanel.setPreferredSize(new Dimension(0, 50));
-            buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-            mainPanel.add(buttonPanel);
-
-            /* Actions */
-            final JMenuBar mb = new JMenuBar();
-            mb.setBackground(PANEL_BACKGROUND);
-            final JMenu serviceCombo = getActionsMenu();
-            updateMenus(null);
-            mb.add(serviceCombo);
-            buttonPanel.add(mb, BorderLayout.EAST);
-            final JPanel p = new JPanel(new SpringLayout());
-            p.setBackground(PANEL_BACKGROUND);
-
-            p.add(addHostButton);
-            SpringUtilities.makeCompactGrid(p, 1, 1,  // rows, cols
-                                               1, 1,  // initX, initY
-                                               1, 1); // xPad, yPad
-            //JPanel panel = new JPanel();
-            mainPanel.setMinimumSize(new Dimension(
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
-                        ));
-            mainPanel.setPreferredSize(new Dimension(
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
-                        ));
-            buttonPanel.add(p);
-            //mainPanel.add(new JScrollPane(ta));
-            //mainPanel.add(panel);
-            return mainPanel;
-        }
     }
 
     /**

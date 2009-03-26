@@ -265,6 +265,7 @@ public class HostConfiguration extends DialogHost {
             for (int i = 0; i < getHops(); i++) {
                 final String hostnameEntered =
                                 getHost().getHostnameEntered().split(",")[i];
+
                 hostnameField[i].setEnabled(false);
                 checkDNSThread[i] = new CheckDNSThread(i, hostnameEntered);
                 checkDNSThread[i].setPriority(Thread.MIN_PRIORITY);

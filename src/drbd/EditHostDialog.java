@@ -46,11 +46,12 @@ public class EditHostDialog {
     public EditHostDialog(final Host host) {
         this.host = host;
     }
+
     /**
      * Shows step by step dialogs that configure a host.
      */
     public void showDialogs() {
-        //Tools.getGUIData().getHostsPanel().setSelectedTab(host);
+        host.setHostnameEntered(host.getHostname());
         DialogHost dialog = new HostNewHost(null, host);
         while (true) {
             final DialogHost newdialog = (DialogHost) dialog.showDialog();

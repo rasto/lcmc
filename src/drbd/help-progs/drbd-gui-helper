@@ -927,7 +927,7 @@ sub get_drbd_xml {
 }
 
 sub get_hb_version {
-	my $hb_version = `/usr/lib/heartbeat/heartbeat -V 2>&1` || "";
+	my $hb_version = `( /usr/lib/heartbeat/heartbeat -V || /usr/lib64/heartbeat/heartbeat -V ) 2>/dev/null` || "";
 	$hb_version =~ s/\s+.*//;
 	if ($hb_version) {
 		chomp $hb_version;

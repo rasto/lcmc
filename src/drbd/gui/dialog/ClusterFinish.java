@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.JCheckBox;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish
@@ -38,6 +39,10 @@ import javax.swing.JComponent;
 public class ClusterFinish extends DialogCluster {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Save checkbox. */
+    final JCheckBox saveCB = new JCheckBox(
+                                    Tools.getString("Dialog.HostFinish.Save"),
+                                    true);
 
     /**
      * Prepares a new <code>ClusterFinish</code> object.
@@ -52,6 +57,16 @@ public class ClusterFinish extends DialogCluster {
      */
     public final WizardDialog nextDialog() {
         return null;
+    }
+
+    /**
+     * Finishes the dialog, and saves the cluster.
+     */
+    protected void finishDialog() {
+        if (saveCB.isSelected()) {
+            final String saveFile = Tools.getConfigData().getSaveFile();
+            Tools.save(saveFile);
+        }
     }
 
     /**
@@ -82,6 +97,9 @@ public class ClusterFinish extends DialogCluster {
      * Returns the empty panel.
      */
     protected final JPanel inputPanel() {
-        return new JPanel();
+        final JPanel pane = new JPanel();
+        /* Save checkbox */
+        pane.add(saveCB); 
+        return pane;
     }
 }

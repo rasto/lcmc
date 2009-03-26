@@ -54,19 +54,6 @@ public class DrbdMC extends JPanel {
     private static void createAndShowGUI() {
         ToolTipManager.sharedInstance().setInitialDelay(TOOLTIP_INITIAL_DELAY);
         ToolTipManager.sharedInstance().setDismissDelay(TOOLTIP_DISMISS_DELAY);
-        /* Setting MetalLookAndFeel, hoping it is there. */
-        //try {
-        //    UIManager.setLookAndFeel("com.sun.java.swing.plaf.metal");
-        //    //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        //} catch (ClassNotFoundException e) {
-        //    e.printStackTrace();
-        //} catch (InstantiationException e) {
-        //    e.printStackTrace();
-        //} catch (IllegalAccessException e) {
-        //    e.printStackTrace();
-        //} catch (UnsupportedLookAndFeelException e) {
-        //    e.printStackTrace();
-        //}
         /* Create and set up the window. */
         final JFrame mainFrame = new JFrame(
                 Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());

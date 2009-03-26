@@ -287,7 +287,9 @@ public class Host implements Serializable {
     public final void setHostnameEntered(final String hostnameEntered) {
         Tools.debug(this, "h e: " + hostnameEntered + " != "
                           + this.hostnameEntered, 1);
-        if (!hostnameEntered.equals(this.hostnameEntered)) {
+        if (hostnameEntered != null
+            && !hostnameEntered.equals(this.hostnameEntered)) {
+            /* back button and hostname changed */
             setName(null);
             setIp(null);
             setHostname(null);
@@ -867,10 +869,12 @@ public class Host implements Serializable {
      * Disconnects this host.
      */
     public final void disconnect() {
-        stopDrbdStatus();
-        waitOnDrbdStatus();
-        stopHbStatus();
-        ssh.disconnect();
+        if (ssh.isConnected()) {
+            stopDrbdStatus();
+            waitOnDrbdStatus();
+            stopHbStatus();
+            ssh.disconnect();
+        }
     }
 
     /**
