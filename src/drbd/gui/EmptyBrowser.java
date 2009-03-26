@@ -101,6 +101,12 @@ public class EmptyBrowser extends Browser {
      */
     public EmptyBrowser() {
         super();
+        /* Load the default file */
+        final String saveFile = Tools.getConfigData().getSaveFile();
+        final String xml = Tools.loadSaveFile(saveFile, false);
+        if (xml != null) {
+            Tools.loadXML(xml);
+        }
         allHostsInfo = new AllHostsInfo();
         setTreeTop();
     }
@@ -179,12 +185,6 @@ public class EmptyBrowser extends Browser {
         public AllHostsInfo() {
             super(Tools.getString("ClusterBrowser.AllHosts"));
             host = null;
-            /* Load the default file */
-            final String saveFile = Tools.getConfigData().getSaveFile();
-            final String xml = Tools.loadSaveFile(saveFile, false);
-            if (xml != null) {
-                Tools.loadXML(xml);
-            }
         }
 
         /**

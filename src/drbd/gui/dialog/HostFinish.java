@@ -63,7 +63,8 @@ public class HostFinish extends DialogHost {
     final JCheckBox saveCB = new JCheckBox(
                                     Tools.getString("Dialog.HostFinish.Save"),
                                     true);
-
+    /** Next dialog. */
+    private WizardDialog nextDialog = null;
     /**
      * Prepares a new <code>HostFinish</code> object.
      */
@@ -76,7 +77,7 @@ public class HostFinish extends DialogHost {
      * Returns next dialog. Null
      */
     public WizardDialog nextDialog() {
-        return null;
+        return nextDialog;
     }
 
     /**
@@ -99,10 +100,17 @@ public class HostFinish extends DialogHost {
 
         enableComponents(new JComponent[]{buttonClass(nextButton())});
         if (Tools.getConfigData().danglingHostsCount() < 2) {
-            /* workaround, TODO: is it necessary? */
-            requestFocusLater(addAnotherHostButton);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    requestFocusLater(addAnotherHostButton);
+                }
+            });
         } else {
-            requestFocusLater(confClusterButton);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    requestFocusLater(confClusterButton);
+                }
+            });
         }
     }
 
@@ -133,6 +141,7 @@ public class HostFinish extends DialogHost {
                     Tools.getString("Dialog.HostFinish.AddAnotherHostButton"),
                     HOST_ICON);
         addAnotherHostButton.setPreferredSize(BUTTON_DIMENSION);
+        final DialogHost thisClass = this;
         addAnotherHostButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
@@ -140,11 +149,12 @@ public class HostFinish extends DialogHost {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 addAnotherHostButton.setEnabled(false);
-                                ((MyButton) buttonClass(finishButton())).pressButton();
+                                nextDialog = new HostNewHost(thisClass,
+                                                             new Host());
+                                Tools.getGUIData().allHostsUpdate();
+                                ((MyButton) buttonClass(nextButton())).pressButton();
                             }
                         });
-                        final AddHostDialog h = new AddHostDialog();
-                        h.showDialogs();
                     }
                 });
                 t.start();

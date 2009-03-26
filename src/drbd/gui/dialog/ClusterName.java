@@ -108,13 +108,13 @@ public class ClusterName extends DialogCluster {
         final JComponent[] c = {buttonClass(nextButton()) };
         enableComponentsLater(c);
 
-        if (!Tools.getConfigData().existsCluster(getCluster())) {
-            Tools.getConfigData().addClusterToClusters(getCluster());
-            Tools.getGUIData().addClusterTab(getCluster());
-        }
         enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                if (!Tools.getConfigData().existsCluster(getCluster())) {
+                    Tools.getConfigData().addClusterToClusters(getCluster());
+                    Tools.getGUIData().addClusterTab(getCluster());
+                }
                 nameField.requestFocus();
                 nameField.selectAll();
             }

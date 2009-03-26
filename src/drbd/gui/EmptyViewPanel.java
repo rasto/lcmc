@@ -97,6 +97,7 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                     new Runnable() {
                         public void run() {
                             AddClusterDialog acd = new AddClusterDialog();
+                            acd.showDialogs();
                         }
                     });
                 thread.start();
