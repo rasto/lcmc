@@ -50,6 +50,7 @@ import java.util.regex.Matcher;
 import java.io.Serializable;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 /**
  * This class holds host data and implementation of host related methods.
@@ -1431,22 +1432,30 @@ public class Host implements Serializable {
                                     public void done(final int flag) {
                                         setConnected();
                                         getInfo();
-                                        Tools.stopProgressIndicator(
-                                                              thisHost,
-                                                              "Connecting "
-                                                              + getName()
-                                                              + "...");
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            public void run() {
+                                                Tools.stopProgressIndicator(
+                                                                      thisHost,
+                                                                      "Connecting "
+                                                                      + getName()
+                                                                      + "...");
+                                            }
+                                        });
                                     }
 
                                     public void doneError(
                                                     final String errorText) {
                                         setLoadingError();
                                         setConnected();
-                                        Tools.stopProgressIndicator(
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            public void run() {
+                                                Tools.stopProgressIndicator(
                                                             thisHost,
                                                             "Connecting "
                                                             + getName()
                                                             + "...");
+                                            }
+                                        });
                                     }
                                 });
         }

@@ -183,6 +183,14 @@ public class ClustersPanel extends JPanel {
     }
 
     /**
+     * Removes specified tab.
+     */
+    public final void removeTab(final Cluster cluster) {
+        tabbedPane.remove(cluster.getClusterTab());
+        cluster.setClusterTab(null);
+    }
+
+    /**
      * Removes all tabs.
      */
     public final void removeAllTabs() {

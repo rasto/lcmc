@@ -159,20 +159,38 @@ public class DrbdGuiXML extends XML {
     /**
      * Starts specified clusters and connects to the hosts of this clusters.
      */
-    public final void startClusters(final List<String> selectedClusters) {
+    public final void startClusters(final List<Cluster> selectedClusters) {
         final Set<Cluster> clusters =
                         Tools.getConfigData().getClusters().getClusterSet();
         if (clusters != null) {
             /* clusters */
             for (final Cluster cluster : clusters) {
                 if (selectedClusters != null
-                    && !selectedClusters.contains(cluster.getName())) {
+                    && !selectedClusters.contains(cluster)) {
                     continue;
                 }
                 Tools.getGUIData().addClusterTab(cluster);
+                boolean first = true;
+                String dsaKey = null;
+                String rsaKey = null;
+                String pwd = null;
                 for (final Host host : cluster.getHosts()) {
                     host.setIsLoading();
+                    if (!first) {
+                        host.getSSH().setPasswords(dsaKey, rsaKey, pwd);
+                    }
                     host.connect();
+                    if (first) {
+                        /* wait till it's connected and try the others with the
+                         * same password/key. */
+                        host.getSSH().waitForConnection();
+                        if (host.isConnected()) {
+                            dsaKey = host.getSSH().getLastDSAKey();
+                            rsaKey = host.getSSH().getLastRSAKey();
+                            pwd = host.getSSH().getLastPassword();
+                        }
+                    }
+                    first = false;
                 }
 
                 final Runnable runnable = new Runnable() {
