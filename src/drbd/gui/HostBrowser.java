@@ -131,7 +131,9 @@ public class HostBrowser extends Browser {
     private static final String DRBD_NI_PORT_PARAM    = "DrbdNetInterfacePort";
     /** Color of the most of backgrounds. */
     private static final Color PANEL_BACKGROUND =
-                    Tools.getDefaultColor("ViewPanel.Background");
+                                 Tools.getDefaultColor("ViewPanel.Background");
+    private static final Color STATUS_BACKGROUND =
+                          Tools.getDefaultColor("ViewPanel.Status.Background");
 
     /**
      * Prepares a new <code>HostBrowser</code> object.
@@ -429,7 +431,7 @@ public class HostBrowser extends Browser {
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
             final JPanel buttonPanel = new JPanel(new BorderLayout());
-            buttonPanel.setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
+            buttonPanel.setBackground(STATUS_BACKGROUND);
             buttonPanel.setMinimumSize(new Dimension(0, 50));
             buttonPanel.setPreferredSize(new Dimension(0, 50));
             buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
@@ -443,7 +445,7 @@ public class HostBrowser extends Browser {
             mb.add(serviceCombo);
             buttonPanel.add(mb, BorderLayout.EAST);
             final JPanel p = new JPanel(new SpringLayout());
-            p.setBackground(PANEL_BACKGROUND);
+            p.setBackground(STATUS_BACKGROUND);
 
             p.add(procDrbdButton);
             p.add(drbdProcsButton);
@@ -1470,7 +1472,7 @@ public class HostBrowser extends Browser {
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
             final JPanel buttonPanel = new JPanel(new BorderLayout());
-            buttonPanel.setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
+            buttonPanel.setBackground(STATUS_BACKGROUND);
             buttonPanel.setMinimumSize(new Dimension(0, 50));
             buttonPanel.setPreferredSize(new Dimension(0, 50));
             buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));

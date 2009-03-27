@@ -105,9 +105,6 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         hbPlayStopButton.setForeground(Color.RED);
 
         final JPanel buttonPanel = new JPanel(new FlowLayout());
-        //buttonPanel.setMinimumSize(new Dimension(0, 50));
-        //buttonPanel.setPreferredSize(new Dimension(0, 50));
-        //buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
         buttonPanel.setBackground(STATUS_BACKGROUND);
 
         final JPanel hbStatusPanel = new JPanel();

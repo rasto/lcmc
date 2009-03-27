@@ -79,6 +79,24 @@ public class MyButton extends JButton {
     /**
      * Prepares a new <code>MyButton</code> object.
      *
+     * @param text
+     *          text in the button
+     * @param icon
+     *          icon in the button
+     * @param toolTip
+     *          tool tip in the button
+     */
+    public MyButton(final String text,
+                    final ImageIcon icon,
+                    final String toolTip) {
+        this(text, icon);
+        setToolTipText(toolTip);
+    }
+
+
+    /**
+     * Prepares a new <code>MyButton</code> object.
+     *
      * @param c1
      *          color 1 in the gradient
      * @param c2

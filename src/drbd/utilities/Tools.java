@@ -712,8 +712,22 @@ public final class Tools {
      * Starts the specified clusters and connects to the hosts of these
      * clusters.
      */
-    public static void startClusters(final List<String> selectedClusters) {
+    public static void startClusters(final List<Cluster> selectedClusters) {
         drbdGuiXML.startClusters(selectedClusters);
+    }
+
+    /**
+     * Stops the specified clusters in the gui.
+     */
+    public static void stopClusters(final List<Cluster> selectedClusters) {
+        for (final Cluster cluster : selectedClusters) {
+            for (final Host host : cluster.getHosts()) {
+                // TODO: can be run concurrently.
+                host.disconnect();
+                host.setCluster(null);
+            }
+            getGUIData().getClustersPanel().removeTab(cluster);
+        }
     }
 
     /**

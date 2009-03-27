@@ -331,10 +331,13 @@ public class TextResource extends
         {"ConfirmDialog.Yes",                 "Yes"},
         {"ConfirmDialog.No",                  "No"},
 
-        {"EmptyBrowser.StartMarkedClusters",  "Start Marked Clusters"},
-        {"EmptyBrowser.MarkAllClusters",      "Mark All"},
-        {"EmptyBrowser.UnmarkAllClusters",    "Unmark All"},
-        {"EmptyBrowser.StartClusterButton",   "Start"},
+        {"EmptyBrowser.StartMarkedClusters",  "Load Marked Clusters"},
+        {"EmptyBrowser.StartMarkedClusters.ToolTip", "Load marked clusters in the gui."},
+        {"EmptyBrowser.StopMarkedClusters",   "Unload Marked Clusters"},
+        {"EmptyBrowser.StopMarkedClusters.ToolTip", "Unload marked clusters in the gui."},
+        {"EmptyBrowser.RemoveMarkedClusters", "Remove Marked Clusters"},
+        {"EmptyBrowser.RemoveMarkedClusters.ToolTip", "Remove marked clusters from the gui."},
+        {"EmptyBrowser.StartClusterButton",   "Load"},
         {"EmptyBrowser.NewHostWizard",        "New Host Wizard"},
 
         {"ClusterBrowser.confirmRemoveAllServices.Title", "Remove All Services"},

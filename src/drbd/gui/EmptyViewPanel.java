@@ -73,7 +73,6 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         super();
         /* add new cluster button */
         browser = new EmptyBrowser();
-        Tools.getGUIData().setEmptyBrowser(browser);
         browser.setEmptyViewPanel(this);
         browser.initHosts();
 

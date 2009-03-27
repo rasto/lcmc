@@ -25,7 +25,6 @@ package drbd.gui;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
 import drbd.utilities.AllHostsUpdatable;
-import drbd.gui.EmptyBrowser;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
@@ -74,9 +73,6 @@ public class GUIData  {
      */
     private List<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
-    /** Empty browser object. */
-    private EmptyBrowser emptyBrowser;
-
     /**
      * Sets main frame of this application.
      */
@@ -351,19 +347,5 @@ public class GUIData  {
             component.allHostsUpdate();
         }
         checkAddClusterButtons();
-    }
-
-    /**
-     * Sets empty browser object.
-     */
-    public final void setEmptyBrowser(final EmptyBrowser emptyBrowser) {
-        this.emptyBrowser = emptyBrowser;
-    }
-
-    /**
-     * Returns empty browser object.
-     */
-    public final EmptyBrowser getEmptyBrowser() {
-        return emptyBrowser;
     }
 }

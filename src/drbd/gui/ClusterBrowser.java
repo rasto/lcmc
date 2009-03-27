@@ -57,8 +57,6 @@ import drbd.utilities.MyMenuItem;
 
 import drbd.gui.HostBrowser.BlockDevInfo;
 import drbd.gui.HostBrowser.HostInfo;
-import drbd.gui.EmptyBrowser;
-import drbd.gui.EmptyBrowser.AllHostsInfo;
 
 import java.awt.Color;
 
@@ -457,10 +455,8 @@ public class ClusterBrowser extends Browser {
      */
     public final void initClusterResources() {
 
-        final EmptyBrowser emptyBrowser = Tools.getGUIData().getEmptyBrowser();
         /* all hosts */
-        allHostsNode = new DefaultMutableTreeNode(
-                emptyBrowser.getAllHostsInfo());
+        allHostsNode = new DefaultMutableTreeNode(new AllHostsInfo());
         setNode(allHostsNode);
         topAdd(allHostsNode);
         /* hosts */
@@ -7167,6 +7163,76 @@ public class ClusterBrowser extends Browser {
             } else {
                 resetFilesystems();
             }
+        }
+    }
+
+    /**
+     * This class holds all hosts that are added to the GUI as opposite to all
+     * hosts in a cluster.
+     */
+    private class AllHostsInfo extends Info {
+        /** infoPanel cache. */
+        private JPanel infoPanel = null;
+
+        /**
+         * Creates a new AllHostsInfo instance.
+         */
+        public AllHostsInfo() {
+            super(Tools.getString("ClusterBrowser.AllHosts"));
+        }
+
+        /**
+         * Returns info panel of all hosts menu item. If a host is selected,
+         * its tab is selected.
+         */
+        public final JComponent getInfoPanel() {
+            if (infoPanel != null) {
+                return infoPanel;
+            }
+            infoPanel = new JPanel();
+
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setBackground(PANEL_BACKGROUND);
+            final JPanel bPanel =
+                           new JPanel(new BorderLayout());
+            bPanel.setMaximumSize(new Dimension(10000, 60));
+            bPanel.setBackground(STATUS_BACKGROUND);
+            final JMenuBar mb = new JMenuBar();
+            mb.setBackground(PANEL_BACKGROUND);
+            final JMenu actionsMenu = getActionsMenu();
+            updateMenus(null);
+            mb.add(actionsMenu);
+            bPanel.add(mb, BorderLayout.EAST);
+            infoPanel.add(bPanel);
+            return infoPanel;
+        }
+
+        /**
+         * Creates the popup for all hosts.
+         */
+        public final List<UpdatableItem> createPopup() {
+            final List<UpdatableItem>items = new ArrayList<UpdatableItem>();
+
+            /* host wizard */
+            final MyMenuItem newHostWizardItem =
+                new MyMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"),
+                               HOST_ICON,
+                               null) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return true;
+                    }
+
+                    public void action() {
+                        final AddHostDialog dialog = new AddHostDialog();
+                        dialog.showDialogs();
+                    }
+                };
+            items.add(newHostWizardItem);
+            registerMenuItem(newHostWizardItem);
+            Tools.getGUIData().registerAddHostButton(newHostWizardItem);
+            return items;
         }
     }
 }
