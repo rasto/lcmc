@@ -149,8 +149,13 @@ public class HostFinish extends DialogHost {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 addAnotherHostButton.setEnabled(false);
+                                final Host newHost = new Host();
+                                newHost.getSSH().setPasswords(
+                                         getHost().getSSH().getLastDSAKey(),
+                                         getHost().getSSH().getLastRSAKey(),
+                                         getHost().getSSH().getLastPassword());
                                 nextDialog = new HostNewHost(thisClass,
-                                                             new Host());
+                                                             newHost);
                                 Tools.getGUIData().allHostsUpdate();
                                 ((MyButton) buttonClass(nextButton())).pressButton();
                             }
