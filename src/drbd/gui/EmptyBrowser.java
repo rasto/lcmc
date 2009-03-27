@@ -154,7 +154,7 @@ public class EmptyBrowser extends Browser {
         for (Host host : allHosts) {
             final HostBrowser hostBrowser = host.getBrowser();
             resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
-            setNode(resource);
+            //setNode(resource);
             allHostsNode.add(resource);
         }
         reload(allHostsNode);
@@ -416,8 +416,8 @@ public class EmptyBrowser extends Browser {
                                         }
                                     }
                                 }
-                                //Tools.stopClusters(selectedRunningClusters);
-                                //Tools.removeClusters(selectedClusters);
+                                Tools.stopClusters(selectedRunningClusters);
+                                Tools.removeClusters(selectedClusters);
                             }
                         });
                         t.start();
@@ -507,7 +507,8 @@ public class EmptyBrowser extends Browser {
                                 stopMarkedClustersBtn.setEnabled(
                                                          notRunningCount == 0);
                             }
-                            removeMarkedClustersBtn.setEnabled(true);
+                            //TODO: still not working
+                            //removeMarkedClustersBtn.setEnabled(true);
                         }
                     });
                 } else {

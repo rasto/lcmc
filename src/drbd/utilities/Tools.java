@@ -731,6 +731,15 @@ public final class Tools {
     }
 
     /**
+     * Removes the specified clusters from the gui.
+     */
+    public static void removeClusters(final List<Cluster> selectedClusters) {
+        for (final Cluster cluster : selectedClusters) {
+            getConfigData().removeClusterFromClusters(cluster);
+        }
+    }
+
+    /**
      * Returns cluster names from the parsed save file.
      */
     public static void loadXML(final String xml) {
