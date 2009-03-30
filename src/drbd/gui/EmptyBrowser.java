@@ -260,6 +260,7 @@ public class EmptyBrowser extends Browser {
                         label.add(nl);
                     }
                     final JPanel startPanel = new JPanel(new BorderLayout());
+                    startPanel.setBackground(Color.WHITE);
                     clusterBackgrounds.put(cluster, startPanel);
                     startPanel.setBorder(
                                 new LineBorder(Tools.getDefaultColor(
@@ -369,7 +370,7 @@ public class EmptyBrowser extends Browser {
                                         if (cb.isSelected()) {
                                             SwingUtilities.invokeLater(new Runnable() {
                                                 public void run() {
-                                                    clusterBackgrounds.get(cluster).setBackground(Color.YELLOW);
+                                                    clusterBackgrounds.get(cluster).setBackground(Color.WHITE);
                                                     allCheckboxes.get(cluster).setSelected(false);
                                                 }
                                             });
@@ -409,7 +410,7 @@ public class EmptyBrowser extends Browser {
                                         if (cb.isSelected()) {
                                             SwingUtilities.invokeLater(new Runnable() {
                                                 public void run() {
-                                                    clusterBackgrounds.get(cluster).setBackground(Color.YELLOW);
+                                                    clusterBackgrounds.get(cluster).setBackground(Color.WHITE);
                                                 }
                                             });
                                             selectedRunningClusters.add(cluster);
@@ -489,56 +490,54 @@ public class EmptyBrowser extends Browser {
             final int runningCount = rc;
             final int notRunningCount = nrc;
             final int allCount = ac;
-            if (allCount != 1) {
-                if (cb.isSelected()) {
-                    /* disable all start cluster buttons */
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            if (notRunningCount >= 1) {
-                                for (final Cluster cluster : clusters) {
+            if (cb.isSelected()) {
+                /* disable all start cluster buttons */
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (notRunningCount >= 1) {
+                            for (final Cluster cluster : clusters) {
+                                allStartButtons.get(cluster).setEnabled(
+                                                             false);
+                            }
+                            /* enable start etc marked clusters button */
+                            startMarkedClustersBtn.setEnabled(
+                                                    runningCount == 0);
+                        }
+                        if (runningCount >= 1) {
+                            stopMarkedClustersBtn.setEnabled(
+                                                     notRunningCount == 0);
+                        }
+                        //TODO: still not working
+                        //removeMarkedClustersBtn.setEnabled(true);
+                    }
+                });
+            } else {
+                /* deselecting */
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (notRunningCount == 0) {
+                            for (final Cluster cluster : clusters) {
+                                if (cluster.getClusterTab() == null) {
                                     allStartButtons.get(cluster).setEnabled(
-                                                                 false);
+                                                        true);
                                 }
-                                /* enable start etc marked clusters button */
-                                startMarkedClustersBtn.setEnabled(
-                                                        runningCount == 0);
                             }
-                            if (runningCount >= 1) {
-                                stopMarkedClustersBtn.setEnabled(
-                                                         notRunningCount == 0);
-                            }
-                            //TODO: still not working
-                            //removeMarkedClustersBtn.setEnabled(true);
+                            startMarkedClustersBtn.setEnabled(false);
+                            if (runningCount > 0) {
+                                stopMarkedClustersBtn.setEnabled(true);
+                            } 
                         }
-                    });
-                } else {
-                    /* deselecting */
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            if (notRunningCount == 0) {
-                                for (final Cluster cluster : clusters) {
-                                    if (cluster.getClusterTab() == null) {
-                                        allStartButtons.get(cluster).setEnabled(
-                                                            true);
-                                    }
-                                }
-                                startMarkedClustersBtn.setEnabled(false);
-                                if (runningCount > 0) {
-                                    stopMarkedClustersBtn.setEnabled(true);
-                                } 
-                            }
-                            if (runningCount == 0) {
-                                stopMarkedClustersBtn.setEnabled(false);
-                                if (notRunningCount > 0) {
-                                    startMarkedClustersBtn.setEnabled(true);
-                                } 
-                            }
-                            if (runningCount + notRunningCount == 0) {
-                                removeMarkedClustersBtn.setEnabled(false);
-                            }
+                        if (runningCount == 0) {
+                            stopMarkedClustersBtn.setEnabled(false);
+                            if (notRunningCount > 0) {
+                                startMarkedClustersBtn.setEnabled(true);
+                            } 
                         }
-                    });
-                }
+                        if (runningCount + notRunningCount == 0) {
+                            removeMarkedClustersBtn.setEnabled(false);
+                        }
+                    }
+                });
             }
         }
 
