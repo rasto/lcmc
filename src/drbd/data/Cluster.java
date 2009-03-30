@@ -60,7 +60,7 @@ public class Cluster {
     /** Default colors of the hosts. */
     private final Color[] hostColors = {
                                   Color.YELLOW,
-                                  Color.ORANGE,
+                                  new Color(255, 100, 0), /* orange */
                                   new Color(184, 207, 229), /* blue */
                                   Color.PINK,
                                   Color.WHITE,
