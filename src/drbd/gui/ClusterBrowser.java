@@ -592,16 +592,21 @@ public class ClusterBrowser extends Browser {
             public void run() {
                 Host firstHost = null;
                 final Host[] hosts = cluster.getHostsArray();
+                for (final Host host : hosts) {
+                    final HostBrowser hostBrowser = host.getBrowser();
+                    drbdGraph.addHost(hostBrowser.getHostInfo());
+                }
                 do { /* wait here until a host is connected. */
-                    boolean notConnected = false;
+                    boolean notConnected = true;
                     for (final Host host : hosts) {
                         // TODO: fix that, use latches or callback
-                        if (!host.isConnected()) {
-                            notConnected = true;
+                        if (host.isConnected()) {
+                            /* at least one connected. */
+                            notConnected = false;
                             break;
                         } else {
-                            final HostBrowser hostBrowser = host.getBrowser();
-                            drbdGraph.addHost(hostBrowser.getHostInfo());
+                            //jfinal HostBrowser hostBrowser = host.getBrowser();
+                            //jdrbdGraph.addHost(hostBrowser.getHostInfo());
                         }
                     }
                     if (!notConnected) {
@@ -5880,7 +5885,7 @@ public class ClusterBrowser extends Browser {
             for (Host host : hosts) {
                 if (!heartbeatStatus.isActiveNode(host.getName())) {
                     //TODO: something's missing here
-                    System.out.println("is active node: " + host.getName());
+                    //System.out.println("is active node: " + host.getName());
                 }
             }
             if (infoPanel == null) {
