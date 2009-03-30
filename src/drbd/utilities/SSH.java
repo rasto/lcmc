@@ -908,11 +908,17 @@ public class SSH {
                     /* show lastError only once */
                     lastError = null;
                 }
-                final String ans = sshGui.enterSomethingDialog(
+                String ans;
+                if (lastPassword == null) {
+                    ans = sshGui.enterSomethingDialog(
                                         "Keyboard Interactive Authentication",
                                         content,
                                         null,
                                         !echo[i]);
+                    lastPassword = ans;
+                } else {
+                    ans = lastPassword;
+                }
                 result[i] = ans;
                 promptCount++;
             }
@@ -1157,7 +1163,11 @@ public class SSH {
                                                                       il);
 
                         if (res) {
+                            lastRSAKey = null;
+                            lastDSAKey = null;
                             break;
+                        } else {
+                            lastPassword = null;
                         }
 
                         if (il.getPromptCount() == 0) {
