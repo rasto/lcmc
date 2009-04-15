@@ -47,13 +47,11 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * of services in the hashes and provides methods to get this
  * information.
  *
- * TODO: it's not only OCF anymore so it needs to be renamed
- *
  * @author Rasto Levrinc
  * @version $Id$
  *
  */
-public class HeartbeatOCF extends XML {
+public class HeartbeatXML extends XML {
     /** Host */
     private final Host host;
     /** List of global parameters. */
@@ -110,9 +108,9 @@ public class HeartbeatOCF extends XML {
     private static final String IS_MANAGED_PARAM = "is_managed";
 
     /**
-     * Prepares a new <code>HeartbeatOCF</code> object.
+     * Prepares a new <code>HeartbeatXML</code> object.
      */
-    public HeartbeatOCF(final Host host) {
+    public HeartbeatXML(final Host host) {
         super();
         this.host = host;
         final String command = host.getCommand("Heartbeat.getOCFParameters");
@@ -122,7 +120,7 @@ public class HeartbeatOCF extends XML {
                             command,
                             null,
                             false,
-                            Tools.getString("HeartbeatOCF.GetOCFParameters"));
+                            Tools.getString("HeartbeatXML.GetOCFParameters"));
         if (output == null) {
             //Tools.appError("heartbeat ocf output is null");
             return;
@@ -568,11 +566,11 @@ public class HeartbeatOCF extends XML {
     public final String getSection(final HeartbeatService hbService,
                                    final String param) {
         if (isMetaAttr(hbService, param)) {
-            return Tools.getString("HeartbeatOCF.MetaAttrOptions");
+            return Tools.getString("HeartbeatXML.MetaAttrOptions");
         } else if (isRequired(hbService, param)) {
-            return Tools.getString("HeartbeatOCF.RequiredOptions");
+            return Tools.getString("HeartbeatXML.RequiredOptions");
         } else {
-            return Tools.getString("HeartbeatOCF.OptionalOptions");
+            return Tools.getString("HeartbeatXML.OptionalOptions");
         }
     }
 
@@ -582,9 +580,9 @@ public class HeartbeatOCF extends XML {
      */
     public final String getGlobalSection(final String param) {
         if (isGlobalRequired(param)) {
-            return Tools.getString("HeartbeatOCF.RequiredOptions");
+            return Tools.getString("HeartbeatXML.RequiredOptions");
         } else {
-            return Tools.getString("HeartbeatOCF.OptionalOptions");
+            return Tools.getString("HeartbeatXML.OptionalOptions");
         }
     }
 
@@ -680,10 +678,10 @@ public class HeartbeatOCF extends XML {
         hbService.setParamRequired(TARGET_ROLE_PARAM, true);
         hbService.setParamShortDesc(
                          TARGET_ROLE_PARAM,
-                         Tools.getString("HeartbeatOCF.TargetRole.ShortDesc"));
+                         Tools.getString("HeartbeatXML.TargetRole.ShortDesc"));
         hbService.setParamLongDesc(
                          TARGET_ROLE_PARAM,
-                         Tools.getString("HeartbeatOCF.TargetRole.LongDesc"));
+                         Tools.getString("HeartbeatXML.TargetRole.LongDesc"));
         hbService.setParamDefault(TARGET_ROLE_PARAM, "stopped");
 
         hbService.addParameter(IS_MANAGED_PARAM);
@@ -693,10 +691,10 @@ public class HeartbeatOCF extends XML {
         hbService.setParamRequired(IS_MANAGED_PARAM, true);
         hbService.setParamShortDesc(
                          IS_MANAGED_PARAM,
-                         Tools.getString("HeartbeatOCF.IsManaged.ShortDesc"));
+                         Tools.getString("HeartbeatXML.IsManaged.ShortDesc"));
         hbService.setParamLongDesc(
                          IS_MANAGED_PARAM,
-                         Tools.getString("HeartbeatOCF.IsManaged.LongDesc"));
+                         Tools.getString("HeartbeatXML.IsManaged.LongDesc"));
         hbService.setParamDefault(IS_MANAGED_PARAM, "true");
 
         final NodeList parameters = parametersNode.getChildNodes();

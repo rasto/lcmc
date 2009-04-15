@@ -43,8 +43,8 @@ public class HeartbeatStatus {
     private volatile CibQuery cibQueryMap = new CibQuery();
     /** DC Node. */
     private String dc = null;
-    /** HeartbeatOCF object */
-    private final HeartbeatOCF heartbeatOCF;
+    /** HeartbeatXML object */
+    private final HeartbeatXML heartbeatXML;
     /** On which node the resource is running */
     private volatile Map<String, String> runningOnNodeHash = null;
 
@@ -53,9 +53,9 @@ public class HeartbeatStatus {
      * Gets and parses metadata from pengine and crmd.
      */
     public HeartbeatStatus(final Host host,
-                           final HeartbeatOCF heartbeatOCF) {
+                           final HeartbeatXML heartbeatXML) {
         this.host = host;
-        this.heartbeatOCF = heartbeatOCF;
+        this.heartbeatXML = heartbeatXML;
         final String command = host.getCommand("Heartbeat.getClusterMetadata");
         final String output =
                     Tools.execCommandProgressIndicator(
@@ -65,7 +65,7 @@ public class HeartbeatStatus {
                             false,
                             Tools.getString("Heartbeat.getClusterMetadata"));
         if (output != null) {
-            heartbeatOCF.parseClusterMetaData(output);
+            heartbeatXML.parseClusterMetaData(output);
         }
     }
 
@@ -424,13 +424,13 @@ public class HeartbeatStatus {
      * Parses output from crm_mon.
      */
     private final void parseResStatus(final String resStatus) {
-        runningOnNodeHash = heartbeatOCF.parseResStatus(resStatus);
+        runningOnNodeHash = heartbeatXML.parseResStatus(resStatus);
     }
 
     /**
      * Parses output from cibadmin command.
      */
     private final void parseCibQuery(final String query) {
-        cibQueryMap    = heartbeatOCF.parseCibQuery(query);
+        cibQueryMap    = heartbeatXML.parseCibQuery(query);
     }
 }

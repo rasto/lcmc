@@ -38,7 +38,7 @@ import drbd.gui.dialog.ClusterDrbdLogs;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.HeartbeatStatus;
-import drbd.data.HeartbeatOCF;
+import drbd.data.HeartbeatXML;
 import drbd.data.DrbdXML;
 import drbd.utilities.NewOutputCallback;
 
@@ -159,7 +159,7 @@ public class ClusterBrowser extends Browser {
     /** object that holds current heartbeat status. */
     private HeartbeatStatus heartbeatStatus;
     /** Object that holds hb ocf data. */
-    private HeartbeatOCF hbOCF;
+    private HeartbeatXML heartbeatXML;
     /** Object that drbd status and data. */
     private DrbdXML drbdXML;
 
@@ -616,8 +616,8 @@ public class ClusterBrowser extends Browser {
                     }
                 } while (firstHost == null);
 
-                hbOCF = new HeartbeatOCF(firstHost);
-                heartbeatStatus = new HeartbeatStatus(firstHost, hbOCF);
+                heartbeatXML = new HeartbeatXML(firstHost);
+                heartbeatStatus = new HeartbeatStatus(firstHost, heartbeatXML);
                 drbdXML = new DrbdXML(cluster.getHostsArray());
                 /* available services */
                 Tools.startProgressIndicator(getCluster(),
@@ -942,7 +942,7 @@ public class ClusterBrowser extends Browser {
      */
     public final List<HeartbeatService> globalGetAddServiceList(
                                                             final String cl) {
-        return hbOCF.getServices(cl);
+        return heartbeatXML.getServices(cl);
     }
 
     /**
@@ -997,7 +997,7 @@ public class ClusterBrowser extends Browser {
             final DefaultMutableTreeNode classNode =
                     new DefaultMutableTreeNode(
                         new HbCategoryInfo(cl.toUpperCase()));
-            for (HeartbeatService hbService : hbOCF.getServices(cl)) {
+            for (HeartbeatService hbService : heartbeatXML.getServices(cl)) {
                 resource = new DefaultMutableTreeNode(
                                     new AvailableServiceInfo(hbService));
                 setNode(resource);
@@ -2241,7 +2241,7 @@ public class ClusterBrowser extends Browser {
          */
         public final void addDrbdDisk(final FilesystemInfo fi) {
             final Point2D p = null;
-            final DrbddiskInfo di = (DrbddiskInfo) heartbeatGraph.getServicesInfo().addServicePanel(hbOCF.getHbDrbddisk(), p, true, null);
+            final DrbddiskInfo di = (DrbddiskInfo) heartbeatGraph.getServicesInfo().addServicePanel(heartbeatXML.getHbDrbddisk(), p, true, null);
             //di.setResourceName(getName());
             di.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(di);
@@ -2551,14 +2551,14 @@ public class ClusterBrowser extends Browser {
             s.append("<h2>");
             s.append(getName());
             s.append(" (");
-            s.append(hbOCF.getVersion(hbService));
+            s.append(heartbeatXML.getVersion(hbService));
             s.append(")</h2><h3>");
-            s.append(hbOCF.getShortDesc(hbService));
+            s.append(heartbeatXML.getShortDesc(hbService));
             s.append("</h3>");
-            s.append(hbOCF.getLongDesc(hbService));
-            final String[] params = hbOCF.getParameters(hbService);
+            s.append(heartbeatXML.getLongDesc(hbService));
+            final String[] params = heartbeatXML.getParameters(hbService);
             for (String param : params) {
-                s.append(hbOCF.getParamLongDesc(hbService, param));
+                s.append(heartbeatXML.getParamLongDesc(hbService, param));
                 s.append("<br>");
             }
             return s.toString();
@@ -3141,7 +3141,7 @@ public class ClusterBrowser extends Browser {
          * Returns the list of services that can be added to the group.
          */
         public List<HeartbeatService> getAddGroupServiceList(final String cl) {
-            return hbOCF.getServices(cl);
+            return heartbeatXML.getServices(cl);
         }
 
         /**
@@ -3512,11 +3512,11 @@ public class ClusterBrowser extends Browser {
          * Sets service parameters with values from resourceNode hash.
          */
         public void setParameters(final Map<String, String> resourceNode) {
-            if (hbOCF == null) {
-                Tools.appError("hbOCF is null");
+            if (heartbeatXML == null) {
+                Tools.appError("heartbeatXML is null");
                 return;
             }
-            final String[] params = hbOCF.getParameters(hbService);
+            final String[] params = heartbeatXML.getParameters(hbService);
             if (params != null) {
                 for (String param : params) {
                     String value = resourceNode.get(param);
@@ -4148,7 +4148,7 @@ public class ClusterBrowser extends Browser {
          * Returns parameters.
          */
         public String[] getParametersFromXML() {
-            return hbOCF.getParameters(hbService);
+            return heartbeatXML.getParameters(hbService);
         }
 
         /**
@@ -4161,7 +4161,7 @@ public class ClusterBrowser extends Browser {
                 && !Tools.checkIp(newValue)) {
                 return false;
             }
-            return hbOCF.checkParam(hbService,
+            return heartbeatXML.checkParam(hbService,
                                     param,
                                     newValue);
         }
@@ -4170,7 +4170,7 @@ public class ClusterBrowser extends Browser {
          * Returns default value for specified parameter.
          */
         protected String getParamDefault(final String param) {
-            return hbOCF.getParamDefault(hbService,
+            return heartbeatXML.getParamDefault(hbService,
                                          param);
         }
 
@@ -4179,10 +4179,10 @@ public class ClusterBrowser extends Browser {
          */
         protected Object[] getParamPossibleChoices(final String param) {
             if (isCheckBox(param)) {
-                return hbOCF.getCheckBoxChoices(hbService, param);
+                return heartbeatXML.getCheckBoxChoices(hbService, param);
             } else {
                 // TODO: this does nothing, I think
-                return hbOCF.getParamPossibleChoices(hbService, param);
+                return heartbeatXML.getParamPossibleChoices(hbService, param);
             }
         }
 
@@ -4190,7 +4190,7 @@ public class ClusterBrowser extends Browser {
          * Returns short description of the specified parameter.
          */
         protected String getParamShortDesc(final String param) {
-            return hbOCF.getParamShortDesc(hbService,
+            return heartbeatXML.getParamShortDesc(hbService,
                                            param);
         }
 
@@ -4198,7 +4198,7 @@ public class ClusterBrowser extends Browser {
          * Returns long description of the specified parameter.
          */
         protected String getParamLongDesc(final String param) {
-            return hbOCF.getParamLongDesc(hbService,
+            return heartbeatXML.getParamLongDesc(hbService,
                                           param);
         }
 
@@ -4207,7 +4207,7 @@ public class ClusterBrowser extends Browser {
          * Returns section to which the specified parameter belongs.
          */
         protected String getSection(final String param) {
-            return hbOCF.getSection(hbService,
+            return heartbeatXML.getSection(hbService,
                                     param);
         }
 
@@ -4215,7 +4215,7 @@ public class ClusterBrowser extends Browser {
          * Returns true if the specified parameter is required.
          */
         protected boolean isRequired(final String param) {
-            return hbOCF.isRequired(hbService,
+            return heartbeatXML.isRequired(hbService,
                                     param);
         }
 
@@ -4223,7 +4223,7 @@ public class ClusterBrowser extends Browser {
          * Returns true if the specified parameter is meta attribute.
          */
         protected boolean isMetaAttr(final String param) {
-            return hbOCF.isMetaAttr(hbService,
+            return heartbeatXML.isMetaAttr(hbService,
                                     param);
         }
 
@@ -4231,7 +4231,7 @@ public class ClusterBrowser extends Browser {
          * Returns true if the specified parameter is integer.
          */
         protected boolean isInteger(final String param) {
-            return hbOCF.isInteger(hbService,
+            return heartbeatXML.isInteger(hbService,
                                    param);
         }
 
@@ -4239,7 +4239,7 @@ public class ClusterBrowser extends Browser {
          * Returns true if the specified parameter is of time type.
          */
         protected boolean isTimeType(final String param) {
-            return hbOCF.isTimeType(hbService,
+            return heartbeatXML.isTimeType(hbService,
                                     param);
         }
 
@@ -4247,7 +4247,7 @@ public class ClusterBrowser extends Browser {
          * Returns whether parameter is checkbox.
          */
         protected boolean isCheckBox(final String param) {
-            final String type = hbOCF.getParamType(hbService,
+            final String type = heartbeatXML.getParamType(hbService,
                                                    param);
             if (type == null) {
                 return false;
@@ -4262,7 +4262,7 @@ public class ClusterBrowser extends Browser {
          * Returns the type of the parameter according to the OCF.
          */
         protected String getParamType(final String param) {
-            return hbOCF.getParamType(hbService,
+            return heartbeatXML.getParamType(hbService,
                                       param);
         }
 
@@ -5193,7 +5193,7 @@ public class ClusterBrowser extends Browser {
                         public void action() {
                             final StringInfo gi = new StringInfo(HB_GROUP_NAME,
                                                                  HB_GROUP_NAME);
-                            addServicePanel(hbOCF.getHbGroup(), getPos(), true);
+                            addServicePanel(heartbeatXML.getHbGroup(), getPos(), true);
                             heartbeatGraph.getVisualizationViewer().repaint();
                         }
                     };
@@ -5211,7 +5211,7 @@ public class ClusterBrowser extends Browser {
                         removeAll();
                         final Point2D pos = getPos();
                         final HeartbeatService fsService =
-                                        hbOCF.getHbService("Filesystem",
+                                        heartbeatXML.getHbService("Filesystem",
                                                                   "ocf");
                         if (fsService != null) { /* just skip it, if it is not*/
                             final MyMenuItem fsMenuItem =
@@ -5229,7 +5229,7 @@ public class ClusterBrowser extends Browser {
                             add(fsMenuItem);
                         }
                         final HeartbeatService ipService =
-                                        hbOCF.getHbService("IPaddr2",
+                                        heartbeatXML.getHbService("IPaddr2",
                                                                   "ocf");
                         if (ipService != null) { /* just skip it, if it is not*/
                             final MyMenuItem ipMenuItem =
@@ -5608,7 +5608,7 @@ public class ClusterBrowser extends Browser {
             final StringBuffer s = new StringBuffer(30);
             s.append("<h2>");
             s.append(getName());
-            if (hbOCF == null) {
+            if (heartbeatXML == null) {
                 s.append("</h2><br>info not available");
                 return s.toString();
             }
@@ -5679,7 +5679,7 @@ public class ClusterBrowser extends Browser {
          * Returns names of all global parameters.
          */
         public String[] getParametersFromXML() {
-            return hbOCF.getGlobalParameters();
+            return heartbeatXML.getGlobalParameters();
         }
 
         /**
@@ -5687,7 +5687,7 @@ public class ClusterBrowser extends Browser {
          * tool tips.
          */
         protected String getParamLongDesc(final String param) {
-            return hbOCF.getGlobalParamLongDesc(param);
+            return heartbeatXML.getGlobalParamLongDesc(param);
         }
 
         /**
@@ -5695,21 +5695,21 @@ public class ClusterBrowser extends Browser {
          * label.
          */
         protected String getParamShortDesc(final String param) {
-            return hbOCF.getGlobalParamShortDesc(param);
+            return heartbeatXML.getGlobalParamShortDesc(param);
         }
 
         /**
          * Returns default for this global parameter.
          */
         protected String getParamDefault(final String param) {
-            return hbOCF.getGlobalParamDefault(param);
+            return heartbeatXML.getGlobalParamDefault(param);
         }
 
         /**
          * Returns possible choices for pulldown menus if applicable.
          */
         protected Object[] getParamPossibleChoices(final String param) {
-            return hbOCF.getGlobalParamPossibleChoices(param);
+            return heartbeatXML.getGlobalParamPossibleChoices(param);
         }
 
         /**
@@ -5718,28 +5718,28 @@ public class ClusterBrowser extends Browser {
          */
         protected boolean checkParam(final String param,
                                      final String newValue) {
-            return hbOCF.checkGlobalParam(param, newValue);
+            return heartbeatXML.checkGlobalParam(param, newValue);
         }
 
         /**
          * Returns whether the global parameter is of the integer type.
          */
         protected boolean isInteger(final String param) {
-            return hbOCF.isGlobalInteger(param);
+            return heartbeatXML.isGlobalInteger(param);
         }
 
         /**
          * Returns whether the global parameter is of the time type.
          */
         protected boolean isTimeType(final String param) {
-            return hbOCF.isGlobalTimeType(param);
+            return heartbeatXML.isGlobalTimeType(param);
         }
 
         /**
          * Returns whether the global parameter is required.
          */
         protected boolean isRequired(final String param) {
-            return hbOCF.isGlobalRequired(param);
+            return heartbeatXML.isGlobalRequired(param);
         }
 
         /**
@@ -5747,7 +5747,7 @@ public class ClusterBrowser extends Browser {
          * requires a checkbox.
          */
         protected boolean isCheckBox(final String param) {
-            final String type = hbOCF.getGlobalParamType(param);
+            final String type = heartbeatXML.getGlobalParamType(param);
             if (type == null) {
                 return false;
             }
@@ -5761,14 +5761,14 @@ public class ClusterBrowser extends Browser {
          * Returns type of the global parameter.
          */
         protected String getParamType(final String param) {
-            return hbOCF.getGlobalParamType(param);
+            return heartbeatXML.getGlobalParamType(param);
         }
 
         /**
          * Returns section to which the global parameter belongs.
          */
         protected String getSection(final String param) {
-            return hbOCF.getGlobalSection(param);
+            return heartbeatXML.getGlobalSection(param);
         }
 
         /**
@@ -5865,7 +5865,7 @@ public class ClusterBrowser extends Browser {
                         if (newGi == null) {
                             final Point2D p = null;
                             newGi = (GroupInfo) heartbeatGraph.getServicesInfo().addServicePanel(
-                                        hbOCF.getHbGroup(),
+                                        heartbeatXML.getHbGroup(),
                                         p,
                                         true,
                                         group);
@@ -6050,7 +6050,7 @@ public class ClusterBrowser extends Browser {
             infoPanel.setBackground(PANEL_BACKGROUND);
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             //infoPanel.add(getButtonPanel());
-            if (hbOCF == null) {
+            if (heartbeatXML == null) {
                 return infoPanel;
             }
             final JPanel mainPanel = new JPanel();
@@ -6252,7 +6252,7 @@ public class ClusterBrowser extends Browser {
                     public void action() {
                         final StringInfo gi = new StringInfo(HB_GROUP_NAME,
                                                              HB_GROUP_NAME);
-                        addServicePanel(hbOCF.getHbGroup(), getPos(), true, null);
+                        addServicePanel(heartbeatXML.getHbGroup(), getPos(), true, null);
                         heartbeatGraph.getVisualizationViewer().repaint();
                     }
                 };
@@ -6269,7 +6269,7 @@ public class ClusterBrowser extends Browser {
                     removeAll();
                     Point2D pos = getPos();
                     final HeartbeatService fsService =
-                                    hbOCF.getHbService("Filesystem",
+                                    heartbeatXML.getHbService("Filesystem",
                                                               "ocf");
                     if (fsService != null) { /* just skip it, if it is not*/
                         final MyMenuItem fsMenuItem =
@@ -6287,7 +6287,7 @@ public class ClusterBrowser extends Browser {
                         add(fsMenuItem);
                     }
                     final HeartbeatService ipService =
-                                    hbOCF.getHbService("IPaddr2",
+                                    heartbeatXML.getHbService("IPaddr2",
                                                               "ocf");
                     if (ipService != null) { /* just skip it, if it is not*/
                         final MyMenuItem ipMenuItem =
