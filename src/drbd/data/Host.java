@@ -1091,12 +1091,10 @@ public class Host implements Serializable {
     public final void execHbStatusCommand(final ExecCallback execCallback,
                                       final NewOutputCallback outputCallback) {
         if (hbStatusThread == null) {
-            final String hbPasswd = cluster.getHbPasswd();
             hbStatusThread = ssh.execCommand(
                                 Tools.getCommand("Heartbeat.getHbStatus",
                                                  dist,
-                                                 distVersionString)
-                                + " " + hbPasswd,
+                                                 distVersionString),
                                 execCallback,
                                 outputCallback,
                                 false,

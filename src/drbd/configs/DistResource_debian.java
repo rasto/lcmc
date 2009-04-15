@@ -55,8 +55,7 @@ public class DistResource_debian extends
         {"DrbdInst.install", "echo | dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
         //{"HbCheck.version", "/usr/bin/dpkg-query --showformat='${Status} ${Version}\n' -W heartbeat-2 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"},
-        {"HbInst.install", "/usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2 heartbeat-2-gui"},
-        {"HbGUIInst.install", "/usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2-gui"},
+        {"HbInst.install", "/usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         //{"UdevCheck.version", "/usr/bin/dpkg-query --showformat='${Status} ${Version}\n' -W udev 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"},
         {"Udev.install",      "/usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' udev"},

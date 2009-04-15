@@ -55,9 +55,6 @@ public class HostCheckInstallation extends DialogHost {
     /** Checking hb label. */
     private final JLabel heartbeatLabel = new JLabel(
           ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingHb"));
-    /** Checking hb gui label. */
-    private final JLabel heartbeatGUILabel = new JLabel(
-          ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingHbGUI"));
     /** Checking udev label. */
     private final JLabel udevLabel = new JLabel(
           ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingUdev"));
@@ -68,9 +65,6 @@ public class HostCheckInstallation extends DialogHost {
     /** Install heartbeat button. */
     private final MyButton heartbeatButton = new MyButton(
             Tools.getString("Dialog.HostCheckInstallation.HbInstallButton"));
-    /** Install heartbeat gui button. */
-    private final MyButton heartbeatGUIButton = new MyButton(
-            Tools.getString("Dialog.HostCheckInstallation.HbGUIInstallButton"));
     /** Install udev button. */
     private final MyButton udevButton = new MyButton(
             Tools.getString("Dialog.HostCheckInstallation.UdevInstallButton"));
@@ -96,8 +90,6 @@ public class HostCheckInstallation extends DialogHost {
     private final JLabel drbdIcon = new JLabel(CHECKING_ICON);
     /** Heartbeat icon: checking ... */
     private final JLabel heartbeatIcon = new JLabel(CHECKING_ICON);
-    /** Heartbeat GUI icon: checking ... */
-    private final JLabel heartbeatGUIIcon = new JLabel(CHECKING_ICON);
     /** udev icon: checking ... */
     private final JLabel udevIcon = new JLabel(CHECKING_ICON);
 
@@ -105,8 +97,6 @@ public class HostCheckInstallation extends DialogHost {
     private boolean drbdOk = false;
     /** Whether heartbeat installation was ok. */
     private boolean heartbeatOk = false;
-    /** Whether heartbeat gui installation was ok. */
-    private boolean heartbeatGUIOk = false;
     /** Whether udev installation was ok. */
     private boolean udevOk = false;
     /** Version that appears in the dialog. */
@@ -127,7 +117,6 @@ public class HostCheckInstallation extends DialogHost {
         super.initDialog();
         drbdOk         = false;
         heartbeatOk    = false;
-        heartbeatGUIOk = false;
         udevOk         = false;
         nextDialogObject = new HostFinish(this, getHost());
         final HostCheckInstallation thisClass = this;
@@ -135,7 +124,6 @@ public class HostCheckInstallation extends DialogHost {
             public void run() {
                 drbdButton.setEnabled(false);
                 heartbeatButton.setEnabled(false);
-                heartbeatGUIButton.setEnabled(false);
                 udevButton.setEnabled(false);
             }
         });
@@ -173,20 +161,6 @@ public class HostCheckInstallation extends DialogHost {
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new HostHbInst(thisClass, getHost());
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            ((MyButton) buttonClass(
-                                                nextButton())).pressButton();
-                        }
-                    });
-                }
-            }
-        );
-
-        heartbeatGUIButton.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    nextDialogObject = new HostHbGUIInst(thisClass, getHost());
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             ((MyButton) buttonClass(
@@ -306,7 +280,6 @@ public class HostCheckInstallation extends DialogHost {
      * Checks whether heartbeat is installed and starts heartbeat gui check.
      */
     public void checkHeartbeat(final String ans) {
-        boolean checkhbGUI = true;
         if ("".equals(ans) || "\n".equals(ans)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -325,11 +298,6 @@ public class HostCheckInstallation extends DialogHost {
             } else {
                 version = ans.substring(0, i);
             }
-            /* hide heartbeat gui package if version is < 2.1.0 TODO: Don't
-             * know exact version */
-            if (Tools.compareVersions(version, "2.1.0") < 0) {
-                checkhbGUI = false;
-            }
             if ("2.1.3".equals(version)
                 && "sles10".equals(getHost().getDistVersion())) {
                 /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
@@ -346,49 +314,6 @@ public class HostCheckInstallation extends DialogHost {
                 }
             });
 
-        }
-        if (checkhbGUI) {
-            getHost().execCommand("HbGUICheck.version",
-                             getProgressBar(),
-                             new ExecCallback() {
-                                 public void done(final String ans) {
-                                     Tools.debug(this, "ans: " + ans);
-                                     checkHeartbeatGUI(ans);
-                                 }
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
-                                     done("");
-                                 }
-                             }, false);
-        } else {
-            checkHeartbeatGUI("ok");
-        }
-    }
-
-    /**
-     * Checks whether heartbeat gui is installed and starts udev check.
-     */
-    public void checkHeartbeatGUI(final String ans) {
-        if ("".equals(ans) || "\n".equals(ans)) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    heartbeatGUILabel.setText(": " + Tools.getString(
-                            "Dialog.HostCheckInstallation.HbGUINotInstalled"));
-                    heartbeatGUIIcon.setIcon(NOT_INSTALLED_ICON);
-                    if (heartbeatOk) {
-                        heartbeatGUIButton.setEnabled(true);
-                    }
-                }
-            });
-        } else {
-            heartbeatGUIOk = true;
-            final String version = ans.trim();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    heartbeatGUILabel.setText(": " + version);
-                    heartbeatGUIIcon.setIcon(INSTALLED_ICON);
-                }
-            });
         }
         getHost().execCommand("UdevCheck.version",
                          getProgressBar(),
@@ -432,7 +357,7 @@ public class HostCheckInstallation extends DialogHost {
                 }
             });
         }
-        if (udevOk && drbdOk && heartbeatOk && heartbeatGUIOk) { 
+        if (udevOk && drbdOk && heartbeatOk) { 
             /* drbd is not required. */
             nextButtonSetEnabled(true);
             enableComponents();
@@ -482,10 +407,6 @@ public class HostCheckInstallation extends DialogHost {
         pane.add(heartbeatLabel);
         pane.add(heartbeatButton);
         pane.add(heartbeatIcon);
-        pane.add(new JLabel("Heartbeat GUI"));
-        pane.add(heartbeatGUILabel);
-        pane.add(heartbeatGUIButton);
-        pane.add(heartbeatGUIIcon);
         pane.add(new JLabel("Drbd"));
         pane.add(drbdLabel);
         pane.add(drbdButton);
@@ -494,7 +415,7 @@ public class HostCheckInstallation extends DialogHost {
         pane.add(udevLabel);
         pane.add(udevButton);
         pane.add(udevIcon);
-        SpringUtilities.makeCompactGrid(pane, 4, 4,  //rows, cols
+        SpringUtilities.makeCompactGrid(pane, 3, 4,  //rows, cols
                                               1, 1,  //initX, initY
                                               1, 1); //xPad, yPad
         return pane;

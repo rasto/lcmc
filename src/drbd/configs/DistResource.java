@@ -69,7 +69,6 @@ public class DistResource extends
         {"DrbdCheck.version", "echo|drbdadm help | grep 'Version: '|sed 's/Version: //' | grep ."},
         //{ "HbCheck.version", ""},
         {"HbCheck.version", "/usr/lib/heartbeat/heartbeat -V 2>/dev/null || /usr/lib64/heartbeat/heartbeat -V"},
-        {"HbGUICheck.version", "which hb_gui"},
         /* DrbdAvailableVersions returns available versions of drbd in the download area. One
          * version per line.
          *
@@ -132,10 +131,12 @@ public class DistResource extends
         {"Heartbeat.setParameter",      "crm_resource -r @ID@ --set-parameter "},
         //{"Heartbeat.addResource",       "cibadmin -C -o resources -X"},
         //{"Heartbeat.removeResource",    "crm_resource -D -r @ID@ -t @TYPE@"},
-        //{"Heartbeat.cleanupResource",    "crm_resource -C -r @ID@ -t @TYPE@"},
+        {"Heartbeat.cleanupResource",    "crm_resource -C -r @ID@ -H @HOST@"},
         {"Heartbeat.addConstraint",     "cibadmin -C -o constraints -X '@XML@'"},
-        //{"Heartbeat.startResource",     "crm_resource -r @ID@ -p target_role -v started"},
-        //{"Heartbeat.stopResource",      "crm_resource -r @ID@ -p target_role -v stopped"},
+        {"Heartbeat.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
+        {"Heartbeat.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
+        {"Heartbeat.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
+        {"Heartbeat.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
         {"Heartbeat.migrateResource",   "crm_resource -r @ID@ -H @HOST@ --migrate"},
         {"Heartbeat.unmigrateResource", "crm_resource -r @ID@ --un-migrate"},
 
@@ -145,7 +146,8 @@ public class DistResource extends
         {"Heartbeat.2.0.8.getOCFParameters", "export OCF_ROOT=/usr/lib/ocf; for s in `ls -1 /usr/lib/ocf/resource.d/heartbeat/ | grep -v Pure-FTPd|grep -v mysql`; do /usr/lib/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done"},
         /* vmxpath env is needed so that vmware meta-data does not hang */
         {"Heartbeat.getOCFParameters", "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/lib/ocf; for s in `ls -1 /usr/lib/ocf/resource.d/heartbeat/ `; do /usr/lib/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done; /usr/local/bin/drbd-gui-helper get-old-style-resources; /usr/local/bin/drbd-gui-helper get-lsb-resources"},
-        {"Heartbeat.getHbStatus",    "/usr/local/bin/drbd-gui-helper get-mgmt-events"},
+        {"Heartbeat.getClusterMetadata", "/usr/local/bin/drbd-gui-helper get-cluster-metadata"},
+        {"Heartbeat.getHbStatus",    "/usr/local/bin/drbd-gui-helper get-cluster-events"},
         {"Heartbeat.start",          "/etc/init.d/heartbeat start"},
         {"Heartbeat.isStarted",      "/etc/init.d/heartbeat status > /dev/null"},
         {"Heartbeat.reloadHeartbeat", "/etc/init.d/heartbeat reload"},

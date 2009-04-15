@@ -56,6 +56,8 @@ public class HeartbeatService {
     private final List<String> parameters = new ArrayList<String>();
     /** List of required parameters. */
     private final List<String> paramRequired = new ArrayList<String>();
+    /** List of parameters that are meta attributes. */
+    private final List<String> paramIsMetaAttr = new ArrayList<String>();
     /** Map from parameter to its long description. */
     private final Map<String, String> paramLongDesc =
                                                   new HashMap<String, String>();
@@ -75,6 +77,7 @@ public class HeartbeatService {
     /** Map that holds default values for operations. The keys are the name and
      * parameter. */
     private final MultiKeyMap opToDefault = new MultiKeyMap();
+    /** Whether the parameter is a meta attribute. */
 
     /**
      * Prepares a new <code>HeartbeatService</code> object.
@@ -330,6 +333,29 @@ public class HeartbeatService {
      */
     public final boolean isDrbddisk() {
         return "drbddisk".equals(name) && isHeartbeatClass();
+    }
+
+    /**
+     * Sets whether the supplied parameter is meta attribute.
+     */
+    public final void setParamIsMetaAttr(final String param,
+                                         final boolean isMetaAttr) {
+        if (!parameters.contains(param)) {
+            wrongParameterError(param);
+            return;
+        }
+        if (isMetaAttr) {
+            paramIsMetaAttr.add(param);
+        } else {
+            paramIsMetaAttr.remove(param);
+        }
+    }
+
+    /**
+     * Returns whether the parameter is meta attribute.
+     */
+    public final boolean isParamMetaAttr(final String param) {
+        return paramIsMetaAttr.contains(param);
     }
 
     /**

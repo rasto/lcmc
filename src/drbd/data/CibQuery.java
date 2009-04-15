@@ -24,6 +24,8 @@ package drbd.data;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
@@ -38,9 +40,10 @@ public class CibQuery {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** crm_config / global config data. */
-    private Map<String, String> crmConfig;
+    private Map<String, String> crmConfig = new HashMap<String, String>();
     /** Map with resources and its parameters. */
-    private Map<String, Map<String, String>> parameters;
+    private Map<String, Map<String, String>> parameters =
+                                    new HashMap<String, Map<String, String>>();
     /** Map with resources and parameters nvpair ids. */
     private Map<String, Map<String, String>> parametersNvpairsIds;
     /** Map with resource type. */
@@ -48,13 +51,15 @@ public class CibQuery {
     /** Map with resource instance_attributes id. */
     private Map<String, String> resourceInstanceAttrId;
     /** Colocation map. */
-    private Map<String, List<String>> colocation;
+    private Map<String, List<String>> colocation =
+                                           new HashMap<String, List<String>>();
     /** Colocation score map. */
     private MultiKeyMap colocationScore;
     /** Colocation id map. */
     private MultiKeyMap colocationId;
     /** Order map. */
-    private Map<String, List<String>> order;
+    private Map<String, List<String>> order =
+                                           new HashMap<String, List<String>>();
     /** Order score map. */
     private MultiKeyMap orderScore;
     /** if order is symmetrical map. */
@@ -81,11 +86,16 @@ public class CibQuery {
     /** <op> tag id map. */
     private Map<String, Map<String, String>> resOpIds =
                                     new HashMap<String, Map<String, String>>();
+    /** List of active nodes. */
+    private Set<String> activeNodes= new HashSet<String>();
+    /** Group to resources map. */
+    private Map<String, List<String>> groupsToResources =
+                                           new HashMap<String, List<String>>();
 
     /**
      * Sets crm config map.
      */
-    public final void setCrmConfig(Map<String, String> crmConfig) {
+    public final void setCrmConfig(final Map<String, String> crmConfig) {
         this.crmConfig = crmConfig;
     }
 
@@ -101,7 +111,7 @@ public class CibQuery {
      * second key being the parameter name.
      */
     public final void setParameters(
-                                Map<String, Map<String, String>> parameters) {
+                           final Map<String, Map<String, String>> parameters) {
         this.parameters = parameters;
     }
 
@@ -132,7 +142,7 @@ public class CibQuery {
      * Sets the resource type map.
      */
     public final void setResourceType(
-                                Map<String, HeartbeatService> resourceType) {
+                            final Map<String, HeartbeatService> resourceType) {
         this.resourceType = resourceType;
     }
 
@@ -148,7 +158,7 @@ public class CibQuery {
      * Sets the resource instance_attributes id map.
      */
     public final void setResourceInstanceAttrId(
-                                Map<String, String> resourceInstanceAttrId) {
+                            final Map<String, String> resourceInstanceAttrId) {
         this.resourceInstanceAttrId = resourceInstanceAttrId;
     }
 
@@ -164,7 +174,8 @@ public class CibQuery {
      * Sets the colocation map with one resource as a key and list of resources
      * with which it is colocated.
      */
-    public final void setColocation(Map<String, List<String>> colocation) {
+    public final void setColocation(
+                                final Map<String, List<String>> colocation) {
         this.colocation = colocation;
     }
 
@@ -178,7 +189,7 @@ public class CibQuery {
     /**
      * Sets colocation score map.
      */
-    public final void setColocationScore(MultiKeyMap colocationScore) {
+    public final void setColocationScore(final MultiKeyMap colocationScore) {
         this.colocationScore = colocationScore;
     }
 
@@ -192,7 +203,7 @@ public class CibQuery {
     /**
      * Sets colocation id map.
      */
-    public final void setColocationId(MultiKeyMap colocationId) {
+    public final void setColocationId(final MultiKeyMap colocationId) {
         this.colocationId = colocationId;
     }
 
@@ -206,7 +217,7 @@ public class CibQuery {
     /**
      * Sets order map.
      */
-    public final void setOrder(Map<String, List<String>> order) {
+    public final void setOrder(final Map<String, List<String>> order) {
         this.order = order;
     }
 
@@ -220,7 +231,7 @@ public class CibQuery {
     /**
      * Sets order id map.
      */
-    public final void setOrderId(MultiKeyMap orderId) {
+    public final void setOrderId(final MultiKeyMap orderId) {
         this.orderId = orderId;
     }
 
@@ -234,7 +245,7 @@ public class CibQuery {
     /**
      * Sets order score map.
      */
-    public final void setOrderScore(MultiKeyMap orderScore) {
+    public final void setOrderScore(final MultiKeyMap orderScore) {
         this.orderScore = orderScore;
     }
 
@@ -248,7 +259,7 @@ public class CibQuery {
     /**
      * Sets if order is symmetrical map.
      */
-    public final void setOrderSymmetrical(MultiKeyMap orderSymmetrical) {
+    public final void setOrderSymmetrical(final MultiKeyMap orderSymmetrical) {
         this.orderSymmetrical = orderSymmetrical;
     }
 
@@ -262,7 +273,7 @@ public class CibQuery {
     /**
      * Sets order direction map.
      */
-    public final void setOrderDirection(MultiKeyMap orderDirection) {
+    public final void setOrderDirection(final MultiKeyMap orderDirection) {
         this.orderDirection = orderDirection;
     }
 
@@ -276,7 +287,7 @@ public class CibQuery {
     /**
      * Sets location map.
      */
-    public final void setLocation(Map<String, Map<String, String>> location) {
+    public final void setLocation(final Map<String, Map<String, String>> location) {
         this.location = location;
     }
 
@@ -290,7 +301,7 @@ public class CibQuery {
     /**
      * Sets locations id map.
      */
-    public final void setLocationsId(Map<String, List<String>> locationsId) {
+    public final void setLocationsId(final Map<String, List<String>> locationsId) {
         this.locationsId = locationsId;
     }
 
@@ -304,7 +315,7 @@ public class CibQuery {
     /**
      * Sets map from location id to the score.
      */
-    public final void setLocationScore(Map<String, String> locationScore) {
+    public final void setLocationScore(final Map<String, String> locationScore) {
         this.locationScore = locationScore;
     }
 
@@ -318,7 +329,7 @@ public class CibQuery {
     /**
      * Sets map from resource and host to the location id.
      */
-    public final void setResHostToLocId(MultiKeyMap resHostToLocId) {
+    public final void setResHostToLocId(final MultiKeyMap resHostToLocId) {
         this.resHostToLocId = resHostToLocId;
     }
 
@@ -332,7 +343,7 @@ public class CibQuery {
     /**
      * Sets operations map.
      */
-    public final void setOperations(MultiKeyMap operations) {
+    public final void setOperations(final MultiKeyMap operations) {
         this.operations = operations;
     }
 
@@ -346,7 +357,7 @@ public class CibQuery {
     /**
      * Sets operations id map.
      */
-    public final void setOperationsId(Map<String, String> operationsId) {
+    public final void setOperationsId(final Map<String, String> operationsId) {
         this.operationsId = operationsId;
     }
 
@@ -360,7 +371,7 @@ public class CibQuery {
     /**
      * Sets <op> tag id map.
      */
-    public final void setResOpIds(Map<String, Map<String, String>> resOpIds) {
+    public final void setResOpIds(final Map<String, Map<String, String>> resOpIds) {
         this.resOpIds = resOpIds;
     }
 
@@ -369,5 +380,34 @@ public class CibQuery {
      */
     public final Map<String, Map<String, String>> getResOpIds() {
         return resOpIds;
+    }
+
+    /**
+     * Sets active nodes.
+     */
+    public final void setActiveNodes(final Set<String> activeNodes) {
+        this.activeNodes = activeNodes;
+    }
+
+    /**
+     * Gets active nodes.
+     */
+    public final Set<String> getActiveNodes() {
+        return activeNodes;
+    }
+
+    /**
+     * Sets the groups to resources map.
+     */
+    public final void setGroupsToResources(
+                           final Map<String, List<String>> groupsToResources) {
+        this.groupsToResources = groupsToResources;
+    }
+
+    /**
+     * Gets the groups to resources map.
+     */
+    public final Map<String, List<String>> getGroupsToResources() {
+        return groupsToResources;
     }
 }

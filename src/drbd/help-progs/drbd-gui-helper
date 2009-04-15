@@ -22,6 +22,11 @@
 use strict;
 use warnings;
 
+use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
+use POSIX qw(:errno_h); # EAGAIN
+
+use Socket;
+
 $ENV{LANG}="C";
 $ENV{LANGUAGE}="C";
 $ENV{LC_LANG}="C";
@@ -58,16 +63,16 @@ if ($option eq "all") {
 	get_drbd_info();
 } elsif ($option eq "get-drbd-events") {
 	get_drbd_events();
-} elsif ($option eq "mgmt") {
-	mgmt(@ARGV);
-} elsif ($option eq "get-mgmt-events") {
-	get_mgmt_events(@ARGV);
 } elsif ($option eq "get-old-style-resources") {
 	get_old_style_resources(@ARGV);
 } elsif ($option eq "get-lsb-resources") {
 	get_lsb_resources(@ARGV);
 } elsif ($option eq "get-drbd-xml") {
 	get_drbd_xml();
+} elsif ($option eq "get-cluster-events") {
+	get_cluster_events();
+} elsif ($option eq "get-cluster-metadata") {
+	get_cluster_metadata();
 } else {
 	die "unknown command";
 }
@@ -358,7 +363,7 @@ sub save_gui_info {
 sub get_drbd_events {
 	my $kidpid;
 	my $pid = $$;
-	die "can’t fork: $!" unless defined($kidpid = fork());
+	die "can't fork: $!" unless defined($kidpid = fork());
 	# TODO: 
 	if ($kidpid) {
 		exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
@@ -455,314 +460,175 @@ sub is_smaller_v {
 	return 0;
 }
 
-sub mgmt {
-	my $passwd = shift;
-	my $hb_version = get_hb_version();
-	return if !$hb_version;
-	my $mgmt_connect_cmd;
-	if (is_smaller_v($hb_version, "2.1.0")) {
-		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\")";
-	} else {
-		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", \"\")";
-	}
-
-	my @args = @_;
-	# TODO python versions
-	system(<<PYTHON);
-/usr/bin/python -c '
-
-import sys, string
-sys.path.append("/usr/lib64/heartbeat-gui")
-sys.path.append("/usr/share/heartbeat-gui")
-sys.path.append("/usr/lib/heartbeat-gui")
-sys.path.append("/usr/lib/heartbeat")
-from pymgmt import *
-
-command = ""
-for arg in sys.argv[1:]:
-	command = command + "\\n"
-	if arg == "..none.." :
-		arg = ""
-	command = command + arg
-command = command.lstrip("\\n")
-ret = $mgmt_connect_cmd
-if ret != 0 :
-	sys.exit(ret)
-ret_str = mgmt_sendmsg(command);
-mgmt_disconnect()
-print ret_str
-' @args
-PYTHON
-	my $ex = $? / 256;
-	exit $ex;
+sub get_message {
+	my $socket = shift;
+        my $msg = "";
+        while (<$socket>) {
+                if ($_ eq "<<<\n") {
+                        return $msg;
+                }
+                if ($_ !~ />>>/) {
+                        $msg .= $_;
+                }
+        }
+        die;
 }
 
-# waits for mgmt events, there is timeout on purpose and it must be restarted.
-sub get_mgmt_events {
-	my $passwd = shift;
-	my $hb_version = get_hb_version();
-	if (!$hb_version) {
-		return;
-	}
-	
-	my $mgmt_connect_cmd;
-	if (is_smaller_v($hb_version, "2.1.0")) {
-		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\")";
-	} else {
-		$mgmt_connect_cmd = "mgmt_connect(\"127.0.0.1\", \"hacluster\", \"$passwd\", \"\")";
-	}
+sub cib_message {
+	my $socket = shift;
+	my $msg = shift;
+	$msg = ">>>\n$msg<<<\n";
+	printf $socket pack "L", length $msg;
+        printf $socket pack "L", 0xabcd;
+        print $socket $msg;
+}
 
-	# TODO python versions
-	my $p = <<PYTHON;
-/usr/bin/python -c '
+#
+# Prints heartbeat info, then waits 45 seconds for events, then it quits, so it # can get restarted again. This timeout is required so that a connection loss 
+# can be detected.
+#
+sub get_cluster_events {
+	my $info = get_cluster_info();
+	if ($info) {
+		print "---start---\n";
+		print $info;
+		print "---done---\n";
+		my $rw_socket_name = "/var/run/heartbeat/crm/cib_rw";
+		my $cb_socket_name = "/var/run/heartbeat/crm/cib_callback";
+		
+		socket(my $RW, PF_UNIX, SOCK_STREAM, 0);
+		connect($RW, sockaddr_un($rw_socket_name))
+		    or return "ERROR: Can't connect to $rw_socket_name: $!";
+		select($RW); $| = 1; select (STDOUT);
 
-import sys, string, gobject, thread, time
-sys.path.append("/usr/lib64/heartbeat-gui")
-sys.path.append("/usr/share/heartbeat-gui")
-sys.path.append("/usr/lib/heartbeat-gui")
-sys.path.append("/usr/lib/heartbeat")
-from pymgmt import *
+		socket(my $CB, PF_UNIX, SOCK_STREAM, 0);
+		connect($CB, sockaddr_un($cb_socket_name))
+		    or return "ERROR: Can't connect to $cb_socket_name: $!";
+		select($CB); $| = 1; select (STDOUT);
+		my $msg = get_message($RW);
+		close $RW;
+		my ($op, $clientid, $token) = split /\n/, $msg;
+		$clientid=~s/.*=//;
+		$token=~s/.*=//;
+		cib_message($CB, "cib_op=register\n"
+				 ."cib_callback_token=$token\n"
+				 ."cib_clientname=$clientid\n");
 
-cmds=[
-	"all_nodes", 
-	"active_nodes",
-	"crm_nodes",
-	"hb_config",
-PYTHON
-	if (is_smaller_v($hb_version, "2.1.3")) {
-		$p.='"crm_config",';
-	} elsif (is_smaller_v($hb_version, "2.99.0")) {
-		$p.= <<PYTHON;
-        "crm_config\\nno-quorum-policy",
-        "crm_config\\nsymmetric-cluster",
-        "crm_config\\nstonith-enabled",
-        "crm_config\\nstonith-action",
-        "crm_config\\ndefault-resource-stickiness",
-        "crm_config\\ndefault-resource-failure-stickiness",
-        "crm_config\\nis-managed-default",
-        "crm_config\\ncluster-delay",
-        "crm_config\\nbatch-limit",
-        "crm_config\\ndefault-action-timeout",
-        "crm_config\\nstop-orphan-resources",
-        "crm_config\\nstop-orphan-actions",
-        "crm_config\\nremove-after-stop",
-        "crm_config\\npe-error-series-max",
-        "crm_config\\npe-warn-series-max",
-        "crm_config\\npe-input-series-max",
-        "crm_config\\nstartup-fencing",
-        "crm_config\\nstart-failure-is-fatal",
-        "crm_config\\ndc_deadtime",
-        "crm_config\\ncluster_recheck_interval",
-        "crm_config\\nelection_timeout",
-        "crm_config\\nshutdown_escalation",
-        "crm_config\\ncrmd-integration-timeout",
-        "crm_config\\ncrmd-finalization-timeout",
+		cib_message($CB, "cib_op=cib_notify\n"
+				 ."cib_notify_type=cib_diff_notify\n"
+				 ."cib_notify_activate=1\n");
+		my $byte;
+		my $count = 0;
 
-	"all_rsc",
-	"sub_rsc",
-	"rsc_type",
-	"rsc_attrs",
-	"rsc_metaattrs",
-	"rsc_params",
-	"rsc_full_ops",
-PYTHON
-	} else {
-		# Pacemaker
-		$p.= <<PYTHON
-	"cib_query\\ncib",
-	"all_rsc",
-	"sub_rsc",
-	"rsc_type",
-PYTHON
-	}
-	$p.= <<PYTHON;
-	"dc",
+		my $flags = fcntl($CB, F_GETFL, 0)
+		    or return "ERROR: Couldn't get flags for $cb_socket_name : $!\n";
+		fcntl($CB, F_SETFL, $flags | O_NONBLOCK)
+		    or return "ERROR: Couldn't set flags for $cb_socket_name: $!\n";
 
-	"node_config",
-	"running_rsc",
-
-	"rsc_status",
-	"rsc_running_on",
-	# "rsc_metadata\\nheartbeat\\ndrbddisk\\nheartbeat",
-
-	"get_cos\\nrsc_location",
-	"get_co\\nrsc_location",
-
-	"get_cos\\nrsc_order",
-	"get_co\\nrsc_order",
-
-	"get_cos\\nrsc_colocation",
-	"get_co\\nrsc_colocation",
-	"crm_metadata\\npengine",
-	"crm_metadata\\ncrmd",
-	 ]
-
-
-host_cmds = {
-		"node_config" 			: 1,
-		"running_rsc" 			: 1,
+		if (my $pid = fork) {
+			# wait 45 seconds and kill the child
+			sleep 45;
+			close $CB;
+			kill 1, $pid;
+		}  else {
+			my $cibevent = 0;
+			while (1) {
+				my $len = sysread($CB, $byte, 1);
+				if ($! == EAGAIN || $len != 1) {
+					sleep 2;
+					if ($cibevent > 0) {
+						print "cibevent: $cibevent\n";
+						my $info = get_cluster_info();
+						if ($info) {
+							print "---start---\n";
+							print $info;
+							print "---done---\n";
+						}
+						$cibevent = 0;
+					}
+					next;
+				}
+				if ($byte eq "%") {
+					$count++;
+					if ($count == 3) {
+						$cibevent++;
+						if ($cibevent == 1) {
+							sleep 5;
+						}
+						$count = 0;
+					}
+				} else {
+					$count = 0;
+				}
+			}
 		}
-rsc_cmds = {
-		"rsc_type" 			: 1,
-		"rsc_status" 			: 1,
-		"rsc_running_on"		: 1,
-		"rsc_attrs" 			: 1,
-		"rsc_params" 			: 1,
-		"rsc_full_ops" 			: 1,
-		"sub_rsc" 			: 1,
-		"rsc_metadata" 			: 1,
-		"rsc_metaattrs"			: 1,
-		}
-loc_cmds = {
-      		"get_co\\nrsc_location" 	: 1,
-	   }
-ord_cmds = {
-      		"get_co\\nrsc_order" 		: 1,
-	   }
-col_cmds = {
-      		"get_co\\nrsc_colocation" 	: 1,
-	   }
-PYTHON
-
-	if (is_smaller_v($hb_version, "2.1.4")) {
-		$p.= <<PYTHON;
-extra_attrs = {
-      		  "get_co\\nrsc_colocation" 	: "",
-      		  "get_co\\nrsc_order" 		: "",
-      		  "get_co\\nrsc_location" 	: "",
-	      }
-PYTHON
 	} else {
-		# version => 2.1.4 oder sles10 2.1.3
-		$p.= <<PYTHON;
-extra_attrs = {
-      		  "get_co\\nrsc_colocation" 	: "\\nid\\nfrom\\nto\\nscore\\nfrom_role\\nto_role\\nsymmetrical\\nnode_attribute",
-      		  "get_co\\nrsc_order" 		: "\\nid\\nfrom\\ntype\\nto\\naction\\nto_action\\nscore\\nsymmetrical",
-      		  "get_co\\nrsc_location"       : "\\nid\\nrsc\\nscore",
-	      }
-PYTHON
+		return "ERROR: cib connection error";
 	}
+}
 
-		$p.= <<PYTHON;
-timeout_func = -1
+#
+# Get info from crm_mon and make xml from it. This is used only to find out
+# if a resource is running, not running and/or unmanaged
+# unmanaged etc.
+sub get_resource_status {
+	my $in_rsc_list = 0;
+	my $info = "";
+	for (`crm_mon -1 -r 2>/dev/null`) {
+		if (!$in_rsc_list) {
+			$in_rsc_list = /^Full list of resources/;
+		} else {
+			next if /^\t*$/;
+			my ($rsc, $type, $running, @rest) = split;
+			my $managed;
+			my $running_on = "";
+			if ($running eq "Started") {
+				$running_on = shift @rest;
+			}
+			if (@rest > 0 and $rest[0] eq "(unmanaged)") {
+				$managed = "unmanaged";
+			} else {
+				$managed = "managed";
+			}
+			$info.= "  <resource id=\"$rsc\""
+				." running=\"$running\""
+				." running_on=\"$running_on\""
+				." managed=\"$managed\" />\n";
+		}
+	}
+	if ($info) {
+		return "<resource_status>\n$info\n</resource_status>\n";
+	}
+	return "";
+}
 
-def timeout_exit() :
-	sys.exit(0);
+sub get_cluster_info {
+	my $info = get_resource_status();
+	my $cibinfo = `/usr/sbin/cibadmin -Ql 2>/dev/null`;
+	if ($cibinfo) {
+		my $res_status = "res_status";
+		my $cibquery = "cibadmin";
+		return "$res_status\nok\n$info\n>>>$res_status\n"
+		       ."$cibquery\nok\n$cibinfo\n>>>$cibquery\n";
+	}
+	return "";
+}
 
-def on_event(source, condition, event_str) :
-	msg = mgmt_recvmsg()
-	if msg != None :
-		get_status()
-        return True
-
-def sendmsg(cmd) :
-	ret = mgmt_sendmsg(cmd)
-	if ret == None :
-		return "None"
-	while len(ret)>=4 and ret[:4] == "evt:" :
-		# gobject.idle_add(self.on_event, None, None, ret)
-		ret = mgmt_recvmsg()
-	return ret
-
-def get_status() :
-	global timeout_func
-	mutex.acquire();
-	if timeout_func != -1 :
-		gobject.source_remove(timeout_func)
-	ret = "---start---\\n"
-	for cmd in cmds :
-		if host_cmds.has_key(cmd) :
-			for node in nodes :
-				ret += cmd + "<<<>>>" + node + "\\n"
-				ret += sendmsg(cmd + "\\n" + node) + "\\n"
-				ret += ">>>" + cmd + "<<<>>>" + node + "\\n"
-		elif rsc_cmds.has_key(cmd) :
-			for rsc in rscs :
-				ret += cmd + "<<<>>>" + rsc + "\\n"
-				res = sendmsg(cmd + "\\n" + rsc)
-				ret += res + "\\n"
-
-				ret += ">>>" + cmd + "<<<>>>" + rsc + "\\n"
-				if cmd == "sub_rsc" :
-					for r in string.split(res, "\\n")[1:] :
-						rscs.append(r)
-		elif loc_cmds.has_key(cmd) :
-			for loc in locs :
-				tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
-				ret += tcmd + "<<<>>>" + loc + "\\n"
-				ret += sendmsg(cmd + "\\n" + loc + extra_attrs[cmd]) + "\\n"
-				ret += ">>>" + tcmd + "<<<>>>" + loc + "\\n"
-		elif ord_cmds.has_key(cmd) :
-			for ord in ords :
-				tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
-				ret += tcmd + "<<<>>>" + ord + "\\n"
-				ret += sendmsg(cmd + "\\n" + ord + extra_attrs[cmd]) + "\\n"
-				ret += ">>>" + tcmd + "<<<>>>" + ord + "\\n"
-		elif col_cmds.has_key(cmd) :
-			for col in cols :
-				tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
-				ret += tcmd + "<<<>>>" + col + "\\n"
-				ret += sendmsg(cmd + "\\n" + col + extra_attrs[cmd]) + "\\n"
-				ret += ">>>" + tcmd + "<<<>>>" + col + "\\n"
-		else :
-			tcmd = string.join(string.split(cmd, "\\n"), "<<<>>>")
-			if (string.split(cmd, "\\n")[0] == "get_cos" or 
-			    string.split(cmd, "\\n")[0] == "cib_query" or
-			    string.split(cmd, "\\n")[0] == "crm_config" or
-			    string.split(cmd, "\\n")[0] == "crm_metadata") :
-				res = sendmsg(cmd);
-			else :
-				res = sendmsg(cmd + "\\n");
-			if cmd == "all_nodes" and res == "None" :
-				ret += "error" + "\\n"
-				break
-			ret += tcmd + "\\n"
-			ret += res + "\\n"
-			ret += ">>>" + tcmd + "\\n"
-
-			if cmd == "all_nodes" :
-				nodes = string.split(res, "\\n")[1:]
-			elif cmd == "all_rsc" :
-				rscs = string.split(res, "\\n")[1:]
-			elif cmd == "get_cos\\nrsc_location" :
-				locs = string.split(res, "\\n")[1:]
-			elif cmd == "get_cos\\nrsc_order" :
-				ords = string.split(res, "\\n")[1:]
-			elif cmd == "get_cos\\nrsc_colocation" :
-				cols = string.split(res, "\\n")[1:]
-	print ret
-	timeout_func = gobject.timeout_add(20000, timeout_exit)
-	mutex.release();
-	time.sleep(1)
-	mutex.acquire();
-	print "---done---"
-	mutex.release();
-
-mutex = thread.allocate_lock()
-
-ret = $mgmt_connect_cmd
-
-if ret != 0 :
-	sys.exit(ret)
-get_status()
-
-if mgmt_sendmsg("regevt\\nevt:cib_changed") != "ok" :
-	sys.exit(10)
-mgmt_sendmsg("regevt\\nevt:disconnected")
-fd = mgmt_inputfd()
-if fd < 0 :
-	sys.exit(11)
-gobject.io_add_watch(fd, gobject.IO_IN, on_event, None)
-main_loop = gobject.MainLoop ()
-main_loop.run ()
-
-mgmt_disconnect()
-'
-PYTHON
-	system($p);
-	my $ex = $? / 256;
-	#print "$ex\n";
-	exit $ex;
+sub get_cluster_metadata {
+	print "<metadata>\n";
+	my $pengine = `/usr/lib/heartbeat/pengine metadata 2>/dev/null`;
+	if ($pengine) {
+		# remove first line
+	 	substr $pengine, 0, index($pengine, "\n") + 1, '';
+		print $pengine;
+	}
+	my $crmd = `/usr/lib/heartbeat/crmd metadata 2>/dev/null`;
+	if ($crmd) {
+		# remove first line
+	 	substr $crmd, 0, index($crmd, "\n") + 1, '';
+		print $crmd;
+	}
+	print "</metadata>\n";
 }
 
 sub get_old_style_resources {
@@ -786,8 +652,6 @@ sub get_ocf_like_xml {
 	my $resource = shift;
 	my $dir      = shift;
 	my $class    = shift;
-	# TODO: mgmt rsc_metadata heartbeat IPaddr2 heartbeat returns
-	# something like this too.
 	my $xml      = <<XML;
 <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
 <resource-agent name="$resource" class="$class">
@@ -941,3 +805,4 @@ sub get_hb_version {
 	}
 	return $hb_version;
 }
+

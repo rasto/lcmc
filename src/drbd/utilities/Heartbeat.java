@@ -23,14 +23,12 @@ package drbd.utilities;
 
 import drbd.data.Host;
 import java.util.Map;
-import java.util.List;
 import java.util.HashMap;
 
 /**
  * This class provides heartbeat commands. There are commands that operate on
- * /etc/init.d/heartbeat script and commands that use mgmt protocol to
- * manipulate the crm. The mgmt commands are executed, using the
- * drbd-gui-helper helper program.
+ * /etc/init.d/heartbeat script and commands that use cibadmin and crm_resource
+ * commands to manipulate the cib, crm, etc.
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -91,53 +89,14 @@ public final class Heartbeat {
     }
 
     /**
-     * Returns command that makes mgmt request as string.
-     *
-     * @param command
-     *          mgmt command
-     * @param hbPasswd
-     *          hacluster password
-     * @param args
-     *          arguments delimited with space
-     *
-     * @return command as string
+     * Returns cibadmin command.
      */
-    public static String getMgmtCommand(final String command,
-                                        final String hbPasswd,
-                                        final String args) {
-        return "/usr/local/bin/drbd-gui-helper mgmt "
-               + hbPasswd + " " + command + " " + args;
-    }
-
-    /**
-     * Gets command for set_target_role.
-     *
-     * @param role
-     *          role e.g. started or stopped
-     * @param hbPasswd
-     *          hacluster password
-     * @param heartbeatId
-     *          heartbeat id of the resource
-     *
-     * @return command as string
-     */
-    private static String getRoleCommand(final String role,
-                                         final Host host,
-                                         final String hbPasswd,
-                                         final String heartbeatId) {
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            /* it returns "failed", but it works. */
-            return getMgmtCommand("set_rsc_attr",
-                                  hbPasswd,
-                                  heartbeatId
-                                  + " meta target-role " + role);
-        } else {
-            return getMgmtCommand("set_target_role",
-                                  hbPasswd,
-                                  heartbeatId+ " " + role);
-        }
+    public static String getCibCommand(final String command,
+                                            final String objType,
+                                            final String xml) {
+        return "/usr/sbin/cibadmin --obj_type " + objType + " "
+                                   + command
+                                   + " -X " + xml;
     }
 
     /**
@@ -176,20 +135,22 @@ public final class Heartbeat {
     }
 
     /**
-     * Adds resource to the heartbeat.
+     * Adds or updates resource in the heartbeat.
      *
      * @param host
      *          host on which the command will be executed
      * @param args
      *          argument string
      */
-    public static void addResource(
+    public static void setParameters(
                            final Host host,
+                           final String command, /* -U or -C */
                            final String heartbeatId,
                            final String groupId,
                            final String args,
                            final Map<String, String> pacemakerResAttrs,
                            final Map<String, String> pacemakerResArgs,
+                           final Map<String, String> pacemakerMetaArgs,
                            String instanceAttrId,
                            final Map<String, String> nvpairIdsHash,
                            final Map<String, Map<String, String>> pacemakerOps,
@@ -197,100 +158,113 @@ public final class Heartbeat {
         if (args == null) {
             return;
         }
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            if (instanceAttrId == null) {
-                instanceAttrId = heartbeatId + "-instance_attributes";
-            }
-            /* pacemaker */
-            final StringBuffer attrsString = new StringBuffer(100);
-            for (final String attrName : pacemakerResAttrs.keySet()) {
-                final String value = pacemakerResAttrs.get(attrName);
-                attrsString.append(attrName);
-                attrsString.append("=\\\"");
-                attrsString.append(value);
-                attrsString.append("\\\"\\ ");
-            }
-            
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append('\'');
-            if (groupId != null) {
-                xml.append("\\<group\\ id=\\\"");
-                xml.append(groupId);
-                xml.append("\\\"\\>");
-            }
-            xml.append("\\<primitive\\ ");
-            xml.append(attrsString);
-            xml.append("\\>");
-            /* instance_attributes */
-            if (!pacemakerResArgs.isEmpty()) {
-                xml.append("\\<instance_attributes\\ id=\\\"");
-                xml.append(instanceAttrId);
-                xml.append("\\\"\\>");
 
-                for (final String paramName : pacemakerResArgs.keySet()) {
-                    final String value = pacemakerResArgs.get(paramName);
-                    String nvpairId = null;
-                    if (nvpairIdsHash != null) {
-                        nvpairId = nvpairIdsHash.get(paramName);
-                    }
-                    if (nvpairId == null) {
-                        nvpairId = "nvpair-"
-                                   + heartbeatId
-                                   + "-"
-                                   + paramName;
-                    }
-                    xml.append("\\<nvpair\\ id=\\\"");
-                    xml.append(nvpairId);
-                    xml.append("\\\"\\ name=\\\"");
-                    xml.append(paramName);
-                    xml.append("\\\"\\ value=\\\"");
-                    xml.append(value);
-                    xml.append("\\\"/\\>");
-                }
-                xml.append("\\</instance_attributes\\>");
+        if (instanceAttrId == null) {
+            instanceAttrId = heartbeatId + "-instance_attributes";
+        }
+        final StringBuffer attrsString = new StringBuffer(100);
+        for (final String attrName : pacemakerResAttrs.keySet()) {
+            final String value = pacemakerResAttrs.get(attrName);
+            attrsString.append(attrName);
+            attrsString.append("=\"");
+            attrsString.append(value);
+            attrsString.append("\" ");
+        }
+        
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append('\'');
+        if (groupId != null) {
+            xml.append("<group id=\"");
+            xml.append(groupId);
+            xml.append("\">");
+        }
+        xml.append("<primitive ");
+        xml.append(attrsString);
+        xml.append(">");
+        /* instance_attributes */
+        if (!pacemakerResArgs.isEmpty()) {
+            xml.append("<instance_attributes id=\"");
+            xml.append(instanceAttrId);
+            xml.append("\">");
+            final String hbVersion = host.getHeartbeatVersion();
+            if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+                /* 2.1.4 */
+                xml.append("<attributes>");
             }
-            /* operations */
-            if (!pacemakerOps.isEmpty()) {
-                xml.append("\\<operations\\ id=\\\"");
+
+            for (final String paramName : pacemakerResArgs.keySet()) {
+                final String value = pacemakerResArgs.get(paramName);
+                String nvpairId = null;
+                if (nvpairIdsHash != null) {
+                    nvpairId = nvpairIdsHash.get(paramName);
+                }
+                if (nvpairId == null) {
+                    nvpairId = "nvpair-"
+                               + heartbeatId
+                               + "-"
+                               + paramName;
+                }
+                xml.append("<nvpair id=\"");
+                xml.append(nvpairId);
+                xml.append("\" name=\"");
+                xml.append(paramName);
+                xml.append("\" value=\"");
+                xml.append(value);
+                xml.append("\"/>");
+            }
+            if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+                /* 2.1.4 */
+                xml.append("</attributes>");
+            }
+            xml.append("</instance_attributes>");
+        }
+        /* operations */
+        if (!pacemakerOps.isEmpty()) {
+
+            final String hbVersion = host.getHeartbeatVersion();
+            if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
+                // 2.1.4 does not have the id.
                 if (operationsId == null) {
                     operationsId = heartbeatId + "-operations";
                 }
+                xml.append("<operations id=\"");
                 xml.append(operationsId);
-                xml.append("\\\"\\>");
-                for (final String op : pacemakerOps.keySet()) {
-                    Map<String, String> opHash = pacemakerOps.get(op);
-                    xml.append("\\<op"); //id=\\\"");
-                    //xml.append(opId);
-                    for (final String name : opHash.keySet()) {
-                        final String value = opHash.get(name);
-                        xml.append("\\ ");
-                        xml.append(name);
-                        xml.append("=\\\"");
-                        xml.append(value);
-                        xml.append("\\\"");
-                    }
-                    xml.append("/\\>");
+                xml.append("\">");
+            } else {
+                xml.append("<operations>");
+            }
+            for (final String op : pacemakerOps.keySet()) {
+                Map<String, String> opHash = pacemakerOps.get(op);
+                xml.append("<op");
+                for (final String name : opHash.keySet()) {
+                    final String value = opHash.get(name);
+                    xml.append(" ");
+                    xml.append(name);
+                    xml.append("=\"");
+                    xml.append(value);
+                    xml.append("\"");
                 }
-                xml.append("\\</operations\\>");
+                xml.append("/>");
             }
-            xml.append("\\</primitive\\>");
-            if (groupId != null) {
-                xml.append("\\</group\\>");
-            }
-            xml.append('\'');
-
-            final String command = getMgmtCommand(
-                                          "cib_update resources",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            final String command = getMgmtCommand("add_rsc",
-                                                  host.getCluster().getHbPasswd(),
-                                                  args);
-            execCommand(host, command, true);
+            xml.append("</operations>");
         }
+        /* meta_attributes */
+        if (!pacemakerMetaArgs.isEmpty()) {
+            xml.append(getMetaAttributes(host,
+                                         heartbeatId,
+                                         pacemakerMetaArgs));
+        }
+        xml.append("</primitive>");
+        if (groupId != null) {
+            xml.append("</group>");
+        }
+        xml.append('\'');
+
+        execCommand(host,
+                    getCibCommand(command,
+                                  "resources",
+                                  xml.toString()),
+                    true);
     }
 
     /**
@@ -304,16 +278,8 @@ public final class Heartbeat {
     public static void addGroup(final Host host,
                                 final String args) {
         if (args == null) {
+            /* does nothing, group is added with the first resource. */
             return;
-        }
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-        } else {
-            final String command = getMgmtCommand("add_grp",
-                                                  host.getCluster().getHbPasswd(),
-                                                  args);
-            execCommand(host, command, true);
         }
     }
 
@@ -338,110 +304,29 @@ public final class Heartbeat {
                                    final String onHost,
                                    final String score,
                                    String locationId) {
+        String command = "-U";
         if (locationId == null) {
             locationId = "loc_" + heartbeatId + "_" + onHost;
+            command = "-C";
         }
-        /* boolean operation is from heartbeat 2.1.3 (not anymore) */
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<rsc_location\\ id=\\\"");
-            xml.append(locationId);
-            xml.append("\\\"\\ rsc=\\\"");
-            xml.append(heartbeatId);
-            xml.append("\\\"\\ node=\\\"");
-            xml.append(onHost);
-            if (score != null) {
-                xml.append("\\\"\\ score=\\\"");
-                xml.append(score);
-            }
-            xml.append("\\\"/\\>'");
-            final String command = getMgmtCommand(
-                                          "cib_update constraints",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            String booleanOperation;
-            if (Tools.compareVersions(hbVersion, "2.1.3") >= 0) {
-                booleanOperation = "and ";
-            } else {
-                booleanOperation = "";
-            }
-            final String args = "rsc_location "
-                                + locationId + " "
-                                + heartbeatId + " "
-                                + "\"" + score + "\" "
-                                + booleanOperation
-                                + "expr_" + locationId + " "
-                                + "\\\\#uname "
-                                + "eq "
-                                + onHost;
-            final String command = getMgmtCommand("up_co",
-                                                  host.getCluster().getHbPasswd(),
-                                                  args);
-            execCommand(host, command, true);
+ 
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_location id=\"");
+        xml.append(locationId);
+        xml.append("\" rsc=\"");
+        xml.append(heartbeatId);
+        xml.append("\" node=\"");
+        xml.append(onHost);
+        if (score != null) {
+            xml.append("\" score=\"");
+            xml.append(score);
         }
-    }
-
-    /**
-     * Adds operation (start, stop, etc. ) in the heartbeat.
-     * Does nothing in newer pacemaker versions. The operations are added in
-     * addResource.
-     */
-    public static void addOperation(final Host host,
-                                    final String heartbeatId,
-                                    final String operation,
-                                    final List<String> args) {
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
-            final String argsString = Integer.toString(args.size() + 1) + " " 
-                                + heartbeatId + " "
-                                + heartbeatId + "_" + operation + " "
-                                + Tools.join(" ",
-                                             args.toArray(new String[args.size()])); 
-            final String command = getMgmtCommand("up_rsc_full_ops",
-                                                  host.getCluster().getHbPasswd(),
-                                                  argsString);
-            execCommand(host, command, true);
-        }
-    }
-
-    /**
-     * Adds meta attribute (e.g. target_role, is_managed) in the heartbeat.
-     * Target_role can be added also differently. See getRoleCommand.
-     * Works till heartbeat 2.1.4
-     */
-    public static void addMetaAttributeOld(final Host host,
-                                        final String heartbeatId,
-                                        final String attribute,
-                                        final String value) {
-        final String argsString = heartbeatId + " "
-                                  + heartbeatId + "_metaattr_" + attribute
-                                  + " " + attribute + " "
-                                  + value;
-        final String command = getMgmtCommand("up_rsc_metaattrs",
-                                              host.getCluster().getHbPasswd(),
-                                              argsString);
-        execCommand(host, command, true);
-    }
-
-    /**
-     * Adds meta attribute (e.g. target_role, is_managed) in the heartbeat.
-     * Target_role can be added also differently. See getRoleCommand.
-     */
-    public static void addMetaAttribute(final Host host,
-                                        final String heartbeatId,
-                                        final String attribute,
-                                        final String value) {
-        final String argsString = heartbeatId + " meta "
-                                  + attribute + " "
-                                  + value;
-        final String command = getMgmtCommand("set_rsc_attr",
-                                              host.getCluster().getHbPasswd(),
-                                              argsString);
-        execCommand(host, command, true);
+        xml.append("\"/>'");
+        execCommand(host,
+                    getCibCommand(command,
+                                  "constraints",
+                                  xml.toString()),
+                    true);
     }
 
     /**
@@ -451,32 +336,20 @@ public final class Heartbeat {
                                       final String locationId,
                                       final String heartbeatId,
                                       final String score) {
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<rsc_location\\ id=\\\"");
-            xml.append(locationId);
-            xml.append("\\\"\\ rsc=\\\"");
-            xml.append(heartbeatId);
-            if (score != null) {
-                xml.append("\\\"\\ score=\\\"");
-                xml.append(score);
-            }
-            xml.append("\\\"/\\>'");
-            final String command = getMgmtCommand(
-                                          "cib_delete constraints",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            final String args = "rsc_location " + locationId;
-            final String command = getMgmtCommand(
-                                               "del_co",
-                                               host.getCluster().getHbPasswd(),
-                                               args);
-            execCommand(host, command, true);
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_location id=\"");
+        xml.append(locationId);
+        xml.append("\" rsc=\"");
+        xml.append(heartbeatId);
+        if (score != null) {
+            xml.append("\" score=\"");
+            xml.append(score);
         }
+        xml.append("\"/>'");
+        final String command = getCibCommand("-D",
+                                             "constraints",
+                                             xml.toString()); 
+        execCommand(host, command, true);
     }
 
 
@@ -491,42 +364,28 @@ public final class Heartbeat {
     public static void removeResource(final Host host,
                                       final String heartbeatId,
                                       final String groupId) {
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append('\'');
-            if (groupId != null) {
-                /* when removing the last resource in a group, remove the
-                 * whole group. */
-                xml.append("\\<group\\ id=\\\"");
-                xml.append(groupId);
-                xml.append("\\\"\\>");
-            }
-            xml.append("\\<primitive\\ id=\\\"");
-            xml.append(heartbeatId);
-            xml.append("\\\"\\>");
-            xml.append("\\</primitive\\>");
-            if (groupId != null) {
-                xml.append("\\</group\\>");
-            }
-            xml.append('\'');
-            final String command = getMgmtCommand(
-                                          "cib_delete resources",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            final String command = getRoleCommand(
-                                              "stopped",
-                                              host,
-                                              host.getCluster().getHbPasswd(),
-                                              heartbeatId) + "; "
-                               + getMgmtCommand("del_rsc",
-                                              host.getCluster().getHbPasswd(),
-                                              heartbeatId);
-            execCommand(host, command, true);
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append('\'');
+        if (groupId != null) {
+            /* when removing the last resource in a group, remove the
+             * whole group. */
+            xml.append("<group id=\"");
+            xml.append(groupId);
+            xml.append("\">");
         }
+        xml.append("<primitive id=\"");
+        xml.append(heartbeatId);
+        xml.append("\">");
+        xml.append("</primitive>");
+        if (groupId != null) {
+            xml.append("</group>");
+        }
+        xml.append('\'');
+        final String command = getCibCommand(
+                                      "-D",
+                                      "resources",
+                                      xml.toString()); 
+        execCommand(host, command, true);
     }
 
     /**
@@ -535,21 +394,13 @@ public final class Heartbeat {
     public static void cleanupResource(final Host host,
                                        final String heartbeatId,
                                        final Host[] clusterHosts) {
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
-            /* make cleanup on all cluster hosts. */
-            for (Host clusterHost : clusterHosts) {
-                final String command = getMgmtCommand(
-                                               "cleanup_rsc",
-                                               host.getCluster().getHbPasswd(),
-                                               clusterHost.getName()
-                                               + " " + heartbeatId);
-                execCommand(host, command, true);
-            }
-        } else {
-            final String command = getMgmtCommand("cleanup_rsc",
-                                                  host.getCluster().getHbPasswd(),
-                                                  heartbeatId);
+        /* make cleanup on all cluster hosts. */
+        for (Host clusterHost : clusterHosts) {
+            final String command = convert(
+                              host.getCommand("Heartbeat.cleanupResource"),
+                              heartbeatId,
+                              clusterHost.getName(),
+                              "");
             execCommand(host, command, true);
         }
     }
@@ -564,11 +415,43 @@ public final class Heartbeat {
      */
     public static void startResource(final Host host,
                                      final String heartbeatId) {
-        final String command = getRoleCommand("started",
-                                              host,
-                                              host.getCluster().getHbPasswd(),
-                                              heartbeatId);
+        final String command = convert(
+                                 host.getCommand("Heartbeat.startResource"),
+                                 heartbeatId, "", "");
         execCommand(host, command, true);
+    }
+
+    private static String getMetaAttributes(final Host host,
+                                           final String heartbeatId,
+                                           final Map<String, String> attrs) {
+        StringBuffer xml = new StringBuffer(360);
+        xml.append("<meta_attributes id=\"");
+        xml.append(heartbeatId);
+        xml.append("_meta_attrs\">");
+
+        final String hbVersion = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* 2.1.4 */
+            xml.append("<attributes>");
+        }
+        for (final String attr : attrs.keySet()) {
+            xml.append("<nvpair id=\"");
+            xml.append(heartbeatId);
+            xml.append("-meta-options-");
+            xml.append(attr);
+            xml.append("\" name=\"");
+            xml.append(attr);
+            xml.append("\" value=\"");
+            xml.append(attrs.get(attr));
+            xml.append("\"/>");
+        }
+
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* 2.1.4 */
+            xml.append("</attributes>");
+        }
+        xml.append("</meta_attributes>");
+        return xml.toString();
     }
 
     /**
@@ -576,14 +459,17 @@ public final class Heartbeat {
      */
     public static void setManaged(final Host host,
                                   final String heartbeatId,
-                                  final String isManaged) {
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            addMetaAttribute(host, heartbeatId, "is-managed", isManaged);
+                                  final boolean isManaged) {
+        String string;
+        if (isManaged) {
+            string = "Heartbeat.isManagedOn";
         } else {
-            addMetaAttributeOld(host, heartbeatId, "is_managed", isManaged);
+            string = "Heartbeat.isManagedOff";
         }
+        final String command = convert(
+                                 host.getCommand(string),
+                                 heartbeatId, "", "");
+        execCommand(host, command, true);
     }
 
     /**
@@ -596,10 +482,9 @@ public final class Heartbeat {
      */
     public static void stopResource(final Host host,
                                     final String heartbeatId) {
-        final String command = getRoleCommand("stopped",
-                                              host,
-                                              host.getCluster().getHbPasswd(),
-                                              heartbeatId);
+        final String command = convert(
+                                 host.getCommand("Heartbeat.stopResource"),
+                                 heartbeatId, "", "");
         execCommand(host, command, true);
     }
 
@@ -643,105 +528,36 @@ public final class Heartbeat {
     }
 
     /**
-     * Sets parameters for resource with 'heartbeatId' in the heartbeat.
-     *
-     * @param host
-     *          host on which the command will be executed
-     * @param heartbeatId
-     *          heartbeatId
-     * @param args
-     *          heartbeat args
-     */
-    public static void setParameters(final Host host,
-                                     final String heartbeatId,
-                                     final String groupId,
-                                     final String args,
-                                   final Map<String, String> pacemakerResAttrs,
-                                   final Map<String, String> pacemakerResArgs,
-                                   final String instanceAttrId,
-                                   final Map<String, String> nvpairIdsHash,
-                                   final Map<String, Map<String, String>> pacemakerOps,
-                                   final String operationsId) {
-
-        final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            addResource(host,
-                        heartbeatId,
-                        groupId,
-                        args,
-                        pacemakerResAttrs,
-                        pacemakerResArgs,
-                        instanceAttrId,
-                        nvpairIdsHash,
-                        pacemakerOps,
-                        operationsId);
-        } else {
-            final String command = getMgmtCommand(
-                                               "up_rsc_params",
-                                               host.getCluster().getHbPasswd(),
-                                               args);
-            execCommand(host, command, true);
-        }
-    }
-
-    /**
-     * Sets parameters for group with 'heartbeatId' in the heartbeat.
-     *
-     * TODO: Same as setParameters?
-     *
-     * @param host
-     *          host on which the command will be executed
-     * @param heartbeatId
-     *          heartbeatId
-     * @param args
-     *          heartbeat args
-     */
-    public static void setGroupParameters(final Host host,
-                                          final String heartbeatId,
-                                          final String args) {
-        final String command = getMgmtCommand("up_rsc_params",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
-    }
-
-    /**
      * Sets global heartbeat parameters.
      */
     public static void setGlobalParameters(final Host host,
                                            final Map<String,String> args) {
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<crm_config><cluster_property_set id=\"cib-bootstrap-options\">");
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<crm_config\\>\\<cluster_property_set\\ id=\\\"cib-bootstrap-options\\\"\\>");
-            for (String arg : args.keySet()) {
-                String id = "cib-bootstrap-options-" + arg;
-                xml.append("\\<nvpair\\ id=\\\"");
-                xml.append(id);
-                xml.append("\\\"\\ name=\\\"");
-                xml.append(arg);
-                xml.append("\\\"\\ value=\\\"");
-                xml.append(args.get(arg));
-                xml.append("\\\"/\\>");
-            }
-            xml.append("\\</cluster_property_set\\>\\</crm_config\\>'");
-            final String command = getMgmtCommand(
-                                          "cib_replace crm_config",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            for (String arg : args.keySet()) {
-                final String command = getMgmtCommand(
-                                              "up_crm_config",
-                                              host.getCluster().getHbPasswd(),
-                                              arg
-                                              + " \"" + args.get(arg) + "\"");
-                execCommand(host, command, true);
-            }
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* 2.1.4 */
+            xml.append("<attributes>");
         }
+        for (String arg : args.keySet()) {
+            String id = "cib-bootstrap-options-" + arg;
+            xml.append("<nvpair id=\"");
+            xml.append(id);
+            xml.append("\" name=\"");
+            xml.append(arg);
+            xml.append("\" value=\"");
+            xml.append(args.get(arg));
+            xml.append("\"/>");
+        }
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* 2.1.4 */
+            xml.append("</attributes>");
+        }
+        xml.append("</cluster_property_set></crm_config>'");
+        final String command = getCibCommand("-R",
+                                             "crm_config",
+                                             xml.toString()); 
+        execCommand(host, command, true);
     }
 
     /**
@@ -753,33 +569,29 @@ public final class Heartbeat {
                                         final String rsc2,
                                         final String score) {
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<rsc_colocation\\ id=\\\"");
-            xml.append(colocationId);
-            xml.append("\\\"\\ rsc=\\\"");
-            xml.append(rsc1);
-            if (score != null) {
-                xml.append("\\\"\\ score=\\\"");
-                xml.append(score);
-            }
-            xml.append("\\\"\\ with-rsc=\\\"");
-            xml.append(rsc2);
-            xml.append("\\\"/\\>'");
-            final String command = getMgmtCommand(
-                                          "cib_delete constraints",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            final String args = "rsc_colocation " + colocationId;
-            final String command = getMgmtCommand(
-                                              "del_co",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-            execCommand(host, command, true);
+        String rscString = "rsc";
+        String withRscString = "with-rsc";
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* <= 2.1.4 */
+            rscString = "from";
+            withRscString = "to";
         }
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_colocation id=\"");
+        xml.append(colocationId);
+        xml.append("\" " + rscString + "=\"");
+        xml.append(rsc1);
+        if (score != null) {
+            xml.append("\" score=\"");
+            xml.append(score);
+        }
+        xml.append("\" " + withRscString + "=\"");
+        xml.append(rsc2);
+        xml.append("\"/>'");
+        final String command = getCibCommand("-D",
+                                             "constraints",
+                                             xml.toString()); 
+        execCommand(host, command, true);
     }
 
     /**
@@ -795,53 +607,30 @@ public final class Heartbeat {
             colocationId = "col_" + parentHbId + "_" + heartbeatId;
         }
         final String score = "INFINITY";
+        String rscString = "rsc";
+        String withRscString = "with-rsc";
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<rsc_colocation\\ id=\\\"");
-            xml.append(colocationId);
-            xml.append("\\\"\\ rsc=\\\"");
-            xml.append(parentHbId);
-            if (score != null) {
-                xml.append("\\\"\\ score=\\\"");
-                xml.append(score);
-            }
-            xml.append("\\\"\\ with-rsc=\\\"");
-            xml.append(heartbeatId);
-            xml.append("\\\"/\\>'");
-            final String command = getMgmtCommand(
-                                          "cib_update constraints",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            String id_str   = "";
-            String from_str = "";
-            String to_str   = "";
-            String score_str = "";
-            if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
-                id_str   = "id ";
-                from_str = "from ";
-                to_str   = "to ";
-                score_str = "score ";
-            }
-
-            final String args = "rsc_colocation "
-                                + id_str
-                                + colocationId + " "
-                                + from_str
-                                + parentHbId   + " "
-                                + to_str
-                                + heartbeatId  + " "
-                                + score_str
-                                + score;
-            final String command =
-                                getMgmtCommand("up_co",
-                                               host.getCluster().getHbPasswd(),
-                                               args);
-            execCommand(host, command, true);
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* <= 2.1.4 */
+            rscString = "from";
+            withRscString = "to";
         }
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_colocation id=\"");
+        xml.append(colocationId);
+        xml.append("\" " + rscString + "=\"");
+        xml.append(parentHbId);
+        if (score != null) {
+            xml.append("\" score=\"");
+            xml.append(score);
+        }
+        xml.append("\" " + withRscString + "=\"");
+        xml.append(heartbeatId);
+        xml.append("\"/>'");
+        final String command = getCibCommand("-C", 
+                                             "constraints",
+                                             xml.toString()); 
+        execCommand(host, command, true);
     }
 
     /**
@@ -854,36 +643,33 @@ public final class Heartbeat {
                                    final String score,
                                    final String symmetrical) {
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<rsc_order\\ id=\\\"");
-            xml.append(orderId);
-            xml.append("\\\"\\ first=\\\"");
-            xml.append(rscFrom);
-            if (score != null) {
-                xml.append("\\\"\\ score=\\\"");
-                xml.append(score);
-            }
-            if (symmetrical != null) {
-                xml.append("\\\"\\ symmetrical=\\\"");
-                xml.append(symmetrical);
-            }
-            xml.append("\\\"\\ then=\\\"");
-            xml.append(rscTo);
-            xml.append("\\\"/\\>'");
-            final String command = getMgmtCommand(
-                                          "cib_delete constraints",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            final String args = "rsc_order " + orderId;
-            final String command = getMgmtCommand("del_co",
-                                                  host.getCluster().getHbPasswd(),
-                                                  args);
-            execCommand(host, command, true);
+        String firstString = "first";
+        String thenString = "then";
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* <= 2.1.4 */
+            firstString = "from";
+            thenString = "to";
         }
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_order id=\"");
+        xml.append(orderId);
+        xml.append("\" " + firstString + "=\"");
+        xml.append(rscFrom);
+        if (score != null) {
+            xml.append("\" score=\"");
+            xml.append(score);
+        }
+        if (symmetrical != null) {
+            xml.append("\" symmetrical=\"");
+            xml.append(symmetrical);
+        }
+        xml.append("\" " + thenString + "=\"");
+        xml.append(rscTo);
+        xml.append("\"/>'");
+        final String command = getCibCommand("-D",
+                                             "constraints",
+                                             xml.toString()); 
+        execCommand(host, command, true);
     }
 
     /**
@@ -896,54 +682,33 @@ public final class Heartbeat {
         final String score = "INFINITY";
         final String symmetrical = null; // TODO:
         final String hbVersion = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbVersion, "2.99.0") >= 0) {
-            /* pacemaker */
-            final StringBuffer xml = new StringBuffer(360);
-            xml.append("'\\<rsc_order\\ id=\\\"");
-            xml.append(orderId);
-            xml.append("\\\"\\ first=\\\"");
-            xml.append(parentHbId);
-            if (score != null) {
-                xml.append("\\\"\\ score=\\\"");
-                xml.append(score);
-            }
-            if (symmetrical != null) {
-                xml.append("\\\"\\ symmetrical=\\\"");
-                xml.append(symmetrical);
-            }
-            xml.append("\\\"\\ then=\\\"");
-            xml.append(heartbeatId);
-            xml.append("\\\"/\\>'");
-            final String command = getMgmtCommand(
-                                          "cib_update constraints",
-                                          host.getCluster().getHbPasswd(),
-                                          xml.toString()); 
-            execCommand(host, command, true);
-        } else {
-            String id_str   = "";
-            String from_str = "";
-            String to_str   = "";
-            String type_str = "";
-            if (Tools.compareVersions(hbVersion, "2.1.4") >= 0) {
-                id_str   = "id ";
-                from_str = "from ";
-                to_str   = "to ";
-                type_str = "type ";
-            }
-            final String args = "rsc_order "
-                                + id_str
-                                + orderId    + " "
-                                + from_str
-                                + parentHbId + " "
-                                + type_str
-                                + "before "
-                                + to_str
-                                + heartbeatId;
-            final String command = getMgmtCommand("up_co",
-                                                  host.getCluster().getHbPasswd(),
-                                                  args);
-            execCommand(host, command, true);
+        String firstString = "first";
+        String thenString = "then";
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* <= 2.1.4 */
+            firstString = "from";
+            thenString = "to";
         }
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_order id=\"");
+        xml.append(orderId);
+        xml.append("\" " + firstString + "=\"");
+        xml.append(parentHbId);
+        if (score != null) {
+            xml.append("\" score=\"");
+            xml.append(score);
+        }
+        if (symmetrical != null) {
+            xml.append("\" symmetrical=\"");
+            xml.append(symmetrical);
+        }
+        xml.append("\" " + thenString + "=\"");
+        xml.append(heartbeatId);
+        xml.append("\"/>'");
+        final String command = getCibCommand("-C",
+                                             "constraints",
+                                             xml.toString()); 
+        execCommand(host, command, true);
     }
 
     /**
@@ -951,11 +716,8 @@ public final class Heartbeat {
      */
     public static void moveGroupResUp(final Host host,
                                       final String heartbeatId) {
-        final String args = heartbeatId + " up";
-        final String command = getMgmtCommand("move_rsc",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+        // TODO: not implemented
+        Tools.appError("not implemented");
     }
 
     /**
@@ -963,11 +725,8 @@ public final class Heartbeat {
      */
     public static void moveGroupResDown(final Host host,
                                         final String heartbeatId) {
-        final String args = heartbeatId + " down";
-        final String command = getMgmtCommand("move_rsc",
-                                              host.getCluster().getHbPasswd(),
-                                              args);
-        execCommand(host, command, true);
+        // TODO: not implemented
+        Tools.appError("not implemented");
     }
 
     /**
@@ -1060,5 +819,4 @@ public final class Heartbeat {
                                        "");
         execCommand(host, command, true);
     }
-
 }

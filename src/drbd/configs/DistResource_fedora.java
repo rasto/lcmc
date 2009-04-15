@@ -44,7 +44,6 @@ public class DistResource_fedora extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
-        {"HbInst.install", "/usr/bin/yum -y install heartbeat && /usr/bin/yum -y install heartbeat-gui"},
-        {"HbGUIInst.install", "/usr/bin/yum -y install heartbeat-gui"},
+        {"HbInst.install", "/usr/bin/yum -y install heartbeat"},
     };
 }

@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -102,6 +104,10 @@ public class HeartbeatOCF extends XML {
     /** Heartbeat boolean true string. */
     private static final String HB_BOOLEAN_TRUE =
                                     Tools.getString("Heartbeat.Boolean.True");
+    /** Target role attribute name. */
+    private static final String TARGET_ROLE_PARAM = "target_role";
+    /** Is managed attribute name. */
+    private static final String IS_MANAGED_PARAM = "is_managed";
 
     /**
      * Prepares a new <code>HeartbeatOCF</code> object.
@@ -109,7 +115,6 @@ public class HeartbeatOCF extends XML {
     public HeartbeatOCF(final Host host) {
         super();
         this.host = host;
-        // TODO: check for drbddisk resource ?
         final String command = host.getCommand("Heartbeat.getOCFParameters");
         final String output =
                     Tools.execCommandProgressIndicator(
@@ -514,6 +519,14 @@ public class HeartbeatOCF extends XML {
     }
 
     /**
+     * Returns whether the parameter is meta attribute or not.
+     */
+    public final boolean isMetaAttr(final HeartbeatService hbService,
+                                    final String param) {
+        return hbService.isParamMetaAttr(param);
+    }
+
+    /**
      * Returns whether the parameter expects an integer value.
      */
     public final boolean isInteger(final HeartbeatService hbService,
@@ -554,7 +567,9 @@ public class HeartbeatOCF extends XML {
      */
     public final String getSection(final HeartbeatService hbService,
                                    final String param) {
-        if (isRequired(hbService, param)) {
+        if (isMetaAttr(hbService, param)) {
+            return Tools.getString("HeartbeatOCF.MetaAttrOptions");
+        } else if (isRequired(hbService, param)) {
             return Tools.getString("HeartbeatOCF.RequiredOptions");
         } else {
             return Tools.getString("HeartbeatOCF.OptionalOptions");
@@ -657,6 +672,33 @@ public class HeartbeatOCF extends XML {
      */
     private void parseParameters(final HeartbeatService hbService,
                                  final Node parametersNode) {
+        /* target_role */
+        hbService.addParameter(TARGET_ROLE_PARAM);
+        hbService.setParamPossibleChoices(TARGET_ROLE_PARAM, 
+                                          new String[]{"started", "stopped"});
+        hbService.setParamIsMetaAttr(TARGET_ROLE_PARAM, true);
+        hbService.setParamRequired(TARGET_ROLE_PARAM, true);
+        hbService.setParamShortDesc(
+                         TARGET_ROLE_PARAM,
+                         Tools.getString("HeartbeatOCF.TargetRole.ShortDesc"));
+        hbService.setParamLongDesc(
+                         TARGET_ROLE_PARAM,
+                         Tools.getString("HeartbeatOCF.TargetRole.LongDesc"));
+        hbService.setParamDefault(TARGET_ROLE_PARAM, "stopped");
+
+        hbService.addParameter(IS_MANAGED_PARAM);
+        hbService.setParamPossibleChoices(IS_MANAGED_PARAM, 
+                                          new String[]{"true", "false"});
+        hbService.setParamIsMetaAttr(IS_MANAGED_PARAM, true);
+        hbService.setParamRequired(IS_MANAGED_PARAM, true);
+        hbService.setParamShortDesc(
+                         IS_MANAGED_PARAM,
+                         Tools.getString("HeartbeatOCF.IsManaged.ShortDesc"));
+        hbService.setParamLongDesc(
+                         IS_MANAGED_PARAM,
+                         Tools.getString("HeartbeatOCF.IsManaged.LongDesc"));
+        hbService.setParamDefault(IS_MANAGED_PARAM, "true");
+
         final NodeList parameters = parametersNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); i++) {
             final Node parameterNode = parameters.item(i);
@@ -800,56 +842,65 @@ public class HeartbeatOCF extends XML {
      *
      * TODO: check if it works with hb != 2.1.[34]
      */
-    public final void parseCrmMetaData(final String which, final String xml) {
+    public final void parseClusterMetaData(final String xml) {
         final Document document = getXMLDocument(xml);
         if (document == null) {
             return;
         }
 
-        /* get root <resource-agent> */
-        final Node raNode = getChildNode(document, "resource-agent");
-        if (raNode == null) {
+        /* get root <metadata> */
+        final Node metadataNode = getChildNode(document, "metadata");
+        if (metadataNode == null) {
             return;
         }
 
-        /* <parameters> */
-        final Node parametersNode = getChildNode(raNode, "parameters");
-        if (parametersNode == null) {
-            return;
-        }
+        /* get <resource-agent> */
+        final NodeList resAgents = metadataNode.getChildNodes();
+        for (int i = 0; i < resAgents.getLength(); i++) {
+            final Node resAgentNode = resAgents.item(i);
+            if (!resAgentNode.getNodeName().equals("resource-agent")) {
+                continue;
+            }
 
-        final NodeList parameters = parametersNode.getChildNodes();
-        for (int i = 0; i < parameters.getLength(); i++) {
-            final Node parameterNode = parameters.item(i);
-            if (parameterNode.getNodeName().equals("parameter")) {
-                final String param = getAttribute(parameterNode, "name");
-                final String required = getAttribute(parameterNode, "required");
-                if (!globalParams.contains(param)) {
-                    globalParams.add(param);
-                }
-                if (required != null && required.equals("1")
-                    && !globalRequiredParams.contains(param)) {
-                    globalRequiredParams.add(param);
-                }
+            /* <parameters> */
+            final Node parametersNode = getChildNode(resAgentNode, "parameters");
+            if (parametersNode == null) {
+                return;
+            }
 
-                /* <longdesc lang="en"> */
-                final Node longdescParamNode = getChildNode(parameterNode,
-                                                            "longdesc");
-                if (longdescParamNode != null) {
-                    final String longDesc = getText(longdescParamNode);
-                    paramGlobalLongDescMap.put(param, longDesc);
-                }
+            final NodeList parameters = parametersNode.getChildNodes();
+            for (int j = 0; j < parameters.getLength(); j++) {
+                final Node parameterNode = parameters.item(j);
+                if (parameterNode.getNodeName().equals("parameter")) {
+                    final String param = getAttribute(parameterNode, "name");
+                    final String required = getAttribute(parameterNode, "required");
+                    if (!globalParams.contains(param)) {
+                        globalParams.add(param);
+                    }
+                    if (required != null && required.equals("1")
+                        && !globalRequiredParams.contains(param)) {
+                        globalRequiredParams.add(param);
+                    }
 
-                /* <content> */
-                final Node contentParamNode = getChildNode(parameterNode,
-                                                           "content");
-                if (contentParamNode != null) {
-                    final String type = getAttribute(contentParamNode, "type");
-                    final String defaultValue = getAttribute(contentParamNode,
-                                                             "default");
+                    /* <longdesc lang="en"> */
+                    final Node longdescParamNode = getChildNode(parameterNode,
+                                                                "longdesc");
+                    if (longdescParamNode != null) {
+                        final String longDesc = getText(longdescParamNode);
+                        paramGlobalLongDescMap.put(param, longDesc);
+                    }
 
-                    paramGlobalTypeMap.put(param, type);
-                    paramGlobalDefaultMap.put(param, defaultValue);
+                    /* <content> */
+                    final Node contentParamNode = getChildNode(parameterNode,
+                                                               "content");
+                    if (contentParamNode != null) {
+                        final String type = getAttribute(contentParamNode, "type");
+                        final String defaultValue = getAttribute(contentParamNode,
+                                                                 "default");
+
+                        paramGlobalTypeMap.put(param, type);
+                        paramGlobalDefaultMap.put(param, defaultValue);
+                    }
                 }
             }
         }
@@ -884,7 +935,7 @@ public class HeartbeatOCF extends XML {
      */
     private final void parsePrimitive(
                 final Node primitiveNode,
-                final String groupId, /* null, if it is not in group */
+                final List<String> groupResList,
                 final Map<String, HeartbeatService> resourceTypeMap,
                 final Map<String, Map<String, String>> parametersMap,
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
@@ -892,13 +943,13 @@ public class HeartbeatOCF extends XML {
                 final MultiKeyMap operationsMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap) {
-        // TODO: group id is not used at the moment, because we get group id
-        // from sub_rsc mgmt command
+        final String hbV = host.getHeartbeatVersion();
         final String hbClass = getAttribute(primitiveNode, "class");
         final String hbId = getAttribute(primitiveNode, "id");
         final String provider = getAttribute(primitiveNode, "provider");
         final String type = getAttribute(primitiveNode, "type");
         resourceTypeMap.put(hbId, getHbService(type, hbClass));
+        groupResList.add(hbId);
         final Map<String, String> params =
                                         new HashMap<String, String>();
         parametersMap.put(hbId, params);
@@ -913,7 +964,16 @@ public class HeartbeatOCF extends XML {
         if (instanceAttrNode != null) {
             final String iAId = getAttribute(instanceAttrNode, "id");
             resourceInstanceAttrIdMap.put(hbId, iAId);
-            final NodeList nvpairsRes = instanceAttrNode.getChildNodes();
+            NodeList nvpairsRes;
+            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+                /* <attributtes> only til 2.1.4 */
+                final Node attrNode =
+                                   getChildNode(instanceAttrNode,
+                                                "attributes");
+                nvpairsRes = attrNode.getChildNodes();
+            } else {
+                nvpairsRes = instanceAttrNode.getChildNodes();
+            }
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
                 if (optionNode.getNodeName().equals("nvpair")) {
@@ -971,23 +1031,60 @@ public class HeartbeatOCF extends XML {
                                                  "meta_attributes");
         if (metaAttrsNode != null) {
             final String metaAttrsId = getAttribute(metaAttrsNode, "id");
+            /* <attributtes> only til 2.1.4 */
+            NodeList nvpairsMA;
+            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+                final Node attrsNode = getChildNode(metaAttrsNode, "attributes");
+                nvpairsMA = attrsNode.getChildNodes();
+            } else {
+                nvpairsMA = metaAttrsNode.getChildNodes();
+            }
             /* <nvpair...> */
             /* target-role and is-managed */
-            final NodeList nvpairsMA = metaAttrsNode.getChildNodes();
             for (int l = 0; l < nvpairsMA.getLength(); l++) {
                 final Node maNode = nvpairsMA.item(l);
                 if (maNode.getNodeName().equals("nvpair")) {
                     final String nvpairId = getAttribute(maNode, "id");
                     final String name = getAttribute(maNode, "name");
                     final String value = getAttribute(maNode, "value");
-                    // TODO: for now I get this info from rsc_status mgmt command
+                    params.put(name, value);
+                    nvpairIds.put(name, nvpairId);
                 }
             }
         }
     }
 
     /**
-     * Returns hash with information from the cib node.
+     * Returns a hash with resource information. (running_on)
+     */
+    public final Map<String,String> parseResStatus(final String resStatus) {
+        final Map<String,String> runningOnNode = new HashMap<String,String>();
+        final Document document = getXMLDocument(resStatus);
+        if (document == null) {
+            return null;
+        }
+
+        /* get root <resource_status> */
+        final Node statusNode = getChildNode(document, "resource_status");
+        if (statusNode == null) {
+            return null;
+        }
+        /*      <resource...> */
+        final NodeList resources = statusNode.getChildNodes();
+        for (int i = 0; i < resources.getLength(); i++) {
+            final Node resourceNode = resources.item(i);
+            if (resourceNode.getNodeName().equals("resource")) {
+                final String id = getAttribute(resourceNode, "id");
+                final String running_on =
+                                      getAttribute(resourceNode, "running_on");
+                runningOnNode.put(id, running_on);
+            }
+        }
+        return runningOnNode;
+    }
+
+    /**
+     * Returns CibQuery object with information from the cib node.
      */
     public final CibQuery parseCibQuery(final String query) {
         final Document document = getXMLDocument(query);
@@ -1054,13 +1151,17 @@ public class HeartbeatOCF extends XML {
                                                 new HashMap<String, String>();
         final Map<String, Map<String, String>> resOpIdsMap =
                                     new HashMap<String, Map<String, String>>();
+        final Map<String, List<String>> groupsToResourcesMap =
+                                           new HashMap<String, List<String>>();
+        groupsToResourcesMap.put("none", new ArrayList<String>());
 
         final NodeList primitivesGroups = resourcesNode.getChildNodes();
         for (int i = 0; i < primitivesGroups.getLength(); i++) {
             final Node primitiveGroupNode = primitivesGroups.item(i);
             if (primitiveGroupNode.getNodeName().equals("primitive")) {
+                List<String> resList = groupsToResourcesMap.get("none");
                 parsePrimitive(primitiveGroupNode,
-                               null,
+                               resList,
                                resourceTypeMap,
                                parametersMap,
                                parametersNvpairsIdsMap,
@@ -1071,11 +1172,17 @@ public class HeartbeatOCF extends XML {
             } else if (primitiveGroupNode.getNodeName().equals("group")) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String groupId = getAttribute(primitiveGroupNode, "id");
+                List<String> resList = groupsToResourcesMap.get(groupId);
+                if (resList == null) {
+                    resList = new ArrayList<String>();
+                    groupsToResourcesMap.put(groupId, resList);
+                }
+
                 for (int j = 0; j < primitives.getLength(); j++) {
                     final Node primitiveNode = primitives.item(j);
                     if (primitiveNode.getNodeName().equals("primitive")) {
                         parsePrimitive(primitiveNode,
-                                       groupId,
+                                       resList,
                                        resourceTypeMap,
                                        parametersMap,
                                        parametersNvpairsIdsMap,
@@ -1109,13 +1216,24 @@ public class HeartbeatOCF extends XML {
         final Node constraintsNode = getChildNode(confNode, "constraints");
         if (constraintsNode != null) {
             final NodeList constraints = constraintsNode.getChildNodes();
+            final String hbV = host.getHeartbeatVersion();
+            String rscString     = "rsc";
+            String withRscString = "with-rsc";
+            String firstString   = "first";
+            String thenString    = "then";
+            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+                rscString     = "from";
+                withRscString = "to";
+                firstString   = "from";
+                thenString    = "to";
+            }
             for (int i = 0; i < constraints.getLength(); i++) {
                 final Node constraintNode = constraints.item(i);
                 if (constraintNode.getNodeName().equals("rsc_colocation")) {
                     final String colId = getAttribute(constraintNode, "id");
-                    final String rsc = getAttribute(constraintNode, "rsc");
+                    final String rsc = getAttribute(constraintNode, rscString);
                     final String withRsc = getAttribute(constraintNode,
-                                                        "with-rsc");
+                                                        withRscString);
                     final String score = getAttribute(constraintNode, "score");
                     List<String> tos = colocationMap.get(rsc);
                     if (tos == null) {
@@ -1128,8 +1246,9 @@ public class HeartbeatOCF extends XML {
                 } else if (constraintNode.getNodeName().equals("rsc_order")) {
                     final String ordId = getAttribute(constraintNode, "id");
                     final String rscFrom = getAttribute(constraintNode,
-                                                        "first");
-                    final String rscTo = getAttribute(constraintNode, "then");
+                                                        firstString);
+                    final String rscTo = getAttribute(constraintNode,
+                                                      thenString);
                     final String score = getAttribute(constraintNode, "score");
                     // TODO: symmetrical order stuff
                     final String symmetrical = getAttribute(constraintNode,
@@ -1168,6 +1287,34 @@ public class HeartbeatOCF extends XML {
             }
         }
 
+        /* <status> */
+        Set<String> activeNodes = new HashSet<String>();
+        final Node statusNode = getChildNode(cibNode, "status");
+        if (statusNode != null) {
+            /* <node_state ...> */
+            final NodeList nodes = statusNode.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node nodeStateNode = nodes.item(i);
+                if (nodeStateNode.getNodeName().equals("node_state")) {
+                    final String id = getAttribute(nodeStateNode, "id");
+                    final String uname = getAttribute(nodeStateNode, "uname");
+                    final String crmd = getAttribute(nodeStateNode, "crmd");
+                    final String shutdown =
+                                        getAttribute(nodeStateNode, "shutdown");
+                    final String inCcm = getAttribute(nodeStateNode, "in_ccm");
+                    /* active / dead */
+                    final String ha = getAttribute(nodeStateNode, "ha");
+                    final String join = getAttribute(nodeStateNode, "join");
+                    final String expected =
+                                    getAttribute(nodeStateNode, "expected");
+                    /* TODO: check and use other stuff too. */
+                    if ("active".equals(ha)) {
+                        activeNodes.add(uname);
+                    }
+                }
+            }
+        }
+
         cibQueryData.setParameters(parametersMap);
         cibQueryData.setParametersNvpairsIds(parametersNvpairsIdsMap);
         cibQueryData.setResourceType(resourceTypeMap);
@@ -1189,6 +1336,8 @@ public class HeartbeatOCF extends XML {
         cibQueryData.setOperations(operationsMap);
         cibQueryData.setOperationsId(operationsIdMap);
         cibQueryData.setResOpIds(resOpIdsMap);
+        cibQueryData.setActiveNodes(activeNodes);
+        cibQueryData.setGroupsToResources(groupsToResourcesMap);
         return cibQueryData;
     }
 }

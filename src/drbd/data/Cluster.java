@@ -49,8 +49,6 @@ public class Cluster {
     private static final long serialVersionUID = 1L;
     /** Name of the cluster. */
     private String name = null;
-    /** Haclient password. */
-    private String hbPasswd = "hacluster";
     /** Hosts that belong to this cluster. */
     private final Set<Host> hosts = new LinkedHashSet<Host>();
     /** Cluster tab of this cluster. */
@@ -295,19 +293,5 @@ public class Cluster {
             }
         }
         return null;
-    }
-
-    /**
-     * Sets the haclient password.
-     */
-    public final void setHbPasswd(final String hbPasswd) {
-        this.hbPasswd = hbPasswd;
-    }
-
-    /**
-     * Returns the haclient password.
-     */
-    public final String getHbPasswd() {
-        return hbPasswd;
     }
 }

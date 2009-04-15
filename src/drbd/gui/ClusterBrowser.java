@@ -29,7 +29,6 @@ import drbd.AddHostDialog;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.DRBD;
-import drbd.utilities.MyButton;
 import drbd.utilities.UpdatableItem;
 import drbd.Exceptions;
 import drbd.gui.dialog.ClusterLogs;
@@ -75,7 +74,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
-import javax.swing.SpringLayout;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
@@ -159,7 +157,7 @@ public class ClusterBrowser extends Browser {
     /** Drbd graph. */
     private final DrbdGraph drbdGraph;
     /** object that holds current heartbeat status. */
-    private final HeartbeatStatus heartbeatStatus;
+    private HeartbeatStatus heartbeatStatus;
     /** Object that holds hb ocf data. */
     private HeartbeatOCF hbOCF;
     /** Object that drbd status and data. */
@@ -345,7 +343,6 @@ public class ClusterBrowser extends Browser {
         this.cluster = cluster;
         heartbeatGraph = new HeartbeatGraph(this);
         drbdGraph = new DrbdGraph(this);
-        heartbeatStatus = new HeartbeatStatus();
         setTreeTop();
         HB_CLASS_MENU.put(HB_OCF_CLASS,       "heartbeat 2 (ocf)");
         HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "heartbeat 1 (hb)");
@@ -376,9 +373,7 @@ public class ClusterBrowser extends Browser {
         HB_OPERATION_PARAMS.put(HB_OP_MONITOR,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
-                                                          HB_PAR_INTERVAL,
-                                                          HB_PAR_START_DELAY
-                                                         )));
+                                                          HB_PAR_INTERVAL)));
     }
 
     /**
@@ -622,6 +617,7 @@ public class ClusterBrowser extends Browser {
                 } while (firstHost == null);
 
                 hbOCF = new HeartbeatOCF(firstHost);
+                heartbeatStatus = new HeartbeatStatus(firstHost, hbOCF);
                 drbdXML = new DrbdXML(cluster.getHostsArray());
                 /* available services */
                 Tools.startProgressIndicator(getCluster(),
@@ -897,7 +893,7 @@ public class ClusterBrowser extends Browser {
                                                                  if ("---start---\r\nerror\r\n\r\n---done---\r\n".equals(status)) {
                                                                      host.setHbStatus(false);
                                                                  } else {
-                                                                     heartbeatStatus.parseStatus(status, hbOCF);
+                                                                     heartbeatStatus.parseStatus(status);
                                                                      // TODO; servicesInfo can be null
                                                                      heartbeatGraph.getServicesInfo().setGlobalConfig();
                                                                      heartbeatGraph.getServicesInfo().setAllResources();
@@ -2989,7 +2985,7 @@ public class ClusterBrowser extends Browser {
             if (newDri.equals(oldDri)) {
                 return;
             }
-            final DrbddiskInfo oddi = getDrbddiskInfo();
+            //final DrbddiskInfo oddi = getDrbddiskInfo();
             if (oldDri != null) {
                 oldDri.removeDrbdDisk(this);
                 oldDri.setUsedByHeartbeat(false);
@@ -3133,36 +3129,6 @@ public class ClusterBrowser extends Browser {
                 Heartbeat.setOrderAndColocation(getDCHost(),
                                                 heartbeatId,
                                                 parents);
-            } else {
-                // update parameters
-                //String heartbeatId = getService().getHeartbeatId();
-                final StringBuffer args = new StringBuffer(heartbeatId);
-                for (String param : params) {
-                    final String oldValue = getResource().getValue(param);
-                    String value = getComboBoxValue(param);
-                    if (value.equals(oldValue)) {
-                        continue;
-                    }
-                    if (value.equals(getParamDefault(param))) {
-                        continue;
-                    }
-
-                    if ("".equals(value)) {
-                        value = getParamDefault(param);
-                    }
-                    args.append(' ');
-                    args.append(heartbeatId);
-                    args.append('-');
-                    args.append(param);
-                    args.append(' ');
-                    args.append(param);
-                    args.append(" \"");
-                    args.append(value);
-                    args.append('"');
-                }
-                Heartbeat.setGroupParameters(getDCHost(),
-                                             heartbeatId,
-                                             args.toString());
             }
             setLocations(heartbeatId);
             storeComboBoxValues(params);
@@ -3682,32 +3648,34 @@ public class ClusterBrowser extends Browser {
          * TODO: "default" value
          */
         final public boolean isManaged() {
-            String status =
-                      heartbeatStatus.getStatus(getService().getHeartbeatId());
-            return status != null && !status.equals("unmanaged");
-            //final String isManaged =
-            //    heartbeatStatus.getParameter(getService().getHeartbeatId(),
-            //                                 "is_managed");
-            //if (isManaged == null || isManaged.equals("true")) {
-            //    return true;
-            //}
-            //return false;
+            final String isManaged =
+                heartbeatStatus.getParameter(getService().getHeartbeatId(),
+                                             "is_managed");
+            if (isManaged == null || isManaged.equals("true")) {
+                return true;
+            }
+            return false;
+        }
+        
+        /**
+         * Returns whether the service is running.
+         */
+        final public boolean isRunning() {
+            return !"".equals(getRunningOnNode());
         }
 
         /**
-         * Returns whether the resource has failed to start. As far as I know
-         * you can say only if service should be managed but is unmanaged.
+         * Returns whether the resource has failed to start. It is detected in
+         * this way that the resource is started but is not running.
          */
         final public boolean isFailed() {
-            String status =
-                      heartbeatStatus.getStatus(getService().getHeartbeatId());
-            return isStarted() && status != null && status.equals("not running");
+            return isStarted() && !isRunning();
         }
 
         /**
          * Sets whether the service is managed.
          */
-        final public void setManaged(final String isManaged) {
+        final public void setManaged(final boolean isManaged) {
             Heartbeat.setManaged(getDCHost(),
                                  getService().getHeartbeatId(),
                                  isManaged);
@@ -4252,6 +4220,14 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns true if the specified parameter is meta attribute.
+         */
+        protected boolean isMetaAttr(final String param) {
+            return hbOCF.isMetaAttr(hbService,
+                                    param);
+        }
+
+        /**
          * Returns true if the specified parameter is integer.
          */
         protected boolean isInteger(final String param) {
@@ -4365,12 +4341,13 @@ public class ClusterBrowser extends Browser {
                       params,
                       SERVICE_LABEL_WIDTH,
                       SERVICE_FIELD_WIDTH);
-            /* Operations */
-            addOperations(optionsPanel,
-                          extraOptionsPanel,
-                          SERVICE_LABEL_WIDTH,
-                          SERVICE_FIELD_WIDTH);
-
+            if (!getHeartbeatService().isGroup()) {
+                /* Operations */
+                addOperations(optionsPanel,
+                              extraOptionsPanel,
+                              SERVICE_LABEL_WIDTH,
+                              SERVICE_FIELD_WIDTH);
+            }
 
             /* add item listeners to the host scores combos */
             for (Host host : getClusterHosts()) {
@@ -4431,22 +4408,43 @@ public class ClusterBrowser extends Browser {
                     }
                 );
             }
+            
+            if (!getHeartbeatService().isGroup()) {
+                /* add item listeners to the operations combos */
+                for (final String op : HB_OPERATIONS) {
+                    for (final String param : HB_OPERATION_PARAMS.get(op)) {
+                        final GuiComboBox cb =
+                                (GuiComboBox) operationsComboBoxHash.get(op, param);
+                        cb.addListeners(
+                            new ItemListener() {
+                                public void itemStateChanged(final ItemEvent e) {
 
-            /* add item listeners to the operations combos */
-            for (final String op : HB_OPERATIONS) {
-                for (final String param : HB_OPERATION_PARAMS.get(op)) {
-                    final GuiComboBox cb =
-                            (GuiComboBox) operationsComboBoxHash.get(op, param);
-                    cb.addListeners(
-                        new ItemListener() {
-                            public void itemStateChanged(final ItemEvent e) {
+                                    if (cb.isCheckBox()
+                                        || e.getStateChange() == ItemEvent.SELECTED) {
+                                        Thread thread = new Thread(new Runnable() {
+                                            public void run() {
+                                                final boolean enable =
+                                                    checkResourceFields("cached", params);
+                                                SwingUtilities.invokeLater(
+                                                new Runnable() {
+                                                    public void run() {
+                                                        applyButton.setEnabled(enable);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        thread.start();
+                                    }
+                                }
+                            },
 
-                                if (cb.isCheckBox()
-                                    || e.getStateChange() == ItemEvent.SELECTED) {
+                            new DocumentListener() {
+                                private void check() {
                                     Thread thread = new Thread(new Runnable() {
                                         public void run() {
                                             final boolean enable =
-                                                checkResourceFields("cached", params);
+                                                checkResourceFields("cached",
+                                                                    params);
                                             SwingUtilities.invokeLater(
                                             new Runnable() {
                                                 public void run() {
@@ -4457,40 +4455,21 @@ public class ClusterBrowser extends Browser {
                                     });
                                     thread.start();
                                 }
-                            }
-                        },
 
-                        new DocumentListener() {
-                            private void check() {
-                                Thread thread = new Thread(new Runnable() {
-                                    public void run() {
-                                        final boolean enable =
-                                            checkResourceFields("cached",
-                                                                params);
-                                        SwingUtilities.invokeLater(
-                                        new Runnable() {
-                                            public void run() {
-                                                applyButton.setEnabled(enable);
-                                            }
-                                        });
-                                    }
-                                });
-                                thread.start();
-                            }
+                                public void insertUpdate(final DocumentEvent e) {
+                                    check();
+                                }
 
-                            public void insertUpdate(final DocumentEvent e) {
-                                check();
-                            }
+                                public void removeUpdate(final DocumentEvent e) {
+                                    check();
+                                }
 
-                            public void removeUpdate(final DocumentEvent e) {
-                                check();
+                                public void changedUpdate(final DocumentEvent e) {
+                                    check();
+                                }
                             }
-
-                            public void changedUpdate(final DocumentEvent e) {
-                                check();
-                            }
-                        }
-                    );
+                        );
+                    }
                 }
             }
 
@@ -4541,6 +4520,7 @@ public class ClusterBrowser extends Browser {
          * Goes through the scores and sets preferred locations.
          */
         protected void setLocations(final String heartbeatId) {
+            final Host dcHost = getDCHost();
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
@@ -4553,7 +4533,7 @@ public class ClusterBrowser extends Browser {
                               heartbeatStatus.getLocationId(
                                                 getService().getHeartbeatId(),
                                                 onHost);
-                    Heartbeat.setLocation(getDCHost(),
+                    Heartbeat.setLocation(dcHost,
                                           getService().getHeartbeatId(),
                                           onHost,
                                           score,
@@ -4607,51 +4587,6 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Goes through the operations and sets the ones that changed to the
-         * heartbeat.
-         * This works for old heartbeats <=2.1.4
-         */
-        private void setOperations(final String heartbeatId) {
-            for (final String op : HB_OPERATIONS) {
-                boolean somethingChanged = false;
-                final List<String> args = new ArrayList<String>();
-                args.add(op);
-                for (final String param : HB_OPERATION_PARAM_LIST) {
-                    String arg = HB_NONE_ARG;
-                    if (HB_OPERATION_PARAMS.get(op).contains(param)) {
-                        final GuiComboBox cb =
-                            (GuiComboBox) operationsComboBoxHash.get(op,
-                                                                     param);
-                        final String value = cb.getStringValue();
-                        String savedOp =
-                            (String) savedOperation.get(op, param);
-                        if (savedOp == null) {
-                            savedOp = "";
-                        }
-                        if (!value.equals(savedOp)) {
-                            //String defaultValue =
-                            //          hbService.getOperationDefault(op, param);
-                            //if (defaultValue == null) {
-                            //    defaultValue = "";
-                            //}
-                            //if (!value.equals(defaultValue)) {
-                                somethingChanged = true;
-                            //}
-                        }
-                        arg = value;
-                    }
-                    args.add(arg);
-                }
-                if (somethingChanged) {
-                    Heartbeat.addOperation(getDCHost(),
-                                           heartbeatId,
-                                           op,
-                                           args);
-                }
-            }
-        }
-
-        /**
          * Applies the changes to the service parameters.
          */
         public void apply() {
@@ -4692,6 +4627,7 @@ public class ClusterBrowser extends Browser {
             Map<String,String> pacemakerResAttrs =
                                                 new HashMap<String,String>();
             Map<String,String> pacemakerResArgs = new HashMap<String,String>();
+            Map<String,String> pacemakerMetaArgs = new HashMap<String,String>();
             final String hbClass         = getService().getHeartbeatClass();
             final String type            = getResource().getName();
             String heartbeatId     = getService().getHeartbeatId();
@@ -4753,14 +4689,19 @@ public class ClusterBrowser extends Browser {
                 }
                 for (String param : params) {
                     String value = getComboBoxValue(param);
-                    if (value.equals(getParamDefault(param))) {
-                        continue;
+                    if (value.equals(getParamDefault(param))
+                        && !isMetaAttr(param)) {
+                            continue;
                     }
                     if ("".equals(value)) {
                         value = HB_NONE_ARG;
                     } else {
                         /* for pacemaker */
-                        pacemakerResArgs.put(param, value);
+                        if (isMetaAttr(param)) {
+                            pacemakerMetaArgs.put(param, value);
+                        } else {
+                            pacemakerResArgs.put(param, value);
+                        }
                     }
                     args.append(' ');
                     args.append(heartbeatId);
@@ -4772,16 +4713,18 @@ public class ClusterBrowser extends Browser {
                     args.append(value);
                     args.append('"');
                 }
-                Heartbeat.addResource(getDCHost(),
-                                      heartbeatId,
-                                      groupId,
-                                      args.toString(),
-                                      pacemakerResAttrs,
-                                      pacemakerResArgs,
-                                      null,
-                                      null,
-                                      getOperations(heartbeatId),
-                                      null);
+                Heartbeat.setParameters(getDCHost(),
+                                        "-C",
+                                        heartbeatId,
+                                        groupId,
+                                        args.toString(),
+                                        pacemakerResAttrs,
+                                        pacemakerResArgs,
+                                        pacemakerMetaArgs,
+                                        null,
+                                        null,
+                                        getOperations(heartbeatId),
+                                        null);
                 if (groupInfo == null) {
                     final String[] parents = heartbeatGraph.getParents(this);
                     Heartbeat.setOrderAndColocation(getDCHost(),
@@ -4801,7 +4744,11 @@ public class ClusterBrowser extends Browser {
                     if ("".equals(value)) {
                         value = getParamDefault(param);
                     } else {
-                        pacemakerResArgs.put(param, value);
+                        if (isMetaAttr(param)) {
+                            pacemakerMetaArgs.put(param, value);
+                        } else {
+                            pacemakerResArgs.put(param, value);
+                        }
                     }
                     args.append(' ');
                     args.append(heartbeatId);
@@ -4817,11 +4764,13 @@ public class ClusterBrowser extends Browser {
 
                 Heartbeat.setParameters(
                         getDCHost(),
+                        "-U",
                         heartbeatId,
                         groupId,
                         args.toString(),
                         pacemakerResAttrs,
                         pacemakerResArgs,
+                        pacemakerMetaArgs,
                         heartbeatStatus.getResourceInstanceAttrId(heartbeatId),
                         heartbeatStatus.getParametersNvpairsIds(heartbeatId),
                         getOperations(heartbeatId),
@@ -4833,10 +4782,6 @@ public class ClusterBrowser extends Browser {
 
             if (groupInfo == null) {
                 setLocations(heartbeatId);
-            }
-            final String hbV = getDCHost().getHeartbeatVersion();
-            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
-                setOperations(heartbeatId);
             }
             storeComboBoxValues(params);
 
@@ -5463,9 +5408,9 @@ public class ClusterBrowser extends Browser {
                     public void action() {
                         if (this.getText().equals(Tools.getString(
                                         "ClusterBrowser.Hb.ManageResource"))) {
-                            setManaged("true");
+                            setManaged(true);
                         } else {
-                            setManaged("false");
+                            setManaged(false);
                         }
                     }
                 };

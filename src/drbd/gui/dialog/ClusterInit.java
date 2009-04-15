@@ -66,11 +66,6 @@ public class ClusterInit extends DialogCluster {
     /** List of start hb buttons. */
     private List<MyButton> hbStartButtons;
 
-    /** List with texts whether hb status is working per host. */
-    private List<JLabel> hbStatusInfos;
-    /** List of hb status buttons. */
-    private List<MyButton> enterPasswdButton;
-
     /** Main panel, so that it can be revalidated, if something have changed.
      */
     private JPanel mainPanel;
@@ -80,10 +75,6 @@ public class ClusterInit extends DialogCluster {
     private Boolean[] lastDrbdLoaded;
     /** Last hb-started check. */
     private Boolean[] lastHbStarted;
-    /** Last hb-status check. */
-    private Boolean[] lastHbStatus;
-    /** Last hb-status exit code */
-    private Integer[] lastHbExitCode;
 
     /** Cluster check thread. */
     private Thread checkClusterThread = null;
@@ -93,8 +84,6 @@ public class ClusterInit extends DialogCluster {
     private String button = null;
     /** Interval between checks. */
     private static final int CHECK_INTERVAL = 1000;
-    /** On which host the hb password should be changed. */
-    private volatile Host changeHbPasswordOnHost = null;
 
     /**
      * Prepares a new <code>ClusterInit</code> object.
@@ -138,15 +127,7 @@ public class ClusterInit extends DialogCluster {
      */
     public final WizardDialog nextDialog() {
         stopCheckCluster();
-        if (changeHbPasswordOnHost != null) {
-            changeHbPasswordOnHost = null;
-            //return new ClusterHbChangePasswd(this,
-            //                                 getCluster(),
-            //                                 changeHbPasswordOnHost);
-            return new ClusterFinish(this, getCluster());
-        } else {
-            return new ClusterFinish(this, getCluster());
-        }
+        return new ClusterFinish(this, getCluster());
     }
 
     /**
@@ -172,8 +153,6 @@ public class ClusterInit extends DialogCluster {
         enableComponentsLater(new JComponent[]{});
         lastDrbdLoaded = null;
         lastHbStarted  = null;
-        lastHbStatus   = null;
-        lastHbExitCode = null;
         checkClusterThread = new Thread(
             new Runnable() {
                 public void run() {
@@ -201,11 +180,9 @@ public class ClusterInit extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         final Boolean[] drbdLoaded = new Boolean[hosts.length];
         final Boolean[] hbStarted  = new Boolean[hosts.length];
-        final Boolean[] hbStatus   = new Boolean[hosts.length];
         final Integer[] hbExitCode = new Integer[hosts.length];
         ExecCommandThread[] tsDrbd     = new ExecCommandThread[hosts.length];
         ExecCommandThread[] tsHb       = new ExecCommandThread[hosts.length];
-        ExecCommandThread[] tsHbStatus = new ExecCommandThread[hosts.length];
         int i = 0;
 
         for (final Host h : hosts) {
@@ -232,29 +209,27 @@ public class ClusterInit extends DialogCluster {
                                      hbStarted[index] = false;
                                  }
                              }, false);
-            tsHbStatus[i] = h.execCommandRaw(
-                     Heartbeat.getMgmtCommand("all_nodes",
-                                              getCluster().getHbPasswd(),
-                                              ""),
-                     (ProgressBar) null,
-                     new ExecCallback() {
-                         public void done(final String ans) {
-                             final String[] s = ans.split("\\r?\\n");
-                             if (s[0].equals("ok")) {
-                                 hbStatus[index] = true;
-                             } else {
-                                 hbStatus[index] = false;
-                             }
-                             hbExitCode[index] = 0;
-                         }
+            //tsHbStatus[i] = h.execCommand("Heartbeat.isStarted",
+            //         // TODO: probably I don't need this check anymore
+            //         (ProgressBar) null,
+            //         new ExecCallback() {
+            //             public void done(final String ans) {
+            //                 final String[] s = ans.split("\\r?\\n");
+            //                 if (s[0].equals("ok")) {
+            //                     hbStatus[index] = true;
+            //                 } else {
+            //                     hbStatus[index] = false;
+            //                 }
+            //                 hbExitCode[index] = 0;
+            //             }
 
-                         public void doneError(final String ans,
-                                               final int exitCode) {
-                             hbStatus[index] = false;
-                             hbExitCode[index] = exitCode;
-                         }
+            //             public void doneError(final String ans,
+            //                                   final int exitCode) {
+            //                 hbStatus[index] = false;
+            //                 hbExitCode[index] = exitCode;
+            //             }
 
-                     }, false, false);
+            //         }, false);
             i++;
         }
         for (ExecCommandThread t : tsDrbd) {
@@ -349,69 +324,66 @@ public class ClusterInit extends DialogCluster {
             i++;
         }
 
-        for (ExecCommandThread t : tsHbStatus) {
-            // wait for all of them
-            try {
-                t.join();
-            } catch (java.lang.InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        i = 0;
+        //for (ExecCommandThread t : tsHbStatus) {
+        //    // wait for all of them
+        //    try {
+        //        t.join();
+        //    } catch (java.lang.InterruptedException e) {
+        //        Thread.currentThread().interrupt();
+        //    }
+        //}
+        //i = 0;
 
-        final boolean lastHbStatusExists = (lastHbStatus != null);
-        if (!lastHbStatusExists) {
-            lastHbStatus = new Boolean[hosts.length];
-            lastHbExitCode = new Integer[hosts.length];
-        }
-        for (Boolean l : hbStatus) {
-            if (!lastHbStarted[i]) {
-                hbStatusInfos.get(i).setVisible(false);
-                enterPasswdButton.get(i).setVisible(false);
-                continue;
-            } else {
-                hbStatusInfos.get(i).setVisible(true);
-            }
-            boolean changed = false;
-            if (lastHbStatusExists && lastHbStatus[i] != null) {
-                if (lastHbStatus[i].booleanValue() != l.booleanValue()
-                    || lastHbExitCode[i].intValue() != hbExitCode[i].intValue()) {
-                    oneChanged = true;
-                    changed = true;
-                    lastHbStatus[i] = Boolean.valueOf(l);
-                    lastHbExitCode[i] = hbExitCode[i];
-                }
-            } else {
-                oneChanged = true;
-                changed = true;
-                lastHbStatus[i] = Boolean.valueOf(l);
-                lastHbExitCode[i] = hbExitCode[i];
-            }
-            if (l.booleanValue()) {
-                if (changed) {
-                    hbStatusInfos.get(i).setText(
-                        Tools.getString("Dialog.ClusterInit.HbStatusWorks"));
-                    enterPasswdButton.get(i).setVisible(false);
-                    hbStatusInfos.get(i).setForeground(Color.BLACK);
-                }
-            } else {
-                oneFailed = true;
-                if (changed) {
-                    if (253 == hbExitCode[i]) {
-                        /* wrong hb password */
-                        hbStatusInfos.get(i).setText(
-                          Tools.getString("Dialog.ClusterInit.HbStatusWrongPassword"));
-                        enterPasswdButton.get(i).setVisible(true);
-                    } else {
-                        hbStatusInfos.get(i).setText(
-                          Tools.getString("Dialog.ClusterInit.HbStatusDoesntWork"));
-                        enterPasswdButton.get(i).setVisible(false);
-                    }
-                    hbStatusInfos.get(i).setForeground(Color.RED);
-                }
-            }
-            i++;
-        }
+        //final boolean lastHbStatusExists = (lastHbStatus != null);
+        //if (!lastHbStatusExists) {
+        //    lastHbStatus = new Boolean[hosts.length];
+        //    lastHbExitCode = new Integer[hosts.length];
+        //}
+        //for (Boolean l : hbStatus) {
+        //    if (!lastHbStarted[i]) {
+        //        hbStatusInfos.get(i).setVisible(false);
+        //        continue;
+        //    } else {
+        //        hbStatusInfos.get(i).setVisible(true);
+        //    }
+        //    boolean changed = false;
+        //    if (lastHbStatusExists && lastHbStatus[i] != null) {
+        //        if (lastHbStatus[i].booleanValue() != l.booleanValue()
+        //            || lastHbExitCode[i].intValue() != hbExitCode[i].intValue()) {
+        //            oneChanged = true;
+        //            changed = true;
+        //            lastHbStatus[i] = Boolean.valueOf(l);
+        //            lastHbExitCode[i] = hbExitCode[i];
+        //        }
+        //    } else {
+        //        oneChanged = true;
+        //        changed = true;
+        //        lastHbStatus[i] = Boolean.valueOf(l);
+        //        lastHbExitCode[i] = hbExitCode[i];
+        //    }
+        //    if (l.booleanValue()) {
+        //        if (changed) {
+        //            hbStatusInfos.get(i).setText(
+        //                Tools.getString("Dialog.ClusterInit.HbStatusWorks"));
+        //            hbStatusInfos.get(i).setForeground(Color.BLACK);
+        //        }
+        //    } else {
+        //        oneFailed = true;
+        //        if (changed) {
+        //            if (253 == hbExitCode[i]) {
+        //                /* wrong hb password */
+        //                hbStatusInfos.get(i).setText(
+        //                  Tools.getString("Dialog.ClusterInit.HbStatusWrongPassword"));
+        //            } else {
+        //                hbStatusInfos.get(i).setText(
+        //                  Tools.getString("Dialog.ClusterInit.HbStatusDoesntWork"));
+        //                enterPasswdButton.get(i).setVisible(false);
+        //            }
+        //            hbStatusInfos.get(i).setForeground(Color.RED);
+        //        }
+        //    }
+        //    i++;
+        //}
 
         if (oneChanged) {
             mainPanel.invalidate();
@@ -450,9 +422,6 @@ public class ClusterInit extends DialogCluster {
 
         hbStartedInfos = new ArrayList<JLabel>();
         hbStartButtons = new ArrayList<MyButton>();
-
-        hbStatusInfos = new ArrayList<JLabel>();
-        enterPasswdButton = new ArrayList<MyButton>();
 
         mainPanel = new JPanel(new GridLayout(1, 0));
         //mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
@@ -524,34 +493,8 @@ public class ClusterInit extends DialogCluster {
             pane.add(hbStartedInfos.get(i));
             pane.add(hbStartButtons.get(i));
 
-            hbStatusInfos.add(new JLabel(
-                    Tools.getString("Dialog.ClusterInit.CheckingHbStatus")));
-            enterPasswdButton.add(new MyButton(
-                    Tools.getString("Dialog.ClusterInit.EnterPasswordButton")));
-            enterPasswdButton.get(i).setVisible(false);
-
-            enterPasswdButton.get(i).addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
-                                public void run() {
-                                    enterPasswdButton.get(index).setVisible(false);
-                                    changeHbPasswordOnHost = host;
-                                    ((MyButton) buttonClass(
-                                                    nextButton())).pressButton();
-                                }
-                            }
-                        );
-                        thread.start();
-                    }
-                });
-
-            pane.add(hbStatusInfos.get(i));
-            pane.add(enterPasswdButton.get(i));
-
             i++;
-            SpringUtilities.makeCompactGrid(pane, 3, 2,  //rows, cols
+            SpringUtilities.makeCompactGrid(pane, 2, 2,  //rows, cols
                                                   1, 1,  //initX, initY
                                                   1, 0); //xPad, yPad
             mainPanel.add(pane);

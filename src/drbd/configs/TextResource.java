@@ -162,17 +162,14 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.DrbdNotInstalled",  "not installed"},
         {"Dialog.HostCheckInstallation.UdevNotInstalled",  "not installed"},
         {"Dialog.HostCheckInstallation.HbNotInstalled",    "not installed"},
-        {"Dialog.HostCheckInstallation.HbGUINotInstalled",    "not installed"},
         {"Dialog.HostCheckInstallation.DrbdUpgradeButton", "Upgrade"},
         {"Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton", "Check for Upgrade"},
 
         {"Dialog.HostCheckInstallation.DrbdInstallButton", "Install"},
         {"Dialog.HostCheckInstallation.UdevInstallButton", "Install"},
         {"Dialog.HostCheckInstallation.HbInstallButton",   "Install"},
-        {"Dialog.HostCheckInstallation.HbGUIInstallButton",   "Install"},
 
         {"Dialog.HostCheckInstallation.CheckingHb",        "checking..."},
-        {"Dialog.HostCheckInstallation.CheckingHbGUI",        "checking..."},
         {"Dialog.HostCheckInstallation.CheckingDrbd",      "checking..."},
         {"Dialog.HostCheckInstallation.CheckingUdev",      "checking..."},
 
@@ -206,12 +203,6 @@ public class TextResource extends
         {"Dialog.HostHbInst.Executing",    "Installing..."},
         {"Dialog.HostHbInst.InstOk",       "Heartbeat was successfully installed."},
         {"Dialog.HostHbInst.InstError",    "Installation error, fix the error and retry."},
-
-        {"Dialog.HostHbGUIInst.Title",        "Heartbeat GUI Install"},
-        {"Dialog.HostHbGUIInst.Description",  "Heartbeat GUI package is being installed."},
-        {"Dialog.HostHbGUIInst.Executing",    "Installing..."},
-        {"Dialog.HostHbGUIInst.InstOk",       "Heartbeat GUI was successfully installed."},
-        {"Dialog.HostHbGUIInst.InstError",    "Installation error, fix the error and retry."},
 
         {"Dialog.HostFinish.Title",        "Finish"},
         {"Dialog.HostFinish.Description",  "Configuration of the host is now complete. You can now add another host or configure a cluster."},
@@ -261,24 +252,16 @@ public class TextResource extends
 
         {"Dialog.ClusterInit.Title",           "Heartbeat/DRBD Initialization"},
         {"Dialog.ClusterInit.Description",     
-         "Heartbeat/DRBD Initialization. Load the DRBD and start the Heartbeat, if you wish at this point. If hb status does not work, please check the following:"
-         + "<ul><li>Change the hacluster's password to \"hacluster\" on all nodes manually.</li>"
-         + "<li>Restart heartbeat. You may have to kill mgmtd process if it hangs.</li></ul>"},
+         "Heartbeat/DRBD Initialization. Load the DRBD and start the Heartbeat, if you wish at this point."},
         {"Dialog.ClusterInit.CheckingDrbd",    "checking..."},
         {"Dialog.ClusterInit.LoadDrbdButton",  "Load"},
         {"Dialog.ClusterInit.CheckingHb",      "checking..."},
-        {"Dialog.ClusterInit.CheckingHbStatus", "checking..."},
         {"Dialog.ClusterInit.StartHbButton",   "Start"},
         {"Dialog.ClusterInit.HbIsRunning",     "heartbeat is running"},
         {"Dialog.ClusterInit.HbIsStopped",     "heartbeat is stopped"},
 
         {"Dialog.ClusterInit.DrbdIsLoaded",     "DRBD is loaded"},
         {"Dialog.ClusterInit.DrbdIsNotLoaded",  "DRBD is not loaded"},
-
-        {"Dialog.ClusterInit.HbStatusWorks",     "hb status works"},
-        {"Dialog.ClusterInit.HbStatusDoesntWork", "hb status does not work"},
-        {"Dialog.ClusterInit.HbStatusWrongPassword", "hacluster's password is unknown"},
-        {"Dialog.ClusterInit.EnterPasswordButton", "Enter Password"},
 
         {"Dialog.ClusterDrbdConf.Title",      "DRBD Configuration"},
 
@@ -418,9 +401,15 @@ public class TextResource extends
         {"ClusterBrowser.AdvancedOperations",    "Other Operations"},
         {"ClusterBrowser.availableServices",     "Available Services"},
         {"HeartbeatOCF.RequiredOptions",         "Required Options"},
+        {"HeartbeatOCF.MetaAttrOptions",         "Meta Attributes"},
         {"HeartbeatOCF.OptionalOptions",         "Advanced Options"},
         {"HeartbeatOCF.GetOCFParameters",        "Getting Heartbeat OCF parameters..."},
+        {"HeartbeatOCF.TargetRole.ShortDesc",    "Target Role"},
+        {"HeartbeatOCF.TargetRole.LongDesc",     "Select whether the service should be started or should be stopped."},
+        {"HeartbeatOCF.IsManaged.ShortDesc",     "Is Managed By HB"},
+        {"HeartbeatOCF.IsManaged.LongDesc",      "Select whether the service should be managed by Heartbeat or not."},
 
+        {"ClusterBrowser.HbStatusFailed",           "<h2>HB status failed</h2>"},
         {"ClusterBrowser.Hb.RemoveAllServices",     "Remove All Services"},
         {"ClusterBrowser.Hb.RemoveService",         "Remove"},
         {"ClusterBrowser.Hb.AddService",            "Add Service"},
@@ -482,7 +471,6 @@ public class TextResource extends
         {"ClusterBrowser.DrbdUpdate",                      "updating DRBD resources..."},
         {"ClusterBrowser.DifferentHbVersionsWarning",      "<i>warning: different hb versions</i>"},
 
-        {"ClusterBrowser.HbStatusFailed",                  "<h2>HB status failed</h2>"},
         {"ClusterBrowser.Hb.ManageResource",               "Manage by HB"},
         {"ClusterBrowser.Hb.ManageResource.ToolTip",       "Manage by HB"},
         {"ClusterBrowser.Hb.UnmanageResource",             "Do not manage by HB"},
@@ -562,6 +550,7 @@ public class TextResource extends
 
         {"Heartbeat.Boolean.True",            "True"},
         {"Heartbeat.Boolean.False",           "False"},
+        {"Heartbeat.getClusterMetadata", "getting metadata"},
 
         {"DrbdNetInterface",                  "DRBD net interface"},
         {"DrbdNetInterface.Long",             "DRBD network interface"},

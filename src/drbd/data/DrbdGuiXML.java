@@ -65,8 +65,6 @@ public class DrbdGuiXML extends XML {
     private static final String HOST_SSHPORT_ATTR = "ssh";
     /** Cluster name attribute string. */
     private static final String CLUSTER_NAME_ATTR = "name";
-    /** Heartbeat password attribute string. */
-    private static final String HB_PASSWD_ATTR = "hbpw";
     /** Name of the host node. */
     private static final String HOST_NODE_STRING = "host";
 
@@ -120,11 +118,9 @@ public class DrbdGuiXML extends XML {
                         Tools.getConfigData().getClusters().getClusterSet();
         for (final Cluster cluster : clusterSet) {
             final String clusterName = cluster.getName();
-            final String hbPasswd = cluster.getHbPasswd();
             final Element clusterNode = (Element) clusters.appendChild(
                                                 doc.createElement("cluster"));
             clusterNode.setAttribute(CLUSTER_NAME_ATTR, clusterName);
-            clusterNode.setAttribute(HB_PASSWD_ATTR, hbPasswd);
             for (final Host host : cluster.getHosts()) {
                 final String hostName = host.getHostname();
                 final Element hostNode =
@@ -264,13 +260,8 @@ public class DrbdGuiXML extends XML {
                             final String clusterName =
                                                getAttribute(clusterNode,
                                                             CLUSTER_NAME_ATTR);
-                            final String hbPasswd =
-                                                  getAttribute(clusterNode,
-                                                               HB_PASSWD_ATTR);
-
                             final Cluster cluster = new Cluster();
                             cluster.setName(clusterName);
-                            cluster.setHbPasswd(hbPasswd);
                             Tools.getConfigData().addClusterToClusters(cluster);
                             loadClusterHosts(clusterNode, cluster, hostMap);
                         }

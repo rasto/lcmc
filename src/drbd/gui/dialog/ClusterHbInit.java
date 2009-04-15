@@ -553,13 +553,7 @@ public class ClusterHbInit extends DialogCluster {
                                 config.append(hbConfigAddr());
                                 config.append(hbConfigDopd(
                                                     dopdCB.isSelected()));
-                                final String hbV =
-                                            hosts[0].getHeartbeatVersion();
-                                final boolean addMgmt =
-                                        Tools.compareVersions(hbV,
-                                                              "2.99.0") >= 0;
-
-                                config.append(hbConfigMgmt(addMgmt));
+                                config.append(hbConfigMgmt(false));
 
                                 Heartbeat.createHBConfig(hosts, config);
                                 updateOldHbConfig();
