@@ -189,7 +189,7 @@ public class DistResource extends
         {"DRBD.makeFilesystem", "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@"},
 
         {"DRBD.getProcDrbd",   "cat /proc/drbd"},
-        {"DRBD.getProcesses",  "ps aux|grep drbd|grep -v python"},
+        {"DRBD.getProcesses",  "ps aux|grep drbd"},
         {"DRBD.start",         "/etc/init.d/drbd start"},
         {"DRBD.load",          "modprobe drbd"},
         {"DRBD.isModuleLoaded", "lsmod|grep drbd"},
