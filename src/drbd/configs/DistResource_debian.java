@@ -43,6 +43,8 @@ public class DistResource_debian extends
         {"version:lenny/sid",   "LENNY"},
         {"version:testing",     "LENNY"},
         {"version:5.0",         "LENNY"},
+        {"version:5.0.1",       "LENNY"},
+        {"version:5.0.2",       "LENNY"},
         {"version:debian-etch", "4"},
         {"version:4.0",         "4"},
         {"version:4.0r1",       "4"},
