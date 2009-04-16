@@ -431,6 +431,6 @@ public class HeartbeatStatus {
      * Parses output from cibadmin command.
      */
     private final void parseCibQuery(final String query) {
-        cibQueryMap    = heartbeatXML.parseCibQuery(query);
+        cibQueryMap = heartbeatXML.parseCibQuery(query);
     }
 }

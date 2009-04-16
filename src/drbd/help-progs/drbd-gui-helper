@@ -518,7 +518,6 @@ sub get_cluster_events {
 				if ($! == EAGAIN || $len != 1) {
 					sleep 2;
 					if ($cibevent > 0) {
-						print "cibevent: $cibevent\n";
 						my $info = get_cluster_info();
 						if ($info) {
 							print "---start---\n";

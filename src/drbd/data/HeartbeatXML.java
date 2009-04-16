@@ -1088,33 +1088,33 @@ public class HeartbeatXML extends XML {
      */
     public final CibQuery parseCibQuery(final String query) {
         final Document document = getXMLDocument(query);
+        final CibQuery cibQueryData = new CibQuery();
         if (document == null) {
-            return null;
+            return cibQueryData;
         }
 
         /* get root <cib> */
         final Node cibNode = getChildNode(document, "cib");
         if (cibNode == null) {
-            return null;
+            return cibQueryData;
         }
 
-        final CibQuery cibQueryData = new CibQuery();
 
         /* <configuration> */
         final Node confNode = getChildNode(cibNode, "configuration");
         if (confNode == null) {
-            return null;
+            return cibQueryData;
         }
 
         /* <crm_config> */
         final Node crmConfNode = getChildNode(confNode, "crm_config");
         if (crmConfNode == null) {
-            return null;
+            return cibQueryData;
         }
         /*      <cluster_property_set> */
         final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
         if (cpsNode == null) {
-            return null;
+            return cibQueryData;
         }
         Map<String,String> crmConfMap = new HashMap<String,String>();
         /*              <nvpair...> */
@@ -1133,7 +1133,7 @@ public class HeartbeatXML extends XML {
         /* <resources> */
         final Node resourcesNode = getChildNode(confNode, "resources");
         if (resourcesNode == null) {
-            return null;
+            return cibQueryData;
         }
         /*      <primitive> */
         //Map<String,String> resourceItemTypeMap = new HashMap<String,String>();
