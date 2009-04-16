@@ -484,7 +484,7 @@ sub cib_message {
 }
 
 #
-# Prints heartbeat info, then waits 45 seconds for events, then it quits, so it # can get restarted again. This timeout is required so that a connection loss 
+# Prints heartbeat info, then waits 25 seconds for events, then it quits, so it # can get restarted again. This timeout is required so that a connection loss 
 # can be detected.
 #
 sub get_cluster_events {
@@ -526,8 +526,8 @@ sub get_cluster_events {
 		    or return "ERROR: Couldn't set flags for $cb_socket_name: $!\n";
 
 		if (my $pid = fork) {
-			# wait 45 seconds and kill the child
-			sleep 45;
+			# wait 25 seconds and kill the child
+			sleep 25;
 			close $CB;
 			kill 1, $pid;
 		}  else {

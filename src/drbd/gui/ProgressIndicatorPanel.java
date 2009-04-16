@@ -273,10 +273,11 @@ public class ProgressIndicatorPanel extends JComponent
             Thread.currentThread().interrupt();
         }
         if (!texts.containsKey(text)) {
-            Tools.appWarning("progress indicator already stopped for: "
-                             + text);
+            Tools.appWarning("progress indicator already stopped for: --"
+                             + text + "--");
             mTextsLock.release();
             mAnimatorLock.release();
+            Tools.printStackTrace();
             return;
         }
         texts.put(text, 250);

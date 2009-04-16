@@ -29,8 +29,6 @@ import drbd.utilities.ConnectionCallback;
 import drbd.utilities.NewOutputCallback;
 import drbd.gui.ProgressBar;
 import drbd.gui.TerminalPanel;
-//import drbd.gui.HostTab;
-//import drbd.gui.HostViewPanel;
 import drbd.gui.SSHGui;
 import drbd.gui.HostBrowser;
 import drbd.data.resources.NetInterface;
@@ -1099,7 +1097,7 @@ public class Host implements Serializable {
                                 outputCallback,
                                 false,
                                 false,
-                                28000);
+                                30000);
         } else {
             Tools.appWarning("trying to start started hb status");
         }
@@ -1335,22 +1333,6 @@ public class Host implements Serializable {
         return terminalPanel;
     }
 
-    ///**
-    // * Sets host view panel object. This is the panel with a view to the
-    // * resources and services of the host
-    // */
-    //public final void setHostViewPanel(final HostViewPanel hostViewPanel) {
-    //    this.hostViewPanel = hostViewPanel;
-    //}
-
-    ///**
-    // * Gets host view panel object.
-    // */
-    //public final HostViewPanel getHostViewPanel() {
-    //    return hostViewPanel;
-    //}
-
-
     /**
      * Connects host with ssh. Dialog is needed, in case if password etc.
      * has to be entered. Connection is made in the background, after
@@ -1415,14 +1397,11 @@ public class Host implements Serializable {
             //connectButton.setForeground(connectButtonForeground);
         } else {
             //connectButton.setEnabled(false);
-            final Host thisHost = this;
-            Tools.startProgressIndicator(thisHost,
-                                         "Connecting "
-                                         + getName()
-                                         + "...");
+            final String hostName = getName();
+            Tools.startProgressIndicator(hostName, "Connecting...");
 
             final SSHGui sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
-                                             thisHost,
+                                             this,
                                              null);
 
             connect(sshGui,
@@ -1433,10 +1412,8 @@ public class Host implements Serializable {
                                         SwingUtilities.invokeLater(new Runnable() {
                                             public void run() {
                                                 Tools.stopProgressIndicator(
-                                                                      thisHost,
-                                                                      "Connecting "
-                                                                      + getName()
-                                                                      + "...");
+                                                                      hostName,
+                                                                      "Connecting...");
                                             }
                                         });
                                     }
@@ -1448,11 +1425,8 @@ public class Host implements Serializable {
                                         SwingUtilities.invokeLater(new Runnable() {
                                             public void run() {
                                                 Tools.stopProgressIndicator(
-                                                            thisHost,
-                                                            "Connecting "
-                                                            + getName()
-                                                            + "...");
-                                            }
+                                                            hostName,
+                                                            "Connecting..."); }
                                         });
                                     }
                                 });
@@ -1591,20 +1565,6 @@ public class Host implements Serializable {
     public final String replaceVars(final String command) {
         return replaceVars(command, false);
     }
-
-    ///**
-    // * Sets host panel, that contains host views.
-    // */
-    //public final void setHostTab(final HostTab hostTab) {
-    //    this.hostTab = hostTab;
-    //}
-
-    ///**
-    // * Gets host panel.
-    // */
-    //public final HostTab getHostTab() {
-    //    return hostTab;
-    //}
 
     /**
      * Parses the host info.
@@ -1810,6 +1770,7 @@ public class Host implements Serializable {
     public final int getSSHPortInt() {
         return new Integer(sshPort);
     }
+
     /**
      * Sets ssh port.
      */

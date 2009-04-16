@@ -358,7 +358,6 @@ public class HostCheckInstallation extends DialogHost {
             });
         }
         if (udevOk && drbdOk && heartbeatOk) { 
-            /* drbd is not required. */
             nextButtonSetEnabled(true);
             enableComponents();
             SwingUtilities.invokeLater(new Runnable() {

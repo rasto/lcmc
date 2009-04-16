@@ -232,15 +232,15 @@ public class TerminalPanel extends JScrollPane {
      * Executes the specified command, if the host is connected.
      */
     public final void execCommand(final String command) {
-        final Host thisHost = host;
+        final String hostName = host.getName();
 
-        if (!thisHost.isConnected()) {
+        if (!host.isConnected()) {
             return;
         }
         if (!"".equals(command)) {
-            Tools.startProgressIndicator(host, "Executing command");
+            Tools.startProgressIndicator(hostName, "Executing command");
         }
-        thisHost.execCommandRaw(command,
+        host.execCommandRaw(command,
              new ExecCallback() {
                  public void done(final String ans) {
                      //try {
@@ -249,14 +249,14 @@ public class TerminalPanel extends JScrollPane {
                      //    Tools.appError("sleep was interrupted.");
                      //}
                      if (!"".equals(command)) {
-                        Tools.stopProgressIndicator(thisHost,
+                        Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
                      }
                  }
 
                  public void doneError(final String ans, final int exitCode) {
                      if (!"".equals(command)) {
-                        Tools.stopProgressIndicator(thisHost,
+                        Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
                      }
                  }

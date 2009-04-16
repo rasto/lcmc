@@ -620,13 +620,14 @@ public class ClusterBrowser extends Browser {
                 heartbeatStatus = new HeartbeatStatus(firstHost, heartbeatXML);
                 drbdXML = new DrbdXML(cluster.getHostsArray());
                 /* available services */
-                Tools.startProgressIndicator(getCluster(),
+                final String clusterName = getCluster().getName();
+                Tools.startProgressIndicator(clusterName,
                         Tools.getString("ClusterBrowser.HbUpdateResources"));
 
                 updateAvailableServices();
-                Tools.stopProgressIndicator(getCluster(),
+                Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.HbUpdateResources"));
-                Tools.startProgressIndicator(getCluster(),
+                Tools.startProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
 
                 updateDrbdResources();
@@ -635,7 +636,7 @@ public class ClusterBrowser extends Browser {
                 //} });
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
-                Tools.stopProgressIndicator(getCluster(),
+                Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
                 cluster.getBrowser().startDrbdStatus(clusterViewPanel);
                 cluster.getBrowser().startHbStatus(clusterViewPanel);
@@ -682,6 +683,7 @@ public class ClusterBrowser extends Browser {
                                 final ClusterViewPanel clusterViewPanel) {
         boolean firstTime = true; // TODO: can use a latch for this shit too.
         host.setDrbdStatus(true);
+        final String hostName = host.getName();
         while (true) {
             final boolean ft = firstTime;
             drbdStatusCanceled = false;
@@ -712,7 +714,7 @@ public class ClusterBrowser extends Browser {
                                                host.setDrbdStatus(true);
                                            }
                                            if (ft) {
-                                               Tools.startProgressIndicator(host, host.getName() + ": updating drbd status...");
+                                               Tools.startProgressIndicator(hostName, ": updating drbd status...");
                                            }
                                            final String[] lines = output.split("\n");
                                            drbdXML.update(host);
@@ -730,7 +732,7 @@ public class ClusterBrowser extends Browser {
                                                });
                                            thread.start();
                                            if (ft) {
-                                               Tools.stopProgressIndicator(host, host.getName() + ": updating drbd status...");
+                                               Tools.stopProgressIndicator(hostName, ": updating drbd status...");
                                            }
                                        }
                                    });
@@ -789,19 +791,19 @@ public class ClusterBrowser extends Browser {
     /**
      * Starts hb status progress indicator.
      */
-    public final void startHbStatusProgressIndicator(final Host host) {
+    public final void startHbStatusProgressIndicator(final String hostName) {
         // TODO; hbStatusFirstTime closure?
         Tools.startProgressIndicator(
-                            host,
+                            hostName,
                             Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
     /**
      * Stops hb status progress indicator.
      */
-    public final void stopHbStatusProgressIndicator(final Host host) {
+    public final void stopHbStatusProgressIndicator(final String hostName) {
         Tools.stopProgressIndicator(
-                            host,
+                            hostName,
                             Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
@@ -812,6 +814,7 @@ public class ClusterBrowser extends Browser {
         hbStatusFirstTime = true;
         while (true) {
             final Host host = getDCHost();
+            final String hostName = host.getName();
             if (host == null) {
                 try {
                     Thread.sleep(5000);
@@ -821,7 +824,7 @@ public class ClusterBrowser extends Browser {
                 continue;
             }
             if (hbStatusFirstTime) {
-                startHbStatusProgressIndicator(host);
+                startHbStatusProgressIndicator(hostName);
             }
             hbStatusCanceled = false;
             host.execHbStatusCommand(
@@ -833,12 +836,12 @@ public class ClusterBrowser extends Browser {
                                                  //SwingUtilities.invokeLater(new Runnable() { public void run() {
                                                  //    heartbeatGraph.scale();
                                                  //} });
-                                                 stopHbStatusProgressIndicator(host);
+                                                 stopHbStatusProgressIndicator(hostName);
                                              }
                                          }
 
                                          public void doneError(final String ans, final int exitCode) {
-                                             Tools.progressIndicatorFailed(host, "Heartbeat status failed");
+                                             Tools.progressIndicatorFailed(hostName, "Heartbeat status failed");
                                              if (hbStatusFirstTime) {
                                                 Tools.debug(this, "hb status failed: " + host.getName());
                                              }
@@ -868,7 +871,7 @@ public class ClusterBrowser extends Browser {
                                                      //SwingUtilities.invokeLater(new Runnable() { public void run() {
                                                          heartbeatGraph.scale();
                                                      //} });
-                                                     stopHbStatusProgressIndicator(host);
+                                                     stopHbStatusProgressIndicator(hostName);
                                                  }
                                                  return;
                                              }
@@ -915,7 +918,7 @@ public class ClusterBrowser extends Browser {
                                                  //SwingUtilities.invokeLater(new Runnable() { public void run() {
                                                  //    heartbeatGraph.scale();
                                                  //} });
-                                                 stopHbStatusProgressIndicator(host);
+                                                 stopHbStatusProgressIndicator(hostName);
                                              }
                                              hbStatusUnlock();
                                          }
@@ -2850,6 +2853,7 @@ public class ClusterBrowser extends Browser {
         public void apply() {
             final String dir = getComboBoxValue("directory");
             for (Host host : getClusterHosts()) {
+                final String hostName = host.getName();
                 final String ret = Tools.execCommandProgressIndicator(
                                                        host,
                                                        "stat -c \"%F\" " + dir,

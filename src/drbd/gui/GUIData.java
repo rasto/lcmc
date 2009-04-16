@@ -49,8 +49,6 @@ public class GUIData  {
     private JFrame mainFrame;
     /** Split pane where is the terminal panel. */
     private JSplitPane terminalSplitPane;
-    ///** Hosts panel. */
-    //private HostsPanel hostsPanel;
     /** Clusters panel. */
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
@@ -155,20 +153,6 @@ public class GUIData  {
         }
     }
 
-    ///**
-    // * Sets hosts panel object, panel where are all the hosts.
-    // */
-    //public final void setHostsPanel(final HostsPanel hostsPanel) {
-    //    this.hostsPanel = hostsPanel;
-    //}
-
-    ///**
-    // * Gets hosts panel object.
-    // */
-    //public final HostsPanel getHostsPanel() {
-    //    return hostsPanel;
-    //}
-
     /**
      * Returns the panel with clusters.
      */
@@ -262,6 +246,7 @@ public class GUIData  {
             addHostButtonList.add(addHostButton);
         }
     }
+
     /**
      * Removes the 'Add Cluster' button from the list.
      */

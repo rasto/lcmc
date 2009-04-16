@@ -378,13 +378,14 @@ public final class Tools {
                                            final boolean outputVisible,
                                            final String text) {
         ExecCallback ec;
-        Tools.startProgressIndicator(host, text);
+        final String hostName = host.getName();
+        Tools.startProgressIndicator(hostName, text);
         final StringBuffer output = new StringBuffer("");
         if (execCallback == null) {
             ec = new ExecCallback() {
                              public void done(final String ans) {
                                  output.append(ans);
-                                 Tools.stopProgressIndicator(host, text);
+                                 Tools.stopProgressIndicator(hostName, text);
                              }
 
                              public void doneError(final String ans,
@@ -395,8 +396,8 @@ public final class Tools {
                                                    ans,
                                                    exitCode);
                                  }
-                                 Tools.stopProgressIndicator(host, text);
-                                 Tools.progressIndicatorFailed(host,
+                                 Tools.stopProgressIndicator(hostName, text);
+                                 Tools.progressIndicatorFailed(hostName,
                                                                text
                                                                + " failed");
                                  output.append(ans);
@@ -580,7 +581,6 @@ public final class Tools {
         errorPane.setMinimumSize(DIALOG_PANEL_SIZE);
         errorPane.setMaximumSize(DIALOG_PANEL_SIZE);
         errorPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        //sendMail("[drbd-gui] apperror: " + msg, errorString.toString());
         JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
                             new JScrollPane(errorPane),
@@ -1311,19 +1311,11 @@ public final class Tools {
     }
 
     /**
-     * Starts progress indicator for host command.
+     * Starts progress indicator for host or cluster command.
      */
-    public static void startProgressIndicator(final Host host,
+    public static void startProgressIndicator(final String name,
                                               final String text) {
-        startProgressIndicator(host.getName() + ": " + text);
-    }
-
-    /**
-     * Starts progress indicator for cluster command.
-     */
-    public static void startProgressIndicator(final Cluster cluster,
-                                              final String text) {
-        startProgressIndicator(cluster.getName() + ": " + text);
+        startProgressIndicator(name + ": " + text);
     }
 
     /**
@@ -1334,21 +1326,12 @@ public final class Tools {
     }
 
     /**
-     * Stops progress indicator for host command.
+     * Stops progress indicator for host or cluster command.
      */
-    public static void stopProgressIndicator(final Host host,
+    public static void stopProgressIndicator(final String name,
                                              final String text) {
-        stopProgressIndicator(host.getName() + ": " + text);
+        stopProgressIndicator(name + ": " + text);
     }
-
-    /**
-     * Stops progress indicator for cluster command.
-     */
-    public static void stopProgressIndicator(final Cluster cluster,
-                                             final String text) {
-        stopProgressIndicator(cluster.getName() + ": " + text);
-    }
-
 
     /**
      * Stops progress indicator with failure message.
@@ -1358,47 +1341,13 @@ public final class Tools {
     }
 
     /**
-     * Stops progress indicator with failure message for host command.
+     * Stops progress indicator with failure message for host or cluster
+     * command.
      */
-    public static void progressIndicatorFailed(final Host host,
+    public static void progressIndicatorFailed(final String name,
                                                final String text) {
-        progressIndicatorFailed(host.getName() + ": " + text);
+        progressIndicatorFailed(name + ": " + text);
     }
-
-    /**
-     * Stops progress indicator with failure message for cluster command.
-     */
-    public static void progressIndicatorFailed(final Cluster cluster,
-                                               final String text) {
-        progressIndicatorFailed(cluster.getName() + ": " + text);
-    }
-
-    //public static void sendMail(String subject, String body) {
-    //    String smtpServer = Tools.getDefault("Tools.Mail.Server");
-    //    String to         = Tools.getDefault("Tools.Mail.To");
-    //    String from       = Tools.getDefault("Tools.Mail.From");
-
-    //    Properties props = new Properties();
-    //    props.put("mail.smtp.host", smtpServer);
-    //    //props.put("mail.debug", "true");
-    //    javax.mail.Session session = javax.mail.Session.getInstance(props);
-    //    try {
-    //        javax.mail.Message msg =
-    //                          new javax.mail.internet.MimeMessage(session);
-
-    //        //Set message attributes
-    //        msg.setFrom(new javax.mail.internet.InternetAddress(from));
-    //        javax.mail.internet.InternetAddress[] address =
-    //                          {new javax.mail.internet.InternetAddress(to)};
-    //        msg.setRecipients(javax.mail.Message.RecipientType.TO, address);
-    //        msg.setSubject(subject);
-    //        msg.setSentDate(new Date());
-    //        msg.setText(body);
-    //        javax.mail.Transport.send(msg);
-    //    } catch (javax.mail.MessagingException mex) {
-    //        mex.printStackTrace();
-    //    }
-    //}
 
     /**
      * Sets fixed size for component.
