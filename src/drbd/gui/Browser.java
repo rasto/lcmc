@@ -217,6 +217,8 @@ public class Browser {
         /** list of items in the menu for this object. */
         private final List<UpdatableItem> menuList =
                                                 new ArrayList<UpdatableItem>();
+        /** Whether the info object is being updated. */
+        private boolean updated = false;
 
         /**
          * Prepares a new <code>Info</code> object.
@@ -319,6 +321,21 @@ public class Browser {
          * Sets the terminal panel, if necessary.
          */
         protected void setTerminalPanel() {
+        }
+
+        /**
+         * Returns whether the info object is being updated. This can be used
+         * for animations.
+         */
+        protected boolean isUpdated() {
+            return updated;
+        }
+
+        /**
+         * Sets whether the info object is being updated.
+         */
+        protected void setUpdated(final boolean updated) {
+            this.updated = updated;
         }
 
         /**

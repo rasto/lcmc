@@ -83,6 +83,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
 
 import java.awt.geom.Area;
+import java.awt.geom.AffineTransform;
+
 
 /**
  * This class creates graph and provides methods for scaling etc.,
@@ -126,7 +128,8 @@ public abstract class ResourceGraph {
     private DefaultSettableVertexLocationFunction vertexLocations;
     /** The scaler. */
     private ViewScalingControl myScaler;
-
+    /** Rotation angle of the animation in the graph. */
+    private volatile int rotation = 0;
 
     /**
      * Prepares a new <code>ResourceGraph</code> object.
@@ -134,6 +137,24 @@ public abstract class ResourceGraph {
     public ResourceGraph(final ClusterBrowser clusterBrowser) {
         this.clusterBrowser = clusterBrowser;
         initGraph();
+        /* start animation thread */
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    rotation += 20;
+                    if (rotation >= 360) {
+                        rotation = 0;
+                    }
+                    repaint();
+                }
+            }
+        });
+        thread.start();
     }
 
     /**
@@ -945,7 +966,20 @@ public abstract class ResourceGraph {
                 icon.setDescription("asdf");
                 final double x = loc.getX() - getVertexSize(v) / 2;
                 final double y = loc.getY() - icon.getIconHeight() / 2;
-                g2d.drawImage(icon.getImage(), (int)x, (int)y, null);
+                if (getInfo(v).isUpdated()) {
+                    /* update animation */
+                    AffineTransform origXform = g2d.getTransform();
+                    AffineTransform newXform = (AffineTransform)(origXform.clone());
+                    int xRot = icon.getIconWidth() / 2;
+                    int yRot = icon.getIconHeight() / 2;
+                    newXform.setToTranslation(x, y);
+                    newXform.rotate(Math.toRadians(rotation),
+                                          xRot,
+                                          yRot);
+                    g2d.drawImage(icon.getImage(), newXform, null);
+                } else {
+                    g2d.drawImage(icon.getImage(), (int)x, (int)y, null);
+                }
             }
         }
     }

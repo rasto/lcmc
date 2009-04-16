@@ -915,6 +915,9 @@ public class HeartbeatGraph extends ResourceGraph {
         }
 
         final ServiceInfo si = (ServiceInfo) getInfo((Vertex) v);
+        if (si == null) {
+            return null;
+        }
         if (si.isStarted()) {
             return SERVICE_RUNNING_ICON;
         } else if (si.isStopped()) {

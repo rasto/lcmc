@@ -102,11 +102,6 @@ public class HeartbeatXML extends XML {
     /** Heartbeat boolean true string. */
     private static final String HB_BOOLEAN_TRUE =
                                     Tools.getString("Heartbeat.Boolean.True");
-    /** Target role attribute name. */
-    private static final String TARGET_ROLE_PARAM = "target_role";
-    /** Is managed attribute name. */
-    private static final String IS_MANAGED_PARAM = "is_managed";
-
     /**
      * Prepares a new <code>HeartbeatXML</code> object.
      */
@@ -670,32 +665,39 @@ public class HeartbeatXML extends XML {
      */
     private void parseParameters(final HeartbeatService hbService,
                                  final Node parametersNode) {
-        /* target_role */
-        hbService.addParameter(TARGET_ROLE_PARAM);
-        hbService.setParamPossibleChoices(TARGET_ROLE_PARAM, 
+        /* target-role */
+        final String hbV = host.getHeartbeatVersion();
+        String targetRoleParam = "target-role";
+        String isManagedParam = "is-managed";
+        if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+            targetRoleParam = "target_role";
+            isManagedParam = "is_managed";
+        }
+        hbService.addParameter(targetRoleParam);
+        hbService.setParamPossibleChoices(targetRoleParam, 
                                           new String[]{"started", "stopped"});
-        hbService.setParamIsMetaAttr(TARGET_ROLE_PARAM, true);
-        hbService.setParamRequired(TARGET_ROLE_PARAM, true);
+        hbService.setParamIsMetaAttr(targetRoleParam, true);
+        hbService.setParamRequired(targetRoleParam, true);
         hbService.setParamShortDesc(
-                         TARGET_ROLE_PARAM,
+                         targetRoleParam,
                          Tools.getString("HeartbeatXML.TargetRole.ShortDesc"));
         hbService.setParamLongDesc(
-                         TARGET_ROLE_PARAM,
+                         targetRoleParam,
                          Tools.getString("HeartbeatXML.TargetRole.LongDesc"));
-        hbService.setParamDefault(TARGET_ROLE_PARAM, "stopped");
+        hbService.setParamDefault(targetRoleParam, "stopped");
 
-        hbService.addParameter(IS_MANAGED_PARAM);
-        hbService.setParamPossibleChoices(IS_MANAGED_PARAM, 
+        hbService.addParameter(isManagedParam);
+        hbService.setParamPossibleChoices(isManagedParam, 
                                           new String[]{"true", "false"});
-        hbService.setParamIsMetaAttr(IS_MANAGED_PARAM, true);
-        hbService.setParamRequired(IS_MANAGED_PARAM, true);
+        hbService.setParamIsMetaAttr(isManagedParam, true);
+        hbService.setParamRequired(isManagedParam, true);
         hbService.setParamShortDesc(
-                         IS_MANAGED_PARAM,
+                         isManagedParam,
                          Tools.getString("HeartbeatXML.IsManaged.ShortDesc"));
         hbService.setParamLongDesc(
-                         IS_MANAGED_PARAM,
+                         isManagedParam,
                          Tools.getString("HeartbeatXML.IsManaged.LongDesc"));
-        hbService.setParamDefault(IS_MANAGED_PARAM, "true");
+        hbService.setParamDefault(isManagedParam, "true");
 
         final NodeList parameters = parametersNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); i++) {

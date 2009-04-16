@@ -133,10 +133,18 @@ public class DistResource extends
         //{"Heartbeat.removeResource",    "crm_resource -D -r @ID@ -t @TYPE@"},
         {"Heartbeat.cleanupResource",    "crm_resource -C -r @ID@ -H @HOST@"},
         {"Heartbeat.addConstraint",     "cibadmin -C -o constraints -X '@XML@'"},
-        {"Heartbeat.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
-        {"Heartbeat.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
-        {"Heartbeat.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
-        {"Heartbeat.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
+
+        /* 2.1.4 and before */
+        {"Heartbeat.2.1.4.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
+        {"Heartbeat.2.1.4.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
+        {"Heartbeat.2.1.4.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
+        {"Heartbeat.2.1.4.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
+        /* 2.99.0 and after. */
+        {"Heartbeat.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target-role -v started"},
+        {"Heartbeat.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target-role -v stopped"},
+        {"Heartbeat.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is-managed -v true"},
+        {"Heartbeat.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
+
         {"Heartbeat.migrateResource",   "crm_resource -r @ID@ -H @HOST@ --migrate"},
         {"Heartbeat.unmigrateResource", "crm_resource -r @ID@ --un-migrate"},
 

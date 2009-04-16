@@ -424,26 +424,6 @@ sub get_drbd_info {
 	print "</drbd-status>\n";
 }
 
-#sub create_hb_conf {
-#	if (!-e '/etc/ha.d/ha.cf') {
-#		print <<CONF;
-#keepalive 1
-#deadtime 10
-#warntime 5
-#initdead 60
-#udpport 694
-#baud 19200
-#serial /dev/ttyS0
-#ucast eth0 10.0.0.20
-#auto_failback off
-#watchdog /dev/watchdog
-#node node-a
-#node node-b
-#CONF
-#	}
-#}
-
-#TODO: sys.path.append is distribution specific...
 sub is_smaller_v {
 	my $v 	   = shift;
 	my $than_v = shift;
@@ -532,6 +512,7 @@ sub get_cluster_events {
 			kill 1, $pid;
 		}  else {
 			my $cibevent = 0;
+			my $prev_byte = "";
 			while (1) {
 				my $len = sysread($CB, $byte, 1);
 				if ($! == EAGAIN || $len != 1) {
@@ -548,17 +529,23 @@ sub get_cluster_events {
 					}
 					next;
 				}
-				if ($byte eq "%") {
+				if ($prev_byte && $byte ne $prev_byte) {
+					$count = 0;
+					$prev_byte = "";
+				} elsif ($byte eq "%" || $byte eq "<") {
+					$prev_byte = $byte;
 					$count++;
 					if ($count == 3) {
 						$cibevent++;
 						if ($cibevent == 1) {
 							sleep 5;
 						}
+						$prev_byte = "";
 						$count = 0;
 					}
 				} else {
 					$count = 0;
+					$prev_byte = "";
 				}
 			}
 		}

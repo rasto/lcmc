@@ -415,8 +415,13 @@ public final class Heartbeat {
      */
     public static void startResource(final Host host,
                                      final String heartbeatId) {
+        final String hbVersion = host.getHeartbeatVersion();
+        String cmd = host.getCommand("Heartbeat.startResource");
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            cmd = host.getCommand("Heartbeat.2.1.4.startResource");
+        }
         final String command = convert(
-                                 host.getCommand("Heartbeat.startResource"),
+                                 cmd,
                                  heartbeatId, "", "");
         execCommand(host, command, true);
     }
@@ -462,12 +467,17 @@ public final class Heartbeat {
                                   final boolean isManaged) {
         String string;
         if (isManaged) {
-            string = "Heartbeat.isManagedOn";
+            string = ".isManagedOn";
         } else {
-            string = "Heartbeat.isManagedOff";
+            string = ".isManagedOff";
+        }
+        final String hbVersion = host.getHeartbeatVersion();
+        String cmd = host.getCommand("Heartbeat" + string);
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            cmd = host.getCommand("Heartbeat.2.1.4" + string);
         }
         final String command = convert(
-                                 host.getCommand(string),
+                                 cmd,
                                  heartbeatId, "", "");
         execCommand(host, command, true);
     }
@@ -482,8 +492,13 @@ public final class Heartbeat {
      */
     public static void stopResource(final Host host,
                                     final String heartbeatId) {
+        final String hbVersion = host.getHeartbeatVersion();
+        String cmd = host.getCommand("Heartbeat.stopResource");
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            cmd = host.getCommand("Heartbeat.2.1.4.stopResource");
+        }
         final String command = convert(
-                                 host.getCommand("Heartbeat.stopResource"),
+                                 cmd,
                                  heartbeatId, "", "");
         execCommand(host, command, true);
     }

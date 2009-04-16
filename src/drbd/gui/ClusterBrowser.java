@@ -3627,7 +3627,7 @@ public class ClusterBrowser extends Browser {
         public boolean isStarted() {
             final String targetRole =
                 heartbeatStatus.getParameter(getService().getHeartbeatId(),
-                                             "target_role");
+                                             "target-role");
             if (targetRole != null && targetRole.equals("started")) {
                 return true;
             }
@@ -3640,7 +3640,7 @@ public class ClusterBrowser extends Browser {
         public boolean isStopped() {
             final String targetRole =
                 heartbeatStatus.getParameter(getService().getHeartbeatId(),
-                                             "target_role");
+                                             "target-role");
             if (targetRole != null && targetRole.equals("stopped")) {
                 return true;
             }
@@ -3654,7 +3654,7 @@ public class ClusterBrowser extends Browser {
         final public boolean isManaged() {
             final String isManaged =
                 heartbeatStatus.getParameter(getService().getHeartbeatId(),
-                                             "is_managed");
+                                             "is-managed");
             if (isManaged == null || isManaged.equals("true")) {
                 return true;
             }
@@ -3680,6 +3680,7 @@ public class ClusterBrowser extends Browser {
          * Sets whether the service is managed.
          */
         final public void setManaged(final boolean isManaged) {
+            setUpdated(true);
             Heartbeat.setManaged(getDCHost(),
                                  getService().getHeartbeatId(),
                                  isManaged);
@@ -4594,6 +4595,8 @@ public class ClusterBrowser extends Browser {
          * Applies the changes to the service parameters.
          */
         public void apply() {
+            /* TODO: make progress indicator per resource. */
+            setUpdated(true);
             final String[] params = getParametersFromXML();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -4937,6 +4940,7 @@ public class ClusterBrowser extends Browser {
          * Starts resource in heartbeat.
          */
         public void startResource() {
+            setUpdated(true);
             Heartbeat.startResource(getDCHost(),
                                     getService().getHeartbeatId());
         }
@@ -4945,6 +4949,7 @@ public class ClusterBrowser extends Browser {
          * Moves resource up in the group.
          */
         public void moveGroupResUp() {
+            setUpdated(true);
             Heartbeat.moveGroupResUp(getDCHost(),
                                      getService().getHeartbeatId());
         }
@@ -4953,6 +4958,7 @@ public class ClusterBrowser extends Browser {
          * Moves resource down in the group.
          */
         public void moveGroupResDown() {
+            setUpdated(true);
             Heartbeat.moveGroupResDown(getDCHost(),
                                        getService().getHeartbeatId());
         }
@@ -4961,6 +4967,7 @@ public class ClusterBrowser extends Browser {
          * Stops resource in heartbeat.
          */
         public void stopResource() {
+            setUpdated(true);
             Heartbeat.stopResource(getDCHost(),
                                    getService().getHeartbeatId());
         }
@@ -4969,6 +4976,7 @@ public class ClusterBrowser extends Browser {
          * Migrates resource in heartbeat from current location.
          */
         public void migrateResource(final String onHost) {
+            setUpdated(true);
             Heartbeat.migrateResource(getDCHost(),
                                       getService().getHeartbeatId(),
                                       onHost);
@@ -4978,6 +4986,7 @@ public class ClusterBrowser extends Browser {
          * Removes constraints created by resource migrate command.
          */
         public void unmigrateResource() {
+            setUpdated(true);
             Heartbeat.unmigrateResource(getDCHost(),
                                         getService().getHeartbeatId());
         }
@@ -4986,6 +4995,7 @@ public class ClusterBrowser extends Browser {
          * Cleans up the resource.
          */
         public void cleanupResource() {
+            setUpdated(true);
             Heartbeat.cleanupResource(getDCHost(),
                                       getService().getHeartbeatId(),
                                       getClusterHosts());
@@ -4995,6 +5005,7 @@ public class ClusterBrowser extends Browser {
          * Removes the service without confirmation dialog.
          */
         protected void removeMyselfNoConfirm() {
+            setUpdated(true);
             getService().setRemoved(true);
 
             //super.removeMyself();
@@ -5880,6 +5891,7 @@ public class ClusterBrowser extends Browser {
                             final Map<String, String> resourceNode =
                                             heartbeatStatus.getParamValuePairs(hbId);
                             newGi.setParameters(resourceNode);
+                            newGi.setUpdated(false);
                             heartbeatGraph.repaint();
                         }
                         heartbeatGraph.setVertexIsPresent(newGi);
@@ -5930,6 +5942,7 @@ public class ClusterBrowser extends Browser {
                         }
                     } else {
                         newSi.setParameters(resourceNode);
+                        newSi.setUpdated(false);
                         heartbeatGraph.repaint();
                     }
                     newSi.getService().setNew(false);
