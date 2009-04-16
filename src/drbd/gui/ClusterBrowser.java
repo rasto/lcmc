@@ -3623,9 +3623,14 @@ public class ClusterBrowser extends Browser {
         * Returns whether service is started.
         */
         public boolean isStarted() {
+            final String hbV = getDCHost().getHeartbeatVersion();
+            String targetRoleString = "target-role";
+            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                targetRoleString = "target_role";
+            }
             final String targetRole =
                 heartbeatStatus.getParameter(getService().getHeartbeatId(),
-                                             "target-role");
+                                             targetRoleString);
             if (targetRole != null && targetRole.equals("started")) {
                 return true;
             }
@@ -3636,9 +3641,14 @@ public class ClusterBrowser extends Browser {
         * Returns whether service is stopped.
         */
         public boolean isStopped() {
+            final String hbV = getDCHost().getHeartbeatVersion();
+            String targetRoleString = "target-role";
+            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                targetRoleString = "target_role";
+            }
             final String targetRole =
                 heartbeatStatus.getParameter(getService().getHeartbeatId(),
-                                             "target-role");
+                                             targetRoleString);
             if (targetRole != null && targetRole.equals("stopped")) {
                 return true;
             }
@@ -3650,9 +3660,14 @@ public class ClusterBrowser extends Browser {
          * TODO: "default" value
          */
         final public boolean isManaged() {
+            final String hbV = getDCHost().getHeartbeatVersion();
+            String isManagedString = "is-managed";
+            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                isManagedString = "is_managed";
+            }
             final String isManaged =
                 heartbeatStatus.getParameter(getService().getHeartbeatId(),
-                                             "is-managed");
+                                             isManagedString);
             if (isManaged == null || isManaged.equals("true")) {
                 return true;
             }
@@ -4799,6 +4814,8 @@ public class ClusterBrowser extends Browser {
          * Removes order.
          */
         public void removeOrder(final ServiceInfo parent) {
+            parent.setUpdated(true);
+            setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             final String orderId =
                     heartbeatStatus.getOrderId(parentHbId,
@@ -4823,6 +4840,8 @@ public class ClusterBrowser extends Browser {
          * Adds order constraint from this service to the parent.
          */
         public void addOrder(final ServiceInfo parent) {
+            parent.setUpdated(true);
+            setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             Heartbeat.addOrder(getDCHost(),
                                getService().getHeartbeatId(),
@@ -4833,6 +4852,8 @@ public class ClusterBrowser extends Browser {
          * Removes colocation.
          */
         public void removeColocation(final ServiceInfo parent) {
+            parent.setUpdated(true);
+            setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             final String colocationId =
                 heartbeatStatus.getColocationId(parentHbId,
@@ -4855,6 +4876,8 @@ public class ClusterBrowser extends Browser {
          * constraint is used along with order constraint.
          */
         public void addColocation(final ServiceInfo parent) {
+            parent.setUpdated(true);
+            setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             Heartbeat.addColocation(getDCHost(),
                                     getService().getHeartbeatId(),
