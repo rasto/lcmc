@@ -2252,8 +2252,6 @@ public class ClusterBrowser extends Browser {
             di.getInfoPanel();
             di.paramComboBoxGet("1", null).setValueAndWait(getName());
             di.apply();
-            fi.addColocation(di);
-            fi.addOrder(di);
             heartbeatGraph.addColocation(di, fi);
         }
 
