@@ -5572,11 +5572,19 @@ public class ClusterBrowser extends Browser {
                 node = "none";
             }
             final StringBuffer sb = new StringBuffer(200);
+            sb.append("<b>");
             sb.append(toString());
-            sb.append(" running on node: ");
-            sb.append(node);
-            sb.append("<br>is managed by heartbeat: ");
-            sb.append(isManaged());
+            if (isFailed()) {
+                sb.append("</b><br><b>Failed</b>");
+            } else if (isStopped()) {
+                sb.append("</b><br>not running");
+            } else {
+                sb.append("</b><br>running on: ");
+                sb.append(node);
+            }
+            if (!isManaged()) { 
+                sb.append(" (unmanaged)");
+            }
             return sb.toString();
         }
 

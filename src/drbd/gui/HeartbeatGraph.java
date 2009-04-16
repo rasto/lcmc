@@ -737,8 +737,8 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         if (si.isFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
-        } else if (!si.isManaged()) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnmanaged");
+        } else if (si.isStopped()) {
+            return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
         } else if (getClusterBrowser().hbStatusFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (vertexIsPresentList.contains(v)) {
@@ -1076,5 +1076,57 @@ public class HeartbeatGraph extends ResourceGraph {
             //    }
             //});
         }
+    }
+
+    /**
+     * Small text that appears above the icon.
+     */
+    protected String getIconText(final Vertex v) {
+        if (vertexToHostMap.containsKey(v)) {
+            // TODO: running etc
+            return null;
+        }
+        final ServiceInfo si = (ServiceInfo)getInfo(v);
+        String targetRole = null; 
+        if (si.isStarted()) {
+            targetRole = "started";
+        } else if (si.isStopped()) {
+            targetRole = "stopped";
+        }
+        return targetRole;
+    }
+
+    /**
+     * Small text that appears in the right corner.
+     */
+    protected String getRightCornerText(final Vertex v) {
+        if (vertexToHostMap.containsKey(v)) {
+            return null;
+        }
+        final ServiceInfo si = (ServiceInfo)getInfo(v);
+        if (!si.isManaged()) {
+            return "(unmanaged)";
+        }
+        return null;
+    }
+
+    /**
+     * Small text that appears down.
+     */
+    protected String getSubtext(final Vertex v) {
+        if (vertexToHostMap.containsKey(v)) {
+            return null;
+        }
+        final ServiceInfo si = (ServiceInfo)getInfo(v);
+        if (si.isFailed()) {
+            return "Failed";
+        } else if (si.isStopped()) {
+            return "not running";
+        }
+        String runningOnNode = si.getRunningOnNode(); 
+        if (runningOnNode != null) {
+            return "running on: " + runningOnNode;
+        }
+        return "";
     }
 }

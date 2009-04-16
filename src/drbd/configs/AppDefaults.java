@@ -161,7 +161,6 @@ public class AppDefaults extends
 
         {"HeartbeatGraph.FillPaintRemoved",       Color.LIGHT_GRAY },
         {"HeartbeatGraph.FillPaintFailed",        Color.RED },
-        {"HeartbeatGraph.FillPaintUnmanaged",     new Color(238, 238, 238)},
         {"HeartbeatGraph.FillPaintUnconfigured",  Color.WHITE},
         {"HeartbeatGraph.FillPaintUnknown",       Color.LIGHT_GRAY},
         {"HeartbeatGraph.FillPaintStopped",       new Color(238, 238, 238)},

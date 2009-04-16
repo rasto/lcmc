@@ -85,6 +85,11 @@ import javax.swing.ImageIcon;
 import java.awt.geom.Area;
 import java.awt.geom.AffineTransform;
 
+import java.awt.Font;
+import java.awt.font.TextLayout;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
+
 
 /**
  * This class creates graph and provides methods for scaling etc.,
@@ -962,11 +967,12 @@ public abstract class ResourceGraph {
             super.paintShapeForVertex(g2d, v, shape);
             final Point2D loc = visualizationViewer.layoutTransform(layout.getLocation(v));
             final ImageIcon icon = getIconForVertex(v);
+            Info info = getInfo(v);
             if (icon != null) {
                 icon.setDescription("asdf");
                 final double x = loc.getX() - getVertexSize(v) / 2;
                 final double y = loc.getY() - icon.getIconHeight() / 2;
-                if (getInfo(v).isUpdated()) {
+                if (info.isUpdated()) {
                     /* update animation */
                     AffineTransform origXform = g2d.getTransform();
                     AffineTransform newXform = (AffineTransform)(origXform.clone());
@@ -980,8 +986,64 @@ public abstract class ResourceGraph {
                 } else {
                     g2d.drawImage(icon.getImage(), (int)x, (int)y, null);
                 }
+                final String iconText = getIconText(v);
+                if (iconText != null) {
+                    drawVertexText(g2d,
+                                   iconText,
+                                   x + 4,
+                                   y,
+                                   0.8,
+                                   new Color(0, 0, 0),
+                                   255,
+                                   false);
+                    
+                }
+                final String subtext = getSubtext(v);
+                if (subtext != null) {
+                    drawVertexText(g2d,
+                                   subtext,
+                                   x + 30,
+                                   y + shape.getBounds().getHeight() - 15,
+                                   0.8,
+                                   new Color(0, 0, 0),
+                                   255,
+                                   false);
+                }
+                final String rightCornerText = getRightCornerText(v);
+                if (rightCornerText != null) {
+                    drawVertexText(g2d,
+                                   rightCornerText,
+                                   x + shape.getBounds().getWidth() - 8,
+                                   y,
+                                   0.9,
+                                   new Color(255, 0, 0),
+                                   255,
+                                   true);
+                    
+                }
             }
         }
+    }
+
+    /**
+     * Small text that appears above the icon.
+     */
+    protected String getIconText(final Vertex v) {
+        return null;
+    }
+
+    /**
+     * Small text that appears in the right corner.
+     */
+    protected String getRightCornerText(final Vertex v) {
+        return null;
+    }
+
+    /**
+     * Small text that appears down.
+     */
+    protected String getSubtext(final Vertex v) {
+        return null;
     }
 
     public void getPositions(final Map<String,Point2D> positions) {
@@ -1026,6 +1088,38 @@ public abstract class ResourceGraph {
         final Host[] hosts = clusterBrowser.getClusterHosts();
         for (int i = 0; i < hosts.length; i++) {
             hosts[i].resetGraphPosition(getId(info));
+        }
+    }
+
+    /**
+     * Draws text on the vertex.
+     */
+    private final void drawVertexText(final Graphics2D g2d,
+                                      final String text,
+                                      final double x,
+                                      final double y,
+                                      final double fontSizeFactor,
+                                      final Color color,
+                                      final int alpha,
+                                      final boolean rightBound) {
+        final Font font = Tools.getGUIData().getMainFrame().getFont();
+        final FontRenderContext context = g2d.getFontRenderContext();
+        final TextLayout layout =
+                           new TextLayout(
+                             text,
+                             new Font(font.getName(),
+                                      font.getStyle(),
+                                      (int) (font.getSize() * fontSizeFactor)),
+                             context);
+        final Rectangle2D bounds = layout.getBounds();
+        g2d.setColor(new Color(color.getRed(),
+                               color.getGreen(),
+                               color.getBlue(),
+                               alpha));
+        if (rightBound) {
+            layout.draw(g2d, (float) (x - bounds.getWidth()), (float) y);
+        } else {
+            layout.draw(g2d, (float) x, (float) y);
         }
     }
 }
