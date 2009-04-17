@@ -4732,8 +4732,12 @@ public class ClusterBrowser extends Browser {
                     args.append(value);
                     args.append('"');
                 }
+                String command = "-C";
+                if (groupInfo != null && !groupInfo.getService().isNew()) {
+                        command = "-U";
+                }
                 Heartbeat.setParameters(getDCHost(),
-                                        "-C",
+                                        command,
                                         heartbeatId,
                                         groupId,
                                         args.toString(),
