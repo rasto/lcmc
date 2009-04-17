@@ -342,7 +342,7 @@ public class HeartbeatGraph extends ResourceGraph {
                     sv,
                     new Point2D.Float(BD_X_POS +
                                       (getVertexSize(v) - MIN_BD_WIDTH) / 2,
-                                      maxYPos + 20));
+                                      maxYPos + 40));
             }
         }
 
