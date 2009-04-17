@@ -99,7 +99,6 @@ public class Service extends Resource {
                 id = heartbeatId;
             }
         }
-        System.out.println("set heartbeat id: " + getName() + ", hbid: " + heartbeatId + ", id: " + id);
         setValue("id", id);
     }
 

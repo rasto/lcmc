@@ -924,6 +924,10 @@ public class Browser {
                 final String longDesc = getParamLongDesc(param);
                 label.setToolTipText(longDesc);
                 addField(panel, label, paramCb, leftWidth, rightWidth);
+            }
+
+            for (final String param : params) {
+                final GuiComboBox paramCb = paramComboBoxGet(param, null);
                 paramCb.addListeners(
                     new ItemListener() {
                         public void itemStateChanged(final ItemEvent e) {

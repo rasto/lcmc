@@ -4930,10 +4930,6 @@ public class ClusterBrowser extends Browser {
 
             serviceInfo.getService().setHeartbeatClass(
                         serviceInfo.getHeartbeatService().getHeartbeatClass());
-            System.out.println("add resource: "
-                                + getService().getHeartbeatId()
-                                + " --> "
-                                + serviceInfo.getService().getHeartbeatId());
             if (heartbeatGraph.addResource(serviceInfo, this, pos)) {
                 // edge added
 
