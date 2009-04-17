@@ -719,9 +719,12 @@ public final class Heartbeat {
         }
         xml.append("\" " + thenString + "=\"");
         xml.append(heartbeatId);
-        final String type = "before"; //TODO: can be after
-        xml.append("\" type=\"");
-        xml.append(type);
+        if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
+            /* <= 2.1.4 */
+            final String type = "before"; //TODO: can be after
+            xml.append("\" type=\"");
+            xml.append(type);
+        }
         xml.append("\"/>'");
         final String command = getCibCommand("-C",
                                              "constraints",
