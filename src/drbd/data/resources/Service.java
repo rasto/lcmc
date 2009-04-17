@@ -87,7 +87,7 @@ public class Service extends Resource {
             if (heartbeatId.equals(GRP_ID_PREFIX)) {
                 id = "";
             } else if (heartbeatId.startsWith(GRP_ID_PREFIX)) {
-                id = heartbeatId.substring(GRP_ID_PREFIX.length() + 1);
+                id = heartbeatId.substring(GRP_ID_PREFIX.length());
             } else {
                 id = heartbeatId;
             }
@@ -99,6 +99,7 @@ public class Service extends Resource {
                 id = heartbeatId;
             }
         }
+        System.out.println("set heartbeat id: " + getName() + ", hbid: " + heartbeatId + ", id: " + id);
         setValue("id", id);
     }
 

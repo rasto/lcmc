@@ -1172,6 +1172,7 @@ public class HeartbeatXML extends XML {
             } else if (primitiveGroupNode.getNodeName().equals("group")) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String groupId = getAttribute(primitiveGroupNode, "id");
+                parametersMap.put(groupId, new HashMap<String, String>());
                 List<String> resList = groupsToResourcesMap.get(groupId);
                 if (resList == null) {
                     resList = new ArrayList<String>();
