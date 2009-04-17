@@ -292,7 +292,7 @@ public final class Heartbeat {
                                              final String[] parents) {
         for (int i = 0; i < parents.length; i++) {
             addColocation(host, heartbeatId, parents[i]);
-            addOrder(host, heartbeatId, parents[i]);
+            addOrder(host, parents[i], heartbeatId);
         }
     }
 
@@ -691,8 +691,8 @@ public final class Heartbeat {
      * Adds order constraint.
      */
     public static void addOrder(final Host host,
-                                final String heartbeatId,
-                                final String parentHbId) {
+                                final String parentHbId,
+                                final String heartbeatId) {
         final String orderId = "ord_" + parentHbId + "_" + heartbeatId;
         final String score = "INFINITY";
         final String symmetrical = null; // TODO:
@@ -719,6 +719,9 @@ public final class Heartbeat {
         }
         xml.append("\" " + thenString + "=\"");
         xml.append(heartbeatId);
+        final String type = "before"; //TODO: can be after
+        xml.append("\" type=\"");
+        xml.append(type);
         xml.append("\"/>'");
         final String command = getCibCommand("-C",
                                              "constraints",

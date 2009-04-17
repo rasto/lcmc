@@ -3127,7 +3127,6 @@ public class ClusterBrowser extends Browser {
             final String heartbeatId     = getService().getHeartbeatId();
             if (getService().isNew()) {
                 final String[] parents = heartbeatGraph.getParents(this);
-
                 Heartbeat.setOrderAndColocation(getDCHost(),
                                                 heartbeatId,
                                                 parents);
@@ -4844,8 +4843,8 @@ public class ClusterBrowser extends Browser {
             setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             Heartbeat.addOrder(getDCHost(),
-                               getService().getHeartbeatId(),
-                               parentHbId);
+                               parentHbId,
+                               getService().getHeartbeatId());
         }
 
         /**
@@ -4880,8 +4879,8 @@ public class ClusterBrowser extends Browser {
             setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             Heartbeat.addColocation(getDCHost(),
-                                    getService().getHeartbeatId(),
-                                    parentHbId);
+                                    parentHbId,
+                                    getService().getHeartbeatId());
         }
 
         /**
@@ -4927,14 +4926,19 @@ public class ClusterBrowser extends Browser {
 
             serviceInfo.getService().setHeartbeatClass(
                         serviceInfo.getHeartbeatService().getHeartbeatClass());
+            System.out.println("add resource: "
+                                + getService().getHeartbeatId()
+                                + " --> "
+                                + serviceInfo.getService().getHeartbeatId());
             if (heartbeatGraph.addResource(serviceInfo, this, pos)) {
                 // edge added
+
+                final String parentId = getService().getHeartbeatId();
                 final String heartbeatId =
                                     serviceInfo.getService().getHeartbeatId();
-                final String[] parents = heartbeatGraph.getParents(serviceInfo);
                 Heartbeat.setOrderAndColocation(getDCHost(),
                                                 heartbeatId,
-                                                parents);
+                                                new String[]{parentId});
             } else {
                 addNameToServiceInfoHash(serviceInfo);
                 final DefaultMutableTreeNode newServiceNode =
@@ -5328,9 +5332,23 @@ public class ClusterBrowser extends Browser {
                                                 new MyMenuItem(asi.toString()) {
                                 private static final long serialVersionUID = 1L;
                                 public void action() {
-                                    getPopup().setVisible(false);
-                                    addServicePanel(asi, null, true);
-                                    repaint();
+                                    final Thread thread = new Thread(
+                                        new Runnable() {
+                                            public void run() {
+                                                SwingUtilities.invokeLater(new Runnable() {
+                                                    public void run() {
+                                                        getPopup().setVisible(false);
+                                                    }
+                                                });
+                                                addServicePanel(asi, null, true);
+                                                SwingUtilities.invokeLater(new Runnable() {
+                                                    public void run() {
+                                                        repaint();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    thread.start();
                                 }
                             };
                             m.addElement(mmi);
@@ -6418,9 +6436,9 @@ public class ClusterBrowser extends Browser {
      * Returns nw hb connection info object. This is called from heartbeat
      * graph.
      */
-    public final HbConnectionInfo getNewHbConnectionInfo(final ServiceInfo si,
-                                                         final ServiceInfo p) {
-        return new HbConnectionInfo(si, p);
+    public final HbConnectionInfo getNewHbConnectionInfo(final ServiceInfo p,
+                                                         final ServiceInfo si) {
+        return new HbConnectionInfo(p, si);
     }
 
     /**
@@ -6432,19 +6450,26 @@ public class ClusterBrowser extends Browser {
 
         /** Cache for the info panel. */
         private JComponent infoPanel = null;
-        /** Connected child service. */
-        private ServiceInfo serviceInfo;
         /** Connected parent service. */
         private ServiceInfo serviceInfoParent;
+        /** Connected child service. */
+        private ServiceInfo serviceInfo;
 
         /**
          * Prepares a new <code>HbConnectionInfo</code> object.
          */
-        public HbConnectionInfo(final ServiceInfo serviceInfo,
-                                final ServiceInfo serviceInfoParent) {
+        public HbConnectionInfo(final ServiceInfo serviceInfoParent,
+                                final ServiceInfo serviceInfo) {
             super("HbConnectionInfo");
-            this.serviceInfo = serviceInfo;
             this.serviceInfoParent = serviceInfoParent;
+            this.serviceInfo = serviceInfo;
+        }
+
+        /**
+         * Returns parent that is connected to this service with constraint.
+         */
+        public final ServiceInfo getServiceInfoParent() {
+            return serviceInfoParent;
         }
 
         /**
@@ -6459,13 +6484,6 @@ public class ClusterBrowser extends Browser {
          */
         public final JPanel getGraphicalView() {
             return heartbeatGraph.getGraphPanel();
-        }
-
-        /**
-         * Returns parent that is connected to this service with constraint.
-         */
-        public final ServiceInfo getServiceInfoParent() {
-            return serviceInfoParent;
         }
 
         /**
@@ -6554,19 +6572,11 @@ public class ClusterBrowser extends Browser {
                 }
 
                 public void action() {
-                    //Vertex v = (Vertex)p.getSecond();
-                    //Vertex parent = (Vertex)p.getFirst();
-                    //ServiceInfo si = (ServiceInfo)getInfo(v);
-                    //ServiceInfo siP = (ServiceInfo)getInfo(parent);
                     if (this.getText().equals(Tools.getString(
                                             "ClusterBrowser.Hb.RemoveOrder"))) {
                         heartbeatGraph.removeOrder(thisClass);
-                        //edgeIsOrderList.remove(edge);
-                        //si.removeOrder(siP);
                     } else {
                         heartbeatGraph.addOrder(thisClass);
-                        //addOrder(siP, si);
-                        //si.addOrder(siP);
                     }
                 }
             };

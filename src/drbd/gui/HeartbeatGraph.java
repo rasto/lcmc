@@ -347,16 +347,18 @@ public class HeartbeatGraph extends ResourceGraph {
         }
 
         if (parent != null) {
-            addOrder(parent, serviceInfo);
             addColocation(parent, serviceInfo);
+            addOrder(parent, serviceInfo);
+            parent.setUpdated(true);
+            serviceInfo.setUpdated(true);
             /* set host score as in parent */
             setHomeNode(parent, parent.getSavedHostScoreInfos());
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+        //SwingUtilities.invokeLater(new Runnable() {
+        //    public void run() {
                 scale();
-            }
-        });
+        //    }
+        //});
         return vertexExists;
     }
 
@@ -386,15 +388,16 @@ public class HeartbeatGraph extends ResourceGraph {
         }
         if (edge == null) {
             final HbConnectionInfo hbci =
-                    getClusterBrowser().getNewHbConnectionInfo(serviceInfo,
-                                                               parent);
+                    getClusterBrowser().getNewHbConnectionInfo(parent,
+                                                               serviceInfo);
 
             edge = (MyEdge) getGraph().addEdge(new MyEdge(vP, v));
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         }
-        edgeIsOrderList.remove(edge);
-        edgeIsOrderList.add(edge);
+        if (!edgeIsOrderList.contains(edge)) {
+            edgeIsOrderList.add(edge);
+        }
     }
 
     /**
@@ -436,8 +439,8 @@ public class HeartbeatGraph extends ResourceGraph {
         }
         if (edge == null) {
             final HbConnectionInfo hbci =
-                       getClusterBrowser().getNewHbConnectionInfo(serviceInfo,
-                                                                  parent);
+                       getClusterBrowser().getNewHbConnectionInfo(parent,
+                                                                  serviceInfo);
 
             edge = (MyEdge) getGraph().addEdge(new MyEdge(vP, v));
             edgeToHbconnectionMap.put(edge, hbci);
@@ -963,8 +966,8 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void removeConnection(
                                     final HbConnectionInfo hbConnectionInfo) {
-        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final ServiceInfo siP = hbConnectionInfo.getServiceInfoParent();
+        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
         if (edgeIsOrderList.contains(edge)) {
             si.removeOrder(siP);
@@ -982,8 +985,8 @@ public class HeartbeatGraph extends ResourceGraph {
      * Removes order.
      */
     public final void removeOrder(final HbConnectionInfo hbConnectionInfo) {
-        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final ServiceInfo siP = hbConnectionInfo.getServiceInfoParent();
+        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
         if (edgeIsOrderList.contains(edge)) {
             edgeIsOrderList.remove(edge);
@@ -999,10 +1002,9 @@ public class HeartbeatGraph extends ResourceGraph {
      * Adds order.
      */
     public final void addOrder(final HbConnectionInfo hbConnectionInfo) {
-        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final ServiceInfo siP = hbConnectionInfo.getServiceInfoParent();
-        //addOrder(siP, si);
-        si.addOrder(siP);
+        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
+        siP.addOrder(si);
     }
 
     /**
@@ -1010,8 +1012,8 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void removeColocation(
                                     final HbConnectionInfo hbConnectionInfo) {
-        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final ServiceInfo siP = hbConnectionInfo.getServiceInfoParent();
+        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
         if (edgeIsColocationList.contains(edge)) {
             edgeIsColocationList.remove(edge);
@@ -1027,9 +1029,9 @@ public class HeartbeatGraph extends ResourceGraph {
      * Adds colocation.
      */
     public final void addColocation(final HbConnectionInfo hbConnectionInfo) {
-        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
         final ServiceInfo siP = hbConnectionInfo.getServiceInfoParent();
-        si.addColocation(siP);
+        final ServiceInfo si = hbConnectionInfo.getServiceInfo();
+        siP.addColocation(si);
     }
 
     /**
