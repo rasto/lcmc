@@ -267,7 +267,7 @@ public class TextResource extends
 
         {"Dialog.About.Title",                "DRBD Management Console (Beta). Release: "},
         {"Dialog.About.Description",          
-         "<b>DRBD Management Console was written by Rasto Levrinc (rasto@linbit.com).</b><br>"
+         "<b>DRBD Management Console by Rasto Levrinc (rasto@linbit.com).</b><br>"
          + "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br><br>"
          + "Please visit the website http://www.drbd.org/mc/management-console/<br>"
          + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
@@ -409,7 +409,7 @@ public class TextResource extends
         {"HeartbeatXML.IsManaged.ShortDesc",     "Is Managed By HB"},
         {"HeartbeatXML.IsManaged.LongDesc",      "Select whether the service should be managed by Heartbeat or not."},
 
-        {"ClusterBrowser.HbStatusFailed",           "<h2>HB status failed</h2>"},
+        {"ClusterBrowser.HbStatusFailed",           "<h2>Waiting for HB status...</h2>"},
         {"ClusterBrowser.Hb.RemoveAllServices",     "Remove All Services"},
         {"ClusterBrowser.Hb.RemoveService",         "Remove"},
         {"ClusterBrowser.Hb.AddService",            "Add Service"},

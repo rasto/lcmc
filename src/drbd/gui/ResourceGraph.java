@@ -987,7 +987,7 @@ public abstract class ResourceGraph {
                     g2d.drawImage(icon.getImage(), (int)x, (int)y, null);
                 }
                 final String iconText = getIconText(v);
-                if (iconText != null) {
+                if (iconText != null && !iconText.equals("")) {
                     drawVertexText(g2d,
                                    iconText,
                                    x + 4,
@@ -999,7 +999,7 @@ public abstract class ResourceGraph {
                     
                 }
                 final String subtext = getSubtext(v);
-                if (subtext != null) {
+                if (subtext != null && !subtext.equals("")) {
                     drawVertexText(g2d,
                                    subtext,
                                    x + 30,
@@ -1010,7 +1010,7 @@ public abstract class ResourceGraph {
                                    false);
                 }
                 final String rightCornerText = getRightCornerText(v);
-                if (rightCornerText != null) {
+                if (rightCornerText != null && !rightCornerText.equals("")) {
                     drawVertexText(g2d,
                                    rightCornerText,
                                    x + shape.getBounds().getWidth() - 8,
