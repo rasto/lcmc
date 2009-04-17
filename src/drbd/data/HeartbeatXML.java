@@ -967,9 +967,8 @@ public class HeartbeatXML extends XML {
             NodeList nvpairsRes;
             if (Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
-                final Node attrNode =
-                                   getChildNode(instanceAttrNode,
-                                                "attributes");
+                final Node attrNode = getChildNode(instanceAttrNode,
+                                                   "attributes");
                 nvpairsRes = attrNode.getChildNodes();
             } else {
                 nvpairsRes = instanceAttrNode.getChildNodes();
@@ -1116,9 +1115,18 @@ public class HeartbeatXML extends XML {
         if (cpsNode == null) {
             return cibQueryData;
         }
+        NodeList nvpairs;
+        final String hbV = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+            /* <attributtes> only til 2.1.4 */
+            final Node attrNode = getChildNode(cpsNode,
+                                               "attributes");
+            nvpairs = attrNode.getChildNodes();
+        } else {
+            nvpairs = cpsNode.getChildNodes();
+        }
         Map<String,String> crmConfMap = new HashMap<String,String>();
         /*              <nvpair...> */
-        final NodeList nvpairs = cpsNode.getChildNodes();
         for (int i = 0; i < nvpairs.getLength(); i++) {
             final Node optionNode = nvpairs.item(i);
             if (optionNode.getNodeName().equals("nvpair")) {
@@ -1217,7 +1225,6 @@ public class HeartbeatXML extends XML {
         final Node constraintsNode = getChildNode(confNode, "constraints");
         if (constraintsNode != null) {
             final NodeList constraints = constraintsNode.getChildNodes();
-            final String hbV = host.getHeartbeatVersion();
             String rscString     = "rsc";
             String withRscString = "with-rsc";
             String firstString   = "first";
