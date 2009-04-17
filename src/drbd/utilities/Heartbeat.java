@@ -569,7 +569,7 @@ public final class Heartbeat {
             xml.append("</attributes>");
         }
         xml.append("</cluster_property_set></crm_config>'");
-        final String command = getCibCommand("-R",
+        final String command = getCibCommand("-U",
                                              "crm_config",
                                              xml.toString()); 
         execCommand(host, command, true);
