@@ -1102,12 +1102,16 @@ public class SSH {
                                                                           dsaKey,
                                                                           key);
                                     } catch (Exception e) {
+                                            lastDSAKey = null;
                                             Tools.debug(this,
                                                         "dsa key auth failed");
                                     }
                                     if (res) {
                                         Tools.debug(this,
                                                     "dsa key auth successful");
+                                        lastRSAKey = null;
+                                        lastDSAKey = key;
+                                        lastPassword = null;
                                         break;
                                     }
                                     conn.close();
@@ -1123,11 +1127,15 @@ public class SSH {
                                                                           rsaKey,
                                                                           key);
                                     } catch (Exception e) {
+                                        lastRSAKey = null;
                                         Tools.debug(this, "rsa key auth failed");
                                     }
                                     if (res) {
                                         Tools.debug(this,
                                                     "rsa key auth successful");
+                                        lastRSAKey = key;
+                                        lastDSAKey = null;
+                                        lastPassword = null;
                                         break;
                                     }
                                     conn.close();
