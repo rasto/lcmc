@@ -66,7 +66,8 @@ public final class DRBD {
                                      command,
                                      execCallback,
                                      outputVisible,
-                                     Tools.getString("DRBD.ExecutingCommand"));
+                                     Tools.getString("DRBD.ExecutingCommand")
+                                     + " " + command + "...");
     }
 
     /**
@@ -433,7 +434,8 @@ public final class DRBD {
                                      command,
                                      execCallback,
                                      false,
-                                     Tools.getString("DRBD.ExecutingCommand"));
+                                     Tools.getString("DRBD.ExecutingCommand")
+                                     + " " + command + "...");
         final Pattern p = Pattern.compile(".*Failure: \\((\\d+)\\).*",
                                           Pattern.DOTALL);
         final Matcher m = p.matcher(ret);

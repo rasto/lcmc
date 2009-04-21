@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -74,7 +75,11 @@ public class DrbdConfigCreateMD extends DrbdConfig {
      * Creates meta-data and checks the results.
      */
     private void createMetadata(final boolean destroyData) {
-        makeMDButton.setEnabled(false);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                makeMDButton.setEnabled(false);
+            }
+        });
         final Thread[] thread = new Thread[2];
         final String[] answer = new String[2];
         final Integer[] returnCode = new Integer[2];
@@ -90,7 +95,11 @@ public class DrbdConfigCreateMD extends DrbdConfig {
                     final ExecCallback execCallback =
                         new ExecCallback() {
                             public void done(final String ans) {
-                                makeMDButton.setEnabled(false);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        makeMDButton.setEnabled(false);
+                                    }
+                                });
                                 answer[index] = ans;
                                 returnCode[index] = 0;
                             }
@@ -150,8 +159,12 @@ public class DrbdConfigCreateMD extends DrbdConfig {
         if (error) {
             answerPaneSetTextError(Tools.join("\n", answer));
         } else {
-            makeMDButton.setEnabled(false);
-            buttonClass(nextButton()).setEnabled(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    makeMDButton.setEnabled(false);
+                    buttonClass(nextButton()).setEnabled(true);
+                }
+            });
             answerPaneSetText(Tools.join("\n", answer));
         }
     }
@@ -264,12 +277,17 @@ public class DrbdConfigCreateMD extends DrbdConfig {
 
         makeMDButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if (metadataCB.getStringValue().equals(
-                                        createNewMetadataDestroyData)) {
-                    createMetadata(true);
-                } else {
-                    createMetadata(false);
-                }
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (metadataCB.getStringValue().equals(
+                                              createNewMetadataDestroyData)) {
+                            createMetadata(true);
+                        } else {
+                            createMetadata(false);
+                        }
+                    }
+                });
+                thread.start();
             }
         });
         inputPane.add(makeMDButton);

@@ -385,7 +385,6 @@ public final class Tools {
             ec = new ExecCallback() {
                              public void done(final String ans) {
                                  output.append(ans);
-                                 Tools.stopProgressIndicator(hostName, text);
                              }
 
                              public void doneError(final String ans,
@@ -396,10 +395,6 @@ public final class Tools {
                                                    ans,
                                                    exitCode);
                                  }
-                                 Tools.stopProgressIndicator(hostName, text);
-                                 Tools.progressIndicatorFailed(hostName,
-                                                               text
-                                                               + " failed");
                                  output.append(ans);
                              }
                          };
@@ -419,6 +414,7 @@ public final class Tools {
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        Tools.stopProgressIndicator(hostName, text);
         return output.toString();
     }
 
