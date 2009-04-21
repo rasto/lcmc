@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -62,6 +63,9 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     /** No host string. (none) */
     private static final String NO_HOST_STRING =
                     Tools.getString("Dialog.DrbdConfigCreateFS.NoHostString");
+    /** No file system (use existing data) */
+    private static final String NO_FILESYSTEM_STRING =
+                Tools.getString("Dialog.DrbdConfigCreateFS.SelectFilesystem");
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
 
@@ -123,13 +127,24 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     protected void createFilesystem() {
         final Runnable runnable = new Runnable() {
             public void run() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        buttonClass(finishButton()).setEnabled(false);
+                        makeFsButton.setEnabled(false);
+                    }
+                });
                 BlockDevInfo bdiPri = getPrimaryBD();
                 BlockDevInfo bdiSec = getSecondaryBD();
-                buttonClass(finishButton()).setEnabled(false);
-                makeFsButton.setEnabled(false);
                 bdiPri.forcePrimary();
                 bdiPri.makeFilesystem(filesystemCB.getStringValue());
-                buttonClass(finishButton()).setEnabled(true);
+                bdiPri.setSecondary();
+                hostCB.setValue(NO_HOST_STRING);
+                filesystemCB.setValue(NO_FILESYSTEM_STRING);
+                //SwingUtilities.invokeLater(new Runnable() {
+                //    public void run() {
+                //        buttonClass(finishButton()).setEnabled(true);
+                //    }
+                //});
             }
         };
         final Thread thread = new Thread(runnable);
@@ -176,16 +191,28 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     protected void checkButtons() {
         final boolean noHost = hostCB.getStringValue().equals(NO_HOST_STRING);
         final boolean noFileSystem = filesystemCB.getStringValue().equals(
-                Tools.getString("Dialog.DrbdConfigCreateFS.SelectFilesystem"));
+                                                        NO_FILESYSTEM_STRING);
         if (noFileSystem) {
-            ((MyButton) buttonClass(finishButton())).setEnabled(true);
-            makeFsButton.setEnabled(false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ((MyButton) buttonClass(finishButton())).setEnabled(true);
+                    makeFsButton.setEnabled(false);
+                }
+            });
         } else if (noHost) {
-            ((MyButton) buttonClass(finishButton())).setEnabled(false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ((MyButton) buttonClass(finishButton())).setEnabled(false);
+                }
+            });
             makeFsButton.setEnabled(false);
         } else {
-            ((MyButton) buttonClass(finishButton())).setEnabled(false);
-            makeFsButton.setEnabled(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ((MyButton) buttonClass(finishButton())).setEnabled(false);
+                    makeFsButton.setEnabled(true);
+                }
+            });
         }
     }
 
@@ -199,7 +226,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* host */
-        String[] hostNames = new String[3];
+        final String[] hostNames = new String[3];
         hostNames[0] = NO_HOST_STRING;
         final Host[] hosts = getDrbdResourceInfo().getHosts();
         int i = 1;
@@ -218,7 +245,12 @@ public class DrbdConfigCreateFS extends DrbdConfig {
             new  ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        checkButtons();
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                checkButtons();
+                            }
+                        });
+                        thread.start();
                     }
                 }
             },
@@ -230,8 +262,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
         /* Filesystem */
         final JLabel filesystemLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfigCreateFS.Filesystem"));
-        final String defaultValue =
-                Tools.getString("Dialog.DrbdConfigCreateFS.SelectFilesystem");
+        final String defaultValue = NO_FILESYSTEM_STRING;
         final StringInfo[] filesystems =
                     getDrbdResourceInfo().getCommonFileSystems2(defaultValue);
 
@@ -246,7 +277,19 @@ public class DrbdConfigCreateFS extends DrbdConfig {
             new  ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        checkButtons();
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                if (NO_HOST_STRING.equals(
+                                                hostCB.getStringValue()) &&
+                                    !NO_FILESYSTEM_STRING.equals(
+                                            filesystemCB.getStringValue())) {
+                                    hostCB.setValue(hostNames[1]);
+                                } else {
+                                    checkButtons();
+                                }
+                            }
+                        });
+                        thread.start();
                     }
                 }
             },

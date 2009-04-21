@@ -94,7 +94,7 @@ public class HostDistDetection extends DialogHost {
                                              getHost().getDist(),
                                              getHost().getDistVersionString());
             answerText = getHost().getDist() + "\nversion: "
-                         + getHost().getDistVersion() + " (support: "
+                         + getHost().getDistVersion() + " (support file: "
                          + support + ")";
             buttonClass(nextButton()).requestFocus();
             answerPaneSetText(answerText);
@@ -120,7 +120,7 @@ public class HostDistDetection extends DialogHost {
         final String answerText = "detected: " + getHost().getDetectedInfo()
                                   + "\n" + getHost().getDist()
                                   + "\nversion: " + getHost().getDistVersion()
-                                  + " (support: " + support + ")";
+                                  + " (support file: " + support + ")";
         //if (ans == null) {
         //    answerPaneSetText(answerText + "\n"
         //                      + Tools.getString(
