@@ -5334,6 +5334,10 @@ public class ClusterBrowser extends Browser {
 
                         DefaultListModel m = new DefaultListModel();
                         for (final ServiceInfo asi : getExistingServiceList(thisClass)) {
+                            if (asi.getGroupInfo() != null) {
+                                /* skip services that are in group. */
+                                continue;
+                            }
                             final MyMenuItem mmi =
                                                 new MyMenuItem(asi.toString()) {
                                 private static final long serialVersionUID = 1L;
