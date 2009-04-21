@@ -728,7 +728,11 @@ public class ClusterBrowser extends Browser {
                                                    public void run() {
                                                        repaintSplitPane();
                                                        drbdGraph.updatePopupMenus();
-                                                       repaintTree();
+                                                       SwingUtilities.invokeLater(new Runnable() {
+                                                           public void run() {
+                                                               repaintTree();
+                                                           }
+                                                       });
                                                    }
                                                });
                                            thread.start();
@@ -901,6 +905,7 @@ public class ClusterBrowser extends Browser {
                                                                      // TODO; servicesInfo can be null
                                                                      heartbeatGraph.getServicesInfo().setGlobalConfig();
                                                                      heartbeatGraph.getServicesInfo().setAllResources();
+                                                                     repaintTree();
                                                                  }
                                                              }
                                                          }
@@ -921,7 +926,6 @@ public class ClusterBrowser extends Browser {
                                                  //} });
                                                  stopHbStatusProgressIndicator(hostName);
                                              }
-                                             repaintTree();
                                              hbStatusUnlock();
                                          }
                                      });
