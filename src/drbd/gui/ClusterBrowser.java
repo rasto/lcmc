@@ -728,6 +728,7 @@ public class ClusterBrowser extends Browser {
                                                    public void run() {
                                                        repaintSplitPane();
                                                        drbdGraph.updatePopupMenus();
+                                                       repaintTree();
                                                    }
                                                });
                                            thread.start();
@@ -920,6 +921,7 @@ public class ClusterBrowser extends Browser {
                                                  //} });
                                                  stopHbStatusProgressIndicator(hostName);
                                              }
+                                             repaintTree();
                                              hbStatusUnlock();
                                          }
                                      });

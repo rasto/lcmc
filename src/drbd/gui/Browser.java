@@ -84,6 +84,8 @@ public class Browser {
     private DefaultTreeModel treeModel;
     /** Top of the menu tree. */
     private DefaultMutableTreeNode treeTop;
+    /** Tree. */
+    private JTree tree;
 
     /** Split pane next to the menu. */
     private JSplitPane infoPanelSplitPane;
@@ -114,6 +116,18 @@ public class Browser {
     protected final void setTreeTop(final Info info) {
         treeTop = new DefaultMutableTreeNode(info);
         treeModel = new DefaultTreeModel(treeTop);
+    }
+
+    protected final void setTree(final JTree tree) {
+        this.tree = tree;
+    }
+
+    protected final void repaintTree() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                tree.repaint();
+            }
+        });
     }
 
     /**

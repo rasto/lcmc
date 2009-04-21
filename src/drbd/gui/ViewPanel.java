@@ -82,6 +82,7 @@ public class ViewPanel extends JPanel {
      */
     public final JTree getTree(final Browser browser) {
         final JTree tree = new JTree(browser.getTreeModel());
+        browser.setTree(tree);
         tree.setOpaque(true);
         tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
         tree.setToggleClickCount(2);
