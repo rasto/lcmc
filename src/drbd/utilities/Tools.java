@@ -1033,22 +1033,33 @@ public final class Tools {
         final Locale locale = new Locale(dist, "");
         final ResourceBundle resourceCommand =
                 ResourceBundle.getBundle("drbd.configs.DistResource", locale);
-        String distVersion;
+        String distVersion = null;
         try {
             distVersion = resourceCommand.getString("version:" + version);
         } catch (Exception e) {
-            // change . and whitespace to _ in the version string
+            /* with wildcard */
             final String[] ver = version.split("\\.|\\s");
             for (int i = 0; i < ver.length; i++) {
                 if (i == 0) {
                     version = ver[i];
                 } else {
-                    version = version + "_" + ver[i];
+                    version = version + "." + ver[i];
+                }
+                try {
+                    distVersion = resourceCommand.getString("version:"
+                                                            + version
+                                                            + "*");
+                } catch (Exception e2) {
+                }
+                if (distVersion != null) {
+                    break;
                 }
             }
-            distVersion = version;
+            if (distVersion == null) {
+                distVersion = version;
+            }
         }
-        debug("dist version: " + distVersion, 2);
+        debug("dist version: " + distVersion, 0);
         return distVersion;
     }
     /**

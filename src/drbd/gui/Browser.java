@@ -123,11 +123,7 @@ public class Browser {
     }
 
     protected final void repaintTree() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                tree.repaint();
-            }
-        });
+        tree.repaint();
     }
 
     /**

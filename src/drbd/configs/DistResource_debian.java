@@ -38,16 +38,10 @@ public class DistResource_debian extends
     private static Object[][] contents = {
         {"Support",             "debian"},
         //{"distribution",        "debian"},
-        {"version:3.1",         "3_1"},
-        {"version:3.2",         "3_2"},
-        {"version:lenny/sid",   "LENNY"},
-        {"version:testing",     "LENNY"},
-        {"version:5.0",         "LENNY"},
-        {"version:5.0.1",       "LENNY"},
-        {"version:5.0.2",       "LENNY"},
+        {"version:3*",          "3"},
+        {"version:5*",          "LENNY"},
         {"version:debian-etch", "4"},
-        {"version:4.0",         "4"},
-        {"version:4.0r1",       "4"},
+        {"version:4*",          "4"},
 
         {"arch:x86_64",       "amd64"}, // convert arch to arch in the drbd download file
 
