@@ -319,7 +319,7 @@ sub get_filesystems_info {
 sub get_mount_points_info {
 	my $dir = "/mnt";
 	if (opendir(DIR, $dir)) {
-		print "$dir/$_\n" for (grep { $_ !~ /^\./ && -d "$dir/$_" } readdir(DIR));
+		print "$dir/$_\n" for (sort grep { $_ !~ /^\./ && -d "$dir/$_" } readdir(DIR));
 		closedir DIR;
 	}
 }
