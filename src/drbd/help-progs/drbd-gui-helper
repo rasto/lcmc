@@ -473,8 +473,13 @@ sub get_cluster_events {
 		print "---start---\n";
 		print $info;
 		print "---done---\n";
-		my $rw_socket_name = "/var/run/heartbeat/crm/cib_rw";
-		my $cb_socket_name = "/var/run/heartbeat/crm/cib_callback";
+		my $hb_version = get_hb_version();
+		my $rw_socket_name = "/var/run/crm/cib_rw";
+		my $cb_socket_name = "/var/run/crm/cib_callback";
+		if (is_smaller_v($hb_version, "2.99.0")) {
+			$rw_socket_name = "/var/run/heartbeat/crm/cib_rw";
+			$cb_socket_name = "/var/run/heartbeat/crm/cib_callback";
+		}
 		
 		socket(my $RW, PF_UNIX, SOCK_STREAM, 0);
 		connect($RW, sockaddr_un($rw_socket_name))
