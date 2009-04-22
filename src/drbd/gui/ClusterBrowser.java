@@ -3263,7 +3263,6 @@ public class ClusterBrowser extends Browser {
          * Removes this group from the heartbeat.
          */
         public void removeMyself() {
-            getService().setRemoved(true);
             String desc = Tools.getString(
                             "ClusterBrowser.confirmRemoveGroup.Description");
 
@@ -3288,6 +3287,7 @@ public class ClusterBrowser extends Browser {
                     desc,
                     Tools.getString("ClusterBrowser.confirmRemoveGroup.Yes"),
                     Tools.getString("ClusterBrowser.confirmRemoveGroup.No"))) {
+                getService().setRemoved(true);
                 removeMyselfNoConfirm();
             }
             getService().doneRemoving();
@@ -3304,12 +3304,6 @@ public class ClusterBrowser extends Browser {
                                 getDCHost(),
                                 null,
                                 getService().getHeartbeatId()); /* group id */
-                //for (String hbId : heartbeatStatus.getGroupResources(
-                //                            getService().getHeartbeatId())) {
-                //    final ServiceInfo child =
-                //                            heartbeatIdToServiceInfo.get(hbId);
-                //    child.removeMyselfNoConfirm();
-                //}
             }
         }
 

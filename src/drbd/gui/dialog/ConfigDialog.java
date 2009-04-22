@@ -124,7 +124,7 @@ public abstract class ConfigDialog {
      * Returns pane where user input can be defined.
      */
     protected JComponent getInputPane() {
-        return new JPanel();
+        return null;
     }
 
     /**
@@ -205,13 +205,17 @@ public abstract class ConfigDialog {
                        + getDescription() + "</p>");
         descPane.setBackground(pane.getBackground());
         descPane.setEditable(false);
+        final JScrollPane descSP = new JScrollPane(descPane);
+        descSP.setBorder(null);
+        pane.add(descSP);
         final JComponent inputPane = getInputPane();
-        inputPane.setPreferredSize(new Dimension(Short.MAX_VALUE,
-                                                 INPUT_PANE_HEIGHT));
-        inputPane.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background"));
-        pane.add(descPane);
-        pane.add(inputPane);
+        if (inputPane != null) {
+            inputPane.setPreferredSize(new Dimension(Short.MAX_VALUE,
+                                                     INPUT_PANE_HEIGHT));
+            inputPane.setBackground(
+                            Tools.getDefaultColor("ConfigDialog.Background"));
+            pane.add(inputPane);
+        }
 
         return pane;
     }
