@@ -354,12 +354,8 @@ public final class Heartbeat {
 
 
     /**
-     * Removes a resource from crm.
-     *
-     * @param host
-     *          host on which the command will be executed
-     * @param heartbeatId
-     *          heartbeat id
+     * Removes a resource from crm. If heartbeat id is null and group id is
+     * not, the whole group will be removed.
      */
     public static void removeResource(final Host host,
                                       final String heartbeatId,
@@ -373,10 +369,12 @@ public final class Heartbeat {
             xml.append(groupId);
             xml.append("\">");
         }
-        xml.append("<primitive id=\"");
-        xml.append(heartbeatId);
-        xml.append("\">");
-        xml.append("</primitive>");
+        if (heartbeatId != null) {
+            xml.append("<primitive id=\"");
+            xml.append(heartbeatId);
+            xml.append("\">");
+            xml.append("</primitive>");
+        }
         if (groupId != null) {
             xml.append("</group>");
         }

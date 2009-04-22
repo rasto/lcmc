@@ -3300,12 +3300,16 @@ public class ClusterBrowser extends Browser {
         public void removeMyselfNoConfirm() {
             super.removeMyselfNoConfirm();
             if (!getService().isNew()) {
-                for (String hbId : heartbeatStatus.getGroupResources(
-                                            getService().getHeartbeatId())) {
-                    final ServiceInfo child =
-                                            heartbeatIdToServiceInfo.get(hbId);
-                    child.removeMyselfNoConfirm();
-                }
+                Heartbeat.removeResource(
+                                getDCHost(),
+                                null,
+                                getService().getHeartbeatId()); /* group id */
+                //for (String hbId : heartbeatStatus.getGroupResources(
+                //                            getService().getHeartbeatId())) {
+                //    final ServiceInfo child =
+                //                            heartbeatIdToServiceInfo.get(hbId);
+                //    child.removeMyselfNoConfirm();
+                //}
             }
         }
 
@@ -4668,6 +4672,7 @@ public class ClusterBrowser extends Browser {
                 groupId = group;
             }
 
+            final Host dcHost = getDCHost();
             if (getService().isNew()) {
                 final String provider = HB_HEARTBEAT_PROVIDER;
                 if (hbClass.equals("ocf")) {
@@ -4706,8 +4711,7 @@ public class ClusterBrowser extends Browser {
                 args.append(masterNodeMax);
 
                 /* TODO: there are more attributes. */
-
-                final String hbV = getDCHost().getHeartbeatVersion();
+                final String hbV = dcHost.getHeartbeatVersion();
                 if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
                     args.append(' ');
                     args.append(newGroup);
@@ -4742,7 +4746,7 @@ public class ClusterBrowser extends Browser {
                 if (groupInfo != null && !groupInfo.getService().isNew()) {
                         command = "-U";
                 }
-                Heartbeat.setParameters(getDCHost(),
+                Heartbeat.setParameters(dcHost,
                                         command,
                                         heartbeatId,
                                         groupId,
@@ -4756,7 +4760,7 @@ public class ClusterBrowser extends Browser {
                                         null);
                 if (groupInfo == null) {
                     final String[] parents = heartbeatGraph.getParents(this);
-                    Heartbeat.setOrderAndColocation(getDCHost(),
+                    Heartbeat.setOrderAndColocation(dcHost,
                                                     heartbeatId,
                                                     parents);
                 }
@@ -4792,7 +4796,7 @@ public class ClusterBrowser extends Browser {
                 args.insert(0, heartbeatId);
 
                 Heartbeat.setParameters(
-                        getDCHost(),
+                        dcHost,
                         "-U",
                         heartbeatId,
                         groupId,
@@ -5043,6 +5047,7 @@ public class ClusterBrowser extends Browser {
             if (getService().isNew()) {
                 heartbeatGraph.getServicesInfo().setAllResources();
             } else {
+                final Host dcHost = getDCHost();
                 if (groupInfo == null) {
                     final String[] parents = heartbeatGraph.getParents(this);
                     for (String parent : parents) {
@@ -5053,7 +5058,7 @@ public class ClusterBrowser extends Browser {
                             heartbeatStatus.getColocationScore(
                                            parent, 
                                            getService().getHeartbeatId());
-                        Heartbeat.removeColocation(getDCHost(),
+                        Heartbeat.removeColocation(dcHost,
                                                    colocationId,
                                                    parent,
                                                    getService().getHeartbeatId(),
@@ -5070,7 +5075,7 @@ public class ClusterBrowser extends Browser {
                             heartbeatStatus.getOrderSymmetrical(
                                            parent, 
                                            getService().getHeartbeatId());
-                        Heartbeat.removeOrder(getDCHost(),
+                        Heartbeat.removeOrder(dcHost,
                                               orderId,
                                               parent,
                                               getService().getHeartbeatId(),
@@ -5087,7 +5092,7 @@ public class ClusterBrowser extends Browser {
                             heartbeatStatus.getColocationScore(
                                            getService().getHeartbeatId(),
                                            child);
-                        Heartbeat.removeColocation(getDCHost(),
+                        Heartbeat.removeColocation(dcHost,
                                                    colocationId,
                                                    getService().getHeartbeatId(),
                                                    child,
@@ -5102,7 +5107,7 @@ public class ClusterBrowser extends Browser {
                             heartbeatStatus.getOrderSymmetrical(
                                            getService().getHeartbeatId(),
                                            child);
-                        Heartbeat.removeOrder(getDCHost(),
+                        Heartbeat.removeOrder(dcHost,
                                               orderId,
                                               getService().getHeartbeatId(),
                                               child,
@@ -5113,7 +5118,7 @@ public class ClusterBrowser extends Browser {
                     for (String locId : heartbeatStatus.getLocationIds(getService().getHeartbeatId())) {
                         final String locScore =
                             heartbeatStatus.getLocationScore(locId);
-                        Heartbeat.removeLocation(getDCHost(),
+                        Heartbeat.removeLocation(dcHost,
                                                  locId,
                                                  getService().getHeartbeatId(),
                                                  locScore);
@@ -5135,6 +5140,7 @@ public class ClusterBrowser extends Browser {
                             child.getService().setModified(true);
                             child.getService().doneModifying();
                         }
+                        System.out.println("group size: " + heartbeatStatus.getGroupResources(group).size()); 
                         if (heartbeatStatus.getGroupResources(group).size() == 1) {
                             groupInfo.getService().setRemoved(true);
                             groupInfo.removeMyselfNoConfirmFromChild();
@@ -5142,7 +5148,8 @@ public class ClusterBrowser extends Browser {
                             groupInfo.getService().doneRemoving();
                         }
                     } 
-                    Heartbeat.removeResource(getDCHost(),
+                    System.out.println("remove: " + getService().getHeartbeatId() + " groupId: " + groupId); 
+                    Heartbeat.removeResource(dcHost,
                                              getService().getHeartbeatId(),
                                              groupId);
                 }
@@ -6303,7 +6310,9 @@ public class ClusterBrowser extends Browser {
                              "ClusterBrowser.confirmRemoveAllServices.No"))) {
 
                         for (ServiceInfo si : getExistingServiceList()) {
-                            si.removeMyselfNoConfirm();
+                            if (si.getGroupInfo() == null) {
+                                si.removeMyselfNoConfirm();
+                            }
                         }
                         heartbeatGraph.getVisualizationViewer().repaint();
                     }
