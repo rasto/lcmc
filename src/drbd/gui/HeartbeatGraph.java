@@ -1004,7 +1004,7 @@ public class HeartbeatGraph extends ResourceGraph {
     public final void addOrder(final HbConnectionInfo hbConnectionInfo) {
         final ServiceInfo siP = hbConnectionInfo.getServiceInfoParent();
         final ServiceInfo si = hbConnectionInfo.getServiceInfo();
-        siP.addOrder(si);
+        si.addOrder(siP);
     }
 
     /**

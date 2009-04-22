@@ -5134,7 +5134,6 @@ public class ClusterBrowser extends Browser {
                             child.getService().setModified(true);
                             child.getService().doneModifying();
                         }
-                        System.out.println("group size: " + heartbeatStatus.getGroupResources(group).size()); 
                         if (heartbeatStatus.getGroupResources(group).size() == 1) {
                             groupInfo.getService().setRemoved(true);
                             groupInfo.removeMyselfNoConfirmFromChild();
@@ -5142,7 +5141,6 @@ public class ClusterBrowser extends Browser {
                             groupInfo.getService().doneRemoving();
                         }
                     } 
-                    System.out.println("remove: " + getService().getHeartbeatId() + " groupId: " + groupId); 
                     Heartbeat.removeResource(dcHost,
                                              getService().getHeartbeatId(),
                                              groupId);
