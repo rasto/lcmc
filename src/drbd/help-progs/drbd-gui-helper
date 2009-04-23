@@ -474,11 +474,28 @@ sub get_cluster_events {
 		print $info;
 		print "---done---\n";
 		my $hb_version = get_hb_version();
-		my $rw_socket_name = "/var/run/crm/cib_rw";
-		my $cb_socket_name = "/var/run/crm/cib_callback";
-		if (is_smaller_v($hb_version, "2.99.0")) {
+
+		my $rw_socket_name;
+		if (-S "/var/run/crm/cib_rw") {
+			$rw_socket_name = "/var/run/crm/cib_rw";
+		} elsif (-S "/var/run/heartbeat/crm/cib_rw") {
 			$rw_socket_name = "/var/run/heartbeat/crm/cib_rw";
+		} else {
+			print "---start---\n";
+			print "ERROR: could not find cib_rw socket.\n";
+			print "---done---\n";
+			return;
+		}
+		my $cb_socket_name;
+		if (-S "/var/run/crm/cib_callback") {
+			$cb_socket_name = "/var/run/crm/cib_callback";
+		} elsif (-S "/var/run/heartbeat/crm/cib_callback") {
 			$cb_socket_name = "/var/run/heartbeat/crm/cib_callback";
+		} else {
+			print "---start---\n";
+			print "ERROR: could not find cib_callback socket.\n";
+			print "---done---\n";
+			return;
 		}
 		
 		socket(my $RW, PF_UNIX, SOCK_STREAM, 0);
