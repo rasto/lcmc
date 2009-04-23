@@ -4865,7 +4865,6 @@ public class ClusterBrowser extends Browser {
             final String colocationId =
                 heartbeatStatus.getColocationId(parentHbId,
                                                 getService().getHeartbeatId());
-            System.out.println("removeColocation: " + parentHbId + " --> " + getService().getHeartbeatId());
             final String score =
                 heartbeatStatus.getColocationScore(
                                     parent.getService().getHeartbeatId(), 
@@ -6635,6 +6634,10 @@ public class ClusterBrowser extends Browser {
                                             "ClusterBrowser.Hb.RemoveOrder"))) {
                         heartbeatGraph.removeOrder(thisClass);
                     } else {
+                        /* there is colocation constraint so let's get the
+                         * endpoints from it. */
+                        setServiceInfoParent(getServiceInfoRsc());
+                        setServiceInfoChild(getServiceInfoWithRsc());
                         heartbeatGraph.addOrder(thisClass);
                     }
                 }
@@ -6672,6 +6675,10 @@ public class ClusterBrowser extends Browser {
                                        "ClusterBrowser.Hb.RemoveColocation"))) {
                         heartbeatGraph.removeColocation(thisClass);
                     } else {
+                        /* there is order constraint so let's get the endpoints
+                         * from it. */
+                        setServiceInfoRsc(getServiceInfoParent());
+                        setServiceInfoWithRsc(getServiceInfoChild());
                         heartbeatGraph.addColocation(thisClass);
                     }
                 }
@@ -6679,7 +6686,6 @@ public class ClusterBrowser extends Browser {
 
             registerMenuItem(removeColocationItem);
             items.add(removeColocationItem);
-
             /* reverse order */
             final MyMenuItem reverseOrderItem =
                 new MyMenuItem(
@@ -6694,6 +6700,12 @@ public class ClusterBrowser extends Browser {
 
                 public void action() {
                     heartbeatGraph.removeOrder(thisClass);
+                    // TODO: or should I wait till it is really removed?
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
                     ServiceInfo t = serviceInfoChild;
                     serviceInfoChild = serviceInfoParent;
                     serviceInfoParent = t;

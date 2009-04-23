@@ -395,7 +395,6 @@ public abstract class ResourceGraph {
      */
     public void scale() { // TODO: synchronize differently
         //TODO: disabling it till it works properly
-        return;
         //Point2D max = getFilledGraphSize();
         //max = visualizationViewer.inverseLayoutTransform(max);
         //final float maxXPos = (float)max.getX();
@@ -416,8 +415,9 @@ public abstract class ResourceGraph {
         //        myScaler.scale(visualizationViewer, factor / scale, new Point2D.Double(0,0));
         //    }
         //}
-        //visualizationViewer.restart();
-        //visualizationViewer.repaint();
+        //TODO: it may hang here, check it
+        visualizationViewer.restart();
+        visualizationViewer.repaint();
     }
 
     /**
