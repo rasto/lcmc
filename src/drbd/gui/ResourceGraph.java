@@ -394,28 +394,30 @@ public abstract class ResourceGraph {
      * get smaller but not bigger.
      */
     public void scale() { // TODO: synchronize differently
-        Point2D max = getFilledGraphSize();
-        max = visualizationViewer.inverseLayoutTransform(max);
-        final float maxXPos = (float)max.getX();
-        final float maxYPos = (float)max.getY();
-        if (maxXPos <= 0 || maxYPos <= 0) {
-            return;
-        }
-        visualizationViewer.stop();
-        final Float vvX = new Float(visualizationViewer.getSize(null).getWidth());
-        final Float vvY = new Float(visualizationViewer.getSize(null).getHeight());
-        final float factorX = vvX / maxXPos;
-        final float factorY = vvY / maxYPos;
-        final float factor = (factorX < factorY)?factorX:factorY;
-        final MutableTransformer vt = visualizationViewer.getViewTransformer();
-        if (vvX > 0 && vvY > 0) {
-            final float scale = (float)vt.getScale();
-            if (factor <= scale) {
-                myScaler.scale(visualizationViewer, factor / scale, new Point2D.Double(0,0));
-            }
-        }
-        visualizationViewer.restart();
-        visualizationViewer.repaint();
+        //TODO: disabling it till it works properly
+        return;
+        //Point2D max = getFilledGraphSize();
+        //max = visualizationViewer.inverseLayoutTransform(max);
+        //final float maxXPos = (float)max.getX();
+        //final float maxYPos = (float)max.getY();
+        //if (maxXPos <= 0 || maxYPos <= 0) {
+        //    return;
+        //}
+        //visualizationViewer.stop();
+        //final Float vvX = new Float(visualizationViewer.getSize(null).getWidth());
+        //final Float vvY = new Float(visualizationViewer.getSize(null).getHeight());
+        //final float factorX = vvX / maxXPos;
+        //final float factorY = vvY / maxYPos;
+        //final float factor = (factorX < factorY)?factorX:factorY;
+        //final MutableTransformer vt = visualizationViewer.getViewTransformer();
+        //if (vvX > 0 && vvY > 0) {
+        //    final float scale = (float)vt.getScale();
+        //    if (factor <= scale) {
+        //        myScaler.scale(visualizationViewer, factor / scale, new Point2D.Double(0,0));
+        //    }
+        //}
+        //visualizationViewer.restart();
+        //visualizationViewer.repaint();
     }
 
     /**

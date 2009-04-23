@@ -4865,14 +4865,15 @@ public class ClusterBrowser extends Browser {
             final String colocationId =
                 heartbeatStatus.getColocationId(parentHbId,
                                                 getService().getHeartbeatId());
+            System.out.println("removeColocation: " + parentHbId + " --> " + getService().getHeartbeatId());
             final String score =
                 heartbeatStatus.getColocationScore(
                                     parent.getService().getHeartbeatId(), 
                                     getService().getHeartbeatId());
             Heartbeat.removeColocation(getDCHost(),
                                        colocationId,
-                                       parentHbId, /* from */
                                        getService().getHeartbeatId(), /* to */
+                                       parentHbId, /* from */
                                        score
                                        );
         }
@@ -5054,8 +5055,8 @@ public class ClusterBrowser extends Browser {
                                            getService().getHeartbeatId());
                         Heartbeat.removeColocation(dcHost,
                                                    colocationId,
-                                                   parent,
                                                    getService().getHeartbeatId(),
+                                                   parent,
                                                    colScore);
                         final String orderId =
                                     heartbeatStatus.getOrderId(
@@ -5088,8 +5089,8 @@ public class ClusterBrowser extends Browser {
                                            child);
                         Heartbeat.removeColocation(dcHost,
                                                    colocationId,
-                                                   getService().getHeartbeatId(),
                                                    child,
+                                                   getService().getHeartbeatId(),
                                                    colScore);
                         final String orderId = heartbeatStatus.getOrderId(child,
                                                 getService().getHeartbeatId());
@@ -6447,9 +6448,8 @@ public class ClusterBrowser extends Browser {
      * Returns nw hb connection info object. This is called from heartbeat
      * graph.
      */
-    public final HbConnectionInfo getNewHbConnectionInfo(final ServiceInfo p,
-                                                         final ServiceInfo si) {
-        return new HbConnectionInfo(p, si);
+    public final HbConnectionInfo getNewHbConnectionInfo() {
+        return new HbConnectionInfo();
     }
 
     /**
@@ -6461,33 +6461,81 @@ public class ClusterBrowser extends Browser {
 
         /** Cache for the info panel. */
         private JComponent infoPanel = null;
-        /** Connected parent service. */
+        /** Parent resource in order constraint. */
         private ServiceInfo serviceInfoParent;
-        /** Connected child service. */
-        private ServiceInfo serviceInfo;
+        /** Child resource in order constraint. */
+        private ServiceInfo serviceInfoChild;
+        /** Resource 1 in colocation constraint. */
+        private ServiceInfo serviceInfoRsc;
+        /** Resource 2 in colocation constraint. */
+        private ServiceInfo serviceInfoWithRsc;
 
         /**
          * Prepares a new <code>HbConnectionInfo</code> object.
          */
-        public HbConnectionInfo(final ServiceInfo serviceInfoParent,
-                                final ServiceInfo serviceInfo) {
+        public HbConnectionInfo() {
             super("HbConnectionInfo");
             this.serviceInfoParent = serviceInfoParent;
-            this.serviceInfo = serviceInfo;
+            this.serviceInfoChild = serviceInfoChild;
         }
 
         /**
-         * Returns parent that is connected to this service with constraint.
+         * Sets parent resource in order constraint.
+         */
+        public final void setServiceInfoParent(
+                                        final ServiceInfo serviceInfoParent) {
+            this.serviceInfoParent = serviceInfoParent;
+        }
+
+        /**
+         * Sets child resource in order constraint.
+         */
+        public final void setServiceInfoChild(
+                                        final ServiceInfo serviceInfoChild) {
+            this.serviceInfoChild = serviceInfoChild;
+        }
+
+        /**
+         * Sets resource 1 in colocation constraint.
+         */
+        public final void setServiceInfoRsc(final ServiceInfo serviceInfoRsc) {
+            this.serviceInfoRsc = serviceInfoRsc;
+        }
+
+        /**
+         * Sets resource 2 in colocation constraint.
+         */
+        public final void setServiceInfoWithRsc(
+                                        final ServiceInfo serviceInfoWithRsc) {
+            this.serviceInfoWithRsc = serviceInfoWithRsc;
+        }
+
+        /**
+         * Returns parent resource in order constraint.
          */
         public final ServiceInfo getServiceInfoParent() {
             return serviceInfoParent;
         }
 
         /**
-         * Returns service info object of the child in this connection.
+         * Returns child resource in order constraint.
          */
-        public final ServiceInfo getServiceInfo() {
-            return serviceInfo;
+        public final ServiceInfo getServiceInfoChild() {
+            return serviceInfoChild;
+        }
+
+        /**
+         * Returns resource 1 in colocation constraint.
+         */
+        public final ServiceInfo getServiceInfoRsc() {
+            return serviceInfoRsc;
+        }
+
+        /**
+         * Returns resource 2 in colocation constraint.
+         */
+        public final ServiceInfo getServiceInfoWithRsc() {
+            return serviceInfoWithRsc;
         }
 
         /**
@@ -6646,8 +6694,8 @@ public class ClusterBrowser extends Browser {
 
                 public void action() {
                     heartbeatGraph.removeOrder(thisClass);
-                    ServiceInfo t = serviceInfo;
-                    serviceInfo = serviceInfoParent;
+                    ServiceInfo t = serviceInfoChild;
+                    serviceInfoChild = serviceInfoParent;
                     serviceInfoParent = t;
                     heartbeatGraph.addOrder(thisClass);
                 }
