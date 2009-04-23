@@ -499,7 +499,10 @@ public class ClusterHbInit extends DialogCluster {
         if (!useDopd) {
             config.append("# ");
         }
-        config.append("respawn hacluster /usr/lib/heartbeat/dopd\n");
+        config.append("respawn hacluster ");
+        final Host[] hosts = getCluster().getHostsArray();
+        config.append(hosts[0].getHeartbeatLibPath());
+        config.append("/dopd\n");
         if (!useDopd) {
             config.append("# ");
         }
@@ -517,7 +520,10 @@ public class ClusterHbInit extends DialogCluster {
         if (!useMgmt) {
             config.append("# ");
         }
-        config.append("respawn root /usr/lib/heartbeat/mgmtd -v\n");
+        config.append("respawn root ");
+        final Host[] hosts = getCluster().getHostsArray();
+        config.append(hosts[0].getHeartbeatLibPath());
+        config.append("/mgmtd -v\n");
         if (!useMgmt) {
             config.append("# ");
         }

@@ -464,6 +464,19 @@ sub cib_message {
 }
 
 #
+# Return heartbeat lib path. It can be /usr/lib/heartbeat or
+# /usr/lib64/heartbeat
+#
+sub get_hb_lib_path {
+	my $arch = `uname -m`;
+	chomp $arch;
+	if ($arch eq "x86_64") {
+		return "/usr/lib64/heartbeat";
+	}
+	return "/usr/lib/heartbeat";
+}
+
+#
 # Prints heartbeat info, then waits 25 seconds for events, then it quits, so it # can get restarted again. This timeout is required so that a connection loss 
 # can be detected.
 #
@@ -624,13 +637,14 @@ sub get_cluster_info {
 
 sub get_cluster_metadata {
 	print "<metadata>\n";
-	my $pengine = `/usr/lib/heartbeat/pengine metadata 2>/dev/null`;
+	my $libpath = get_hb_lib_path();
+	my $pengine = `$libpath/pengine metadata 2>/dev/null`;
 	if ($pengine) {
 		# remove first line
 	 	substr $pengine, 0, index($pengine, "\n") + 1, '';
 		print $pengine;
 	}
-	my $crmd = `/usr/lib/heartbeat/crmd metadata 2>/dev/null`;
+	my $crmd = `$libpath/crmd metadata 2>/dev/null`;
 	if ($crmd) {
 		# remove first line
 	 	substr $crmd, 0, index($crmd, "\n") + 1, '';
@@ -799,7 +813,8 @@ sub get_drbd_xml {
 }
 
 sub get_hb_version {
-	my $hb_version = `( /usr/lib/heartbeat/heartbeat -V || /usr/lib64/heartbeat/heartbeat -V ) 2>/dev/null` || "";
+	my $libpath = get_hb_lib_path();
+	my $hb_version = `$libpath/heartbeat -V 2>/dev/null` || "";
 	$hb_version =~ s/\s+.*//;
 	if ($hb_version) {
 		chomp $hb_version;

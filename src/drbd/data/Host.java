@@ -838,6 +838,19 @@ public class Host implements Serializable {
         return arch;
     }
 
+    /**
+     * Returns heartbeat lib path.
+     */
+    public final String getHeartbeatLibPath() {
+        if ("".equals(arch)) {
+            Tools.appError(
+                        "getHeartbeatLibPath() called to soon: unknown arch");
+        } else if ("x86_64".equals(arch)) {
+            return "/usr/lib64/heartbeat";
+        }
+        return "/usr/lib/heartbeat";
+    }
+
 
     /**
      * Gets distribution, e.g., debian.
