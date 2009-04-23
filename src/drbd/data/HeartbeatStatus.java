@@ -111,14 +111,14 @@ public class HeartbeatStatus {
      * Returns the dc host.
      */
     public final String getDC() {
-        return dc;
+        return cibQueryMap.getDC();
     }
 
     /**
      * Sets the dc host.
      */
     public final void setDC(final String dc) {
-        this.dc = dc;
+        cibQueryMap.setDC(dc);
     }
 
     /**

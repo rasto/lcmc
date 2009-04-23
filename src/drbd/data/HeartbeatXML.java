@@ -1097,7 +1097,9 @@ public class HeartbeatXML extends XML {
         if (cibNode == null) {
             return cibQueryData;
         }
-
+        /* Designated Co-ordinator */
+        final String dcUuid = getAttribute(cibNode, "dc-uuid");
+        //TODO: more attributes are here
 
         /* <configuration> */
         final Node confNode = getChildNode(cibNode, "configuration");
@@ -1138,6 +1140,27 @@ public class HeartbeatXML extends XML {
         cibQueryData.setCrmConfig(crmConfMap);
 
         /* <nodes> */
+        /* xml node with cluster node make stupid variable names, but let's
+         * keep the convention. */
+        String dc = null;
+        final Node nodesNode = getChildNode(confNode, "nodes");
+        if (nodesNode != null) {
+            final NodeList nodes = nodesNode.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node nodeNode = nodes.item(i);
+                if (nodeNode.getNodeName().equals("node")) {
+                    /* TODO: doing nothing with the info, just getting the dc,
+                     * for now.
+                     */
+                    final String uuid = getAttribute(nodeNode, "id");
+                    final String uname = getAttribute(nodeNode, "uname");
+                    if (dcUuid != null && dcUuid.equals(uuid)) {
+                        dc = uname;
+                    }
+                }
+            }
+        }
+
         /* <resources> */
         final Node resourcesNode = getChildNode(confNode, "resources");
         if (resourcesNode == null) {
@@ -1322,7 +1345,7 @@ public class HeartbeatXML extends XML {
                 }
             }
         }
-
+        cibQueryData.setDC(dc);
         cibQueryData.setParameters(parametersMap);
         cibQueryData.setParametersNvpairsIds(parametersNvpairsIdsMap);
         cibQueryData.setResourceType(resourceTypeMap);

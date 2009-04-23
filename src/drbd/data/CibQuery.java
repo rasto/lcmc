@@ -91,6 +91,8 @@ public class CibQuery {
     /** Group to resources map. */
     private Map<String, List<String>> groupsToResources =
                                            new HashMap<String, List<String>>();
+    /** Designated co-ordinator. */
+    private String dc = null;
 
     /**
      * Sets crm config map.
@@ -409,5 +411,19 @@ public class CibQuery {
      */
     public final Map<String, List<String>> getGroupsToResources() {
         return groupsToResources;
+    }
+
+    /**
+     * Sets the designated co-ordinator.
+     */
+    public final void setDC(final String dc) {
+        this.dc = dc;
+    }
+
+    /**
+     * Gets the designated co-ordinator.
+     */
+    public final String getDC() {
+        return dc;
     }
 }
