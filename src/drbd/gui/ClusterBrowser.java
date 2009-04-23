@@ -6699,6 +6699,8 @@ public class ClusterBrowser extends Browser {
                 }
 
                 public void action() {
+                    ServiceInfo child = serviceInfoChild;
+                    ServiceInfo parent = serviceInfoParent;
                     heartbeatGraph.removeOrder(thisClass);
                     // TODO: or should I wait till it is really removed?
                     try {
@@ -6706,9 +6708,8 @@ public class ClusterBrowser extends Browser {
                     } catch (InterruptedException ex) {
                         Thread.currentThread().interrupt();
                     }
-                    ServiceInfo t = serviceInfoChild;
-                    serviceInfoChild = serviceInfoParent;
-                    serviceInfoParent = t;
+                    serviceInfoChild = parent;
+                    serviceInfoParent = child;
                     heartbeatGraph.addOrder(thisClass);
                 }
             };
