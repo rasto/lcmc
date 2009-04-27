@@ -90,7 +90,7 @@ public class HostDistDetection extends DialogHost {
             answerPaneSetText(answerText);
         } else if (getHost().getKernelName().equals("Linux")) {
             final String support =
-                            Tools.getCommand("Support",
+                         Tools.getDistString("Support",
                                              getHost().getDist(),
                                              getHost().getDistVersionString());
             answerText = getHost().getDist() + "\nversion: "
@@ -114,7 +114,7 @@ public class HostDistDetection extends DialogHost {
 
         enableComponents();
         final String support =
-                         Tools.getCommand("Support",
+                      Tools.getDistString("Support",
                                           getHost().getDist(),
                                           getHost().getDistVersionString());
         final String answerText = "detected: " + getHost().getDetectedInfo()
@@ -149,7 +149,7 @@ public class HostDistDetection extends DialogHost {
                     //getProgressBar().hold();
                     ExecCommandThread t = getHost().execCommandCache(
                              "WhichDist",
-                             null,
+                             null, /* ProgressBar */
                              new ExecCallback() {
                                 public void done(final String ans) {
                                     checkAnswer(ans);
@@ -161,7 +161,9 @@ public class HostDistDetection extends DialogHost {
                                                        ans,
                                                        exitCode);
                                 }
-                             }, true);
+                             },
+                             null,  /* ConvertCmdCallback */
+                             true); /* outputVisible */
                     setCommandThread(t);
                 }
             });

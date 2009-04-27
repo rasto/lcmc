@@ -833,102 +833,102 @@ public class ClusterBrowser extends Browser {
             }
             hbStatusCanceled = false;
             host.execHbStatusCommand(
-                                     new ExecCallback() {
-                                         public void done(final String ans) {
-                                             if (hbStatusFirstTime) {
-                                                 hbStatusFirstTime = false;
-                                                 selectServices();
-                                                 //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                                                 //    heartbeatGraph.scale();
-                                                 //} });
-                                                 stopHbStatusProgressIndicator(hostName);
-                                             }
-                                         }
+                 new ExecCallback() {
+                     public void done(final String ans) {
+                         if (hbStatusFirstTime) {
+                             hbStatusFirstTime = false;
+                             selectServices();
+                             //SwingUtilities.invokeLater(new Runnable() { public void run() {
+                             //    heartbeatGraph.scale();
+                             //} });
+                             stopHbStatusProgressIndicator(hostName);
+                         }
+                     }
 
-                                         public void doneError(final String ans, final int exitCode) {
-                                             Tools.progressIndicatorFailed(hostName, "Heartbeat status failed");
-                                             if (hbStatusFirstTime) {
-                                                Tools.debug(this, "hb status failed: " + host.getName());
-                                             }
-                                             hbStatusLock();
-                                             final boolean prevHbStatusFailed = hbStatusFailed();
-                                             host.setHbStatus(false);
-                                             heartbeatStatus.setDC(null);
-                                             hbStatusUnlock();
-                                             if (prevHbStatusFailed != hbStatusFailed()) {
-                                                 heartbeatGraph.getServicesInfo().selectMyself();
-                                             }
-                                             done(ans);
-                                         }
-                                     },
+                     public void doneError(final String ans, final int exitCode) {
+                         Tools.progressIndicatorFailed(hostName, "Heartbeat status failed");
+                         if (hbStatusFirstTime) {
+                            Tools.debug(this, "hb status failed: " + host.getName());
+                         }
+                         hbStatusLock();
+                         final boolean prevHbStatusFailed = hbStatusFailed();
+                         host.setHbStatus(false);
+                         heartbeatStatus.setDC(null);
+                         hbStatusUnlock();
+                         if (prevHbStatusFailed != hbStatusFailed()) {
+                            heartbeatGraph.getServicesInfo().selectMyself();
+                         }
+                         done(ans);
+                     }
+                 },
 
-                                     new NewOutputCallback() {
-                                         //TODO: check this buffer's size
-                                         private StringBuffer heartbeatStatusOutput = new StringBuffer(300);
-                                         public void output(final String output) {
-                                             hbStatusLock();
-                                             final boolean prevHbStatusFailed = hbStatusFailed();
-                                             if (hbStatusCanceled) {
-                                                 hbStatusUnlock();
-                                                 if (hbStatusFirstTime) {
-                                                     hbStatusFirstTime = false;
-                                                     selectServices();
-                                                     //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                                                         heartbeatGraph.scale();
-                                                     //} });
-                                                     stopHbStatusProgressIndicator(hostName);
-                                                 }
-                                                 return;
-                                             }
-                                             if (output == null) {
+                 new NewOutputCallback() {
+                     //TODO: check this buffer's size
+                     private StringBuffer heartbeatStatusOutput = new StringBuffer(300);
+                     public void output(final String output) {
+                         hbStatusLock();
+                         final boolean prevHbStatusFailed = hbStatusFailed();
+                         if (hbStatusCanceled) {
+                             hbStatusUnlock();
+                             if (hbStatusFirstTime) {
+                                 hbStatusFirstTime = false;
+                                 selectServices();
+                                 //SwingUtilities.invokeLater(new Runnable() { public void run() {
+                                     heartbeatGraph.scale();
+                                 //} });
+                                 stopHbStatusProgressIndicator(hostName);
+                             }
+                             return;
+                         }
+                         if (output == null) {
+                             host.setHbStatus(false);
+                             if (prevHbStatusFailed != hbStatusFailed()) {
+                                 heartbeatGraph.getServicesInfo().selectMyself();
+                             }
+                         } else {
+                             heartbeatStatusOutput.append(output);
+                             if (heartbeatStatusOutput.length() > 12) {
+                                 //host.setHbStatus(true);
+                                 final String e = heartbeatStatusOutput.substring(heartbeatStatusOutput.length() - 12);
+                                 if (e.trim().equals("---done---")) {
+                                     final int i = heartbeatStatusOutput.lastIndexOf("---start---");
+                                     if (i >= 0) {
+                                         if (heartbeatStatusOutput.indexOf("is stopped") >= 0) {
+                                             /* TODO: heartbeat's not running. */
+                                         } else {
+                                             final String status = heartbeatStatusOutput.substring(i);
+                                             heartbeatStatusOutput.delete(0, heartbeatStatusOutput.length() - 1);
+                                             if ("---start---\r\nerror\r\n\r\n---done---\r\n".equals(status)) {
                                                  host.setHbStatus(false);
-                                                 if (prevHbStatusFailed != hbStatusFailed()) {
-                                                     heartbeatGraph.getServicesInfo().selectMyself();
-                                                 }
                                              } else {
-                                                 heartbeatStatusOutput.append(output);
-                                                 if (heartbeatStatusOutput.length() > 12) {
-                                                     //host.setHbStatus(true);
-                                                     final String e = heartbeatStatusOutput.substring(heartbeatStatusOutput.length() - 12);
-                                                     if (e.trim().equals("---done---")) {
-                                                         final int i = heartbeatStatusOutput.lastIndexOf("---start---");
-                                                         if (i >= 0) {
-                                                             if (heartbeatStatusOutput.indexOf("is stopped") >= 0) {
-                                                                 /* TODO: heartbeat's not running. */
-                                                             } else {
-                                                                 final String status = heartbeatStatusOutput.substring(i);
-                                                                 heartbeatStatusOutput.delete(0, heartbeatStatusOutput.length() - 1);
-                                                                 if ("---start---\r\nerror\r\n\r\n---done---\r\n".equals(status)) {
-                                                                     host.setHbStatus(false);
-                                                                 } else {
-                                                                     heartbeatStatus.parseStatus(status);
-                                                                     // TODO; servicesInfo can be null
-                                                                     heartbeatGraph.getServicesInfo().setGlobalConfig();
-                                                                     heartbeatGraph.getServicesInfo().setAllResources();
-                                                                     repaintTree();
-                                                                 }
-                                                             }
-                                                         }
-                                                     }
-                                                     setHbStatus();
-                                                 } else {
-                                                    host.setHbStatus(false);
-                                                 }
+                                                 heartbeatStatus.parseStatus(status);
+                                                 // TODO; servicesInfo can be null
+                                                 heartbeatGraph.getServicesInfo().setGlobalConfig();
+                                                 heartbeatGraph.getServicesInfo().setAllResources();
+                                                 repaintTree();
                                              }
-                                            if (prevHbStatusFailed != hbStatusFailed()) {
-                                                 heartbeatGraph.getServicesInfo().selectMyself();
-                                            }
-                                             if (hbStatusFirstTime) {
-                                                 hbStatusFirstTime = false;
-                                                 selectServices();
-                                                 //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                                                 //    heartbeatGraph.scale();
-                                                 //} });
-                                                 stopHbStatusProgressIndicator(hostName);
-                                             }
-                                             hbStatusUnlock();
                                          }
-                                     });
+                                     }
+                                 }
+                                 setHbStatus();
+                             } else {
+                                host.setHbStatus(false);
+                             }
+                         }
+                        if (prevHbStatusFailed != hbStatusFailed()) {
+                             heartbeatGraph.getServicesInfo().selectMyself();
+                        }
+                         if (hbStatusFirstTime) {
+                             hbStatusFirstTime = false;
+                             selectServices();
+                             //SwingUtilities.invokeLater(new Runnable() { public void run() {
+                             //    heartbeatGraph.scale();
+                             //} });
+                             stopHbStatusProgressIndicator(hostName);
+                         }
+                         hbStatusUnlock();
+                     }
+                 });
             clusterViewPanel.hbStatusButtonEnable();
             host.waitOnHbStatus();
             if (hbStatusCanceled) {
@@ -4377,7 +4377,6 @@ public class ClusterBrowser extends Browser {
                 cb.addListeners(
                     new ItemListener() {
                         public void itemStateChanged(final ItemEvent e) {
-
                             if (cb.isCheckBox()
                                 || e.getStateChange() == ItemEvent.SELECTED) {
                                 Thread thread = new Thread(new Runnable() {

@@ -42,6 +42,18 @@ public class DistResource_suse_SLES11 extends
         /* distribution name that is used in the download url */
         {"distributiondir", "sles11"},
         {"Support", "suse-SLES11"},
-        {"DRBD.load",          "modprobe --allow-unsupported drbd"},
+        {"DRBD.load", "modprobe --allow-unsupported drbd"}, //TODO: not enough for reboot
+
+        {"HbInst.install.text.1", "download.opensuse.org" },
+        {"HbInst.install.1", "rm -rf /tmp/drbd-mc-hbinst/; "
+                           + "mkdir /tmp/drbd-mc-hbinst/ && "
+                           + "wget -nd -r -np --progress=dot -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/@ARCH@/ && "
+                           + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
+                           + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
+                           + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
+                           + "rm -rf /tmp/drbd-mc-hbinst/"},
+
+        {"HbInst.install.text.2", "CD" },
+        {"HbInst.install.2", "zypper -n install heartbeat"},
     };
 }

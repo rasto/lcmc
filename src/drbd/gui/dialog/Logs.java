@@ -23,15 +23,19 @@ package drbd.gui.dialog;
 
 import drbd.utilities.Tools;
 import drbd.data.Host;
+import drbd.gui.SpringUtilities;
+import drbd.utilities.ExecCallback;
+import drbd.gui.ProgressBar;
+
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import drbd.gui.SpringUtilities;
-import drbd.utilities.ExecCallback;
-import drbd.gui.ProgressBar;
+
+import java.util.Map;
+import java.util.HashMap;
 
 
 /**
@@ -98,11 +102,10 @@ public class Logs extends ConfigDialog {
      * the result.
      */
     protected void getLog() {
-        String c = host.getCommand(logFileCommand());
-        if (c.indexOf("@GREPPATTERN@") > -1) {
-            c = c.replaceAll("@GREPPATTERN@", grepPattern());
-        }
-        final String command = c;
+        Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@GREPPATTERN@", grepPattern());
+        final String command = host.getDistCommand(logFileCommand(),
+                                                   replaceHash);
         host.execCommandRaw(command,
                              (ProgressBar) null,
                              new ExecCallback() {

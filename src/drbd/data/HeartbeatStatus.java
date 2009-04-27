@@ -23,6 +23,7 @@
 package drbd.data;
 
 import drbd.utilities.Tools;
+import drbd.utilities.ConvertCmdCallback;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -56,13 +57,15 @@ public class HeartbeatStatus {
                            final HeartbeatXML heartbeatXML) {
         this.host = host;
         this.heartbeatXML = heartbeatXML;
-        final String command = host.getCommand("Heartbeat.getClusterMetadata");
+        final String command =
+                   host.getDistCommand("Heartbeat.getClusterMetadata",
+                                       (ConvertCmdCallback) null);
         final String output =
                     Tools.execCommandProgressIndicator(
                             host,
                             command,
-                            null,
-                            false,
+                            null,  /* ExecCallback */
+                            false, /* outputVisible */
                             Tools.getString("Heartbeat.getClusterMetadata"));
         if (output != null) {
             heartbeatXML.parseClusterMetaData(output);

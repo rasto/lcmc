@@ -919,6 +919,36 @@ public final class Tools {
     }
 
     /**
+     * Returns string that is specific to a distribution and version.
+     */
+    public static String getDistString(final String text,
+                                       String dist,
+                                       String version) {
+        if (dist == null) {
+            dist = "";
+        }
+        if (version == null) {
+            version = "";
+        }
+        final Locale locale = new Locale(dist, version);
+        debug("getDistString text: "
+              + text
+              + " dist: "
+              + dist
+              + " version: "
+              + version, 2);
+        final ResourceBundle resourceString =
+                ResourceBundle.getBundle("drbd.configs.DistResource", locale);
+        try {
+            String ret = resourceString.getString(text);
+            debug("ret: " + ret, 2);
+            return ret;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Returns command from DistResource resource bundle for specific
      * distribution and version.
      *
@@ -931,32 +961,16 @@ public final class Tools {
      *
      * @return command.
      */
-    public static String getCommand(final String text,
-                                    String dist,
-                                    String version) {
-        if (dist == null) {
-            dist = "";
+    public static String getDistCommand(
+                                 final String text,
+                                 final String dist,
+                                 final String version,
+                                 final ConvertCmdCallback convertCmdCallback) {
+        String ret = getDistString(text, dist, version);
+        if (convertCmdCallback != null) {
+            ret = convertCmdCallback.convert(ret);
         }
-        if (version == null) {
-            version = "";
-        }
-        final Locale locale = new Locale(dist, version);
-        debug("getCommand text: "
-              + text
-              + " dist: "
-              + dist
-              + " version: "
-              + version, 2);
-        final ResourceBundle resourceCommand =
-                ResourceBundle.getBundle("drbd.configs.DistResource", locale);
-        try {
-            final String ret = resourceCommand.getString(text);
-            debug("ret: " + ret, 2);
-            return ret;
-        } catch (Exception e) {
-            //appError("AppError.Unresolved.Command", text + "\n", e);
-            return "# command not defined: " + text;
-        }
+        return ret;
     }
 
     /**
@@ -1003,7 +1017,7 @@ public final class Tools {
     public static String getKernelDownloadDir(final String kernelVersion,
                                               final String dist,
                                               final String version) {
-        final String regexp = getCommand("kerneldir", dist, version);
+        final String regexp = getDistString("kerneldir", dist, version);
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
             final Matcher m = p.matcher(kernelVersion);
@@ -1221,7 +1235,7 @@ public final class Tools {
      * @return html
      */
     public static String html(final String text) {
-        return "<html>\n" + text.replaceAll("\n", "<br>") + "\n</html>";
+        return "<html><p>" + text.replaceAll("\n", "<br>") + "\n</html>";
     }
 
     /**

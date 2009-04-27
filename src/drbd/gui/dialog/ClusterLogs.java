@@ -114,15 +114,15 @@ public class ClusterLogs extends ConfigDialog {
         Thread[] threads = new Thread[hosts.length];
         final String[] texts = new String[hosts.length];
 
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@GREPPATTERN@", grepPattern());
+
         int i = 0;
         for (final Host host : hosts) {
             final int index = i;
-            String c = host.getCommand(logFileCommand());
-            if (c.indexOf("@GREPPATTERN@") > -1) {
-                c = c.replaceAll("@GREPPATTERN@", grepPattern());
-            }
-            final String command = c;
-            threads[index] = host.execCommandRaw(c,
+            final String command = host.getDistCommand(logFileCommand(),
+                                                       replaceHash);
+            threads[index] = host.execCommandRaw(command,
                                  (ProgressBar) null,
                                  new ExecCallback() {
                                      public void done(final String ans) {

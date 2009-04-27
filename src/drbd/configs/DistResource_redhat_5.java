@@ -24,7 +24,7 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for redhat verson 5.
+ * Here are commands for centos verson 5.
  */
 public class DistResource_redhat_5 extends
             java.util.ListResourceBundle {
@@ -45,5 +45,11 @@ public class DistResource_redhat_5 extends
 
         /* support */
         {"Support", "redhat-5"},
+
+        {"HbInst.install.text.1", "download.opensuse.org" },
+        {"HbInst.install.1", "wget -N -nd --progress=dot -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
+                             + "yum -y install heartbeat pacemaker"},
+        {"HbInst.install.text.2", "yum" },
+        {"HbInst.install.2", "/usr/bin/yum -y install heartbeat"},
     };
 }

@@ -44,6 +44,7 @@ public class DistResource_redhat extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
 
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
-        {"HbInst.install", "/usr/bin/yum -y install heartbeat"},
+        {"HbInst.install.text.1", "yum"},
+        {"HbInst.install.1", "/usr/bin/yum -y install heartbeat"},
     };
 }

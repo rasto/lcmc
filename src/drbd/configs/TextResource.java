@@ -172,6 +172,7 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.CheckingHb",        "checking..."},
         {"Dialog.HostCheckInstallation.CheckingDrbd",      "checking..."},
         {"Dialog.HostCheckInstallation.CheckingUdev",      "checking..."},
+        {"Dialog.HostCheckInstallation.HbInstallMethod",   "Installation method: "},
 
         {"Dialog.HostLogin.Title",          "Log in"},
         {"Dialog.HostLogin.Description",    "You need to log in to the http://www.linbit.com/support download area to get a package for your distribution. Please provide your username and password. Contact LINBIT support to obtain one. Alternatively you can install/upgrade the DRBD yourself and go back to the previous dialog in order to continue.<br><br>"

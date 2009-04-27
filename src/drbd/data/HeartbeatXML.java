@@ -23,6 +23,7 @@
 package drbd.data;
 
 import drbd.utilities.Tools;
+import drbd.utilities.ConvertCmdCallback;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -108,13 +109,14 @@ public class HeartbeatXML extends XML {
     public HeartbeatXML(final Host host) {
         super();
         this.host = host;
-        final String command = host.getCommand("Heartbeat.getOCFParameters");
+        final String command = host.getDistCommand("Heartbeat.getOCFParameters",
+                                                   (ConvertCmdCallback) null);
         final String output =
                     Tools.execCommandProgressIndicator(
                             host,
                             command,
-                            null,
-                            false,
+                            null,  /* ExecCallback */
+                            false, /* outputVisible */
                             Tools.getString("HeartbeatXML.GetOCFParameters"));
         if (output == null) {
             //Tools.appError("heartbeat ocf output is null");

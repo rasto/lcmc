@@ -45,5 +45,7 @@ public class DistResource_fedora extends
 
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
         {"HbInst.install", "/usr/bin/yum -y install heartbeat"},
+        /* at least fedora 10 has different ocf path. */
+        {"Heartbeat.getOCFParameters", "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/share/ocf; for s in `ls -1 /usr/share/ocf/resource.d/heartbeat/ `; do /usr/share/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done; /usr/local/bin/drbd-gui-helper get-old-style-resources; /usr/local/bin/drbd-gui-helper get-lsb-resources"},
     };
 }

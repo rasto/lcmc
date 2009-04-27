@@ -25,6 +25,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.SSH;
 import drbd.utilities.SSH.ExecCommandThread;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.ConvertCmdCallback;
 import drbd.utilities.ConnectionCallback;
 import drbd.utilities.NewOutputCallback;
 import drbd.gui.ProgressBar;
@@ -162,6 +163,8 @@ public class Host implements Serializable {
     private CountDownLatch isLoadingGate;
     /** List of gui elements that are to be enabled if the host is connected.*/
     private List<JComponent> enableOnConnectList = new ArrayList<JComponent>();
+    /** Heartbeat installation method index. */
+    private String hbInstallMethod;
 
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
@@ -723,15 +726,15 @@ public class Host implements Serializable {
             Tools.appError("dist: " + dist + " does not match " + detectedDist);
         }
         distVersionString = Tools.getDistVersionString(dist, distVersion);
-        distVersion = Tools.getCommand("distributiondir",
-                                       detectedDist,
-                                       distVersionString);
+        distVersion = Tools.getDistString("distributiondir",
+                                          detectedDist,
+                                          distVersionString);
         setKernelVersion(Tools.getKernelDownloadDir(detectedKernelVersion,
                                                     getDist(),
                                                     distVersionString));
-        setArch(Tools.getCommand("arch:" + detectedArch,
-                                 getDist(),
-                                 distVersionString));
+        setArch(Tools.getDistString("arch:" + detectedArch,
+                                    getDist(),
+                                    distVersionString));
     }
 
     /**
@@ -766,9 +769,9 @@ public class Host implements Serializable {
         }
         Tools.debug(this, "getDistVersionString dist:"
                           + dV.replaceFirst("\\d.*", ""), 0);
-        return Tools.getCommand("dist:" + dV.replaceFirst("\\d.*", ""),
-                                "",
-                                "");
+        return Tools.getDistString("dist:" + dV.replaceFirst("\\d.*", ""),
+                                   "",
+                                   "");
     }
 
 
@@ -886,10 +889,51 @@ public class Host implements Serializable {
     }
 
     /**
-     * Converts command string to real command for a distribution.
+     * Converts command string to real command for a distribution, specifying
+     * the convert command callback.
      */
-    public final String getCommand(final String commandString) {
-        return Tools.getCommand(commandString, dist, distVersionString);
+    public final String getDistCommand(
+                                 final String commandString,
+                                 final ConvertCmdCallback convertCmdCallback) {
+        return Tools.getDistCommand(commandString,
+                                    dist,
+                                    distVersionString,
+                                    convertCmdCallback);
+    }
+
+    /**
+     * Converts a string that is specific to the distribution distribution,
+     */
+    public final String getDistString(
+                                 final String commandString) {
+        return Tools.getDistString(commandString,
+                                   dist,
+                                   distVersionString);
+    }
+
+    /**
+     * Converts command string to real command for a distribution, specifying
+     * what-with-what hash.
+     */
+    public final String getDistCommand(final String commandString,
+                                       final Map<String, String> replaceHash) {
+        return Tools.getDistCommand(
+                    commandString,
+                    dist,
+                    distVersionString,
+                    new ConvertCmdCallback() {
+                        public final String convert(String command) {
+                            for (final String tag : replaceHash.keySet()) {
+                                if (command.indexOf(tag) > -1) {
+                                    command =
+                                        command.replaceAll(
+                                                        tag,
+                                                        replaceHash.get(tag));
+                                }
+                            }
+                            return command;
+                        }
+                    });
     }
 
     /**
@@ -897,15 +941,19 @@ public class Host implements Serializable {
      * is finished execCallback.done function will be called. In case of error,
      * callback.doneError is called.
      */
-    public final ExecCommandThread execCommand(final String commandString,
-                                               final ExecCallback execCallback,
-                                               final boolean outputVisible) {
+    public final ExecCommandThread execCommand(
+                                final String commandString,
+                                final ExecCallback execCallback,
+                                final ConvertCmdCallback convertCmdCallback,
+                                final boolean outputVisible) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
-        return ssh.execCommand(Tools.getCommand(commandString,
-                                                dist,
-                                                distVersionString),
+        
+        return ssh.execCommand(Tools.getDistCommand(commandString,
+                                                    dist,
+                                                    distVersionString,
+                                                    convertCmdCallback),
                                execCallback,
                                outputVisible,
                                true,
@@ -920,16 +968,19 @@ public class Host implements Serializable {
      * commands that do not return, but run in the background and occasionaly
      * print a line to the stdout.
      */
-    public final ExecCommandThread execCommand(final String commandString,
-                                     final ExecCallback execCallback,
-                                     final NewOutputCallback newOutputCallback,
-                                     final boolean outputVisible) {
+    public final ExecCommandThread execCommand(
+                                final String commandString,
+                                final ExecCallback execCallback,
+                                final ConvertCmdCallback convertCmdCallback,
+                                final NewOutputCallback newOutputCallback,
+                                final boolean outputVisible) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
-        return ssh.execCommand(Tools.getCommand(commandString,
-                                                dist,
-                                                distVersionString),
+        return ssh.execCommand(Tools.getDistCommand(commandString,
+                                                    dist,
+                                                    distVersionString,
+                                                    convertCmdCallback),
                                execCallback,
                                newOutputCallback,
                                outputVisible,
@@ -963,16 +1014,20 @@ public class Host implements Serializable {
      * In case of error, callback.doneError is called.
      * Parameters will be passed directly as they are to the command.
      */
-    public final ExecCommandThread execCommand(final String commandString,
-                                               final String params,
-                                               final ExecCallback callback,
-                                               final boolean outputVisible) {
+    public final ExecCommandThread execCommand(
+                                final String commandString,
+                                final String params,
+                                final ExecCallback callback,
+                                final ConvertCmdCallback convertCmdCallback,
+                                final boolean outputVisible) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
-        return ssh.execCommand(Tools.getCommand(commandString,
-                                                dist,
-                                                distVersionString) + params,
+        return ssh.execCommand(Tools.getDistCommand(commandString,
+                                                    dist,
+                                                    distVersionString,
+                                                    convertCmdCallback)
+                               + params,
                                callback,
                                outputVisible,
                                true,
@@ -984,16 +1039,19 @@ public class Host implements Serializable {
      * is finished callback.done function will be called. In case of error,
      * callback.doneError is called.
      */
-    public final ExecCommandThread execCommand(final String commandString,
-                                               final ProgressBar progressBar,
-                                               final ExecCallback callback,
-                                               final boolean outputVisible) {
+    public final ExecCommandThread execCommand(
+                                final String commandString,
+                                final ProgressBar progressBar,
+                                final ExecCallback callback,
+                                final ConvertCmdCallback convertCmdCallback,
+                                final boolean outputVisible) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
-        return ssh.execCommand(Tools.getCommand(commandString,
-                                                dist,
-                                                distVersionString),
+        return ssh.execCommand(Tools.getDistCommand(commandString,
+                                                    dist,
+                                                    distVersionString,
+                                                    convertCmdCallback),
                                progressBar,
                                callback,
                                outputVisible,
@@ -1006,7 +1064,8 @@ public class Host implements Serializable {
      * and is executed in a new thread, after command is finished callback.done
      * function will be called. In case of error, callback.doneError is called.
      */
-    public final ExecCommandThread execCommandRaw(final String command,
+    public final ExecCommandThread execCommandRaw(
+                                            final String command,
                                             final ProgressBar progressBar,
                                             final ExecCallback execCallback,
                                             final boolean outputVisible,
@@ -1028,16 +1087,19 @@ public class Host implements Serializable {
      * is finished callback.done function will be called. In case of error,
      * callback.doneError is called.
      */
-    public final ExecCommandThread execCommandCache(final String commandString,
-                                              final ProgressBar progressBar,
-                                              final ExecCallback callback,
-                                              final boolean outputVisible) {
+    public final ExecCommandThread execCommandCache(
+                                final String commandString,
+                                final ProgressBar progressBar,
+                                final ExecCallback callback,
+                                final ConvertCmdCallback convertCmdCallback,
+                                final boolean outputVisible) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
-        return ssh.execCommand(Tools.getCommand(commandString,
-                                                dist,
-                                                distVersionString),
+        return ssh.execCommand(Tools.getDistCommand(commandString,
+                                                    dist,
+                                                    distVersionString,
+                                                    convertCmdCallback),
                                progressBar,
                                callback,
                                true,
@@ -1051,18 +1113,21 @@ public class Host implements Serializable {
      * block device object. The command is 'drbdsetup /dev/drbdX events'
      * The session is stored, so that in can be stopped with 'stop' button.
      */
-    public final void execDrbdStatusCommand(final ExecCallback execCallback,
-                                      final NewOutputCallback outputCallback) {
+    public final void execDrbdStatusCommand(
+                                final ExecCallback execCallback,
+                                final NewOutputCallback outputCallback) {
         if (drbdStatusThread == null) {
             drbdStatusThread = ssh.execCommand(
-                                        Tools.getCommand("DRBD.getDrbdStatus",
-                                                         dist,
-                                                         distVersionString),
-                                        execCallback,
-                                        outputCallback,
-                                        false,
-                                        false,
-                                        28000);
+                                Tools.getDistCommand(
+                                                "DRBD.getDrbdStatus",
+                                                dist,
+                                                distVersionString,
+                                                null), /* ConvertCmdCallback */
+                                    execCallback,
+                                    outputCallback,
+                                    false,
+                                    false,
+                                    28000);
         } else {
             Tools.appWarning("trying to start started drbd status");
         }
@@ -1099,13 +1164,15 @@ public class Host implements Serializable {
     /**
      * Executes an hb status command.
      */
-    public final void execHbStatusCommand(final ExecCallback execCallback,
-                                      final NewOutputCallback outputCallback) {
+    public final void execHbStatusCommand(
+                                final ExecCallback execCallback,
+                                final NewOutputCallback outputCallback) {
         if (hbStatusThread == null) {
             hbStatusThread = ssh.execCommand(
-                                Tools.getCommand("Heartbeat.getHbStatus",
+                            Tools.getDistCommand("Heartbeat.getHbStatus",
                                                  dist,
-                                                 distVersionString),
+                                                 distVersionString,
+                                                 null), /* ConvertCmdCallback */
                                 execCallback,
                                 outputCallback,
                                 false,
@@ -1464,7 +1531,9 @@ public class Host implements Serializable {
                                  setLoadingError();
                                  //States.interrupt("load:" + host.getName());
                              }
-                         }, false);
+                         },
+                         null, /* ConvertCmdCallback */
+                         false);
     }
 
 
@@ -1787,7 +1856,21 @@ public class Host implements Serializable {
     /**
      * Sets ssh port.
      */
-     public final void setSSHPort(final String sshPort) {
-         this.sshPort = sshPort;
-     }
+    public final void setSSHPort(final String sshPort) {
+        this.sshPort = sshPort;
+    }
+
+    /**
+     * Sets heartbeat installation method index.
+     */
+    public final void setHbInstallMethod(final String hbInstallMethod) {
+        this.hbInstallMethod = hbInstallMethod;
+    }
+
+    /**
+     * Returns heartbeat  installation method.
+     */
+    public final String getHbInstallMethod() {
+        return hbInstallMethod;
+    }
 }

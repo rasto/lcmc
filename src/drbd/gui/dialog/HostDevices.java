@@ -82,7 +82,7 @@ public class HostDevices extends DialogHost {
                     getHost().removeBlockDevices();
                     getProgressBar().start(6000);
                     final ExecCommandThread t = getHost().execCommand("installGuiHelper",
-                                     (ProgressBar)null, //getProgressBar(),
+                                     (ProgressBar) null, //getProgressBar(),
                                      new ExecCallback() {
                                          public void done(final String ans) {
                                              getInfo();
@@ -94,7 +94,9 @@ public class HostDevices extends DialogHost {
                                                 Helper can be installed anyway. */
                                              getInfo();
                                          }
-                                     }, false);
+                                     },
+                                     null,   /* ConvertCmdCallback */
+                                     false); /* outputVisible */
                     setCommandThread(t);
                 }
             });
@@ -109,7 +111,7 @@ public class HostDevices extends DialogHost {
 
         getHost().removeNetInterfaces();
         final ExecCommandThread t = getHost().execCommand("GetHostInfo",
-                         (ProgressBar)null, //getProgressBar(),
+                         (ProgressBar) null, //getProgressBar(),
                          new ExecCallback() {
                              public void done(final String ans) {
                                  checkAnswer(ans);
@@ -122,7 +124,9 @@ public class HostDevices extends DialogHost {
                                                     ans,
                                                     exitCode);
                              }
-                         }, true);
+                         },
+                         null,  /* ConvertCmdCallback */
+                         true); /* outputVisible */
         setCommandThread(t);
     }
 

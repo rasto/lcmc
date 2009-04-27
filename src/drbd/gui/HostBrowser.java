@@ -299,7 +299,12 @@ public class HostBrowser extends Browser {
             final Runnable runnable = new Runnable() {
                 public void run() {
                     if (modinfo == null) {
-                        modinfo = Tools.execCommand(host, "/sbin/modinfo " + getName(), null, false);
+                        modinfo = Tools.execCommand(
+                                            host,
+                                            "/sbin/modinfo "
+                                            + getName(),
+                                            null,   /* ExecCallback */
+                                            false); /* outputVisible */
                     }
                     ep.setText("<html><pre>" + modinfo + "</html></pre>");
                 }
@@ -361,7 +366,7 @@ public class HostBrowser extends Browser {
             final StringBuffer tt = new StringBuffer(80);
             tt.append("<b>" + host.getName() + "</b>");
             if (host.getCluster().getBrowser().isRealDcHost(host)) {
-                tt.append(" (DC)");
+                tt.append(" (designated co-ordinator)");
             }
             if (!host.isDrbdStatus() && !host.isHbStatus()) {
                 tt.append('\n');
@@ -381,7 +386,7 @@ public class HostBrowser extends Browser {
             final JTextArea ta = new JTextArea();
             ta.setFont(f);
 
-            final ExecCallback callback =
+            final ExecCallback execCallback =
                 new ExecCallback() {
                     public void done(final String ans) {
                         ta.setText(ans);
@@ -397,7 +402,10 @@ public class HostBrowser extends Browser {
             final MyButton procDrbdButton = new MyButton("/proc/drbd");
             procDrbdButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("DRBD.getProcDrbd", callback, true);
+                    host.execCommand("DRBD.getProcDrbd",
+                                     execCallback,
+                                     null,  /* ConvertCmdCallback */
+                                     true); /* outputVisible */
                 }
             });
             host.registerEnableOnConnect(procDrbdButton);
@@ -405,7 +413,10 @@ public class HostBrowser extends Browser {
             final MyButton drbdProcsButton = new MyButton("DRBD Processes");
             drbdProcsButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("DRBD.getProcesses", callback, true);
+                    host.execCommand("DRBD.getProcesses",
+                                     execCallback,
+                                     null,  /* ConvertCmdCallback */
+                                     true); /* outputVisible */
                 }
             });
             host.registerEnableOnConnect(drbdProcsButton);
@@ -413,7 +424,10 @@ public class HostBrowser extends Browser {
             final MyButton crmMonButton = new MyButton("crm_mon");
             crmMonButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("Heartbeat.getCrmMon", callback, true);
+                    host.execCommand("Heartbeat.getCrmMon",
+                                     execCallback,
+                                     null,  /* ConvertCmdCallback */
+                                     true); /* outputVisible */
                 }
             });
             host.registerEnableOnConnect(crmMonButton);
@@ -421,7 +435,10 @@ public class HostBrowser extends Browser {
             final MyButton hbProcsButton = new MyButton("Heartbeat Processes");
             hbProcsButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("Heartbeat.getProcesses", callback, true);
+                    host.execCommand("Heartbeat.getProcesses",
+                                     execCallback,
+                                     null,  /* ConvertCmdCallback */
+                                     true); /* outputVisible */
                 }
             });
             host.registerEnableOnConnect(hbProcsButton);
@@ -847,7 +864,12 @@ public class HostBrowser extends Browser {
         public void updateInfo(final JEditorPane ep) {
             final Runnable runnable = new Runnable() {
                 public void run() {
-                    String text = Tools.execCommand(host, "/sbin/ifconfig " + getName(), null, false);
+                    String text = Tools.execCommand(
+                                            host,
+                                            "/sbin/ifconfig "
+                                            + getName(),
+                                            null,   /* ExecCallback */
+                                            false); /* outputVisible */
                     ep.setText("<html><pre>" + text + "</html></pre>");
                 }
             };
@@ -1701,11 +1723,11 @@ public class HostBrowser extends Browser {
             /* attach / detach */
             final MyMenuItem attachMenu =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
-                               HARDDISC_ICON,
+                               NO_HARDDISC_ICON,
                                Tools.getString("HostBrowser.Drbd.Detach.ToolTip"),
 
                                Tools.getString("HostBrowser.Drbd.Attach"),
-                               NO_HARDDISC_ICON,
+                               HARDDISC_ICON,
                                Tools.getString("HostBrowser.Drbd.Attach.ToolTip")
                               ) {
                     private static final long serialVersionUID = 1L;

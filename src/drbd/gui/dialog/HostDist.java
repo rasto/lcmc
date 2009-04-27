@@ -99,7 +99,7 @@ public class HostDist extends DialogHost {
             answerPaneSetText(answerText);
         } else if (getHost().getKernelName().equals("Linux")) {
             final String support =
-                            Tools.getCommand("Support",
+                         Tools.getDistString("Support",
                                              getHost().getDist(),
                                              getHost().getDistVersionString());
             answerText = getHost().getDist() + "\nversion: "
@@ -127,7 +127,7 @@ public class HostDist extends DialogHost {
         drbdArchCombo.setEnabled(false);
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailVersions",
-                          null,
+                          null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(final String ans) {
                                 String[] items = ans.split(NEWLINE);
@@ -155,7 +155,9 @@ public class HostDist extends DialogHost {
                                                    ans,
                                                    exitCode);
                             }
-                          }, false);
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false); /* outputVisible */
         setCommandThread(t);
     }
 
@@ -167,7 +169,7 @@ public class HostDist extends DialogHost {
         drbdArchCombo.setEnabled(false);
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailDistributions",
-                          null,
+                          null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(String ans) {
                                 ans = NO_MATCH_STRING + "\n" + ans;
@@ -188,7 +190,9 @@ public class HostDist extends DialogHost {
                                                    ans,
                                                    exitCode);
                             }
-                          }, false);
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false); /* outputVisible */
         setCommandThread(t);
     }
 
@@ -208,7 +212,7 @@ public class HostDist extends DialogHost {
         drbdArchCombo.setEnabled(false);
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailKernels",
-                          null,
+                          null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(String ans) {
                                 ans = NO_MATCH_STRING + "\n" + ans;
@@ -231,7 +235,9 @@ public class HostDist extends DialogHost {
                                    ans,
                                    exitCode);
                             }
-                          }, false);
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false); /* outputVisible */
         setCommandThread(t);
     }
 
@@ -249,7 +255,7 @@ public class HostDist extends DialogHost {
         }
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailArchs",
-                          null,
+                          null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(String ans) {
                                 ans = NO_MATCH_STRING + "\n" + ans;
@@ -277,7 +283,10 @@ public class HostDist extends DialogHost {
                                     ans,
                                     exitCode);
                             }
-                          }, false);
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false); /* outputVisible */
+
         setCommandThread(t);
     }
 
@@ -287,7 +296,7 @@ public class HostDist extends DialogHost {
     protected void availVersionsForDist() {
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailVersionsForDist",
-                          null,
+                          null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(final String ans) {
                                 allDone(ans);
@@ -300,7 +309,10 @@ public class HostDist extends DialogHost {
                                     ans,
                                     exitCode);
                             }
-                          }, false);
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false); /* outputVisible */
+
         setCommandThread(t);
     }
 
@@ -313,7 +325,7 @@ public class HostDist extends DialogHost {
 
         enableComponents();
         final String support =
-                         Tools.getCommand("Support",
+                      Tools.getDistString("Support",
                                           getHost().getDist(),
                                           getHost().getDistVersionString());
         final String answerText = "detected: " + getHost().getDetectedInfo()
@@ -356,7 +368,7 @@ public class HostDist extends DialogHost {
                     //getProgressBar().hold();
                     ExecCommandThread t = getHost().execCommandCache(
                              "WhichDist",
-                             null,
+                             null, /* ProgressBar */
                              new ExecCallback() {
                                 public void done(final String ans) {
                                     checkAnswer(ans);
@@ -368,7 +380,9 @@ public class HostDist extends DialogHost {
                                                        ans,
                                                        exitCode);
                                 }
-                             }, true);
+                             },
+                             null,  /* ConvertCmdCallback */
+                             true); /* outputVisible */
                     setCommandThread(t);
                 }
             });

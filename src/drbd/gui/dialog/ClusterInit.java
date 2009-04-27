@@ -197,7 +197,9 @@ public class ClusterInit extends DialogCluster {
                                                        final int exitCode) {
                                      drbdLoaded[index] = false;
                                  }
-                             }, false);
+                             },
+                             null,   /* ConvertCmdCallback */
+                             false); /* outputVisible */
             tsHb[i] = h.execCommand("Heartbeat.isStarted",
                              (ProgressBar) null,
                              new ExecCallback() {
@@ -208,7 +210,9 @@ public class ClusterInit extends DialogCluster {
                                                        final int exitCode) {
                                      hbStarted[index] = false;
                                  }
-                             }, false);
+                             },
+                             null,   /* ConvertCmdCallback */
+                             false); /* outputVisible */
             i++;
         }
         for (ExecCommandThread t : tsDrbd) {

@@ -98,7 +98,7 @@ public class HostDrbdAvailFiles extends DialogHost {
     protected void availBuilds() {
         getHost().execCommandCache(
                           "DrbdAvailBuilds",
-                          null,
+                          null, /* ProgresBar */
                           new ExecCallback() {
                             public void done(final String ans) {
                                 String defaultValue =
@@ -149,7 +149,9 @@ public class HostDrbdAvailFiles extends DialogHost {
                                     }
                                 });
                             }
-                          }, false);
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false); /* outputVisible */
     }
 
     /**
@@ -159,7 +161,7 @@ public class HostDrbdAvailFiles extends DialogHost {
 
         drbdBuildCombo.setEnabled(true);
         getHost().execCommandCache("DrbdAvailFiles",
-                          null,
+                          null, /* ProgresBar */
                           new ExecCallback() {
                             public void done(final String ans) {
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -194,7 +196,9 @@ public class HostDrbdAvailFiles extends DialogHost {
                                     }
                                 });
                             }
-                          }, true);
+                          },
+                          null,  /* ConvertCmdCallback */
+                          true); /* outputVisible */
     }
 
     /**

@@ -46,6 +46,7 @@ public class DistResource_ubuntu extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+).*"},
 
         {"DrbdInst.install", "dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
-        {"HbInst.install", "/usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        {"HbInst.install.text.1", "apt-get"},
+        {"HbInst.install.1", "/usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
     };
 }

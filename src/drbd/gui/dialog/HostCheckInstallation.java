@@ -25,6 +25,7 @@ import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.gui.SpringUtilities;
+import drbd.gui.GuiComboBox;
 import drbd.utilities.ExecCallback;
 
 import javax.swing.JPanel;
@@ -35,6 +36,10 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * An implementation of a dialog where drbd/heartbeat installation is checked.
@@ -68,6 +73,8 @@ public class HostCheckInstallation extends DialogHost {
     /** Install udev button. */
     private final MyButton udevButton = new MyButton(
             Tools.getString("Dialog.HostCheckInstallation.UdevInstallButton"));
+    /** Heartbeat installation method */
+    private GuiComboBox hbInstMethodCB;
 
     /** Checking icon. */
     private static final ImageIcon CHECKING_ICON =
@@ -124,6 +131,7 @@ public class HostCheckInstallation extends DialogHost {
             public void run() {
                 drbdButton.setEnabled(false);
                 heartbeatButton.setEnabled(false);
+                hbInstMethodCB.setEnabled(false);
                 udevButton.setEnabled(false);
             }
         });
@@ -161,6 +169,9 @@ public class HostCheckInstallation extends DialogHost {
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new HostHbInst(thisClass, getHost());
+                    InstallMethods im =
+                                   (InstallMethods) hbInstMethodCB.getValue();
+                    getHost().setHbInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             ((MyButton) buttonClass(
@@ -194,7 +205,9 @@ public class HostCheckInstallation extends DialogHost {
                                                    final int exitCode) {
                                  checkDrbd(""); // not installed
                              }
-                         }, false);
+                         },
+                         null,   /* ConvertCmdCallback */
+                         false); /* outputVisible */
     }
 
     /**
@@ -227,7 +240,9 @@ public class HostCheckInstallation extends DialogHost {
                                                     ans,
                                                     exitCode);
                              }
-                         }, true);
+                         },
+                         null,   /* ConvertCmdCallback */
+                         true); /* outputVisible */
     }
 
     /**
@@ -273,7 +288,9 @@ public class HostCheckInstallation extends DialogHost {
                                                    final int exitCode) {
                                  done("");
                              }
-                         }, false);
+                         },
+                         null,   /* ConvertCmdCallback */
+                         false); /* outputVisible */
     }
 
     /**
@@ -287,6 +304,11 @@ public class HostCheckInstallation extends DialogHost {
                     heartbeatLabel.setText(": " + Tools.getString(
                              "Dialog.HostCheckInstallation.HbNotInstalled"));
                     heartbeatButton.setEnabled(true);
+                    hbInstMethodCB.setEnabled(true);
+                    final String toolTip =
+                                   getHbInstToolTip("1");
+                    hbInstMethodCB.setToolTipText(toolTip);
+                    heartbeatButton.setToolTipText(toolTip);
                 }
             });
         } else {
@@ -328,7 +350,9 @@ public class HostCheckInstallation extends DialogHost {
                                     "Dialog.HostCheckInstallation.Heartbeat.CheckError"));
                                  checkUdev("");
                              }
-                         }, false);
+                         },
+                         null,   /* ConvertCmdCallback */
+                         false); /* outputVisible */
     }
 
     /**
@@ -396,25 +420,113 @@ public class HostCheckInstallation extends DialogHost {
     }
 
     /**
+     * This class holds install method names, and their indeces.
+     */
+    private class InstallMethods {
+        /** Name of the method like "CD". */
+        private final String name;
+        /** Index of the method. */
+        private final int index;
+
+        /**
+         * Creates new InstallMethods object.
+         */
+        InstallMethods(final String name, final int index) {
+            this.name = name;
+            this.index = index;
+        }
+
+        /**
+         * Returns name of the install method.
+         */
+        public final String toString() {
+            return name;
+        }
+
+        /**
+         * Returns index of the install method.
+         */
+        public final String getIndex() {
+            return Integer.toString(index);
+        }
+    }
+
+    /**
+     * Returns tool tip texts for hb installation method combo box and install
+     * button.
+     */
+    private final String getHbInstToolTip(final String index) {
+        return Tools.html(
+            getHost().getDistString(
+                "HbInst.install." + index)).replaceAll("&&", "<br>&gt; &&");
+    }
+    /**
      * Returns the pane, that checks the installation of different
      * components and provides buttons to update or upgrade.
      */
     private JPanel getInstallationPane() {
         final JPanel pane = new JPanel(new SpringLayout());
+        List<InstallMethods> methods = new ArrayList<InstallMethods>();
+        int i = 1;
+        while (true) {
+            final String index = Integer.toString(i);
+            final String text =
+                      getHost().getDistString("HbInst.install.text." + index);
+            if (text == null) {
+                break;
+            }
+            methods.add(new InstallMethods(
+                Tools.getString("Dialog.HostCheckInstallation.HbInstallMethod")
+                + text, i));
+            i++;
+        }
+        final String defaultValue = methods.get(1).toString();
+        hbInstMethodCB = new GuiComboBox(
+                           defaultValue,
+                           (Object[]) methods.toArray(new InstallMethods[methods.size()]),
+                           GuiComboBox.Type.COMBOBOX,
+                           null,
+                           0);
+        hbInstMethodCB.addListeners(
+            new ItemListener() {
+                public void itemStateChanged(final ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                InstallMethods method =
+                                     (InstallMethods) hbInstMethodCB.getValue();
+                                final String toolTip =
+                                           getHbInstToolTip(method.getIndex());
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        hbInstMethodCB.setToolTipText(toolTip);
+                                        heartbeatButton.setToolTipText(toolTip);
+                                    }
+                                });
 
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            }, null);
         pane.add(new JLabel("Heartbeat"));
         pane.add(heartbeatLabel);
         pane.add(heartbeatButton);
         pane.add(heartbeatIcon);
+        pane.add(hbInstMethodCB);
         pane.add(new JLabel("Drbd"));
         pane.add(drbdLabel);
         pane.add(drbdButton);
         pane.add(drbdIcon);
+        pane.add(new JPanel());
+        //pane.add(drbdInstMethodCB); // TODO
         pane.add(new JLabel("Udev"));
         pane.add(udevLabel);
         pane.add(udevButton);
         pane.add(udevIcon);
-        SpringUtilities.makeCompactGrid(pane, 3, 4,  //rows, cols
+        pane.add(new JPanel());
+        SpringUtilities.makeCompactGrid(pane, 3, 5,  //rows, cols
                                               1, 1,  //initX, initY
                                               1, 1); //xPad, yPad
         return pane;

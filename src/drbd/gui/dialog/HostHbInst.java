@@ -25,6 +25,7 @@ import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.ConvertCmdCallback;
 
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -77,7 +78,20 @@ public class HostHbInst extends DialogHost {
      * Installs the heartbeat.
      */
     private void installHeartbeat() {
-        getHost().execCommand("HbInst.install",
+        String arch = getHost().getDistString("HbInst.install."
+                                              + getHost().getArch());
+        if (arch == null) {
+            arch = getHost().getArch();
+        }
+        final String archString = arch;
+        String installCommand = "HbInst.install"; 
+        final String installMethod = getHost().getHbInstallMethod();
+        if (installMethod != null) {
+            installCommand = "HbInst.install." + installMethod; 
+        }
+       
+
+        getHost().execCommand(installCommand,
                          getProgressBar(),
                          new ExecCallback() {
                              public void done(final String ans) {
@@ -90,7 +104,14 @@ public class HostHbInst extends DialogHost {
                                                     ans,
                                                     exitCode);
                              }
-                         }, true);
+                         },
+                         new ConvertCmdCallback() {
+                             public final String convert(final String command) {
+                                 return command.replaceAll("@ARCH@",
+                                                           archString);
+                             }
+                         },
+                         true);
     }
 
     /**

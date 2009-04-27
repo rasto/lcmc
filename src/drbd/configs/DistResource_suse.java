@@ -52,6 +52,11 @@ public class DistResource_suse extends
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
         /* heartbeat donwload and installation */
         //{ "HbCheck.version", "/bin/rpm -qa|grep heartbeat | sed s/.*heartbeat-//" },
+        {"HbInst.install.i386", "i586" },
+        {"HbInst.install.i486", "i586" },
+        {"HbInst.install.i586", "i586" },
+
+        {"HbInst.install.text", "CD" },
         {"HbInst.install", "zypper -n install heartbeat"},
     };
 }

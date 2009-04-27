@@ -246,7 +246,9 @@ public class ClusterHbInit extends DialogCluster {
                                                        final int exitCode) {
                                      configs[index] = "error";
                                  }
-                             }, false);
+                             },
+                             null,   /* ConvertCmdCallback */
+                             false); /* outputVisible */
             i++;
         }
         for (ExecCommandThread t : ts) {

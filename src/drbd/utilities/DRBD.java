@@ -24,6 +24,8 @@ package drbd.utilities;
 import drbd.data.Host;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This class provides drbd commands.
@@ -71,17 +73,6 @@ public final class DRBD {
     }
 
     /**
-     * Converts the command replacing the @RESOURCE@ placeholder.
-     */
-    private static String convert(String command,
-                                  final String resource) {
-        if (command.indexOf(RESOURCE_PH) > -1) {
-            command = command.replaceAll(RESOURCE_PH, resource);
-        }
-        return command;
-    }
-
-    /**
      * Executes the drbdadm attach on the specified host and resource.
      */
     public static void attach(final Host host, final String resource) {
@@ -95,8 +86,10 @@ public final class DRBD {
     public static void attach(final Host host,
                               final String resource,
                               final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.attach"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.attach",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -114,8 +107,10 @@ public final class DRBD {
     public static void detach(final Host host,
                               final String resource,
                               final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.detach"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.detach",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -133,8 +128,10 @@ public final class DRBD {
     public static void connect(final Host host,
                                final String resource,
                                final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.connect"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.connect",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -152,8 +149,10 @@ public final class DRBD {
     public static void disconnect(final Host host,
                                   final String resource,
                                   final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.disconnect"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.disconnect",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -171,8 +170,10 @@ public final class DRBD {
     public static void pauseSync(final Host host,
                                  final String resource,
                                  final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.pauseSync"),
-                                       resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.pauseSync",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -190,8 +191,10 @@ public final class DRBD {
     public static void resumeSync(final Host host,
                                   final String resource,
                                   final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.resumeSync"),
-                                       resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.resumeSync",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -209,8 +212,10 @@ public final class DRBD {
     public static void setPrimary(final Host host,
                                   final String resource,
                                   final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.setPrimary"),
-                                       resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.setPrimary",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -228,8 +233,10 @@ public final class DRBD {
     public static void setSecondary(final Host host,
                                     final String resource,
                                     final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.setSecondary"),
-                                       resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.setSecondary",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -248,8 +255,10 @@ public final class DRBD {
     public static void initDrbd(final Host host,
                                 final String resource,
                                 final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.initDrbd"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.initDrbd",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -271,11 +280,11 @@ public final class DRBD {
                                 final String resource,
                                 final String device,
                                 final ExecCallback execCallback) {
-        String command = convert(host.getCommand("DRBD.createMD"),
-                                 resource);
-        if (command.indexOf(DEVICE_PH) > -1) {
-            command = command.replaceAll(DEVICE_PH, device);
-        }
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        replaceHash.put(DEVICE_PH, device);
+        final String command = host.getDistCommand("DRBD.createMD",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -298,11 +307,11 @@ public final class DRBD {
                                            final String resource,
                                            final String device,
                                            final ExecCallback execCallback) {
-        String command = convert(host.getCommand("DRBD.createMDDestroyData"),
-                                 resource);
-        if (command.indexOf(DEVICE_PH) > -1) {
-            command = command.replaceAll(DEVICE_PH, device);
-        }
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        replaceHash.put(DEVICE_PH, device);
+        String command = host.getDistCommand("DRBD.createMDDestroyData",
+                                             replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -323,15 +332,11 @@ public final class DRBD {
                                       final String blockDevice,
                                       final String filesystem,
                                       final ExecCallback execCallback) {
-        String command = host.getCommand("DRBD.makeFilesystem");
-
-        if (command.indexOf(DRBDDEV_PH) > -1) {
-            command = command.replaceAll(DRBDDEV_PH, blockDevice);
-        }
-        if (command.indexOf(FILESYSTEM_PH) > -1) {
-            command = command.replaceAll(FILESYSTEM_PH, filesystem);
-        }
-
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(DRBDDEV_PH, blockDevice);
+        replaceHash.put(FILESYSTEM_PH, filesystem);
+        String command = host.getDistCommand("DRBD.makeFilesystem",
+                                             replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -350,8 +355,10 @@ public final class DRBD {
     public static void forcePrimary(final Host host,
                                     final String resource,
                                     final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.forcePrimary"),
-                                       resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.forcePrimary",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -369,8 +376,10 @@ public final class DRBD {
     public static void invalidate(final Host host,
                                   final String resource,
                                   final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.invalidate"),
-                                       resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.invalidate",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -389,8 +398,10 @@ public final class DRBD {
     public static void discardData(final Host host,
                                    final String resource,
                                    final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.discardData"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.discardData",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -408,8 +419,10 @@ public final class DRBD {
     public static void resize(final Host host,
                               final String resource,
                               final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.resize"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.resize",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -427,8 +440,10 @@ public final class DRBD {
     public static int adjust(final Host host,
                              final String resource,
                              final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.adjust"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.adjust",
+                                                   replaceHash);
         final String ret = Tools.execCommandProgressIndicator(
                                      host,
                                      command,
@@ -463,8 +478,10 @@ public final class DRBD {
     public static void adjustDryrun(final Host host,
                                     final String resource,
                                     final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.adjust.dryrun"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.adjust.dryrun",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
 
     }
@@ -483,8 +500,10 @@ public final class DRBD {
     public static void down(final Host host,
                             final String resource,
                             final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.down"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.down",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -502,8 +521,10 @@ public final class DRBD {
     public static void up(final Host host,
                           final String resource,
                           final ExecCallback execCallback) {
-        final String command = convert(host.getCommand("DRBD.up"),
-                                 resource);
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(RESOURCE_PH, resource);
+        final String command = host.getDistCommand("DRBD.up",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true);
     }
 
@@ -520,7 +541,8 @@ public final class DRBD {
      */
     public static void start(final Host host,
                              final ExecCallback execCallback) {
-        final String command = host.getCommand("DRBD.start");
+        final String command = host.getDistCommand("DRBD.start",
+                                                   (ConvertCmdCallback) null);
         execCommand(host, command, execCallback, true);
     }
 
@@ -537,7 +559,8 @@ public final class DRBD {
      */
     public static void load(final Host host,
                             final ExecCallback execCallback) {
-        final String command = host.getCommand("DRBD.load");
+        final String command = host.getDistCommand("DRBD.load",
+                                                   (ConvertCmdCallback) null);
         execCommand(host, command, execCallback, true);
     }
 }

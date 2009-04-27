@@ -53,71 +53,14 @@ public final class Heartbeat {
     private Heartbeat() { }
 
     /**
-     * Converts commands placeholders and returns the converted command.
-     *
-     * @param command
-     *          command to be converted
-     * @param heartbeatId
-     *          heartbeat id, that replaces @ID@ placeholder
-     * @param onHost
-     *          for which host is the command, and @HOST@ placeholder
-     * @param type
-     *          type (service name), that replaces @TYPE@ placeholder
-     * @param xml
-     *          xml, that replaces @XML@ placeholder
-     *
-     * @return converted command
-     */
-    private static String convert(String command,
-                                  final String heartbeatId,
-                                  final String onHost,
-                                  final String type,
-                                  final String xml) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("ID",   heartbeatId);
-        replaceHash.put("HOST", onHost);
-        replaceHash.put("TYPE", type);
-        replaceHash.put("XML",  xml);
-
-        for (final String tag : replaceHash.keySet()) {
-            final String rtag = "@" + tag + "@";
-            if (command.indexOf(rtag) > -1) {
-                command = command.replaceAll(rtag, replaceHash.get(tag));
-            }
-        }
-        return command;
-    }
-
-    /**
      * Returns cibadmin command.
      */
     public static String getCibCommand(final String command,
-                                            final String objType,
-                                            final String xml) {
+                                       final String objType,
+                                       final String xml) {
         return "/usr/sbin/cibadmin --obj_type " + objType + " "
                                    + command
                                    + " -X " + xml;
-    }
-
-    /**
-     * Converts commands placeholders and returns the converted command.
-     *
-     * @param command
-     *          command to be converted
-     * @param heartbeatId
-     *          heartbeat id, that replaces @ID@ placeholder
-     * @param onHost
-     *          for which host is the command, and @HOST@ placeholder
-     * @param type
-     *          type (service name), that replaces @TYPE@ placeholder
-     *
-     * @return converted command
-     */
-    private static String convert(final String command,
-                                  final String heartbeatId,
-                                  final String onHost,
-                                  final String type) {
-        return convert(command, heartbeatId, onHost, type, null);
     }
 
     /**
@@ -393,12 +336,13 @@ public final class Heartbeat {
                                        final String heartbeatId,
                                        final Host[] clusterHosts) {
         /* make cleanup on all cluster hosts. */
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
         for (Host clusterHost : clusterHosts) {
-            final String command = convert(
-                              host.getCommand("Heartbeat.cleanupResource"),
-                              heartbeatId,
-                              clusterHost.getName(),
-                              "");
+            replaceHash.put("@HOST@", clusterHost.getName());
+            final String command =
+                      host.getDistCommand("Heartbeat.cleanupResource",
+                                          replaceHash);
             execCommand(host, command, true);
         }
     }
@@ -414,13 +358,13 @@ public final class Heartbeat {
     public static void startResource(final Host host,
                                      final String heartbeatId) {
         final String hbVersion = host.getHeartbeatVersion();
-        String cmd = host.getCommand("Heartbeat.startResource");
+        String cmd = "Heartbeat.startResource";
         if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
-            cmd = host.getCommand("Heartbeat.2.1.4.startResource");
+            cmd = "Heartbeat.2.1.4.startResource";
         }
-        final String command = convert(
-                                 cmd,
-                                 heartbeatId, "", "");
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
+        final String command = host.getDistCommand(cmd, replaceHash); 
         execCommand(host, command, true);
     }
 
@@ -470,13 +414,14 @@ public final class Heartbeat {
             string = ".isManagedOff";
         }
         final String hbVersion = host.getHeartbeatVersion();
-        String cmd = host.getCommand("Heartbeat" + string);
+        String cmd = "Heartbeat" + string;
         if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
-            cmd = host.getCommand("Heartbeat.2.1.4" + string);
+            cmd = "Heartbeat.2.1.4" + string;
         }
-        final String command = convert(
-                                 cmd,
-                                 heartbeatId, "", "");
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
+
+        final String command = host.getDistCommand(cmd, replaceHash);
         execCommand(host, command, true);
     }
 
@@ -491,13 +436,14 @@ public final class Heartbeat {
     public static void stopResource(final Host host,
                                     final String heartbeatId) {
         final String hbVersion = host.getHeartbeatVersion();
-        String cmd = host.getCommand("Heartbeat.stopResource");
+        String cmd = "Heartbeat.stopResource";
         if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
-            cmd = host.getCommand("Heartbeat.2.1.4.stopResource");
+            cmd = "Heartbeat.2.1.4.stopResource";
         }
-        final String command = convert(
-                                 cmd,
-                                 heartbeatId, "", "");
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
+
+        final String command = host.getDistCommand(cmd, replaceHash);
         execCommand(host, command, true);
     }
 
@@ -514,11 +460,12 @@ public final class Heartbeat {
     public static void migrateResource(final Host host,
                                        final String heartbeatId,
                                        final String onHost) {
-        final String command = convert(
-                                 host.getCommand("Heartbeat.migrateResource"),
-                                 heartbeatId,
-                                 onHost,
-                                 "");
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@HOST@", onHost);
+        final String command = host.getDistCommand("Heartbeat.migrateResource",
+                                                   replaceHash);
+
         execCommand(host, command, true);
     }
 
@@ -532,11 +479,11 @@ public final class Heartbeat {
      */
     public static void unmigrateResource(final Host host,
                                          final String heartbeatId) {
-        final String command = convert(
-                                 host.getCommand("Heartbeat.unmigrateResource"),
-                                 heartbeatId,
-                                 "",
-                                 "");
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
+        final String command = host.getDistCommand(
+                                             "Heartbeat.unmigrateResource",
+                                             replaceHash);
         execCommand(host, command, true);
     }
 
@@ -756,7 +703,8 @@ public final class Heartbeat {
      *          host
      */
     public static void start(final Host host) {
-        final String command = host.getCommand("Heartbeat.start");
+        final String command = host.getDistCommand("Heartbeat.start",
+                                                   (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
 
@@ -768,7 +716,8 @@ public final class Heartbeat {
      *          host
      */
     public static void reloadHeartbeat(final Host host) {
-        final String command = host.getCommand("Heartbeat.reloadHeartbeat");
+        final String command = host.getDistCommand("Heartbeat.reloadHeartbeat",
+                                                   (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
 
@@ -780,7 +729,8 @@ public final class Heartbeat {
      *          host
      */
     public static void stopHeartbeat(final Host host) {
-        final String command = host.getCommand("Heartbeat.stopHeartbeat");
+        final String command = host.getDistCommand("Heartbeat.stopHeartbeat",
+                                                   (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
 
@@ -821,10 +771,10 @@ public final class Heartbeat {
      * Makes heartbeat stand by.
      */
     public static void standByOn(final Host host) {
-        final String command = convert(host.getCommand("Heartbeat.standByOn"),
-                                 "",
-                                 host.getName(),
-                                 "");
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@HOST@", host.getName());
+        final String command = host.getDistCommand("Heartbeat.standByOn",
+                                                   replaceHash);
         execCommand(host, command, true);
     }
 
@@ -832,10 +782,10 @@ public final class Heartbeat {
      * Undoes heartbeat stand by.
      */
     public static void standByOff(final Host host) {
-        final String command = convert(host.getCommand("Heartbeat.standByOff"),
-                                       "",
-                                       host.getName(),
-                                       "");
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@HOST@", host.getName());
+        final String command = host.getDistCommand("Heartbeat.standByOff",
+                                                   replaceHash);
         execCommand(host, command, true);
     }
 }

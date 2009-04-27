@@ -126,13 +126,7 @@ public class DistResource extends
         {"GetNetInfo",  "/usr/local/bin/drbd-gui-helper get-net-info"},
 
         /* heartbeat crm commands */
-        {"Heartbeat.resourceList",      "cibadmin -Q"},
-        {"Heartbeat.getStatus",         "cibadmin -Q --obj_type status"},
-        {"Heartbeat.setParameter",      "crm_resource -r @ID@ --set-parameter "},
-        //{"Heartbeat.addResource",       "cibadmin -C -o resources -X"},
-        //{"Heartbeat.removeResource",    "crm_resource -D -r @ID@ -t @TYPE@"},
         {"Heartbeat.cleanupResource",    "crm_resource -C -r @ID@ -H @HOST@"},
-        {"Heartbeat.addConstraint",     "cibadmin -C -o constraints -X '@XML@'"},
 
         /* 2.1.4 and before */
         {"Heartbeat.2.1.4.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},

@@ -117,7 +117,9 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
                                                    final int exitCode) {
                                  checkDrbd(""); /* not installed */
                              }
-                         }, false);
+                         },
+                         null,   /* ConvertCmdCallback */
+                         false); /* outputVisible */
     }
 
     /**

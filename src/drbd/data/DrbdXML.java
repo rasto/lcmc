@@ -25,6 +25,7 @@ package drbd.data;
 import drbd.gui.DrbdGraph;
 import drbd.data.resources.BlockDevice;
 import drbd.utilities.Tools;
+import drbd.utilities.ConvertCmdCallback;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -145,14 +146,16 @@ public class DrbdXML extends XML {
                      new String[]{"A", "B", "C"},
                      true);
         for (Host host : hosts) {
-            final String command = host.getCommand("Drbd.getParameters");
+            final String command =
+                                host.getDistCommand("Drbd.getParameters",
+                                                    (ConvertCmdCallback) null);
 
             final String output =
                         Tools.execCommandProgressIndicator(
                                     host,
                                     command,
-                                    null,
-                                    false,
+                                    null,  /* ExecCallback */
+                                    false, /* outputVisible */
                                     Tools.getString("DrbdXML.GetParameters"));
             if (output == null) {
                 return;
@@ -201,12 +204,13 @@ public class DrbdXML extends XML {
      */
     public final void update(final Host host) {
 
-        final String command2 = host.getCommand("Drbd.getConfig");
+        final String command2 = host.getDistCommand("Drbd.getConfig",
+                                                    (ConvertCmdCallback) null);
         final String configString =
                       Tools.execCommand(host,
                                         command2,
-                                        null,
-                                        false,
+                                        null,  /* ExecCallback */
+                                        false, /* outputVisible */
                                         Tools.getString("DrbdXML.GetConfig"));
 
         if (configString != null && !configString.equals("")) {

@@ -78,7 +78,9 @@ public class HostDrbdInst extends DialogHost {
                                                    ans,
                                                    exitCode);
                             }
-                          }, true);
+                          },
+                          null,  /* ConvertCmdCallback */
+                          true); /* outputVisible */
     }
 
     /**
@@ -101,7 +103,9 @@ public class HostDrbdInst extends DialogHost {
                                                     final int exitCode) {
                                   downloadDrbd();
                               }
-                          }, true);
+                          },
+                          null,  /* ConvertCmdCallback */
+                          true); /* outputVisible */
     }
 
     /**
@@ -122,7 +126,9 @@ public class HostDrbdInst extends DialogHost {
                                                    ans,
                                                    exitCode);
                             }
-                          }, true);
+                          },
+                          null,  /* ConvertCmdCallback */
+                          true); /* outputVisible */
     }
 
     /**
@@ -144,7 +150,9 @@ public class HostDrbdInst extends DialogHost {
                                                    ans,
                                                    exitCode);
                             }
-                          }, true);
+                          },
+                          null,  /* ConvertCmdCallback */
+                          true); /* outputVisible */
     }
 
     /**
