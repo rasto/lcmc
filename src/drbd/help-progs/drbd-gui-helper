@@ -272,12 +272,14 @@ sub get_disk_info {
 		} elsif ($major == 9) { # raid
 			$device = "/dev/$name";
 		} elsif ($major == $device_mapper_major) {
-			# skipping except lvm devices
-			next if !$$major_minor_to_dev{"$major:$minor"};
-			$device = "/dev/".$$major_minor_to_dev{"$major:$minor"};
-			my $dev = $$major_minor_to_dev{"$major:$minor"};
-			$dev = $name if !$dev;
-			$device = "/dev/".$dev;
+			if ($$major_minor_to_dev{"$major:$minor"}) {
+				$device = "/dev/".$$major_minor_to_dev{"$major:$minor"};
+				my $dev = $$major_minor_to_dev{"$major:$minor"};
+				$dev = $name if !$dev;
+				$device = "/dev/".$dev;
+			} else {
+				$device = "/dev/$name";
+			}
 
 		} elsif ($name =~ /^drbd/) {
 			# disk_info_warning("skiping: $_");
