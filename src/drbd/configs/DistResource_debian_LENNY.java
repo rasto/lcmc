@@ -46,5 +46,14 @@ public class DistResource_debian_LENNY extends
         /* support */
         // TODO: use flags for this
         {"Support", "debian-LENNY"},
+
+        {"HbInst.install.text.1", "http://download.opensuse.org repository"},
+        {"HbInst.install.1", "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_5.0/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+                             + " && apt-get update"
+                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
+
+        {"HbInst.install.text.2", "lenny repository"},
+        {"HbInst.install.version.2", "2.1.3"},
+        {"HbInst.install.2", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
     };
 }

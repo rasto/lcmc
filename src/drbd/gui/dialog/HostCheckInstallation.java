@@ -40,6 +40,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * An implementation of a dialog where drbd/heartbeat installation is checked.
@@ -108,6 +110,8 @@ public class HostCheckInstallation extends DialogHost {
     private boolean udevOk = false;
     /** Version that appears in the dialog. */
     private String versionText;
+    private Map<String, InstallMethods> installedMethodMap =
+                                         new HashMap<String, InstallMethods>();
 
     /**
      * Prepares a new <code>HostCheckInstallation</code> object.
@@ -329,10 +333,15 @@ public class HostCheckInstallation extends DialogHost {
                 versionText = version;
             }
             getHost().setHeartbeatVersion(version);
+            final InstallMethods installedMethod =
+                                              installedMethodMap.get(version);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     heartbeatIcon.setIcon(INSTALLED_ICON);
                     heartbeatLabel.setText(": " + versionText);
+                    if (installedMethod != null) {
+                        hbInstMethodCB.setValue(installedMethod);
+                    }
                 }
             });
 
@@ -458,7 +467,8 @@ public class HostCheckInstallation extends DialogHost {
     private final String getHbInstToolTip(final String index) {
         return Tools.html(
             getHost().getDistString(
-                "HbInst.install." + index)).replaceAll("&&", "<br>&gt; &&");
+                "HbInst.install." + index)).replaceAll(";", ";<br>&gt; ")
+                                           .replaceAll("&&", "<br>&gt; &&");
     }
     /**
      * Returns the pane, that checks the installation of different
@@ -475,12 +485,18 @@ public class HostCheckInstallation extends DialogHost {
             if (text == null) {
                 break;
             }
-            methods.add(new InstallMethods(
+            InstallMethods installMethod = new InstallMethods(
                 Tools.getString("Dialog.HostCheckInstallation.HbInstallMethod")
-                + text, i));
+                + text, i);
+            methods.add(installMethod);
+            final String forVersion =
+                      getHost().getDistString("HbInst.install.version." + index);
+            if (forVersion != null) {
+                installedMethodMap.put(forVersion, installMethod);
+            }
             i++;
         }
-        final String defaultValue = methods.get(1).toString();
+        final String defaultValue = methods.get(0).toString();
         hbInstMethodCB = new GuiComboBox(
                            defaultValue,
                            (Object[]) methods.toArray(new InstallMethods[methods.size()]),
@@ -510,7 +526,7 @@ public class HostCheckInstallation extends DialogHost {
                     }
                 }
             }, null);
-        pane.add(new JLabel("Heartbeat"));
+        pane.add(new JLabel("HB/Pacemaker"));
         pane.add(heartbeatLabel);
         pane.add(heartbeatButton);
         pane.add(heartbeatIcon);

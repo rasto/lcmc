@@ -41,7 +41,14 @@ public class DistResource_debian_4 extends
 
         /* support */
         {"Support", "debian-4"},
-        {"HbInst.install", "/usr/bin/apt-get -y -q install heartbeat-2"},
 
+        {"HbInst.install.text.1", "http://download.opensuse.org repository"},
+        {"HbInst.install.1", "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+                             + " && apt-get update"
+                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
+
+        {"HbInst.install.text.2", "etch repository"},
+        {"HbInst.install.version.2", "2.0.7"},
+        {"HbInst.install.2", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
     };
 }

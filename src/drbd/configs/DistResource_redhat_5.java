@@ -46,7 +46,7 @@ public class DistResource_redhat_5 extends
         /* support */
         {"Support", "redhat-5"},
 
-        {"HbInst.install.text.1", "download.opensuse.org" },
+        {"HbInst.install.text.1", "http://download.opensuse.org" },
         {"HbInst.install.1", "wget -N -nd --progress=dot -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
                              + "yum -y install heartbeat pacemaker"},
         {"HbInst.install.text.2", "yum" },

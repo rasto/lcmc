@@ -42,5 +42,8 @@ public class DistResource_redhatenterpriseserver_5 extends
         /* support */
         {"Support", "redhatenterpriseserver-5"},
 
+        {"HbInst.install.text.1", "http://download.opensuse.org" },
+        {"HbInst.install.1", "wget -N -nd --progress=dot -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
+                             + "yum -y install heartbeat pacemaker"},
     };
 }

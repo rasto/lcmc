@@ -56,7 +56,7 @@ public class DistResource_suse extends
         {"HbInst.install.i486", "i586" },
         {"HbInst.install.i586", "i586" },
 
-        {"HbInst.install.text", "CD" },
-        {"HbInst.install", "zypper -n install heartbeat"},
+        {"HbInst.install.text.1", "CD" },
+        {"HbInst.install.1", "zypper -n install heartbeat"},
     };
 }

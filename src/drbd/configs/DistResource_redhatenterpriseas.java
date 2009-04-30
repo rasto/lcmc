@@ -41,8 +41,16 @@ public class DistResource_redhatenterpriseas extends
         {"distribution", "redhatenterpriseas"},
         {"version:4*", "4"},
 
+        {"HbInst.install.i386", "i386" },
+        {"HbInst.install.i486", "i386" },
+        {"HbInst.install.i586", "i386" },
+        {"HbInst.install.i686", "i386" },
+
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?EL\\d*).*"},
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+
+        {"HbInst.install.text.1", "yum"},
+        {"HbInst.install.1", "/usr/bin/yum -y install heartbeat"},
     };
 }

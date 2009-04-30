@@ -146,7 +146,7 @@ public class TextResource extends
         {"Dialog.HostDistDetection.Executing", "Executing..."},
 
         {"Dialog.HostCheckInstallation.Title",      "Installation Check"},
-        {"Dialog.HostCheckInstallation.Description", "Checking if DRBD, Heartbeat and other important components are already installed. If not, you can press one of the 'Install' buttons to install them. You can check for DRBD upgrade as well if installed DRBD was detected. Installing or upgrading of DRBD via binary packages is possible only if you have support contract with LINBIT."},
+        {"Dialog.HostCheckInstallation.Description", "Checking if DRBD, Heartbeat/Pacemaker and other important components are already installed. If not, you can press one of the 'Install' buttons to install them. You can check for DRBD upgrade as well if installed DRBD was detected. Installing or upgrading of DRBD via binary packages is possible only if you have support contract with LINBIT.<br>You can also choose a heartbeat installation method. The newest packages for many different distributions are in Opensuse repositories, yes even your distribution is not an Opensuse. You can also install the Heartbeat/Pacemaker that comes with your distribution, if you choose so."},
 
         {"Dialog.HostCheckInstallation.Drbd.AlreadyInstalled", "is already installed."},
         {"Dialog.HostCheckInstallation.Drbd.NotInstalled",     "DRBD is not installed. Click 'Install' button to install a new shiny DRBD."},
