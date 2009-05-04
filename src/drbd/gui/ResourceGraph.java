@@ -147,7 +147,7 @@ public abstract class ResourceGraph {
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(50); // TODO!
                     } catch (InterruptedException ex) {
                         Thread.currentThread().interrupt();
                     }

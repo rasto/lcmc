@@ -5042,70 +5042,11 @@ public class ClusterBrowser extends Browser {
             } else {
                 final Host dcHost = getDCHost();
                 if (groupInfo == null) {
-                    final String[] parents = heartbeatGraph.getParents(this);
-                    for (String parent : parents) {
-                        final String colocationId =
-                            heartbeatStatus.getColocationId(
-                                    parent, getService().getHeartbeatId());
-                        final String colScore =
-                            heartbeatStatus.getColocationScore(
-                                           parent, 
-                                           getService().getHeartbeatId());
-                        Heartbeat.removeColocation(dcHost,
-                                                   colocationId,
-                                                   getService().getHeartbeatId(),
-                                                   parent,
-                                                   colScore);
-                        final String orderId =
-                                    heartbeatStatus.getOrderId(
-                                        parent, getService().getHeartbeatId());
-
-                        final String ordScore =
-                            heartbeatStatus.getOrderScore(
-                                           parent, 
-                                           getService().getHeartbeatId());
-                        final String symmetrical =
-                            heartbeatStatus.getOrderSymmetrical(
-                                           parent, 
-                                           getService().getHeartbeatId());
-                        Heartbeat.removeOrder(dcHost,
-                                              orderId,
-                                              parent,
-                                              getService().getHeartbeatId(),
-                                              ordScore,
-                                              symmetrical);
-                    }
-
-                    final String[] children = heartbeatGraph.getChildren(this);
-                    for (String child : children) {
-                        final String colocationId =
-                                       heartbeatStatus.getColocationId(
-                                          child, getService().getHeartbeatId());
-                        final String colScore =
-                            heartbeatStatus.getColocationScore(
-                                           getService().getHeartbeatId(),
-                                           child);
-                        Heartbeat.removeColocation(dcHost,
-                                                   colocationId,
-                                                   child,
-                                                   getService().getHeartbeatId(),
-                                                   colScore);
-                        final String orderId = heartbeatStatus.getOrderId(child,
-                                                getService().getHeartbeatId());
-                        final String ordScore =
-                            heartbeatStatus.getOrderScore(
-                                           getService().getHeartbeatId(),
-                                           child);
-                        final String symmetrical =
-                            heartbeatStatus.getOrderSymmetrical(
-                                           getService().getHeartbeatId(),
-                                           child);
-                        Heartbeat.removeOrder(dcHost,
-                                              orderId,
-                                              getService().getHeartbeatId(),
-                                              child,
-                                              ordScore,
-                                              symmetrical);
+                    final HbConnectionInfo[] hbcis =
+                                        heartbeatGraph.getHbConnections(this);
+                    for (final HbConnectionInfo hbci : hbcis) {
+                        heartbeatGraph.removeOrder(hbci);
+                        heartbeatGraph.removeColocation(hbci);
                     }
 
                     for (String locId : heartbeatStatus.getLocationIds(getService().getHeartbeatId())) {

@@ -267,6 +267,37 @@ public class HeartbeatGraph extends ResourceGraph {
     }
 
     /**
+     * Returns all connections from this service.
+     */
+    public final HbConnectionInfo[] getHbConnections(final ServiceInfo si) {
+        List<HbConnectionInfo> infos = new ArrayList<HbConnectionInfo>();
+        final Vertex v = getVertex(si);
+        if (v != null) {
+            for (Object pV : v.getPredecessors()) {
+                MyEdge edge = (MyEdge) ((Vertex) pV).findEdge(v);
+
+                if (edge == null) {
+                    edge = (MyEdge) v.findEdge((Vertex) pV);
+                }
+                if (edge != null) {
+                    infos.add(edgeToHbconnectionMap.get(edge));
+                }
+            }
+            for (Object sV : v.getSuccessors()) {
+                MyEdge edge = (MyEdge) v.findEdge((Vertex) sV);
+
+                if (edge == null) {
+                    edge = (MyEdge) ((Vertex) sV).findEdge(v);
+                }
+                if (edge != null) {
+                    infos.add(edgeToHbconnectionMap.get(edge));
+                }
+            }
+        }
+        return infos.toArray(new HbConnectionInfo[infos.size()]);
+    }
+
+    /**
      * Sets host scores in all descendants as it is in the si node.
      */
     private void setHomeNodeInDescendants(
@@ -400,8 +431,8 @@ public class HeartbeatGraph extends ResourceGraph {
                     edgeIsColocationList.remove(edge);
                 }
                 edgeIsOrderList.remove(edge);
-                hbconnectionToEdgeMap.remove(edge);
-                edgeToHbconnectionMap.remove(hbci);
+                hbconnectionToEdgeMap.remove(hbci);
+                edgeToHbconnectionMap.remove(edge);
                 getGraph().removeEdge(edge);
                 edge = null;
             }
@@ -930,10 +961,10 @@ public class HeartbeatGraph extends ResourceGraph {
                                 (ServiceInfo) getInfo((Vertex) p.getFirst());
                 if (!s1.getService().isNew() && !s2.getService().isNew()) {
                     getGraph().removeEdge(e);
+                    HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
+                    edgeToHbconnectionMap.remove(e);
+                    hbconnectionToEdgeMap.remove(hbci);
                 }
-                HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-                edgeToHbconnectionMap.remove(e);
-                hbconnectionToEdgeMap.remove(hbci);
             }
         }
         mEdgeLock.release();
@@ -1262,6 +1293,9 @@ public class HeartbeatGraph extends ResourceGraph {
             return null;
         }
         final ServiceInfo si = (ServiceInfo)getInfo(v);
+        if (si == null) {
+            return null;
+        }
         String targetRole = null; 
         if (si.isStarted()) {
             targetRole = "started";
@@ -1279,7 +1313,7 @@ public class HeartbeatGraph extends ResourceGraph {
             return null;
         }
         final ServiceInfo si = (ServiceInfo)getInfo(v);
-        if (!si.isManaged()) {
+        if (si != null && !si.isManaged()) {
             return "(unmanaged)";
         }
         return null;
@@ -1293,6 +1327,9 @@ public class HeartbeatGraph extends ResourceGraph {
             return null;
         }
         final ServiceInfo si = (ServiceInfo)getInfo(v);
+        if (si == null) {
+            return null;
+        }
         if (si.isFailed()) {
             return "Failed";
         } else if (si.isStopped()) {
