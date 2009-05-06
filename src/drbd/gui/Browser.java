@@ -229,6 +229,8 @@ public class Browser {
                                                 new ArrayList<UpdatableItem>();
         /** Whether the info object is being updated. */
         private boolean updated = false;
+        /** Animation index. */
+        private int animationIndex = 0;
 
         /**
          * Prepares a new <code>Info</code> object.
@@ -346,6 +348,25 @@ public class Browser {
          */
         protected void setUpdated(final boolean updated) {
             this.updated = updated;
+            animationIndex = 0;
+        }
+        
+        /**
+         * Returns the animation index.
+         */
+        public final int getAnimationIndex() {
+            return animationIndex;
+        }
+
+        /**
+         * Increments the animation index that wraps to zero if it is greater
+         * than 100.
+         */
+        public final void incAnimationIndex() {
+            animationIndex += 5;
+            if (animationIndex > 100) {
+                animationIndex = 0;
+            }
         }
 
         /**
@@ -362,22 +383,22 @@ public class Browser {
             return null;
         }
 
-        /**
-         * Returns whether two info objects are equal.
-         */
-        public boolean equals(final Object value) {
-            if (value == null) {
-                return false;
-            }
-            if (Tools.isStringClass(value)) {
-                return name.equals(value.toString());
-            } else {
-                if (toString() == null) {
-                    return false;
-                }
-                return toString().equals(value.toString());
-            }
-        }
+        ///**
+        // * Returns whether two info objects are equal.
+        // */
+        //public boolean equals(final Object value) {
+        //    if (value == null) {
+        //        return false;
+        //    }
+        //    if (Tools.isStringClass(value)) {
+        //        return name.equals(value.toString());
+        //    } else {
+        //        if (toString() == null) {
+        //            return false;
+        //        }
+        //        return toString().equals(value.toString());
+        //    }
+        //}
 
         //public int hashCode() {
         //    return toString().hashCode();

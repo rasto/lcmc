@@ -5561,6 +5561,18 @@ public class ClusterBrowser extends Browser {
         public HeartbeatService getHeartbeatService() {
             return hbService;
         }
+
+        /**
+         * Sets whether the info object is being updated.
+         */
+        protected void setUpdated(final boolean updated) {
+            if (updated && !isUpdated()) {
+                heartbeatGraph.startAnimation(this);
+            } else if (!updated) {
+                heartbeatGraph.stopAnimation(this);
+            }
+            super.setUpdated(updated);
+        }
     }
 
     /**

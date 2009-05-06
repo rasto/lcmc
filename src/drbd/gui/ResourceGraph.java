@@ -34,7 +34,6 @@ import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.decorators.ConstantDirectionalEdgeValue;
 import edu.uci.ics.jung.graph.decorators.EdgeShape;
-import edu.uci.ics.jung.graph.decorators.VertexStringer;
 import edu.uci.ics.jung.graph.decorators.EdgeStringer;
 import edu.uci.ics.jung.graph.decorators.DefaultToolTipFunction;
 import edu.uci.ics.jung.graph.decorators.AbstractVertexShapeFunction;
@@ -62,7 +61,6 @@ import edu.uci.ics.jung.visualization.control.EditingModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ViewScalingControl;
 import edu.uci.ics.jung.visualization.control.EditingPopupGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.ScalingGraphMousePlugin;
-import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
 import java.awt.Shape;
 import java.awt.Color;
@@ -70,8 +68,10 @@ import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.awt.Dimension;
 
@@ -83,13 +83,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
 
 import java.awt.geom.Area;
-import java.awt.geom.AffineTransform;
 
 import java.awt.Font;
 import java.awt.font.TextLayout;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.Rectangle2D;
-
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class creates graph and provides methods for scaling etc.,
@@ -107,7 +105,7 @@ public abstract class ResourceGraph {
                                         new LinkedHashMap<Vertex, Info>();
     /** Resource info object to vertex map. */
     private final Map<Info, Vertex>infoToVertexMap =
-                                        new LinkedHashMap<Info,Vertex>();
+                                        new LinkedHashMap<Info, Vertex>();
     /** Edge to popup menu map. */
     private final Map<Edge, JPopupMenu>edgeToPopupMap =
                                         new LinkedHashMap<Edge, JPopupMenu>();
@@ -133,8 +131,13 @@ public abstract class ResourceGraph {
     private DefaultSettableVertexLocationFunction vertexLocations;
     /** The scaler. */
     private ViewScalingControl myScaler;
-    /** Rotation angle of the animation in the graph. */
-    private volatile int rotation = 0;
+    /** List with resources that should be animated. */
+    private final List<Info> animationList = new ArrayList<Info>();
+    /** This mutex is for protecting the animation list. */
+    private final Mutex mAnimationListLock = new Mutex();
+    /** Map from vertex to its size. */
+    private final Map<Vertex, Integer>vertexSize =
+                                               new HashMap<Vertex, Integer>();
 
     /**
      * Prepares a new <code>ResourceGraph</code> object.
@@ -142,25 +145,65 @@ public abstract class ResourceGraph {
     public ResourceGraph(final ClusterBrowser clusterBrowser) {
         this.clusterBrowser = clusterBrowser;
         initGraph();
-        /* start animation thread */
-        final Thread thread = new Thread(new Runnable() {
-            public void run() {
-                while(true) {
-                    try {
-                        Thread.sleep(50); // TODO!
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                    rotation += 20;
-                    if (rotation >= 360) {
-                        rotation = 0;
-                    }
-                    repaint();
-                }
-            }
-        });
-        thread.start();
     }
+
+    /**
+     * Starts the animation if vertex is being updated.
+     */
+    public final void startAnimation(final Info info) {
+        try {
+            mAnimationListLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        if (animationList.isEmpty()) {
+            /* start animation thread */
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    while (true) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
+
+                        try {
+                            mAnimationListLock.acquire();
+                        } catch (java.lang.InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                        if (animationList.isEmpty()) {
+                            mAnimationListLock.release();
+                            repaint();
+                            break;
+                        }
+                        for (final Info info : animationList) {
+                            info.incAnimationIndex();
+                        }
+                        mAnimationListLock.release();
+                        repaint();
+                    }
+                }
+            });
+            thread.start();
+        }
+        animationList.add(info);
+        mAnimationListLock.release();
+    }
+
+    /**
+     * Stops the animation.
+     */
+    public final void stopAnimation(final Info info) {
+        try {
+            mAnimationListLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        animationList.remove(info);
+        mAnimationListLock.release();
+    }
+
 
     /**
      * Returns the cluster browser object.
@@ -177,29 +220,27 @@ public abstract class ResourceGraph {
     /**
      * Inits the graph.
      */
-    protected void initGraph(final Graph graph) {
+    protected final void initGraph(final Graph graph) {
         this.graph = graph;
 
         vertexLocations = new DefaultSettableVertexLocationFunction();
         layout = new StaticLayout(graph);
         final PluggableRenderer pr = new MyPluggableRenderer();
-        pr.setVertexStringer(new MyVertexStringer());
         pr.setEdgeStringer(new MyEdgeStringer());
         pr.setVertexShapeFunction(new MyVertexShapeSize());
         pr.setVertexPaintFunction(new MyPickableVertexPaintFunction(
                     pr,
-                    (Paint)Tools.getDefaultColor("ResourceGraph.DrawPaint"),
-                    (Paint)Tools.getDefaultColor("ResourceGraph.FillPaint"),
-                    (Paint)Tools.getDefaultColor("ResourceGraph.PickedPaint")
+                    (Paint) Tools.getDefaultColor("ResourceGraph.DrawPaint"),
+                    (Paint) Tools.getDefaultColor("ResourceGraph.FillPaint"),
+                    (Paint) Tools.getDefaultColor("ResourceGraph.PickedPaint")
                     ));
         pr.setEdgePaintFunction(new MyPickableEdgePaintFunction(
                     pr,
-                    (Paint)Tools.getDefaultColor(
+                    (Paint) Tools.getDefaultColor(
                                                 "ResourceGraph.EdgeDrawPaint"),
-                    (Paint)Tools.getDefaultColor(
+                    (Paint) Tools.getDefaultColor(
                                               "ResourceGraph.EdgePickedPaint")
                     ));
-        pr.setVertexLabelCentering(true);
         pr.setEdgeArrowFunction(new MyEdgeArrowFunction());
         pr.setEdgeLabelClosenessFunction(
                                 new ConstantDirectionalEdgeValue(0.5, 0.5));
@@ -216,7 +257,7 @@ public abstract class ResourceGraph {
             public void scale(final VisualizationViewer vv,
                               final float amount,
                               final Point2D from) {
-                super.scale(vv, amount, new Point2D.Double(0,0));
+                super.scale(vv, amount, new Point2D.Double(0, 0));
             }
         };
 
@@ -226,13 +267,13 @@ public abstract class ResourceGraph {
                                             new EditingModalGraphMouse() {
             protected void loadPlugins() {
                 super.loadPlugins();
-                ((ScalingGraphMousePlugin)scalingPlugin).setScaler(myScaler);
+                ((ScalingGraphMousePlugin) scalingPlugin).setScaler(myScaler);
             }
         };
         graphMouse.add(new MyPopupGraphMousePlugin(vertexLocations));
         graphMouse.setVertexLocations(vertexLocations);
         visualizationViewer.setGraphMouse(graphMouse);
-        visualizationViewer.addGraphMouseListener(new MyGraphMouseListener() );
+        visualizationViewer.addGraphMouseListener(new MyGraphMouseListener());
         visualizationViewer.setPickSupport(new ShapePickSupport(50));
         graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
         layout.initialize(new Dimension(3600, 3600), vertexLocations);
@@ -249,56 +290,56 @@ public abstract class ResourceGraph {
     /**
      * Returns the graph object.
      */
-    protected Graph getGraph() {
+    protected final Graph getGraph() {
         return graph;
     }
 
     /**
      * Returns the vertex locations function.
      */
-    protected DefaultSettableVertexLocationFunction getVertexLocations() {
+    protected final DefaultSettableVertexLocationFunction getVertexLocations() {
         return vertexLocations;
     }
 
     /**
      * Returns the layout object.
      */
-    protected StaticLayout getLayout() {
+    protected final StaticLayout getLayout() {
         return layout;
     }
 
     /**
      * Returns the visualization viewer.
      */
-    protected VisualizationViewer getVisualizationViewer() {
+    protected final VisualizationViewer getVisualizationViewer() {
         return visualizationViewer;
     }
 
     /**
      * Returns the hash with vertex to menus map.
      */
-    protected Map<Vertex,List<MyMenuItem>> getVertexToMenus() {
+    protected final Map<Vertex, List<MyMenuItem>> getVertexToMenus() {
         return vertexToMenus;
     }
 
     /**
      * Returns the vertex that represents the specified resource.
      */
-    protected Vertex getVertex(final Info i) {
+    protected final Vertex getVertex(final Info i) {
         return infoToVertexMap.get(i);
     }
 
     /**
      * Removes the vertex that represents the specified resource.
      */
-    protected void removeVertex(final Info i) {
+    protected final void removeVertex(final Info i) {
         infoToVertexMap.remove(i);
     }
 
     /**
      * Inserts the hash that maps resource info to its vertex.
      */
-    protected void putInfoToVertex(final Info i, final Vertex v) {
+    protected final void putInfoToVertex(final Info i, final Vertex v) {
         infoToVertexMap.remove(i);
         infoToVertexMap.put(i, v);
     }
@@ -306,28 +347,28 @@ public abstract class ResourceGraph {
     /**
      * Returns all resources.
      */
-    protected Set infoToVertexKeySet() {
+    protected final Set infoToVertexKeySet() {
         return infoToVertexMap.keySet();
     }
 
     /**
      * Returns the resource info object for specified vertex v.
      */
-    protected Info getInfo(final Vertex v) {
+    protected final Info getInfo(final Vertex v) {
         return vertexToInfoMap.get(v);
     }
 
     /**
      * Removes the specified vertex from the hash.
      */
-    protected void removeInfo(final Vertex v) {
+    protected final void removeInfo(final Vertex v) {
         vertexToInfoMap.remove(v);
     }
 
     /**
      * Puts the vertex to resource info object map to the hash.
      */
-    protected void putVertexToInfo(final Vertex v, final Info i) {
+    protected final void putVertexToInfo(final Vertex v, final Info i) {
         vertexToInfoMap.remove(v);
         vertexToInfoMap.put(v, i);
     }
@@ -335,28 +376,28 @@ public abstract class ResourceGraph {
     /**
      * Returns popup menu for the edge e.
      */
-    protected JPopupMenu getPopup(final Edge e) {
+    protected final JPopupMenu getPopup(final Edge e) {
         return edgeToPopupMap.get(e);
     }
 
     /**
      * Removes popup menu for the edge e.
      */
-    protected void removePopup(final Edge e) {
+    protected final void removePopup(final Edge e) {
         edgeToPopupMap.remove(e);
     }
 
     /**
      * Returns whether popup menu exists for this edge.
      */
-    protected boolean popupExists(final Edge v) {
+    protected final boolean popupExists(final Edge v) {
         return edgeToPopupMap.containsKey(v);
     }
 
     /**
      * Enters the map from edge to its popup menu in the hash.
      */
-    protected void putEdgeToPopup(final Edge e, final JPopupMenu p) {
+    protected final void putEdgeToPopup(final Edge e, final JPopupMenu p) {
         edgeToPopupMap.remove(e);
         edgeToPopupMap.put(e, p);
     }
@@ -364,7 +405,7 @@ public abstract class ResourceGraph {
     /**
      * Returns the minimal size of the graph that has all vertices in it.
      */
-    protected Point2D.Float getFilledGraphSize() {
+    protected final Point2D.Float getFilledGraphSize() {
         Float maxYPos = new Float(0);
         Float maxXPos = new Float(0);
 
@@ -393,7 +434,7 @@ public abstract class ResourceGraph {
      * Scales the graph, so that all vertices can be seen. The graph can
      * get smaller but not bigger.
      */
-    public void scale() { // TODO: synchronize differently
+    public final void scale() { // TODO: synchronize differently
         //TODO: disabling it till it works properly
         //Point2D max = getFilledGraphSize();
         //max = visualizationViewer.inverseLayoutTransform(max);
@@ -403,16 +444,20 @@ public abstract class ResourceGraph {
         //    return;
         //}
         //visualizationViewer.stop();
-        //final Float vvX = new Float(visualizationViewer.getSize(null).getWidth());
-        //final Float vvY = new Float(visualizationViewer.getSize(null).getHeight());
+        //final Float vvX =
+        //             new Float(visualizationViewer.getSize(null).getWidth());
+        //final Float vvY =
+        //            new Float(visualizationViewer.getSize(null).getHeight());
         //final float factorX = vvX / maxXPos;
         //final float factorY = vvY / maxYPos;
         //final float factor = (factorX < factorY)?factorX:factorY;
-        //final MutableTransformer vt = visualizationViewer.getViewTransformer();
+        //final MutableTransformer vt =
+        //                            visualizationViewer.getViewTransformer();
         //if (vvX > 0 && vvY > 0) {
         //    final float scale = (float)vt.getScale();
         //    if (factor <= scale) {
-        //        myScaler.scale(visualizationViewer, factor / scale, new Point2D.Double(0,0));
+        //        myScaler.scale(visualizationViewer,
+        //                       factor / scale, new Point2D.Double(0,0));
         //    }
         //}
         //TODO: it may hang here, check it
@@ -466,27 +511,14 @@ public abstract class ResourceGraph {
     /**
      * Returns graph in the scroll pane.
      */
-    public JPanel getGraphPanel() {
+    public final JPanel getGraphPanel() {
         return scrollPane;
     }
 
     /**
      * Returns label for vertex v.
      */
-    protected abstract String getLabelForVertexStringer(final ArchetypeVertex v);
-
-    /**
-     * This class takes care for the string in the node.
-     */
-    class MyVertexStringer implements VertexStringer {
-        /**
-         * Returns label of vertex v. Label consists of name of the service
-         * with id in the parenthesis, if it is not an empty string.
-         */
-        public String getLabel(final ArchetypeVertex v) {
-            return " " + getLabelForVertexStringer(v) + " ";
-        }
-    }
+    protected abstract String getMainText(final ArchetypeVertex v);
 
     /**
      * Returns label for edge e.
@@ -535,19 +567,40 @@ public abstract class ResourceGraph {
     public abstract String getEdgeToolTip(final Edge edge);
 
     /**
-     * Returns size of the vertex v
+     * Returns size of the service vertex shape.
      */
-    protected abstract int getVertexSize(final Vertex v);
+    protected final int getVertexSize(final Vertex v) {
+        if (vertexSize.containsKey(v)) {
+            return vertexSize.get(v);
+        } else {
+            return getDefaultVertexSize(v);
+        }
+    }
 
     /**
-     * Returns aspect ratio of the vertex v
+     * Returns the default vertex width.
+     */
+    protected int getDefaultVertexSize(final Vertex v) {
+        return 1;
+    }
+
+    /**
+     * Sets the vertex size.
+     */
+    protected final void setVertexSize(final Vertex v, final int size) {
+        vertexSize.put(v, size);
+    }
+
+    /**
+     * Returns aspect ratio of the vertex v.
      */
     protected abstract float getVertexAspectRatio(final Vertex v);
 
     /**
-     * Returns shape of the vertex v
+     * Returns shape of the vertex v.
      */
-    protected Shape getVertexShape(final Vertex v, final VertexShapeFactory factory) {
+    protected Shape getVertexShape(final Vertex v,
+                                         final VertexShapeFactory factory) {
         return factory.getEllipse(v);
     }
 
@@ -602,14 +655,14 @@ public abstract class ResourceGraph {
     /**
      * Adds popup menu item for vertex.
      */
-    public void addPopupItem(final Vertex v, final MyMenuItem item) {
+    public final void addPopupItem(final Vertex v, final MyMenuItem item) {
         vertexToMenus.get(v).add(item);
     }
 
     /**
      * Adds popup menu item for edge.
      */
-    public void addPopupItem(final Edge e, final MyMenuItem item) {
+    public final void addPopupItem(final Edge e, final MyMenuItem item) {
         edgeToMenus.get(e).add(item);
     }
 
@@ -629,26 +682,24 @@ public abstract class ResourceGraph {
     /**
      * Updates all popup menus.
      */
-    public void updatePopupMenus() {
-        for (final Iterator i = graph.getVertices().iterator(); i.hasNext();  ) {
-            final Vertex v = (Vertex)i.next();
-            vertexToMenus.remove(v);
+    public final void updatePopupMenus() {
+        for (final Object v : graph.getVertices()) {
+            vertexToMenus.remove((Vertex) v);
         }
-        for (final Iterator i = graph.getEdges().iterator(); i.hasNext();  ) {
-            final Edge e = (Edge)i.next();
-            edgeToMenus.remove(e);
-            updatePopupEdge(e);
+        for (final Object e : graph.getEdges()) {
+            edgeToMenus.remove((Edge) e);
+            updatePopupEdge((Edge) e);
         }
     }
 
     /**
-     * Updates edge popup
+     * Updates edge popup.
      */
-    protected void updatePopupEdge(final Edge edge) {
+    protected final void updatePopupEdge(final Edge edge) {
         final List<MyMenuItem> menus = edgeToMenus.get(edge);
         if (menus != null) {
-            for (final Iterator it = menus.iterator(); it.hasNext(); ) {
-                ((MyMenuItem)it.next()).update();
+            for (final MyMenuItem menu : menus) {
+                menu.update();
             }
         }
     }
@@ -657,13 +708,14 @@ public abstract class ResourceGraph {
      * This class handles popup menus in the graph.
      */
     class MyPopupGraphMousePlugin extends EditingPopupGraphMousePlugin {
-
+        /** Serial version ID. */
         private static final long serialVersionUID = 1L;
 
         /**
          * Creates new <code>MyPopupGraphMousePlugin</code> object.
          */
-        MyPopupGraphMousePlugin(final DefaultSettableVertexLocationFunction vertexLocations) {
+        MyPopupGraphMousePlugin(
+                final DefaultSettableVertexLocationFunction vertexLocations) {
             super(vertexLocations);
         }
 
@@ -674,7 +726,7 @@ public abstract class ResourceGraph {
             super.mouseClicked(e);
             final PickedState ps = visualizationViewer.getPickedState();
             if (ps.getPickedEdges().size() == 1) {
-                final Edge edge = (Edge)ps.getPickedEdges().toArray()[0];
+                final Edge edge = (Edge) ps.getPickedEdges().toArray()[0];
                 oneEdgePressed(edge);
             } else if (ps.getPickedVertices().size() == 0) {
                 backgroundClicked();
@@ -686,15 +738,15 @@ public abstract class ResourceGraph {
          */
         protected void handlePopup(final MouseEvent me) {
             // TODO: it comes here twice
-            final VisualizationViewer vv = (VisualizationViewer)me.getSource();
+            final VisualizationViewer vv = (VisualizationViewer) me.getSource();
             final Point2D p = vv.inverseViewTransform(me.getPoint());
             final PickSupport pickSupport = vv.getPickSupport();
             final Vertex v = pickSupport.getVertex(p.getX(), p.getY());
             final Point2D popP = me.getPoint();
 
-            final int posX = (int)popP.getX();
-            final int posY = (int)popP.getY();
-            if(v == null) {
+            final int posX = (int) popP.getX();
+            final int posY = (int) popP.getY();
+            if (v == null) {
                 final Edge edge = pickSupport.getEdge(p.getX(), p.getY());
                 if (edge == null) {
                     /* background was clicked */
@@ -742,7 +794,7 @@ public abstract class ResourceGraph {
     /**
      * Picks edge e.
      */
-    public void pickEdge(final Edge e) {
+    public final void pickEdge(final Edge e) {
         final PickedState ps = visualizationViewer.getPickedState();
         ps.clearPickedEdges();
         ps.clearPickedVertices();
@@ -752,7 +804,7 @@ public abstract class ResourceGraph {
     /**
      * Picks vertex v.
      */
-    public void pickVertex(final Vertex v) {
+    public final void pickVertex(final Vertex v) {
         final PickedState ps = visualizationViewer.getPickedState();
         ps.clearPickedEdges();
         ps.clearPickedVertices();
@@ -762,7 +814,7 @@ public abstract class ResourceGraph {
     /**
      * Picks background.
      */
-    public void pickBackground() {
+    public final void pickBackground() {
         final PickedState ps = visualizationViewer.getPickedState();
         ps.clearPickedEdges();
         ps.clearPickedVertices();
@@ -807,12 +859,9 @@ public abstract class ResourceGraph {
          */
         public void graphReleased(final Vertex v, final MouseEvent me) {
             final PickedState ps = visualizationViewer.getPickedState();
-            Vertex vertex;
-            for (final Iterator it = ps.getPickedVertices().iterator(); it.hasNext(); ) {
-                vertex = (Vertex)it.next();
-                final Point2D p = layout.getLocation(vertex);
-                //Point2D p = vertexLocations.getLocation(vertex);
-                vertexReleased(vertex, p);
+            for (final Object vertex : ps.getPickedVertices()) {
+                final Point2D p = layout.getLocation((Vertex) vertex);
+                vertexReleased((Vertex) vertex, p);
             }
             //scale();
         }
@@ -832,7 +881,7 @@ public abstract class ResourceGraph {
     /**
      * Retuns border paint color for vertex v.
      */
-    protected Paint getVertexDrawPaint(final Vertex v) {
+    protected final Paint getVertexDrawPaint(final Vertex v) {
         return Tools.getDefaultColor("ResourceGraph.DrawPaint");
     }
 
@@ -846,7 +895,7 @@ public abstract class ResourceGraph {
     /**
      * Returns fill paint color for the specified resource.
      */
-    protected Color getVertexFillColor(final Info i) {
+    protected final Color getVertexFillColor(final Info i) {
         return getVertexFillColor(infoToVertexMap.get(i));
     }
 
@@ -868,9 +917,9 @@ public abstract class ResourceGraph {
          */
         MyPickableVertexPaintFunction(final PickedInfo pi,
                                       final Paint drawPaint,
-                                      final Paint fill_paint,
+                                      final Paint fillPaint,
                                       final Paint pickedPaint) {
-            super(pi, drawPaint, fill_paint, pickedPaint);
+            super(pi, drawPaint, fillPaint, pickedPaint);
         }
 
         /**
@@ -888,17 +937,19 @@ public abstract class ResourceGraph {
          * Returns fill paint color for of vertex v.
          */
         public Paint getFillPaint(final Vertex v)  {
-            final Point2D p = visualizationViewer.layoutTransform(layout.getLocation(v));
+            final Point2D p =
+                    visualizationViewer.layoutTransform(layout.getLocation(v));
             final float x = (float) p.getX();
             final float y = (float) p.getY();
 
-            return new GradientPaint(x,
-                                     y - getVertexSize(v) * getVertexAspectRatio(v) / 2,
-                                     getVertexFillSecondaryColor(v),
-                                     x,
-                                     y + getVertexSize(v) * getVertexAspectRatio(v) / 2,
-                                     getVertexFillColor(v),
-                                     false);
+            return new GradientPaint(
+                            x,
+                            y - getVertexSize(v) * getVertexAspectRatio(v) / 2,
+                            getVertexFillSecondaryColor(v),
+                            x,
+                            y + getVertexSize(v) * getVertexAspectRatio(v) / 2,
+                            getVertexFillColor(v),
+                            false);
         }
     }
 
@@ -916,6 +967,9 @@ public abstract class ResourceGraph {
         return Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
     }
 
+    /**
+     * This class defines paints for the edges.
+     */
     class MyPickableEdgePaintFunction extends PickableEdgePaintFunction {
 
         /**
@@ -927,6 +981,9 @@ public abstract class ResourceGraph {
             super(pi, drawPaint, pickedPaint);
         }
 
+        /**
+         * Returns paint of the edge.
+         */
         public Paint getDrawPaint(final Edge e) {
             if (pi.isPicked(e)) {
                 return getEdgePickedPaint(e);
@@ -943,11 +1000,21 @@ public abstract class ResourceGraph {
         }
     }
 
+    /**
+     * This class defines what arrow and if at all should be painted.
+     */
     class MyEdgeArrowFunction extends DirectionalEdgeArrowFunction {
+        /**
+         * Creates new MyEdgeArrowFunction object.
+         */
         public MyEdgeArrowFunction() {
             super(20, 8, 4);
         }
 
+        /**
+         * Returns the shape of the arrow, or not if no arrow should be
+         * painted.
+         */
         public Shape getArrow(final Edge e) {
             if (showEdgeArrow(e)) {
                 return super.getArrow(e);
@@ -957,72 +1024,167 @@ public abstract class ResourceGraph {
         }
     }
 
+    /**
+     * Returns whether an arrow on edge should be painted.
+     */
     protected abstract boolean showEdgeArrow(final Edge e);
 
+    /**
+     * Returns an icon for vertex.
+     */
     protected abstract ImageIcon getIconForVertex(final ArchetypeVertex v);
 
+    /**
+     * This class is for rendering of the vertices.
+     */
     class MyPluggableRenderer extends PluggableRenderer {
-
+        /**
+         * Paints the shape for vertex and all icons and texts inside. It
+         * resizes and repositions the vertex if neccessary.
+         */
         public void paintShapeForVertex(final Graphics2D g2d,
                                         final Vertex v,
                                         final Shape shape) {
+            int shapeWidth = getDefaultVertexSize(v);
+            /* main text */
+            final String mainText = getMainText(v);
+            TextLayout mainTextLayout = null;
+            if (mainText != null && !mainText.equals("")) {
+                mainTextLayout = getVertexTextLayout(g2d, mainText, 1);
+                final int mainTextWidth =
+                              (int) mainTextLayout.getBounds().getWidth() + 64;
+                if (mainTextWidth > shapeWidth) {
+                    shapeWidth = mainTextWidth;
+                }
+            }
+
+            /* icon text */
+            final String iconText = getIconText(v);
+            int iconTextWidth = 0;
+            TextLayout iconTextLayout = null;
+            if (iconText != null && !iconText.equals("")) {
+                iconTextLayout = getVertexTextLayout(g2d, iconText, 0.8);
+                iconTextWidth =
+                            (int) iconTextLayout.getBounds().getWidth();
+            }
+
+            /* right corner text */
+            final String rightCornerText = getRightCornerText(v);
+            TextLayout rightCornerTextLayout = null;
+            if (rightCornerText != null && !rightCornerText.equals("")) {
+                rightCornerTextLayout = getVertexTextLayout(
+                               g2d,
+                               rightCornerText,
+                               0.8);
+                final int rightCornerTextWidth =
+                        (int) rightCornerTextLayout.getBounds().getWidth();
+
+                if (iconTextWidth + rightCornerTextWidth + 10 > shapeWidth) {
+                    shapeWidth = iconTextWidth + rightCornerTextWidth + 10;
+                }
+            }
+
+            /* subtext */
+            final String subtext = getSubtext(v);
+            TextLayout subtextLayout = null;
+            if (subtext != null && !subtext.equals("")) {
+                subtextLayout = getVertexTextLayout(g2d, subtext,
+                               0.8);
+                final int subtextWidth =
+                                (int) subtextLayout.getBounds().getWidth();
+                if (subtextWidth + 10 > shapeWidth) {
+                    shapeWidth = subtextWidth + 10;
+                }
+            }
+            final int oldShapeWidth = getVertexSize(v);
+            if (Math.abs(oldShapeWidth - shapeWidth) > 10) {
+                /* move it, so that left side has the same position, if it is
+                 * resized */
+                setVertexSize(v, shapeWidth);
+                final Point2D pos = getVertexLocations().getLocation(v);
+                final double x = pos.getX();
+                pos.setLocation(x - (oldShapeWidth - shapeWidth) / 2,
+                                pos.getY());
+                getVertexLocations().setLocation(v, pos);
+                scale();
+            }
+            /* shape */
             super.paintShapeForVertex(g2d, v, shape);
-            final Point2D loc = visualizationViewer.layoutTransform(layout.getLocation(v));
+            final Point2D loc = visualizationViewer.layoutTransform(
+                                                    layout.getLocation(v));
+            final double x = loc.getX() - getVertexSize(v) / 2;
+            final double height = shape.getBounds().getHeight();
+            final double y = loc.getY() - height / 2;
+            /* icon */
             final ImageIcon icon = getIconForVertex(v);
-            Info info = getInfo(v);
             if (icon != null) {
                 icon.setDescription("asdf");
-                final double x = loc.getX() - getVertexSize(v) / 2;
-                final double y = loc.getY() - icon.getIconHeight() / 2;
-                if (info.isUpdated()) {
-                    /* update animation */
-                    AffineTransform origXform = g2d.getTransform();
-                    AffineTransform newXform = (AffineTransform)(origXform.clone());
-                    int xRot = icon.getIconWidth() / 2;
-                    int yRot = icon.getIconHeight() / 2;
-                    newXform.setToTranslation(x, y);
-                    newXform.rotate(Math.toRadians(rotation),
-                                          xRot,
-                                          yRot);
-                    g2d.drawImage(icon.getImage(), newXform, null);
-                } else {
-                    g2d.drawImage(icon.getImage(), (int)x, (int)y, null);
-                }
-                final String iconText = getIconText(v);
-                if (iconText != null && !iconText.equals("")) {
-                    drawVertexText(g2d,
-                                   iconText,
-                                   x + 4,
-                                   y,
-                                   0.8,
-                                   new Color(0, 0, 0),
-                                   255,
-                                   false);
-                    
-                }
-                final String subtext = getSubtext(v);
-                if (subtext != null && !subtext.equals("")) {
-                    drawVertexText(g2d,
-                                   subtext,
-                                   x + 30,
-                                   y + shape.getBounds().getHeight() - 15,
-                                   0.8,
-                                   new Color(0, 0, 0),
-                                   255,
-                                   false);
-                }
-                final String rightCornerText = getRightCornerText(v);
-                if (rightCornerText != null && !rightCornerText.equals("")) {
-                    drawVertexText(g2d,
-                                   rightCornerText,
-                                   x + shape.getBounds().getWidth() - 8,
-                                   y,
-                                   0.9,
-                                   new Color(255, 0, 0),
-                                   255,
-                                   true);
-                    
-                }
+                g2d.drawImage(
+                      icon.getImage(),
+                      (int) (x + 4),
+                      (int) (y + height / 2 - icon.getIconHeight() / 2),
+                      null);
+            }
+
+            /* texts are drawn from left down corner. */
+            if (mainTextLayout != null) {
+                final int textW = (int) mainTextLayout.getBounds().getWidth();
+                final int textH = (int) mainTextLayout.getBounds().getHeight();
+                drawVertexText(g2d,
+                               mainTextLayout,
+                               x + shapeWidth / 2 - textW / 2, /* middle */
+                               y + height / 2 + textH / 2,
+                               new Color(0, 0, 0),
+                               255);
+            }
+            if (iconTextLayout != null) {
+                drawVertexText(g2d,
+                               iconTextLayout,
+                               x + 4,
+                               y + 11,
+                               new Color(0, 0, 0),
+                               255);
+            }
+            if (rightCornerTextLayout != null) {
+                drawVertexText(
+                   g2d,
+                   rightCornerTextLayout,
+                   x + shapeWidth
+                     - rightCornerTextLayout.getBounds().getWidth() - 4,
+                   y + 11,
+                   new Color(255, 0, 0),
+                   255);
+            }
+
+            if (subtextLayout != null) {
+                drawVertexText(
+                           g2d,
+                           subtextLayout,
+                           x + 4,
+                           y + height - 4,
+                           new Color(0, 0, 0),
+                           255);
+            }
+
+            final Info info = getInfo(v);
+            try {
+                mAnimationListLock.acquire();
+            } catch (java.lang.InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            if (animationList.contains(info)) {
+                /* update animation */
+                final int i = info.getAnimationIndex();
+                mAnimationListLock.release();
+                final int barPos = i * (shapeWidth - 7) / 100;
+                g2d.setColor(new Color(250, 133, 34,
+                                       90));
+                g2d.fillRect((int) (x + barPos), (int) y, 7, (int) height);
+                g2d.fillRect((int) (x + shapeWidth - barPos - 7),
+                             (int) y, 7,
+                             (int) height);
+            } else {
+                mAnimationListLock.release();
             }
         }
     }
@@ -1030,33 +1192,28 @@ public abstract class ResourceGraph {
     /**
      * Small text that appears above the icon.
      */
-    protected String getIconText(final Vertex v) {
-        return null;
-    }
+    protected abstract String getIconText(final Vertex v);
 
     /**
      * Small text that appears in the right corner.
      */
-    protected String getRightCornerText(final Vertex v) {
-        return null;
-    }
+    protected abstract String getRightCornerText(final Vertex v);
 
     /**
      * Small text that appears down.
      */
-    protected String getSubtext(final Vertex v) {
-        return null;
-    }
+    protected abstract String getSubtext(final Vertex v);
 
-    public void getPositions(final Map<String,Point2D> positions) {
-        for (final Iterator i = graph.getVertices().iterator(); i.hasNext();  ) {
-            final Vertex v = (Vertex) i.next();
-            final Info info = getInfo(v);
-            final Point2D p = layout.getLocation(v);
+    /**
+     * Returns positions of the vertices (by value).
+     */
+    public final void getPositions(final Map<String, Point2D> positions) {
+        for (final Object v : graph.getVertices()) {
+            final Info info = getInfo((Vertex) v);
+            final Point2D p = layout.getLocation((Vertex) v);
             if (info != null) {
                 final String id = getId(info);
                 if (id != null) {
-                    positions.remove(id);
                     positions.put(id, p);
                 }
             }
@@ -1094,34 +1251,33 @@ public abstract class ResourceGraph {
     }
 
     /**
-     * Draws text on the vertex.
+     * Returns layout of the text that will be drawn on the vertex.
      */
-    private final void drawVertexText(final Graphics2D g2d,
-                                      final String text,
-                                      final double x,
-                                      final double y,
-                                      final double fontSizeFactor,
-                                      final Color color,
-                                      final int alpha,
-                                      final boolean rightBound) {
+    private TextLayout getVertexTextLayout(final Graphics2D g2d,
+                                           final String text,
+                                           final double fontSizeFactor) {
         final Font font = Tools.getGUIData().getMainFrame().getFont();
         final FontRenderContext context = g2d.getFontRenderContext();
-        final TextLayout layout =
-                           new TextLayout(
-                             text,
-                             new Font(font.getName(),
-                                      font.getStyle(),
-                                      (int) (font.getSize() * fontSizeFactor)),
-                             context);
-        final Rectangle2D bounds = layout.getBounds();
+        return new TextLayout(text,
+                              new Font(font.getName(),
+                                       font.getStyle(),
+                                       (int) (font.getSize() * fontSizeFactor)),
+                              context);
+    }
+
+    /**
+     * Draws text on the vertex.
+     */
+    private void drawVertexText(final Graphics2D g2d,
+                                final TextLayout textLayout,
+                                final double x,
+                                final double y,
+                                final Color color,
+                                final int alpha) {
         g2d.setColor(new Color(color.getRed(),
                                color.getGreen(),
                                color.getBlue(),
                                alpha));
-        if (rightBound) {
-            layout.draw(g2d, (float) (x - bounds.getWidth()), (float) y);
-        } else {
-            layout.draw(g2d, (float) x, (float) y);
-        }
+        textLayout.draw(g2d, (float) x, (float) y);
     }
 }

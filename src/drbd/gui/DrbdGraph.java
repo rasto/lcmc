@@ -39,7 +39,6 @@ import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.impl.SparseVertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.visualization.PickedState;
 import edu.uci.ics.jung.visualization.VertexShapeFactory;
 
 import java.util.LinkedHashMap;
@@ -86,8 +85,8 @@ public class DrbdGraph extends ResourceGraph {
 
     /** Drbd info object to which this graph belongs. */
     private DrbdInfo drbdInfo;
-    /** Old location of the moved vertex. */
-    private double oldLocation;
+    ///** Old location of the moved vertex. */
+    //private double oldLocation;
 
     /** Hard disc icon. */
     private static final ImageIcon HARDDISC_ICON = Tools.createImageIcon(
@@ -100,21 +99,21 @@ public class DrbdGraph extends ResourceGraph {
                                     Tools.getDefault("DrbdGraph.HostIcon"));
     /** Horizontal step in pixels by which the block devices are drawn in
      * the graph. */
-    private static final int BD_STEP_Y = 50;
+    private static final int BD_STEP_Y = 55;
     /** Y position of the host. */
     private static final int HOST_Y_POS = 40;
     /** Vertical step in pixels by which the hosts are drawn in the graph. */
-    private static final int HOST_STEP_X = 330;
-    /** Maximum vertical position. */
-    private static final int MAX_Y_POS = 2600;
-    /** Aspect ratio of the block device vertex. */
-    private static final float ASPECT_RATIO_BD = 0.2f;
-    /** Aspect ratio of the host vertex. */
-    private static final float ASPECT_RATIO_HOST = 0.3f;
+    private static final int HOST_STEP_X = 280;
+    ///** Maximum vertical position. */
+    //private static final int MAX_Y_POS = 2600;
     /** Block device vertex size. */
     private static final int VERTEX_SIZE_BD = 200;
     /** Host vertex size. */
     private static final int VERTEX_SIZE_HOST = 150;
+    /** Height of the host vertices. */
+    private static final float HOST_VERTEX_HEIGHT = 50.0f;
+    /** Height of the block device vertices. */
+    private static final float VERTEX_HEIGHT = 50.0f;
 
     /** Maximum length of the label in the vertex, after which the string will
      * be cut. */
@@ -127,10 +126,10 @@ public class DrbdGraph extends ResourceGraph {
     /** String length after the cut. */
     private static final int EDGE_STRING_LENGTH = 7;
     /** Postion offset of block devices from the host x position. */
-    private static final int BD_X_OFFSET = 40;
+    private static final int BD_X_OFFSET = 15;
 
     /** The first X position of the host. */
-    private int hostDefaultXPos = 80;
+    private int hostDefaultXPos = 10;
 
     /**
      * Prepares a new <code>DrbdGraph</code> object.
@@ -181,14 +180,17 @@ public class DrbdGraph extends ResourceGraph {
             hostToVertexMap.put(hostInfo, v);
             putVertexToInfo(v, (Info) hostInfo);
             // TODO: get saved position is disabled at the moment,
-            // because it does more harm than good at the moment. 
+            // because it does more harm than good at the moment.
             Point2D hostPos = null; // getSavedPosition(hostInfo);
 
             if (hostPos == null) {
-                hostPos = new Point2D.Double(hostDefaultXPos, HOST_Y_POS);
+                hostPos = new Point2D.Double(
+                                hostDefaultXPos + getDefaultVertexSize(v) / 2,
+                                HOST_Y_POS);
                 hostDefaultXPos += HOST_STEP_X;
             }
-            final double hostXPos = hostPos.getX();
+            final double hostXPos =
+                                hostPos.getX() - getDefaultVertexSize(v) / 2;
             getVertexLocations().setLocation(sv, hostPos);
 
             /* add block devices vertices */
@@ -209,10 +211,12 @@ public class DrbdGraph extends ResourceGraph {
                 vertexToHostMap.put(bdv, hostInfo);
                 vertexList.add(bdv);
                 // TODO: get saved position is disabled at the moment,
-                // because it does more harm than good at the moment. 
+                // because it does more harm than good at the moment.
                 Point2D pos = null; // getSavedPosition(bdi);
                 if (pos == null) {
-                    pos = new Point2D.Double(hostXPos + BD_X_OFFSET, devYPos);
+                    pos = new Point2D.Double(
+                        hostXPos + BD_X_OFFSET + getDefaultVertexSize(bdv) / 2,
+                        devYPos);
                 }
                 getVertexLocations().setLocation(bdv, pos);
 
@@ -305,10 +309,63 @@ public class DrbdGraph extends ResourceGraph {
     }
 
     /**
+     * Small text that appears above the icon.
+     */
+    protected final String getIconText(final Vertex v) {
+        if (isVertexBlockDevice(v)) {
+            final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi != null && bdi.getBlockDevice().isDrbd()) {
+                return bdi.getBlockDevice().getNodeState();
+            }
+        } else {
+            /* TODO: host */
+        }
+        return null;
+    }
+
+    /**
+     * Small text that appears in the right corner.
+     */
+    protected final String getRightCornerText(final Vertex v) {
+        if (isVertexBlockDevice(v)) {
+            final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi != null) {
+                if (bdi.getBlockDevice().isDrbdMetaDisk()) {
+                    return "meta-disk";
+                } else if (bdi.getBlockDevice().getMountedOn() != null) {
+                    return "mounted";
+                } else if (bdi.getBlockDevice().isDrbd()) {
+                    return bdi.getBlockDevice().getName();
+                }
+
+            }
+        } else {
+            /* TODO: host */
+        }
+        return null;
+    }
+
+    /**
+     * Small text that appears down.
+     */
+    protected final String getSubtext(final Vertex v) {
+        if (isVertexBlockDevice(v)) {
+            final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi != null && bdi.getBlockDevice().isDrbd()) {
+                return bdi.getBlockDevice().getConnectionState() + " / "
+                       + bdi.getBlockDevice().getDiskState();
+            }
+        } else {
+            /* TODO: host */
+        }
+        return null;
+    }
+
+    /**
      * Returns label for block device vertex. If it is longer than 23
      * characters, it is shortened.
      */
-    protected final String getLabelForVertexStringer(final ArchetypeVertex v) {
+    protected final String getMainText(final ArchetypeVertex v) {
         if (isVertexBlockDevice((Vertex) v)) {
             String l;
             if (isVertexDrbd((Vertex) v)) {
@@ -330,24 +387,13 @@ public class DrbdGraph extends ResourceGraph {
     }
 
     /**
-     * Returns size of the block device and host rectangle.
-     */
-    protected final int getVertexSize(final Vertex v) {
-        if (isVertexBlockDevice(v)) {
-            return VERTEX_SIZE_BD;
-        } else {
-            return VERTEX_SIZE_HOST;
-        }
-    }
-
-    /**
      * Returns aspect ratio of the rectangle with block device or host.
      */
     protected final float getVertexAspectRatio(final Vertex v) {
         if (isVertexBlockDevice(v)) {
-            return ASPECT_RATIO_BD;
+            return VERTEX_HEIGHT / getVertexSize(v);
         } else {
-            return ASPECT_RATIO_HOST;
+            return HOST_VERTEX_HEIGHT / getVertexSize(v);
         }
     }
 
@@ -393,7 +439,6 @@ public class DrbdGraph extends ResourceGraph {
             final Edge e = getGraph().addEdge(edge);
             edgeToDrbdResourceMap.put(e, dri);
             drbdResourceToEdgeMap.put(dri, e);
-            //repaint();
         }
     }
 
@@ -448,37 +493,37 @@ public class DrbdGraph extends ResourceGraph {
         return null;
     }
 
-    /**
-     * Fixes locations of the block device vertices after they where moved.
-     * TODO: fix for more moved vertices.
-     */
-    private void fixLocations(final Vertex vertex,
-                              final Point2D newLocation) {
-        final double oldY = oldLocation;
-        final double newY = newLocation.getY();
-        final HostInfo hi = vertexToHostMap.get(vertex);
-        final PickedState ps = getVisualizationViewer().getPickedState();
-        final Point2D hl = getVertexLocations().getLocation(getVertex(hi));
-        final double x = hl.getX() + BD_X_OFFSET;
-        for (final Vertex v : hostBDVerticesMap.get(hi)) {
-            if (!v.equals(vertex) && !ps.isPicked(v)) {
-                final Point2D l = getVertexLocations().getLocation(v);
-                final double y = l.getY();
-                if (oldY >= 0) {
-                    if (y >= oldY && y <= newY) {
-                        l.setLocation(x, y - BD_STEP_Y);
-                        getVertexLocations().setLocation(v, l);
-                    } else if (y <= oldY && y >= newY) {
-                        l.setLocation(x, y + BD_STEP_Y);
-                        getVertexLocations().setLocation(v, l);
-                    }
-                } else {
-                    l.setLocation(x, y);
-                    getVertexLocations().setLocation(v, l);
-                }
-            }
-        }
-    }
+    ///**
+    // * Fixes locations of the block device vertices after they where moved.
+    // * TODO: fix for more moved vertices.
+    // */
+    //private void fixLocations(final Vertex vertex,
+    //                          final Point2D newLocation) {
+    //    final double oldY = oldLocation;
+    //    final double newY = newLocation.getY();
+    //    final HostInfo hi = vertexToHostMap.get(vertex);
+    //    final PickedState ps = getVisualizationViewer().getPickedState();
+    //    final Point2D hl = getVertexLocations().getLocation(getVertex(hi));
+    //    final double x = hl.getX() + BD_X_OFFSET;
+    //    for (final Vertex v : hostBDVerticesMap.get(hi)) {
+    //        if (!v.equals(vertex) && !ps.isPicked(v)) {
+    //            final Point2D l = getVertexLocations().getLocation(v);
+    //            final double y = l.getY();
+    //            if (oldY >= 0) {
+    //                if (y >= oldY && y <= newY) {
+    //                    l.setLocation(x, y - BD_STEP_Y);
+    //                    getVertexLocations().setLocation(v, l);
+    //                } else if (y <= oldY && y >= newY) {
+    //                    l.setLocation(x, y + BD_STEP_Y);
+    //                    getVertexLocations().setLocation(v, l);
+    //                }
+    //            } else {
+    //                l.setLocation(x, y);
+    //                getVertexLocations().setLocation(v, l);
+    //            }
+    //        }
+    //    }
+    //}
 
     /**
      * Picks vertex representig specified block device info object in the
@@ -506,10 +551,10 @@ public class DrbdGraph extends ResourceGraph {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             drbdInfo.setSelectedNode(bdi);
             drbdInfo.selectMyself();
-            oldLocation = getVertexLocations().getLocation(v).getY();
+            //oldLocation = getVertexLocations().getLocation(v).getY();
         } else {
             pickHost(v);
-            oldLocation = getVertexLocations().getLocation(v).getY();
+            //oldLocation = getVertexLocations().getLocation(v).getY();
             final HostInfo hi = vertexToHostMap.get(v);
             hi.setGraph(this);
             getClusterBrowser().setRightComponentInView(hi);
@@ -520,8 +565,8 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Is called when block device vertex is released.
      */
-    // TODO: make it work
     protected final void vertexReleased(final Vertex v, final Point2D pos) {
+        // TODO: make it work
     }
     //protected final void vertexReleased(final Vertex v, final Point2D pos) {
     //    double y = pos.getY();
@@ -795,5 +840,16 @@ public class DrbdGraph extends ResourceGraph {
             hiId = hi.getId();
         }
         return "dr=" + hiId + i.getId();
+    }
+
+    /**
+     * Returns the default vertex width.
+     */
+    protected final int getDefaultVertexSize(final Vertex v) {
+        if (isVertexBlockDevice(v)) {
+            return VERTEX_SIZE_BD;
+        } else {
+            return VERTEX_SIZE_HOST;
+        }
     }
 }
