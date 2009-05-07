@@ -629,7 +629,7 @@ public class GuiComboBox extends JPanel {
                 } else if (Tools.isStringClass(item)) {
                     for (int i = 0; i < cb.getItemCount(); i++) {
                         final Object it = cb.getItemAt(i);
-                        if (it.equals(item)) {
+                        if (it.toString().equals(item)) {
                             cb.setSelectedItem(it);
                             break;
                         }

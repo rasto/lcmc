@@ -140,11 +140,6 @@ public class DrbdConfigCreateFS extends DrbdConfig {
                 bdiPri.setSecondary();
                 hostCB.setValue(NO_HOST_STRING);
                 filesystemCB.setValue(NO_FILESYSTEM_STRING);
-                //SwingUtilities.invokeLater(new Runnable() {
-                //    public void run() {
-                //        buttonClass(finishButton()).setEnabled(true);
-                //    }
-                //});
             }
         };
         final Thread thread = new Thread(runnable);
