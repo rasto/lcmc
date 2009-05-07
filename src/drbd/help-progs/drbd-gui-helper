@@ -146,7 +146,7 @@ sub get_mount {
 			if ($dev =~ m!^mapper/(.+)!) {
 				# convert mapper/vg00--sepp-sources to vg00-sepp/sources
 				my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
-				if ($group && $name && !$$lvm_devs{"$group/$name"}) {
+				if ($group && $name) { # && !$$lvm_devs{"$group/$name"}) {
 					$dev = "$group/$name";
 				}
 			}
@@ -158,6 +158,26 @@ sub get_mount {
 	return \%dev_to_mount;
 }
 
+# get_swaps
+# returns hash with swaps as keys.
+sub get_swaps {
+	open SW, "/proc/swaps" or disk_info_error("cannot open /proc/swaps");
+	my %swaps;
+	while (<SW>) {
+		next if /^Filename/; # header
+		my ($swap_dev) = split;
+		if ($swap_dev =~ m!^/dev/mapper/(.+)!) {
+			# convert
+			my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
+			if ($group && $name) {
+				$swap_dev = "/dev/$group/$name";
+			}
+		}
+		$swaps{$swap_dev}++;
+	}
+	return \%swaps;
+}
+
 # get_lvm
 #
 # returns 4 hashes. One hash that maps lvm group to the physical volume. A hash
@@ -165,11 +185,13 @@ sub get_mount {
 # minor numbers are separated with ":". And a hash that contains block devices
 # that have lvm on top of them.
 sub get_lvm {
-	return ({}, {}, {}, {}) if ! -e "/sbin/pvdisplay";
+	if (! -e "/sbin/pvdisplay" && ! -e "/usr/sbin/pvdisplay") {
+		return ({}, {}, {}, {});
+	}
 
 	# create physical volume to volume group hash
 	my %group_to_pv;
-	for (`/sbin/pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null`) {
+	for (`pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null`) {
 		my ($pv_name, $vg_name) = split;
 		$pv_name =~ s!^/dev/!!;
 		print_debug("pv: $pv_name, $vg_name");
@@ -181,7 +203,7 @@ sub get_lvm {
 	my %lvm_devs;
 
 	# create major:minor kernel number to device hash
-	for (`/sbin/lvdisplay -C --noheadings -o lv_kernel_major,lv_kernel_minor,vg_name,lv_name 2>/dev/null`) {
+	for (`lvdisplay -C --noheadings -o lv_kernel_major,lv_kernel_minor,vg_name,lv_name 2>/dev/null`) {
 		my ($major, $minor, $group, $name) = split;
 		print_debug("get_lvm: ($major, $minor, $group, $name, $group_to_pv{$group})");
 		$major_minor_to_dev{"$major:$minor"} = "$group/$name";
@@ -241,6 +263,7 @@ sub get_disk_info {
 	my $devs_in_raid = get_raid();
 	my ($group_to_pv, $major_minor_to_dev, $devs_with_lvm, $lvm_devs) = get_lvm();
 	my $dev_to_mount = get_mount($lvm_devs);
+	my $dev_to_swap = get_swaps();
 	# read partition table
 	open PT, "/proc/partitions" or disk_info_error("cannot open /proc/partitions");
 	my @raids;
@@ -290,6 +313,7 @@ sub get_disk_info {
 		}
 		my $info = "$device $blocks";
 		$info.= " ".$$dev_to_mount{$device} if $$dev_to_mount{$device};
+		$info.= " swap swap" if $$dev_to_swap{$device};
 		$info.= "\n";
 		push @info, $info;
 	}
