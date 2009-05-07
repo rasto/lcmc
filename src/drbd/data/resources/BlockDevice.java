@@ -562,4 +562,14 @@ public class BlockDevice extends Resource {
             return "";
         }
     }
+
+    /**
+     * Returns whether the block device is swap.
+     */
+    public final boolean isSwap() {
+        if (fsType != null && "swap".equals(fsType)) {
+            return true;
+        }
+        return false;
+    }
 }

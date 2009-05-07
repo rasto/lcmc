@@ -23,7 +23,7 @@ package drbd.gui.dialog;
 
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
-
+import java.awt.Color;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JCheckBox;
@@ -100,6 +100,7 @@ public class ClusterFinish extends DialogCluster {
         final JPanel pane = new JPanel();
         /* Save checkbox */
         pane.add(saveCB); 
+        saveCB.setBackground(Color.WHITE);
         return pane;
     }
 }

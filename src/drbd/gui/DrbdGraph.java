@@ -332,6 +332,8 @@ public class DrbdGraph extends ResourceGraph {
             if (bdi != null) {
                 if (bdi.getBlockDevice().isDrbdMetaDisk()) {
                     return "meta-disk";
+                } else if (bdi.getBlockDevice().isSwap()) {
+                    return "swap";
                 } else if (bdi.getBlockDevice().getMountedOn() != null) {
                     return "mounted";
                 } else if (bdi.getBlockDevice().isDrbd()) {
