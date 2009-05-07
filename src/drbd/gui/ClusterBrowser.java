@@ -3120,6 +3120,7 @@ public class ClusterBrowser extends Browser {
             }
             final String id = idField.getStringValue();
             getService().setId(id);
+            setHeartbeatIdLabel();
             addToHeartbeatIdList(this);
             addNameToServiceInfoHash(this);
 
@@ -4674,6 +4675,13 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Sets the visible heartbeat id.
+         */
+        protected void setHeartbeatIdLabel() {
+            heartbeatIdLabel.setText(getService().getHeartbeatId());
+        }
+
+        /**
          * Applies the changes to the service parameters.
          */
         public void apply() {
@@ -4697,7 +4705,7 @@ public class ClusterBrowser extends Browser {
             }
             final String id = idField.getStringValue();
             getService().setId(id);
-            heartbeatIdLabel.setText(getService().getHeartbeatId());
+            setHeartbeatIdLabel();
             addToHeartbeatIdList(this);
             addNameToServiceInfoHash(this);
 
@@ -4729,6 +4737,9 @@ public class ClusterBrowser extends Browser {
             if (groupInfo == null) {
                 group = HB_NONE_ARG;
             } else {
+                if (groupInfo.getService().isNew()) {
+                    groupInfo.apply();
+                }
                 group = groupInfo.getService().getHeartbeatId();
                 groupId = group;
             }
@@ -4869,9 +4880,6 @@ public class ClusterBrowser extends Browser {
                         heartbeatStatus.getParametersNvpairsIds(heartbeatId),
                         getOperations(heartbeatId),
                         heartbeatStatus.getOperationsId(heartbeatId));
-            }
-            if (groupInfo != null && groupInfo.getService().isNew()) {
-                groupInfo.apply();
             }
 
             if (groupInfo == null) {
