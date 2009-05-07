@@ -3227,6 +3227,66 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Starts all resources in the group.
+         */
+        final public void startResource() {
+            setUpdated(true);
+            final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+            final Host dc = getDCHost();
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    Heartbeat.startResource(dc, hbId);
+                }
+            }
+        }
+
+        /**
+         * Stops all resources in the group.
+         */
+        final public void stopResource() {
+            setUpdated(true);
+            final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+            final Host dc = getDCHost();
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    Heartbeat.stopResource(dc, hbId);
+                }
+            }
+        }
+
+        /**
+         * Cleans up all resources in the group.
+         */
+        final public void cleanupResource() {
+            setUpdated(true);
+            final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+            final Host dc = getDCHost();
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    Heartbeat.cleanupResource(dc, hbId, getClusterHosts());
+                }
+            }
+        }
+
+        /**
+         * Sets whether the group services are managed.
+         */
+        final public void setManaged(final boolean isManaged) {
+            setUpdated(true);
+            final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+            final Host dc = getDCHost();
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    Heartbeat.setManaged(dc, hbId, isManaged);
+                }
+            }
+        }
+
+        /**
          * Returns items for the group popup.
          */
         public List<UpdatableItem> createPopup() {
@@ -3706,7 +3766,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Sets whether the service is managed.
          */
-        final public void setManaged(final boolean isManaged) {
+        public void setManaged(final boolean isManaged) {
             setUpdated(true);
             Heartbeat.setManaged(getDCHost(),
                                  getService().getHeartbeatId(),
