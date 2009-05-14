@@ -70,14 +70,14 @@ public class DistResource_redhatenterpriseas_4 extends
          "/usr/bin/wget -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O - |perl -ple '($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?(?:(?:km|module|utils)[_-]@BUILD@)?[-_]?@DRBDVERSION@.*?[._]@ARCH@\\.(?:rpm|deb))\"! or goto LINE'"
         },
         // TODO: --no-check-certificate does not work on older rhel4
-        {"DrbdInst.wget",    "/usr/bin/wget --no-check-certificate --progress=dot --http-user='@USER@' --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
+        {"DrbdInst.wget",    "/usr/bin/wget --no-check-certificate --http-user='@USER@' --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
 
         {"HbInst.install.text.1", "http://download.opensuse.org: wget & rpm -U" },
         {"HbInst.install.1", "rm -rf /tmp/drbd-mc-hbinst/; "
                            + "mkdir /tmp/drbd-mc-hbinst/ && "
-                           + "wget -nd -r -np --progress=dot -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/ && "
+                           + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/ && "
                            + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
                            + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
                            + "up2date libtool-libs perl-TimeDate && "

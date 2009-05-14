@@ -74,6 +74,8 @@ public class TerminalPanel extends JScrollPane {
     private boolean userCommand = false;
     /** Whether typing in the commands is enabled. */
     private boolean editEnabled = false;
+    /** Begining of the previous line. */
+    private int prevLine = 0;
 
     /**
      * Prepares a new <code>TerminalPanel</code> object.
@@ -121,10 +123,10 @@ public class TerminalPanel extends JScrollPane {
         terminalArea.addCaretListener(new CaretListener() {
             public void caretUpdate(final CaretEvent e) {
                 // don't do this if caret moved because of selection
-                if (e != null) {
-                    if (e.getDot() < commandOffset && e.getDot() == e.getMark()) {
-                        terminalArea.setCaretPosition(commandOffset);
-                    }
+                if (e != null
+                    && e.getDot() < commandOffset
+                    && e.getDot() == e.getMark()) {
+                    terminalArea.setCaretPosition(commandOffset);
                 }
             }
         });
@@ -148,38 +150,9 @@ public class TerminalPanel extends JScrollPane {
 
         promptColor = new SimpleAttributeSet();
         StyleConstants.setForeground(promptColor, host.getColor());
-        //    Tools.getDefaultColor("TerminalPanel.Prompt"));
 
         append(prompt(), promptColor);
         terminalArea.setEditable(true);
-        //final Host thisHost = host;
-        //terminalArea.getDocument().addDocumentListener(
-        //    new DocumentListener() {
-        //        public void insertUpdate(DocumentEvent e) {
-        //            if (userCommand) {
-        //                Document d = e.getDocument();
-        //                int o = e.getOffset();
-        //                int l = e.getLength();
-        //                try {
-        //                    String letter = d.getText(o, l);
-        //                    if (letter.equals("\n")) {
-        //                        String command =
-        //                                  d.getText(commandOffset,
-        //                                            o - commandOffset).trim();
-        //                        execCommand(command);
-        //                    }
-        //                } catch (Exception de) {
-        //                }
-        //            }
-        //        }
-
-        //        public void removeUpdate(DocumentEvent e) {
-        //        }
-
-        //        public void changedUpdate(DocumentEvent e) {
-        //        }
-        //    }
-        //);
 
         getViewport().add(terminalArea, BorderLayout.PAGE_END);
 
@@ -191,32 +164,55 @@ public class TerminalPanel extends JScrollPane {
     private void append(final String text, final MutableAttributeSet color) {
         userCommand = false;
         final MyDocument doc = (MyDocument) terminalArea.getStyledDocument();
-        //int start = doc.getLength();
-        final int start = terminalArea.getCaretPosition();
+        final int end = terminalArea.getCaretPosition();
+        final byte[] bytes = text.getBytes();
+        int j = 0;
+        int maxJ = 0;
         try {
-            doc.insertString(start, text, color);
-
-            //byte[] bytes = text.getBytes(); // TODO: backspace handling
             //int i = 0;
-            //int j = 0;
-            //for (byte b : bytes) {
-            //    if (b == 8) {
-            //        doc.removeForced(start + j - 1, 2);
-            //        j = j - 2;
-            //    //} else if (b == 13 && bytes[i + 1] == 10) { // new line
-            //    //    prev_line = start + j;
-            //    //} else if (b == 13) { // beginning of the same line
-            //        doc.removeForced(prev_line, doc.getLength() - prev_line);
-            //    //    j = prev_line;
-            //    }
-            //    i++;
-            //    j++;
-            //}
+            for (int i = 0; i < bytes.length; i++) {
+                final byte b = bytes[i];
+                boolean printit = true;
+                if (b == 8) {
+                    printit = false;
+                    j = j - 1;
+                } else if (i < bytes.length - 1
+                           && b == 13 && bytes[i + 1] == 10) { /* new line */
+                    j = maxJ;
+                    prevLine = end + j + 2;
+                } else if (b == 13) { /* beginning of the same line */
+                    j = prevLine - end;
+                    printit = false;
+                }
+                if (j < 0) {
+                    /* it's not very efficient, but it's also not very likely.*/
+                    doc.removeForced(end + j, 1);
+                    commandOffset = end + j;
+                    doc.insertString(end + j,
+                                     new String(bytes, i, 1, "UTF-8"),
+                                     color);
+                    j++;
+                    if (maxJ < j) {
+                        maxJ = j;
+                    }
+                } else if (printit) {
+                    bytes[j] = bytes[i];
+                    j++;
+                    if (maxJ < j) {
+                        maxJ = j;
+                    }
+                }
+            }
+            if (maxJ > 0) {
+                doc.insertString(end,
+                                 new String(bytes, 0, maxJ, "UTF-8"),
+                                 color);
+            }
         } catch (Exception e) {
-            Tools.appError("TerminalPanel.getLength", "", e);
+            Tools.appError("TerminalPanel", "", e);
         }
 
-        //terminalArea.setCaretPosition(terminalArea.getText().length());
+        terminalArea.setCaretPosition(terminalArea.getText().length());
         commandOffset = terminalArea.getDocument().getLength();
         userCommand = true;
     }
@@ -243,11 +239,6 @@ public class TerminalPanel extends JScrollPane {
         host.execCommandRaw(command,
              new ExecCallback() {
                  public void done(final String ans) {
-                     //try {
-                     //    Thread.sleep(1000);
-                     //} catch (InterruptedException e) {
-                     //    Tools.appError("sleep was interrupted.");
-                     //}
                      if (!"".equals(command)) {
                         Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
@@ -329,21 +320,6 @@ public class TerminalPanel extends JScrollPane {
         }
     }
 
-    ///**
-    // * Adds content to the terminal textarea and scrolls up.
-    // */
-    //public void addContent(byte[] data, int len) {
-    //    StringBuffer text = new StringBuffer("");
-    //    for (int i = 0; i < len; i++) {
-    //        char c = (char) (data[i] & 0xFF);
-    //        if (c == 8 - 127) { //backspace
-    //            text.append("backspace");
-    //        }
-    //        text.append(c);
-    //    }
-    //    append(text.toString(), outputColor);
-    //}
-
     /**
      * Adds content string (output of a command) to the terminal area.
      */
@@ -351,17 +327,17 @@ public class TerminalPanel extends JScrollPane {
         append(c, outputColor);
     }
 
-    /**
-     * Adds content to the terminal textarea and scrolls up.
-     */
-    public final void addContentErr(final byte[] data, final int len) {
-        final StringBuffer text = new StringBuffer("");
-        for (int i = 0; i < len; i++) {
-            final char c = (char) (data[i] & 0xFF);
-            text.append(c);
-        }
-        append(text.toString(), errorColor);
-    }
+    ///**
+    // * Adds content to the terminal textarea and scrolls up.
+    // */
+    //public final void addContentErr(final byte[] data, final int len) {
+    //    final StringBuffer text = new StringBuffer("");
+    //    for (int i = 0; i < len; i++) {
+    //        final char c = (char) (data[i] & 0xFF);
+    //        text.append(c);
+    //    }
+    //    append(text.toString(), errorColor);
+    //}
 
     /**
      * This class overwrites the DefaultStyledDocument in order to add godmode
@@ -397,6 +373,7 @@ public class TerminalPanel extends JScrollPane {
                                         getText(commandOffset,
                                                 offs - commandOffset).trim();
                         execCommand(command);
+                        prevLine = offs + 1;
                     }
                     cheatCode = COMMAND_CHEAT_OFF;
                 } else {

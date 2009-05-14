@@ -52,7 +52,7 @@ public class DistResource_suse_SLES10 extends
         {"HbInst.install.2", "rm -rf /tmp/drbd-mc-hbinst/; "
                            + "zypper -n install libnet && "
                            + "mkdir /tmp/drbd-mc-hbinst/ && "
-                           + "wget -nd -r -np --progress=dot -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10/@ARCH@/ && "
+                           + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10/@ARCH@/ && "
                            + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
                            + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
                            + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "

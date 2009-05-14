@@ -113,7 +113,7 @@ public class DistResource extends
         /* donwload and installation */
         {"DrbdInst.test",    "/bin/ls /tmp/drbdinst/@DRBDPACKAGE@ && /bin/ls /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
         {"DrbdInst.mkdir",   "/bin/mkdir -p /tmp/drbdinst/"},
-        {"DrbdInst.wget",    "/usr/bin/wget --no-check-certificate --progress=dot --http-user='@USER@' --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
+        {"DrbdInst.wget",    "/usr/bin/wget --no-check-certificate --http-user='@USER@' --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
         {"DrbdInst.start",   "/etc/init.d/drbd start"},
