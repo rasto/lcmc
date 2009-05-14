@@ -38,6 +38,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultCaret;
+import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import javax.swing.plaf.TextUI;
@@ -76,6 +77,8 @@ public class TerminalPanel extends JScrollPane {
     private boolean editEnabled = false;
     /** Begining of the previous line. */
     private int prevLine = 0;
+    /** Position of the cursor in the text. */
+    private int pos = 0;
 
     /**
      * Prepares a new <code>TerminalPanel</code> object.
@@ -122,7 +125,7 @@ public class TerminalPanel extends JScrollPane {
         terminalArea.setCaret(caret);
         terminalArea.addCaretListener(new CaretListener() {
             public void caretUpdate(final CaretEvent e) {
-                // don't do this if caret moved because of selection
+                /* don't do this if caret moved because of selection */
                 if (e != null
                     && e.getDot() < commandOffset
                     && e.getDot() == e.getMark()) {
@@ -131,7 +134,7 @@ public class TerminalPanel extends JScrollPane {
             }
         });
 
-        // set font and colors
+        /* set font and colors */
         terminalArea.setFont(f);
         terminalArea.setBackground(
             Tools.getDefaultColor("TerminalPanel.Background"));
@@ -166,54 +169,86 @@ public class TerminalPanel extends JScrollPane {
         final MyDocument doc = (MyDocument) terminalArea.getStyledDocument();
         final int end = terminalArea.getCaretPosition();
         final byte[] bytes = text.getBytes();
-        int j = 0;
-        int maxJ = 0;
-        try {
-            //int i = 0;
+        int maxPos = 0;
+
             for (int i = 0; i < bytes.length; i++) {
                 final byte b = bytes[i];
                 boolean printit = true;
-                if (b == 8) {
+                if (b == 8) { /* one position to the left */
                     printit = false;
-                    j = j - 1;
+                    pos = pos - 1;
                 } else if (i < bytes.length - 1
                            && b == 13 && bytes[i + 1] == 10) { /* new line */
-                    j = maxJ;
-                    prevLine = end + j + 2;
+                    pos = maxPos;
+                    prevLine = end + pos + 2;
                 } else if (b == 13) { /* beginning of the same line */
-                    j = prevLine - end;
+                    pos = prevLine - end;
                     printit = false;
                 }
-                if (j < 0) {
-                    /* it's not very efficient, but it's also not very likely.*/
-                    doc.removeForced(end + j, 1);
-                    commandOffset = end + j;
-                    doc.insertString(end + j,
-                                     new String(bytes, i, 1, "UTF-8"),
-                                     color);
-                    j++;
-                    if (maxJ < j) {
-                        maxJ = j;
+                if (pos < 0 && printit) {
+                    /* The cursor moved to the left, but the text we overwrite
+                     * was written last time this function was called. 
+                     * It's not very efficient code here, but it's not very
+                     * likely either.*/
+                    commandOffset = end + pos - 1;
+                    try {
+                        doc.removeForced(end + pos, 1);
+                    } catch (javax.swing.text.BadLocationException e) {
+                        Tools.appError("TerminalPanel end + pos: " + end + pos,
+                                       e);
+                    }
+                    try {
+                        doc.insertString(end + pos,
+                                         new String(bytes, i, 1, "UTF-8"),
+                                         color);
+                    } catch (javax.swing.text.BadLocationException e1) {
+                        Tools.appError("TerminalPanel end + pos: " + end + pos,
+                                       e1);
+                    } catch (java.io.UnsupportedEncodingException e2) {
+                        Tools.appError(
+                                "TerminalPanel UnsupportedEncodingException",
+                                "",
+                                e2);
+                    }
+                    pos++;
+                    if (maxPos < pos) {
+                        maxPos = pos;
                     }
                 } else if (printit) {
-                    bytes[j] = bytes[i];
-                    j++;
-                    if (maxJ < j) {
-                        maxJ = j;
+                    bytes[pos] = bytes[i];
+                    pos++;
+                    if (maxPos < pos) {
+                        maxPos = pos;
                     }
                 }
             }
-            if (maxJ > 0) {
-                doc.insertString(end,
-                                 new String(bytes, 0, maxJ, "UTF-8"),
-                                 color);
+            if (maxPos > 0) {
+                try {
+                    doc.insertString(end,
+                                     new String(bytes, 0, maxPos, "UTF-8"),
+                                     color);
+                } catch (javax.swing.text.BadLocationException e1) {
+                    Tools.appError("TerminalPanel end: " + end
+                                   + "maxPos: " + maxPos, "", e1);
+                } catch (java.io.UnsupportedEncodingException e2) {
+                    Tools.appError("TerminalPanel UnsupportedEncodingException",
+                                   "",
+                                   e2);
+                }
             }
-        } catch (Exception e) {
-            Tools.appError("TerminalPanel", "", e);
-        }
+        //} catch (Exception e) {
+        //    Tools.appError("TerminalPanel", "", e);
+        //}
 
-        terminalArea.setCaretPosition(terminalArea.getText().length());
+        if (pos < maxPos) {
+            /* the cursor has moved to the left. It will be remembered next
+             * time the function is called. */
+            pos = pos - maxPos;
+        } else {
+            pos = 0;
+        }
         commandOffset = terminalArea.getDocument().getLength();
+        terminalArea.setCaretPosition(terminalArea.getDocument().getLength());
         userCommand = true;
     }
 
@@ -281,7 +316,11 @@ public class TerminalPanel extends JScrollPane {
      * and scrolls the text up.
      */
     public final void nextCommand() {
-        append(prompt(), promptColor);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                append(prompt(), promptColor);
+            }
+        });
     }
 
     /**
@@ -290,41 +329,57 @@ public class TerminalPanel extends JScrollPane {
     public final void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
-        append(lines[0], commandColor);
-        for (int i = 1; i < lines.length; i++) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                append(lines[0], commandColor);
+                for (int i = 1; i < lines.length; i++) {
 
-            append(" \\\n> " + lines[i], commandColor);
-        }
-        append("\n", commandColor);
+                    append(" \\\n> " + lines[i], commandColor);
+                }
+                append("\n", commandColor);
+            }
+        });
     }
 
     /**
      * Adds command output to the terminal textarea and scrolls up.
      */
     public final void addCommandOutput(final String output) {
-        append(output, outputColor);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                append(output, outputColor);
+            }
+        });
     }
 
     /**
      * Adds array of command output to the terminal textarea and scrolls up.
      */
     public final void addCommandOutput(final String[] output) {
-        for (int i = 0; i < output.length; i++) {
-            if (output[i] != null) {
-                String newLine = "";
-                if (i != output.length - 1) {
-                    newLine = "\n";
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (int i = 0; i < output.length; i++) {
+                    if (output[i] != null) {
+                        String newLine = "";
+                        if (i != output.length - 1) {
+                            newLine = "\n";
+                        }
+                        append(output[i] + newLine, outputColor);
+                    }
                 }
-                append(output[i] + newLine, outputColor);
             }
-        }
+        });
     }
 
     /**
      * Adds content string (output of a command) to the terminal area.
      */
     public final void addContent(final String c) {
-        append(c, outputColor);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                append(c, outputColor);
+            }
+        });
     }
 
     ///**
@@ -368,12 +423,12 @@ public class TerminalPanel extends JScrollPane {
                 String cheatCode;
                 if (editEnabled) {
                     super.insertString(offs, s, commandColor);
-                    if ("\n".equals(s)) {
+                    if (s.charAt(s.length() - 1) == '\n') {
                         final String command =
-                                        getText(commandOffset,
-                                                offs - commandOffset).trim();
-                        execCommand(command);
+                                    (getText(commandOffset,
+                                            offs - commandOffset) + s).trim();
                         prevLine = offs + 1;
+                        execCommand(command);
                     }
                     cheatCode = COMMAND_CHEAT_OFF;
                 } else {
