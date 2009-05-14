@@ -67,6 +67,10 @@ public class DrbdGuiXML extends XML {
     private static final String CLUSTER_NAME_ATTR = "name";
     /** Name of the host node. */
     private static final String HOST_NODE_STRING = "host";
+    /** Download user. */
+    private static final String DOWNLOAD_USER_ATTR = "dwuser";
+    /** Download user password. */
+    private static final String DOWNLOAD_PASSWD_ATTR = "dwpasswd";
 
     /**
      * Saves data about clusters and hosts to the supplied output stream.
@@ -85,6 +89,16 @@ public class DrbdGuiXML extends XML {
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(
                                                 doc.createElement("drbdgui"));
+        if (Tools.getConfigData().getLoginSave()) {
+            final String downloadUser =
+                                Tools.getConfigData().getDownloadUser();
+            final String downloadPasswd =
+                                Tools.getConfigData().getDownloadPassword();
+            if (downloadUser != null && downloadPasswd != null) { 
+                root.setAttribute(DOWNLOAD_USER_ATTR, downloadUser);
+                root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
+            }
+        }
         final Element hosts = (Element) root.appendChild(
                                                 doc.createElement("hosts"));
         for (final Host host : Tools.getConfigData().getHosts().getHostSet()) {
@@ -214,6 +228,15 @@ public class DrbdGuiXML extends XML {
         final Node rootNode = getChildNode(document, "drbdgui");
         final Map<String, Host> hostMap = new LinkedHashMap<String, Host>();
         if (rootNode != null) {
+            final String downloadUser = getAttribute(rootNode,
+                                                     DOWNLOAD_USER_ATTR);
+            final String downloadPasswd = getAttribute(rootNode,
+                                                       DOWNLOAD_PASSWD_ATTR);
+            if (downloadUser != null && downloadPasswd != null) {
+                Tools.getConfigData().setDownloadLogin(downloadUser,
+                                                       downloadPasswd,
+                                                       true);
+            }
             /* hosts */
             final Node hostsNode = getChildNode(rootNode, "hosts");
             if (hostsNode != null) {
