@@ -1359,11 +1359,12 @@ public class SSH {
                           final String remoteFilename,
                           final String mode) {
         final Thread t = host.execCommandRaw(
-                                            "echo \""
-                                            + host.escapeQuotes(fileContent, 1)
-                                            + "\">" + remoteFilename
-                                            + ";chmod " + mode + " "
-                                            + remoteFilename,
+                                "cp " + remoteFilename + "{,.`date +'%s'`}" 
+                                + ";echo \""
+                                + host.escapeQuotes(fileContent, 1)
+                                + "\">" + remoteFilename
+                                + ";chmod " + mode + " "
+                                + remoteFilename,
                             new ExecCallback() {
                                 public void done(final String ans) {
                                     /* ok */
