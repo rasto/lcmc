@@ -133,6 +133,16 @@ public class AppDefaults extends
         {"TerminalPanel.Error",              Color.RED },
         {"TerminalPanel.Prompt",             Color.GREEN },
 
+        {"TerminalPanel.TerminalBlack",      Color.BLACK},
+        {"TerminalPanel.TerminalWhite",      Color.WHITE},
+        {"TerminalPanel.TerminalDarkGray",   Color.GRAY},
+        {"TerminalPanel.TerminalRed",        Color.RED},
+        {"TerminalPanel.TerminalGreen",      Color.GREEN},
+        {"TerminalPanel.TerminalYellow",     Color.YELLOW},
+        {"TerminalPanel.TerminalBlue",       Color.BLUE},
+        {"TerminalPanel.TerminalPurple",     new Color(128, 0, 128)},
+        {"TerminalPanel.TerminalCyan",       Color.CYAN},
+
         {"ConfigDialog.Background",          Color.WHITE },
         {"ConfigDialog.Background.Dark",     LINBIT_LIGHT_ORANGE },
         {"ConfigDialog.Background.Light",    LINBIT_LIGHT_ORANGE },

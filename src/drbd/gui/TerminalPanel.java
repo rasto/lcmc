@@ -26,6 +26,8 @@ import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 
+import java.util.Map;
+import java.util.HashMap;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleConstants;
@@ -44,7 +46,10 @@ import java.awt.Rectangle;
 import javax.swing.plaf.TextUI;
 
 import java.awt.Font;
+import java.awt.Color;
 import java.awt.BorderLayout;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * An implementation of a terminal panel that show commands and output from
@@ -79,7 +84,11 @@ public class TerminalPanel extends JScrollPane {
     private int prevLine = 0;
     /** Position of the cursor in the text. */
     private int pos = 0;
+    private int maxPos = 0;
 
+    /** Terminal output colors. */
+    private final Map<String, Color> terminalColor =
+                                            new HashMap<String, Color>();
     /**
      * Prepares a new <code>TerminalPanel</code> object.
      */
@@ -87,12 +96,39 @@ public class TerminalPanel extends JScrollPane {
         super();
         this.host = host;
         host.setTerminalPanel(this);
+        /* Sets terminal some of the output colors. This is in no way complete
+         * or correct and probably doesn't have to be. */
+        terminalColor.put("0",
+                          Tools.getDefaultColor("TerminalPanel.TerminalWhite"));
+        terminalColor.put("30",
+                          Tools.getDefaultColor("TerminalPanel.TerminalBlack"));
+        terminalColor.put("31",
+                          Tools.getDefaultColor("TerminalPanel.TerminalRed"));
+        terminalColor.put("32",
+                          Tools.getDefaultColor("TerminalPanel.TerminalGreen"));
+        terminalColor.put("33",
+                          Tools.getDefaultColor("TerminalPanel.TerminalYellow"));
+        terminalColor.put("34",
+                          Tools.getDefaultColor("TerminalPanel.TerminalBlue"));
+        terminalColor.put("35",
+                          Tools.getDefaultColor("TerminalPanel.TerminalPurple"));
+        terminalColor.put("36",
+                          Tools.getDefaultColor("TerminalPanel.TerminalCyan"));
         final Font f = new Font("Monospaced", Font.PLAIN, 14);
-
         terminalArea = new JTextPane();
         terminalArea.setStyledDocument(new MyDocument());
         final DefaultCaret caret = new DefaultCaret() {
             private static final long serialVersionUID = 1L;
+
+            protected synchronized void damage(final Rectangle r) {
+                if (r != null) {
+                    x = r.x;
+                    y = r.y;
+                    width = 8;
+                    height = r.height;
+                    repaint();
+                }
+            }
 
             public void paint(final Graphics g) {
                 /* painting cursor. If it is not visible it is out of focus, we
@@ -162,90 +198,116 @@ public class TerminalPanel extends JScrollPane {
     }
 
     /**
+     * Returns terminal output color.
+     */
+    private final Color getColorFromString(final String s) {
+        /* "]" default color */
+        if ("[".equals(s)) {
+            return null;
+        } 
+        /* [0;1;32 */
+        final Pattern p1 = Pattern.compile("^\\[\\d+;(\\d+)$");
+        final Matcher m1 = p1.matcher(s);
+        if (m1.matches()) {
+            final String c = m1.group(1);
+            /* can be null */
+            return terminalColor.get(c);
+        }
+        final Pattern p2 = Pattern.compile("^\\[\\d+;\\d+;(\\d+)$");
+        final Matcher m2 = p2.matcher(s);
+        if (m2.matches()) {
+            final String c = m2.group(1);
+            /* can be null */
+            return terminalColor.get(c);
+        }
+        return null;
+    }
+
+    /**
      * Appends a text whith specified color to the terminal area.
      */
-    private void append(final String text, final MutableAttributeSet color) {
+    private void append(final String text,
+                        final MutableAttributeSet colorAS) {
+        final Color defaultColor = StyleConstants.getForeground(colorAS);
         userCommand = false;
         final MyDocument doc = (MyDocument) terminalArea.getStyledDocument();
-        final int end = terminalArea.getCaretPosition();
+        final int end = terminalArea.getDocument().getLength();
+        pos = end + pos - maxPos;
+        maxPos = end;
         final byte[] bytes = text.getBytes();
-        int maxPos = 0;
+        Color color = defaultColor;
+        StringBuffer colorString = new StringBuffer(10);
+        boolean changeColor = false;
+        for (int i = 0; i < bytes.length; i++) {
+            final byte b = bytes[i];
+            boolean printit = true;
+            if (b == 8) { /* one position to the left */
+                printit = false;
+                pos--;
+            } else if (i < bytes.length - 1
+                       && b == 13 && bytes[i + 1] == 10) { /* new line */
+                prevLine = pos + 2;
+            } else if (b == 13) { /* beginning of the same line */
+                pos = prevLine;
+                printit = false;
+            } else if (b == 27) {
+                /* funny colors, e.g. in sles */
+                changeColor = true;
+                printit = false;
+                colorString = new StringBuffer(10);
+            } 
+            String c = "";
+            try {
+                c = new String(bytes, i, 1, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException e) {
+                Tools.appError(
+                        "TerminalPanel UnsupportedEncodingException UTF-8",
+                        "",
+                        e);
+            }
+            if (changeColor) {
+                if (b == 'm' || b == 'K') {
+                    /* we are done */
+                    changeColor = false;
+                    if (b == 'm') {
+                        Color newColor =
+                                        getColorFromString(colorString.toString());
 
-            for (int i = 0; i < bytes.length; i++) {
-                final byte b = bytes[i];
-                boolean printit = true;
-                if (b == 8) { /* one position to the left */
-                    printit = false;
-                    pos = pos - 1;
-                } else if (i < bytes.length - 1
-                           && b == 13 && bytes[i + 1] == 10) { /* new line */
-                    pos = maxPos;
-                    prevLine = end + pos + 2;
-                } else if (b == 13) { /* beginning of the same line */
-                    pos = prevLine - end;
-                    printit = false;
-                }
-                if (pos < 0 && printit) {
-                    /* The cursor moved to the left, but the text we overwrite
-                     * was written last time this function was called. 
-                     * It's not very efficient code here, but it's not very
-                     * likely either.*/
-                    commandOffset = end + pos - 1;
-                    try {
-                        doc.removeForced(end + pos, 1);
-                    } catch (javax.swing.text.BadLocationException e) {
-                        Tools.appError("TerminalPanel end + pos: " + end + pos,
-                                       e);
-                    }
-                    try {
-                        doc.insertString(end + pos,
-                                         new String(bytes, i, 1, "UTF-8"),
-                                         color);
-                    } catch (javax.swing.text.BadLocationException e1) {
-                        Tools.appError("TerminalPanel end + pos: " + end + pos,
-                                       e1);
-                    } catch (java.io.UnsupportedEncodingException e2) {
-                        Tools.appError(
-                                "TerminalPanel UnsupportedEncodingException",
-                                "",
-                                e2);
-                    }
-                    pos++;
-                    if (maxPos < pos) {
-                        maxPos = pos;
+                        if (newColor == null) {
+                            newColor = defaultColor;
+                        }
+                        StyleConstants.setForeground(colorAS, newColor);
+                        colorString = new StringBuffer(10);
                     }
                 } else if (printit) {
-                    bytes[pos] = bytes[i];
-                    pos++;
-                    if (maxPos < pos) {
-                        maxPos = pos;
+                    colorString.append(c);
+                }
+                printit = false;
+            }
+
+            if (printit) {
+                if (pos < maxPos) {
+                    try {
+                        commandOffset = pos - 1;
+                        doc.removeForced(pos, 1);
+                    } catch (javax.swing.text.BadLocationException e) {
+                        Tools.appError("TerminalPanel pos: " + pos,
+                                       e);
                     }
                 }
-            }
-            if (maxPos > 0) {
                 try {
-                    doc.insertString(end,
-                                     new String(bytes, 0, maxPos, "UTF-8"),
-                                     color);
+                    doc.insertString(pos,
+                                     c,
+                                     colorAS);
                 } catch (javax.swing.text.BadLocationException e1) {
-                    Tools.appError("TerminalPanel end: " + end
-                                   + "maxPos: " + maxPos, "", e1);
-                } catch (java.io.UnsupportedEncodingException e2) {
-                    Tools.appError("TerminalPanel UnsupportedEncodingException",
-                                   "",
-                                   e2);
+                    Tools.appError("TerminalPanel pos: " + pos,
+                                   e1);
+                }
+                pos++;
+                if (maxPos < pos) {
+                    maxPos = pos;
                 }
             }
-        //} catch (Exception e) {
-        //    Tools.appError("TerminalPanel", "", e);
-        //}
-
-        if (pos < maxPos) {
-            /* the cursor has moved to the left. It will be remembered next
-             * time the function is called. */
-            pos = pos - maxPos;
-        } else {
-            pos = 0;
         }
         commandOffset = terminalArea.getDocument().getLength();
         terminalArea.setCaretPosition(terminalArea.getDocument().getLength());
@@ -422,13 +484,18 @@ public class TerminalPanel extends JScrollPane {
             if (userCommand) {
                 String cheatCode;
                 if (editEnabled) {
-                    super.insertString(offs, s, commandColor);
                     if (s.charAt(s.length() - 1) == '\n') {
+                        final int end = terminalArea.getDocument().getLength();
+                        super.insertString(end, "\n", commandColor);
                         final String command =
                                     (getText(commandOffset,
-                                            offs - commandOffset) + s).trim();
-                        prevLine = offs + 1;
+                                            end - commandOffset) + s).trim();
+                        prevLine = end + 1;
+                        pos = end;
+                        maxPos = end;
                         execCommand(command);
+                    } else {
+                        super.insertString(offs, s, commandColor);
                     }
                     cheatCode = COMMAND_CHEAT_OFF;
                 } else {
