@@ -246,7 +246,8 @@ public class TerminalPanel extends JScrollPane {
                 pos--;
             } else if (i < bytes.length - 1
                        && b == 13 && bytes[i + 1] == 10) { /* new line */
-                prevLine = pos + 2;
+                prevLine = maxPos + 2;
+                pos = maxPos;
             } else if (b == 13) { /* beginning of the same line */
                 pos = prevLine;
                 printit = false;
