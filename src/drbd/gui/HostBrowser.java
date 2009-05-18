@@ -1658,7 +1658,8 @@ public class HostBrowser extends Browser {
                 /* block devices are not available */
                 return null;
             }
-            final MyMenu repMenuItem = new MyMenu(Tools.getString("HostBrowser.Drbd.AddDrbdResource")) {
+            final MyMenu repMenuItem = new MyMenu(
+                        Tools.getString("HostBrowser.Drbd.AddDrbdResource")) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

@@ -84,11 +84,14 @@ public class TerminalPanel extends JScrollPane {
     private int prevLine = 0;
     /** Position of the cursor in the text. */
     private int pos = 0;
+    /** Maximum position of the cursor in the text. */
     private int maxPos = 0;
-
     /** Terminal output colors. */
     private final Map<String, Color> terminalColor =
                                             new HashMap<String, Color>();
+    /** Default text color of the output in the terminal. */
+    private final Color defaultOutputColor;
+
     /**
      * Prepares a new <code>TerminalPanel</code> object.
      */
@@ -184,8 +187,8 @@ public class TerminalPanel extends JScrollPane {
             Tools.getDefaultColor("TerminalPanel.Error"));
 
         outputColor = new SimpleAttributeSet();
-        StyleConstants.setForeground(outputColor,
-            Tools.getDefaultColor("TerminalPanel.Output"));
+        defaultOutputColor = Tools.getDefaultColor("TerminalPanel.Output");
+        StyleConstants.setForeground(outputColor, defaultOutputColor);
 
         promptColor = new SimpleAttributeSet();
         StyleConstants.setForeground(promptColor, host.getColor());
@@ -205,7 +208,6 @@ public class TerminalPanel extends JScrollPane {
         if ("[".equals(s)) {
             return null;
         } 
-        /* [0;1;32 */
         final Pattern p1 = Pattern.compile("^\\[\\d+;(\\d+)$");
         final Matcher m1 = p1.matcher(s);
         if (m1.matches()) {
@@ -213,6 +215,7 @@ public class TerminalPanel extends JScrollPane {
             /* can be null */
             return terminalColor.get(c);
         }
+        /* [0;1;32 */
         final Pattern p2 = Pattern.compile("^\\[\\d+;\\d+;(\\d+)$");
         final Matcher m2 = p2.matcher(s);
         if (m2.matches()) {
@@ -224,20 +227,31 @@ public class TerminalPanel extends JScrollPane {
     }
 
     /**
+     * Get char count.
+     */
+    private final int getCharCount(final String s) {
+        final Pattern p1 = Pattern.compile("^\\[(\\d+)$");
+        final Matcher m1 = p1.matcher(s);
+        if (m1.matches()) {
+            return Integer.parseInt(m1.group(1));
+        }
+        return 0;
+    }
+
+
+    /**
      * Appends a text whith specified color to the terminal area.
      */
     private void append(final String text,
                         final MutableAttributeSet colorAS) {
-        final Color defaultColor = StyleConstants.getForeground(colorAS);
         userCommand = false;
         final MyDocument doc = (MyDocument) terminalArea.getStyledDocument();
         final int end = terminalArea.getDocument().getLength();
         pos = end + pos - maxPos;
         maxPos = end;
         final byte[] bytes = text.getBytes();
-        Color color = defaultColor;
         StringBuffer colorString = new StringBuffer(10);
-        boolean changeColor = false;
+        boolean inside = false;
         for (int i = 0; i < bytes.length; i++) {
             final byte b = bytes[i];
             boolean printit = true;
@@ -253,7 +267,7 @@ public class TerminalPanel extends JScrollPane {
                 printit = false;
             } else if (b == 27) {
                 /* funny colors, e.g. in sles */
-                changeColor = true;
+                inside = true;
                 printit = false;
                 colorString = new StringBuffer(10);
             } 
@@ -266,19 +280,33 @@ public class TerminalPanel extends JScrollPane {
                         "",
                         e);
             }
-            if (changeColor) {
-                if (b == 'm' || b == 'K') {
+            if (inside) {
+                if ((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')) {
                     /* we are done */
-                    changeColor = false;
+                    inside = false;
                     if (b == 'm') {
                         Color newColor =
-                                        getColorFromString(colorString.toString());
+                                     getColorFromString(colorString.toString());
 
                         if (newColor == null) {
-                            newColor = defaultColor;
+                            newColor = defaultOutputColor;
                         }
                         StyleConstants.setForeground(colorAS, newColor);
                         colorString = new StringBuffer(10);
+                    } else if (b == 'G') {
+                        final int g = getCharCount(colorString.toString());
+                        pos = prevLine + g;
+                        while (pos > maxPos) {
+                            try {
+                                doc.insertString(maxPos,
+                                                 " ",
+                                                 colorAS);
+                                maxPos++;
+                            } catch (javax.swing.text.BadLocationException e1) {
+                                Tools.appError("TerminalPanel pos: " + pos,
+                                               e1);
+                            }
+                        }
                     }
                 } else if (printit) {
                     colorString.append(c);
