@@ -16,6 +16,7 @@
     </target>
 
     <target name="superclean">
+        <delete dir="${jar.dir}"/>
         <delete dir="${build.dir}/classes/"/>
     </target>
 
