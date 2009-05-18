@@ -62,9 +62,6 @@ public class HostCheckInstallation extends DialogHost {
     /** Checking hb label. */
     private final JLabel heartbeatLabel = new JLabel(
           ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingHb"));
-    /** Checking udev label. */
-    private final JLabel udevLabel = new JLabel(
-          ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingUdev"));
 
     /** Install/Upgrade drbd button. */
     private final MyButton drbdButton = new MyButton(
@@ -72,9 +69,6 @@ public class HostCheckInstallation extends DialogHost {
     /** Install heartbeat button. */
     private final MyButton heartbeatButton = new MyButton(
             Tools.getString("Dialog.HostCheckInstallation.HbInstallButton"));
-    /** Install udev button. */
-    private final MyButton udevButton = new MyButton(
-            Tools.getString("Dialog.HostCheckInstallation.UdevInstallButton"));
     /** Heartbeat installation method */
     private GuiComboBox hbInstMethodCB;
 
@@ -99,15 +93,11 @@ public class HostCheckInstallation extends DialogHost {
     private final JLabel drbdIcon = new JLabel(CHECKING_ICON);
     /** Heartbeat icon: checking ... */
     private final JLabel heartbeatIcon = new JLabel(CHECKING_ICON);
-    /** udev icon: checking ... */
-    private final JLabel udevIcon = new JLabel(CHECKING_ICON);
 
     /** Whether drbd installation was ok. */
     private boolean drbdOk = false;
     /** Whether heartbeat installation was ok. */
     private boolean heartbeatOk = false;
-    /** Whether udev installation was ok. */
-    private boolean udevOk = false;
     /** Version that appears in the dialog. */
     private String versionText;
     private Map<String, InstallMethods> installedMethodMap =
@@ -128,7 +118,6 @@ public class HostCheckInstallation extends DialogHost {
         super.initDialog();
         drbdOk         = false;
         heartbeatOk    = false;
-        udevOk         = false;
         nextDialogObject = new HostFinish(this, getHost());
         final HostCheckInstallation thisClass = this;
         SwingUtilities.invokeLater(new Runnable() {
@@ -136,7 +125,6 @@ public class HostCheckInstallation extends DialogHost {
                 drbdButton.setEnabled(false);
                 heartbeatButton.setEnabled(false);
                 hbInstMethodCB.setEnabled(false);
-                udevButton.setEnabled(false);
             }
         });
         drbdButton.addActionListener(
@@ -188,17 +176,6 @@ public class HostCheckInstallation extends DialogHost {
 
         enableComponentsLater(new JComponent[]{});
 
-        udevButton.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    installUdev();
-                    //nextDialogObject = new HostHbInst(thisClass, getHost());
-                    //((MyButton)buttonClass(nextButton())).pressButton();
-                }
-            }
-        );
-
-
         getHost().execCommand("DrbdCheck.version",
                          getProgressBar(),
                          new ExecCallback() {
@@ -215,41 +192,6 @@ public class HostCheckInstallation extends DialogHost {
     }
 
     /**
-     * Installs udev.
-     */
-    private void installUdev() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                udevButton.setEnabled(false);
-            }
-        });
-        final HostCheckInstallation thisClass = this;
-        getHost().execCommand("Udev.install",
-                         getProgressBar(),
-                         new ExecCallback() {
-                             public void done(final String ans) {
-                                 //checkDrbd(ans);
-                                nextDialogObject = thisClass;
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        ((MyButton) buttonClass(
-                                                nextButton())).pressButton();
-                                    }
-                                });
-                             }
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
-                                 printErrorAndRetry(Tools.getString(
-                                    "Dialog.HostCheckInstallation.CheckError"),
-                                                    ans,
-                                                    exitCode);
-                             }
-                         },
-                         null,   /* ConvertCmdCallback */
-                         true); /* outputVisible */
-    }
-
-    /**
      * Checks whether drbd is installed and starts heartbeat check.
      */
     public void checkDrbd(final String ans) {
@@ -263,10 +205,10 @@ public class HostCheckInstallation extends DialogHost {
                 }
             });
         } else {
+            drbdOk = true;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     drbdLabel.setText(": " + ans.trim());
-                    drbdOk = true;
                     if (getHost().isDrbdUpgradeAvailable(ans.trim())) {
                         drbdIcon.setIcon(UPGR_AVAIL_ICON);
                         drbdButton.setText(Tools.getString(
@@ -346,51 +288,9 @@ public class HostCheckInstallation extends DialogHost {
             });
 
         }
-        getHost().execCommand("UdevCheck.version",
-                         getProgressBar(),
-                         new ExecCallback() {
-                             public void done(final String ans) {
-                                 Tools.debug(this, "ans: " + ans);
-                                 checkUdev(ans);
-                             }
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
-                                 printErrorAndRetry(Tools.getString(
-                                    "Dialog.HostCheckInstallation.Heartbeat.CheckError"));
-                                 checkUdev("");
-                             }
-                         },
-                         null,   /* ConvertCmdCallback */
-                         false); /* outputVisible */
-    }
 
-    /**
-     * Checks whether udev is installed.
-     */
-    public void checkUdev(final String ans) {
-        if ("".equals(ans) || "\n".equals(ans)) {
-            progressBarDoneError();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    udevLabel.setText(": " + Tools.getString(
-                                    "Dialog.HostCheckInstallation.UdevNotInstalled"));
-                    udevIcon.setIcon(NOT_INSTALLED_ICON);
-                    udevButton.setEnabled(true);
-                    //buttonClass(nextButton()).requestFocus();
-                }
-            });
-        } else {
-            udevOk = true;
+        if (drbdOk && heartbeatOk) { 
             progressBarDone();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    udevLabel.setText(": " + ans.trim());
-                    udevIcon.setIcon(INSTALLED_ICON);
-                    //buttonClass(nextButton()).requestFocus();
-                }
-            });
-        }
-        if (udevOk && drbdOk && heartbeatOk) { 
             nextButtonSetEnabled(true);
             enableComponents();
             SwingUtilities.invokeLater(new Runnable() {
@@ -400,6 +300,8 @@ public class HostCheckInstallation extends DialogHost {
                 }
             });
         } else {
+            progressBarDoneError();
+            Tools.debug(this, "drbd: " + drbdOk + ", hb: " + heartbeatOk);
             printErrorAndRetry(Tools.getString(
                                 "Dialog.HostCheckInstallation.SomeFailed"));
         }
@@ -537,12 +439,7 @@ public class HostCheckInstallation extends DialogHost {
         pane.add(drbdIcon);
         pane.add(new JPanel());
         //pane.add(drbdInstMethodCB); // TODO
-        pane.add(new JLabel("Udev"));
-        pane.add(udevLabel);
-        pane.add(udevButton);
-        pane.add(udevIcon);
-        pane.add(new JPanel());
-        SpringUtilities.makeCompactGrid(pane, 3, 5,  //rows, cols
+        SpringUtilities.makeCompactGrid(pane, 2, 5,  //rows, cols
                                               1, 1,  //initX, initY
                                               1, 1); //xPad, yPad
         return pane;

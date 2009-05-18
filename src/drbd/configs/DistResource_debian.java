@@ -53,8 +53,5 @@ public class DistResource_debian extends
         //{"HbCheck.version", "/usr/bin/dpkg-query --showformat='${Status} ${Version}\n' -W heartbeat-2 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"},
         {"HbInst.install.text.1", "apt-get"},
         {"HbInst.install.1", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
-
-        //{"UdevCheck.version", "/usr/bin/dpkg-query --showformat='${Status} ${Version}\n' -W udev 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"},
-        {"Udev.install",      "/usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' udev"},
     };
 }

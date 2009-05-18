@@ -38,6 +38,5 @@ public class DistResource_ubuntu_JAUNTY extends
     private static Object[][] contents = {
         {"Support",            "ubuntu-JAUNTY"},
         {"distributiondir",    "ubuntu-jaunty-server"},
-        {"UdevCheck.version", "udevadm version 2>/dev/null"},
     };
 }

@@ -160,18 +160,15 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.AllOk",      "All required components are installed."},
         {"Dialog.HostCheckInstallation.SomeFailed", "Some of the required components are not installed."},
         {"Dialog.HostCheckInstallation.DrbdNotInstalled",  "not installed"},
-        {"Dialog.HostCheckInstallation.UdevNotInstalled",  "not installed"},
         {"Dialog.HostCheckInstallation.HbNotInstalled",    "not installed"},
         {"Dialog.HostCheckInstallation.DrbdUpgradeButton", "Upgrade"},
         {"Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton", "Check for Upgrade"},
 
         {"Dialog.HostCheckInstallation.DrbdInstallButton", "Install"},
-        {"Dialog.HostCheckInstallation.UdevInstallButton", "Install"},
         {"Dialog.HostCheckInstallation.HbInstallButton",   "Install"},
 
         {"Dialog.HostCheckInstallation.CheckingHb",        "checking..."},
         {"Dialog.HostCheckInstallation.CheckingDrbd",      "checking..."},
-        {"Dialog.HostCheckInstallation.CheckingUdev",      "checking..."},
         {"Dialog.HostCheckInstallation.HbInstallMethod",   "Installation method: "},
 
         {"Dialog.HostLogin.Title",          "Log in"},
