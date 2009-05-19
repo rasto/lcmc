@@ -672,7 +672,9 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final void vertexReleased(final Vertex v, final Point2D pos) {
         double x = pos.getX();
         double y = pos.getY();
-        x = x < MIN_X_POS ? MIN_X_POS : x;
+        final double minPos = (getVertexSize(v)
+                               - getDefaultVertexSize(v)) / 2;
+        x = x < minPos ? minPos : x;
         x = x > MAX_X_POS ? MAX_X_POS : x;
         y = y < MIN_Y_POS ? MIN_Y_POS : y;
         y = y > MAX_Y_POS ? MAX_Y_POS : y;

@@ -1152,7 +1152,7 @@ public abstract class ResourceGraph {
                    x + shapeWidth
                      - rightCornerTextLayout.getBounds().getWidth() - 4,
                    y + 11,
-                   new Color(255, 0, 0),
+                   new Color(0, 0, 255),
                    255);
             }
 
@@ -1210,7 +1210,12 @@ public abstract class ResourceGraph {
     public final void getPositions(final Map<String, Point2D> positions) {
         for (final Object v : graph.getVertices()) {
             final Info info = getInfo((Vertex) v);
-            final Point2D p = layout.getLocation((Vertex) v);
+            final Point2D p = new Point2D.Double();
+            p.setLocation(layout.getLocation((Vertex) v));
+            final double x = p.getX();
+            p.setLocation(x + (getDefaultVertexSize((Vertex) v)
+                            - getVertexSize((Vertex) v)) / 2,
+                          p.getY());
             if (info != null) {
                 final String id = getId(info);
                 if (id != null) {
@@ -1231,8 +1236,8 @@ public abstract class ResourceGraph {
     public final Point2D getSavedPosition(final Info info) {
         final Host[] hosts = clusterBrowser.getClusterHosts();
         Point2D p = null;
-        for (int i = 0; i < hosts.length; i++) {
-            p = hosts[i].getGraphPosition(getId(info));
+        for (final Host host : hosts) {
+            p = host.getGraphPosition(getId(info));
             if (p != null) {
                 break;
             }
@@ -1245,8 +1250,8 @@ public abstract class ResourceGraph {
      */
     public final void resetSavedPosition(final Info info) {
         final Host[] hosts = clusterBrowser.getClusterHosts();
-        for (int i = 0; i < hosts.length; i++) {
-            hosts[i].resetGraphPosition(getId(info));
+        for (final Host host : hosts) {
+            host.resetGraphPosition(getId(info));
         }
     }
 
