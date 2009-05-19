@@ -1711,7 +1711,6 @@ public class Host implements Serializable {
             }
         }
         if (id != null && x != null && y != null) {
-            servicePositions.remove(id);
             servicePositions.put(id, new Point2D.Double(
                                                   new Double(x).doubleValue(),
                                                   new Double(y).doubleValue()));
@@ -1731,6 +1730,11 @@ public class Host implements Serializable {
         } else if (tokens[0].equals("hn")) { // hostname
             hostname = tokens[1].trim();
             setName(hostname);
+        } else if (tokens[0].equals("ar")) { // hostname
+            detectedArch = tokens[1].trim();
+            setArch(Tools.getDistString("arch:" + detectedArch,
+                                        getDist(),
+                                        distVersionString));
         }
     }
 

@@ -373,6 +373,9 @@ sub get_installation_info {
 	my $hn = `hostname`;
 	chomp $hn;
 	print "hn:$hn\n";
+	my $arch = `uname -m`;
+	chomp $arch;
+	print "ar:$arch\n";
 }
 
 # save_gui_info()
