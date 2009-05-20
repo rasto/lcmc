@@ -1435,14 +1435,17 @@ public final class Tools {
      *          directory where the config should be stored
      * @param mode
      *          mode, e.g. "0700"
+     * @param makeBackup
+     *          whether to make backup or not
      */
     public static void createConfigOnAllHosts(final Host[] hosts,
                                               final String config,
                                               final String fileName,
                                               final String dir,
-                                              final String mode) {
+                                              final String mode,
+                                              final boolean makeBackup) {
         for (Host host : hosts) {
-            host.getSSH().createConfig(config, fileName, dir, mode);
+            host.getSSH().createConfig(config, fileName, dir, mode, makeBackup);
         }
     }
 

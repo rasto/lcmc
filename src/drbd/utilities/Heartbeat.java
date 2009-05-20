@@ -744,7 +744,8 @@ public final class Heartbeat {
                                      config.toString(),
                                      HA_CONF_NAME,
                                      HA_CONF_DIR,
-                                     HA_CONF_PERMS);
+                                     HA_CONF_PERMS,
+                                     true);
 
         // TODO: make this configurable
         final StringBuffer authkeys =
@@ -755,7 +756,8 @@ public final class Heartbeat {
                                      authkeys.toString(),
                                      AUTHKEYS_CONF_NAME,
                                      HA_CONF_DIR,
-                                     AUTHKEYS_CONF_PERMS);
+                                     AUTHKEYS_CONF_PERMS,
+                                     true);
     }
 
     /**

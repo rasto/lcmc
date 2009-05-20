@@ -1769,7 +1769,8 @@ public class Host implements Serializable {
         getSSH().createConfig(lines.toString(),
                               "drbdgui.cf",
                               "/var/lib/heartbeat/",
-                              "0600");
+                              "0600",
+                              false);
     }
 
     /**

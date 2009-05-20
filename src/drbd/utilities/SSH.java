@@ -1321,7 +1321,10 @@ public class SSH {
                 file.append(br.readLine());
                 file.append('\n');
             }
-            scp(file.toString(), "/usr/local/bin/drbd-gui-helper", "0700");
+            scp(file.toString(),
+                "/usr/local/bin/drbd-gui-helper",
+                "0700",
+                false);
         } catch (IOException e) {
             Tools.appError("install gui helper error", "", e);
         }
@@ -1339,12 +1342,15 @@ public class SSH {
      *          directory where the config should be stored
      * @param mode
      *          mode, e.g. "0700"
+     * @param makeBackup
+                whether to make backup or not
      */
     public final void createConfig(final String config,
                                    final String fileName,
                                    final String dir,
-                                   final String mode) {
-        scp(config, dir + fileName, mode);
+                                   final String mode,
+                                   final boolean makeBackup) {
+        scp(config, dir + fileName, mode, makeBackup);
     }
 
     /**
@@ -1357,10 +1363,15 @@ public class SSH {
      */
     public final void scp(final String fileContent,
                           final String remoteFilename,
-                          final String mode) {
+                          final String mode,
+                          final boolean makeBackup) {
+        String backupCommand = "";
+        if (makeBackup) {
+            backupCommand = "cp " + remoteFilename + "{,.`date +'%s'`};" ;
+        }
         final Thread t = host.execCommandRaw(
-                                "cp " + remoteFilename + "{,.`date +'%s'`}" 
-                                + ";echo \""
+                                backupCommand
+                                + "echo \""
                                 + host.escapeQuotes(fileContent, 1)
                                 + "\">" + remoteFilename
                                 + ";chmod " + mode + " "

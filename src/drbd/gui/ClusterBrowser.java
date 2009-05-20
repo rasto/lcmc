@@ -6863,7 +6863,8 @@ public class ClusterBrowser extends Browser {
                                              + resConfig.toString(),
                                            "drbd.conf",
                                            "/etc/",
-                                           "0600");
+                                           "0600",
+                                           true);
                 //DRBD.adjust(host, "all"); // it can't be here
             }
         }

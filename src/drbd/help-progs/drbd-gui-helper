@@ -55,8 +55,6 @@ if ($option eq "all") {
 	get_filesystems_info();
 } elsif ($option eq "get-gui-info") {
 	get_gui_info();
-} elsif ($option eq "save-gui-info") {
-	save_gui_info(@ARGV);
 } elsif ($option eq "get-mount-point-info") {
 	get_mount_points_info();
 } elsif ($option eq "get-drbd-info") {
@@ -376,17 +374,6 @@ sub get_installation_info {
 	my $arch = `uname -m`;
 	chomp $arch;
 	print "ar:$arch\n";
-}
-
-# save_gui_info()
-#
-sub save_gui_info {
-	if (open FH, ">/var/lib/heartbeat/drbdgui.cf") {
-		for (@ARGV) {
-			print FH $_;
-		}
-		close FH;
-	}
 }
 
 sub get_drbd_events {
