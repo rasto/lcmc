@@ -93,6 +93,8 @@ public class CibQuery {
                                            new HashMap<String, List<String>>();
     /** Designated co-ordinator. */
     private String dc = null;
+    /** Map from nodename and resource to the fail-count. */
+    private MultiKeyMap failed = new MultiKeyMap();
 
     /**
      * Sets crm config map.
@@ -426,4 +428,25 @@ public class CibQuery {
     public final String getDC() {
         return dc;
     }
+
+    /**
+     * Sets failed map.
+     */
+    public final void setFailed(final MultiKeyMap failed) {
+        this.failed = failed;
+    }
+
+    /**
+     * Returns failed map.
+     */
+    public final MultiKeyMap getFailed() {
+        return failed;
+    }
+
+    /**
+     * Returns fail-count. It can be "INFINITY"
+     */
+     public final String getFailCount(final String node, final String res) {
+         return (String) failed.get(node, res);
+     }
 }

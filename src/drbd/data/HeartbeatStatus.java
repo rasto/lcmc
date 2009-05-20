@@ -347,6 +347,13 @@ public class HeartbeatStatus {
     }
 
     /**
+     * Returns fail count of the service on the specified node.
+     */
+     public final String getFailCount(final String node, final String res) {
+         return cibQueryMap.getFailCount(node, res);
+     }
+
+    /**
      * Parses the command with data.
      */
     private void parseCommand(final String command,

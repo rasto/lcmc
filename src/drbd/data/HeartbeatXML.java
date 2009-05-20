@@ -103,6 +103,8 @@ public class HeartbeatXML extends XML {
     /** Heartbeat boolean true string. */
     private static final String HB_BOOLEAN_TRUE =
                                     Tools.getString("Heartbeat.Boolean.True");
+    /** Fail count prefix. */
+    private static final String FAIL_COUNT_PREFIX = "fail-count-";
     /**
      * Prepares a new <code>HeartbeatXML</code> object.
      */
@@ -1084,6 +1086,41 @@ public class HeartbeatXML extends XML {
         return runningOnNode;
     }
 
+    private void parseTransientAttributes(final String uname,
+                                          final Node transientAttrNode,
+                                          final MultiKeyMap failedMap,
+                                          final String hbV) {
+        /* <instance_attributes> */
+        final Node instanceAttrNode = getChildNode(transientAttrNode,
+                                                   "instance_attributes");
+        /* <nvpair...> */
+        if (instanceAttrNode != null) {
+            final String iAId = getAttribute(instanceAttrNode, "id");
+            NodeList nvpairsRes;
+            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+                /* <attributtes> only til 2.1.4 */
+                final Node attrNode = getChildNode(instanceAttrNode,
+                                                   "attributes");
+                nvpairsRes = attrNode.getChildNodes();
+            } else {
+                nvpairsRes = instanceAttrNode.getChildNodes();
+            }
+            for (int j = 0; j < nvpairsRes.getLength(); j++) {
+                final Node optionNode = nvpairsRes.item(j);
+                if (optionNode.getNodeName().equals("nvpair")) {
+                    final String name = getAttribute(optionNode, "name");
+                    final String value = getAttribute(optionNode, "value");
+                    /* TODO: last-failure-" */
+                    if (name.indexOf(FAIL_COUNT_PREFIX) == 0) {
+                        final String resId =
+                                    name.substring(FAIL_COUNT_PREFIX.length());
+                        failedMap.put(uname, resId, value);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Returns CibQuery object with information from the cib node.
      */
@@ -1178,14 +1215,14 @@ public class HeartbeatXML extends XML {
                                       new HashMap<String, HeartbeatService>();
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
-        final MultiKeyMap operationsMap =
-                                      new MultiKeyMap();
+        final MultiKeyMap operationsMap = new MultiKeyMap();
         final Map<String, String> operationsIdMap =
                                                 new HashMap<String, String>();
         final Map<String, Map<String, String>> resOpIdsMap =
                                     new HashMap<String, Map<String, String>>();
         final Map<String, List<String>> groupsToResourcesMap =
                                            new HashMap<String, List<String>>();
+        final MultiKeyMap failedMap = new MultiKeyMap();
         groupsToResourcesMap.put("none", new ArrayList<String>());
 
         final NodeList primitivesGroups = resourcesNode.getChildNodes();
@@ -1328,7 +1365,7 @@ public class HeartbeatXML extends XML {
             final NodeList nodes = statusNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node nodeStateNode = nodes.item(i);
-                if (nodeStateNode.getNodeName().equals("node_state")) {
+                if ("node_state".equals(nodeStateNode.getNodeName())) {
                     final String id = getAttribute(nodeStateNode, "id");
                     final String uname = getAttribute(nodeStateNode, "uname");
                     final String crmd = getAttribute(nodeStateNode, "crmd");
@@ -1343,6 +1380,17 @@ public class HeartbeatXML extends XML {
                     /* TODO: check and use other stuff too. */
                     if ("active".equals(ha)) {
                         activeNodes.add(uname);
+                    }
+                    final NodeList nodeStates = nodeStateNode.getChildNodes();
+                    for (int j = 0; j < nodeStates.getLength(); j++) {
+                        final Node nodeStateChild = nodeStates.item(j);
+                        if ("transient_attributes".equals(
+                                               nodeStateChild.getNodeName())) {
+                            parseTransientAttributes(uname,
+                                                     nodeStateChild,
+                                                     failedMap,
+                                                     hbV);
+                        }
                     }
                 }
             }
@@ -1371,6 +1419,7 @@ public class HeartbeatXML extends XML {
         cibQueryData.setResOpIds(resOpIdsMap);
         cibQueryData.setActiveNodes(activeNodes);
         cibQueryData.setGroupsToResources(groupsToResourcesMap);
+        cibQueryData.setFailed(failedMap);
         return cibQueryData;
     }
 }

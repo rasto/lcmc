@@ -3757,11 +3757,57 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Returns whether the resource has failed to start. It is detected in
-         * this way that the resource is started but is not running.
+         * Returns whether the reousrce failed on the specified host.
+         */
+        private boolean failedOnHost(final Host host) {
+             if ("INFINITY".equals(
+                    heartbeatStatus.getFailCount(
+                                        host.getName(),
+                                        getService().getHeartbeatId()))) {
+                 return true;
+             }
+             return false;
+        }
+
+        /**
+         * Returns whether the resource has failed to start.
          */
         final public boolean isFailed() {
-            return isStarted() && !isRunning();
+            for (final Host host : getClusterHosts()) {
+                if (!failedOnHost(host)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Returns fail-count.
+         */
+         final public String failCount() {
+             StringBuffer fcString = new StringBuffer(10);
+             for (final Host host : getClusterHosts()) {
+                 final String fc = heartbeatStatus.getFailCount(
+                                         host.getName(),
+                                         getService().getHeartbeatId());
+                 if (fc != null) {
+                     fcString.append(fc);
+                     fcString.append(' ');
+                 }
+             }
+             return fcString.toString();
+         }
+
+        /**
+         * Returns whether the resource has failed on one of the nodes.
+         */
+        final public boolean isOneFailed() {
+            for (final Host host : getClusterHosts()) {
+                if (failedOnHost(host)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /**
@@ -5100,9 +5146,16 @@ public class ClusterBrowser extends Browser {
          */
         public void cleanupResource() {
             setUpdated(true);
+            List<Host> dirtyHosts = new ArrayList<Host>();
+            for (final Host host : getClusterHosts()) {
+                if (failedOnHost(host)) {
+                    dirtyHosts.add(host);
+                }
+            }
             Heartbeat.cleanupResource(getDCHost(),
                                       getService().getHeartbeatId(),
-                                      getClusterHosts());
+                                      dirtyHosts.toArray(
+                                                new Host[dirtyHosts.size()]));
         }
 
         /**
@@ -5464,6 +5517,25 @@ public class ClusterBrowser extends Browser {
             items.add((UpdatableItem) stopMenuItem);
             registerMenuItem((UpdatableItem) stopMenuItem);
 
+            /* clean up resource */
+            final MyMenuItem cleanupMenuItem =
+                new MyMenuItem(Tools.getString(
+                                        "ClusterBrowser.Hb.CleanUpResource")) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return getService().isAvailable()
+                               && isOneFailed();
+                    }
+
+                    public void action() {
+                        cleanupResource();
+                    }
+                };
+            items.add((UpdatableItem) cleanupMenuItem);
+            registerMenuItem((UpdatableItem) cleanupMenuItem);
+
+
             /* manage resource */
             final MyMenuItem manageMenuItem =
                 new MyMenuItem(
@@ -5557,23 +5629,6 @@ public class ClusterBrowser extends Browser {
                 };
             items.add((UpdatableItem) unmigrateMenuItem);
             registerMenuItem((UpdatableItem) unmigrateMenuItem);
-
-            /* clean up resource */
-            final MyMenuItem cleanupMenuItem =
-                new MyMenuItem(Tools.getString(
-                                        "ClusterBrowser.Hb.CleanUpResource")) {
-                    private static final long serialVersionUID = 1L;
-
-                    public boolean enablePredicate() {
-                        return getService().isAvailable();
-                    }
-
-                    public void action() {
-                        cleanupResource();
-                    }
-                };
-            items.add((UpdatableItem) cleanupMenuItem);
-            registerMenuItem((UpdatableItem) cleanupMenuItem);
 
             /* view log */
             final MyMenuItem viewLogMenu = new MyMenuItem(

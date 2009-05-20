@@ -445,7 +445,7 @@ public class TextResource extends
         {"ClusterBrowser.Hb.AddOrder.ToolTip",      "Add order dependency."},
         {"ClusterBrowser.Hb.AddColocation",         "Add Colocation"},
         {"ClusterBrowser.Hb.AddColocation.ToolTip", "Add co-location dependency."},
-        {"ClusterBrowser.Hb.CleanUpResource",       "Clean Up"},
+        {"ClusterBrowser.Hb.CleanUpResource",       "Restart (Clean Up)"},
         {"ClusterBrowser.Hb.ViewLogs",              "View Logs"},
         {"ClusterBrowser.Hb.ResGrpMoveUp",          "Move Up"},
         {"ClusterBrowser.Hb.ResGrpMoveDown",        "Move Down"},
