@@ -127,6 +127,41 @@ public class ClusterHbInit extends DialogCluster {
     public ClusterHbInit(final WizardDialog previousDialog,
                          final Cluster cluster) {
         super(previousDialog, cluster);
+        final Host[] hosts = getCluster().getHostsArray();
+        makeConfigButton.addActionListener(
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(
+                        new Runnable() {
+                            public void run() {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        makeConfigButton.setEnabled(false);
+                                    }
+                                });
+                                disableComponents();
+                                //getProgressBar().hold();
+                                //TODO: bug here, broswer is not created at
+                                //this point.
+                                StringBuffer config = hbConfigHead();
+                                config.append('\n');
+                                config.append(hbConfigAddr());
+                                config.append(hbConfigDopd(
+                                                    dopdCB.isSelected()));
+                                config.append(hbConfigMgmt(false));
+
+                                Heartbeat.createHBConfig(hosts, config);
+                                updateOldHbConfig();
+                                Heartbeat.reloadHeartbeats(hosts);
+                                pressRetryButton();
+                            }
+                        }
+                    );
+                    thread.start();
+
+                }
+            });
+
     }
 
     /**
@@ -541,40 +576,6 @@ public class ClusterHbInit extends DialogCluster {
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.setBackground(Color.RED);
         final Host[] hosts = getCluster().getHostsArray();
-        makeConfigButton.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(
-                        new Runnable() {
-                            public void run() {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        makeConfigButton.setEnabled(false);
-                                    }
-                                });
-                                disableComponents();
-                                //getProgressBar().hold();
-                                //TODO: bug here, broswer is not created at
-                                //this point.
-                                StringBuffer config = hbConfigHead();
-                                config.append('\n');
-                                config.append(hbConfigAddr());
-                                config.append(hbConfigDopd(
-                                                    dopdCB.isSelected()));
-                                config.append(hbConfigMgmt(false));
-
-                                Heartbeat.createHBConfig(hosts, config);
-                                updateOldHbConfig();
-                                Heartbeat.reloadHeartbeats(hosts);
-                                pressRetryButton();
-                            }
-                        }
-                    );
-                    thread.start();
-
-                }
-            });
-
         final String[] types = {MCAST_TYPE,
                                 BCAST_TYPE,
                                 UCAST_TYPE,

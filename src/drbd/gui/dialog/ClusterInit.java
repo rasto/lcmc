@@ -109,6 +109,15 @@ public class ClusterInit extends DialogCluster {
     }
 
     /**
+     * Returns previous dialog. It is used to get with the back button to
+     * the dialog before this one.
+     */
+    protected WizardDialog getPreviousDialog() {
+        stopCheckCluster();
+        return super.getPreviousDialog();
+    }
+
+    /**
      * After the dialog is finished.
      */
     protected final void finishDialog() {
