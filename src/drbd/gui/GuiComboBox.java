@@ -366,7 +366,8 @@ public class GuiComboBox extends JPanel {
                     Tools.appError("item: " + i + " is null");
                     continue;
                 }
-                if (items[i].equals(selectedValue)) {
+                if (items[i].toString().equals(selectedValue)
+                    || items[i].equals(selectedValue)) {
                     selectedValueInfo = items[i];
                 }
                 comboList.add(items[i]);
@@ -629,7 +630,7 @@ public class GuiComboBox extends JPanel {
                 } else if (Tools.isStringClass(item)) {
                     for (int i = 0; i < cb.getItemCount(); i++) {
                         final Object it = cb.getItemAt(i);
-                        if (it.toString().equals(item)) {
+                        if (it.toString().equals(item) || it.equals(item)) {
                             cb.setSelectedItem(it);
                             break;
                         }

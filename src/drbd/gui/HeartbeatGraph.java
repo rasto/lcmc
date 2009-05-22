@@ -1298,9 +1298,9 @@ public class HeartbeatGraph extends ResourceGraph {
             return "not running";
         }
         final String runningOnNode = si.getRunningOnNode();
-        if (runningOnNode != null) {
+        if (runningOnNode != null && !"".equals(runningOnNode)) {
             return "running on: " + runningOnNode;
-        }
-        return "";
+        } 
+        return "not running";
     }
 }

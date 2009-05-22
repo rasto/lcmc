@@ -2990,7 +2990,7 @@ public class ClusterBrowser extends Browser {
                     drbdDevHash.get(getResource().getValue(DRBD_RES_PARAM_DEV));
             final DrbdResourceInfo newDri =
                     drbdDevHash.get(getComboBoxValue(DRBD_RES_PARAM_DEV));
-            if (newDri.equals(oldDri)) {
+            if (newDri == null || newDri.equals(oldDri)) {
                 return;
             }
             //final DrbddiskInfo oddi = getDrbddiskInfo();
@@ -3264,10 +3264,9 @@ public class ClusterBrowser extends Browser {
             setUpdated(true);
             final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
-            final Host dc = getDCHost();
             if (resources != null) {
                 for (final String hbId : resources) {
-                    Heartbeat.cleanupResource(dc, hbId, getClusterHosts());
+                    heartbeatIdToServiceInfo.get(hbId).cleanupResource();
                 }
             }
         }
@@ -3389,7 +3388,7 @@ public class ClusterBrowser extends Browser {
          */
         public String getToolTipText() {
             String hostName = getRunningOnNode();
-            if (hostName == null) {
+            if (hostName == null || "".equals(hostName)) {
                 hostName = "none";
             }
             final StringBuffer sb = new StringBuffer(220);
@@ -3410,6 +3409,42 @@ public class ClusterBrowser extends Browser {
 
             return sb.toString();
         }
+
+        /**
+         * Returns whether one of the services on one of the hosts failed.
+         */
+         final public boolean isOneFailed() {
+                final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+             if (resources != null) {
+                 for (final String hbId : resources) {
+                     if (heartbeatIdToServiceInfo.get(hbId).isOneFailed()) {
+                         return true;
+                     }
+                 }
+             }
+             return false;
+         }
+
+        /**
+         * Returns whether one of the services failed to start.
+         */
+         final public boolean isFailed() {
+             final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+             if (resources != null) {
+                 for (final String hbId : resources) {
+                     final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
+                     if (si == null) {
+                         return false;
+                     }
+                     if (si.isFailed()) {
+                         return true;
+                     }
+                 }
+             }
+             return false;
+         }
     }
 
     /**
@@ -3760,10 +3795,9 @@ public class ClusterBrowser extends Browser {
          * Returns whether the reousrce failed on the specified host.
          */
         private boolean failedOnHost(final Host host) {
-             if ("INFINITY".equals(
-                    heartbeatStatus.getFailCount(
-                                        host.getName(),
-                                        getService().getHeartbeatId()))) {
+             if (heartbeatStatus.getFailCount(
+                                    host.getName(),
+                                    getService().getHeartbeatId()) != null) {
                  return true;
              }
              return false;
@@ -3772,7 +3806,10 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the resource has failed to start.
          */
-        final public boolean isFailed() {
+        public boolean isFailed() {
+            if (isRunning()) {
+                return false;
+            }
             for (final Host host : getClusterHosts()) {
                 if (!failedOnHost(host)) {
                     return false;
@@ -3801,7 +3838,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the resource has failed on one of the nodes.
          */
-        final public boolean isOneFailed() {
+        public boolean isOneFailed() {
             for (final Host host : getClusterHosts()) {
                 if (failedOnHost(host)) {
                     return true;
@@ -5519,8 +5556,10 @@ public class ClusterBrowser extends Browser {
 
             /* clean up resource */
             final MyMenuItem cleanupMenuItem =
-                new MyMenuItem(Tools.getString(
-                                        "ClusterBrowser.Hb.CleanUpResource")) {
+                new MyMenuItem(
+                        Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
+                        SERVICE_RUNNING_ICON,
+                        Tools.getString("ClusterBrowser.Hb.CleanUpResource")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -6009,8 +6048,10 @@ public class ClusterBrowser extends Browser {
                                         heartbeatStatus.getResourceType(hbId);
                     if (newHbService == null) {
                         /* This is bad. There is a service but we do not have
-                         * the heartbeat script of this service.
+                         * the heartbeat script of this service or the we look
+                         * in the wrong places.
                          */
+                        Tools.appWarning(hbId + ": could not find hb script");
                         continue;
                     }
                     GroupInfo newGi = null;
