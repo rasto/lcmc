@@ -1654,6 +1654,7 @@ public class Host implements Serializable {
     public final void parseHostInfo(final String ans) {
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
+        List<String> versionLines = new ArrayList<String>();
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
                 break;
@@ -1665,7 +1666,8 @@ public class Host implements Serializable {
                 || "filesystems-info".equals(line)
                 || "mount-points-info".equals(line)
                 || "gui-info".equals(line)
-                || "installation-info".equals(line)) {
+                || "installation-info".equals(line)
+                || "version-info".equals(line)) {
                 type = line;
                 continue;
             }
@@ -1683,8 +1685,11 @@ public class Host implements Serializable {
                 parseGuiInfo(line);
             } else if ("installation-info".equals(type)) {
                 parseInstallationInfo(line);
+            } else if ("version-info".equals(type)) {
+                versionLines.add(line);
             }
         }
+        setDistInfo(versionLines.toArray(new String[versionLines.size()]));
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
                                        getFileSystems());
@@ -1730,11 +1735,6 @@ public class Host implements Serializable {
         } else if (tokens[0].equals("hn")) { // hostname
             hostname = tokens[1].trim();
             setName(hostname);
-        } else if (tokens[0].equals("ar")) { // hostname
-            detectedArch = tokens[1].trim();
-            setArch(Tools.getDistString("arch:" + detectedArch,
-                                        getDist(),
-                                        distVersionString));
         }
     }
 

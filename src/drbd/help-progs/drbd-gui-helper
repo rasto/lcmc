@@ -47,6 +47,8 @@ if ($option eq "all") {
 	get_gui_info();
 	print "installation-info\n";
 	get_installation_info();
+	print "version-info\n";
+	get_version_info();
 } elsif ($option eq "get-net-info") {
 	get_net_info();
 } elsif ($option eq "get-disk-info") {
@@ -371,9 +373,20 @@ sub get_installation_info {
 	my $hn = `hostname`;
 	chomp $hn;
 	print "hn:$hn\n";
-	my $arch = `uname -m`;
-	chomp $arch;
-	print "ar:$arch\n";
+}
+# get_version_info()
+#
+sub get_version_info {
+	my $cmd = 
+	  'uname; uname -m; uname -r; '
+	 .'for d in [ redhat debian gentoo SuSE]; do '
+	   .'v=`head -1 -q /etc/"$d"_version /etc/"$d"-release 2>/dev/null`; '
+	   .'if [ ! -z "$v" ]; then echo "$v"; echo "$d"; fi; '
+	 .'done; '
+	 .'lsb_release -i -r 2>/dev/null '
+	 .'| sed "s/CentOS/redhat/"|sed "s/SUSE LINUX/suse/" '
+	 .'| perl -lne "print lc((split /:\s*/)[1])"';
+	 print `$cmd`;
 }
 
 sub get_drbd_events {
