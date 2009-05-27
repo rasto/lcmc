@@ -48,8 +48,11 @@ public class DistResource_redhat_5 extends
 
         {"HbInst.install.text.1", "http://download.opensuse.org" },
         {"HbInst.install.1", "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
-                             + "yum -y install heartbeat pacemaker"},
+                             + "yum -y install heartbeat pacemaker "
+                             + "&& /sbin/chkconfig --add heartbeat"},
         {"HbInst.install.text.2", "yum" },
-        {"HbInst.install.2", "/usr/bin/yum -y install heartbeat"},
+        {"HbInst.install.2", "/usr/sbin/useradd hacluster 2>/dev/null; "
+			   + "/usr/bin/yum -y install heartbeat "
+			   + "&& /sbin/chkconfig --add heartbeat"},
     };
 }

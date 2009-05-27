@@ -82,6 +82,7 @@ public class DistResource_redhatenterpriseas_4 extends
                            + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
                            + "up2date libtool-libs perl-TimeDate && "
                            + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
+                           + "/sbin/chkconfig --add heartbeat && "
                            + "rm -rf /tmp/drbd-mc-hbinst/"},
     };
 }

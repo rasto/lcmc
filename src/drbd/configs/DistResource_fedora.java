@@ -46,11 +46,12 @@ public class DistResource_fedora extends
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
         {"HbInst.install.text.1", "http://download.opensuse.org" },
-        {"HbInst.install.1", "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_10/server:ha-clustering.repo && "
-                             + "yum -y install heartbeat pacemaker"},
+        {"HbInst.install.1", "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_10/server:ha-clustering.repo "
+                             + "&& (/usr/sbin/groupadd haclient 2>/dev/null && /usr/sbin/useradd -g haclient hacluster 2>/dev/null;"
+                             + "yum -y install heartbeat pacemaker && /sbin/chkconfig --add heartbeat)"},
         {"HbInst.install.text.2", "yum" },
         {"HbInst.install.2", "/usr/bin/yum -y install heartbeat"},
-        /* at least fedora 10 has different ocf path. */
-        {"Heartbeat.getOCFParameters", "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/share/ocf; for s in `ls -1 /usr/share/ocf/resource.d/heartbeat/ `; do /usr/share/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done; /usr/local/bin/drbd-gui-helper get-old-style-resources; /usr/local/bin/drbd-gui-helper get-lsb-resources"},
+        /* at least fedora 10 in version 2.1.3 has different ocf path. */
+        {"Heartbeat.2.1.3.getOCFParameters", "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/share/ocf; for s in `ls -1 /usr/share/ocf/resource.d/heartbeat/ `; do /usr/share/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done; /usr/local/bin/drbd-gui-helper get-old-style-resources; /usr/local/bin/drbd-gui-helper get-lsb-resources"},
     };
 }

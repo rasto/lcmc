@@ -111,8 +111,16 @@ public class HeartbeatXML extends XML {
     public HeartbeatXML(final Host host) {
         super();
         this.host = host;
-        final String command = host.getDistCommand("Heartbeat.getOCFParameters",
-                                                   (ConvertCmdCallback) null);
+        String command = null;
+        final String hbV = host.getHeartbeatVersion();
+        if (Tools.compareVersions(hbV, "2.1.3") <= 0) {
+            command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
+                                          (ConvertCmdCallback) null);
+        }
+        if (command == null) {
+            command = host.getDistCommand("Heartbeat.getOCFParameters",
+                                          (ConvertCmdCallback) null);
+        }
         final String output =
                     Tools.execCommandProgressIndicator(
                             host,
@@ -157,7 +165,6 @@ public class HeartbeatXML extends XML {
         }
 
 
-        final String hbV = host.getHeartbeatVersion();
         String[] booleanValues = getGlobalCheckBoxChoices();
 
         /* hardcoding global params */

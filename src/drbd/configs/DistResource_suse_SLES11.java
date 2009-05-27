@@ -42,11 +42,16 @@ public class DistResource_suse_SLES11 extends
         /* distribution name that is used in the download url */
         {"distributiondir", "sles11"},
         {"Support", "suse-SLES11"},
-        {"DRBD.load", "modprobe --allow-unsupported drbd"}, //TODO: not enough for reboot
+        {"DRBD.load",
+            "if [ ! -e /etc/default/drbd ]; then "
+          + "echo 'MODPROBE=\"/sbin/modprobe --allow-unsupported-modules\"' "
+          +     "> /etc/default/drbd; fi;"
+          + "modprobe --allow-unsupported-modules drbd"},
 
         {"HbInst.install.text.1", "http://download.opensuse.org: zypper" },
         {"HbInst.install.1", "wget -N -nd -P /etc/zypp/repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo && "
-                             + "zypper -n --no-gpg-check install heartbeat pacemaker"},
+                             + "zypper -n --no-gpg-check install heartbeat pacemaker"
+                             + " && chkconfig --add heartbeat"},
         {"HbInst.install.text.2", "http://download.opensuse.org: wget & rpm -U" },
         {"HbInst.install.2", "rm -rf /tmp/drbd-mc-hbinst/; "
                            + "mkdir /tmp/drbd-mc-hbinst/ && "
@@ -54,6 +59,7 @@ public class DistResource_suse_SLES11 extends
                            + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
                            + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
                            + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
+                           + "chkconfig --add heartbeat && "
                            + "rm -rf /tmp/drbd-mc-hbinst/"},
 
     };

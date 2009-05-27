@@ -50,7 +50,8 @@ public class DistResource_debian_LENNY extends
         {"HbInst.install.text.1", "http://download.opensuse.org repository"},
         {"HbInst.install.1", "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_5.0/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
                              + " && apt-get update"
-                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
+                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"
+                             + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
         {"HbInst.install.text.2", "lenny repository"},
         {"HbInst.install.version.2", "2.1.3"},
