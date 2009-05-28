@@ -39,9 +39,8 @@ public class DistResource_redhatenterpriseserver extends
         {"Support", "redhatenterpriseserver"},
         {"arch:i686", "i686"},
         {"distribution", "rhel"},
-        //{"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},
-        {"version:4*", "4"},
-        {"version:5*", "5"},
+        {"version:Red Hat Enterprise Linux ES release 4 (Nahant*", "4"},
+        {"version:Red Hat Enterprise Linux Server release 5*", "5"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},

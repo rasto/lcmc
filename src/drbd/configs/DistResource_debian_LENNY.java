@@ -53,8 +53,18 @@ public class DistResource_debian_LENNY extends
                              + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"
                              + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
-        {"HbInst.install.text.2", "lenny repository"},
-        {"HbInst.install.version.2", "2.1.3"},
-        {"HbInst.install.2", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        {"HbInst.install.text.2", "madkiss repository (testing i386)"},
+        {"HbInst.install.2", "echo 'deb http://people.debian.org/~madkiss/ha/lenny/i386/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+                             + " && apt-get update"
+                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"},
+
+        {"HbInst.install.text.3", "madkiss repository (testing amd64)"},
+        {"HbInst.install.3", "echo 'deb http://people.debian.org/~madkiss/ha/lenny/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+                             + " && apt-get update"
+                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
+
+        {"HbInst.install.text.4", "lenny repository (not recommended)"},
+        {"HbInst.install.version.4", "2.1.3"},
+        {"HbInst.install.4", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
     };
 }

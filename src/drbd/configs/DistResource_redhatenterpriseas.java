@@ -39,7 +39,8 @@ public class DistResource_redhatenterpriseas extends
         {"Support", "redhatenterpriseas"},
         {"arch:i686", "i686"},
         {"distribution", "redhatenterpriseas"},
-        {"version:4*", "4"},
+        {"version:Red Hat Enterprise Linux AS release 4 (Nahant)/4", "4_0"},
+        {"version:Red Hat Enterprise Linux AS release 4 (Nahant*", "4"},
 
         {"HbInst.install.i386", "i386" },
         {"HbInst.install.i486", "i386" },

@@ -668,24 +668,24 @@ public class Host implements Serializable {
             return;
         }
         // no breaks in the switch statement are intentional
-        String debianLikeVersion = null;
-        String debianLikeDist = null;
+        String lsbVersion = null;
+        String lsbDist = null;
         switch (info.length) {
             case 7:
-                debianLikeVersion = info[6];
+                lsbVersion = info[6]; // TODO: not used
             case 6:
-                debianLikeDist = info[5];
+                lsbDist = info[5];
             case 5:
-                if (debianLikeDist == null) {
+                if (lsbDist == null) {
                     detectedDist = info[4];
                 } else {
-                    detectedDist = debianLikeDist;
+                    detectedDist = lsbDist;
                 }
             case 4:
-                if (debianLikeVersion == null) {
-                    detectedDistVersion = info[3];
+                if (lsbVersion != null) {
+                    detectedDistVersion = info[3] + "/" + lsbVersion;
                 } else {
-                    detectedDistVersion = debianLikeVersion;
+                    detectedDistVersion = info[3];
                 }
             case 3:
                 detectedKernelVersion = info[2];
@@ -739,20 +739,9 @@ public class Host implements Serializable {
 
     /**
      * Returns the detected info to show.
-     * TODO: show something nice.
      */
     public final String getDetectedInfo() {
-        return "kn: " + detectedKernelName + " "
-               + "kv: " + detectedKernelVersion + " "
-               + "a: "  + detectedArch + " "
-               + "dv: " + detectedDistVersion + " "
-               + "d: "  + detectedDist + "\n"
-
-               + "kn: " + kernelName + " "
-               + "kv: " + kernelVersion + " "
-               + "a: "  + arch + " "
-               + "dv: " + distVersion + " "
-               + "d: "  + dist + "\n";
+        return detectedDist + " " + detectedDistVersion;
     }
 
     /**

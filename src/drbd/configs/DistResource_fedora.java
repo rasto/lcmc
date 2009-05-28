@@ -38,7 +38,7 @@ public class DistResource_fedora extends
     private static Object[][] contents = {
         {"Support", "fedora"},
         {"distribution", "redhat"},
-        //{"version:10", "10"},
+        //{"vaesion:Fedora release 10*", "10"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},

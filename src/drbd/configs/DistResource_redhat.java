@@ -39,7 +39,7 @@ public class DistResource_redhat extends
         {"Support", "redhat"},
         {"distribution", "redhat"},
         {"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},
-        {"version:5*", "5"},
+        {"version:CentOS release 5*", "5"},
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
 

@@ -36,11 +36,11 @@ public class DistResource_ubuntu extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "ubuntu"},
-        {"version:7.04",       ""},
-        {"version:9.04",       "JAUNTY"},
-        {"version:8.04",       "HARDY"},
-        {"version:6.06",       "DAPPER"},
+        {"Support",                       "ubuntu"},
+        {"version:7.04",                  ""},
+        {"version:5.0/9.04",              "JAUNTY"},
+        {"version:lenny/sid/8.04",        "HARDY"},
+        {"version:testing/unstable/6.06", "DAPPER"},
         {"arch:x86_64",        "amd64"}, // convert arch to arch in the drbd download file
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+).*"},

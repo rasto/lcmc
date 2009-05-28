@@ -74,48 +74,6 @@ public class HostDist extends DialogHost {
     }
 
     /**
-     * checks answer from host about distribution and sets answer text in
-     * answerLabel.
-     *
-     * answer comes as lines of text with one token per line.
-     * tokens:
-     *
-     * 0: kernel name    : Linux
-     * 1: kernel version : 2.6.15-1-1-p3-smp-highmem
-     * 2: arch           : i686
-     * 3: dist:          : debian
-     * 4: dist version   : 3.1
-     *
-     * @param ans
-     *          answer from host.
-     */
-    public void checkAnswer(final String ans) {
-        final String[] result = ans.split(NEWLINE);
-        String answerText = "";
-
-        getHost().setDistInfo(result);
-        if (result.length < 1) {
-            answerText = "HostDist.NoInfoAvailable";
-            answerPaneSetText(answerText);
-        } else if (getHost().getKernelName().equals("Linux")) {
-            final String support =
-                         Tools.getDistString("Support",
-                                             getHost().getDist(),
-                                             getHost().getDistVersionString());
-            answerText = getHost().getDist() + "\nversion: "
-                         + getHost().getDistVersion() + " (support file: "
-                         + support + ")";
-            buttonClass(nextButton()).requestFocus();
-            answerPaneSetText(answerText);
-        } else {
-            answerText = getHost().getKernelName() + " "
-                         + Tools.getString("Dialog.HostDist.NotALinux");
-            answerPaneSetText(answerText);
-        }
-        availVersions();
-    }
-
-    /**
      * Checks the available drbd verisions.
      */
     protected void availVersions() {
@@ -355,38 +313,7 @@ public class HostDist extends DialogHost {
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-
-        final Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    drbdDistCombo.setEnabled(false);
-                    drbdKernelDirCombo.setEnabled(false);
-                    drbdArchCombo.setEnabled(false);
-
-                    disableComponents();
-                    getProgressBar().start(20000);
-                    //getProgressBar().hold();
-                    ExecCommandThread t = getHost().execCommandCache(
-                             "WhichDist",
-                             null, /* ProgressBar */
-                             new ExecCallback() {
-                                public void done(final String ans) {
-                                    checkAnswer(ans);
-                                }
-                                public void doneError(final String ans,
-                                                      final int exitCode) {
-                                    printErrorAndRetry(Tools.getString(
-                                                "Dialog.HostDist.NoDist"),
-                                                       ans,
-                                                       exitCode);
-                                }
-                             },
-                             null,  /* ConvertCmdCallback */
-                             true); /* outputVisible */
-                    setCommandThread(t);
-                }
-            });
-        thread.start();
+        availVersions();
     }
 
     /**

@@ -1043,7 +1043,7 @@ public final class Tools {
         if (dist == null) {
             dist = "";
         }
-        debug("dist: " + dist + ", version: " + version, 2);
+        debug("dist: " + dist + ", version: " + version, 0);
         final Locale locale = new Locale(dist, "");
         final ResourceBundle resourceCommand =
                 ResourceBundle.getBundle("drbd.configs.DistResource", locale);
@@ -1052,22 +1052,18 @@ public final class Tools {
             distVersion = resourceCommand.getString("version:" + version);
         } catch (Exception e) {
             /* with wildcard */
-            final String[] ver = version.split("\\.|\\s");
-            for (int i = 0; i < ver.length; i++) {
-                if (i == 0) {
-                    version = ver[i];
-                } else {
-                    version = version + "." + ver[i];
-                }
+            final StringBuffer buf = new StringBuffer(version);
+            for (int i = version.length() - 1; i >=0; i--) {
                 try {
                     distVersion = resourceCommand.getString("version:"
-                                                            + version
+                                                            + buf.toString()
                                                             + "*");
                 } catch (Exception e2) {
                 }
                 if (distVersion != null) {
                     break;
                 }
+                buf.setLength(i);
             }
             if (distVersion == null) {
                 distVersion = version;
