@@ -50,17 +50,7 @@ public class DistResource_suse_SLES11 extends
 
         {"HbInst.install.text.1", "http://download.opensuse.org: zypper" },
         {"HbInst.install.1", "wget -N -nd -P /etc/zypp/repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo && "
-                             + "zypper -n --no-gpg-check install heartbeat pacemaker"
-                             + " && chkconfig --add heartbeat"},
-        {"HbInst.install.text.2", "http://download.opensuse.org: wget & rpm -U" },
-        {"HbInst.install.2", "rm -rf /tmp/drbd-mc-hbinst/; "
-                           + "mkdir /tmp/drbd-mc-hbinst/ && "
-                           + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/@ARCH@/ && "
-                           + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
-                           + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
-                           + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
-                           + "chkconfig --add heartbeat && "
-                           + "rm -rf /tmp/drbd-mc-hbinst/"},
-
+         + "/usr/bin/zypper -n --no-gpg-check install heartbeat pacemaker && "
+         + "/sbin/chkconfig --add heartbeat"},
     };
 }

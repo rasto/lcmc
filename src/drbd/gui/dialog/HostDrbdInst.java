@@ -33,6 +33,7 @@ import javax.swing.SpringLayout;
 
 /**
  * An implementation of a dialog where drbd will be installed.
+ * TODO: rename it to HostDrbdLinbitInst
  *
  * @author Rasto Levrinc
  * @version $Id$

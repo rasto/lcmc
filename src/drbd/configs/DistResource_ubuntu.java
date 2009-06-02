@@ -47,7 +47,42 @@ public class DistResource_ubuntu extends
 
         {"DrbdInst.install", "dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        {"HbInst.install.text.1", "apt-get"},
-        {"HbInst.install.1", "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        /* pacemaker install method 1 */
+        {"HbInst.install.text.1",
+         "the ubuntu way: possibly too old"},
+
+        {"HbInst.install.1",
+         "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+
+        /* Drbd install method 2 */
+        {"DrbdInst.install.text.2",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.2",
+         "source"},
+
+
+        {"DrbdInst.install.2",
+         "/bin/mkdir -p /tmp/drbdinst && "
+         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
+         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         + "cd /tmp/drbdinst && "
+         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
+         + "cd drbd-@VERSION@ && "
+         + "/usr/bin/apt-get update && "
+         + "/usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
+         + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
+           + "/lib/modules/`uname -r`/kernel/ubuntu/drbd/drbd.ko && "
+         + "make && make install && "
+         + "/usr/sbin/update-rc.d drbd defaults 70 8 && "
+         + "/bin/rm -rf /tmp/drbdinst"},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "the ubuntu way: possibly too old"},
+
+        {"DrbdInst.install.3",
+         "apt-get update && /usr/bin/apt-get -y install -o "
+         + "'DPkg::Options::force=--force-confnew' drbd8-utils"},
     };
 }

@@ -39,6 +39,8 @@ import javax.swing.SwingUtilities;
  * An implementation of a dialog where available versions of drbd will be
  * determined.
  *
+ * TODO: this class needs to be made better
+ *
  * @author Rasto Levrinc
  * @version $Id$
  *
@@ -69,8 +71,6 @@ public class HostDrbdAvailFiles extends DialogHost {
     protected void initDialog() {
         super.initDialog();
         listenersAdded = false;
-        //drbdVersionCombo.setEnabled(false);
-        //drbdBuildCombo.setEnabled(false);
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
         disableComponents(new JComponent[]{drbdVersionCombo, drbdBuildCombo});
@@ -87,7 +87,6 @@ public class HostDrbdAvailFiles extends DialogHost {
             allDone();
         } else {
             getHost().setDrbdVersionToInstall(selectedItem);
-            //drbdVersionCombo.setEnabled(true);
             availBuilds();
         }
     }
@@ -117,6 +116,7 @@ public class HostDrbdAvailFiles extends DialogHost {
                                             defaultValue.replaceAll("-", "_");
                                 }
                                 final String defaultValueCopy = defaultValue;
+                                drbdBuildCombo.clear();
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         drbdBuildCombo.reloadComboBox(
@@ -210,12 +210,8 @@ public class HostDrbdAvailFiles extends DialogHost {
         //nextDialogObject = new HostDrbdInst(this, getHost());
         nextDialogObject = new HostLogin(this, getHost());
         progressBarDone();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                enableComponents();
-                buttonClass(nextButton()).requestFocus();
-            }
-        });
+        enableComponents();
+        buttonClass(nextButton()).requestFocus();
         if (!listenersAdded) {
             addListeners();
             listenersAdded = true;

@@ -71,6 +71,8 @@ public class HostCheckInstallation extends DialogHost {
             Tools.getString("Dialog.HostCheckInstallation.HbInstallButton"));
     /** Heartbeat installation method */
     private GuiComboBox hbInstMethodCB;
+    /** DRBD installation method */
+    private GuiComboBox drbdInstMethodCB;
 
     /** Checking icon. */
     private static final ImageIcon CHECKING_ICON =
@@ -100,8 +102,12 @@ public class HostCheckInstallation extends DialogHost {
     private boolean heartbeatOk = false;
     /** Version that appears in the dialog. */
     private String versionText;
-    private Map<String, InstallMethods> installedMethodMap =
+    /** Map from version to the installed hb method. */
+    /* TODO: this thing is a bit fuzzy, remove it maybe. */
+    private Map<String, InstallMethods> hbInstalledMethodMap =
                                          new HashMap<String, InstallMethods>();
+    /** Whether there are drbd methods available */
+    private boolean drbdInstallMethodsAvailable = false;
 
     /**
      * Prepares a new <code>HostCheckInstallation</code> object.
@@ -125,6 +131,7 @@ public class HostCheckInstallation extends DialogHost {
                 drbdButton.setEnabled(false);
                 heartbeatButton.setEnabled(false);
                 hbInstMethodCB.setEnabled(false);
+                drbdInstMethodCB.setEnabled(false);
             }
         });
         drbdButton.addActionListener(
@@ -133,10 +140,26 @@ public class HostCheckInstallation extends DialogHost {
                     if (drbdOk) {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
+                    InstallMethods im =
+                                  (InstallMethods) drbdInstMethodCB.getValue();
+                    getHost().setDrbdInstallMethod(im.getIndex());
                     final String button = e.getActionCommand();
                     if (!drbdOk || button.equals(Tools.getString(
                      "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"))) {
-                        nextDialogObject = new HostDist(thisClass, getHost());
+                        if (im.isLinbitMethod()) {
+                            nextDialogObject =
+                                new HostDrbdLinbitAvailPackages(thisClass,
+                                                                getHost());
+                        } else if (im.isSourceMethod()) {
+                           nextDialogObject =
+                               new HostDrbdAvailSourceFiles(thisClass,
+                                                            getHost());
+                        } else {
+                            // TODO: this only when there is no drbd installed
+                            nextDialogObject = new HostDrbdCommandInst(
+                                                        thisClass, getHost());
+                            getHost().setDrbdInstallMethod(im.getIndex());
+                        }
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ((MyButton) buttonClass(
@@ -201,7 +224,14 @@ public class HostCheckInstallation extends DialogHost {
                     drbdLabel.setText(": " + Tools.getString(
                             "Dialog.HostCheckInstallation.DrbdNotInstalled"));
                     drbdIcon.setIcon(NOT_INSTALLED_ICON);
-                    drbdButton.setEnabled(true);
+                    final String toolTip =
+                                   getDrbdInstToolTip("1");
+                    drbdInstMethodCB.setToolTipText(toolTip);
+                    drbdButton.setToolTipText(toolTip);
+                    if (drbdInstallMethodsAvailable) {
+                        drbdButton.setEnabled(true);
+                        drbdInstMethodCB.setEnabled(true);
+                    }
                 }
             });
         } else {
@@ -213,11 +243,15 @@ public class HostCheckInstallation extends DialogHost {
                         drbdIcon.setIcon(UPGR_AVAIL_ICON);
                         drbdButton.setText(Tools.getString(
                           "Dialog.HostCheckInstallation.DrbdUpgradeButton"));
-                        drbdButton.setEnabled(true);
+                        if (drbdInstallMethodsAvailable) {
+                            drbdButton.setEnabled(true);
+                        }
                     } else {
                         drbdButton.setText(Tools.getString(
                           "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"));
-                        drbdButton.setEnabled(true);
+                        if (drbdInstallMethodsAvailable) {
+                            drbdButton.setEnabled(true);
+                        }
                         drbdIcon.setIcon(INSTALLED_ICON);
                     }
                 }
@@ -275,14 +309,14 @@ public class HostCheckInstallation extends DialogHost {
                 versionText = version;
             }
             getHost().setHeartbeatVersion(version);
-            final InstallMethods installedMethod =
-                                              installedMethodMap.get(version);
+            final InstallMethods hbInstalledMethod =
+                                              hbInstalledMethodMap.get(version);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     heartbeatIcon.setIcon(INSTALLED_ICON);
                     heartbeatLabel.setText(": " + versionText);
-                    if (installedMethod != null) {
-                        hbInstMethodCB.setValue(installedMethod);
+                    if (hbInstalledMethod != null) {
+                        hbInstMethodCB.setValue(hbInstalledMethod);
                     }
                 }
             });
@@ -338,13 +372,25 @@ public class HostCheckInstallation extends DialogHost {
         private final String name;
         /** Index of the method. */
         private final int index;
+        /** Method string */
+        private final String method;
 
         /**
          * Creates new InstallMethods object.
          */
         InstallMethods(final String name, final int index) {
+            this(name, index, "");
+        }
+
+        /**
+         * Creates new InstallMethods object.
+         */
+        InstallMethods(final String name,
+                       final int index,
+                       final String method) {
             this.name = name;
             this.index = index;
+            this.method = method;
         }
 
         /**
@@ -360,6 +406,27 @@ public class HostCheckInstallation extends DialogHost {
         public final String getIndex() {
             return Integer.toString(index);
         }
+
+        /**
+         * Returns method.
+         */
+        public final String getMethod() {
+            return method;
+        }
+
+        /**
+         * Returns whether the installation method is "source"
+         */
+         public final boolean isSourceMethod() {
+             return "source".equals(method);
+         }
+
+        /**
+         * Returns whether the installation method is "linbit"
+         */
+         public final boolean isLinbitMethod() {
+             return "linbit".equals(method);
+         }
     }
 
     /**
@@ -372,13 +439,25 @@ public class HostCheckInstallation extends DialogHost {
                 "HbInst.install." + index)).replaceAll(";", ";<br>&gt; ")
                                            .replaceAll("&&", "<br>&gt; &&");
     }
+
+    /**
+     * Returns tool tip texts for drbd installation method combo box and install
+     * button.
+     */
+    private final String getDrbdInstToolTip(final String index) {
+        return Tools.html(
+            getHost().getDistString(
+                "DrbdInst.install." + index)).replaceAll(";", ";<br>&gt; ")
+                                           .replaceAll("&&", "<br>&gt; &&");
+    }
     /**
      * Returns the pane, that checks the installation of different
      * components and provides buttons to update or upgrade.
      */
     private JPanel getInstallationPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        List<InstallMethods> methods = new ArrayList<InstallMethods>();
+        /* get hb installation methods */
+        List<InstallMethods> hbMethods = new ArrayList<InstallMethods>();
         int i = 1;
         while (true) {
             final String index = Integer.toString(i);
@@ -387,21 +466,22 @@ public class HostCheckInstallation extends DialogHost {
             if (text == null) {
                 break;
             }
-            InstallMethods installMethod = new InstallMethods(
+            InstallMethods hbInstallMethod = new InstallMethods(
                 Tools.getString("Dialog.HostCheckInstallation.HbInstallMethod")
                 + text, i);
-            methods.add(installMethod);
+            hbMethods.add(hbInstallMethod);
             final String forVersion =
                       getHost().getDistString("HbInst.install.version." + index);
             if (forVersion != null) {
-                installedMethodMap.put(forVersion, installMethod);
+                hbInstalledMethodMap.put(forVersion, hbInstallMethod);
             }
             i++;
         }
-        final String defaultValue = methods.get(0).toString();
+        // TODO: make default value also what was already installed. */
+        final String hbDefaultValue = hbMethods.get(0).toString();
         hbInstMethodCB = new GuiComboBox(
-                           defaultValue,
-                           (Object[]) methods.toArray(new InstallMethods[methods.size()]),
+                           hbDefaultValue,
+                           (Object[]) hbMethods.toArray(new InstallMethods[hbMethods.size()]),
                            GuiComboBox.Type.COMBOBOX,
                            null,
                            0);
@@ -428,6 +508,70 @@ public class HostCheckInstallation extends DialogHost {
                     }
                 }
             }, null);
+        /* get drbd installation methods */
+        List<InstallMethods> drbdMethods = new ArrayList<InstallMethods>();
+        i = 1;
+        while (true) {
+            final String index = Integer.toString(i);
+            final String text =
+                      getHost().getDistString("DrbdInst.install.text." + index);
+            if (text == null) {
+                break;
+            }
+            String method =
+                   getHost().getDistString("DrbdInst.install.method." + index);
+            if (method == null) {
+                method = "";
+            }
+            InstallMethods drbdInstallMethod = new InstallMethods(
+               Tools.getString("Dialog.HostCheckInstallation.DrbdInstallMethod")
+               + text, i, method);
+            drbdMethods.add(drbdInstallMethod);
+            i++;
+        }
+        if (i > 1) {
+            drbdInstallMethodsAvailable = true;
+            // TODO: make default value also what was already installed. */
+            final String drbdDefaultValue = drbdMethods.get(0).toString();
+            drbdInstMethodCB = new GuiComboBox(
+                       drbdDefaultValue,
+                       (Object[]) drbdMethods.toArray(
+                                        new InstallMethods[drbdMethods.size()]),
+                       GuiComboBox.Type.COMBOBOX,
+                       null,
+                       0);
+            drbdInstMethodCB.addListeners(
+                new ItemListener() {
+                    public void itemStateChanged(final ItemEvent e) {
+                        if (e.getStateChange() == ItemEvent.SELECTED) {
+                            Thread thread = new Thread(new Runnable() {
+                                public void run() {
+                                    InstallMethods method =
+                                       (InstallMethods) drbdInstMethodCB.getValue();
+                                    final String toolTip =
+                                               getDrbdInstToolTip(method.getIndex());
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                           drbdInstMethodCB.setToolTipText(toolTip);
+                                           drbdButton.setToolTipText(toolTip);
+                                        }
+                                    });
+
+                                }
+                            });
+                            thread.start();
+                        }
+                    }
+                }, null);
+        } else {
+            drbdInstMethodCB = new GuiComboBox("",
+                                               null,
+                                               GuiComboBox.Type.COMBOBOX,
+                                               null,
+                                               0);
+            drbdInstMethodCB.setEnabled(false);
+        }
+
         pane.add(new JLabel("HB/Pacemaker"));
         pane.add(heartbeatLabel);
         pane.add(heartbeatButton);
@@ -437,8 +581,8 @@ public class HostCheckInstallation extends DialogHost {
         pane.add(drbdLabel);
         pane.add(drbdButton);
         pane.add(drbdIcon);
-        pane.add(new JPanel());
-        //pane.add(drbdInstMethodCB); // TODO
+        pane.add(drbdInstMethodCB);
+
         SpringUtilities.makeCompactGrid(pane, 2, 5,  //rows, cols
                                               1, 1,  //initX, initY
                                               1, 1); //xPad, yPad

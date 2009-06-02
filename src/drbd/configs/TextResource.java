@@ -130,16 +130,49 @@ public class TextResource extends
         {"Dialog.HostDevices.Executing",   "Executing..."},
         {"Dialog.HostDevices.CheckError",  "Failed."},
 
-        {"Dialog.HostDist.Title",          "Available Packages"},
-        {"Dialog.HostDist.Description",    "Trying to match distribution, kernel package and architecture of the server to the available binary DRBD packages. If none is selected, most likely there is no DRBD package available for your system. If you use stock kernel of your distribution, the package will be provided to you by LINBIT support (not free). After that you may retry this step again."},
-        {"Dialog.HostDist.DownloadNotAvailable", "DRBD package not available."},
-        {"Dialog.HostDist.NoDist",         "DRBD package not found."},
-        {"Dialog.HostDist.NotALinux",      "Cannot determine an operating system."},
-        {"Dialog.HostDist.NoArch",         "Cannot determine the architecture"},
-        {"Dialog.HostDist.Executing",      "Executing..."},
-        {"Dialog.HostDist.AvailVersions",  "Available versions: "},
-        {"Dialog.HostDist.NoKernels",      "Not available for this kernel"},
-        {"Dialog.HostDist.NoVersions",     "Could not find any DRBD versions"},
+        {"Dialog.HostDrbdLinbitAvailPackages.Title",
+                                           "Available Packages"},
+        {"Dialog.HostDrbdLinbitAvailPackages.Description",
+         "Trying to match distribution, kernel package and architecture of "
+         + "the server to the available binary DRBD packages. If none is "
+         + "selected, most likely there is no DRBD package available for "
+         + "your system. If you use stock kernel of your distribution, the "
+         + "package will be provided to you by LINBIT support (not free). "
+         + "After that you may retry this step again."},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Dist",
+         "There are no DRBD packages available for your distribution."},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Kernel",
+         "There are no DRBD packages available for your kernel version."},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Arch",
+         "There are no DRBD packages available at www.linbit.com for your "
+         + "kernel architecture."},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.AvailablePackages",
+         "Available packages at www.linbit.com: "},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.NoDist",
+         "DRBD package not found."},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.NotALinux",
+         "Cannot determine an operating system."},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.NoArch",
+         "Cannot determine the architecture"},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.Executing",
+         "Checking available packages..."},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.AvailVersions",
+         "Available versions: "},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.NoKernels",
+         "Not available for this kernel"},
+
+        {"Dialog.HostDrbdLinbitAvailPackages.NoVersions",
+         "Could not find any DRBD versions"},
 
         {"Dialog.HostDistDetection.Title", "Distribution Detection"},
         {"Dialog.HostDistDetection.Description", "Trying to detect the Linux distribution of the host. It is Linux, right? If none is detected, it means that the distribution is not supported. You may then choose a distribution that is similar, which may or may not work for you."},
@@ -170,6 +203,7 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.CheckingHb",        "checking..."},
         {"Dialog.HostCheckInstallation.CheckingDrbd",      "checking..."},
         {"Dialog.HostCheckInstallation.HbInstallMethod",   "Installation method: "},
+        {"Dialog.HostCheckInstallation.DrbdInstallMethod", "Installation method: "},
 
         {"Dialog.HostLogin.Title",          "Log in"},
         {"Dialog.HostLogin.Description",    "You need to log in to the http://www.linbit.com/support download area to get a package for your distribution. Please provide your username and password. Contact LINBIT support to obtain one. Alternatively you can install/upgrade the DRBD yourself and go back to the previous dialog in order to continue.<br><br>"
@@ -183,6 +217,17 @@ public class TextResource extends
         {"Dialog.HostDrbdAvailFiles.Description", "Trying to detect available packages. There should be one module and one util package if you use stock distribution kernel. If no package was auto-detected, you may choose appropriate kernel version in the pull down menu. It is also possible that packages were not build for your system at all. In that case contact LINBIT support and packages will be provided to you as soon as possible."},
         {"Dialog.HostDrbdAvailFiles.Executing",  "Executing..."},
         {"Dialog.HostDrbdAvailFiles.NoFiles",    "No packages found."},
+
+        {"Dialog.HostDrbdAvailSourceFiles.Title",
+         "Available DRBD Source Tarballs"},
+
+        {"Dialog.HostDrbdAvailSourceFiles.Description",
+         "Trying to parse available source tarballs from the LINBIT website. "
+         + "If you don't know which DRBD version should be installed, take "
+         + "the already selected one, this is also the newest one."},
+
+        {"Dialog.HostDrbdAvailSourceFiles.Executing",  "Executing..."},
+        {"Dialog.HostDrbdAvailSourceFiles.NoFiles",    "No packages found."},
 
         {"Dialog.HostDrbdInst.Title",       "DRBD Installation"},
         {"Dialog.HostDrbdInst.Description", "DRBD is being installed. If it fails with authorization errors, you entered a wrong username or password, going back, entering it correctly, would fix it. Other possibility is that wrong distribution was selected and therefore the installation did not work. Yet another remote possibility is that LINBIT servers are down, but this is not very likely, since LINBIT servers are fault-tolerant using DRBD."},
@@ -200,7 +245,26 @@ public class TextResource extends
         {"Dialog.HostHbInst.Description",  "Heartbeat packages are being installed."},
         {"Dialog.HostHbInst.Executing",    "Installing..."},
         {"Dialog.HostHbInst.InstOk",       "Heartbeat was successfully installed."},
-        {"Dialog.HostHbInst.InstError",    "Installation error, fix the error and retry."},
+
+        {"Dialog.HostHbInst.InstError",
+         "Installation error: you may have to go to the command line and fix "
+         + "whatever needs fixing there."},
+
+        {"Dialog.HostDrbdCommandInst.Title",
+         "DRBD Install"},
+
+        {"Dialog.HostDrbdCommandInst.Description",
+         "DRBD is being installed."},
+
+        {"Dialog.HostDrbdCommandInst.Executing",
+         "Installing..."},
+
+        {"Dialog.HostDrbdCommandInst.InstOk",
+         "DRBD was successfully installed."},
+
+        {"Dialog.HostDrbdCommandInst.InstError",
+         "Installation error: you may have to go to the command line and fix "
+         + "whatever needs fixing there:\n"},
 
         {"Dialog.HostFinish.Title",        "Finish"},
         {"Dialog.HostFinish.Description",  "Configuration of the host is now complete. You can now add another host or configure a cluster."},

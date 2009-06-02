@@ -44,26 +44,24 @@ public class DistResource_suse_SLES10 extends
         {"Support", "suse-SLES10"},
 
         {"HbInst.install.text.1", "http://download.opensuse.org: rug" },
-        {"HbInst.install.1", "rug service-delete ha-clustering; "
-                             + "rug key-add 'server\\x3aha-clustering OBS Project <server\\x3aha-clustering@build.opensuse.org>' 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
-                             + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
-                             + " && zypper -n install heartbeat pacemaker" 
-                             + " && /sbin/chkconfig --add heartbeat"},
-        {"HbInst.install.text.2", "http://download.opensuse.org: wget & rpm -U" },
-        {"HbInst.install.2", "rm -rf /tmp/drbd-mc-hbinst/; "
-                           + "zypper -n install libnet && "
-                           + "mkdir /tmp/drbd-mc-hbinst/ && "
-                           + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10/@ARCH@/ && "
-                           + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
-                           + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
-                           + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
-                           + "/sbin/chkconfig --add heartbeat && "
-                           + "rm -rf /tmp/drbd-mc-hbinst/"},
+        {"HbInst.install.1",
+         "rug service-delete ha-clustering; "
+         + "rug key-add 'server\\x3aha-clustering OBS Project <server\\x3aha-clustering@build.opensuse.org>' 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
+         + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
+         + " && /usr/bin/zypper -n install heartbeat pacemaker" 
+         + " && /sbin/chkconfig --add heartbeat"},
 
-        {"HbInst.install.text.3", "SLES10 repository: zypper" },
-        {"HbInst.install.version.3", "2.1.3" },
-        {"HbInst.install.3", "zypper -n install heartbeat &&" 
+        {"HbInst.install.text.2", "the suse way: possibly too old" },
+        {"HbInst.install.version.2", "2.1.3" },
+        {"HbInst.install.2", "/usr/bin/zypper -n install heartbeat &&" 
                            + "/sbin/chkconfig --add heartbeat"},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "the suse way: possibly too old"},
+
+        {"DrbdInst.install.3",
+         "/usr/bin/zypper -n install drbd drbd-kmp-default"},
 
     };
 }

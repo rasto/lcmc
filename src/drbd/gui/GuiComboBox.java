@@ -343,9 +343,9 @@ public class GuiComboBox extends JPanel {
         final JComboBox cb = (JComboBox) component;
         cb.setSelectedIndex(-1);
         for (final Object item : comboList) {
-            if (!itemCache.contains((String) item)) {
+            if (!itemCache.contains(item.toString())) {
                 cb.addItem(item);
-                itemCache.add((String) item);
+                itemCache.add(item.toString());
             }
         }
         if (selectedValueInfo != null) {

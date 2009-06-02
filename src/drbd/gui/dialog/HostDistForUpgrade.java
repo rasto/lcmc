@@ -31,7 +31,7 @@ import drbd.data.Host;
  * @version $Id$
  *
  */
-public class HostDistForUpgrade extends HostDist {
+public class HostDistForUpgrade extends HostDrbdLinbitAvailPackages {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 

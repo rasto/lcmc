@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 /**
  * Here are commands for rhel version 5.
+ * TODO: rename it to rhel
  */
 public class DistResource_redhatenterpriseserver_5 extends
             java.util.ListResourceBundle {
@@ -42,9 +43,12 @@ public class DistResource_redhatenterpriseserver_5 extends
         /* support */
         {"Support", "redhatenterpriseserver-5"},
 
-        {"HbInst.install.text.1", "http://download.opensuse.org: yum" },
+        {"HbInst.install.text.1", "http://download.opensuse.org" },
         {"HbInst.install.1", "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
                              + "yum -y install heartbeat pacemaker && "
                              + "/sbin/chkconfig --add heartbeat"},
+
+        {"HbInst.install.text.2", "the redhat way: possibly too old"},
+        {"HbInst.install.2", "/usr/bin/yum -y install heartbeat"},
     };
 }

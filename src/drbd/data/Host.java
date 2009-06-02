@@ -100,6 +100,8 @@ public class Host implements Serializable {
     private List<String> availableDrbdVersions = null;
     /** Drbd version, that will be installed. */
     private String drbdVersionToInstall = null;
+    /** Drbd version of the source tarball, that will be installed . */
+    private String drbdVersionUrlStringToInstall = null;
     /** Build, which will be installed. */
     private String drbdBuildToInstall = null;
     /** Drbd package, that will be installed. */
@@ -165,6 +167,8 @@ public class Host implements Serializable {
     private List<JComponent> enableOnConnectList = new ArrayList<JComponent>();
     /** Heartbeat installation method index. */
     private String hbInstallMethod;
+    /** Drbd installation method index. */
+    private String drbdInstallMethod;
 
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
@@ -604,12 +608,29 @@ public class Host implements Serializable {
     }
 
     /**
+     * Sets the drbd version in the form that is in the source tarball on
+     * linbit website, like so: "8.3/drbd-8.3.1.tar.gz"
+     */
+    public final void setDrbdVersionUrlStringToInstall(
+                                  final String drbdVersionUrlStringToInstall) {
+        this.drbdVersionUrlStringToInstall = drbdVersionUrlStringToInstall;
+    }
+
+    /**
      * Gets drbdVersionToInstall. This version is one that is to be installed.
      * If drbd is already installed, installedDrbdVersion contains
      * its version.
      */
     public final String getDrbdVersionToInstall() {
         return drbdVersionToInstall;
+    }
+
+    /**
+     * Gets drbd version of the source tarball in the form as it is on
+     * the linbit website: "8.3/drbd-8.3.1.tar.gz"
+     */
+    public final String getDrbdVersionUrlStringToInstall() {
+        return drbdVersionUrlStringToInstall;
     }
 
     /**
@@ -1862,9 +1883,23 @@ public class Host implements Serializable {
     }
 
     /**
-     * Returns heartbeat  installation method.
+     * Returns heartbeat installation method.
      */
     public final String getHbInstallMethod() {
         return hbInstallMethod;
+    }
+
+    /**
+     * Sets drbd installation method index.
+     */
+    public final void setDrbdInstallMethod(final String drbdInstallMethod) {
+        this.drbdInstallMethod = drbdInstallMethod;
+    }
+
+    /**
+     * Returns drbd installation method.
+     */
+    public final String getDrbdInstallMethod() {
+        return drbdInstallMethod;
     }
 }

@@ -690,6 +690,8 @@ public class ClusterBrowser extends Browser {
             host.execDrbdStatusCommand(
                                   new ExecCallback() {
                                        public void done(final String ans) {
+                                           host.setDrbdStatus(true);
+                                           drbdGraph.repaint();
                                        }
 
                                        public void doneError(final String ans, final int exitCode) {
@@ -697,11 +699,12 @@ public class ClusterBrowser extends Browser {
                                            if (exitCode != 143) {
                                                /* was killed intentionally */
                                                host.setDrbdStatus(false);
+                                               drbdGraph.repaint();
                                            }
                                            //TODO: repaint ok?
                                            //repaintSplitPane();
                                            //drbdGraph.updatePopupMenus();
-                                           drbdGraph.repaint();
+                                           //drbdGraph.repaint();
                                        }
                                    },
 
@@ -709,6 +712,7 @@ public class ClusterBrowser extends Browser {
                                        public void output(final String output) {
                                            if (output.indexOf("No response from the DRBD driver") >= 0) {
                                                host.setDrbdStatus(false);
+                                               drbdGraph.repaint();
                                                return;
                                            } else {
                                                host.setDrbdStatus(true);
@@ -719,6 +723,7 @@ public class ClusterBrowser extends Browser {
                                            final String[] lines = output.split("\n");
                                            drbdXML.update(host);
                                            host.setDrbdStatus(true);
+                                           drbdGraph.repaint();
                                            for (int i = 0; i < lines.length; i++) {
                                                parseDrbdEvent(host.getName(), lines[i]);
                                            }

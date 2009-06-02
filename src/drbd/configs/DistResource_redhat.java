@@ -44,7 +44,33 @@ public class DistResource_redhat extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
 
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
-        {"HbInst.install.text.1", "yum"},
+        {"HbInst.install.text.1", "the centos way: possibly too old"},
         {"HbInst.install.1", "/usr/bin/yum -y install heartbeat"},
+
+        /* Drbd install method 2 */
+        {"DrbdInst.install.text.2",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.2",
+         "source"},
+
+        {"DrbdInst.install.2",
+         "/bin/mkdir -p /tmp/drbdinst && "
+         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
+         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         + "cd /tmp/drbdinst && "
+         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
+         + "cd drbd-@VERSION@ && "
+         + "/usr/bin/yum -y install flex gcc kernel-devel && "
+         + "make && make install && "
+         + "/sbin/chkconfig --add drbd && "
+         + "/bin/rm -rf /tmp/drbdinst"},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "the centos way: possibly too old"},
+
+        {"DrbdInst.install.3",
+         "/usr/bin/yum -y install kmod-drbd82 drbd82"},
     };
 }

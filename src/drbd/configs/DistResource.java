@@ -81,8 +81,16 @@ public class DistResource extends
          * ------
          */
         {"DrbdAvailVersions",
-         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/@SUPPORTDIR@/ -O - |perl -ple '($_) = /href=\"@DRBDDIR@-(\\d.*?)\\/\"/ or goto LINE'"
-        },
+         "/usr/bin/wget --no-check-certificate -q "
+         + "http://www.linbit.com/@SUPPORTDIR@/ -O - "
+         + "|perl -ple '($_) = /href=\"@DRBDDIR@-(\\d.*?)\\/\"/ or goto LINE'"},
+
+        {"DrbdAvailVersionsSource",
+         "/usr/bin/wget --no-check-certificate -q http://oss.linbit.com/drbd/"
+         + " -O - |"
+         + "perl -ple '($_) = m!href=\"(\\d\\.\\d/drbd-.*?\\.tar\\.gz)\"!"
+         + " or goto LINE'"
+         },
 
         {"DrbdAvailDistributions",
          "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/ -O - |perl -ple '($_) = m!href=\"([^\"/]+)/\"! or goto LINE'"
@@ -201,5 +209,10 @@ public class DistResource extends
 
         {"Logs.hbLog",     "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null || grep @GREPPATTERN@ /var/log/syslog)|tail -500"},
         {"DrbdLog.log",    "grep @GREPPATTERN@ /var/log/kern.log | tail -500"},
+
+        {"DrbdInst.install.text.1", "packages from LINBIT"},
+        {"DrbdInst.install.1",
+                        " packages from www.linbit.com for LINBIT customers"},
+        {"DrbdInst.install.method.1",       "linbit"},
     };
 }

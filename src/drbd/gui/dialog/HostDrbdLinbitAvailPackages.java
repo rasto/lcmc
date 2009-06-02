@@ -32,10 +32,14 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.util.List;
+import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.Box;
 
@@ -47,7 +51,7 @@ import javax.swing.Box;
  * @version $Id$
  *
  */
-public class HostDist extends DialogHost {
+public class HostDrbdLinbitAvailPackages extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Combo box with distributions. */
@@ -57,8 +61,12 @@ public class HostDist extends DialogHost {
     /** Combo box with available architectures versions for this distribution.
      */
     private GuiComboBox drbdArchCombo = null;
-    /** Whether the listeners where already added to the combo boxes. */
-    private boolean listenersAdded = false;
+    /** List of items in the dist combo */
+    private List<String> drbdDistItems = null;
+    /** List of items in the kernel versions combo */
+    private List<String> drbdKernelDirItems = null;
+    /** List of items in the arch combo */
+    private List<String> drbdArchItems = null;
     /** No match string. */
     private static final String NO_MATCH_STRING = "No Match";
     /** Newline. */
@@ -67,9 +75,10 @@ public class HostDist extends DialogHost {
     private static final int CHOICE_BOX_HEIGHT = 30;
 
     /**
-     * Prepares a new <code>HostDist</code> object.
+     * Prepares a new <code>HostDrbdLinbitAvailPackages</code> object.
      */
-    public HostDist(final WizardDialog previousDialog, final Host host) {
+    public HostDrbdLinbitAvailPackages(final WizardDialog previousDialog,
+                                       final Host host) {
         super(previousDialog, host);
     }
 
@@ -83,12 +92,13 @@ public class HostDist extends DialogHost {
         drbdDistCombo.setEnabled(false);
         drbdKernelDirCombo.setEnabled(false);
         drbdArchCombo.setEnabled(false);
+        getProgressBar().start(20000);
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailVersions",
                           null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(final String ans) {
-                                String[] items = ans.split(NEWLINE);
+                                final String[] items = ans.split(NEWLINE);
                                 /* all drbd versions are stored in form
                                  * {version1,version2,...}. This will be
                                  * later expanded by shell. */
@@ -109,7 +119,7 @@ public class HostDist extends DialogHost {
                             public void doneError(final String ans,
                                                   final int exitCode) {
                                 printErrorAndRetry(Tools.getString(
-                                                "Dialog.HostDist.NoVersions"),
+                              "Dialog.HostDrbdLinbitAvailPackages.NoVersions"),
                                                    ans,
                                                    exitCode);
                             }
@@ -123,28 +133,34 @@ public class HostDist extends DialogHost {
      * Checks the available distributions.
      */
     protected void availDistributions() {
-        drbdKernelDirCombo.setEnabled(false);
-        drbdArchCombo.setEnabled(false);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                drbdKernelDirCombo.setEnabled(false);
+                drbdArchCombo.setEnabled(false);
+            }
+        });
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailDistributions",
                           null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(String ans) {
                                 ans = NO_MATCH_STRING + "\n" + ans;
-                                // TODO: should be "\n" ?
-                                String[] items = ans.split(NEWLINE);
-                                drbdDistCombo.reloadComboBox(
+                                final String[] items = ans.split(NEWLINE);
+                                drbdDistItems = Arrays.asList(items);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        drbdDistCombo.reloadComboBox(
                                                     getHost().getDistVersion(),
                                                     items);
-                                String selectedItem =
-                                                drbdDistCombo.getStringValue();
-                                drbdDistCombo.setEnabled(true);
+                                        drbdDistCombo.setEnabled(true);
+                                    }
+                                });
                                 availKernels();
                             }
                             public void doneError(final String ans,
                                                   final int exitCode) {
                                 printErrorAndRetry(Tools.getString(
-                                            "Dialog.HostDist.NoDistributions"),
+                          "Dialog.HostDrbdLinbitAvailPackages.NoDistributions"),
                                                    ans,
                                                    exitCode);
                             }
@@ -159,29 +175,33 @@ public class HostDist extends DialogHost {
      */
     protected void availKernels() {
         final String distVersion = getHost().getDistVersion();
-        if (distVersion == null || distVersion.equals(NO_MATCH_STRING)) {
-            drbdKernelDirCombo.reloadComboBox(null,
-                                              new String[]{NO_MATCH_STRING});
-            drbdKernelDirCombo.setEnabled(false);
-            getHost().setKernelVersion(null);
+        if (drbdDistItems == null || !drbdDistItems.contains(distVersion)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    drbdKernelDirCombo.reloadComboBox(
+                                                null,
+                                                new String[]{NO_MATCH_STRING});
+                }
+            });
             availArchs();
             return;
         }
-        drbdArchCombo.setEnabled(false);
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailKernels",
                           null, /* ProgressBar */
                           new ExecCallback() {
                             public void done(String ans) {
                                 ans = NO_MATCH_STRING + "\n" + ans;
-                                String[] items = ans.split(NEWLINE);
-                                drbdKernelDirCombo.reloadComboBox(
+                                final String[] items = ans.split(NEWLINE);
+                                drbdKernelDirItems = Arrays.asList(items);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        drbdKernelDirCombo.reloadComboBox(
                                                 getHost().getKernelVersion(),
                                                 items);
-                                String selectedItem =
-                                            drbdKernelDirCombo.getStringValue();
-                                getHost().setKernelVersion(selectedItem);
-                                drbdKernelDirCombo.setEnabled(true);
+                                        drbdKernelDirCombo.setEnabled(true);
+                                    }
+                                });
                                 availArchs();
                             }
 
@@ -189,7 +209,7 @@ public class HostDist extends DialogHost {
                                                   final int exitCode) {
                                 Tools.debug(this, "doneError");
                                 printErrorAndRetry(
-                                   Tools.getString("Dialog.HostDist.NoKernels"),
+                Tools.getString("Dialog.HostDrbdLinbitAvailPackages.NoKernels"),
                                    ans,
                                    exitCode);
                             }
@@ -204,10 +224,19 @@ public class HostDist extends DialogHost {
      */
     protected void availArchs() {
         final String kernelVersion = getHost().getKernelVersion();
-        if (kernelVersion == null || kernelVersion.equals(NO_MATCH_STRING)) {
-            drbdArchCombo.reloadComboBox(null, new String[]{NO_MATCH_STRING});
-            drbdArchCombo.setEnabled(false);
-            getHost().setArch(null);
+        final String arch = getHost().getArch();
+        if (drbdDistItems == null
+            || drbdKernelDirItems == null
+            || arch == null
+            || !drbdDistItems.contains(getHost().getDistVersion())
+            || !drbdKernelDirItems.contains(kernelVersion)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    drbdArchCombo.reloadComboBox(null,
+                                                 new String[]{NO_MATCH_STRING});
+                    drbdArchCombo.setEnabled(false);
+                }
+            });
             allDone(null);
             return;
         }
@@ -217,17 +246,18 @@ public class HostDist extends DialogHost {
                           new ExecCallback() {
                             public void done(String ans) {
                                 ans = NO_MATCH_STRING + "\n" + ans;
-                                String defaultValue = getHost().getArch();
-                                String[] items = ans.split(NEWLINE);
-                                drbdArchCombo.reloadComboBox(
-                                                        getHost().getArch(),
+                                final String[] items = ans.split(NEWLINE);
+                                drbdArchItems = Arrays.asList(items);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        drbdArchCombo.reloadComboBox(
+                                                        arch,
                                                         items);
-                                String selectedItem =
-                                                drbdArchCombo.getStringValue();
-                                drbdArchCombo.setEnabled(true);
-                                getHost().setArch(selectedItem);
-                                if (selectedItem == null
-                                    || selectedItem.equals(NO_MATCH_STRING)) {
+                                        drbdArchCombo.setEnabled(true);
+                                    }
+                                });
+                                if (drbdArchItems == null
+                                    || !drbdArchItems.contains(arch)) {
                                     allDone(null);
                                 } else {
                                     availVersionsForDist();
@@ -236,10 +266,10 @@ public class HostDist extends DialogHost {
 
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                printErrorAndRetry(
-                                    Tools.getString("Dialog.HostDist.NoArchs"),
-                                    ans,
-                                    exitCode);
+                                printErrorAndRetry(Tools.getString(
+                                 "Dialog.HostDrbdLinbitAvailPackages.NoArchs"),
+                                                   ans,
+                                                   exitCode);
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -263,7 +293,8 @@ public class HostDist extends DialogHost {
                             public void doneError(final String ans,
                                                   final int exitCode) {
                                 printErrorAndRetry(
-                                    Tools.getString("Dialog.HostDist.NoArchs"),
+                                    Tools.getString(
+                                  "Dialog.HostDrbdLinbitAvailPackages.NoArchs"),
                                     ans,
                                     exitCode);
                             }
@@ -286,25 +317,41 @@ public class HostDist extends DialogHost {
                       Tools.getDistString("Support",
                                           getHost().getDist(),
                                           getHost().getDistVersionString());
-        final String answerText = "detected: " + getHost().getDetectedInfo()
-                                  + "\n" + getHost().getDist()
-                                  + "\nversion: " + getHost().getDistVersion()
-                                  + " (support file: " + support + ")";
         if (ans == null) {
-            answerPaneSetText(answerText + "\n"
-                              + Tools.getString(
-                                       "Dialog.HostDist.DownloadNotAvailable"));
+            final StringBuffer errorText = new StringBuffer(80);
+            final String dist = getHost().getDistVersion();
+            final String kernel = getHost().getKernelVersion();
+            final String arch = getHost().getArch();
+            if (drbdDistItems == null || !drbdDistItems.contains(dist)) {
+                errorText.append(
+                  Tools.getString(
+                    "Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Dist"));
+            } else if (drbdKernelDirItems == null
+                       || !drbdKernelDirItems.contains(kernel)) {
+                errorText.append(
+                  Tools.getString(
+                    "Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Kernel"));
+            } else if (drbdArchItems == null || !drbdArchItems.contains(arch)) {
+                errorText.append(
+                  Tools.getString(
+                    "Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Arch"));
+            }
+            errorText.append("\n\n");
+            errorText.append(dist);
+            errorText.append("\n");
+            errorText.append(kernel);
+            errorText.append("\n");
+            errorText.append(arch);
+            printErrorAndRetry(errorText.toString());
         } else {
             final String[] versions = ans.split(NEWLINE);
             getHost().setAvailableDrbdVersions(versions);
-            answerPaneSetText(answerText + "\n"
-                              + Tools.getString("Dialog.HostDist.AvailVersions")
-                              + " " + Tools.join(", ", versions));
+            answerPaneSetText(
+                    Tools.getString(
+                        "Dialog.HostDrbdLinbitAvailPackages.AvailVersions")
+                    + " " + Tools.join(", ", versions));
         }
-        if (!listenersAdded) {
-            addListeners();
-            listenersAdded = true;
-        }
+        addListeners();
     }
 
     /**
@@ -330,18 +377,19 @@ public class HostDist extends DialogHost {
 
     /**
      * Returns the title of the dialog. It is defined as
-     * Dialog.HostDist.Title in TextResources.
+     * Dialog.HostDrbdLinbitAvailPackages.Title in TextResources.
      */
     protected String getHostDialogTitle() {
-        return Tools.getString("Dialog.HostDist.Title");
+        return Tools.getString("Dialog.HostDrbdLinbitAvailPackages.Title");
     }
 
     /**
      * Returns the description of the dialog. It is defined as
-     * Dialog.HostDist.Description in TextResources.
+     * Dialog.HostDrbdLinbitAvailPackages.Description in TextResources.
      */
     protected String getDescription() {
-        return Tools.getString("Dialog.HostDist.Description");
+        return Tools.getString(
+                            "Dialog.HostDrbdLinbitAvailPackages.Description");
     }
 
     /**
@@ -387,21 +435,16 @@ public class HostDist extends DialogHost {
      * Adds listeners to the check boxes.
      */
     private void addListeners() {
-        /* listeners */
+        /* listeners, that disallow to select anything. */
         /* distribution combo box */
         final ItemListener distItemListener = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    drbdKernelDirCombo.setEnabled(false);
-                    drbdArchCombo.setEnabled(false);
-                    final String item = drbdDistCombo.getStringValue();
-                    SwingUtilities.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                getHost().setDistVersion(item);
-                                availKernels();
-                            }
-                        });
+                    String v = getHost().getDistVersion();
+                    if (drbdDistItems == null || !drbdDistItems.contains(v)) {
+                        v = NO_MATCH_STRING;
+                    }
+                    drbdDistCombo.setValue(v);
                 }
             }
         };
@@ -411,15 +454,12 @@ public class HostDist extends DialogHost {
         final ItemListener kernelItemListener = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    drbdArchCombo.setEnabled(false);
-                    final String item = drbdKernelDirCombo.getStringValue();
-                    SwingUtilities.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                getHost().setKernelVersion(item);
-                                availArchs();
-                            }
-                        });
+                    String v = getHost().getKernelVersion();
+                    if (drbdKernelDirItems == null
+                        || !drbdKernelDirItems.contains(v)) {
+                        v = NO_MATCH_STRING;
+                    }
+                    drbdKernelDirCombo.setValue(v);
                 }
             }
         };
@@ -429,14 +469,11 @@ public class HostDist extends DialogHost {
         final ItemListener archItemListener = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final String item = drbdArchCombo.getStringValue();
-                    SwingUtilities.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                getHost().setArch(item);
-                                availVersionsForDist();
-                            }
-                        });
+                    String v = getHost().getArch();
+                    if (drbdArchItems == null || !drbdArchItems.contains(v)) {
+                        v = NO_MATCH_STRING;
+                    }
+                    drbdArchCombo.setValue(v);
                 }
             }
         };
@@ -449,10 +486,19 @@ public class HostDist extends DialogHost {
      */
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        pane.add(getProgressBarPane());
+        final JPanel progrPane = getProgressBarPane();
+        pane.add(progrPane);
+        final JPanel labelP = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        labelP.setPreferredSize(new Dimension(0, 0));
+        labelP.add(new JLabel(
+            Tools.getString(
+                "Dialog.HostDrbdLinbitAvailPackages.AvailablePackages")));
+        labelP.setBackground(progrPane.getBackground());
+        pane.add(labelP);
         pane.add(getChoiceBoxes());
-        pane.add(getAnswerPane(Tools.getString("Dialog.HostDist.Executing")));
-        SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
+        pane.add(getAnswerPane(Tools.getString(
+                            "Dialog.HostDrbdLinbitAvailPackages.Executing")));
+        SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad
         return pane;
