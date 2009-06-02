@@ -579,13 +579,13 @@ public final class Heartbeat {
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
         xml.append("\" " + rscString + "=\"");
-        xml.append(parentHbId);
+        xml.append(heartbeatId);
         if (score != null) {
             xml.append("\" score=\"");
             xml.append(score);
         }
         xml.append("\" " + withRscString + "=\"");
-        xml.append(heartbeatId);
+        xml.append(parentHbId);
         xml.append("\"/>'");
         final String command = getCibCommand("-C", 
                                              "constraints",
