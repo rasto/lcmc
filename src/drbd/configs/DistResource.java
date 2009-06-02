@@ -88,7 +88,7 @@ public class DistResource extends
         {"DrbdAvailVersionsSource",
          "/usr/bin/wget --no-check-certificate -q http://oss.linbit.com/drbd/"
          + " -O - |"
-         + "perl -ple '($_) = m!href=\"(\\d\\.\\d/drbd-.*?\\.tar\\.gz)\"!"
+         + "perl -ple '($_) = m!href=\"(\\d\\.\\d/drbd-[89].*?\\.tar\\.gz)\"!"
          + " or goto LINE'"
          },
 

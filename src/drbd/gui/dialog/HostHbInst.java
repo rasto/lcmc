@@ -59,8 +59,8 @@ public class HostHbInst extends DialogHost {
     public void checkAnswer(final String ans) {
         // TODO: check if it really failes
         nextDialogObject = new HostCheckInstallation(this, getHost());
-        progressBarDoneError();
-        answerPaneSetTextError(Tools.getString("Dialog.HostHbInst.InstOk"));
+        progressBarDone();
+        answerPaneSetText(Tools.getString("Dialog.HostHbInst.InstOk"));
         enableComponents();
         buttonClass(nextButton()).requestFocus();
     }

@@ -245,12 +245,14 @@ public class HostCheckInstallation extends DialogHost {
                           "Dialog.HostCheckInstallation.DrbdUpgradeButton"));
                         if (drbdInstallMethodsAvailable) {
                             drbdButton.setEnabled(true);
+                            drbdInstMethodCB.setEnabled(true);
                         }
                     } else {
                         drbdButton.setText(Tools.getString(
                           "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"));
                         if (drbdInstallMethodsAvailable) {
                             drbdButton.setEnabled(true);
+                            drbdInstMethodCB.setEnabled(true);
                         }
                         drbdIcon.setIcon(INSTALLED_ICON);
                     }
@@ -574,14 +576,14 @@ public class HostCheckInstallation extends DialogHost {
 
         pane.add(new JLabel("HB/Pacemaker"));
         pane.add(heartbeatLabel);
-        pane.add(heartbeatButton);
         pane.add(heartbeatIcon);
         pane.add(hbInstMethodCB);
+        pane.add(heartbeatButton);
         pane.add(new JLabel("Drbd"));
         pane.add(drbdLabel);
-        pane.add(drbdButton);
         pane.add(drbdIcon);
         pane.add(drbdInstMethodCB);
+        pane.add(drbdButton);
 
         SpringUtilities.makeCompactGrid(pane, 2, 5,  //rows, cols
                                               1, 1,  //initX, initY
