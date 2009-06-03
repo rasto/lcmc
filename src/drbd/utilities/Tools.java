@@ -51,9 +51,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.DefaultListModel;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.UIManager;
 
 import java.awt.Component;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -1485,5 +1488,16 @@ public final class Tools {
      */
     public static boolean isLinux() {
         return "Linux".equals(System.getProperty("os.name"));
+    }
+
+    /**
+     * Sets the html font of the editor pane to be the default font.
+     */
+    public static void setEditorFont(final JEditorPane ep) {
+        final Font font = UIManager.getFont("Label.font");
+        final String bodyRule = "body { font-family: " + font.getFamily() +
+                                "; " +
+                                "font-size: " + font.getSize() + "pt; }";
+        ((HTMLDocument) ep.getDocument()).getStyleSheet().addRule(bodyRule);
     }
 }

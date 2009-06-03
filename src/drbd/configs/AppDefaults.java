@@ -124,6 +124,7 @@ public class AppDefaults extends
         {"ViewPanel.Status.Background",      LINBIT_ORANGE },
         {"ViewPanel.Foreground",             Color.BLACK },
         {"ViewPanel.Status.Foreground",      Color.WHITE },
+        {"EmptyViewPanel.Help.Background",   Color.WHITE },
         //{"ClustersPanel.Background",         LINBIT_LIGHT_ORANGE },
         {"ClustersPanel.Background",         Color.WHITE },
         {"HostsTab.Background",              Color.GRAY },

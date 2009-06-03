@@ -674,5 +674,38 @@ public class TextResource extends
         {"Dialog.Logs.Title",                 "Log Viewer"},
 
         {"Error.Title",                       "Error"},
+
+        {"EmptyViewPanel.HelpButton",
+         "I am new here"},
+
+        {"EmptyViewPanel.HideHelpButton",
+         "I am a DMC expert"},
+
+        {"EmptyViewPanel.HelpText",
+"<h3>Welcome to the DRBD Management Console.</h3>"
++ "<p>You can start by clicking on the \"Host Wizard\" button. When you have added at least\n"
++ "two hosts, you can combine them in a new cluster with \"Cluster Wizard\" button.\n"
++ "The same way you can add also an existing cluster, configured and running or any\n"
++ "combination of the previous, just do not press the \"Create HB Config\" button,\n"
++ "in the \"Heartbeat Initialization\" dialog window and you and the cluster will\n"
++ "be fine.</p>"
+
++ "<p><i>And of course this is a beta software, so do not forget to double check\n"
++ "everything the gui is doing and if you find a bug file a bug report.</i></p>"
+
++ "<p>You can start even if you have nothing installed, just a Linux distribution of\n"
++ "course. There is a possibility to install all required components from\n"
++ "different sources with different methods during the \"host wizard\" phase\n"
++ "and have a running cluster in under a minute or two.</p>"
+
++ "<p>The host and cluster wizards allow you to install, configure, start and get\n"
++ "a visual overview of the DRBD, Pacemaker (Heartbeat) clusters.\n"
++ "The configuration part of Pacemaker-Heartbeat is still very basic and\n"
++ "Pacemaker-Openais is non-existent at the moment, so you would have to write\n"
++ "the config file by yourself, till it is properly implemented.</p>"
+
++ "<p>Thanks.</p>"
+        },
+
     };
 }

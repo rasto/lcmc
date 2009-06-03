@@ -30,7 +30,6 @@ import drbd.utilities.MyButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
-
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;

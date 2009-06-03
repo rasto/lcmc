@@ -28,12 +28,17 @@ import drbd.utilities.AllHostsUpdatable;
 import drbd.utilities.MyButton;
 
 import javax.swing.JTree;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import java.awt.FlowLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.CardLayout;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -55,6 +60,9 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Normal background color. */
+    private static final Color HELP_BACKGROUND =
+                        Tools.getDefaultColor("EmptyViewPanel.Help.Background");
     /** Add cluster icon. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                    Tools.getDefault("ClusterTab.ClusterIcon"));
@@ -64,6 +72,19 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Dimension of the big buttons. */
     private static final Dimension BIG_BUTTON_DIMENSION =
                                                     new Dimension(300, 100);
+    /** Logo panel for card layout */
+    private static final String LOGO_PANEL_STRING = "LOGO-STRING";
+    /** Help panel for card layout */
+    private static final String HELP_PANEL_STRING = "HELP-STRING";
+    /** I am new here button text */
+    private static final String HELP_BUTTON_STRING =
+                                Tools.getString("EmptyViewPanel.HelpButton");
+    /** Button that hides the help text */
+    private static final String HIDE_HELP_BUTTON_STRING =
+                                Tools.getString("EmptyViewPanel.HideHelpButton");
+    /** I am new here help text */
+    private static final String HELP_TEXT_STRING =
+                                Tools.getString("EmptyViewPanel.HelpText");
     /** Menu tree object. */
     private JTree tree;
     /**
@@ -71,7 +92,6 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
      */
     public EmptyViewPanel() {
         super();
-        /* add new cluster button */
         browser = new EmptyBrowser();
         browser.setEmptyViewPanel(this);
         browser.initHosts();
@@ -82,7 +102,86 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 110));
         buttonPanel.setBackground(STATUS_BACKGROUND);
         add(buttonPanel, BorderLayout.NORTH);
+        final JPanel logoPanel = new JPanel(new CardLayout());
+        logoPanel.setBackground(STATUS_BACKGROUND);
+        final ImageIcon logoImage = Tools.createImageIcon(
+                                                        "startpage_head.jpg");
 
+        final JLabel logo = new JLabel(logoImage);
+        logoPanel.add(logo, LOGO_PANEL_STRING);
+        final JEditorPane hp = new JEditorPane("text/html", HELP_TEXT_STRING);
+        hp.setCaretPosition(0);
+        Tools.setEditorFont(hp);
+
+        hp.setBackground(HELP_BACKGROUND);
+        hp.setEditable(false);
+        final JScrollPane sp = new JScrollPane(hp);
+        sp.setHorizontalScrollBarPolicy(
+                              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        final JPanel helpPanel = new JPanel();
+        helpPanel.setBackground(STATUS_BACKGROUND);
+        helpPanel.setPreferredSize(
+                            new Dimension(600, logoImage.getIconHeight()));
+        sp.setPreferredSize(
+                        new Dimension(600, logoImage.getIconHeight() - 20));
+        helpPanel.add(sp);
+        logoPanel.add(helpPanel, HELP_PANEL_STRING);
+        /* add "I am new here" button */
+        final EmptyViewPanel thisPanel = this;
+        final MyButton newButton = new MyButton("I am new here");
+        buttonPanel.add(newButton);
+        newButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(
+                    new Runnable() {
+                        public void run() {
+                            final CardLayout cl =
+                                        (CardLayout) (logoPanel.getLayout());
+                            final String btnString = e.getActionCommand();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (HELP_BUTTON_STRING.equals(btnString)) {
+                                        cl.show(logoPanel, HELP_PANEL_STRING);
+                                        newButton.setText(
+                                                    HIDE_HELP_BUTTON_STRING);
+                                    } else {
+                                        cl.show(logoPanel, LOGO_PANEL_STRING);
+                                        newButton.setText(HELP_BUTTON_STRING);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                thread.start();
+            }
+        });
+        /* add new host button */
+        final MyButton addHostButton = new MyButton(
+                                    Tools.getString("ClusterTab.AddNewHost"),
+                                    HOST_ICON);
+        addHostButton.setBackground(
+                        Tools.getDefaultColor("DefaultButton.Background"));
+        addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
+        addHostButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(
+                    new Runnable() {
+                        public void run() {
+                            final AddHostDialog ahd = new AddHostDialog();
+                            ahd.showDialogs();
+                        }
+                    });
+                thread.start();
+            }
+        });
+        Tools.getGUIData().registerAddHostButton(addHostButton);
+        buttonPanel.add(addHostButton);
+        createEmptyView();
+        add(logoPanel, BorderLayout.SOUTH);
+        Tools.getGUIData().registerAllHostsUpdate(this);
+        Tools.getGUIData().allHostsUpdate();
+
+        /* add new cluster button */
         final MyButton addClusterButton =
                 new MyButton(Tools.getString("ClusterTab.AddNewCluster"),
                              CLUSTER_ICON);
@@ -106,33 +205,6 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         Tools.getGUIData().checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
 
-        /* add new host button */
-        final MyButton addHostButton = new MyButton(
-                                    Tools.getString("ClusterTab.AddNewHost"),
-                                    HOST_ICON);
-        addHostButton.setBackground(
-                        Tools.getDefaultColor("DefaultButton.Background"));
-        addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
-        addHostButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(
-                    new Runnable() {
-                        public void run() {
-                            final AddHostDialog ahd = new AddHostDialog();
-                            ahd.showDialogs();
-                        }
-                    });
-                thread.start();
-            }
-        });
-        Tools.getGUIData().registerAddHostButton(addHostButton);
-        buttonPanel.add(addHostButton);
-        createEmptyView();
-        final JLabel logo = new JLabel(Tools.createImageIcon(
-                                                    "startpage_head.jpg"));
-        add(logo, BorderLayout.SOUTH);
-        Tools.getGUIData().registerAllHostsUpdate(this);
-        Tools.getGUIData().allHostsUpdate();
     }
 
     /**
