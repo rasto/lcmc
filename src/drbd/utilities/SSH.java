@@ -43,6 +43,7 @@ import com.trilead.ssh2.InteractiveCallback;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.KnownHosts;
+import com.trilead.ssh2.ConnectionMonitor;
 
 /**
  * Verifying server hostkeys with an existing known_hosts file
@@ -95,23 +96,6 @@ public class SSH {
         }
         if (disconnectForGood) {
             return false;
-        }
-        if (isConnected()) {
-            // TODO: isConnected does not work all the time.
-            // TODO: connection can be null in between
-            try {
-                connection.sendIgnorePacket();
-            } catch (java.io.IOException e) {
-                // retry
-                Tools.debug(this, "connection failed: " + host.getName());
-                if (connection != null) {
-                    //TODO: need proper locking here
-                    connection.close();
-                    connection = null;
-                }
-            } catch (java.lang.IllegalStateException e) {
-                /* ignoring */
-            }
         }
         if (!isConnected()) {
             Tools.debug(this, "connecting: " + host.getName());
@@ -256,6 +240,38 @@ public class SSH {
             disconnectForGood = true;
             Tools.debug(this, "disconnecting: " + host.getName(), 0);
             connection.close();
+            connection = null;
+            host.getTerminalPanel().addCommand("logout");
+            host.getTerminalPanel().nextCommand();
+        }
+    }
+
+    /**
+     * Disconnects this host if it was connected. This should be called if
+     * there is an assumption that the connection was lost.There is no way
+     * with ganymed ssh library to find out if connection was lost at the
+     * moment. The difference to the normal disconnect is that the
+     * Connection.close is not called which would hang. The old connection
+     * thread will probably will stay there, so here is an infrequent leak.
+     *
+     * After this method is called a reconnect will work as expected.
+     */
+    public final void forceReconnect() {
+        if (connection != null) {
+            Tools.debug(this, "force reconnecting: " + host.getName(), 0);
+            connection = null;
+            host.getTerminalPanel().addCommand("logout");
+            host.getTerminalPanel().nextCommand();
+        }
+    }
+
+    /**
+     * Force disconnection.
+     */
+    public final void forceDisconnect() {
+        if (connection != null) {
+            disconnectForGood = true;
+            Tools.debug(this, "force disconnecting: " + host.getName(), 0);
             connection = null;
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
@@ -966,6 +982,7 @@ public class SSH {
         public void cancel() {
             cancelIt = true;
         }
+
         /**
          * Start connection in the thread.
          */
@@ -975,7 +992,6 @@ public class SSH {
                     callback.done(1);
                 }
             }
-            Tools.debug(this, "getting connection");
             final Connection conn = new Connection(hostname,
                                                    host.getSSHPortInt());
             disconnectForGood = false;
@@ -996,6 +1012,17 @@ public class SSH {
                                         ? connectTimeout : kexTimeout;
                     progressBar.start(timeout);
                 }
+                /* ConnectionMonitor does not work if we lost a connection */
+                //final ConnectionMonitor connectionMonitor =
+                //                               new ConnectionMonitor() {
+                //    public void connectionLost(java.lang.Throwable reason) {
+                //        System.out.println(host.getName() + ": connection lost");
+                //        if (!disconnectForGood) {
+                //            connection = null;
+                //        }
+                //    }
+                //};
+                //conn.addConnectionMonitor(connectionMonitor);
                 conn.connect(new AdvancedVerifier(),
                              connectTimeout,
                              kexTimeout);
@@ -1261,20 +1288,11 @@ public class SSH {
                     if (callback != null) {
                         callback.doneError("");
                     }
+                    connection = null;
                     host.setConnected();
                 } else {
                     //  authentication ok.
                     connection = conn;
-                    //ConnectionMonitor connectionMonitor =
-                    //                               new ConnectionMonitor() {
-                    //    public void connectionLost(
-                    //                          java.lang.Throwable reason) {
-                    //        if (!disconnectForGood) {
-                    //            connection = null;
-                    //        }
-                    //    }
-                    //};
-                    //connection.addConnectionMonitor(connectionMonitor);
                     host.setConnected();
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -1289,7 +1307,6 @@ public class SSH {
                     Tools.debug(this, "authentication ok");
                 }
             } catch (IOException e) {
-                System.out.println("connection failed: " + host.getName());
                 Tools.debug(this, e.getMessage(), 0);
                 connectionFailed = true;
                 if (!cancelIt) {
@@ -1301,6 +1318,7 @@ public class SSH {
                     }
                 }
                 connectionThread = null;
+                connection = null;
                 host.setConnected();
             }
         }

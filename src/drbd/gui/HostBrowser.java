@@ -368,7 +368,10 @@ public class HostBrowser extends Browser {
             if (host.getCluster().getBrowser().isRealDcHost(host)) {
                 tt.append(" (designated co-ordinator)");
             }
-            if (!host.isDrbdStatus() && !host.isHbStatus()) {
+            if (!host.isConnected()) {
+                tt.append('\n');
+                tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
+            } else if (!host.isDrbdStatus() && !host.isHbStatus()) {
                 tt.append('\n');
                 tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
             }

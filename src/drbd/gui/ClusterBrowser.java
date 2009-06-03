@@ -688,64 +688,80 @@ public class ClusterBrowser extends Browser {
             final boolean ft = firstTime;
             drbdStatusCanceled = false;
             host.execDrbdStatusCommand(
-                                  new ExecCallback() {
-                                       public void done(final String ans) {
-                                           host.setDrbdStatus(true);
-                                           drbdGraph.repaint();
-                                       }
+                  new ExecCallback() {
+                       public void done(final String ans) {
+                           host.setDrbdStatus(true);
+                           drbdGraph.repaint();
+                       }
 
-                                       public void doneError(final String ans, final int exitCode) {
-                                           Tools.debug(this, "drbd status failed: " + host.getName() + "exit code: " + exitCode, 2);
-                                           if (exitCode != 143) {
-                                               /* was killed intentionally */
-                                               host.setDrbdStatus(false);
-                                               drbdGraph.repaint();
-                                           }
-                                           //TODO: repaint ok?
-                                           //repaintSplitPane();
-                                           //drbdGraph.updatePopupMenus();
-                                           //drbdGraph.repaint();
-                                       }
-                                   },
+                       public void doneError(final String ans,
+                                             final int exitCode) {
+                           Tools.debug(this, "drbd status failed: "
+                                             + host.getName()
+                                             + "exit code: "
+                                             + exitCode,
+                                       2);
+                           if (exitCode != 143) {
+                               /* was killed intentionally */
+                               host.setDrbdStatus(false);
+                               drbdGraph.repaint();
+                               if (exitCode == 255) {
+                                   /* looks like connection was lost */
+                                   host.getSSH().forceReconnect();
+                               }
+                           }
+                           //TODO: repaint ok?
+                           //repaintSplitPane();
+                           //drbdGraph.updatePopupMenus();
+                           //drbdGraph.repaint();
+                       }
+                   },
 
-                                   new NewOutputCallback() {
-                                       public void output(final String output) {
-                                           if (output.indexOf("No response from the DRBD driver") >= 0) {
-                                               host.setDrbdStatus(false);
-                                               drbdGraph.repaint();
-                                               return;
-                                           } else {
-                                               host.setDrbdStatus(true);
-                                           }
-                                           if (ft) {
-                                               Tools.startProgressIndicator(hostName, ": updating drbd status...");
-                                           }
-                                           final String[] lines = output.split("\n");
-                                           drbdXML.update(host);
-                                           host.setDrbdStatus(true);
-                                           drbdGraph.repaint();
-                                           for (int i = 0; i < lines.length; i++) {
-                                               parseDrbdEvent(host.getName(), lines[i]);
-                                           }
+                   new NewOutputCallback() {
+                       public void output(final String output) {
+                           if (output.indexOf(
+                                    "No response from the DRBD driver") >= 0) {
+                               host.setDrbdStatus(false);
+                               drbdGraph.repaint();
+                               return;
+                           } else {
+                               host.setDrbdStatus(true);
+                           }
+                           if (ft) {
+                               Tools.startProgressIndicator(
+                                                hostName,
+                                                ": updating drbd status...");
+                           }
+                           final String[] lines = output.split("\n");
+                           drbdXML.update(host);
+                           host.setDrbdStatus(true);
+                           drbdGraph.repaint();
+                           for (int i = 0; i < lines.length; i++) {
+                               parseDrbdEvent(host.getName(), lines[i]);
+                           }
 
-                                           final Thread thread = new Thread(
-                                               new Runnable() {
-                                                   public void run() {
-                                                       repaintSplitPane();
-                                                       drbdGraph.updatePopupMenus();
-                                                       SwingUtilities.invokeLater(new Runnable() {
-                                                           public void run() {
-                                                               repaintTree();
-                                                           }
-                                                       });
-                                                   }
-                                               });
-                                           thread.start();
-                                           if (ft) {
-                                               Tools.stopProgressIndicator(hostName, ": updating drbd status...");
+                           final Thread thread = new Thread(
+                               new Runnable() {
+                                   public void run() {
+                                       repaintSplitPane();
+                                       drbdGraph.updatePopupMenus();
+                                       SwingUtilities.invokeLater(
+                                           new Runnable() {
+                                               public void run() {
+                                                   repaintTree();
+                                               }
                                            }
-                                       }
-                                   });
+                                       );
+                                   }
+                               });
+                           thread.start();
+                           if (ft) {
+                               Tools.stopProgressIndicator(
+                                                hostName,
+                                                ": updating drbd status...");
+                           }
+                       }
+                   });
             clusterViewPanel.drbdStatusButtonEnable();
             if (!host.isDrbdStatus()) {
                 try {
@@ -824,7 +840,6 @@ public class ClusterBrowser extends Browser {
         hbStatusFirstTime = true;
         while (true) {
             final Host host = getDCHost();
-            final String hostName = host.getName();
             if (host == null) {
                 try {
                     Thread.sleep(5000);
@@ -833,6 +848,7 @@ public class ClusterBrowser extends Browser {
                 }
                 continue;
             }
+            final String hostName = host.getName();
             if (hbStatusFirstTime) {
                 startHbStatusProgressIndicator(hostName);
             }
@@ -853,7 +869,10 @@ public class ClusterBrowser extends Browser {
                      public void doneError(final String ans, final int exitCode) {
                          Tools.progressIndicatorFailed(hostName, "Heartbeat status failed");
                          if (hbStatusFirstTime) {
-                            Tools.debug(this, "hb status failed: " + host.getName());
+                             Tools.debug(this, "hb status failed: "
+                                               + host.getName()
+                                               + ", ec: "
+                                               + exitCode, 2);
                          }
                          hbStatusLock();
                          final boolean prevHbStatusFailed = hbStatusFailed();
@@ -861,7 +880,11 @@ public class ClusterBrowser extends Browser {
                          heartbeatStatus.setDC(null);
                          hbStatusUnlock();
                          if (prevHbStatusFailed != hbStatusFailed()) {
-                            heartbeatGraph.getServicesInfo().selectMyself();
+                             heartbeatGraph.getServicesInfo().selectMyself();
+                         }
+                         if (exitCode == 255) {
+                             /* looks like connection was lost */
+                             host.getSSH().forceReconnect();
                          }
                          done(ans);
                      }
@@ -869,7 +892,8 @@ public class ClusterBrowser extends Browser {
 
                  new NewOutputCallback() {
                      //TODO: check this buffer's size
-                     private StringBuffer heartbeatStatusOutput = new StringBuffer(300);
+                     private StringBuffer heartbeatStatusOutput =
+                                                        new StringBuffer(300);
                      public void output(final String output) {
                          hbStatusLock();
                          final boolean prevHbStatusFailed = hbStatusFailed();

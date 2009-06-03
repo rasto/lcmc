@@ -891,10 +891,7 @@ public class Host implements Serializable {
      */
     public final void disconnect() {
         if (ssh.isConnected()) {
-            stopDrbdStatus();
-            waitOnDrbdStatus();
-            stopHbStatus();
-            ssh.disconnect();
+            ssh.forceDisconnect();
         }
     }
 

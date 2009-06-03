@@ -778,7 +778,7 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final Color getVertexFillColor(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
-            if (!hi.getHost().isHbStatus()) {
+            if (!hi.getHost().isHbStatus() || !hi.getHost().isConnected()) {
                 return Tools.getDefaultColor(
                                             "HeartbeatGraph.FillPaintUnknown");
             } else {

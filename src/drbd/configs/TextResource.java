@@ -588,6 +588,7 @@ public class TextResource extends
         {"HostBrowser.DrbdNetInterface.Select", "Select..."},
         {"HostBrowser.NoInfoAvailable",        "no info available"},
 
+        {"ClusterBrowser.Host.Disconnected",  "Disconnected"},
         {"ClusterBrowser.Host.Offline",       "Offline"},
         {"ClusterBrowser.AddNewHost",         "New Host / Wizard"},
         {"GuiComboBox.Select",                "Select..."},
@@ -685,7 +686,7 @@ public class TextResource extends
 "<h3>Welcome to the DRBD Management Console.</h3>"
 + "<p>You can start by clicking on the \"Host Wizard\" button. When you have added at least\n"
 + "two hosts, you can combine them in a new cluster with \"Cluster Wizard\" button.\n"
-+ "The same way you can add also an existing cluster, configured and running or any\n"
++ "The same way you can also add an existing cluster, configured and running or any\n"
 + "combination of the previous, just do not press the \"Create HB Config\" button,\n"
 + "in the \"Heartbeat Initialization\" dialog window and you and the cluster will\n"
 + "be fine.</p>"
@@ -693,7 +694,7 @@ public class TextResource extends
 + "<p><i>And of course this is a beta software, so do not forget to double check\n"
 + "everything the gui is doing and if you find a bug file a bug report.</i></p>"
 
-+ "<p>You can start even if you have nothing installed, just a Linux distribution of\n"
++ "<p>You can start even if you have nothing installed on the cluster hosts, just a Linux distribution of\n"
 + "course. There is a possibility to install all required components from\n"
 + "different sources with different methods during the \"host wizard\" phase\n"
 + "and have a running cluster in under a minute or two.</p>"
