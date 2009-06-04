@@ -687,7 +687,7 @@ public class TextResource extends
 + "<p>You can start by clicking on the \"Host Wizard\" button. When you have added at least\n"
 + "two hosts, you can combine them in a new cluster with \"Cluster Wizard\" button.\n"
 + "The same way you can also add an existing cluster, configured and running or any\n"
-+ "combination of the previous, just do not press the \"Create HB Config\" button,\n"
++ "combination of the previous, just do not press the \"Create HB Config\" button\n"
 + "in the \"Heartbeat Initialization\" dialog window and you and the cluster will\n"
 + "be fine.</p>"
 
