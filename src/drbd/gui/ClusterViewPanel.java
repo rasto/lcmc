@@ -86,6 +86,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         /* hb status buttons */
         hbPlayStopButton = new MyButton(
                         Tools.getString("ClusterViewPanel.StatusHbStopButton"));
+        hbPlayStopButton.setEnabled(false); // TODO: remove all this
         hbPlayStopButton.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
@@ -120,6 +121,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         /* drbd status buttons */
         drbdPlayStopButton = new MyButton(
                     Tools.getString("ClusterViewPanel.StatusDrbdStopButton"));
+        drbdPlayStopButton.setEnabled(false); // TODO: remove all this
         drbdPlayStopButton.setPreferredSize(new Dimension(130, 20));
         drbdPlayStopButton.addActionListener(
                 new ActionListener() {
@@ -227,7 +229,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
      * Enables the hb status button.
      */
     public final void hbStatusButtonEnable() {
-        hbPlayStopButton.setEnabled(true);
+        hbPlayStopButton.setEnabled(false);
     }
 
     /**
@@ -241,7 +243,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         final Runnable runnable = new Runnable() {
             public void run() {
                 cluster.getBrowser().stopHbStatus();
-                hbPlayStopButton.setEnabled(true);
+                hbPlayStopButton.setEnabled(false);
             }
         };
         final Thread thread = new Thread(runnable);
@@ -281,7 +283,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
      * Enables the drbd status button.
      */
     public final void drbdStatusButtonEnable() {
-        drbdPlayStopButton.setEnabled(true);
+        drbdPlayStopButton.setEnabled(false);
     }
 
     /**
@@ -296,7 +298,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         final Runnable runnable = new Runnable() {
             public void run() {
                 cluster.getBrowser().stopDrbdStatus();
-                drbdPlayStopButton.setEnabled(true);
+                drbdPlayStopButton.setEnabled(false);
             }
         };
         final Thread thread = new Thread(runnable);
