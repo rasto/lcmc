@@ -49,6 +49,21 @@ if ($option eq "all") {
 	get_installation_info();
 	print "version-info\n";
 	get_version_info();
+} elsif ($option eq "hw-info") {
+	print "net-info\n";
+	get_net_info();
+	print "disk-info\n";
+	get_disk_info();
+	print "filesystems-info\n";
+	get_filesystems_info();
+	print "mount-points-info\n";
+	get_mount_points_info();
+	#print "gui-info\n";
+	#get_gui_info();
+	print "installation-info\n";
+	get_installation_info();
+	print "version-info\n";
+	get_version_info();
 } elsif ($option eq "get-net-info") {
 	get_net_info();
 } elsif ($option eq "get-disk-info") {

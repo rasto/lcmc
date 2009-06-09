@@ -80,18 +80,10 @@ public class TextResource extends
 
         {"ClusterTab.AddNewCluster",          "Cluster Wizard"},
         {"ClusterTab.AddNewHost",             "Host Wizard"},
-        {"ClusterViewPanel.StatusHbButtonsTitle", "Heartbeat Status"},
-        {"ClusterViewPanel.StatusHbStopButton", "Stop"},
-        {"ClusterViewPanel.StatusHbPlayButton", "Play"},
         {"ClusterViewPanel.ClusterButtons",       "Cluster"},
         {"ClusterViewPanel.ClusterWizard",        "Cluster Wizard"},
 
-        {"ClusterViewPanel.StatusDrbdButtonsTitle", "DRBD Status"},
-        {"ClusterViewPanel.StatusDrbdStopButton", "Stop"},
-        {"ClusterViewPanel.StatusDrbdPlayButton", "Play"},
-
         {"ProgressBar.Cancel",                "Cancel"},
-
 
         {"Dialog.Dialog.Next",             "Next"},
         {"Dialog.Dialog.Back",             "Back"},

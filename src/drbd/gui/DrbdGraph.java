@@ -40,6 +40,7 @@ import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.impl.SparseVertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.VertexShapeFactory;
+import edu.uci.ics.jung.visualization.Coordinates;
 
 import java.util.LinkedHashMap;
 import java.awt.geom.Point2D;
@@ -189,29 +190,57 @@ public class DrbdGraph extends ResourceGraph {
                                 HOST_Y_POS);
                 hostDefaultXPos += HOST_STEP_X;
             }
-            final double hostXPos =
-                                hostPos.getX() - getDefaultVertexSize(v) / 2;
+            //final double hostXPos =
+            //                    hostPos.getX() - getDefaultVertexSize(v) / 2;
             getVertexLocations().setLocation(sv, hostPos);
-
-            /* add block devices vertices */
-            final Host host = hostInfo.getHost();
+        }
+        /* add block devices vertices */
+        final Host host = hostInfo.getHost();
+        final Point2D hostPos = getVertexLocations().getLocation(v);
+        final double hostXPos = hostPos.getX() - getDefaultVertexSize(v) / 2;
+        //if (host.blockDevicesHaveChanged()) {
             int devYPos = HOST_Y_POS + BD_STEP_Y;
-            final List<Vertex> vertexList = new ArrayList<Vertex>();
-            hostBDVerticesMap.put(hostInfo, vertexList);
+            List<Vertex> vertexList = hostBDVerticesMap.get(hostInfo);
+            List<Vertex> oldVertexList = null;
+            if (vertexList == null) {
+                vertexList = new ArrayList<Vertex>();
+                hostBDVerticesMap.put(hostInfo, vertexList);
+            } else {
+                oldVertexList = new ArrayList<Vertex>(vertexList);
+            }
             final List<BlockDevInfo> blockDevInfos =
                                         host.getBrowser().getBlockDevInfos();
+            if (oldVertexList != null) {
+                for (final Vertex vertex : oldVertexList) {
+                    final BlockDevInfo bdi = (BlockDevInfo) getInfo(vertex);
+                    if (!blockDevInfos.contains(bdi)) {
+                        /* removing */
+                        final Vertex bdv = bdiToVertexMap.get(bdi);
+                        getGraph().removeVertex(bdv);
+                        removeInfo(bdv);
+                        removeVertex(bdi);
+                        getVertexToMenus().remove(bdv);
+                        bdiToVertexMap.remove(bdi);
+                        blockDeviceToVertexMap.remove(bdi.getBlockDevice());
+                        vertexToHostMap.remove(bdv);
+                        vertexList.remove(bdv);
+                    }
+                }
+            }
             for (final BlockDevInfo bdi : blockDevInfos) {
-                final SparseVertex bdsv = new SparseVertex();
-
-                final Vertex bdv = getGraph().addVertex(bdsv);
-                bdiToVertexMap.put(bdi, bdv);
-                blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
-                putVertexToInfo(bdv, (Info) bdi);
-                putInfoToVertex(bdi, bdv);
-                vertexToHostMap.put(bdv, hostInfo);
-                vertexList.add(bdv);
-                // TODO: get saved position is disabled at the moment,
-                // because it does more harm than good at the moment.
+                if (!blockDeviceToVertexMap.containsKey(bdi.getBlockDevice())) {
+                    final SparseVertex bdsv = new SparseVertex();
+                    final Vertex bdv = getGraph().addVertex(bdsv);
+                    bdiToVertexMap.put(bdi, bdv);
+                    blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
+                    putVertexToInfo(bdv, (Info) bdi);
+                    putInfoToVertex(bdi, bdv);
+                    vertexToHostMap.put(bdv, hostInfo);
+                    vertexList.add(bdv);
+                    // TODO: get saved position is disabled at the moment,
+                    // because it does more harm than good at the moment.
+                }
+                final Vertex bdv = blockDeviceToVertexMap.get(bdi.getBlockDevice());
                 Point2D pos = null; // getSavedPosition(bdi);
                 if (pos == null) {
                     pos = new Point2D.Double(
@@ -219,10 +248,9 @@ public class DrbdGraph extends ResourceGraph {
                         devYPos);
                 }
                 getVertexLocations().setLocation(bdv, pos);
-
                 devYPos += BD_STEP_Y;
             }
-        }
+        //}
     }
 
     /**

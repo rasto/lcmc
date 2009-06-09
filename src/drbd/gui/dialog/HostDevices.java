@@ -78,21 +78,19 @@ public class HostDevices extends DialogHost {
         final Thread thread = new Thread(
             new Runnable() {
                 public void run() {
-                    getHost().removeNetInterfaces();
-                    getHost().removeBlockDevices();
                     getProgressBar().start(6000);
                     final ExecCommandThread t = getHost().execCommand("installGuiHelper",
                                      (ProgressBar) null, //getProgressBar(),
                                      new ExecCallback() {
                                          public void done(final String ans) {
-                                             getInfo();
+                                             getAllInfo();
                                          }
                                          public void doneError(final String ans,
                                                                final int exitCode) {
                                              /* in case of error, the next command will
                                                 find out, so it's not checked here. Gui
                                                 Helper can be installed anyway. */
-                                             getInfo();
+                                             getAllInfo();
                                          }
                                      },
                                      null,   /* ConvertCmdCallback */
@@ -106,11 +104,9 @@ public class HostDevices extends DialogHost {
     /**
      * Returns info for input pane.
      */
-    protected void getInfo() {
+    protected void getAllInfo() {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-
-        getHost().removeNetInterfaces();
-        final ExecCommandThread t = getHost().execCommand("GetHostInfo",
+        final ExecCommandThread t = getHost().execCommand("GetHostAllInfo",
                          (ProgressBar) null, //getProgressBar(),
                          new ExecCallback() {
                              public void done(final String ans) {

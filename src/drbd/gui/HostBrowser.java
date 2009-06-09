@@ -70,6 +70,7 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.JColorChooser;
 import javax.swing.SpringLayout;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class holds host resource data in a tree. It shows panels that allow
@@ -134,6 +135,12 @@ public class HostBrowser extends Browser {
                                  Tools.getDefaultColor("ViewPanel.Background");
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Block device infos lock. */
+    private final Mutex mBlockDevInfosLock = new Mutex();
+    /** Net Interface infos lock. */
+    private final Mutex mNetInfosLock = new Mutex();
+    /** File system list lock. */
+    private final Mutex mFileSystemsLock = new Mutex();
 
     /**
      * Prepares a new <code>HostBrowser</code> object.
@@ -184,45 +191,76 @@ public class HostBrowser extends Browser {
 
     /**
      * Updates hardware resources of a host in the tree.
-     *
-     * @param ni
-     *          array of network interfaces
-     * @param bd
-     *          array of block devices
-     * @param fs
-     *          array of filesystems
      */
-    public final void updateHWResources(final NetInterface[] ni,
-                                  final BlockDevice[] bd,
-                                  final String[] fs) {
+    public final void updateHWResources(final NetInterface[] nis,
+                                        final BlockDevice[] bds,
+                                        final String[] fss) {
         DefaultMutableTreeNode resource = null;
-
         /* net interfaces */
+        Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
+        try {
+            mNetInfosLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         netInterfacesNode.removeAllChildren();
-        for (int i = 0; i < ni.length; i++) {
-            resource = new DefaultMutableTreeNode(new NetInfo(ni[i].getName(), ni[i]));
+        for (final NetInterface ni : nis) {
+            NetInfo nii;
+            if (oldNetInterfaces.containsKey(ni)) {
+                nii = oldNetInterfaces.get(ni);
+            } else {
+                nii = new NetInfo(ni.getName(), ni);
+            }
+            resource = new DefaultMutableTreeNode(nii);
             setNode(resource);
             netInterfacesNode.add(resource);
         }
         reload(netInterfacesNode);
+        mNetInfosLock.release();
 
         /* block devices */
+        Map<BlockDevice, BlockDevInfo> oldBlockDevices = getBlockDevicesMap();
+        try {
+            mBlockDevInfosLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         blockDevicesNode.removeAllChildren();
-        for (int i = 0; i < bd.length; i++) {
-            resource = new DefaultMutableTreeNode(new BlockDevInfo(bd[i].getName(), bd[i]));
+        for (final BlockDevice bd : bds) {
+            BlockDevInfo bdi;
+            if (oldBlockDevices.containsKey(bd)) {
+                bdi = oldBlockDevices.get(bd);
+            } else {
+                bdi = new BlockDevInfo(bd.getName(), bd);
+            }
+            resource = new DefaultMutableTreeNode(bdi);
             setNode(resource);
             blockDevicesNode.add(resource);
         }
         reload(blockDevicesNode);
+        mBlockDevInfosLock.release();
 
         /* file systems */
+        Map<String, FilesystemInfo> oldFilesystems = getFilesystemsMap();
+        try {
+            mFileSystemsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         fileSystemsNode.removeAllChildren();
-        for (int i = 0; i < fs.length; i++) {
-            resource = new DefaultMutableTreeNode(new FilesystemInfo(fs[i]));
+        for (final String fs : fss) {
+            FilesystemInfo fsi;
+            if (oldFilesystems.containsKey(fs)) {
+                fsi = oldFilesystems.get(fs);
+            } else {
+                fsi = new FilesystemInfo(fs);
+            }
+            resource = new DefaultMutableTreeNode(fsi);
             setNode(resource);
             fileSystemsNode.add(resource);
         }
         reload(fileSystemsNode);
+        mFileSystemsLock.release();
     }
 
     /**
@@ -233,17 +271,89 @@ public class HostBrowser extends Browser {
     }
 
     /**
-     * @return list of block devices.
+     * Return list of block device info objects.
      */
     public final List<BlockDevInfo> getBlockDevInfos() {
         final List<BlockDevInfo> blockDevInfos = new ArrayList<BlockDevInfo>();
+        try {
+            mBlockDevInfosLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         final Enumeration e = blockDevicesNode.children();
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode bdNode = (DefaultMutableTreeNode) e.nextElement();
             final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
             blockDevInfos.add(bdi);
         }
+        mBlockDevInfosLock.release();
         return blockDevInfos;
+    }
+
+    /**
+     * Returns map of block device objects with its block device info objects.
+     */
+    public final Map<BlockDevice, BlockDevInfo> getBlockDevicesMap() {
+        final Map<BlockDevice, BlockDevInfo> blockDevices =
+                                             new HashMap<BlockDevice, BlockDevInfo>();
+        try {
+            mBlockDevInfosLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final Enumeration e = blockDevicesNode.children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode bdNode =
+                                            (DefaultMutableTreeNode) e.nextElement();
+            final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
+            blockDevices.put(bdi.getBlockDevice(), bdi);
+        }
+        mBlockDevInfosLock.release();
+        return blockDevices;
+    }
+
+    /**
+     * Returns map of net interface objects with its net info objects.
+     */
+    public final Map<NetInterface, NetInfo> getNetInterfacesMap() {
+        final Map<NetInterface, NetInfo> netInterfaces =
+                                             new HashMap<NetInterface, NetInfo>();
+        try {
+            mNetInfosLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final Enumeration e = netInterfacesNode.children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode niNode =
+                                            (DefaultMutableTreeNode) e.nextElement();
+            final NetInfo nii = (NetInfo) niNode.getUserObject();
+            netInterfaces.put(nii.getNetInterface(), nii);
+        }
+        mNetInfosLock.release();
+        return netInterfaces;
+    }
+
+    /**
+     * Returns map of file systems its file system info objects.
+     */
+    public final Map<String, FilesystemInfo> getFilesystemsMap() {
+        final Map<String, FilesystemInfo> filesystems =
+                                             new HashMap<String, FilesystemInfo>();
+        try {
+            mFileSystemsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final Enumeration e = fileSystemsNode.children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode fsiNode =
+                                            (DefaultMutableTreeNode) e.nextElement();
+            final FilesystemInfo fsi = (FilesystemInfo) fsiNode.getUserObject();
+            filesystems.put(fsi.getName(), fsi);
+        }
+        mFileSystemsLock.release();
+        return filesystems;
     }
 
     /**
@@ -583,7 +693,6 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
                             if (bdi.getBlockDevice().isDrbd()
                                 && !bdi.getBlockDevice().isConnected()
@@ -1284,7 +1393,13 @@ public class HostBrowser extends Browser {
                 final StringInfo internalMetaDisk = new StringInfo(Tools.getString("HostBrowser.MetaDisk.Internal"), "internal");
                 final String defaultMetaDiskString = internalMetaDisk.getStringValue();
 
+                try {
+                    mBlockDevInfosLock.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
                 final Info[] blockDevices = getAvailableBlockDevicesForMetaDisk(internalMetaDisk, getName(), blockDevicesNode.children());
+                mBlockDevInfosLock.release();
 
                 getBlockDevice().setDefaultValue(DRBD_MD_PARAM, defaultMetaDiskString);
                 return blockDevices;

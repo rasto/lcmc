@@ -69,7 +69,7 @@ public class DistResource_redhatenterpriseas extends
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
          + "/usr/sbin/up2date -f kernel-devel && "
-         + "/usr/sbin/up2date flex gcc kernel-devel && "
+         + "/usr/sbin/up2date flex gcc && "
          + "make && make install && "
          + "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},

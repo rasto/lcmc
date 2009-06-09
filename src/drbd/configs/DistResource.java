@@ -130,7 +130,8 @@ public class DistResource extends
 
         {"installGuiHelper", "installGuiHelper"}, // is treated specially by ssh class.
 
-        {"GetHostInfo", "/usr/local/bin/drbd-gui-helper all"},
+        {"GetHostAllInfo", "/usr/local/bin/drbd-gui-helper all"},
+        {"GetHostHWInfo", "/usr/local/bin/drbd-gui-helper hw-info"},
         {"GetNetInfo",  "/usr/local/bin/drbd-gui-helper get-net-info"},
 
         /* heartbeat crm commands */

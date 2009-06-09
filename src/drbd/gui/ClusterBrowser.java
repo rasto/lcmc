@@ -537,8 +537,7 @@ public class ClusterBrowser extends Browser {
     public final void updateClusterResources(final JTree treeMenu,
                                              final Host[] clusterHosts,
                                              final String[] commonFileSystems,
-                                             final String[] commonMountPoints,
-                                      final ClusterViewPanel clusterViewPanel) {
+                                             final String[] commonMountPoints) {
         this.treeMenu = treeMenu;
         this.commonFileSystems = commonFileSystems;
         this.commonMountPoints = commonMountPoints;
@@ -575,14 +574,13 @@ public class ClusterBrowser extends Browser {
         /* networks */
         updateNetworks();
 
-        updateHeartbeatDrbdThread(clusterViewPanel);
+        updateHeartbeatDrbdThread();
     }
 
     /**
      * Starts everything.
      */
-    private void updateHeartbeatDrbdThread(
-                                    final ClusterViewPanel clusterViewPanel) {
+    private void updateHeartbeatDrbdThread() {
         final Runnable runnable = new Runnable() {
             public void run() {
                 Host firstHost = null;
@@ -631,15 +629,18 @@ public class ClusterBrowser extends Browser {
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
 
                 updateDrbdResources();
-                //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                   drbdGraph.scale();
-                //} });
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        drbdGraph.scale();
+                    }
+                });
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
                 Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
-                cluster.getBrowser().startDrbdStatus(clusterViewPanel);
-                cluster.getBrowser().startHbStatus(clusterViewPanel);
+                cluster.getBrowser().startServerStatus();
+                cluster.getBrowser().startDrbdStatus();
+                cluster.getBrowser().startHbStatus();
             }
         };
         final Thread thread = new Thread(runnable);
@@ -648,14 +649,53 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
-     * Starts drbd status on all hosts.
+     * Starts polling of the server status on all hosts, for all the stuff that can
+     * change on the server on the fly, like for example the block devices.
      */
-    public final void startDrbdStatus(final ClusterViewPanel clusterViewPanel) {
+    public final void startServerStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
             final Thread thread = new Thread(new Runnable() {
                 public void run() {
-                    startDrbdStatus(host, clusterViewPanel);
+                    startServerStatus(host);
+                }
+            });
+            thread.start();
+        }
+    }
+
+    /**
+     * Starts polling of the server status on one host.
+     */
+    public final void startServerStatus(final Host host) {
+        final String hostName = host.getName();
+        while (true) {
+            host.setIsLoading();
+            host.getHWInfo();
+            drbdGraph.addHost(host.getBrowser().getHostInfo());
+            SwingUtilities.invokeLater(
+                new Runnable() {
+                    public void run() {
+                         drbdGraph.scale();
+                    }
+                });
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    /**
+     * Starts drbd status on all hosts.
+     */
+    public final void startDrbdStatus() {
+        final Host[] hosts = cluster.getHostsArray();
+        for (final Host host : hosts) {
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    startDrbdStatus(host);
                 }
             });
             thread.start();
@@ -679,8 +719,7 @@ public class ClusterBrowser extends Browser {
     /**
      * Starts drbd status on host.
      */
-    public final void startDrbdStatus(final Host host,
-                                final ClusterViewPanel clusterViewPanel) {
+    public final void startDrbdStatus(final Host host) {
         boolean firstTime = true; // TODO: can use a latch for this shit too.
         host.setDrbdStatus(true);
         final String hostName = host.getName();
@@ -762,7 +801,6 @@ public class ClusterBrowser extends Browser {
                            }
                        }
                    });
-            clusterViewPanel.drbdStatusButtonEnable();
             if (!host.isDrbdStatus()) {
                 try {
                     Thread.sleep(2000);
@@ -836,7 +874,7 @@ public class ClusterBrowser extends Browser {
     /**
      * Starts hb status.
      */
-    public final void startHbStatus(final ClusterViewPanel clusterViewPanel) {
+    public final void startHbStatus() {
         hbStatusFirstTime = true;
         while (true) {
             final Host host = getDCHost();
@@ -859,9 +897,11 @@ public class ClusterBrowser extends Browser {
                          if (hbStatusFirstTime) {
                              hbStatusFirstTime = false;
                              selectServices();
-                             //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                             //    heartbeatGraph.scale();
-                             //} });
+                             SwingUtilities.invokeLater(new Runnable() {
+                                 public void run() {
+                                    heartbeatGraph.scale();
+                                }
+                             });
                              stopHbStatusProgressIndicator(hostName);
                          }
                      }
@@ -902,9 +942,11 @@ public class ClusterBrowser extends Browser {
                              if (hbStatusFirstTime) {
                                  hbStatusFirstTime = false;
                                  selectServices();
-                                 //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                                     heartbeatGraph.scale();
-                                 //} });
+                                 SwingUtilities.invokeLater(new Runnable() {
+                                     public void run() {
+                                         heartbeatGraph.scale();
+                                     }
+                                 });
                                  stopHbStatusProgressIndicator(hostName);
                              }
                              return;
@@ -950,15 +992,16 @@ public class ClusterBrowser extends Browser {
                          if (hbStatusFirstTime) {
                              hbStatusFirstTime = false;
                              selectServices();
-                             //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                             //    heartbeatGraph.scale();
-                             //} });
+                             SwingUtilities.invokeLater(new Runnable() {
+                                 public void run() {
+                                     heartbeatGraph.scale();
+                                 }
+                             });
                              stopHbStatusProgressIndicator(hostName);
                          }
                          hbStatusUnlock();
                      }
                  });
-            clusterViewPanel.hbStatusButtonEnable();
             host.waitOnHbStatus();
             if (hbStatusCanceled) {
                 hbStatusFirstTime = true;
@@ -2280,7 +2323,6 @@ public class ClusterBrowser extends Browser {
         public final void addDrbdDisk(final FilesystemInfo fi) {
             final Point2D p = null;
             final DrbddiskInfo di = (DrbddiskInfo) heartbeatGraph.getServicesInfo().addServicePanel(heartbeatXML.getHbDrbddisk(), p, true, null);
-            //di.setResourceName(getName());
             di.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(di);
             fi.setDrbddiskInfo(di);
@@ -6003,7 +6045,6 @@ public class ClusterBrowser extends Browser {
                     applyButton.setEnabled(false);
                 }
             });
-
 
             /* update heartbeat */
             final Map<String,String> args = new HashMap<String,String>();

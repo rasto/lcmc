@@ -56,18 +56,6 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
     private final Cluster cluster;
-    /** Hb status play/stop button. */
-    private final MyButton hbPlayStopButton;
-    /** Hb status play/stop button foreground color. */
-    private final Color hbPlayButtonColor;
-    /** Hb status play/stop button background color. */
-    private final Color hbPlayButtonBgColor;
-    /** DRBD status play/stop button. */
-    private final MyButton drbdPlayStopButton;
-    /** DRBD status play/stop button foreground color. */
-    private final Color drbdPlayButtonColor;
-    /** DRBD status play/stop button background color. */
-    private final Color drbdPlayButtonBgColor;
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
@@ -83,74 +71,10 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         cluster.createClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
 
-        /* hb status buttons */
-        hbPlayStopButton = new MyButton(
-                        Tools.getString("ClusterViewPanel.StatusHbStopButton"));
-        hbPlayStopButton.setEnabled(false); // TODO: remove all this
-        hbPlayStopButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final String command = e.getActionCommand();
-                        if (command.equals(Tools.getString(
-                                    "ClusterViewPanel.StatusHbPlayButton"))) {
-                            hbStatusPlay();
-                        } else if (command.equals(Tools.getString(
-                                    "ClusterViewPanel.StatusHbStopButton"))) {
-                            hbStatusStop();
-                        }
-                    }
-                });
-
-        hbPlayButtonColor   = hbPlayStopButton.getForeground();
-        hbPlayButtonBgColor = hbPlayStopButton.getBackground();
-        hbPlayStopButton.setForeground(Color.RED);
-
+        /* wizard buttons */
         final JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBackground(STATUS_BACKGROUND);
-
-        final JPanel hbStatusPanel = new JPanel();
-        hbStatusPanel.setBackground(STATUS_BACKGROUND);
-        TitledBorder titledBorder = Tools.getBorder(Tools.getString(
-                                    "ClusterViewPanel.StatusHbButtonsTitle"));
-        hbStatusPanel.setBorder(titledBorder);
-        hbPlayStopButton.setPreferredSize(new Dimension(130, 20));
-
-        hbStatusPanel.add(hbPlayStopButton);
-        buttonPanel.add(hbStatusPanel);
-
-        /* drbd status buttons */
-        drbdPlayStopButton = new MyButton(
-                    Tools.getString("ClusterViewPanel.StatusDrbdStopButton"));
-        drbdPlayStopButton.setEnabled(false); // TODO: remove all this
-        drbdPlayStopButton.setPreferredSize(new Dimension(130, 20));
-        drbdPlayStopButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final String command = e.getActionCommand();
-                        if (command.equals(Tools.getString(
-                                    "ClusterViewPanel.StatusDrbdPlayButton"))) {
-                            drbdStatusPlay();
-                        } else if (command.equals(Tools.getString(
-                                    "ClusterViewPanel.StatusDrbdStopButton"))) {
-                            drbdStatusStop();
-                        }
-                    }
-                });
-
-        drbdPlayButtonColor   = drbdPlayStopButton.getForeground();
-        drbdPlayButtonBgColor = drbdPlayStopButton.getBackground();
-        drbdPlayStopButton.setForeground(Color.RED);
-
-        final JPanel drbdStatusPanel = new JPanel();
-        drbdStatusPanel.setBackground(STATUS_BACKGROUND);
-        titledBorder = Tools.getBorder(
-                    Tools.getString("ClusterViewPanel.StatusDrbdButtonsTitle"));
-        drbdStatusPanel.setBorder(titledBorder);
-
-        drbdStatusPanel.add(drbdPlayStopButton);
-        buttonPanel.add(drbdStatusPanel);
-
-        /* cluster buttons */
+        /* cluster wizard */
         final MyButton clusterWizardButton = new MyButton(
                             Tools.getString("ClusterViewPanel.ClusterWizard"));
         clusterWizardButton.setPreferredSize(new Dimension(130, 20));
@@ -169,7 +93,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
 
         final JPanel clusterButtonsPanel = new JPanel();
         clusterButtonsPanel.setBackground(STATUS_BACKGROUND);
-        titledBorder = Tools.getBorder(
+        final TitledBorder titledBorder = Tools.getBorder(
                         Tools.getString("ClusterViewPanel.ClusterButtons"));
         clusterButtonsPanel.setBorder(titledBorder);
 
@@ -197,113 +121,10 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
      * This is called when there was added a new host.
      */
     public final void allHostsUpdate() {
-        cluster.getBrowser().updateClusterResources(
-                                                tree,
-                                                cluster.getHostsArray(),
-                                                cluster.getCommonFileSystems(),
-                                                cluster.getCommonMountPoints(),
-                                                this);
-    }
-
-    /**
-     * Start automatic hb status updates.
-     */
-    public final void hbStatusPlay() {
-        final ClusterViewPanel thisClass = this;
-        final Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    hbPlayStopButton.setEnabled(false);
-                    hbPlayStopButton.setText(Tools.getString(
-                                    "ClusterViewPanel.StatusHbStopButton"));
-                    hbPlayStopButton.setForeground(Color.RED);
-                    hbPlayStopButton.setBackground(hbPlayButtonBgColor);
-                    cluster.getBrowser().startHbStatus(thisClass);
-                }
-            }
-        );
-        thread.start();
-    }
-
-    /**
-     * Enables the hb status button.
-     */
-    public final void hbStatusButtonEnable() {
-        hbPlayStopButton.setEnabled(false);
-    }
-
-    /**
-     * Stop automatic hb status updates.
-     */
-    public final void hbStatusStop() {
-        hbPlayStopButton.setEnabled(false);
-        hbPlayStopButton.setText(Tools.getString(
-                                    "ClusterViewPanel.StatusHbPlayButton"));
-        hbPlayStopButton.setForeground(hbPlayButtonColor);
-        final Runnable runnable = new Runnable() {
-            public void run() {
-                cluster.getBrowser().stopHbStatus();
-                hbPlayStopButton.setEnabled(false);
-            }
-        };
-        final Thread thread = new Thread(runnable);
-        thread.setPriority(Thread.MIN_PRIORITY);
-        thread.start();
-    }
-
-    /**
-     * Should be called if hb status failed.
-     */
-    public final void hbStatusStopFailed() {
-        hbPlayStopButton.setBackground(Color.RED);
-        hbStatusStop();
-    }
-
-    /**
-     * Start automatic drbd status updates.
-     */
-    public final void drbdStatusPlay() {
-        final ClusterViewPanel thisClass = this;
-        final Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    drbdPlayStopButton.setEnabled(false);
-                    drbdPlayStopButton.setText(Tools.getString(
-                                    "ClusterViewPanel.StatusDrbdStopButton"));
-                    drbdPlayStopButton.setForeground(Color.RED);
-                    drbdPlayStopButton.setBackground(drbdPlayButtonBgColor);
-                    cluster.getBrowser().startDrbdStatus(thisClass);
-                }
-            }
-        );
-        thread.start();
-    }
-
-    /**
-     * Enables the drbd status button.
-     */
-    public final void drbdStatusButtonEnable() {
-        drbdPlayStopButton.setEnabled(false);
-    }
-
-    /**
-     * Stop automatic drbd status updates.
-     */
-    public final void drbdStatusStop() {
-        drbdPlayStopButton.setEnabled(false);
-
-        drbdPlayStopButton.setText(
-                    Tools.getString("ClusterViewPanel.StatusDrbdPlayButton"));
-        drbdPlayStopButton.setForeground(drbdPlayButtonColor);
-        final Runnable runnable = new Runnable() {
-            public void run() {
-                cluster.getBrowser().stopDrbdStatus();
-                drbdPlayStopButton.setEnabled(false);
-            }
-        };
-        final Thread thread = new Thread(runnable);
-        thread.setPriority(Thread.MIN_PRIORITY);
-        thread.start();
+        cluster.getBrowser().updateClusterResources(tree,
+                                                    cluster.getHostsArray(),
+                                                    cluster.getCommonFileSystems(),
+                                                    cluster.getCommonMountPoints());
     }
 
     /**

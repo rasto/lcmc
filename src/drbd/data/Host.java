@@ -113,16 +113,16 @@ public class Host implements Serializable {
 
     /** Installed drbd version. TODO */
     private final String installedDrbdVersion = null;
-    /** List of network interfaces of this host. */
-    private final List<NetInterface> netInterfaces =
-                                                new ArrayList<NetInterface>();
+    /** Map of network interfaces of this host. */
+    private Map<String, NetInterface> netInterfaces =
+                                            new LinkedHashMap<String, NetInterface>();
     /** Available file systems. */
     private final List<String> fileSystems = new ArrayList<String>();
     /** Mount points that exist in /mnt dir. */
     private final List<String> mountPoints = new ArrayList<String>();
     /** List of block devices of this host. */
-    private final Map<String, BlockDevice> blockDevices =
-                                    new LinkedHashMap<String, BlockDevice>();
+    private Map<String, BlockDevice> blockDevices =
+                                             new LinkedHashMap<String, BlockDevice>();
     /** Color of this host in graphs. */
     private Color color;
     /** Thread where drbd status command is running. */
@@ -341,32 +341,10 @@ public class Host implements Serializable {
     }
 
     /**
-     * Adds network interface to the list of network interfaces.
-     */
-    public final void addNetInterface(final NetInterface netInterface) {
-        netInterfaces.add(netInterface);
-    }
-
-    /**
-     * Removes network interface from the list of network interfaces.
-     *
-     */
-    public final void removeNetInterfaces() {
-        netInterfaces.clear();
-    }
-
-    /**
      * Returns net interfaces.
      */
     public final NetInterface[] getNetInterfaces() {
-        return netInterfaces.toArray(new NetInterface [netInterfaces.size()]);
-    }
-
-    /**
-     * Removes block devices from the list of block devices.
-     */
-    public final void removeBlockDevices() {
-        blockDevices.clear();
+        return netInterfaces.values().toArray(new NetInterface[netInterfaces.size()]);
     }
 
     /**
@@ -420,7 +398,7 @@ public class Host implements Serializable {
      */
     public final List<String> getNetworkIps() {
         final List<String> networkIps = new ArrayList<String>();
-        for (final NetInterface ni : netInterfaces) {
+        for (final NetInterface ni : netInterfaces.values()) {
             final String netIp = ni.getNetworkIp();
             if (!networkIps.contains(netIp)) {
                 networkIps.add(netIp);
@@ -438,7 +416,7 @@ public class Host implements Serializable {
         if (otherNetworkIps == null) {
             return getNetworkIps();
         }
-        for (final NetInterface ni : netInterfaces) {
+        for (final NetInterface ni : netInterfaces.values()) {
             final String networkIp = ni.getNetworkIp();
             if (otherNetworkIps.contains(networkIp)
                 && !networksIntersection.contains(networkIp)) {
@@ -453,7 +431,7 @@ public class Host implements Serializable {
      */
     public final List<String> getIpsFromNetwork(final String netIp) {
         final List<String> networkIps = new ArrayList<String>();
-        for (final NetInterface ni : netInterfaces) {
+        for (final NetInterface ni : netInterfaces.values()) {
             if (netIp.equals(ni.getNetworkIp())) {
                 networkIps.add(ni.getIp());
             }
@@ -466,13 +444,6 @@ public class Host implements Serializable {
      */
     public final BlockDevice getBlockDevice(final String device) {
         return blockDevices.get(device);
-    }
-
-    /**
-     * Adds block device to the list of block devices.
-     */
-    public final void addBlockDevice(final BlockDevice blockDevice) {
-        blockDevices.put(blockDevice.getName(), blockDevice);
     }
 
     /**
@@ -1495,7 +1466,8 @@ public class Host implements Serializable {
                                 new ConnectionCallback() {
                                     public void done(final int flag) {
                                         setConnected();
-                                        getInfo();
+                                        getSSH().installGuiHelper();
+                                        getAllInfo();
                                         SwingUtilities.invokeLater(new Runnable() {
                                             public void run() {
                                                 Tools.stopProgressIndicator(
@@ -1522,26 +1494,53 @@ public class Host implements Serializable {
     /**
      * Gets and stores info about the host.
      */
-    public final void getInfo() {
-        removeNetInterfaces();
-        getSSH().installGuiHelper();
-        execCommand("GetHostInfo",
+    public final void getAllInfo() {
+        final Thread t = execCommand("GetHostAllInfo",
                          new ExecCallback() {
                              public void done(final String ans) {
                                  parseHostInfo(ans);
                                  setLoadingDone();
-                                 //States.done("load:" + host.getName());
                              }
 
                              public void doneError(final String ans,
                                                    final int exitCode) {
                                  setLoadingError();
-                                 //States.interrupt("load:" + host.getName());
                              }
                          },
                          null, /* ConvertCmdCallback */
                          false);
+        try {
+            t.join(0);
+        } catch (java.lang.InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
+
+    /**
+     * Gets and stores hardware info about the host.
+     */
+    public final void getHWInfo() {
+        final Thread t = execCommand("GetHostHWInfo",
+                         new ExecCallback() {
+                             public void done(final String ans) {
+                                 parseHostInfo(ans);
+                                 setLoadingDone();
+                             }
+
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
+                                 setLoadingError();
+                             }
+                         },
+                         null, /* ConvertCmdCallback */
+                         false);
+        try {
+            t.join(0);
+        } catch (java.lang.InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 
 
     /**
@@ -1662,11 +1661,16 @@ public class Host implements Serializable {
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
         List<String> versionLines = new ArrayList<String>();
+        final Map<String, BlockDevice> newBlockDevices =
+                                        new LinkedHashMap<String, BlockDevice>();
+        final Map<String, NetInterface> newNetInterfaces =
+                                        new LinkedHashMap<String, NetInterface>();
+         
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
                 break;
             } else if (line.indexOf("WARNING:") == 0) {
-                    continue;
+                continue;
             }
             if ("net-info".equals(line)
                 || "disk-info".equals(line)
@@ -1679,11 +1683,18 @@ public class Host implements Serializable {
                 continue;
             }
             if ("net-info".equals(type)) {
-                final NetInterface netInterface = new NetInterface(line);
-                addNetInterface(netInterface);
+                NetInterface netInterface = new NetInterface(line);
+                if (netInterfaces.containsKey(netInterface.getName())) {
+                    netInterface = netInterfaces.get(netInterface.getName());
+                }
+                newNetInterfaces.put(netInterface.getName(), netInterface);
             } else if ("disk-info".equals(type)) {
-                final BlockDevice blockDevice = new BlockDevice(line);
-                addBlockDevice(blockDevice);
+                BlockDevice blockDevice = new BlockDevice(line);
+                if (blockDevices.containsKey(blockDevice.getName())) {
+                    /* get the existing block device object, forget the new one. */
+                    blockDevice = blockDevices.get(blockDevice.getName());
+                }
+                newBlockDevices.put(blockDevice.getName(), blockDevice);
             } else if ("filesystems-info".equals(type)) {
                 addFileSystem(line);
             } else if ("mount-points-info".equals(type)) {
@@ -1697,6 +1708,8 @@ public class Host implements Serializable {
             }
         }
         setDistInfo(versionLines.toArray(new String[versionLines.size()]));
+        blockDevices = newBlockDevices;
+        netInterfaces = newNetInterfaces;
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
                                        getFileSystems());

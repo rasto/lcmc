@@ -1046,7 +1046,7 @@ public final class Tools {
         if (dist == null) {
             dist = "";
         }
-        debug("dist: " + dist + ", version: " + version, 0);
+        debug("dist: " + dist + ", version: " + version, 1);
         final Locale locale = new Locale(dist, "");
         final ResourceBundle resourceCommand =
                 ResourceBundle.getBundle("drbd.configs.DistResource", locale);
@@ -1072,7 +1072,7 @@ public final class Tools {
                 distVersion = version;
             }
         }
-        debug("dist version: " + distVersion, 0);
+        debug("dist version: " + distVersion, 1);
         return distVersion;
     }
     /**
