@@ -66,19 +66,21 @@ public class BlockDevice extends Resource {
     private String syncedProgress  = null;
     /** Drbd flags. */
     private String drbdFlags       = null;
+    /** How much of the file system is used in percents. */
+    private int used            = -1;
 
-    /**
-     * Creates a new <code>BlockDevice</code> object.
-     */
-    public BlockDevice(final String name,
-                       final String blockSize,
-                       final String mountedOn,
-                       final String fsType) {
-        super(name);
-        this.blockSize = blockSize;
-        this.mountedOn = mountedOn;
-        this.fsType    = fsType;
-    }
+    ///**
+    // * Creates a new <code>BlockDevice</code> object.
+    // */
+    //public BlockDevice(final String name,
+    //                   final String blockSize,
+    //                   final String mountedOn,
+    //                   final String fsType) {
+    //    super(name);
+    //    this.blockSize = blockSize;
+    //    this.mountedOn = mountedOn;
+    //    this.fsType    = fsType;
+    //}
 
     /**
      * Creates a new <code>BlockDevice</code> object.
@@ -101,6 +103,9 @@ public class BlockDevice extends Resource {
             if (cols.length > 3) {
                 this.mountedOn = cols[2];
                 this.fsType    = cols[3];
+            }
+            if (cols.length > 4) {
+                this.used = Integer.parseInt(cols[4]);
             }
         }
     }
@@ -138,6 +143,14 @@ public class BlockDevice extends Resource {
      */
     public final boolean isDrbd() {
         return drbd;
+    }
+
+    /**
+     * Returns how much of the file system is used in percents. -1 denotes that
+     * there is no usage information.
+     */
+    public final int getUsed() {
+        return used;
     }
 
     /**

@@ -1303,4 +1303,12 @@ public class HeartbeatGraph extends ResourceGraph {
         } 
         return "not running";
     }
+
+    /**
+     * Returns how much of the disk is used. Probably useful only for disks.
+     * -1 for not used or not applicable.
+     */
+    protected int getUsed(final Vertex v) {
+        return -1;
+    }
 }

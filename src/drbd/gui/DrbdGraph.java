@@ -721,9 +721,13 @@ public class DrbdGraph extends ResourceGraph {
         } else if (v.equals(hostVertex)) {
             /* host */
             return hi.getHost().getColor();
-        } else if (isVertexAvailable(v)) {
+        } else {
             if (!isVertexDrbd(v)) {
-                return super.getVertexFillColor(v);
+                if (isVertexAvailable(v)) {
+                    return super.getVertexFillColor(v);
+                } else {
+                    return Tools.getDefaultColor("DrbdGraph.FillPaintNotAvailable");
+                }
             }
             if (isVertexPrimary(v)) {
                 return Tools.getDefaultColor("DrbdGraph.FillPaintPrimary");
@@ -732,8 +736,6 @@ public class DrbdGraph extends ResourceGraph {
             } else {
                 return Tools.getDefaultColor("DrbdGraph.FillPaintUnknown");
             }
-        } else {
-            return Tools.getDefaultColor("DrbdGraph.FillPaintNotAvailable");
         }
     }
 
@@ -882,4 +884,24 @@ public class DrbdGraph extends ResourceGraph {
             return VERTEX_SIZE_HOST;
         }
     }
+
+    /**
+     * Returns how much of the disk is used.
+     * -1 for not used or not applicable.
+     */
+    protected int getUsed(final Vertex v) {
+        if (isVertexBlockDevice(v)) {
+            final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi.getBlockDevice().isPrimary()) {
+                return bdi.getBlockDevice().getUsed();
+            } else if (bdi.getBlockDevice().isSecondary()) {
+                final BlockDevInfo otherBdi = bdi.getOtherBlockDevInfo();
+                if (otherBdi != null) {
+                    return otherBdi.getBlockDevice().getUsed();
+                }
+            }
+        }
+        return -1;
+    }
+
 }

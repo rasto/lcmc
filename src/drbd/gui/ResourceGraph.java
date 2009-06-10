@@ -1035,6 +1035,13 @@ public abstract class ResourceGraph {
     protected abstract ImageIcon getIconForVertex(final ArchetypeVertex v);
 
     /**
+     * Returns how much of the disk is used and use it to cover proportional part of
+     * the vertex. Probably useful only for disks.
+     * -1 for not used or not applicable.
+     */
+    protected abstract int getUsed(final Vertex v);
+
+    /**
      * This class is for rendering of the vertices.
      */
     class MyPluggableRenderer extends PluggableRenderer {
@@ -1115,6 +1122,18 @@ public abstract class ResourceGraph {
             final double x = loc.getX() - getVertexSize(v) / 2;
             final double height = shape.getBounds().getHeight();
             final double y = loc.getY() - height / 2;
+            final double used = getUsed(v);
+            if (used > 0) {
+                /** Show how much is used. */
+                final double width = shape.getBounds().getWidth();
+                final double freeWidth = width * (100 - used) / 100;
+                g2d.setColor(new Color(255, 255, 255, 200));
+                g2d.fillRect((int) (x + shape.getBounds().getWidth() - freeWidth),
+                             (int) y,
+                             (int) freeWidth,
+                             (int) height);
+            }
+
             /* icon */
             final ImageIcon icon = getIconForVertex(v);
             if (icon != null) {

@@ -1122,17 +1122,22 @@ public class HostBrowser extends Browser {
             ret.append(getBlockDevice().isDrbdMetaDisk());
             ret.append("\nSize            : ");
             ret.append(getBlockDevice().getBlockSize());
-            ret.append(" blocks\n");
+            ret.append(" blocks");
             if (getBlockDevice().getMountedOn() == null) {
-                ret.append("not mounted\n");
+                ret.append("\nnot mounted");
             } else {
-                ret.append("Mounted on      : ");
+                ret.append("\nMounted on      : ");
                 ret.append(getBlockDevice().getMountedOn());
                 ret.append("\nType            : ");
                 ret.append(getBlockDevice().getFsType());
+                if (getBlockDevice().getUsed() >= 0) {
+                    ret.append("\nUsed:           : ");
+                    ret.append(getBlockDevice().getUsed());
+                    ret.append('%');
+                }
             }
             if (getBlockDevice().isDrbd()) {
-                ret.append("Connection state: ");
+                ret.append("\nConnection state: ");
                 ret.append(getBlockDevice().getConnectionState());
                 ret.append("\nNode state      : ");
                 ret.append(getBlockDevice().getNodeState());
@@ -1603,9 +1608,9 @@ public class HostBrowser extends Browser {
         }
 
         public final JComponent getInfoPanelBD() {
-            if (infoPanel != null) {
-                return infoPanel;
-            }
+            //if (infoPanel != null) {
+            //    return infoPanel;
+            //}
 
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -1772,7 +1777,7 @@ public class HostBrowser extends Browser {
         public final List<UpdatableItem> createPopup() {
             final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
             final BlockDevInfo thisClass = this;
-            if (!getBlockDevice().isAvailable()) {
+            if (!getBlockDevice().isDrbd() && !getBlockDevice().isAvailable()) {
                 /* block devices are not available */
                 return null;
             }

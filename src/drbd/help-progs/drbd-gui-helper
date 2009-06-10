@@ -29,7 +29,9 @@ use Socket;
 
 $ENV{LANG}="C";
 $ENV{LANGUAGE}="C";
-$ENV{LC_LANG}="C";
+for (keys %ENV) {
+	$ENV{$_} = "C" if /^LC_/;
+}
 
 our $DEBUG = 0;
 my $option = shift || die;
@@ -142,6 +144,25 @@ sub disk_info_warning {
 	print STDERR "WARNING: $warning\n";
 }
 
+# get_drbd_devs
+# Returns hash with drbd devices as keys and the underlying blockd evices as their
+# value.
+sub get_drbd_devs {
+	my %drbd_devs;
+	for (qx(for f in `find /dev/drbd/by-disk/ -name '*' 2>/dev/null`;do 
+			if [ -L \$f ]; then
+				echo -n "\$f ";
+				readlink -f \$f;
+			fi;
+	     	done)) {
+		my ($dev, $drbd) = split;
+		$dev =~ s!^/dev/drbd/by-disk/!/dev/!;
+		$drbd_devs{$drbd} = $dev;
+	}
+	return \%drbd_devs;
+}
+
+
 # get_mount
 #
 # returns hash with block device as a key and mount point with filesystem as
@@ -152,25 +173,53 @@ sub disk_info_warning {
 # form.
 sub get_mount {
 	my $lvm_devs = shift;
+	my $drbd_devs = shift;
 	my %dev_to_mount;
 	for (`/bin/mount`) {
 		# /dev/md1 on / type xfs (rw)
 		# /dev/mapper/vg00--sepp-sources on /mnt/local-src type xfs (rw)
 		if (m!/dev/(\S+)\s+on\s+(\S+)\s+type\s+(\S+)!) {
 			my ($dev, $mountpoint, $filesystem) = ($1, $2, $3);
-			if ($dev =~ m!^mapper/(.+)!) {
+			$dev = "/dev/$dev";
+			if ($$drbd_devs{"$dev"}) {
+				$dev = $$drbd_devs{"$dev"};
+			}
+			if ($dev =~ m!^/dev/mapper/(.+)!) {
 				# convert mapper/vg00--sepp-sources to vg00-sepp/sources
 				my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
 				if ($group && $name) { # && !$$lvm_devs{"$group/$name"}) {
 					$dev = "$group/$name";
 				}
 			}
-			$dev = "/dev/$dev";
 			print_debug("mount: $dev, $mountpoint, $filesystem");
 			$dev_to_mount{$dev} = "$mountpoint $filesystem";
 		}
 	}
 	return \%dev_to_mount;
+}
+
+#
+# Returns hash with free disk space
+sub get_used {
+	my $lvm_devs = shift;
+	my $drbd_devs = shift;
+	my %dev_to_used;
+	for (`/bin/df -P`) {
+		if (m!(\S+)\s+\d+\s+\d+\s+\d+\s+(\d+)%\s+!) {
+			my ($dev, $used) = ($1, $2);
+			if ($$drbd_devs{$dev}) {
+				$dev = $$drbd_devs{$dev};
+			} elsif ($dev =~ m!^/dev/mapper/(.+)!) {
+				# convert mapper/vg00--sepp-sources to vg00-sepp/sources
+				my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
+				if ($group && $name) { # && !$$lvm_devs{"$group/$name"}) {
+					$dev = "/dev/$group/$name";
+				}
+			}
+			$dev_to_used{$dev} = $used;
+		}
+	}
+	return \%dev_to_used;
 }
 
 # get_swaps
@@ -277,7 +326,9 @@ sub get_device_mapper_major {
 sub get_disk_info {
 	my $devs_in_raid = get_raid();
 	my ($group_to_pv, $major_minor_to_dev, $devs_with_lvm, $lvm_devs) = get_lvm();
-	my $dev_to_mount = get_mount($lvm_devs);
+	my $drbd_devs = get_drbd_devs();
+	my $dev_to_mount = get_mount($lvm_devs, $drbd_devs);
+	my $dev_to_used = get_used($lvm_devs, $drbd_devs);
 	my $dev_to_swap = get_swaps();
 	# read partition table
 	open PT, "/proc/partitions" or disk_info_error("cannot open /proc/partitions");
@@ -329,6 +380,7 @@ sub get_disk_info {
 		my $info = "$device $blocks";
 		$info.= " ".$$dev_to_mount{$device} if $$dev_to_mount{$device};
 		$info.= " swap swap" if $$dev_to_swap{$device};
+		$info.= " ".$$dev_to_used{$device} if defined $$dev_to_used{$device};
 		$info.= "\n";
 		push @info, $info;
 	}
@@ -872,4 +924,7 @@ sub get_hb_version {
 	}
 	return $hb_version;
 }
+
+
+
 

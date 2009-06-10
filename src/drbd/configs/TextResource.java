@@ -413,8 +413,8 @@ public class TextResource extends
         {"ClusterBrowser.ClusterHosts",       "Cluster Hosts"},
         {"ClusterBrowser.Networks",           "Networks"},
         {"ClusterBrowser.CommonBlockDevices", "Shared Disks"},
-        {"ClusterBrowser.Drbd",               "DRBD"},
-        {"ClusterBrowser.Heartbeat",          "Heartbeat"},
+        {"ClusterBrowser.Drbd",               "Storage (DRBD)"},
+        {"ClusterBrowser.Heartbeat",          "Cluster"},
         {"ClusterBrowser.Services",           "Services"},
         {"ClusterBrowser.Scores",             "Scores"},
 
