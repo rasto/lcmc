@@ -691,6 +691,10 @@ public class Browser {
         private MyButton oldApplyButton = null;
         /** Apply button. */ // TODO: private
         protected MyButton applyButton;
+        /** How much of the info is used. */
+        public int getUsed() {
+            return -1;
+        }
 
         /**
          * Prepares a new <code>EditableInfo</code> object.

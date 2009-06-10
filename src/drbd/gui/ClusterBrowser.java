@@ -1508,6 +1508,10 @@ public class ClusterBrowser extends Browser {
         void setUsedByHeartbeat(boolean isUsedByHeartbeat);
         /** Returns whether the device is used by heartbeat. */
         boolean isUsedByHeartbeat();
+        /** Returns the last created filesystem. */
+        String getCreatedFs();
+        /** Returns how much of the device is used. */
+        int getUsed();
     }
 
     /**
@@ -1544,6 +1548,8 @@ public class ClusterBrowser extends Browser {
         private JComponent infoPanel = null;
         /** Whether the meta-data has to be created or not. */
         private boolean haveToCreateMD = false;
+        /** Last created filesystem. */
+        private String createdFs = null;
 
         /**
          * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -2589,6 +2595,32 @@ public class ClusterBrowser extends Browser {
         public String getToolTipForGraph() {
             return getName();
         }
+
+        /**
+         * Returns the last created filesystem.
+         */
+        public final String getCreatedFs() {
+            return createdFs;
+        }
+
+        /**
+         * Sets the last created filesystem.
+         */
+        public final void setCreatedFs(final String createdFs) {
+            this.createdFs = createdFs;
+        }
+
+        /**
+         * Returns how much diskspace is used on the primary.
+         */
+        public final int getUsed() {
+            if (blockDevInfo1.getBlockDevice().isPrimary()) {
+                return blockDevInfo1.getBlockDevice().getUsed();
+            } else if (blockDevInfo2.getBlockDevice().isPrimary()) {
+                return blockDevInfo2.getBlockDevice().getUsed();
+            }
+            return -1;
+        }
     }
 
     /**
@@ -2723,6 +2755,23 @@ public class ClusterBrowser extends Browser {
          */
         public CommonBlockDevice getCommonBlockDevice() {
             return (CommonBlockDevice) getResource();
+        }
+        /** Returns the last created filesystem. */
+        public final String getCreatedFs() {
+            return null;
+        }
+
+        /**
+         * Returns how much of the filesystem is used.
+         */
+        public final int getUsed() {
+            int used = -1;
+            for (BlockDevice bd : blockDevices) {
+                if (bd.getUsed() > used) {
+                    used = bd.getUsed();
+                }
+            }
+            return used;
         }
     }
 
@@ -2859,6 +2908,10 @@ public class ClusterBrowser extends Browser {
     class FilesystemInfo extends ServiceInfo {
         /** drbddisk service object. */
         private DrbddiskInfo drbddiskInfo = null;
+        /** Block device combo box. */
+        private GuiComboBox blockDeviceParamCb = null;
+        /** Filesystem type combo box. */
+        private GuiComboBox fstypeParamCb = null;
 
         /**
          * Creates the FilesystemInfo object.
@@ -2981,17 +3034,50 @@ public class ClusterBrowser extends Browser {
                                           null,
                                           null,
                                           width);
+                blockDeviceParamCb = paramCb;
+
+                paramCb.addListeners(
+                    new ItemListener() {
+                        public void itemStateChanged(final ItemEvent e) {
+                            if (e.getStateChange() == ItemEvent.SELECTED
+                                && fstypeParamCb != null) {
+                                final Thread thread = new Thread(new Runnable() {
+                                    public void run() {
+                                        final Info item = (Info) e.getItem();
+                                        if (item.getStringValue() == null) {
+                                            return;
+                                        }
+                                        final String selectedValue =
+                                                    getResource().getValue("fstype");
+                                        String createdFs;
+                                        if (selectedValue != null) {
+                                            createdFs = selectedValue;
+                                        } else {
+                                            final CommonDeviceInterface cdi =
+                                                (CommonDeviceInterface) item;
+                                            createdFs = cdi.getCreatedFs();
+                                        }
+                                        fstypeParamCb.setValue(createdFs);
+                                    }
+                                });
+                                thread.start();
+                            }
+                        }
+                    },
+                
+                    null);
 
                 paramComboBoxAdd(param, prefix, paramCb);
             } else if ("fstype".equals(param)) {
                 final String defaultValue =
                             Tools.getString("ClusterBrowser.SelectFilesystem");
-                final String selectedValue = getResource().getValue("fstype");
+                String selectedValue = getResource().getValue("fstype");
                 paramCb = new GuiComboBox(selectedValue,
                                           getCommonFileSystems(defaultValue),
                                           null,
                                           null,
                                           width);
+                fstypeParamCb = paramCb;
 
                 paramComboBoxAdd(param, prefix, paramCb);
                 paramCb.setEditable(false);
@@ -3078,6 +3164,21 @@ public class ClusterBrowser extends Browser {
             //if (oddi != null) {
             //    oddi.cleanupResource();
             //}
+        }
+
+        /**
+         * Returns how much of the filesystem is used.
+         */
+        public final int getUsed() {
+            if (blockDeviceParamCb != null) {
+                final Info item = (Info) blockDeviceParamCb.getValue();
+                if (item == null) {
+                    return -1;
+                }
+                final CommonDeviceInterface cdi = (CommonDeviceInterface) item;
+                return cdi.getUsed();
+            }
+            return -1;
         }
     }
 
@@ -4602,7 +4703,7 @@ public class ClusterBrowser extends Browser {
                             public void itemStateChanged(final ItemEvent e) {
                                 if (cb.isCheckBox()
                                     || e.getStateChange() == ItemEvent.SELECTED) {
-                                    Thread thread = new Thread(new Runnable() {
+                                    final Thread thread = new Thread(new Runnable() {
                                         public void run() {
                                             final boolean enable =
                                                       checkResourceFields("cached",

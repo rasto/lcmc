@@ -136,7 +136,9 @@ public class DrbdConfigCreateFS extends DrbdConfig {
                 BlockDevInfo bdiPri = getPrimaryBD();
                 BlockDevInfo bdiSec = getSecondaryBD();
                 bdiPri.forcePrimary();
-                bdiPri.makeFilesystem(filesystemCB.getStringValue());
+                final String fs = filesystemCB.getStringValue();
+                bdiPri.makeFilesystem(fs);
+                getDrbdResourceInfo().setCreatedFs(fs);
                 bdiPri.setSecondary();
                 hostCB.setValue(NO_HOST_STRING);
                 filesystemCB.setValue(NO_FILESYSTEM_STRING);

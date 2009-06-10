@@ -32,6 +32,10 @@ import drbd.gui.HostBrowser.BlockDevInfo;
 import drbd.gui.Browser.Info;
 
 import java.awt.Shape;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.Paint;
+import java.awt.Color;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -43,12 +47,9 @@ import edu.uci.ics.jung.visualization.VertexShapeFactory;
 import edu.uci.ics.jung.visualization.Coordinates;
 
 import java.util.LinkedHashMap;
-import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-import java.awt.Paint;
-import java.awt.Color;
 
 import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
@@ -892,16 +893,31 @@ public class DrbdGraph extends ResourceGraph {
     protected int getUsed(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
-            if (bdi.getBlockDevice().isPrimary()) {
-                return bdi.getBlockDevice().getUsed();
-            } else if (bdi.getBlockDevice().isSecondary()) {
-                final BlockDevInfo otherBdi = bdi.getOtherBlockDevInfo();
-                if (otherBdi != null) {
-                    return otherBdi.getBlockDevice().getUsed();
-                }
-            }
+            return bdi.getUsed();
         }
-        return -1;
+        final HostInfo hi = vertexToHostMap.get(v);
+        return hi.getUsed();
     }
 
+    /**
+     * This method draws how much of the vertex is used for something.
+     */
+    protected void drawInside(final Vertex v,
+                              final Graphics2D g2d,
+                              final double x,
+                              final double y,
+                              final Shape shape) {
+        final double used = getUsed(v);
+        if (used > 0) {
+            /** Show how much is used. */
+            final double height = shape.getBounds().getHeight();
+            final double width = shape.getBounds().getWidth();
+            final double freeWidth = width * (100 - used) / 100;
+            g2d.setColor(new Color(255, 255, 255, 220));
+            g2d.fillRect((int) (x + shape.getBounds().getWidth() - freeWidth),
+                         (int) (y + 2),
+                         (int) (freeWidth - 2),
+                         (int) (height - 2));
+        }
+    }
 }

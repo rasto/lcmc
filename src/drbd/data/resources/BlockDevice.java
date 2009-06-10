@@ -91,6 +91,13 @@ public class BlockDevice extends Resource {
      */
     public BlockDevice(final String line) {
         super();
+        update(line);
+    }
+
+    /**
+     * Updates the block device.
+     */
+    public final void update(final String line) {
         final String[] cols = line.split(" ");
         if (cols.length < 2) {
             Tools.appError("cannot parse line: " + line);

@@ -1693,6 +1693,7 @@ public class Host implements Serializable {
                 if (blockDevices.containsKey(blockDevice.getName())) {
                     /* get the existing block device object, forget the new one. */
                     blockDevice = blockDevices.get(blockDevice.getName());
+                    blockDevice.update(line);
                 }
                 newBlockDevices.put(blockDevice.getName(), blockDevice);
             } else if ("filesystems-info".equals(type)) {

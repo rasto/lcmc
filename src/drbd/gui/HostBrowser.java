@@ -949,6 +949,13 @@ public class HostBrowser extends Browser {
             }
             return graph.getGraphPanel();
         }
+        /**
+         * Returns how much of this is used.
+         */
+         public final int getUsed() {
+             // TODO: maybe the load?
+             return -1;
+         }
     }
 
 
@@ -1130,9 +1137,9 @@ public class HostBrowser extends Browser {
                 ret.append(getBlockDevice().getMountedOn());
                 ret.append("\nType            : ");
                 ret.append(getBlockDevice().getFsType());
-                if (getBlockDevice().getUsed() >= 0) {
+                if (getUsed() >= 0) {
                     ret.append("\nUsed:           : ");
-                    ret.append(getBlockDevice().getUsed());
+                    ret.append(getUsed());
                     ret.append('%');
                 }
             }
@@ -2118,5 +2125,15 @@ public class HostBrowser extends Browser {
 
             return items;
         }
+
+        /**
+         * Returns how much of the block device is used.
+         */
+         public final int getUsed() {
+             if (drbdResourceInfo != null) {
+                 return drbdResourceInfo.getUsed();
+             }
+             return getBlockDevice().getUsed();
+         }
     }
 }

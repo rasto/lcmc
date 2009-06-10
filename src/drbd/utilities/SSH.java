@@ -1339,7 +1339,6 @@ public class SSH {
                 file.append(br.readLine());
                 file.append('\n');
             }
-            System.out.println("scp");
             scp(file.toString(),
                 "/usr/local/bin/drbd-gui-helper",
                 "0700",

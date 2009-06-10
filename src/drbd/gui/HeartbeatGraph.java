@@ -44,16 +44,18 @@ import edu.uci.ics.jung.visualization.VertexShapeFactory;
 
 import edu.uci.ics.jung.utils.Pair;
 import java.awt.Shape;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.Color;
+import java.awt.Paint;
+import java.awt.geom.RoundRectangle2D;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
-import java.awt.Color;
-import java.awt.Paint;
 
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
@@ -1309,6 +1311,36 @@ public class HeartbeatGraph extends ResourceGraph {
      * -1 for not used or not applicable.
      */
     protected int getUsed(final Vertex v) {
-        return -1;
+        if (vertexToHostMap.containsKey(v)) {
+            return ((HostInfo) getInfo(v)).getUsed();
+        }
+        return ((ServiceInfo) getInfo(v)).getUsed();
+    }
+
+    /**
+     * This method draws how much of the vertex is used for something.
+     */
+    protected void drawInside(final Vertex v,
+                              final Graphics2D g2d,
+                              final double x,
+                              final double y,
+                              final Shape shape) {
+        if (vertexToHostMap.containsKey(v)) {
+            return;
+        }
+        final double used = getUsed(v);
+        if (used > 0) {
+            /** Show how much is used. */
+            final double height = shape.getBounds().getHeight();
+            final double width = shape.getBounds().getWidth();
+            final double freeWidth = width * (100 - used) / 100;
+            g2d.setColor(new Color(255, 255, 255, 220));
+            g2d.fillRoundRect((int) (x + shape.getBounds().getWidth() - freeWidth),
+                              (int) (y + 2),
+                              (int) (freeWidth - 1),
+                              (int) (height - 4),
+                              20,
+                              20);
+        }
     }
 }
