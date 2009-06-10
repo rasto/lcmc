@@ -217,6 +217,11 @@ public class Browser {
          * object. */
         private Resource resource;
 
+        /**
+         * Area with text info.
+         */
+        private JEditorPane resourceInfoArea;
+
         /** Map from parameter to its user-editable widget. */
         private final Map<String, GuiComboBox> paramComboBoxHash =
                                             new HashMap<String, GuiComboBox>();
@@ -231,6 +236,8 @@ public class Browser {
         private boolean updated = false;
         /** Animation index. */
         private int animationIndex = 0;
+        /** Cache with info text. */
+        private String infoCache = "";
 
         /**
          * Prepares a new <code>Info</code> object.
@@ -405,10 +412,35 @@ public class Browser {
         //}
 
         /**
+         * Updates the info text.
+         */
+        public void updateInfo() {
+            if (resourceInfoArea != null) {
+                final String newInfo = getInfo();
+                if (newInfo != null) {
+                    if (!newInfo.equals(infoCache)) {
+                        infoCache = newInfo;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                resourceInfoArea.setText(newInfo);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+        /**
          * Updates the info in the info panel, long after it is drawn. For
          * example, if command has to be executed to get the info.
          */
         protected void updateInfo(final JEditorPane ep) {
+        }
+
+        /**
+         * Returns type of the info text. text/plain or text/html.
+         */
+        protected String getInfoType() {
+            return "text/plain";
         }
 
         /**
@@ -417,15 +449,15 @@ public class Browser {
         public JComponent getInfoPanel() {
             setTerminalPanel();
             final String info = getInfo();
-            JEditorPane resourceInfoArea = null;
+            resourceInfoArea = null;
             if (info == null) {
                 final JPanel panel = new JPanel();
                 panel.setBackground(PANEL_BACKGROUND);
                 return panel;
             } else {
                 final Font f = new Font("Monospaced", Font.PLAIN, 12);
-                resourceInfoArea = new JEditorPane("text/html",
-                                                   Tools.html(info));
+                resourceInfoArea = new JEditorPane(getInfoType(),
+                                                   info);
                 resourceInfoArea.setMinimumSize(new Dimension(
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")

@@ -24,6 +24,7 @@ package drbd.data;
 
 import drbd.gui.DrbdGraph;
 import drbd.data.resources.BlockDevice;
+import drbd.gui.HostBrowser.BlockDevInfo;
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
 
@@ -869,10 +870,10 @@ public class DrbdXML extends XML {
     /**
      * Gets block device object from device number. Can return null.
      */
-    private BlockDevice getBlockDevice(final String devNr,
-                                       final String hostName,
-                                       final DrbdGraph drbdGraph) {
-        BlockDevice bd = null;
+    private BlockDevInfo getBlockDevInfo(final String devNr,
+                                         final String hostName,
+                                         final DrbdGraph drbdGraph) {
+        BlockDevInfo bdi = null;
         final String device = "/dev/drbd" + devNr;
         final String resName = deviceResourceMap.get(device);
         if (resName != null) {
@@ -881,11 +882,11 @@ public class DrbdXML extends XML {
             if (hostDiskMap != null) {
                 final String disk = hostDiskMap.get(hostName);
                 if (disk != null) {
-                    bd = drbdGraph.findBlockDevice(hostName, disk);
+                    bdi = drbdGraph.findBlockDevInfo(hostName, disk);
                 }
             }
         }
-        return bd;
+        return bdi;
     }
 
     /**
@@ -934,12 +935,13 @@ public class DrbdXML extends XML {
             final String ds2          = m.group(7);
             final String flags        = m.group(8);
             /* get blockdevice object from device */
-            final BlockDevice bd = getBlockDevice(devNr, hostName, drbdGraph);
-            if (bd != null) {
-                bd.setConnectionState(cs);
-                bd.setNodeState(ro1);
-                bd.setDiskState(ds1);
-                bd.setDrbdFlags(flags);
+            final BlockDevInfo bdi = getBlockDevInfo(devNr, hostName, drbdGraph);
+            if (bdi != null) {
+                bdi.getBlockDevice().setConnectionState(cs);
+                bdi.getBlockDevice().setNodeState(ro1);
+                bdi.getBlockDevice().setDiskState(ds1);
+                bdi.getBlockDevice().setDrbdFlags(flags);
+                bdi.updateInfo();
             }
             return;
         }
@@ -950,9 +952,10 @@ public class DrbdXML extends XML {
             /* String counter      = m.group(1); // not used */
             final String devNr        = m.group(2);
             final String synced       = m.group(3);
-            final BlockDevice bd = getBlockDevice(devNr, hostName, drbdGraph);
-            if (bd != null && bd.isDrbd()) {
-                bd.setSyncedProgress(synced);
+            final BlockDevInfo bdi = getBlockDevInfo(devNr, hostName, drbdGraph);
+            if (bdi != null && bdi.getBlockDevice().isDrbd()) {
+                bdi.getBlockDevice().setSyncedProgress(synced);
+                bdi.updateInfo();
             }
             return;
         }
@@ -965,12 +968,13 @@ public class DrbdXML extends XML {
             final String what         = m.group(3);
             Tools.debug(this, "drbd event: " + devNr + " - " + what);
             if ("split-brain".equals(what)) {
-                final BlockDevice bd = getBlockDevice(devNr,
-                                                      hostName,
-                                                      drbdGraph);
+                final BlockDevInfo bdi = getBlockDevInfo(devNr,
+                                                       hostName,
+                                                       drbdGraph);
 
-                if (bd != null && bd.isDrbd()) {
-                    bd.setSplitBrain(true);
+                if (bdi != null && bdi.getBlockDevice().isDrbd()) {
+                    bdi.getBlockDevice().setSplitBrain(true);
+                    bdi.updateInfo();
                 }
             }
             return;

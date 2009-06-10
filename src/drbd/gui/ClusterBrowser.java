@@ -2654,6 +2654,12 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns type of the info text. text/plain or text/html.
+         */
+        protected String getInfoType() {
+            return "text/html";
+        }
+        /**
          * Returns the info about the service.
          */
         public String getInfo() {
@@ -3688,7 +3694,6 @@ public class ClusterBrowser extends Browser {
 
         /**
          * Sets info panel of the service.
-         * TODO: is it used?
          */
         public void setInfoPanel(final JPanel infoPanel) {
             this.infoPanel = infoPanel;
@@ -5931,6 +5936,12 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns type of the info text. text/plain or text/html.
+         */
+        protected String getInfoType() {
+            return "text/html";
+        }
+        /**
          * Returns info for the category.
          */
         public String getInfo() {
@@ -5966,6 +5977,12 @@ public class ClusterBrowser extends Browser {
             return null;
         }
 
+        /**
+         * Returns type of the info text. text/plain or text/html.
+         */
+        protected String getInfoType() {
+            return "text/html";
+        }
         /**
          * Returns info for the Heartbeat menu.
          */
@@ -6027,7 +6044,6 @@ public class ClusterBrowser extends Browser {
 
         /**
          * Sets info panel.
-         * TODO: dead code?
          */
         public void setInfoPanel(final JComponent infoPanel) {
             this.infoPanel = infoPanel;
@@ -6388,6 +6404,12 @@ public class ClusterBrowser extends Browser {
             return infoPanel == null;
         }
 
+        /**
+         * Returns type of the info text. text/plain or text/html.
+         */
+        protected String getInfoType() {
+            return "text/html";
+        }
 
         /**
          * Returns info for info panel, that hb status failed or null, in which

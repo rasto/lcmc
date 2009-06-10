@@ -230,6 +230,7 @@ public class HostBrowser extends Browser {
             BlockDevInfo bdi;
             if (oldBlockDevices.containsKey(bd)) {
                 bdi = oldBlockDevices.get(bd);
+                bdi.updateInfo();
             } else {
                 bdi = new BlockDevInfo(bd.getName(), bd);
             }
@@ -393,6 +394,13 @@ public class HostBrowser extends Browser {
          */
         public ImageIcon getMenuIcon() {
             return FS_ICON;
+        }
+
+        /**
+         * Returns type of the info text. text/plain or text/html.
+         */
+        protected String getInfoType() {
+            return "text/html";
         }
 
         /**
@@ -1690,18 +1698,19 @@ public class HostBrowser extends Browser {
 
             /* info */
             final Font f = new Font("Monospaced", Font.PLAIN, 12);
-            final JEditorPane resourceInfoArea = new JEditorPane("text/plain", getInfo());
-            resourceInfoArea.setEditable(false);
-            resourceInfoArea.setFont(f);
-            resourceInfoArea.setPreferredSize(new Dimension(
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
-                        ));
-            resourceInfoArea.setMaximumSize(resourceInfoArea.getPreferredSize());
+            //final JEditorPane resourceInfoArea = new JEditorPane("text/plain", getInfo());
+            //resourceInfoArea.setEditable(false);
+            //resourceInfoArea.setFont(f);
+            //resourceInfoArea.setPreferredSize(new Dimension(
+            //            Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
+            //            Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
+            //            ));
+            //resourceInfoArea.setMaximumSize(resourceInfoArea.getPreferredSize());
             final JPanel riaPanel = new JPanel();
             riaPanel.setBackground(PANEL_BACKGROUND);
             riaPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            riaPanel.add(resourceInfoArea);
+            //riaPanel.add(resourceInfoArea);
+            riaPanel.add(super.getInfoPanel());
             mainPanel.add(riaPanel);
 
             ///* drbd node */
