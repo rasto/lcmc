@@ -46,6 +46,13 @@ public class DistResource_redhatenterpriseas_4_0 extends
          "/usr/bin/wget -q http://www.linbit.com/@SUPPORTDIR@/ -O - |perl -ple '($_) = /href=\"@DRBDDIR@-(\\d.*?)\\/\"/ or goto LINE'"
         },
 
+        {"DrbdAvailVersionsSource",
+         "/usr/bin/wget -q http://oss.linbit.com/drbd/"
+         + " -O - |"
+         + "perl -ple '($_) = m!href=\"(\\d\\.\\d/drbd-[89].*?\\.tar\\.gz)\"!"
+         + " or goto LINE'"
+         },
+
         {"DrbdAvailDistributions",
          "/usr/bin/wget -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/ -O - |perl -ple '($_) = m!href=\"([^\"/]+)/\"! or goto LINE'"
         },
@@ -75,15 +82,18 @@ public class DistResource_redhatenterpriseas_4_0 extends
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
 
-        {"HbInst.install.text.1", "http://download.opensuse.org: wget & rpm -U" },
-        {"HbInst.install.1", "rm -rf /tmp/drbd-mc-hbinst/; "
-                           + "mkdir /tmp/drbd-mc-hbinst/ && "
-                           + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/ && "
-                           + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
-                           + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
-                           + "up2date libtool-libs perl-TimeDate && "
-                           + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
-                           + "/sbin/chkconfig --add heartbeat && "
-                           + "rm -rf /tmp/drbd-mc-hbinst/"},
+        {"HbInst.install.text.1",
+         "http://download.opensuse.org: wget & rpm -U" },
+
+        {"HbInst.install.1",
+         "rm -rf /tmp/drbd-mc-hbinst/; "
+         + "mkdir /tmp/drbd-mc-hbinst/ && "
+         + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/ && "
+         + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
+         + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
+         + "up2date net-snmp-libs lm_sensors libtool-libs perl-TimeDate && "
+         + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
+         + "/sbin/chkconfig --add heartbeat && "
+         + "rm -rf /tmp/drbd-mc-hbinst/"},
     };
 }

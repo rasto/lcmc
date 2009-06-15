@@ -802,7 +802,9 @@ public class Browser {
             final Map<String, Boolean> sectionIsRequiredMap =
                                             new HashMap<String, Boolean>();
             // TODO: parts of this are the same as in addParams
-            getInfoPanel(); // TODO: finished here
+            //reload(getNode());
+            //nodeChanged(getNode());
+            //getInfoPanel(); // TODO: finished here
             for (final String param : params) {
                 final GuiComboBox paramCb = getParamComboBox(param,
                                                              "wizard",

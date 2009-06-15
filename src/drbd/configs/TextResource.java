@@ -246,7 +246,12 @@ public class TextResource extends
          "DRBD Install"},
 
         {"Dialog.HostDrbdCommandInst.Description",
-         "DRBD is being installed."},
+         "DRBD is being installed. For some distributions, especially "
+         + "Red Hats, if you use an older kernel than is currently "
+         + "available, you may need to find, download and install the "
+         + "<b>kernel-devel</b> package for your kernel yourself or update "
+         + "the kernel. You can find out your kernel version with \"uname -r\" "
+         + "command. After that you can retry this step again."},
 
         {"Dialog.HostDrbdCommandInst.Executing",
          "Installing..."},
