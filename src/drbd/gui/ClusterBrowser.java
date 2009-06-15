@@ -629,13 +629,15 @@ public class ClusterBrowser extends Browser {
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
 
                 updateDrbdResources();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        drbdGraph.scale();
-                    }
-                });
+                //SwingUtilities.invokeLater(new Runnable() {
+                //    public void run() {
+                //        drbdGraph.scale();
+                //    }
+                //});
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
+                drbdGraph.getDrbdInfo().getInfoPanel();
+                drbdGraph.getDrbdInfo().selectMyself();
                 Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
                 cluster.getBrowser().startServerStatus();
@@ -7510,12 +7512,14 @@ public class ClusterBrowser extends Browser {
                 bd1.setDrbd(true);
                 bd1.setDrbdResourceInfo(dri);
                 bd1.setInfoPanel(null); /* reload panel */
+                bd1.getInfoPanel();
                 bd1.selectMyself();
             }
             if (bd2 != null) {
                 bd2.setDrbd(true);
                 bd2.setDrbdResourceInfo(dri);
                 bd2.setInfoPanel(null); /* reload panel */
+                bd2.getInfoPanel();
                 bd2.selectMyself();
             }
 
@@ -7534,14 +7538,14 @@ public class ClusterBrowser extends Browser {
             drbdResourceNode.add(drbdBDNode1);
             drbdResourceNode.add(drbdBDNode2);
 
-            //reload(getNode());
-            //reload(drbdResourceNode);
             drbdGraph.addDrbdResource(dri, bd1, bd2);
             final DrbdResourceInfo driF = dri;
             if (interactive) {
                 final Thread thread = new Thread(
                     new Runnable() {
                         public void run() {
+                            //reload(getNode());
+                            reload(drbdResourceNode);
                             AddDrbdConfigDialog adrd
                                 = new AddDrbdConfigDialog(driF);
                             adrd.showDialogs();
