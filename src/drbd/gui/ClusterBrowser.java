@@ -3178,7 +3178,7 @@ public class ClusterBrowser extends Browser {
         public final int getUsed() {
             if (blockDeviceParamCb != null) {
                 final Info item = (Info) blockDeviceParamCb.getValue();
-                if (item == null) {
+                if (item.getStringValue() == null) {
                     return -1;
                 }
                 final CommonDeviceInterface cdi = (CommonDeviceInterface) item;
