@@ -119,9 +119,9 @@ public class DrbdGraph extends ResourceGraph {
 
     /** Maximum length of the label in the vertex, after which the string will
      * be cut. */
-    private static final int MAX_VERTEX_STRING_LENGTH = 23;
+    private static final int MAX_VERTEX_STRING_LENGTH = 18;
     /** String length after the cut. */
-    private static final int VERTEX_STRING_LENGTH = 20;
+    private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
     /** Maximum length of the label in the edge, after which the string will
      * be cut. */
     private static final int MAX_EDGE_STRING_LENGTH = 10;
@@ -366,7 +366,13 @@ public class DrbdGraph extends ResourceGraph {
                 } else if (bdi.getBlockDevice().getMountedOn() != null) {
                     return "mounted";
                 } else if (bdi.getBlockDevice().isDrbd()) {
-                    return bdi.getBlockDevice().getName();
+                    String s = bdi.getBlockDevice().getName();
+                    if (s.length() > MAX_RIGHT_CORNER_STRING_LENGTH) {
+                        s = "..." + s.substring(
+                                      s.length() - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
+                                      s.length());
+                    }
+                    return s;
                 }
 
             }
@@ -406,7 +412,7 @@ public class DrbdGraph extends ResourceGraph {
                 l = getInfo((Vertex) v).getName();
             }
             if (l.length() > MAX_VERTEX_STRING_LENGTH) {
-                l = "..." + l.substring(l.length() - VERTEX_STRING_LENGTH,
+                l = "..." + l.substring(l.length() - MAX_VERTEX_STRING_LENGTH + 3,
                                         l.length());
             }
             return l;
