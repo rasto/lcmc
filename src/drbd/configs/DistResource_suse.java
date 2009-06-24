@@ -61,7 +61,7 @@ public class DistResource_suse extends
         {"AisPmInst.install.i586", "i586" },
 
         {"HbPmInst.install.text.1", "CD" },
-        {"HbPmInst.install.1", "zypper -n install heartbeat"},
+        {"HbPmInst.install.1", "zypper -n --no-gpg-checks install heartbeat"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",

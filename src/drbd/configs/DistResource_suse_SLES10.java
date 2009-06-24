@@ -63,8 +63,9 @@ public class DistResource_suse_SLES10 extends
 
         /* Heartbeat */
         {"HbPmInst.install.text.2", "the suse way: possibly too old" },
-        {"HbPmInst.install.2", "/usr/bin/zypper -n install heartbeat &&" 
-                           + "/sbin/chkconfig --add heartbeat"},
+        {"HbPmInst.install.2",
+         "/usr/bin/zypper -n --no-gpg-checks install heartbeat &&" 
+         + "/sbin/chkconfig --add heartbeat"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -80,8 +81,8 @@ public class DistResource_suse_SLES10 extends
          + "cd /tmp/drbdinst && "
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
-         + "/usr/bin/zypper -n in kernel-source && "
-         + "/usr/bin/zypper -n in flex gcc && "
+         + "/usr/bin/zypper -n --no-gpg-checks in kernel-source && "
+         + "/usr/bin/zypper -n --no-gpg-checks in flex gcc && "
          + "make && make install && "
          + "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
@@ -91,7 +92,7 @@ public class DistResource_suse_SLES10 extends
          "the suse way: possibly too old"},
 
         {"DrbdInst.install.3",
-         "/usr/bin/zypper -n install drbd drbd-kmp-default"},
+         "/usr/bin/zypper -n --no-gpg-checks install drbd drbd-kmp-default"},
 
     };
 }
