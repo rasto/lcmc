@@ -25,6 +25,7 @@ package drbd.gui.dialog;
 import drbd.utilities.Tools;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JComponent;
 
 /**
  * @author rasto
@@ -155,7 +156,7 @@ public class ConfirmDialog extends ConfigDialog {
      * Returns the dialog title. ConfirmDialog.Title from TextResources by
      * default.
      */
-    protected String getDialogTitle() {
+    protected final String getDialogTitle() {
         if (title == null) {
             return Tools.getString("ConfirmDialog.Title");
         } else {
@@ -168,11 +169,18 @@ public class ConfirmDialog extends ConfigDialog {
      * in the constructor.
      * ConfirmDialog.Description from TextResources by * default.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         if (description == null) {
             return Tools.getString("ConfirmDialog.Description");
         } else {
             return description;
         }
+    }
+
+    /**
+     * Returns pane where user input can be defined.
+     */
+    protected final JComponent getInputPane() {
+        return null;
     }
 }

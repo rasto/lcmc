@@ -202,11 +202,10 @@ public class DrbdConfigCreateMD extends DrbdConfig {
      */
     protected void initDialog() {
         super.initDialog();
-        if (!getDrbdResourceInfo().isHaveToCreateMD()) {
-            enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-            //buttonClass(nextButton()).setEnabled(true);
-        } else {
+        if (getDrbdResourceInfo().isHaveToCreateMD()) {
             enableComponentsLater(new JComponent[]{});
+        } else {
+            enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         }
         enableComponents();
     }

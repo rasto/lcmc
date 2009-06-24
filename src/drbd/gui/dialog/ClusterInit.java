@@ -112,7 +112,7 @@ public class ClusterInit extends DialogCluster {
      * Returns previous dialog. It is used to get with the back button to
      * the dialog before this one.
      */
-    protected WizardDialog getPreviousDialog() {
+    protected final WizardDialog getPreviousDialog() {
         stopCheckCluster();
         return super.getPreviousDialog();
     }
@@ -382,7 +382,8 @@ public class ClusterInit extends DialogCluster {
                         final Thread thread = new Thread(
                             new Runnable() {
                                 public void run() {
-                                    drbdLoadButtons.get(index).setVisible(false);
+                                    drbdLoadButtons.get(index).setVisible(
+                                                                        false);
                                     DRBD.load(host);
                                     if (host.isDrbdUpgraded()) {
                                         DRBD.adjust(host, "all");
@@ -435,7 +436,7 @@ public class ClusterInit extends DialogCluster {
     /**
      * Enable skip button.
      */
-    protected boolean skipButtonEnabled() {
+    protected final boolean skipButtonEnabled() {
         return true;
     }
 }

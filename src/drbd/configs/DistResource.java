@@ -66,9 +66,11 @@ public class DistResource extends
            + "if [ ! -z \"$v\" ]; then echo \"$v\"; echo \"$d\"; fi; \n"
            + "done; lsb_release -i -r 2>/dev/null|sed 's/CentOS/redhat/'|sed 's/SUSE LINUX/suse/'|perl -lne 'print lc((split /:\\s*/)[1])' "},
         /* DrbdCheck.version has exit code != 0 if nothing is installed */
-        {"DrbdCheck.version", "echo|drbdadm help | grep 'Version: '|sed 's/Version: //' | grep ."},
-        //{ "HbCheck.version", ""},
-        {"HbCheck.version", "/usr/lib/heartbeat/heartbeat -V 2>/dev/null || /usr/lib64/heartbeat/heartbeat -V"},
+        {"DrbdCheck.version",
+         "echo|drbdadm help | grep 'Version: '|sed 's/Version: //'|sed 's/ .*//'|grep ."},
+
+        {"HbCheck.version",
+         "/usr/local/bin/drbd-gui-helper get-cluster-versions"},
         /* DrbdAvailableVersions returns available versions of drbd in the download area. One
          * version per line.
          *
@@ -113,7 +115,11 @@ public class DistResource extends
         },
 
         {"DrbdAvailFiles",
-         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O - |perl -ple '($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?(?:(?:km|module|utils)[_-]@BUILD@)?[-_]?@DRBDVERSION@.*?[._]@ARCH@\\.(?:rpm|deb))\"! or goto LINE'"
+         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/"
+         + "@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/"
+         + " -O - |perl -ple '($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?"
+         + "(?:(?:km|module|utils)[_-]@BUILD@)?[-_]?@DRBDVERSION@.*?[._]@ARCH@"
+         + "\\.(?:rpm|deb))\"! or goto LINE'"
         },
 
         {"TestCommand", "uptime"},
@@ -125,8 +131,6 @@ public class DistResource extends
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
         {"DrbdInst.start",   "/etc/init.d/drbd start"},
-
-        {"HbInst.authkeys", "if [ ! -e /etc/ha.d/authkeys ]; then printf 'auth 1\n1 crc\n# 2 sha1 ThisIsASampleKeyAnythingAlphaNumericIsGoodHere\n#3 md5 ThisIsASampleKeyAnythingAlphaNumericIsGoodHere' > /etc/ha.d/authkeys; fi"},
 
         {"installGuiHelper", "installGuiHelper"}, // is treated specially by ssh class.
 

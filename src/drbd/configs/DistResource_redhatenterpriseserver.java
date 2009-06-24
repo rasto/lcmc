@@ -46,8 +46,8 @@ public class DistResource_redhatenterpriseserver extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
 
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
-        {"HbInst.install.text.1", "the redhat way: possibly too old"},
-        {"HbInst.install.1", "/usr/bin/yum -y install heartbeat"},
+        {"HbPmInst.install.text.1", "the redhat way: possibly too old"},
+        {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -63,9 +63,17 @@ public class DistResource_redhatenterpriseserver extends
          + "cd /tmp/drbdinst && "
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
-         + "/usr/bin/yum -y install flex gcc kernel-devel && "
+         + "/usr/bin/yum -y install kernel`uname -r|"
+          + " grep -o '5PAE\\|5xen\\|5debug'"
+          + "|tr 5 -`-devel-`uname -r|sed 's/\\(PAE\\|xen\\|debug\\)$//'` && "
+         + "/usr/bin/yum -y install glibc flex gcc && "
          + "make && make install && "
          + "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
+
+        {"HbCheck.version",
+         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         + "/bin/rpm -q -i openais|perl -lne"
+         + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
     };
 }

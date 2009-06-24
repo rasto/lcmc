@@ -102,7 +102,7 @@ public class Logs extends ConfigDialog {
      * the result.
      */
     protected void getLog() {
-        Map<String, String> replaceHash = new HashMap<String, String>();
+        final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@GREPPATTERN@", grepPattern());
         final String command = host.getDistCommand(logFileCommand(),
                                                    replaceHash);

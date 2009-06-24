@@ -24,7 +24,6 @@ package drbd.gui.dialog;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.data.Host;
-import drbd.AddHostDialog;
 import drbd.AddClusterDialog;
 
 import javax.swing.JPanel;
@@ -60,7 +59,7 @@ public class HostFinish extends DialogHost {
     /** Dimensions of the buttons. */
     private static final Dimension BUTTON_DIMENSION = new Dimension(300, 100);
     /** Save checkbox. */
-    final JCheckBox saveCB = new JCheckBox(
+    private final JCheckBox saveCB = new JCheckBox(
                                     Tools.getString("Dialog.HostFinish.Save"),
                                     true);
     /** Next dialog. */

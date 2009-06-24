@@ -73,16 +73,32 @@ public class DistResource_redhatenterpriseas_4 extends
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
 
-        {"HbInst.install.text.1",
+        /* Openais/Pacemaker Opensuse */
+        {"AisPmInst.install.text.1",
          "http://download.opensuse.org: wget & rpm -U" },
 
-        {"HbInst.install.1",
+        {"AisPmInst.install.1",
          "rm -rf /tmp/drbd-mc-hbinst/; "
          + "mkdir /tmp/drbd-mc-hbinst/ && "
          + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/ && "
          + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
          + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
-         + "up2date libtool-libs perl-TimeDate && "
+         + "up2date lm_sensors net-snmp-libs libtool-libs perl-TimeDate && "
+         + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
+         + "/sbin/chkconfig --add openais && "
+         + "rm -rf /tmp/drbd-mc-hbinst/"},
+
+        /* Heartbeat/Pacemaker Opensuse */
+        {"HbPmInst.install.text.1",
+         "http://download.opensuse.org: wget & rpm -U" },
+
+        {"HbPmInst.install.1",
+         "rm -rf /tmp/drbd-mc-hbinst/; "
+         + "mkdir /tmp/drbd-mc-hbinst/ && "
+         + "wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/ && "
+         + "rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm && "
+         + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
+         + "up2date lm_sensors net-snmp-libs libtool-libs perl-TimeDate && "
          + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
          + "/sbin/chkconfig --add heartbeat && "
          + "rm -rf /tmp/drbd-mc-hbinst/"},

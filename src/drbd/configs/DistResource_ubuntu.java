@@ -48,10 +48,10 @@ public class DistResource_ubuntu extends
         {"DrbdInst.install", "dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
         /* pacemaker install method 1 */
-        {"HbInst.install.text.1",
+        {"HbPmInst.install.text.1",
          "the ubuntu way: possibly too old"},
 
-        {"HbInst.install.1",
+        {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         /* Drbd install method 2 */
@@ -84,5 +84,10 @@ public class DistResource_ubuntu extends
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "
          + "'DPkg::Options::force=--force-confnew' drbd8-utils"},
+
+        {"HbCheck.version",
+         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         + "/usr/bin/dpkg-query --showformat='ais:${Version}\\n' -W openais"
+         + "|sed 's/-.*//'"},
     };
 }

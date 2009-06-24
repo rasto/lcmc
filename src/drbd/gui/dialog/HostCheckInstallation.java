@@ -40,11 +40,10 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
- * An implementation of a dialog where drbd/heartbeat installation is checked.
+ * An implementation of a dialog where
+ * drbd/heartbeat/pacemaker/openais/corosync etc. installation is checked.
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -59,18 +58,26 @@ public class HostCheckInstallation extends DialogHost {
     /** Checking drbd label. */
     private final JLabel drbdLabel = new JLabel(
           ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingDrbd"));
-    /** Checking hb label. */
-    private final JLabel heartbeatLabel = new JLabel(
-          ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingHb"));
+    /** Checking openais/pacemaker label. */
+    private final JLabel aisPmLabel = new JLabel(
+          ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingAisPm"));
+    /** Checking heartbeat/pacemaker label. */
+    private final JLabel hbPmLabel = new JLabel(
+          ": " + Tools.getString("Dialog.HostCheckInstallation.CheckingHbPm"));
 
     /** Install/Upgrade drbd button. */
     private final MyButton drbdButton = new MyButton(
             Tools.getString("Dialog.HostCheckInstallation.DrbdInstallButton"));
-    /** Install heartbeat button. */
-    private final MyButton heartbeatButton = new MyButton(
-            Tools.getString("Dialog.HostCheckInstallation.HbInstallButton"));
-    /** Heartbeat installation method */
-    private GuiComboBox hbInstMethodCB;
+    /** Install openais/pacemaker button. */
+    private final MyButton aisPmButton = new MyButton(
+            Tools.getString("Dialog.HostCheckInstallation.AisPmInstallButton"));
+    /** Install heartbeat/pacemaker button. */
+    private final MyButton hbPmButton = new MyButton(
+            Tools.getString("Dialog.HostCheckInstallation.HbPmInstallButton"));
+    /** Openais/pacemaker installation method */
+    private GuiComboBox aisPmInstMethodCB;
+    /** Heartbeat/pacemaker installation method */
+    private GuiComboBox hbPmInstMethodCB;
     /** DRBD installation method */
     private GuiComboBox drbdInstMethodCB;
 
@@ -93,21 +100,20 @@ public class HostCheckInstallation extends DialogHost {
 
     /** Drbd icon: checking ... */
     private final JLabel drbdIcon = new JLabel(CHECKING_ICON);
-    /** Heartbeat icon: checking ... */
-    private final JLabel heartbeatIcon = new JLabel(CHECKING_ICON);
+    /** openais/pacemaker icon: checking ... */
+    private final JLabel aisPmIcon = new JLabel(CHECKING_ICON);
+    /** Heartbeat/pacemaker icon: checking ... */
+    private final JLabel hbPmIcon = new JLabel(CHECKING_ICON);
 
     /** Whether drbd installation was ok. */
     private boolean drbdOk = false;
-    /** Whether heartbeat installation was ok. */
-    private boolean heartbeatOk = false;
-    /** Version that appears in the dialog. */
-    private String versionText;
-    /** Map from version to the installed hb method. */
-    /* TODO: this thing is a bit fuzzy, remove it maybe. */
-    private Map<String, InstallMethods> hbInstalledMethodMap =
-                                         new HashMap<String, InstallMethods>();
+    /** Whether openais/pacemaker installation was ok. */
+    private boolean aisPmOk = false;
+    /** Whether heartbeat/pacemaker installation was ok. */
+    private boolean hbPmOk = false;
     /** Whether there are drbd methods available */
     private boolean drbdInstallMethodsAvailable = false;
+    private final JLabel hbPmJLabel = new JLabel("HB/Pacemaker");
 
     /**
      * Prepares a new <code>HostCheckInstallation</code> object.
@@ -122,16 +128,20 @@ public class HostCheckInstallation extends DialogHost {
      */
     protected void initDialog() {
         super.initDialog();
-        drbdOk         = false;
-        heartbeatOk    = false;
+        drbdOk = false;
+        aisPmOk = false;
+        hbPmOk = false;
+
         nextDialogObject = new HostFinish(this, getHost());
         final HostCheckInstallation thisClass = this;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 drbdButton.setEnabled(false);
-                heartbeatButton.setEnabled(false);
-                hbInstMethodCB.setEnabled(false);
                 drbdInstMethodCB.setEnabled(false);
+                aisPmButton.setEnabled(false);
+                aisPmInstMethodCB.setEnabled(false);
+                hbPmButton.setEnabled(false);
+                hbPmInstMethodCB.setEnabled(false);
             }
         });
         drbdButton.addActionListener(
@@ -140,7 +150,7 @@ public class HostCheckInstallation extends DialogHost {
                     if (drbdOk) {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
-                    InstallMethods im =
+                    final InstallMethods im =
                                   (InstallMethods) drbdInstMethodCB.getValue();
                     getHost().setDrbdInstallMethod(im.getIndex());
                     final String button = e.getActionCommand();
@@ -179,14 +189,30 @@ public class HostCheckInstallation extends DialogHost {
             }
         );
 
-
-        heartbeatButton.addActionListener(
+        hbPmButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new HostHbInst(thisClass, getHost());
-                    InstallMethods im =
-                                   (InstallMethods) hbInstMethodCB.getValue();
-                    getHost().setHbInstallMethod(im.getIndex());
+                    final InstallMethods im =
+                                   (InstallMethods) hbPmInstMethodCB.getValue();
+                    getHost().setHbPmInstallMethod(im.getIndex());
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            ((MyButton) buttonClass(
+                                                nextButton())).pressButton();
+                        }
+                    });
+                }
+            }
+        );
+
+        aisPmButton.addActionListener(
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    nextDialogObject = new HostAisPmInst(thisClass, getHost());
+                    final InstallMethods im =
+                                (InstallMethods) aisPmInstMethodCB.getValue();
+                    getHost().setAisPmInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             ((MyButton) buttonClass(
@@ -198,7 +224,6 @@ public class HostCheckInstallation extends DialogHost {
         );
 
         enableComponentsLater(new JComponent[]{});
-
         getHost().execCommand("DrbdCheck.version",
                          getProgressBar(),
                          new ExecCallback() {
@@ -215,7 +240,7 @@ public class HostCheckInstallation extends DialogHost {
     }
 
     /**
-     * Checks whether drbd is installed and starts heartbeat check.
+     * Checks whether drbd is installed and starts heartbeat/pacemaker check.
      */
     public void checkDrbd(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
@@ -264,7 +289,7 @@ public class HostCheckInstallation extends DialogHost {
                          new ExecCallback() {
                              public void done(final String ans) {
                                  Tools.debug(this, "ans: " + ans);
-                                 checkHeartbeat(ans);
+                                 checkAisHbPm(ans);
                              }
                              public void doneError(final String ans,
                                                    final int exitCode) {
@@ -276,56 +301,97 @@ public class HostCheckInstallation extends DialogHost {
     }
 
     /**
-     * Checks whether heartbeat is installed and starts heartbeat gui check.
+     * Checks whether heartbeat/pacemaker is installed and starts
+     * openais/pacemaker check.
      */
-    public void checkHeartbeat(final String ans) {
-        if ("".equals(ans) || "\n".equals(ans)) {
+    public void checkAisHbPm(final String ans) {
+        getHost().setPacemakerVersion(null);
+        getHost().setOpenaisVersion(null);
+        getHost().setHeartbeatVersion(null);
+        getHost().setCorosyncVersion(null);
+        if (!"".equals(ans) && !"\n".equals(ans)) {
+            for (final String line : ans.split("\n")) {
+                getHost().parseInstallationInfo(line);
+            }
+        }
+        final String aisVersion = getHost().getOpenaisVersion();
+        String hbVersion = getHost().getHeartbeatVersion();
+        if (hbVersion == null && aisVersion == null) {
+            if (hbPmInstMethodCB.getValue() != null) {
+                hbPmButton.setEnabled(true);
+                hbPmInstMethodCB.setEnabled(true);
+                final String toolTip = getHbPmInstToolTip("1");
+                hbPmInstMethodCB.setToolTipText(toolTip);
+                hbPmButton.setToolTipText(toolTip);
+            }
+            if (aisPmInstMethodCB.getValue() != null) {
+                aisPmButton.setEnabled(true);
+                aisPmInstMethodCB.setEnabled(true);
+                final String aisToolTip =
+                               getAisPmInstToolTip("1");
+                aisPmInstMethodCB.setToolTipText(aisToolTip);
+                aisPmButton.setToolTipText(aisToolTip);
+            }
+        }
+        if (hbVersion == null) {
+            /* hb */
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    heartbeatIcon.setIcon(NOT_INSTALLED_ICON);
-                    heartbeatLabel.setText(": " + Tools.getString(
-                             "Dialog.HostCheckInstallation.HbNotInstalled"));
-                    heartbeatButton.setEnabled(true);
-                    hbInstMethodCB.setEnabled(true);
-                    final String toolTip =
-                                   getHbInstToolTip("1");
-                    hbInstMethodCB.setToolTipText(toolTip);
-                    heartbeatButton.setToolTipText(toolTip);
+                    hbPmIcon.setIcon(NOT_INSTALLED_ICON);
+                    hbPmLabel.setText(": " + Tools.getString(
+                             "Dialog.HostCheckInstallation.HbPmNotInstalled"));
                 }
             });
         } else {
-            heartbeatOk = true;
-            final int i = ans.indexOf(' ');
-            String version;
-            if (i < 0) {
-                version = ans.trim();
-            } else {
-                version = ans.substring(0, i);
-            }
-            if ("2.1.3".equals(version)
+            hbPmOk = true;
+            String text;
+            if ("2.1.3".equals(hbVersion)
                 && "sles10".equals(getHost().getDistVersion())) {
                 /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
-                version = "2.1.4";
-                versionText = "2.1.3 (2.1.4)";
+                hbVersion = "2.1.4";
+                text = "2.1.3 (2.1.4)";
             } else {
-                versionText = version;
+                text = hbVersion;
             }
-            getHost().setHeartbeatVersion(version);
-            final InstallMethods hbInstalledMethod =
-                                              hbInstalledMethodMap.get(version);
+            final String hbVersionText = text;
+            getHost().setHeartbeatVersion(hbVersion);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    heartbeatIcon.setIcon(INSTALLED_ICON);
-                    heartbeatLabel.setText(": " + versionText);
-                    if (hbInstalledMethod != null) {
-                        hbInstMethodCB.setValue(hbInstalledMethod);
+                    if (getHost().getHeartbeatVersion().equals(
+                                            getHost().getPacemakerVersion())) {
+                        // TODO: check for sles10
+                        hbPmJLabel.setText("Heartbeat");
+                        hbPmLabel.setText(": " + hbVersionText);
+                    } else {
+                        hbPmLabel.setText(": " + hbVersionText + "/" 
+                                          + getHost().getPacemakerVersion());
                     }
+                    hbPmIcon.setIcon(INSTALLED_ICON);
                 }
             });
-
+        }
+        if (aisVersion == null) {
+            /* openais */
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    aisPmIcon.setIcon(NOT_INSTALLED_ICON);
+                    aisPmLabel.setText(": " + Tools.getString(
+                            "Dialog.HostCheckInstallation.AisPmNotInstalled"));
+                }
+            });
+        } else {
+            aisPmOk = true;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    aisPmIcon.setIcon(INSTALLED_ICON);
+                    aisPmLabel.setText(": "
+                                      + getHost().getOpenaisVersion() + "/" 
+                                      + getHost().getPacemakerVersion());
+                }
+            });
         }
 
-        if (drbdOk && heartbeatOk) { 
+        if (drbdOk && (hbPmOk || aisPmOk)) { 
             progressBarDone();
             nextButtonSetEnabled(true);
             enableComponents();
@@ -337,7 +403,9 @@ public class HostCheckInstallation extends DialogHost {
             });
         } else {
             progressBarDoneError();
-            Tools.debug(this, "drbd: " + drbdOk + ", hb: " + heartbeatOk);
+            Tools.debug(this, "drbd: " + drbdOk
+                              + ", ais/pm: " + aisPmOk
+                              + ", hb/pm: " + hbPmOk);
             printErrorAndRetry(Tools.getString(
                                 "Dialog.HostCheckInstallation.SomeFailed"));
         }
@@ -432,13 +500,24 @@ public class HostCheckInstallation extends DialogHost {
     }
 
     /**
-     * Returns tool tip texts for hb installation method combo box and install
-     * button.
+     * Returns tool tip texts for ais/pm installation method combo box and
+     * install button.
      */
-    private final String getHbInstToolTip(final String index) {
+    private final String getAisPmInstToolTip(final String index) {
         return Tools.html(
             getHost().getDistString(
-                "HbInst.install." + index)).replaceAll(";", ";<br>&gt; ")
+                "AisPmInst.install." + index)).replaceAll(";", ";<br>&gt; ")
+                                           .replaceAll("&&", "<br>&gt; &&");
+    }
+
+    /**
+     * Returns tool tip texts for hb/pm installation method combo box and
+     * install button.
+     */
+    private final String getHbPmInstToolTip(final String index) {
+        return Tools.html(
+            getHost().getDistString(
+                "HbPmInst.install." + index)).replaceAll(";", ";<br>&gt; ")
                                            .replaceAll("&&", "<br>&gt; &&");
     }
 
@@ -458,49 +537,101 @@ public class HostCheckInstallation extends DialogHost {
      */
     private JPanel getInstallationPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        /* get hb installation methods */
-        List<InstallMethods> hbMethods = new ArrayList<InstallMethods>();
+        /* get openais/pacemaker installation methods */
+        final List<InstallMethods> aisPmMethods =
+                                            new ArrayList<InstallMethods>();
         int i = 1;
         while (true) {
             final String index = Integer.toString(i);
             final String text =
-                      getHost().getDistString("HbInst.install.text." + index);
-            if (text == null) {
+                    getHost().getDistString("AisPmInst.install.text." + index);
+            if (text == null || text.equals("")) {
                 break;
             }
-            InstallMethods hbInstallMethod = new InstallMethods(
-                Tools.getString("Dialog.HostCheckInstallation.HbInstallMethod")
-                + text, i);
-            hbMethods.add(hbInstallMethod);
-            final String forVersion =
-                      getHost().getDistString("HbInst.install.version." + index);
-            if (forVersion != null) {
-                hbInstalledMethodMap.put(forVersion, hbInstallMethod);
-            }
+            final InstallMethods aisPmInstallMethod = new InstallMethods(
+              Tools.getString("Dialog.HostCheckInstallation.AisPmInstallMethod")
+              + text, i);
+            aisPmMethods.add(aisPmInstallMethod);
             i++;
         }
         // TODO: make default value also what was already installed. */
-        final String hbDefaultValue = hbMethods.get(0).toString();
-        hbInstMethodCB = new GuiComboBox(
-                           hbDefaultValue,
-                           (Object[]) hbMethods.toArray(new InstallMethods[hbMethods.size()]),
-                           GuiComboBox.Type.COMBOBOX,
-                           null,
-                           0);
-        hbInstMethodCB.addListeners(
+        String aisPmDefaultValue = null;
+        if (!aisPmMethods.isEmpty()) {
+            aisPmDefaultValue = aisPmMethods.get(0).toString();
+        }
+        aisPmInstMethodCB = new GuiComboBox(
+                   aisPmDefaultValue,
+                   (Object[]) aisPmMethods.toArray(
+                                      new InstallMethods[aisPmMethods.size()]),
+                   GuiComboBox.Type.COMBOBOX,
+                   null,
+                   0);
+        aisPmInstMethodCB.addListeners(
             new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        Thread thread = new Thread(new Runnable() {
+                        final Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 InstallMethods method =
-                                     (InstallMethods) hbInstMethodCB.getValue();
+                                     (InstallMethods) aisPmInstMethodCB.getValue();
                                 final String toolTip =
-                                           getHbInstToolTip(method.getIndex());
+                                           getAisPmInstToolTip(method.getIndex());
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        hbInstMethodCB.setToolTipText(toolTip);
-                                        heartbeatButton.setToolTipText(toolTip);
+                                        aisPmInstMethodCB.setToolTipText(toolTip);
+                                        aisPmButton.setToolTipText(toolTip);
+                                    }
+                                });
+
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            }, null);
+        /* get hb/pm installation methods */
+        final List<InstallMethods> hbPmMethods =
+                                            new ArrayList<InstallMethods>();
+        i = 1;
+        while (true) {
+            final String index = Integer.toString(i);
+            final String text =
+                      getHost().getDistString("HbPmInst.install.text." + index);
+            if (text == null || text.equals("")) {
+                break;
+            }
+            final InstallMethods hbPmInstallMethod = new InstallMethods(
+                Tools.getString("Dialog.HostCheckInstallation.HbPmInstallMethod")
+                + text, i);
+            hbPmMethods.add(hbPmInstallMethod);
+            i++;
+        }
+        // TODO: make default value also what was already installed. */
+        String hbPmDefaultValue = null;
+        if (!hbPmMethods.isEmpty()) {
+            hbPmDefaultValue = hbPmMethods.get(0).toString();
+        }
+        hbPmInstMethodCB = new GuiComboBox(
+                   hbPmDefaultValue,
+                   (Object[]) hbPmMethods.toArray(
+                                        new InstallMethods[hbPmMethods.size()]),
+                   GuiComboBox.Type.COMBOBOX,
+                   null,
+                   0);
+        hbPmInstMethodCB.addListeners(
+            new ItemListener() {
+                public void itemStateChanged(final ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                InstallMethods method =
+                                     (InstallMethods) hbPmInstMethodCB.getValue();
+                                final String toolTip =
+                                           getHbPmInstToolTip(method.getIndex());
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        hbPmInstMethodCB.setToolTipText(toolTip);
+                                        hbPmButton.setToolTipText(toolTip);
                                     }
                                 });
 
@@ -511,13 +642,14 @@ public class HostCheckInstallation extends DialogHost {
                 }
             }, null);
         /* get drbd installation methods */
-        List<InstallMethods> drbdMethods = new ArrayList<InstallMethods>();
+        final List<InstallMethods> drbdMethods =
+                                            new ArrayList<InstallMethods>();
         i = 1;
         while (true) {
             final String index = Integer.toString(i);
             final String text =
                       getHost().getDistString("DrbdInst.install.text." + index);
-            if (text == null) {
+            if (text == null || text.equals("")) {
                 break;
             }
             String method =
@@ -525,7 +657,7 @@ public class HostCheckInstallation extends DialogHost {
             if (method == null) {
                 method = "";
             }
-            InstallMethods drbdInstallMethod = new InstallMethods(
+            final InstallMethods drbdInstallMethod = new InstallMethods(
                Tools.getString("Dialog.HostCheckInstallation.DrbdInstallMethod")
                + text, i, method);
             drbdMethods.add(drbdInstallMethod);
@@ -546,12 +678,11 @@ public class HostCheckInstallation extends DialogHost {
                 new ItemListener() {
                     public void itemStateChanged(final ItemEvent e) {
                         if (e.getStateChange() == ItemEvent.SELECTED) {
-                            Thread thread = new Thread(new Runnable() {
+                            final Thread thread = new Thread(new Runnable() {
                                 public void run() {
                                     InstallMethods method =
                                        (InstallMethods) drbdInstMethodCB.getValue();
-                                    final String toolTip =
-                                               getDrbdInstToolTip(method.getIndex());
+                                    final String toolTip = getDrbdInstToolTip(method.getIndex());
                                     SwingUtilities.invokeLater(new Runnable() {
                                         public void run() {
                                            drbdInstMethodCB.setToolTipText(toolTip);
@@ -574,18 +705,23 @@ public class HostCheckInstallation extends DialogHost {
             drbdInstMethodCB.setEnabled(false);
         }
 
-        pane.add(new JLabel("HB/Pacemaker"));
-        pane.add(heartbeatLabel);
-        pane.add(heartbeatIcon);
-        pane.add(hbInstMethodCB);
-        pane.add(heartbeatButton);
+        pane.add(new JLabel("AIS/Pacemaker"));
+        pane.add(aisPmLabel);
+        pane.add(aisPmIcon);
+        pane.add(aisPmInstMethodCB);
+        pane.add(aisPmButton);
+        pane.add(hbPmJLabel);
+        pane.add(hbPmLabel);
+        pane.add(hbPmIcon);
+        pane.add(hbPmInstMethodCB);
+        pane.add(hbPmButton);
         pane.add(new JLabel("Drbd"));
         pane.add(drbdLabel);
         pane.add(drbdIcon);
         pane.add(drbdInstMethodCB);
         pane.add(drbdButton);
 
-        SpringUtilities.makeCompactGrid(pane, 2, 5,  //rows, cols
+        SpringUtilities.makeCompactGrid(pane, 3, 5,  //rows, cols
                                               1, 1,  //initX, initY
                                               1, 1); //xPad, yPad
         return pane;

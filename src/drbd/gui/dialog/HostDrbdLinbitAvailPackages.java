@@ -313,10 +313,6 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
         progressBarDone();
 
         enableComponents();
-        final String support =
-                      Tools.getDistString("Support",
-                                          getHost().getDist(),
-                                          getHost().getDistVersionString());
         if (ans == null) {
             final StringBuffer errorText = new StringBuffer(80);
             final String dist = getHost().getDistVersion();
@@ -338,9 +334,9 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
             }
             errorText.append("\n\n");
             errorText.append(dist);
-            errorText.append("\n");
+            errorText.append('\n');
             errorText.append(kernel);
-            errorText.append("\n");
+            errorText.append('\n');
             errorText.append(arch);
             printErrorAndRetry(errorText.toString());
         } else {

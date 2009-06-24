@@ -31,8 +31,9 @@ import drbd.data.Cluster;
  * @version $Id$
  */
 public class ClusterDrbdLogs extends ClusterLogs {
-
+    /** Serial version UUID. */
     private static final long serialVersionUID = 1L;
+    /** Name of the drbd device. */
     private final String deviceName;
 
     /**
@@ -43,11 +44,18 @@ public class ClusterDrbdLogs extends ClusterLogs {
         deviceName = device.substring(device.lastIndexOf('/') + 1) + ":";
     }
 
-    protected String logFileCommand() {
+    /**
+     * Returns command string (defined in Distresource...) that prints the drbd
+     * log.
+     */
+    protected final String logFileCommand() {
         return "DrbdLog.log";
     }
 
-    protected String grepPattern() {
+    /**
+     * Returns pattern that will be greped in the log.
+     */
+    protected final String grepPattern() {
         return deviceName;
     }
 }

@@ -405,7 +405,6 @@ public class ClusterHbInit extends DialogCluster {
                 configPanel.repaint();
             }
         });
-    
     }
 
     /**
@@ -421,7 +420,7 @@ public class ClusterHbInit extends DialogCluster {
         removeButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    Thread t = new Thread(new Runnable() {
+                    final Thread t = new Thread(new Runnable() {
                         public void run() {
                             castAddresses.remove(c);
                             updateConfigPanel();
@@ -566,6 +565,34 @@ public class ClusterHbInit extends DialogCluster {
         }
         config.append("apiauth mgmtd uid=root\n");
         return config;
+    }
+
+    /**
+     * Adds interface to the config panel. It must be called from a thread.
+     */
+    private void addInterface(final String type) {
+        String iface      = "";
+        String addr       = "";
+        String serial     = "";
+        if (MCAST_TYPE.equals(type)) {
+            iface  = ifaceCB.getStringValue();
+            addr = addrCB.getStringValue();
+        } else if (BCAST_TYPE.equals(type)) {
+            iface  = ifaceCB.getStringValue();
+        } else if (UCAST_TYPE.equals(type)) {
+            iface = ((UcastLink) ucastLink1CB.getValue()).getInterface();
+            addr = ((UcastLink) ucastLink2CB.getValue()).getIp();
+        } else if (SERIAL_TYPE.equals(type)) {
+            serial = serialCB.getStringValue();
+        }
+        castAddresses.add(new CastAddress(type, iface, addr, serial));
+        updateConfigPanel();
+        checkInterface();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                makeConfigButton.setEnabled(true);
+            }
+        });
     }
 
     /**
@@ -760,33 +787,9 @@ public class ClusterHbInit extends DialogCluster {
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     final String type = typeCB.getStringValue();
-                    Thread thread = new Thread(new Runnable() {
+                    final Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            String iface      = "";
-                            String addr       = "";
-                            String serial     = "";
-                            if (MCAST_TYPE.equals(type)) {
-                                iface  = ifaceCB.getStringValue();
-                                addr = addrCB.getStringValue();
-                            } else if (BCAST_TYPE.equals(type)) {
-                                iface  = ifaceCB.getStringValue();
-                            } else if (UCAST_TYPE.equals(type)) {
-                                iface = ((UcastLink) ucastLink1CB.getValue()).getInterface();
-                                addr = ((UcastLink) ucastLink2CB.getValue()).getIp();
-                            } else if (SERIAL_TYPE.equals(type)) {
-                                serial = serialCB.getStringValue();
-                            }
-                            castAddresses.add(new CastAddress(type,
-                                                              iface,
-                                                              addr,
-                                                              serial));
-                            updateConfigPanel();
-                            checkInterface();
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    makeConfigButton.setEnabled(true);
-                                }
-                            });
+                            addInterface(type);
                         }
                     });
                     thread.start();
@@ -824,7 +827,7 @@ public class ClusterHbInit extends DialogCluster {
                 public void itemStateChanged(final ItemEvent e) {
                     // TODO: more logic here is required. E.g it should not
                     // enable the button if something is wrong
-                    Thread thread = new Thread(new Runnable() {
+                    final Thread thread = new Thread(new Runnable() {
                         public void run() {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
@@ -845,7 +848,7 @@ public class ClusterHbInit extends DialogCluster {
     /**
      * Enable skip button.
      */
-    protected boolean skipButtonEnabled() {
+    protected final boolean skipButtonEnabled() {
         return true;
     }
 }

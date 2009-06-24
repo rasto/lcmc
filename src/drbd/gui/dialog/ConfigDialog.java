@@ -115,16 +115,12 @@ public abstract class ConfigDialog {
      * Returns description for dialog. This can be HTML defined in
      * TextResource.
      */
-    protected String getDescription() {
-        return Tools.html(Tools.getString("Dialog.ConfigDialog.Description"));
-    }
+    protected abstract String getDescription();
 
     /**
      * Returns pane where user input can be defined.
      */
-    protected JComponent getInputPane() {
-        return null;
-    }
+    protected abstract JComponent getInputPane();
 
     /**
      * Returns the option pane.
@@ -393,6 +389,9 @@ public abstract class ConfigDialog {
         return false;
     }
 
+    /**
+     * Enable/disable skip button.
+     */
     protected final void skipButtonSetEnabled(final boolean enable) {
         if (skipButton != null) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -412,7 +411,7 @@ public abstract class ConfigDialog {
         final ImageIcon[] icons = getIcons();
         MyButton[] options = new MyButton[buttons.length];
         MyButton defaultButtonClass = null;
-        List<JComponent> allOptions = new ArrayList<JComponent>();
+        final List<JComponent> allOptions = new ArrayList<JComponent>();
         if (skipButtonEnabled()) {
             skipButton = new JCheckBox(Tools.getString(
                                            "Dialog.ConfigDialog.SkipButton"));
@@ -443,7 +442,7 @@ public abstract class ConfigDialog {
         /* making non modal dialog */
         dialogGate = new CountDownLatch(1);
         optionPane.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
+            public void propertyChange(final PropertyChangeEvent evt) {
                 if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())) {
                     dialogGate.countDown();
                 }
@@ -536,7 +535,8 @@ public abstract class ConfigDialog {
      * Enables components that were disabled with disableComponents, except
      * the ones that are in componentsToDisable array.
      */
-    protected void enableComponents(final JComponent[] componentsToDisable) {
+    protected void enableComponents(
+                                    final JComponent[] componentsToDisable) {
         final HashSet<JComponent> ctdHash =
                 new HashSet<JComponent>(Arrays.asList(componentsToDisable));
         SwingUtilities.invokeLater(new Runnable() {

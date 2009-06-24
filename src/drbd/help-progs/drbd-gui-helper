@@ -90,6 +90,8 @@ if ($option eq "all") {
 	get_cluster_events();
 } elsif ($option eq "get-cluster-metadata") {
 	get_cluster_metadata();
+} elsif ($option eq "get-cluster-versions") {
+	print get_cluster_versions();
 } else {
 	die "unknown command";
 }
@@ -431,12 +433,7 @@ sub get_gui_info {
 # get_installation_info()
 #
 sub get_installation_info {
-	my $hb_version = get_hb_version();
-	if ($hb_version) {
-		print "hb:$hb_version\n";
-	} else {
-		print "hb:not installed\n";
-	}
+	print get_cluster_versions();
 	my $hn = `hostname`;
 	chomp $hn;
 	print "hn:$hn\n";
@@ -582,7 +579,6 @@ sub get_cluster_events {
 		print "---start---\n";
 		print $info;
 		print "---done---\n";
-		my $hb_version = get_hb_version();
 
 		my $rw_socket_name;
 		if (-S "/var/run/crm/cib_rw") {
@@ -908,11 +904,11 @@ sub get_drbd_xml {
 	}
 }
 
-sub get_hb_version {
+sub get_cluster_versions {
 	my $libpath = get_hb_lib_path();
 	my $hb_version = `$libpath/heartbeat -V 2>/dev/null` || "";
-	$hb_version =~ s/\s+.*//;
 	if ($hb_version) {
+		$hb_version =~ s/\s+.*//;
 		chomp $hb_version;
 	}
 	if ($hb_version eq "2.1.3") {
@@ -922,9 +918,37 @@ sub get_hb_version {
 			$hb_version = "2.1.4";
 		}
 	}
-	return $hb_version;
+	my $pm_version = `$libpath/crmd version 2>/dev/null` || "";
+	if ($pm_version) {
+		$pm_version =~ s/\s+.*//;
+		chomp $pm_version;
+	}
+
+	# there is no reliable way to find the installed corosync and openais
+	# version, so it is best effort or just "ok" if it is installed
+	# after that only the package managers will be asked.
+	my $cs_prog = "/usr/sbin/corosync";
+	my $cs_version = "";
+	if (-e $cs_prog) {
+		$cs_version =
+		`grep -m 1 -a -o '/BUILD/corosync-[^/]*' /usr/sbin/corosync|sed s/.*-// 2>/dev/null` || "";
+		chomp $cs_version;
+		if (!$cs_version) {
+			$cs_version = "ok";
+		}
+	}
+	my $ais_prog = "/usr/sbin/aisexec";
+	my $ais_version = "";
+	if (-e $ais_prog) {
+		$ais_version =
+		`grep -a -o 'subrev [0-9]* version [0-9.]*' /usr/sbin/aisexec|sed 's/.* //'`;
+		chomp $ais_version;
+		if (!$ais_version) {
+			$ais_version = "ok";
+		}
+	}
+	return "hb:$hb_version\n"
+	       ."pm:$pm_version\n"
+	       ."cs:$cs_version\n"
+	       ."ais:$ais_version\n";
 }
-
-
-
-

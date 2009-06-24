@@ -40,9 +40,9 @@ public class ClusterFinish extends DialogCluster {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Save checkbox. */
-    final JCheckBox saveCB = new JCheckBox(
-                                    Tools.getString("Dialog.ClusterFinish.Save"),
-                                    true);
+    private final JCheckBox saveCB = new JCheckBox(
+                                  Tools.getString("Dialog.ClusterFinish.Save"),
+                                  true);
 
     /**
      * Prepares a new <code>ClusterFinish</code> object.
@@ -62,7 +62,7 @@ public class ClusterFinish extends DialogCluster {
     /**
      * Finishes the dialog, and saves the cluster.
      */
-    protected void finishDialog() {
+    protected final void finishDialog() {
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
             Tools.save(saveFile);
@@ -99,7 +99,7 @@ public class ClusterFinish extends DialogCluster {
     protected final JPanel getInputPane() {
         final JPanel pane = new JPanel();
         /* Save checkbox */
-        pane.add(saveCB); 
+        pane.add(saveCB);
         saveCB.setBackground(Color.WHITE);
         return pane;
     }

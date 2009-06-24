@@ -76,14 +76,6 @@ public class HostConfiguration extends DialogHost {
     }
 
     /**
-     * Returns the previous dialog.
-     */
-    public WizardDialog getPreviousDialog() {
-        //Tools.getGUIData().renameSelectedHostTab(getHost().getName());
-        return super.getPreviousDialog();
-    }
-
-    /**
      * Finishes the dialog and stores the values.
      */
     protected void finishDialog() {

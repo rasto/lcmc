@@ -91,7 +91,8 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
                     }
                     final List<ComboInfo> items = new ArrayList<ComboInfo>();
                     for (final String versionString : versions) {
-                        final String version = versionString.substring(9, 14);
+                        final String version =
+                                versionString.substring(9, versionString.length() - 7);
                         items.add(new ComboInfo(version, versionString));
                     }
                     drbdTarballCombo.clear();

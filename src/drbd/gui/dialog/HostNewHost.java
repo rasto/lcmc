@@ -100,7 +100,7 @@ public class HostNewHost extends DialogHost {
         final String ps = sshPortField.getStringValue().trim();
         boolean hf = (hs.length() > 0);
         boolean uf = (us.length() > 0);
-        boolean pf = (ps.length() > 0);
+        final boolean pf = (ps.length() > 0);
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
         if (hf && uf) {
@@ -175,7 +175,7 @@ public class HostNewHost extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.HostNewHost.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostNewHost.Title");
     }
 
@@ -183,14 +183,14 @@ public class HostNewHost extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.HostNewHost.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostNewHost.Description");
     }
 
     /**
      * Inits the dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
@@ -208,7 +208,7 @@ public class HostNewHost extends DialogHost {
      * Returns an input pane where user can enter a host and username. Username
      * is normally root and host can be entered either as ip or node name etc.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(Tools.getDefaultColor(

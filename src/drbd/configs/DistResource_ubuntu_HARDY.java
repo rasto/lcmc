@@ -39,19 +39,31 @@ public class DistResource_ubuntu_HARDY extends
         {"Support",            "ubuntu-HARDY"},
         {"distributiondir",    "ubuntu-hardy-server"},
 
+        /* Openais/Pacemaker Opensuse */
+        {"AisPmInst.install.text.1", "http://download.opensuse.org"},
+
+        {"AisPmInst.install.1",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/xUbuntu_8.04/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"},
+
         /* TODO: does not work? */
-        {"HbInst.install.text.1", "http://download.opensuse.org"},
-        {"HbInst.install.1", "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/xUbuntu_8.04/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
-                             + " && apt-get update"
-                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
+        /* Heartbeat/Pacemaker Opensuse */
+        {"HbPmInst.install.text.1", "http://download.opensuse.org"},
+
+        {"HbPmInst.install.1",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/xUbuntu_8.04/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
          "from the source tarball"},
 
-        {"HbInst.install.text.2", "apt-get"},
-        //{"HbInst.install.version.1", "2.1.3"},
-        {"HbInst.install.2", "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        {"HbPmInst.install.text.2", "apt-get"},
+        {"HbPmInst.install.2",
+         "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         {"DrbdInst.install.2",
          "/bin/mkdir -p /tmp/drbdinst && "

@@ -48,8 +48,23 @@ public class DistResource_suse_SLES11 extends
           +     "> /etc/default/drbd; fi;"
           + "modprobe --allow-unsupported-modules drbd"},
 
-        {"HbInst.install.text.1", "http://download.opensuse.org: zypper" },
-        {"HbInst.install.1", "wget -N -nd -P /etc/zypp/repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo && "
+        /* Openais/Pacemaker opensuse */
+        {"AisPmInst.install.text.1",
+         "http://download.opensuse.org: zypper" },
+
+        {"AisPmInst.install.1",
+         "wget -N -nd -P /etc/zypp/repos.d/"
+         + " http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo && "
+         + "/usr/bin/zypper -n --no-gpg-check install openais pacemaker && "
+         + "/sbin/chkconfig --add openais"},
+
+        /* Heartbeat/Pacemaker opensuse */
+        {"HbPmInst.install.text.1",
+         "http://download.opensuse.org: zypper" },
+
+        {"HbPmInst.install.1",
+         "wget -N -nd -P /etc/zypp/repos.d/"
+         + " http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo && "
          + "/usr/bin/zypper -n --no-gpg-check install heartbeat pacemaker && "
          + "/sbin/chkconfig --add heartbeat"},
     };

@@ -48,10 +48,21 @@ public class DistResource_suse_OPENSUSE11_1 extends
           +     "> /etc/default/drbd; fi;"
           + "modprobe --allow-unsupported-modules drbd"},
 
-        {"HbInst.install.text.1", "http://download.opensuse.org: zypper" },
-        {"HbInst.install.1", "wget -N -nd -P /etc/zypp/repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/openSUSE_11.1/server:ha-clustering.repo && "
-                             + "zypper -n --no-gpg-check install heartbeat pacemaker"
-                             + " && chkconfig --add heartbeat"},
+        /* Openais/Pacemaker Opensuse */
+        {"AisPmInst.install.text.1", "http://download.opensuse.org: zypper" },
+        {"AisPmInst.install.1",
+         "wget -N -nd -P /etc/zypp/repos.d/"
+         + " http://download.opensuse.org/repositories/server:/ha-clustering/openSUSE_11.1/server:ha-clustering.repo && "
+         + "zypper -n --no-gpg-check install openais pacemaker"
+         + " && chkconfig --add openais"},
+
+        /* Heartbeat/Pacemaker Opensuse */
+        {"HbPmInst.install.text.1", "http://download.opensuse.org: zypper" },
+        {"HbPmInst.install.1",
+         "wget -N -nd -P /etc/zypp/repos.d/"
+         + " http://download.opensuse.org/repositories/server:/ha-clustering/openSUSE_11.1/server:ha-clustering.repo && "
+         + "zypper -n --no-gpg-check install heartbeat pacemaker"
+         + " && chkconfig --add heartbeat"},
 
     };
 }

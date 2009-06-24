@@ -185,16 +185,20 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.AllOk",      "All required components are installed."},
         {"Dialog.HostCheckInstallation.SomeFailed", "Some of the required components are not installed."},
         {"Dialog.HostCheckInstallation.DrbdNotInstalled",  "not installed"},
-        {"Dialog.HostCheckInstallation.HbNotInstalled",    "not installed"},
+        {"Dialog.HostCheckInstallation.AisPmNotInstalled",    "not installed"},
+        {"Dialog.HostCheckInstallation.HbPmNotInstalled",    "not installed"},
         {"Dialog.HostCheckInstallation.DrbdUpgradeButton", "Upgrade"},
         {"Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton", "Check for Upgrade"},
 
-        {"Dialog.HostCheckInstallation.DrbdInstallButton", "Install"},
-        {"Dialog.HostCheckInstallation.HbInstallButton",   "Install"},
+        {"Dialog.HostCheckInstallation.DrbdInstallButton",  "Install"},
+        {"Dialog.HostCheckInstallation.AisPmInstallButton", "Install"},
+        {"Dialog.HostCheckInstallation.HbPmInstallButton",  "Install"},
 
-        {"Dialog.HostCheckInstallation.CheckingHb",        "checking..."},
+        {"Dialog.HostCheckInstallation.CheckingAisPm",      "checking..."},
+        {"Dialog.HostCheckInstallation.CheckingHbPm",      "checking..."},
         {"Dialog.HostCheckInstallation.CheckingDrbd",      "checking..."},
-        {"Dialog.HostCheckInstallation.HbInstallMethod",   "Installation method: "},
+        {"Dialog.HostCheckInstallation.AisPmInstallMethod", "Installation method: "},
+        {"Dialog.HostCheckInstallation.HbPmInstallMethod", "Installation method: "},
         {"Dialog.HostCheckInstallation.DrbdInstallMethod", "Installation method: "},
 
         {"Dialog.HostLogin.Title",          "Log in"},
@@ -234,11 +238,30 @@ public class TextResource extends
         {"Dialog.HostDrbdInst.WgetError",   "Could not get DRBD packages."},
 
         {"Dialog.HostHbInst.Title",        "Heartbeat Install"},
-        {"Dialog.HostHbInst.Description",  "Heartbeat packages are being installed."},
+
+        {"Dialog.HostHbInst.Description",
+         "Heartbeat and pacemaker packages are being installed."},
+
         {"Dialog.HostHbInst.Executing",    "Installing..."},
-        {"Dialog.HostHbInst.InstOk",       "Heartbeat was successfully installed."},
+
+        {"Dialog.HostHbInst.InstOk",
+         "Heartbeat and Pacemaker were successfully installed."},
 
         {"Dialog.HostHbInst.InstError",
+         "Installation error: you may have to go to the command line and fix "
+         + "whatever needs fixing there."},
+
+        {"Dialog.HostAisPmInst.Title",        "OpenAIS/Pacemaker Install"},
+
+        {"Dialog.HostAisPmInst.Description",
+         "OpenAIS and Pacemaker packages are being installed."},
+
+        {"Dialog.HostAisPmInst.Executing",    "Installing..."},
+
+        {"Dialog.HostAisPmInst.InstOk",
+         "OpenAIS and Pacemaker were successfully installed."},
+
+        {"Dialog.HostAisPmInst.InstError",
          "Installation error: you may have to go to the command line and fix "
          + "whatever needs fixing there."},
 
@@ -247,7 +270,7 @@ public class TextResource extends
 
         {"Dialog.HostDrbdCommandInst.Description",
          "DRBD is being installed. For some distributions, especially "
-         + "Red Hats, if you use an older kernel than is currently "
+         + "older RedHats, if you use an older kernel than is currently "
          + "available, you may need to find, download and install the "
          + "<b>kernel-devel</b> package for your kernel yourself or update "
          + "the kernel. You can find out your kernel version with \"uname -r\" "
@@ -264,7 +287,11 @@ public class TextResource extends
          + "whatever needs fixing there:\n"},
 
         {"Dialog.HostFinish.Title",        "Finish"},
-        {"Dialog.HostFinish.Description",  "Configuration of the host is now complete. You can now add another host or configure a cluster."},
+
+        {"Dialog.HostFinish.Description",
+         "Configuration of the host is now complete. You can now add another "
+         + "host or configure a cluster."},
+
         {"Dialog.HostFinish.AddAnotherHostButton", "Add Another Host"},
         {"Dialog.HostFinish.ConfigureClusterButton", "Configure Cluster"},
         {"Dialog.HostFinish.Save",           "Save"},

@@ -47,10 +47,10 @@ public class DistResource_fedora extends
         {"DrbdInst.install",
          "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        {"HbInst.install.text.2",
+        {"HbPmInst.install.text.2",
          "the fedora way: possibly too old" },
 
-        {"HbInst.install.2",
+        {"HbPmInst.install.2",
          "/usr/bin/yum -y install heartbeat"},
         /* at least fedora 10 and fedora11 in version 2.1.3 and 2.14 has different
            ocf path. */
@@ -61,37 +61,9 @@ public class DistResource_fedora extends
          + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
 
-        /* Drbd install method 2 */
-        {"DrbdInst.install.text.2",
-         "from the source tarball"},
-
-        {"DrbdInst.install.method.2",
-         "source"},
-
-        {"DrbdInst.install.2",
-         "/bin/mkdir -p /tmp/drbdinst && "
-         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
-         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
-         /* it installs eather kernel-devel- or kernel-PAE-devel-, etc. */
-         /* the fedora 10 does not keep old devel packages so for old kernels
-          * the kernel-devel pacakge will be downloaded from rpmfind.net.
-          */
-         + "/usr/bin/yum -y install kernel`uname -r|"
-         + " grep -o '\\.PAE\\|\\.xen\\|\\.kdump'" // TODO: fedora11 PAEdebug,fedora10?
-         + "|tr . -`-devel-`uname -r|sed 's/\\.\\(PAE\\|xen\\|kdump\\)$//'` "
-         + "|tee -a /dev/tty|grep 'No package'>/dev/null;"
-         + "(if [ \"$?\" == 0 ]; then "
-         + "wget --directory-prefix=/tmp/drbdinst/"
-         + " ftp://fr.rpmfind.net/linux/fedora/updates/10/@ARCH@/kernel-devel-`uname -r`.rpm && "
-         // TODO: fedora 11 needs update/11/
-         + "cd /tmp/drbdinst && "
-         + "/bin/rpm -Uvh kernel-devel-`uname -r`.rpm; fi) && "
-         + "/usr/bin/yum -y install flex gcc && "
-         + "cd /tmp/drbdinst && "
-         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
-         + "cd drbd-@VERSION@ && "
-         + "make && make install && "
-         + "/sbin/chkconfig --add drbd && "
-         + "/bin/rm -rf /tmp/drbdinst"},
+        {"HbCheck.version",
+         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         + "/bin/rpm -q -i openais|perl -lne"
+         + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
     };
 }

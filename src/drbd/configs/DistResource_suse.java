@@ -53,12 +53,15 @@ public class DistResource_suse extends
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
         /* heartbeat donwload and installation */
         //{ "HbCheck.version", "/bin/rpm -qa|grep heartbeat | sed s/.*heartbeat-//" },
-        {"HbInst.install.i386", "i586" },
-        {"HbInst.install.i486", "i586" },
-        {"HbInst.install.i586", "i586" },
+        {"HbPmInst.install.i386", "i586" },
+        {"HbPmInst.install.i486", "i586" },
+        {"HbPmInst.install.i586", "i586" },
+        {"AisPmInst.install.i386", "i586" },
+        {"AisPmInst.install.i486", "i586" },
+        {"AisPmInst.install.i586", "i586" },
 
-        {"HbInst.install.text.1", "CD" },
-        {"HbInst.install.1", "zypper -n install heartbeat"},
+        {"HbPmInst.install.text.1", "CD" },
+        {"HbPmInst.install.1", "zypper -n install heartbeat"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -74,9 +77,16 @@ public class DistResource_suse extends
          + "cd /tmp/drbdinst && "
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
-         + "/usr/bin/zypper -n install flex gcc kernel-source && "
+         /* removing -pae etc. from uname -r */
+         + "/usr/bin/zypper -n in kernel-source=`uname -r|sed s/-[a-z].*//;` && "
+         + "/usr/bin/zypper -n in flex gcc && "
          + "make && make install && "
          + "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
+
+        {"HbCheck.version",
+         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         + "/bin/rpm -q -i openais|perl -lne"
+         + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
     };
 }

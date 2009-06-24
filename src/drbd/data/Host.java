@@ -136,6 +136,12 @@ public class Host implements Serializable {
      */
     private final Map<String, Point2D> servicePositions =
                                             new HashMap<String, Point2D>();
+    /** Pacemaker version. */
+    private String pacemakerVersion = null;
+    /** Openais version. */
+    private String openaisVersion = null;
+    /** Corosync version. */
+    private String corosyncVersion = null;
     /** Heartbeat version. */
     private String heartbeatVersion = null;
     /** Whether drbd will be upgraded. */
@@ -165,8 +171,10 @@ public class Host implements Serializable {
     private CountDownLatch isLoadingGate;
     /** List of gui elements that are to be enabled if the host is connected.*/
     private List<JComponent> enableOnConnectList = new ArrayList<JComponent>();
-    /** Heartbeat installation method index. */
-    private String hbInstallMethod;
+    /** Openais/pacemaker installation method index. */
+    private String aisPmInstallMethod;
+    /** Heartbeat/pacemaker installation method index. */
+    private String hbPmInstallMethod;
     /** Drbd installation method index. */
     private String drbdInstallMethod;
 
@@ -1746,16 +1754,37 @@ public class Host implements Serializable {
     /**
      * Parses the installation info.
      */
-    private void parseInstallationInfo(final String line) {
+    public void parseInstallationInfo(final String line) {
         final String[] tokens = line.split(":|\\s+");
-        if (tokens[0].equals("hb")) {
-            final String version = tokens[1].trim();
-            if (!"".equals(version)) {
-                setHeartbeatVersion(version);
+        if (tokens.length == 2) {
+            if (tokens[0].equals("pm")) {
+                final String version = tokens[1].trim();
+                if (!"".equals(version)) {
+                    pacemakerVersion = version;
+                }
+            } else if (tokens[0].equals("cs")) {
+                final String version = tokens[1].trim();
+                if (!"".equals(version)) {
+                    if (corosyncVersion == null || "ok".equals(corosyncVersion)) {
+                        corosyncVersion = version;
+                    }
+                }
+            } else if (tokens[0].equals("ais")) {
+                final String version = tokens[1].trim();
+                if (!"".equals(version)) {
+                    if (openaisVersion == null || "ok".equals(openaisVersion)) {
+                        openaisVersion = version;
+                    }
+                }
+            } else if (tokens[0].equals("hb")) {
+                final String version = tokens[1].trim();
+                if (!"".equals(version)) {
+                    heartbeatVersion = version;
+                }
+            } else if (tokens[0].equals("hn")) { // hostname
+                hostname = tokens[1].trim();
+                setName(hostname);
             }
-        } else if (tokens[0].equals("hn")) { // hostname
-            hostname = tokens[1].trim();
-            setName(hostname);
         }
     }
 
@@ -1799,6 +1828,48 @@ public class Host implements Serializable {
      */
     public final void setHeartbeatVersion(final String heartbeatVersion) {
         this.heartbeatVersion = heartbeatVersion;
+    }
+
+    /**
+     * Sets the corosync version.
+     */
+    public final void setCorosyncVersion(final String corosyncVersion) {
+        this.corosyncVersion = corosyncVersion;
+    }
+
+    /**
+     * Sets the pacemaker version.
+     */
+    public final void setPacemakerVersion(final String pacemakerVersion) {
+        this.pacemakerVersion = pacemakerVersion;
+    }
+
+    /**
+     * Sets the openais version.
+     */
+    public final void setOpenaisVersion(final String openaisVersion) {
+        this.openaisVersion = openaisVersion;
+    }
+
+    /**
+     * Returns the pacemaker version.
+     */
+    public final String getPacemakerVersion() {
+        return pacemakerVersion;
+    }
+
+    /**
+     * Returns the corosync version.
+     */
+    public final String getCorosyncVersion() {
+        return corosyncVersion;
+    }
+
+    /**
+     * Returns the openais version.
+     */
+    public final String getOpenaisVersion() {
+        return openaisVersion;
     }
 
     /**
@@ -1887,17 +1958,31 @@ public class Host implements Serializable {
     }
 
     /**
-     * Sets heartbeat installation method index.
+     * Sets openais/pacemaker installation method index.
      */
-    public final void setHbInstallMethod(final String hbInstallMethod) {
-        this.hbInstallMethod = hbInstallMethod;
+    public final void setAisPmInstallMethod(final String aisPmInstallMethod) {
+        this.aisPmInstallMethod = aisPmInstallMethod;
     }
 
     /**
-     * Returns heartbeat installation method.
+     * Returns openais/pacemaker installation method.
      */
-    public final String getHbInstallMethod() {
-        return hbInstallMethod;
+    public final String getAisPmInstallMethod() {
+        return aisPmInstallMethod;
+    }
+
+    /**
+     * Sets heartbeat/pacemaker installation method index.
+     */
+    public final void setHbPmInstallMethod(final String hbPmInstallMethod) {
+        this.hbPmInstallMethod = hbPmInstallMethod;
+    }
+
+    /**
+     * Returns heartbeat/pacemaker installation method.
+     */
+    public final String getHbPmInstallMethod() {
+        return hbPmInstallMethod;
     }
 
     /**

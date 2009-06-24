@@ -42,13 +42,60 @@ public class DistResource_debian_4 extends
         /* support */
         {"Support", "debian-4"},
 
-        {"HbInst.install.text.1", "http://download.opensuse.org repository"},
-        {"HbInst.install.1", "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
-                             + " && apt-get update"
-                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
+        {"DrbdAvailFiles",
+         "/usr/bin/wget --no-check-certificate -q http://www.linbit.com/"
+         + "@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/"
+         + " -O - |perl -ple '"
+         + "(undef, $ver) = split /\\s+/, `dpkg-query -W linux-image-\\`uname -r\\``;"
+         + "($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?"
+         + "(?:(?:km|module|utils)[_-]@BUILD@)?[-_]?@DRBDVERSION@"
+         + "-0(?:\\+$ver.*?)?[._]@ARCH@"
+         + "\\.(?:rpm|deb))\"! or goto LINE'"
+        },
 
-        {"HbInst.install.text.2", "etch repository"},
-        {"HbInst.install.version.2", "2.0.7"},
-        {"HbInst.install.2", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        /* Heartbeat/Pacemaker Opensuse */
+        {"AisPmInst.install.text.1", "http://download.opensuse.org repository"},
+        {"AisPmInst.install.1",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"},
+
+        /* Heartbeat/Pacemaker Opensuse */
+        {"AisPmInst.install.text.1", "http://download.opensuse.org repository"},
+        {"AisPmInst.install.1",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"},
+
+        /* Old Heartbeat */
+        {"HbPmInst.install.text.2", "etch repository"},
+        {"HbPmInst.install.2",
+         "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+
+        /* Drbd install method 2 */
+        {"DrbdInst.install.text.2",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.2",
+         "source"},
+
+        {"DrbdInst.install.2",
+         "/bin/mkdir -p /tmp/drbdinst && "
+         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
+         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         + "cd /tmp/drbdinst && "
+         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
+         + "cd drbd-@VERSION@ && "
+         + "/usr/bin/apt-get update && "
+         + "/usr/bin/apt-get -y install make gcc libc-dev flex linux-headers-`uname -r` && "
+         + "make && make install && "
+         + "/usr/sbin/update-rc.d drbd defaults 70 8 && "
+         + "/bin/rm -rf /tmp/drbdinst"},
+
+        /* disable drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         ""},
     };
 }

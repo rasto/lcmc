@@ -42,17 +42,22 @@ public class DistResource_redhatenterpriseas extends
         {"version:Red Hat Enterprise Linux AS release 4 (Nahant)/4", "4_0"},
         {"version:Red Hat Enterprise Linux AS release 4 (Nahant*", "4"},
 
-        {"HbInst.install.i386", "i386" },
-        {"HbInst.install.i486", "i386" },
-        {"HbInst.install.i586", "i386" },
-        {"HbInst.install.i686", "i386" },
+        {"HbPmInst.install.i386", "i386" },
+        {"HbPmInst.install.i486", "i386" },
+        {"HbPmInst.install.i586", "i386" },
+        {"HbPmInst.install.i686", "i386" },
+
+        {"AisPmInst.install.i386", "i386" },
+        {"AisPmInst.install.i486", "i386" },
+        {"AisPmInst.install.i586", "i386" },
+        {"AisPmInst.install.i686", "i386" },
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?EL\\d*).*"},
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        {"HbInst.install.text.1", "the redhat way: possibly too old"},
-        {"HbInst.install.1", "/usr/bin/yum -y install heartbeat"},
+        {"HbPmInst.install.text.1", "the redhat way: possibly too old"},
+        {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -73,5 +78,10 @@ public class DistResource_redhatenterpriseas extends
          + "make && make install && "
          + "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
+
+        {"HbCheck.version",
+         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         + "/bin/rpm -q -i openais|perl -lne"
+         + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
     };
 }

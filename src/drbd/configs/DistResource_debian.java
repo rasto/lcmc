@@ -51,8 +51,9 @@ public class DistResource_debian extends
         {"DrbdInst.install", "echo | dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
         //{"HbCheck.version", "/usr/bin/dpkg-query --showformat='${Status} ${Version}\n' -W heartbeat-2 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"},
-        {"HbInst.install.text.1", "the debian way"},
-        {"HbInst.install.1", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        {"HbPmInst.install.text.1", "the debian way"},
+        {"HbPmInst.install.1",
+         "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -81,5 +82,10 @@ public class DistResource_debian extends
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "
          + "'DPkg::Options::force=--force-confnew' drbd8-modules-`uname -r` drbd8-utils"},
+
+        {"HbCheck.version",
+         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         + "/usr/bin/dpkg-query --showformat='ais:${Version}\\n' -W openais"
+         + "|sed 's/-.*//'"},
     };
 }

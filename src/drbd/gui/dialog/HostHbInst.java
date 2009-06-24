@@ -78,16 +78,16 @@ public class HostHbInst extends DialogHost {
      * Installs the heartbeat.
      */
     private void installHeartbeat() {
-        String arch = getHost().getDistString("HbInst.install."
+        String arch = getHost().getDistString("HbPmInst.install."
                                               + getHost().getArch());
         if (arch == null) {
             arch = getHost().getArch();
         }
         final String archString = arch;
-        String installCommand = "HbInst.install"; 
-        final String installMethod = getHost().getHbInstallMethod();
+        String installCommand = "HbPmInst.install"; 
+        final String installMethod = getHost().getHbPmInstallMethod();
         if (installMethod != null) {
-            installCommand = "HbInst.install." + installMethod; 
+            installCommand = "HbPmInst.install." + installMethod; 
         }
        
 

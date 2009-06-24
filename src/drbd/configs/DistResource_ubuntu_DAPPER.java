@@ -39,5 +39,27 @@ public class DistResource_ubuntu_DAPPER extends
     private static Object[][] contents = {
         {"Support",            "ubuntu-DAPPER"},
         {"distributiondir",    "ubuntu-dapper-server"},
+
+        /* Drbd install method 2 */
+        {"DrbdInst.install.text.2",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.2",
+         "source"},
+
+        {"DrbdInst.install.2",
+         "/bin/mkdir -p /tmp/drbdinst && "
+         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
+         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         + "cd /tmp/drbdinst && "
+         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
+         + "cd drbd-@VERSION@ && "
+         + "/usr/bin/apt-get update && "
+         + "/usr/bin/apt-get -y install libc6-dev gcc make flex linux-headers-`uname -r` && "
+         + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
+           + "/lib/modules/`uname -r`/kernel/ubuntu/drbd/drbd.ko && "
+         + "make && make install && "
+         + "/usr/sbin/update-rc.d drbd defaults 70 8 && "
+         + "/bin/rm -rf /tmp/drbdinst"},
     };
 }

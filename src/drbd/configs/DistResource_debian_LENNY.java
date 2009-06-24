@@ -47,24 +47,55 @@ public class DistResource_debian_LENNY extends
         // TODO: use flags for this
         {"Support", "debian-LENNY"},
 
-        {"HbInst.install.text.1", "http://download.opensuse.org repository"},
-        {"HbInst.install.1", "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_5.0/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
-                             + " && apt-get update"
-                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"
-                             + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
+        /* openais/pacemaker opensuse */
+        {"AisPmInst.install.text.1", "http://download.opensuse.org repository"},
 
-        {"HbInst.install.text.2", "madkiss repository (testing: pacemaker-openais)"},
-        {"HbInst.install.2", "echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
-                             + " && apt-get update"
-                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"},
+        {"AisPmInst.install.1",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_5.0/ ./'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
+         + " && /usr/sbin/update-rc.d openais-legacy start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
-        {"HbInst.install.text.3", "madkiss repository (testing: pacemaker-heartbeat)"},
-        {"HbInst.install.3", "echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
-                             + " && apt-get update"
-                             + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
+        /* openais/pacemaker madkiss */
+        {"AisPmInst.install.text.2",
+         "LINBIT/MADKISS repository (testing)"},
 
-        {"HbInst.install.text.4", "lenny repository (not recommended)"},
-        {"HbInst.install.version.4", "2.1.3"},
-        {"HbInst.install.4", "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        {"AisPmInst.install.2",
+         "echo 'deb http://people.debian.org/~madkiss/ha lenny main'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"},
+
+        /* heartbeat/pacemaker opensuse */
+        {"HbPmInst.install.text.1", "http://download.opensuse.org repository"},
+
+        {"HbPmInst.install.1",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_5.0/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"
+         + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
+
+        /* heartbeat/pacemaker madkiss */
+        {"HbPmInst.install.text.2",
+         "LINBIT/MADKISS repository (testing: pacemaker-heartbeat)"},
+
+        {"HbPmInst.install.2",
+         "echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
+
+        /* heartbeat apt-get install */
+        {"HbPmInst.install.text.3",
+         "lenny repository (not recommended)"},
+
+        {"HbPmInst.install.3",
+         "apt-get update && "
+         + "/usr/bin/apt-get -y -q install -o"
+         + " 'DPkg::Options::force=--force-confnew' heartbeat-2"},
     };
 }
