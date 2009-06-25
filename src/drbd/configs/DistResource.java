@@ -67,7 +67,7 @@ public class DistResource extends
            + "done; lsb_release -i -r 2>/dev/null|sed 's/CentOS/redhat/'|sed 's/SUSE LINUX/suse/'|perl -lne 'print lc((split /:\\s*/)[1])' "},
         /* DrbdCheck.version has exit code != 0 if nothing is installed */
         {"DrbdCheck.version",
-         "echo|drbdadm help | grep 'Version: '|sed 's/Version: //'|sed 's/ .*//'|grep ."},
+         "echo|drbdadm help | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
 
         {"HbCheck.version",
          "/usr/local/bin/drbd-gui-helper get-cluster-versions"},
