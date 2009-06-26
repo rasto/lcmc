@@ -322,23 +322,60 @@ public class TextResource extends
         {"Dialog.ClusterConnect.Description", "Trying to connect to all the hosts in the cluster."},
 
         {"Dialog.ClusterHbInit.Title",        "Heartbeat Initialization"},
-        {"Dialog.ClusterHbInit.Description",  "In this step Heartbeat config (/etc/ha.d/ha.cf) is created and Heartbeat is started. You do not have to overwrite your old config if you have some special options. You can modify it by hand on every host in the cluster. You have to press the \"Create HB Config\" button to save the new configuration on all hosts."},
-        {"Dialog.ClusterHbInit.CreateHbConfig", "Create HB Config"},
-        {"Dialog.ClusterHbInit.CreateHbConfig", "Create HB Config"},
-        {"Dialog.ClusterHbInit.WarningAtLeastTwoInt", "(specify at least two interfaces)"},
+
+        {"Dialog.ClusterHbInit.Description",
+         "In this step Heartbeat config (/etc/ha.d/ha.cf) is created and "
+         + "Heartbeat is started. You do not have to overwrite your old "
+         + "config if you have some special options. You can modify it by "
+         + "hand on every host in the cluster. You have to press the "
+         + "\"Create HB Config\" button to save the new configuration on all "
+         + "hosts. By the way it is ok to have ucast address to the node's "
+         + "own interface, it will be ignored, at the same time it allows to "
+         + "have the same config file on all hosts."},
+
+        {"Dialog.ClusterHbInit.CreateHbConfig", "Create/Overwrite HB Config"},
+
+        {"Dialog.ClusterHbInit.WarningAtLeastTwoInt",
+         "# (specify at least two interfaces)"},
+
+        {"Dialog.ClusterHbInit.WarningAtLeastTwoInt.OneMore",
+         "# (specify at least two interfaces: one more to go)"},
+
         {"Dialog.ClusterHbInit.RemoveIntButton", "remove"},
         {"Dialog.ClusterHbInit.AddIntButton",    "add"},
-        {"Dialog.ClusterHbInit.UseDopdCheckBox.ToolTip", "use DRBD Peer Outdater"},
+
+        {"Dialog.ClusterHbInit.UseDopdCheckBox.ToolTip",
+         "use DRBD Peer Outdater"},
+
         {"Dialog.ClusterHbInit.UseDopdCheckBox", ""},
-        {"Dialog.ClusterHbInit.NoConfigFound", "no config found"},
-        {"Dialog.ClusterHbInit.ConfigsNotTheSame", "configuration files are not the same on all hosts"},
+
+        {"Dialog.ClusterHbInit.UseMgmtdCheckBox.ToolTip",
+         "use mgmtd, if you want to use pacemaker-gui"},
+
+        {"Dialog.ClusterHbInit.UseMgmtdCheckBox", ""},
+
+        {"Dialog.ClusterHbInit.NoConfigFound", "/etc/ha.d/ha.cf: file not found"},
+
+        {"Dialog.ClusterHbInit.ConfigsNotTheSame",
+         "configuration files are not the same on all hosts"},
+
         {"Dialog.ClusterHbInit.Loading", "loading..."},
         {"Dialog.ClusterHbInit.CurrentConfig", "current config:"},
         {"Dialog.ClusterHbInit.Interfaces",    "interfaces:"},
 
+        {"Dialog.ClusterHbInit.ha.cf.ok",
+         "/etc/ha.d/ha.cf the same on all nodes"},
+
+        {"Dialog.ClusterHbInit.Checkbox.EditConfig", "edit a new config"},
+        {"Dialog.ClusterHbInit.Checkbox.SeeExisting",
+         "see the existing configs"},
+
         {"Dialog.ClusterInit.Title",           "Heartbeat/DRBD Initialization"},
+
         {"Dialog.ClusterInit.Description",     
-         "Heartbeat/DRBD Initialization. Load the DRBD and start the Heartbeat, if you wish at this point."},
+         "Heartbeat/DRBD Initialization. Load the DRBD and start the "
+         + "Heartbeat, if you wish at this point."},
+
         {"Dialog.ClusterInit.CheckingDrbd",    "checking..."},
         {"Dialog.ClusterInit.LoadDrbdButton",  "Load"},
         {"Dialog.ClusterInit.CheckingHb",      "checking..."},
@@ -354,6 +391,7 @@ public class TextResource extends
         {"Dialog.About.Title",                "DRBD Management Console (Beta). Release: "},
         {"Dialog.About.Description",          
          "<b>DRBD Management Console by Rasto Levrinc (rasto@linbit.com).</b><br>"
+         + "(C)opyright 2002-2009 by Rasto Levrinc.<br>"
          + "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br><br>"
          + "Please visit the website http://www.drbd.org/mc/management-console/<br>"
          + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
@@ -387,7 +425,12 @@ public class TextResource extends
 
 
         {"Dialog.ClusterFinish.Title",     "Finish"},
-        {"Dialog.ClusterFinish.Description",  "Configuration of the cluster is now complete. You can now configure DRBD and Heartbeat services from the menu in the cluster view."},
+
+        {"Dialog.ClusterFinish.Description",
+         "Configuration of the cluster is now complete. You can now "
+         + "configure DRBD and Heartbeat services from the menu in "
+         + "the cluster view."},
+
         {"Dialog.ClusterFinish.Save",           "Save"},
 
         {"AppError.Title",                    "Application Error"},
@@ -401,16 +444,28 @@ public class TextResource extends
         {"ConfirmDialog.No",                  "No"},
 
         {"EmptyBrowser.StartMarkedClusters",  "Load Marked Clusters"},
-        {"EmptyBrowser.StartMarkedClusters.ToolTip", "Load marked clusters in the gui."},
+
+        {"EmptyBrowser.StartMarkedClusters.ToolTip",
+         "Load marked clusters in the gui."},
+
         {"EmptyBrowser.StopMarkedClusters",   "Unload Marked Clusters"},
-        {"EmptyBrowser.StopMarkedClusters.ToolTip", "Unload marked clusters in the gui."},
+
+        {"EmptyBrowser.StopMarkedClusters.ToolTip",
+         "Unload marked clusters in the gui."},
+
         {"EmptyBrowser.RemoveMarkedClusters", "Remove Marked Clusters"},
-        {"EmptyBrowser.RemoveMarkedClusters.ToolTip", "Remove marked clusters from the gui."},
+
+        {"EmptyBrowser.RemoveMarkedClusters.ToolTip",
+         "Remove marked clusters from the gui."},
+
         {"EmptyBrowser.StartClusterButton",   "Load"},
         {"EmptyBrowser.NewHostWizard",        "New Host Wizard"},
 
         {"ClusterBrowser.confirmRemoveAllServices.Title", "Remove All Services"},
-        {"ClusterBrowser.confirmRemoveAllServices.Description", "All services and constraints will be removed. Are you sure?"},
+
+        {"ClusterBrowser.confirmRemoveAllServices.Description",
+         "All services and constraints will be removed. Are you sure?"},
+
         {"ClusterBrowser.confirmRemoveAllServices.Yes", "Remove"},
         {"ClusterBrowser.confirmRemoveAllServices.No",  "Cancel"},
 

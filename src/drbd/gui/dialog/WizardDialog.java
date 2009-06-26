@@ -33,6 +33,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.Container;
 
 /**
  * An implementation of a wizard dialog with next, back, finish and cancel
@@ -257,11 +258,11 @@ public abstract class WizardDialog extends ConfigDialog {
         layout.setAlignment(FlowLayout.RIGHT);
 
         if (buttonClass(cancelButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+            //SwingUtilities.invokeLater(new Runnable() {
+            //    public void run() {
                     buttonClass(cancelButton()).getParent().setLayout(layout);
-                }
-            });
+            //    }
+            //});
         }
 
         /* disable back button if there is no previous dialog */
@@ -416,7 +417,12 @@ public abstract class WizardDialog extends ConfigDialog {
         if (buttonClass(cancelButton()) != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    buttonClass(cancelButton()).getParent().setLayout(layout);
+                    final Container parent =
+                                    buttonClass(cancelButton()).getParent();
+                    if (parent != null) {
+                        buttonClass(cancelButton()).getParent().setLayout(
+                                                                       layout);
+                    }
                 }
             });
         }
@@ -426,6 +432,21 @@ public abstract class WizardDialog extends ConfigDialog {
                 public void run() {
                     buttonClass(retryButton()).setVisible(true);
                     buttonClass(retryButton()).setEnabled(true);
+                }
+            });
+        }
+    }
+
+    /**
+     * Hides the retry button if it is there.
+     */
+    public final void hideRetryButton() {
+        final MyButton rb = (MyButton) buttonClass(retryButton());
+
+        if (rb != null && rb.isVisible() && rb.isEnabled()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setVisible(false);
                 }
             });
         }

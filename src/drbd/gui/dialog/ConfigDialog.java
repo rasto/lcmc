@@ -91,6 +91,8 @@ public abstract class ConfigDialog {
     private CountDownLatch dialogGate;
     /** Skip button, can be null, if there is no skip button. */
     private JCheckBox skipButton = null;
+    /** Answer from the optionpane */
+    private volatile Object optionPaneAnswer;
 
     /**
      * Gets dialogPanel.
@@ -202,6 +204,7 @@ public abstract class ConfigDialog {
         descPane.setEditable(false);
         final JScrollPane descSP = new JScrollPane(descPane);
         descSP.setBorder(null);
+        descSP.setAlignmentX(Component.LEFT_ALIGNMENT);
         pane.add(descSP);
         final JComponent inputPane = getInputPane();
         if (inputPane != null) {
@@ -209,6 +212,7 @@ public abstract class ConfigDialog {
                                                      INPUT_PANE_HEIGHT));
             inputPane.setBackground(
                             Tools.getDefaultColor("ConfigDialog.Background"));
+            inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);
             pane.add(inputPane);
         }
 
@@ -444,7 +448,10 @@ public abstract class ConfigDialog {
         optionPane.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(final PropertyChangeEvent evt) {
                 if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())) {
-                    dialogGate.countDown();
+                    if (!"uninitializedValue".equals(evt.getNewValue())) {
+                        optionPaneAnswer = optionPane.getValue();
+                        dialogGate.countDown();
+                    }
                 }
             }
         });
@@ -488,9 +495,8 @@ public abstract class ConfigDialog {
             /* ignored */
         }
 
-        final Object answer = optionPane.getValue();
-        if (answer instanceof String) {
-            setPressedButton((String) answer);
+        if (optionPaneAnswer instanceof String) {
+            setPressedButton((String) optionPaneAnswer);
         } else {
             setPressedButton(cancelButton());
         }
