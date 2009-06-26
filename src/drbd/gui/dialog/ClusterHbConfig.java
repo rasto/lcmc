@@ -71,7 +71,7 @@ import java.awt.Component;
  * @version $Id$
  *
  */
-public class ClusterHbInit extends DialogCluster {
+public class ClusterHbConfig extends DialogCluster {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Checkbox for dopd. */
@@ -87,7 +87,7 @@ public class ClusterHbInit extends DialogCluster {
     private final JLabel configStatus = new JLabel("");
     /** Make config button. */
     private final MyButton makeConfigButton =
-           new MyButton(Tools.getString("Dialog.ClusterHbInit.CreateHbConfig"));
+        new MyButton(Tools.getString("Dialog.ClusterHbConfig.CreateHbConfig"));
     /** Connection type pulldown menu: ucast, bcast, mcast ... */
     private GuiComboBox typeCB;
     /** Interface pulldown menu. */
@@ -135,19 +135,19 @@ public class ClusterHbInit extends DialogCluster {
     private static final int REMOVE_BUTTON_HEIGHT = 14;
     /** Checkbox text (Edit the config). */
     private static final String EDIT_CONFIG_STRING = Tools.getString(
-                                  "Dialog.ClusterHbInit.Checkbox.EditConfig");
+                                 "Dialog.ClusterHbConfig.Checkbox.EditConfig");
     /** Checkbox text (See existing). */
     private static final String SEE_EXISTING_STRING = Tools.getString(
-                                  "Dialog.ClusterHbInit.Checkbox.SeeExisting");
+                                 "Dialog.ClusterHbConfig.Checkbox.SeeExisting");
     /** /etc/ha.d/ha.cf read error string. */
     private static final String HA_CF_ERROR_STRING = "error: read error";
     /** Newline. */
     private static final String NEWLINE = "\\r?\\n";
 
     /**
-     * Prepares a new <code>ClusterHbInit</code> object.
+     * Prepares a new <code>ClusterHbConfig</code> object.
      */
-    public ClusterHbInit(final WizardDialog previousDialog,
+    public ClusterHbConfig(final WizardDialog previousDialog,
                          final Cluster cluster) {
         super(previousDialog, cluster);
         final Host[] hosts = getCluster().getHostsArray();
@@ -199,14 +199,14 @@ public class ClusterHbInit extends DialogCluster {
      * Returns title of this dialog.
      */
     protected final String getClusterDialogTitle() {
-        return Tools.getString("Dialog.ClusterHbInit.Title");
+        return Tools.getString("Dialog.ClusterHbConfig.Title");
     }
 
     /**
      * Returns description of this dialog.
      */
     protected final String getDescription() {
-        return Tools.getString("Dialog.ClusterHbInit.Description");
+        return Tools.getString("Dialog.ClusterHbConfig.Description");
     }
 
     /**
@@ -293,7 +293,7 @@ public class ClusterHbInit extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         boolean configOk = false;
         ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
-        configStatus.setText(Tools.getString("Dialog.ClusterHbInit.Loading"));
+        configStatus.setText(Tools.getString("Dialog.ClusterHbConfig.Loading"));
         int i = 0;
 
         for (Host h : hosts) {
@@ -326,7 +326,7 @@ public class ClusterHbInit extends DialogCluster {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     configStatus.setText(hosts[0] + ": " + Tools.getString(
-                                        "Dialog.ClusterHbInit.NoConfigFound"));
+                                      "Dialog.ClusterHbConfig.NoConfigFound"));
                 }
             });
             retry();
@@ -339,7 +339,7 @@ public class ClusterHbInit extends DialogCluster {
                         public void run() {
                             configStatus.setText(host + ": "
                                                  + Tools.getString(
-                                        "Dialog.ClusterHbInit.NoConfigFound"));
+                                      "Dialog.ClusterHbConfig.NoConfigFound"));
                         }
                     });
                     break;
@@ -347,7 +347,7 @@ public class ClusterHbInit extends DialogCluster {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             configStatus.setText(Tools.getString(
-                                    "Dialog.ClusterHbInit.ConfigsNotTheSame"));
+                                  "Dialog.ClusterHbConfig.ConfigsNotTheSame"));
                         }
                     });
                     break;
@@ -359,7 +359,7 @@ public class ClusterHbInit extends DialogCluster {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         configStatus.setText(
-                            Tools.getString("Dialog.ClusterHbInit.ha.cf.ok"));
+                            Tools.getString("Dialog.ClusterHbConfig.ha.cf.ok"));
                         configCheckbox.setText(SEE_EXISTING_STRING);
                         configCheckbox.setSelected(false);
                         statusPanel.setMaximumSize(
@@ -399,7 +399,7 @@ public class ClusterHbInit extends DialogCluster {
                     if (HA_CF_ERROR_STRING.equals(configs[i])) {
                         configs[i] =
                             Tools.getString(
-                                    "Dialog.ClusterHbInit.NoConfigFound");
+                                    "Dialog.ClusterHbConfig.NoConfigFound");
                     }
                     final JLabel l = new JLabel(hosts[i].getName() + ":");
                     l.setBackground(Color.WHITE);
@@ -460,10 +460,10 @@ public class ClusterHbInit extends DialogCluster {
                     JLabel l;
                     if (castAddresses.size() < 1) {
                         l = new JLabel(Tools.getString(
-                                "Dialog.ClusterHbInit.WarningAtLeastTwoInt"));
+                                "Dialog.ClusterHbConfig.WarningAtLeastTwoInt"));
                     } else {
                         l = new JLabel(Tools.getString(
-                          "Dialog.ClusterHbInit.WarningAtLeastTwoInt.OneMore"));
+                        "Dialog.ClusterHbConfig.WarningAtLeastTwoInt.OneMore"));
                     }
                     l.setForeground(Color.RED);
                     configPanel.add(l);
@@ -528,7 +528,7 @@ public class ClusterHbInit extends DialogCluster {
      */
     private MyButton getRemoveButton(final CastAddress c) {
         final MyButton removeButton = new MyButton(
-                    Tools.getString("Dialog.ClusterHbInit.RemoveIntButton"));
+                    Tools.getString("Dialog.ClusterHbConfig.RemoveIntButton"));
         removeButton.setMaximumSize(new Dimension(REMOVE_BUTTON_WIDTH,
                                                   REMOVE_BUTTON_HEIGHT));
         removeButton.setPreferredSize(new Dimension(REMOVE_BUTTON_WIDTH,
@@ -758,7 +758,7 @@ public class ClusterHbInit extends DialogCluster {
         final String regexp = "^\\d{1,3}(\\.\\d{0,3}(\\d\\.\\d{0,3}"
                               + "(\\d\\.\\d{0,3})( \\d{0,3}(\\d \\d{0,3}"
                               + "(\\d \\d{0,3})?)?)?)?)?$";
-        addrCB = new GuiComboBox("230.0.0.71 694 1 1",
+        addrCB = new GuiComboBox("239.192.0.0 694 1 0",
                                  null, null, regexp, ADDR_COMBOBOX_WIDTH);
 
         final ItemListener typeL = new ItemListener() {
@@ -883,8 +883,8 @@ public class ClusterHbInit extends DialogCluster {
 
         addrCB.addListeners(null, addrL);
 
-        addButton =
-            new MyButton(Tools.getString("Dialog.ClusterHbInit.AddIntButton"));
+        addButton = new MyButton(
+                       Tools.getString("Dialog.ClusterHbConfig.AddIntButton"));
         addButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -958,11 +958,11 @@ public class ClusterHbInit extends DialogCluster {
         mcast.setMaximumSize(mcast.getPreferredSize());
         /* dopd */
         dopdCB = new JCheckBox(
-                    Tools.getString("Dialog.ClusterHbInit.UseDopdCheckBox"),
+                    Tools.getString("Dialog.ClusterHbConfig.UseDopdCheckBox"),
                     null,
                     false);
         dopdCB.setToolTipText(
-            Tools.getString("Dialog.ClusterHbInit.UseDopdCheckBox.ToolTip"));
+            Tools.getString("Dialog.ClusterHbConfig.UseDopdCheckBox.ToolTip"));
         dopdCB.addItemListener(
             new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -977,11 +977,11 @@ public class ClusterHbInit extends DialogCluster {
 
         /* mgmtd */
         mgmtdCB = new JCheckBox(
-                    Tools.getString("Dialog.ClusterHbInit.UseMgmtdCheckBox"),
+                    Tools.getString("Dialog.ClusterHbConfig.UseMgmtdCheckBox"),
                     null,
                     false);
         mgmtdCB.setToolTipText(
-            Tools.getString("Dialog.ClusterHbInit.UseMgmtdCheckBox.ToolTip"));
+            Tools.getString("Dialog.ClusterHbConfig.UseMgmtdCheckBox.ToolTip"));
         mgmtdCB.addItemListener(
             new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {

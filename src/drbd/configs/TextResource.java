@@ -321,9 +321,9 @@ public class TextResource extends
         {"Dialog.ClusterConnect.Title",      "Cluster Connect"},
         {"Dialog.ClusterConnect.Description", "Trying to connect to all the hosts in the cluster."},
 
-        {"Dialog.ClusterHbInit.Title",        "Heartbeat Initialization"},
+        {"Dialog.ClusterHbConfig.Title",        "Heartbeat Initialization"},
 
-        {"Dialog.ClusterHbInit.Description",
+        {"Dialog.ClusterHbConfig.Description",
          "In this step Heartbeat config (/etc/ha.d/ha.cf) is created and "
          + "Heartbeat is started. You do not have to overwrite your old "
          + "config if you have some special options. You can modify it by "
@@ -333,41 +333,41 @@ public class TextResource extends
          + "own interface, it will be ignored, at the same time it allows to "
          + "have the same config file on all hosts."},
 
-        {"Dialog.ClusterHbInit.CreateHbConfig", "Create/Overwrite HB Config"},
+        {"Dialog.ClusterHbConfig.CreateHbConfig", "Create/Overwrite HB Config"},
 
-        {"Dialog.ClusterHbInit.WarningAtLeastTwoInt",
+        {"Dialog.ClusterHbConfig.WarningAtLeastTwoInt",
          "# (specify at least two interfaces)"},
 
-        {"Dialog.ClusterHbInit.WarningAtLeastTwoInt.OneMore",
+        {"Dialog.ClusterHbConfig.WarningAtLeastTwoInt.OneMore",
          "# (specify at least two interfaces: one more to go)"},
 
-        {"Dialog.ClusterHbInit.RemoveIntButton", "remove"},
-        {"Dialog.ClusterHbInit.AddIntButton",    "add"},
+        {"Dialog.ClusterHbConfig.RemoveIntButton", "remove"},
+        {"Dialog.ClusterHbConfig.AddIntButton",    "add"},
 
-        {"Dialog.ClusterHbInit.UseDopdCheckBox.ToolTip",
+        {"Dialog.ClusterHbConfig.UseDopdCheckBox.ToolTip",
          "use DRBD Peer Outdater"},
 
-        {"Dialog.ClusterHbInit.UseDopdCheckBox", ""},
+        {"Dialog.ClusterHbConfig.UseDopdCheckBox", ""},
 
-        {"Dialog.ClusterHbInit.UseMgmtdCheckBox.ToolTip",
+        {"Dialog.ClusterHbConfig.UseMgmtdCheckBox.ToolTip",
          "use mgmtd, if you want to use pacemaker-gui"},
 
-        {"Dialog.ClusterHbInit.UseMgmtdCheckBox", ""},
+        {"Dialog.ClusterHbConfig.UseMgmtdCheckBox", ""},
 
-        {"Dialog.ClusterHbInit.NoConfigFound", "/etc/ha.d/ha.cf: file not found"},
+        {"Dialog.ClusterHbConfig.NoConfigFound", "/etc/ha.d/ha.cf: file not found"},
 
-        {"Dialog.ClusterHbInit.ConfigsNotTheSame",
+        {"Dialog.ClusterHbConfig.ConfigsNotTheSame",
          "configuration files are not the same on all hosts"},
 
-        {"Dialog.ClusterHbInit.Loading", "loading..."},
-        {"Dialog.ClusterHbInit.CurrentConfig", "current config:"},
-        {"Dialog.ClusterHbInit.Interfaces",    "interfaces:"},
+        {"Dialog.ClusterHbConfig.Loading", "loading..."},
+        {"Dialog.ClusterHbConfig.CurrentConfig", "current config:"},
+        {"Dialog.ClusterHbConfig.Interfaces",    "interfaces:"},
 
-        {"Dialog.ClusterHbInit.ha.cf.ok",
+        {"Dialog.ClusterHbConfig.ha.cf.ok",
          "/etc/ha.d/ha.cf the same on all nodes"},
 
-        {"Dialog.ClusterHbInit.Checkbox.EditConfig", "edit a new config"},
-        {"Dialog.ClusterHbInit.Checkbox.SeeExisting",
+        {"Dialog.ClusterHbConfig.Checkbox.EditConfig", "edit a new config"},
+        {"Dialog.ClusterHbConfig.Checkbox.SeeExisting",
          "see the existing configs"},
 
         {"Dialog.ClusterInit.Title",           "Heartbeat/DRBD Initialization"},

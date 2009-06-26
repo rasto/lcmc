@@ -56,7 +56,7 @@ public class ClusterConnect extends DialogCluster {
      * Returns the next dialog which is ClusterDrbdConf.
      */
     public final WizardDialog nextDialog() {
-        return new ClusterHbInit(this, getCluster());
+        return new ClusterHbConfig(this, getCluster());
     }
 
     /**
