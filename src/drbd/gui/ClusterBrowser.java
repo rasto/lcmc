@@ -44,6 +44,7 @@ import drbd.utilities.NewOutputCallback;
 
 import drbd.utilities.ExecCallback;
 import drbd.utilities.Heartbeat;
+import drbd.utilities.CRM;
 import drbd.data.resources.Resource;
 import drbd.data.resources.Service;
 import drbd.data.resources.CommonBlockDevice;
@@ -219,7 +220,7 @@ public class ClusterBrowser extends Browser {
     /** last dc host detected. */
     private Host lastDcHost = null;
 
-    /** dc host as reported by heartbeat. */
+    /** dc host as reported by crm. */
     private Host realDcHost = null;
 
     /** Panel that holds this browser. */
@@ -1197,7 +1198,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
-     * Returns whether the host is the real dc host as reported by heartbeat.
+     * Returns whether the host is the real dc host as reported by dc.
      */
     public final boolean isRealDcHost(final Host host) {
         return host.equals(realDcHost);
@@ -1418,7 +1419,7 @@ public class ClusterBrowser extends Browser {
     public final void startHeartbeats() {
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
-            Heartbeat.start(host);
+            Heartbeat.startHeartbeat(host);
         }
     }
 
@@ -1499,17 +1500,17 @@ public class ClusterBrowser extends Browser {
 
     /**
      * This interface provides getDevice function for drbd block devices or
-     * block devices that don't have drbd over them but are used by heartbeat.
+     * block devices that don't have drbd over them but are used by crm.
      */
     public interface CommonDeviceInterface {
         /** Returns the name. */
         String getName();
         /** Returns the device name. */
         String getDevice();
-        /** Sets whether the device is used by heartbeat. */
-        void setUsedByHeartbeat(boolean isUsedByHeartbeat);
-        /** Returns whether the device is used by heartbeat. */
-        boolean isUsedByHeartbeat();
+        /** Sets whether the device is used by crm. */
+        void setUsedByCRM(boolean isUsedByCRM);
+        /** Returns whether the device is used by crm. */
+        boolean isUsedByCRM();
         /** Returns the last created filesystem. */
         String getCreatedFs();
         /** Returns how much of the device is used. */
@@ -1545,7 +1546,7 @@ public class ClusterBrowser extends Browser {
          * Whether the block device is used by heartbeat via Filesystem
          * service.
          */
-        private boolean isUsedByHeartbeat;
+        private boolean isUsedByCRM;
         /** Cache for getInfoPanel method. */
         private JComponent infoPanel = null;
         /** Whether the meta-data has to be created or not. */
@@ -2353,15 +2354,15 @@ public class ClusterBrowser extends Browser {
         /**
          * Sets that this drbd resource is used by hb.
          */
-        public final void setUsedByHeartbeat(final boolean isUsedByHeartbeat) {
-            this.isUsedByHeartbeat = isUsedByHeartbeat;
+        public final void setUsedByCRM(final boolean isUsedByCRM) {
+            this.isUsedByCRM = isUsedByCRM;
         }
 
         /**
-         * Returns whether this drbd resource is used by heartbeat.
+         * Returns whether this drbd resource is used by crm.
          */
-        public final boolean isUsedByHeartbeat() {
-            return isUsedByHeartbeat;
+        public final boolean isUsedByCRM() {
+            return isUsedByCRM;
         }
 
         /**
@@ -2427,7 +2428,7 @@ public class ClusterBrowser extends Browser {
                 }
 
                 public boolean enablePredicate() {
-                    return !isUsedByHeartbeat();
+                    return !isUsedByCRM();
                 }
             };
             registerMenuItem(removeResMenu);
@@ -2738,22 +2739,22 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Sets this block device on all nodes ass used by heartbeat.
+         * Sets this block device on all nodes ass used by crm.
          */
-        public void setUsedByHeartbeat(final boolean isUsedByHeartbeat) {
+        public void setUsedByCRM(final boolean isUsedByCRM) {
             for (BlockDevice bd : blockDevices) {
-                bd.setUsedByHeartbeat(isUsedByHeartbeat);
+                bd.setUsedByCRM(isUsedByCRM);
             }
         }
 
         /**
-         * Returns if all of the block devices are used by heartbeat.
+         * Returns if all of the block devices are used by crm.
          * TODO: or any is used by hb?
          */
-        public boolean isUsedByHeartbeat() {
+        public boolean isUsedByCRM() {
             boolean is = true;
             for (int i = 0; i < blockDevices.length; i++) {
-                is = is && blockDevices[i].isUsedByHeartbeat();
+                is = is && blockDevices[i].isUsedByCRM();
             }
             return is;
         }
@@ -3161,12 +3162,12 @@ public class ClusterBrowser extends Browser {
             //final DrbddiskInfo oddi = getDrbddiskInfo();
             if (oldDri != null) {
                 oldDri.removeDrbdDisk(this);
-                oldDri.setUsedByHeartbeat(false);
+                oldDri.setUsedByCRM(false);
                 setDrbddiskInfo(null);
             }
 
             if (newDri != null) {
-                newDri.setUsedByHeartbeat(true);
+                newDri.setUsedByCRM(true);
                 newDri.addDrbdDisk(this);
             }
             //if (oddi != null) {
@@ -3179,7 +3180,12 @@ public class ClusterBrowser extends Browser {
          */
         public final int getUsed() {
             if (blockDeviceParamCb != null) {
-                final Info item = (Info) blockDeviceParamCb.getValue();
+                final Object value = blockDeviceParamCb.getValue();
+                if (Tools.isStringClass(value)) {
+                    // TODO: 
+                    return -1;
+                }
+                final Info item = (Info) value;
                 if (item.getStringValue() == null) {
                     return -1;
                 }
@@ -3252,7 +3258,7 @@ public class ClusterBrowser extends Browser {
             super.removeMyselfNoConfirm();
             final DrbdResourceInfo dri = drbdResHash.get(getResourceName());
             if (dri != null) {
-                dri.setUsedByHeartbeat(false);
+                dri.setUsedByCRM(false);
             }
         }
     }
@@ -3314,9 +3320,9 @@ public class ClusterBrowser extends Browser {
             final String heartbeatId     = getService().getHeartbeatId();
             if (getService().isNew()) {
                 final String[] parents = heartbeatGraph.getParents(this);
-                Heartbeat.setOrderAndColocation(getDCHost(),
-                                                heartbeatId,
-                                                parents);
+                CRM.setOrderAndColocation(getDCHost(),
+                                          heartbeatId,
+                                          parents);
             }
             //setLocations(heartbeatId);
             storeComboBoxValues(params);
@@ -3417,7 +3423,7 @@ public class ClusterBrowser extends Browser {
             final Host dc = getDCHost();
             if (resources != null) {
                 for (final String hbId : resources) {
-                    Heartbeat.startResource(dc, hbId);
+                    CRM.startResource(dc, hbId);
                 }
             }
         }
@@ -3432,7 +3438,7 @@ public class ClusterBrowser extends Browser {
             final Host dc = getDCHost();
             if (resources != null) {
                 for (final String hbId : resources) {
-                    Heartbeat.stopResource(dc, hbId);
+                    CRM.stopResource(dc, hbId);
                 }
             }
         }
@@ -3461,7 +3467,7 @@ public class ClusterBrowser extends Browser {
             final Host dc = getDCHost();
             if (resources != null) {
                 for (final String hbId : resources) {
-                    Heartbeat.setManaged(dc, hbId, isManaged);
+                    CRM.setManaged(dc, hbId, isManaged);
                 }
             }
         }
@@ -3509,7 +3515,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Removes this group from the heartbeat.
+         * Removes this group from the cib.
          */
         public void removeMyself() {
             String desc = Tools.getString(
@@ -3549,7 +3555,7 @@ public class ClusterBrowser extends Browser {
         public void removeMyselfNoConfirm() {
             super.removeMyselfNoConfirm();
             if (!getService().isNew()) {
-                Heartbeat.removeResource(
+                CRM.removeResource(
                                 getDCHost(),
                                 null,
                                 getService().getHeartbeatId()); /* group id */
@@ -4031,9 +4037,9 @@ public class ClusterBrowser extends Browser {
          */
         public void setManaged(final boolean isManaged) {
             setUpdated(true);
-            Heartbeat.setManaged(getDCHost(),
-                                 getService().getHeartbeatId(),
-                                 isManaged);
+            CRM.setManaged(getDCHost(),
+                           getService().getHeartbeatId(),
+                           isManaged);
         }
 
         /**
@@ -4883,11 +4889,11 @@ public class ClusterBrowser extends Browser {
                               heartbeatStatus.getLocationId(
                                                 getService().getHeartbeatId(),
                                                 onHost);
-                    Heartbeat.setLocation(dcHost,
-                                          getService().getHeartbeatId(),
-                                          onHost,
-                                          score,
-                                          locationId);
+                    CRM.setLocation(dcHost,
+                                    getService().getHeartbeatId(),
+                                    onHost,
+                                    score,
+                                    locationId);
                 }
             }
             storeHostScoreInfos();
@@ -5080,23 +5086,23 @@ public class ClusterBrowser extends Browser {
                 if (groupInfo != null && !groupInfo.getService().isNew()) {
                         command = "-U";
                 }
-                Heartbeat.setParameters(dcHost,
-                                        command,
-                                        heartbeatId,
-                                        groupId,
-                                        args.toString(),
-                                        pacemakerResAttrs,
-                                        pacemakerResArgs,
-                                        pacemakerMetaArgs,
-                                        null,
-                                        null,
-                                        getOperations(heartbeatId),
-                                        null);
+                CRM.setParameters(dcHost,
+                                  command,
+                                  heartbeatId,
+                                  groupId,
+                                  args.toString(),
+                                  pacemakerResAttrs,
+                                  pacemakerResArgs,
+                                  pacemakerMetaArgs,
+                                  null,
+                                  null,
+                                  getOperations(heartbeatId),
+                                  null);
                 if (groupInfo == null) {
                     final String[] parents = heartbeatGraph.getParents(this);
-                    Heartbeat.setOrderAndColocation(dcHost,
-                                                    heartbeatId,
-                                                    parents);
+                    CRM.setOrderAndColocation(dcHost,
+                                              heartbeatId,
+                                              parents);
                 }
             } else {
                 // update parameters
@@ -5129,7 +5135,7 @@ public class ClusterBrowser extends Browser {
                 }
                 args.insert(0, heartbeatId);
 
-                Heartbeat.setParameters(
+                CRM.setParameters(
                         dcHost,
                         "-U",
                         heartbeatId,
@@ -5172,12 +5178,12 @@ public class ClusterBrowser extends Browser {
                 heartbeatStatus.getOrderSymmetrical(
                                     parent.getService().getHeartbeatId(), 
                                     getService().getHeartbeatId());
-            Heartbeat.removeOrder(getDCHost(),
-                                  orderId,
-                                  parentHbId,
-                                  getService().getHeartbeatId(),
-                                  score,
-                                  symmetrical);
+            CRM.removeOrder(getDCHost(),
+                            orderId,
+                            parentHbId,
+                            getService().getHeartbeatId(),
+                            score,
+                            symmetrical);
         }
 
         /**
@@ -5187,9 +5193,9 @@ public class ClusterBrowser extends Browser {
             parent.setUpdated(true);
             setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
-            Heartbeat.addOrder(getDCHost(),
-                               parentHbId,
-                               getService().getHeartbeatId());
+            CRM.addOrder(getDCHost(),
+                         parentHbId,
+                         getService().getHeartbeatId());
         }
 
         /**
@@ -5206,12 +5212,11 @@ public class ClusterBrowser extends Browser {
                 heartbeatStatus.getColocationScore(
                                     parent.getService().getHeartbeatId(), 
                                     getService().getHeartbeatId());
-            Heartbeat.removeColocation(getDCHost(),
-                                       colocationId,
-                                       getService().getHeartbeatId(), /* to */
-                                       parentHbId, /* from */
-                                       score
-                                       );
+            CRM.removeColocation(getDCHost(),
+                                 colocationId,
+                                 getService().getHeartbeatId(), /* to */
+                                 parentHbId, /* from */
+                                 score);
         }
 
         /**
@@ -5223,9 +5228,9 @@ public class ClusterBrowser extends Browser {
             parent.setUpdated(true);
             setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
-            Heartbeat.addColocation(getDCHost(),
-                                    parentHbId,
-                                    getService().getHeartbeatId());
+            CRM.addColocation(getDCHost(),
+                              parentHbId,
+                              getService().getHeartbeatId());
         }
 
         /**
@@ -5277,9 +5282,9 @@ public class ClusterBrowser extends Browser {
                 final String parentId = getService().getHeartbeatId();
                 final String heartbeatId =
                                     serviceInfo.getService().getHeartbeatId();
-                Heartbeat.setOrderAndColocation(getDCHost(),
-                                                heartbeatId,
-                                                new String[]{parentId});
+                CRM.setOrderAndColocation(getDCHost(),
+                                          heartbeatId,
+                                          new String[]{parentId});
             } else {
                 addNameToServiceInfoHash(serviceInfo);
                 final DefaultMutableTreeNode newServiceNode =
@@ -5303,12 +5308,11 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Starts resource in heartbeat.
+         * Starts resource in crm.
          */
         public void startResource() {
             setUpdated(true);
-            Heartbeat.startResource(getDCHost(),
-                                    getService().getHeartbeatId());
+            CRM.startResource(getDCHost(), getService().getHeartbeatId());
         }
 
         /**
@@ -5316,8 +5320,7 @@ public class ClusterBrowser extends Browser {
          */
         public void moveGroupResUp() {
             setUpdated(true);
-            Heartbeat.moveGroupResUp(getDCHost(),
-                                     getService().getHeartbeatId());
+            CRM.moveGroupResUp(getDCHost(), getService().getHeartbeatId());
         }
 
         /**
@@ -5325,17 +5328,15 @@ public class ClusterBrowser extends Browser {
          */
         public void moveGroupResDown() {
             setUpdated(true);
-            Heartbeat.moveGroupResDown(getDCHost(),
-                                       getService().getHeartbeatId());
+            CRM.moveGroupResDown(getDCHost(), getService().getHeartbeatId());
         }
 
         /**
-         * Stops resource in heartbeat.
+         * Stops resource in crm.
          */
         public void stopResource() {
             setUpdated(true);
-            Heartbeat.stopResource(getDCHost(),
-                                   getService().getHeartbeatId());
+            CRM.stopResource(getDCHost(), getService().getHeartbeatId());
         }
 
         /**
@@ -5343,9 +5344,9 @@ public class ClusterBrowser extends Browser {
          */
         public void migrateResource(final String onHost) {
             setUpdated(true);
-            Heartbeat.migrateResource(getDCHost(),
-                                      getService().getHeartbeatId(),
-                                      onHost);
+            CRM.migrateResource(getDCHost(),
+                                getService().getHeartbeatId(),
+                                onHost);
         }
 
         /**
@@ -5353,8 +5354,8 @@ public class ClusterBrowser extends Browser {
          */
         public void unmigrateResource() {
             setUpdated(true);
-            Heartbeat.unmigrateResource(getDCHost(),
-                                        getService().getHeartbeatId());
+            CRM.unmigrateResource(getDCHost(),
+                                  getService().getHeartbeatId());
         }
 
         /**
@@ -5368,10 +5369,10 @@ public class ClusterBrowser extends Browser {
                     dirtyHosts.add(host);
                 }
             }
-            Heartbeat.cleanupResource(getDCHost(),
-                                      getService().getHeartbeatId(),
-                                      dirtyHosts.toArray(
-                                                new Host[dirtyHosts.size()]));
+            CRM.cleanupResource(getDCHost(),
+                                getService().getHeartbeatId(),
+                                dirtyHosts.toArray(
+                                          new Host[dirtyHosts.size()]));
         }
 
         /**
@@ -5397,10 +5398,10 @@ public class ClusterBrowser extends Browser {
                     for (String locId : heartbeatStatus.getLocationIds(getService().getHeartbeatId())) {
                         final String locScore =
                             heartbeatStatus.getLocationScore(locId);
-                        Heartbeat.removeLocation(dcHost,
-                                                 locId,
-                                                 getService().getHeartbeatId(),
-                                                 locScore);
+                        CRM.removeLocation(dcHost,
+                                           locId,
+                                           getService().getHeartbeatId(),
+                                           locScore);
                     }
                 }
                 if (!getHeartbeatService().isGroup()) {
@@ -5426,9 +5427,9 @@ public class ClusterBrowser extends Browser {
                             groupInfo.getService().doneRemoving();
                         }
                     } 
-                    Heartbeat.removeResource(dcHost,
-                                             getService().getHeartbeatId(),
-                                             groupId);
+                    CRM.removeResource(dcHost,
+                                       getService().getHeartbeatId(),
+                                       groupId);
                 }
             }
             //if (groupInfo == null)
@@ -6183,8 +6184,7 @@ public class ClusterBrowser extends Browser {
                 args.put(param, value);
             }
             if (!args.isEmpty()) {
-                Heartbeat.setGlobalParameters(getDCHost(),
-                                    args);
+                CRM.setGlobalParameters(getDCHost(), args);
             }
             storeComboBoxValues(params);
         }
@@ -6361,7 +6361,7 @@ public class ClusterBrowser extends Browser {
                                             ((FilesystemInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
                                             final DrbdResourceInfo dri = drbdResHash.get(((DrbddiskInfo) siP).getResourceName());
                                             if (dri != null) {
-                                                dri.setUsedByHeartbeat(true);
+                                                dri.setUsedByCRM(true);
                                             }
                                         }
                                     }

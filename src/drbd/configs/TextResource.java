@@ -321,6 +321,53 @@ public class TextResource extends
         {"Dialog.ClusterConnect.Title",      "Cluster Connect"},
         {"Dialog.ClusterConnect.Description", "Trying to connect to all the hosts in the cluster."},
 
+        {"Dialog.ClusterAisConfig.Title",        "OpenAIS Config File"},
+
+        {"Dialog.ClusterAisConfig.Description",
+         "In this step OpenAIS config (/etc/ais/openais.conf) is created and "
+         + "OpenAIS is started. You do not have to overwrite your old "
+         + "config if you have some special options. You can modify it by "
+         + "hand on every host in the cluster. You have to press the "
+         + "\"Create AIS Config\" button to save the new configuration on all "
+         + "hosts. "},
+
+        {"Dialog.ClusterAisConfig.CreateAisConfig", "Create/Overwrite AIS Config"},
+
+        {"Dialog.ClusterAisConfig.WarningAtLeastTwoInt",
+         "# (specify at least two interfaces)"},
+
+        {"Dialog.ClusterAisConfig.WarningAtLeastTwoInt.OneMore",
+         "# (specify at least two interfaces: one more to go)"},
+
+        {"Dialog.ClusterAisConfig.RemoveIntButton", "remove"},
+        {"Dialog.ClusterAisConfig.AddIntButton",    "add"},
+
+        {"Dialog.ClusterAisConfig.UseDopdCheckBox.ToolTip",
+         "use DRBD Peer Outdater"},
+
+        {"Dialog.ClusterAisConfig.UseDopdCheckBox", ""},
+
+        {"Dialog.ClusterAisConfig.UseMgmtdCheckBox.ToolTip",
+         "use mgmtd, if you want to use pacemaker-gui"},
+
+        {"Dialog.ClusterAisConfig.UseMgmtdCheckBox", ""},
+
+        {"Dialog.ClusterAisConfig.NoConfigFound", "/etc/ais/openais.conf: file not found"},
+
+        {"Dialog.ClusterAisConfig.ConfigsNotTheSame",
+         "configuration files are not the same on all hosts"},
+
+        {"Dialog.ClusterAisConfig.Loading", "loading..."},
+        {"Dialog.ClusterAisConfig.CurrentConfig", "current config:"},
+        {"Dialog.ClusterAisConfig.Interfaces",    "interfaces:"},
+
+        {"Dialog.ClusterAisConfig.ais.conf.ok",
+         "/etc/ais/openais.conf the same on all nodes"},
+
+        {"Dialog.ClusterAisConfig.Checkbox.EditConfig", "edit a new config"},
+        {"Dialog.ClusterAisConfig.Checkbox.SeeExisting",
+         "see the existing configs"},
+
         {"Dialog.ClusterHbConfig.Title",        "Heartbeat Initialization"},
 
         {"Dialog.ClusterHbConfig.Description",
@@ -378,10 +425,40 @@ public class TextResource extends
 
         {"Dialog.ClusterInit.CheckingDrbd",    "checking..."},
         {"Dialog.ClusterInit.LoadDrbdButton",  "Load"},
+
+        {"Dialog.ClusterInit.CheckingAis",      "checking..."},
+        {"Dialog.ClusterInit.StartAisButton",   "Start"},
+        {"Dialog.ClusterInit.AisButtonRc",      "Run at system start-up"},
+        {"Dialog.ClusterInit.AisButtonSwitch",  "Switch to AIS"},
+        {"Dialog.ClusterInit.AisIsRunning",     "OpenAIS is running"},
+        {"Dialog.ClusterInit.AisIsRc",
+         "OpenAIS is running at system start-up"},
+
+        {"Dialog.ClusterInit.AisIsStopped",
+         "OpenAIS is stopped"},
+
+        {"Dialog.ClusterInit.AisIsNotInstalled",
+         "OpenAIS is not installed"},
+
+        {"Dialog.ClusterInit.AisIsNotConfigured",
+         "OpenAIS is not configured"},
+
         {"Dialog.ClusterInit.CheckingHb",      "checking..."},
         {"Dialog.ClusterInit.StartHbButton",   "Start"},
-        {"Dialog.ClusterInit.HbIsRunning",     "heartbeat is running"},
-        {"Dialog.ClusterInit.HbIsStopped",     "heartbeat is stopped"},
+        {"Dialog.ClusterInit.HbButtonRc",      "Run at system start-up"},
+        {"Dialog.ClusterInit.HbButtonSwitch",  "Switch to HB"},
+        {"Dialog.ClusterInit.HbIsRunning",     "Heartbeat is running"},
+        {"Dialog.ClusterInit.HbIsRc",
+         "Heartbeat is running at system start-up"},
+
+        {"Dialog.ClusterInit.HbIsStopped",
+         "Heartbeat is stopped"},
+
+        {"Dialog.ClusterInit.HbIsNotInstalled",
+         "Heartbeat is not installed"},
+
+        {"Dialog.ClusterInit.HbIsNotConfigured",
+         "Heartbeat is not configured"},
 
         {"Dialog.ClusterInit.DrbdIsLoaded",     "DRBD is loaded"},
         {"Dialog.ClusterInit.DrbdIsNotLoaded",  "DRBD is not loaded"},
@@ -391,8 +468,8 @@ public class TextResource extends
         {"Dialog.About.Title",                "DRBD Management Console (Beta). Release: "},
         {"Dialog.About.Description",          
          "<b>DRBD Management Console by Rasto Levrinc (rasto@linbit.com).</b><br>"
-         + "(C)opyright 2002-2009 by Rasto Levrinc.<br>"
-         + "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br><br>"
+         + "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br>"
+         + "(C)opyright 2002-2009 by Rasto Levrinc.<br><br>"
          + "Please visit the website http://www.drbd.org/mc/management-console/<br>"
          + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
 
@@ -654,8 +731,8 @@ public class TextResource extends
         {"HostBrowser.Drbd.DisconnectAll",              "Disconnect All DRBDs"},
         {"HostBrowser.Drbd.SetAllPrimary",              "Set All DRBDs Primary"},
         {"HostBrowser.Drbd.SetAllSecondary",            "Set All DRBDs Secondary"},
-        {"HostBrowser.Heartbeat.StandByOn",             "Heartbeat Standby On"},
-        {"HostBrowser.Heartbeat.StandByOff",            "Heartbeat Standby Off"},
+        {"HostBrowser.CRM.StandByOn",                   "Cluster Standby On"},
+        {"HostBrowser.CRM.StandByOff",                  "Cluster Standby Off"},
         {"HostBrowser.RemoveHost",                      "Remove"},
 
         /* Host Browser */
@@ -708,24 +785,51 @@ public class TextResource extends
 
         {"ProgressIndicatorPanel.Cancel",     "Cancel"},
 
+        {"CIB.ExecutingCommand",              "Executing cibadmin..."},
         {"Heartbeat.ExecutingCommand",        "Executing Heartbeat command..."},
+        {"Openais.ExecutingCommand",          "Executing OpenAIS command..."},
         {"DRBD.ExecutingCommand",             "Executing DRBD command..."},
         {"DrbdXML.GetConfig",                 "Getting DRBD configuration..."},
         {"DrbdXML.GetParameters",             "Getting DRBD parameters..."},
 
         {"Dialog.DrbdConfigResource.Title",      "Configure DRBD Resource"},
-        {"Dialog.DrbdConfigResource.Description", "Configure the new DRBD resource. Enter the <b>name</b> of the resource. "
-                                                  + "You can call it whatever you want as long it is unique. "
-                                                  + "The same applies for DRBD device. "
-                                                  + "This <b>device</b> should be in the form /dev/drbdX. "
-                                                  + "Choose a <b>protocol</b> that the DRBD should use for replication. "
-                                                  + "You can learn more about protocols -- a.k.a replication modes -- in <a href=\"http://www.drbd.org/docs/introduction/\">DRBD User's Guide: Introduction to DRBD</a>. After you changed the fields, or you are satisfied with the defaults, press <b>Next</b> to continue."},
 
-        {"Dialog.DrbdConfigBlockDev.Title",      "Configure DRBD Block Device"},
-        {"Dialog.DrbdConfigBlockDev.Description", "Enter the information about the DRBD block device. Choose a DRBD net interface that will be used for DRBD communication and a port. The port must not be used by anything else and must not be used by another DRBD block device. The net interface should be different than the one that is used by Heartbeat. Choose where DRBD meta data should be written. You can choose internal to make it simple or learn external DRBD meta disk to make it faster."},
+        {"Dialog.DrbdConfigResource.Description",
+         "Configure the new DRBD resource. Enter the <b>name</b> of the "
+         + "resource. "
+         + "You can call it whatever you want as long it is unique. "
+         + "The same applies for DRBD device. "
+         + "This <b>device</b> should be in the form /dev/drbdX. "
+         + "Choose a <b>protocol</b> that the DRBD should use for replication. "
+         + "You can learn more about protocols -- a.k.a replication "
+         + "modes -- in <a href=\"http://www.drbd.org/docs/introduction/\">"
+         + "DRBD User's Guide: Introduction to DRBD</a>. After you changed "
+         + "the fields, or you are satisfied with the defaults, press "
+         + "<b>Next</b> to continue."},
 
-        {"Dialog.DrbdConfigCreateFS.Title",            "Initialize DRBD block devices."},
-        {"Dialog.DrbdConfigCreateFS.Description",      "In this step you can initialize and start the DRBD cluster. You can choose one host as a primary host. You can create a filesystem on it, but in this case you have to choose one host as a primary, choose the file system and press \"Create File System\" button."},
+        {"Dialog.DrbdConfigBlockDev.Title",
+         "Configure DRBD Block Device"},
+
+        {"Dialog.DrbdConfigBlockDev.Description",
+         "Enter the information about the DRBD block device. Choose a "
+         + "DRBD net interface that will be used for DRBD communication "
+         + "and a port. The port must not be used by anything else and must "
+         + "not be used by another DRBD block device. The net interface "
+         + "should be different than the one that is used by Heartbeat. "
+         + "Choose where DRBD meta data should be written. You can choose "
+         + "internal to make it simple or learn external DRBD meta disk to "
+         + "make it faster."},
+
+        {"Dialog.DrbdConfigCreateFS.Title",
+         "Initialize DRBD block devices."},
+
+        {"Dialog.DrbdConfigCreateFS.Description",
+         "In this step you can initialize and start the DRBD cluster. "
+         + "You can choose one host as a primary host. You can create a "
+         + "filesystem on it, but in this case you have to choose one host "
+         + "as a primary, choose the file system and press "
+         + "\"Create File System\" button."},
+
         {"Dialog.DrbdConfigCreateFS.NoHostString",     "none"},
         {"Dialog.DrbdConfigCreateFS.ChooseHost",       "host (primary)"},
         {"Dialog.DrbdConfigCreateFS.Filesystem",       "file system"},

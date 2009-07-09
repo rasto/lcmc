@@ -140,6 +140,20 @@ public class Host implements Serializable {
     private String pacemakerVersion = null;
     /** Openais version. */
     private String openaisVersion = null;
+    /** Is "on" if openais is in rc. */
+    private String openaisIsRc = null;
+    /** Is "on" if openais is running. */
+    private String openaisRunning = null;
+    /** Is "on" if openais config exists. */
+    private String openaisConf = null;
+    /** Is "on" if heartbeat is in rc. */
+    private String heartbeatIsRc = null;
+    /** Is "on" if heartbeat is running. */
+    private String heartbeatRunning = null;
+    /** Is "on" if heartbeat config exists. */
+    private String heartbeatConf = null;
+    /** Is "on" if drbd module is loaded. */
+    private String drbdLoaded = null;
     /** Corosync version. */
     private String corosyncVersion = null;
     /** Heartbeat version. */
@@ -365,13 +379,13 @@ public class Host implements Serializable {
 
     /**
      * Returns blockDevices as array list of device names. Removes the
-     * ones that are in the drbd and are already used in heartbeat.
+     * ones that are in the drbd and are already used in CRM.
      */
     public final List<String> getBlockDevicesNames() {
         final List<String> blockDevicesNames = new ArrayList<String>();
         for (final String bdName : blockDevices.keySet()) {
             final BlockDevice bd = blockDevices.get(bdName);
-            if (!bd.isDrbd() && !bd.isUsedByHeartbeat()) {
+            if (!bd.isDrbd() && !bd.isUsedByCRM()) {
                 blockDevicesNames.add(bdName);
             }
         }
@@ -1757,31 +1771,68 @@ public class Host implements Serializable {
     public void parseInstallationInfo(final String line) {
         final String[] tokens = line.split(":|\\s+");
         if (tokens.length == 2) {
-            if (tokens[0].equals("pm")) {
+            if ("pm".equals(tokens[0])) {
                 final String version = tokens[1].trim();
                 if (!"".equals(version)) {
                     pacemakerVersion = version;
                 }
-            } else if (tokens[0].equals("cs")) {
+            } else if ("cs".equals(tokens[0])) {
                 final String version = tokens[1].trim();
                 if (!"".equals(version)) {
-                    if (corosyncVersion == null || "ok".equals(corosyncVersion)) {
+                    if (corosyncVersion == null
+                        || "ok".equals(corosyncVersion)) {
                         corosyncVersion = version;
                     }
                 }
-            } else if (tokens[0].equals("ais")) {
+            } else if ("ais".equals(tokens[0])) {
                 final String version = tokens[1].trim();
                 if (!"".equals(version)) {
-                    if (openaisVersion == null || "ok".equals(openaisVersion)) {
+                    if (openaisVersion == null
+                        || "ok".equals(openaisVersion)) {
                         openaisVersion = version;
                     }
                 }
-            } else if (tokens[0].equals("hb")) {
+            } else if ("ais-rc".equals(tokens[0])) {
+                final String aisRc = tokens[1].trim();
+                if (!"".equals(aisRc)) {
+                    openaisIsRc = aisRc;
+                }
+            } else if ("ais-conf".equals(tokens[0])) {
+                final String aisConf = tokens[1].trim();
+                if (!"".equals(aisConf)) {
+                    openaisConf = aisConf;
+                }
+            } else if ("ais-running".equals(tokens[0])) {
+                final String aisRunning = tokens[1].trim();
+                if (!"".equals(aisRunning)) {
+                    openaisRunning = aisRunning;
+                }
+            } else if ("hb".equals(tokens[0])) {
                 final String version = tokens[1].trim();
                 if (!"".equals(version)) {
                     heartbeatVersion = version;
                 }
-            } else if (tokens[0].equals("hn")) { // hostname
+            } else if ("hb-rc".equals(tokens[0])) {
+                final String hbRc = tokens[1].trim();
+                if (!"".equals(hbRc)) {
+                    heartbeatIsRc = hbRc;
+                }
+            } else if ("hb-conf".equals(tokens[0])) {
+                final String hbConf = tokens[1].trim();
+                if (!"".equals(hbConf)) {
+                    heartbeatConf = hbConf;
+                }
+            } else if ("hb-running".equals(tokens[0])) {
+                final String hbRunning = tokens[1].trim();
+                if (!"".equals(hbRunning)) {
+                    heartbeatRunning = hbRunning;
+                }
+            } else if ("drbd-loaded".equals(tokens[0])) {
+                final String dl = tokens[1].trim();
+                if (!"".equals(dl)) {
+                    drbdLoaded = dl;
+                }
+            } else if ("hn".equals(tokens[0])) { // hostname
                 hostname = tokens[1].trim();
                 setName(hostname);
             }
@@ -1997,5 +2048,54 @@ public class Host implements Serializable {
      */
     public final String getDrbdInstallMethod() {
         return drbdInstallMethod;
+    }
+
+    /**
+     * Returns whether Openais is rc script.
+     */
+    public final boolean isOpenaisRc() {
+       return openaisIsRc != null && openaisIsRc.equals("on");
+    }
+
+    /**
+     * Returns whether Openais is running script.
+     */
+    public final boolean isOpenaisRunning() {
+       return openaisRunning != null && openaisRunning.equals("on");
+    }
+
+    /**
+     * Returns whether Openais config exists.
+     */
+    public final boolean isOpenaisConf() {
+       return openaisConf != null && openaisConf.equals("on");
+    }
+
+    /**
+     * Returns whether Heartbeat is rc script.
+     */
+    public final boolean isHeartbeatRc() {
+       return heartbeatIsRc != null && heartbeatIsRc.equals("on");
+    }
+
+    /**
+     * Returns whether Heartbeat is running script.
+     */
+    public final boolean isHeartbeatRunning() {
+       return heartbeatRunning != null && heartbeatRunning.equals("on");
+    }
+
+    /**
+     * Returns whether Heartbeat config exists.
+     */
+    public final boolean isHeartbeatConf() {
+       return heartbeatConf != null && heartbeatConf.equals("on");
+    }
+
+    /**
+     * Returns whether drbd module is loaded.
+     */
+    public final boolean isDrbdLoaded() {
+       return drbdLoaded != null && drbdLoaded.equals("on");
     }
 }

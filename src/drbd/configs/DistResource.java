@@ -139,21 +139,21 @@ public class DistResource extends
         {"GetNetInfo",  "/usr/local/bin/drbd-gui-helper get-net-info"},
 
         /* heartbeat crm commands */
-        {"Heartbeat.cleanupResource",    "crm_resource -C -r @ID@ -H @HOST@"},
+        {"CRM.cleanupResource",    "crm_resource -C -r @ID@ -H @HOST@"},
 
         /* 2.1.4 and before */
-        {"Heartbeat.2.1.4.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
-        {"Heartbeat.2.1.4.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
-        {"Heartbeat.2.1.4.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
-        {"Heartbeat.2.1.4.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
+        {"CRM.2.1.4.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
+        {"CRM.2.1.4.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
+        {"CRM.2.1.4.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
+        {"CRM.2.1.4.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
         /* 2.99.0 and after. */
-        {"Heartbeat.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target-role -v started"},
-        {"Heartbeat.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target-role -v stopped"},
-        {"Heartbeat.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is-managed -v true"},
-        {"Heartbeat.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
+        {"CRM.startResource",     "crm_resource --meta -t primitive -r @ID@ -p target-role -v started"},
+        {"CRM.stopResource",      "crm_resource --meta -t primitive -r @ID@ -p target-role -v stopped"},
+        {"CRM.isManagedOn",       "crm_resource --meta -t primitive -r @ID@ -p is-managed -v true"},
+        {"CRM.isManagedOff",      "crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
 
-        {"Heartbeat.migrateResource",   "crm_resource -r @ID@ -H @HOST@ --migrate"},
-        {"Heartbeat.unmigrateResource", "crm_resource -r @ID@ --un-migrate"},
+        {"CRM.migrateResource",   "crm_resource -r @ID@ -H @HOST@ --migrate"},
+        {"CRM.unmigrateResource", "crm_resource -r @ID@ --un-migrate"},
 
         /* gets all ocf resources and theirs meta-data */
         /* TODO: buggy xml in heartbeat 2.0.8 in ftp and mysql */
@@ -163,13 +163,19 @@ public class DistResource extends
         {"Heartbeat.getOCFParameters", "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/lib/ocf; for s in `ls -1 /usr/lib/ocf/resource.d/heartbeat/ `; do /usr/lib/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done; /usr/local/bin/drbd-gui-helper get-old-style-resources; /usr/local/bin/drbd-gui-helper get-lsb-resources"},
         {"Heartbeat.getClusterMetadata", "/usr/local/bin/drbd-gui-helper get-cluster-metadata"},
         {"Heartbeat.getHbStatus",    "/usr/local/bin/drbd-gui-helper get-cluster-events"},
-        {"Heartbeat.start",          "/etc/init.d/heartbeat start"},
-        {"Heartbeat.isStarted",      "/etc/init.d/heartbeat status > /dev/null"},
+        {"Heartbeat.startHeartbeat", "/etc/init.d/heartbeat start"},
+        {"Openais.startOpenais",   "/etc/init.d/openais start"},
+        {"Openais.reloadOpenais",  "/etc/init.d/openais reload"},
         {"Heartbeat.reloadHeartbeat", "/etc/init.d/heartbeat reload"},
         {"Heartbeat.stopHeartbeat",  "/etc/init.d/heartbeat stop"},
         {"Heartbeat.getHbConfig",    "cat /etc/ha.d/ha.cf"},
-        {"Heartbeat.standByOn",      "crm_standby -U @HOST@ -v on"},
-        {"Heartbeat.standByOff",     "crm_standby -U @HOST@ -v off"},
+        {"CRM.standByOn",      "crm_standby -U @HOST@ -v on"},
+        {"CRM.standByOff",     "crm_standby -U @HOST@ -v off"},
+
+        {"OpenAis.getAisConfig",     "cat /etc/ais/openais.conf"},
+
+        {"ClusterInit.getInstallationInfo",
+         "/usr/local/bin/drbd-gui-helper installation-info"},
 
 
         /* drbd commands */
@@ -207,13 +213,17 @@ public class DistResource extends
         {"DRBD.getProcesses",  "ps aux|grep drbd"},
         {"DRBD.start",         "/etc/init.d/drbd start"},
         {"DRBD.load",          "modprobe drbd"},
-        {"DRBD.isModuleLoaded", "lsmod|grep drbd"},
 
-        {"Heartbeat.getCrmMon",     "crm_mon -1"},
-        {"Heartbeat.getProcesses",  "ps aux|grep heartbeat|grep -v regevt"},
+        {"HostBrowser.getCrmMon",
+         "crm_mon -1"},
+        {"HostBrowser.Heartbeat.getProcesses",
+         "ps aux|grep heartbeat|grep -v regevt"},
 
-        {"Logs.hbLog",     "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null || grep @GREPPATTERN@ /var/log/syslog)|tail -500"},
-        {"DrbdLog.log",    "grep @GREPPATTERN@ /var/log/kern.log | tail -500"},
+        {"Logs.hbLog",
+         "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null || grep @GREPPATTERN@ /var/log/syslog)|tail -500"},
+
+        {"DrbdLog.log",
+         "grep @GREPPATTERN@ /var/log/kern.log | tail -500"},
 
         {"DrbdInst.install.text.1", "packages from LINBIT"},
         {"DrbdInst.install.1",

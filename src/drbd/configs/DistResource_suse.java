@@ -50,7 +50,9 @@ public class DistResource_suse extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+\\.\\d+-[.0-9]+).*"},
         /* drbd donwload and installation */
         // { "DrbdCheck.version", "/bin/rpm -qa|grep drbd- | sed s/drbd-//" },
-        {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+        {"DrbdInst.install",
+         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@"
+         +" /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
         /* heartbeat donwload and installation */
         //{ "HbCheck.version", "/bin/rpm -qa|grep heartbeat | sed s/.*heartbeat-//" },
         {"HbPmInst.install.i386", "i586" },
@@ -78,7 +80,8 @@ public class DistResource_suse extends
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
          /* removing -pae etc. from uname -r */
-         + "/usr/bin/zypper -n in kernel-source=`uname -r|sed s/-[a-z].*//;` && "
+         + "/usr/bin/zypper -n in kernel-source=`uname -r"
+         + "|sed s/-[a-z].*//;` && "
          + "/usr/bin/zypper -n in flex gcc && "
          + "make && make install && "
          + "/sbin/chkconfig --add drbd && "
@@ -88,5 +91,28 @@ public class DistResource_suse extends
          "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
+
+        {"Openais.removeHeartbeatAddOpenais",
+         "/etc/init.d/heartbeat stop;/sbin/chkconfig --del heartbeat;"
+         + "/etc/init.d/openais start && "
+         + "/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.removeOpenaisAddHeartbeat",
+         "/etc/init.d/openais stop;/sbin/chkconfig --del openais;"
+         + "/etc/init.d/heartbeat start && "
+         + "/sbin/chkconfig --add heartbeat"},
+
+        {"Openais.addOpenaisToRc",
+         "/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.addHeartbeatToRc",
+         "/sbin/chkconfig --add heartbeat"},
+
+        {"Openais.startOpenaisRc",
+         "/etc/init.d/openais start;/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.startHeartbeatRc",
+         "/etc/init.d/heartbeat start;/sbin/chkconfig --add heartbeat"},
+
     };
 }

@@ -152,4 +152,25 @@ public class NetInterface extends Resource {
             return "";
         }
     }
+
+    /**
+     * Returns bindnetaddr.
+     */
+    public final String getBindnetaddr() {
+        final String[] ipParts = ip.split("\\.");
+        if (netMask == null) {
+            return null;
+        }
+        final String[] netMaskParts = netMask.split("\\.");
+        String[] networkIpParts = new String[4];
+        if (ipParts.length != 4 && netMaskParts.length != 4) {
+            return "";
+        }
+        for (int i = 0; i < 4; i++) {
+            networkIpParts[i] =
+                         Integer.toString(Integer.parseInt(ipParts[i])
+                                          & Integer.parseInt(netMaskParts[i]));
+        }
+        return Tools.join(".", networkIpParts);
+    }
 }

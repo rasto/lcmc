@@ -338,7 +338,7 @@ public class SSH {
                 if (sess == null) {
                     return new Object[]{"", 130};
                 }
-                sess.requestPTY("dumb", 90, 30, 0, 0, null);
+                //sess.requestPTY("dumb", 0, 0, 0, 0, null);
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "
@@ -434,23 +434,25 @@ public class SSH {
 
                     /* stderr */
                     final StringBuffer errOutput = new StringBuffer("");
-                    //while (stderr.available() > 0) {
-                    //    // this is unreachable.
-                    //    // stdout and stderr are mixed in the stdout
-                    //    // if pty is requested.
-                    //    int len = stderr.read(buff);
-                    //    if (len > 0) {
-                    //        for (int i = 0; i<len; i++) {
-                    //            char c = (char) (buff[i] & 0xFF);
-                    //            errOutput += c;
-                    //        }
-                    //        if (outputVisible)
-                    //            host.getTerminalPanel().addContentErr(buff,
-                    //                                                  len);
-                    //    }
-                    //}
+                    while (stderr.available() > 0) {
+                        // this is unreachable.
+                        // stdout and stderr are mixed in the stdout
+                        // if pty is requested.
+                        int len = stderr.read(buff);
+                        if (len > 0) {
+                            final String buffString =
+                                            new String(buff, 0, len, "UTF-8");
+                            output.append(buffString);
+
+                            if (outputVisible) {
+                                host.getTerminalPanel().addContentErr(
+                                                                   buffString);
+                            }
+                        }
+                    }
                     res.append(errOutput);
                 }
+
                 if (outputVisible) {
                     host.getTerminalPanel().nextCommand();
                 }

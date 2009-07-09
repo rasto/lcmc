@@ -39,6 +39,7 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Heartbeat;
+import drbd.utilities.CRM;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JPanel;
@@ -545,7 +546,7 @@ public class HostBrowser extends Browser {
             final MyButton crmMonButton = new MyButton("crm_mon");
             crmMonButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("Heartbeat.getCrmMon",
+                    host.execCommand("HostBrowser.getCrmMon",
                                      execCallback,
                                      null,  /* ConvertCmdCallback */
                                      true); /* outputVisible */
@@ -556,7 +557,7 @@ public class HostBrowser extends Browser {
             final MyButton hbProcsButton = new MyButton("Heartbeat Processes");
             hbProcsButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("Heartbeat.getProcesses",
+                    host.execCommand("HostBrowser.Heartbeat.getProcesses",
                                      execCallback,
                                      null,  /* ConvertCmdCallback */
                                      true); /* outputVisible */
@@ -884,7 +885,7 @@ public class HostBrowser extends Browser {
 
             /* heartbeat standby on */
             final MyMenuItem standByOnItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Heartbeat.StandByOn"),
+                new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
                                null,
                                null) {
                     private static final long serialVersionUID = 1L;
@@ -894,7 +895,7 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        Heartbeat.standByOn(host);
+                        CRM.standByOn(host);
                     }
                 };
             items.add(standByOnItem);
@@ -902,7 +903,7 @@ public class HostBrowser extends Browser {
 
             /* heartbeat standby off */
             final MyMenuItem standByOffItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Heartbeat.StandByOff"),
+                new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOff"),
                                null,
                                null) {
                     private static final long serialVersionUID = 1L;
@@ -912,7 +913,7 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        Heartbeat.standByOff(host);
+                        CRM.standByOff(host);
                     }
                 };
             registerMenuItem(standByOffItem);
@@ -1490,7 +1491,10 @@ public class HostBrowser extends Browser {
                 final BlockDevInfo bdi = (BlockDevInfo) ((DefaultMutableTreeNode) e.nextElement()).getUserObject();
                 final BlockDevice bd = bdi.getBlockDevice();
                 if (bd.toString().equals(savedMetaDisk)
-                    || (!bd.isDrbdMetaDisk() && !bd.isDrbd() && !bd.isUsedByHeartbeat() && !bd.isMounted())) {
+                    || (!bd.isDrbdMetaDisk()
+                        && !bd.isDrbd()
+                        && !bd.isUsedByCRM()
+                        && !bd.isMounted())) {
                     list.add(bdi);
                 }
             }

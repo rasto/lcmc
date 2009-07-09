@@ -66,6 +66,8 @@ if ($option eq "all") {
 	get_installation_info();
 	print "version-info\n";
 	get_version_info();
+} elsif ($option eq "installation-info") {
+	get_installation_info();
 } elsif ($option eq "get-net-info") {
 	get_net_info();
 } elsif ($option eq "get-disk-info") {
@@ -904,6 +906,23 @@ sub get_drbd_xml {
 	}
 }
 
+#
+# Returns a portable command that determines if the init script is in rc?.d
+# directories.
+sub is_script_rc {
+	my $script =  shift;
+	return "(/usr/sbin/update-rc.d -n $script defaults 1"
+              ." || /sbin/chkconfig $script|grep -v 'off\$') 2>/dev/null"
+	      ."|sed s/.*/on/";
+}
+
+#
+# Returns a portable command that determines if the init script is running.
+sub is_running {
+	my $script =  shift;
+	return "/etc/init.d/$script status>/dev/null";
+}
+
 sub get_cluster_versions {
 	my $libpath = get_hb_lib_path();
 	my $hb_version = `$libpath/heartbeat -V 2>/dev/null` || "";
@@ -947,8 +966,31 @@ sub get_cluster_versions {
 			$ais_version = "ok";
 		}
 	}
+	my $hb_isrc_cmd = is_script_rc("heartbeat");
+	my $ais_isrc_cmd = is_script_rc("openais");
+	my $hb_isrc = `$hb_isrc_cmd` || "off";
+	my $ais_isrc = `$ais_isrc_cmd` || "off";
+	chomp $hb_isrc;
+	chomp $ais_isrc;
+
+	my $hb_running_cmd = is_running("heartbeat");
+	my $ais_running_cmd = is_running("openais");
+	my $hb_running = system($hb_running_cmd) >> 8 || "on";
+	my $ais_running = system($ais_running_cmd) >> 8 ||  "on";
+	my $drbd_loaded = system("lsmod |grep '\\<drbd\\>'") >> 8 || "on";
+	my $hb_conf = system("ls /etc/ha.d/ha.cf") >> 8 || "on";
+	my $ais_conf = system("ls /etc/ais/openais.conf") >> 8 || "on";
+	chomp $hb_running;
+	chomp $ais_running;
 	return "hb:$hb_version\n"
 	       ."pm:$pm_version\n"
 	       ."cs:$cs_version\n"
-	       ."ais:$ais_version\n";
+	       ."ais:$ais_version\n"
+	       ."hb-rc:$hb_isrc\n"
+	       ."ais-rc:$ais_isrc\n"
+	       ."hb-running:$hb_running\n"
+	       ."ais-running:$ais_running\n"
+	       ."hb-conf:$hb_conf\n"
+	       ."ais-conf:$ais_conf\n"
+	       ."drbd-loaded:$drbd_loaded\n"
 }

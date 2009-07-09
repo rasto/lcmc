@@ -206,6 +206,8 @@ public class AppDefaults extends
         {"Dialog.ClusterHosts.HostUncheckedIcon", "Icons/Unchecked.gif"},
         {"Dialog.ClusterHbConfig.DopdCheckedIcon",  "Icons/Checked.gif"},
         {"Dialog.ClusterHbConfig.DopdUncheckedIcon", "Icons/Unchecked.gif"},
+        {"Dialog.ClusterAisConfig.DefaultMCastAddress", "226.94.1.1"},
+        {"Dialog.ClusterAisConfig.DefaultMCastPort",    "5405"},
         {"Browser.ResourceIcon", "Icons/16X16/crab.png"},
         {"Browser.CategoryIcon", "Icons/tango/16x16/folder_16x16.png"},
         {"Browser.ApplyIcon",    "Icons/tango/16x16/ok_16x16.png"},

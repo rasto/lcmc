@@ -42,9 +42,9 @@ public class BlockDevice extends Resource {
     private String fsType;
     /** Whether this device is drbd device. */
     private boolean drbd = false;
-    /** Whether this block device is used by heartbeat in Filesystem service.
+    /** Whether this block device is used by crm in Filesystem service.
      */
-    private boolean isUsedByHeartbeat;
+    private boolean isUsedByCRM;
     /** Whether this device is used as a drbd meta-disk. */
     private boolean isDrbdMetaDisk;
     /** Drbd net interface of this block device. */
@@ -173,10 +173,10 @@ public class BlockDevice extends Resource {
     }
 
     /**
-     * Returns true if this device is used by heartbeat.
+     * Returns true if this device is used by CRM.
      */
-    public final boolean isUsedByHeartbeat() {
-        return isUsedByHeartbeat;
+    public final boolean isUsedByCRM() {
+        return isUsedByCRM;
     }
 
     /**
@@ -196,10 +196,10 @@ public class BlockDevice extends Resource {
     /**
      * Returns whether this block device is available for
      * drbd. That is if this device is not mounted and is
-     * not used by heartbeat.
+     * not used by CRM.
      */
     public final boolean isAvailable() {
-        return !isMounted() && !isUsedByHeartbeat && !isDrbdMetaDisk;
+        return !isMounted() && !isUsedByCRM && !isDrbdMetaDisk;
     }
 
 
@@ -224,10 +224,10 @@ public class BlockDevice extends Resource {
     }
 
     /**
-     * Sets this device used by heartbeat flag.
+     * Sets this device used by CRM flag.
      */
-    public final void setUsedByHeartbeat(final boolean isUsedByHeartbeat) {
-        this.isUsedByHeartbeat = isUsedByHeartbeat;
+    public final void setUsedByCRM(final boolean isUsedByCRM) {
+        this.isUsedByCRM = isUsedByCRM;
     }
 
     /**

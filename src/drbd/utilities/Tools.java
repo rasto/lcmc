@@ -1388,6 +1388,9 @@ public final class Tools {
      */
     public static int compareVersions(final String version1,
                                       final String version2) {
+        if (version1 == null || version2 == null) {
+            return -100;
+        }
         final String[] v1a = version1.split("\\.");
         final String[] v2a = version2.split("\\.");
         if (v1a.length != 3 || v2a.length != 3) {

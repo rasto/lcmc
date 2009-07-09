@@ -473,17 +473,16 @@ public class TerminalPanel extends JScrollPane {
         });
     }
 
-    ///**
-    // * Adds content to the terminal textarea and scrolls up.
-    // */
-    //public final void addContentErr(final byte[] data, final int len) {
-    //    final StringBuffer text = new StringBuffer("");
-    //    for (int i = 0; i < len; i++) {
-    //        final char c = (char) (data[i] & 0xFF);
-    //        text.append(c);
-    //    }
-    //    append(text.toString(), errorColor);
-    //}
+    /**
+     * Adds content to the terminal textarea and scrolls up.
+     */
+    public final void addContentErr(final String c) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                append(c, errorColor);
+            }
+        });
+    }
 
     /**
      * This class overwrites the DefaultStyledDocument in order to add godmode
