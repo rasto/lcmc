@@ -94,7 +94,7 @@ public final class CRM {
             attrsString.append(value);
             attrsString.append("\" ");
         }
-        
+
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
         if (groupId != null) {
@@ -104,7 +104,7 @@ public final class CRM {
         }
         xml.append("<primitive ");
         xml.append(attrsString);
-        xml.append(">");
+        xml.append('>');
         /* instance_attributes */
         if (!pacemakerResArgs.isEmpty()) {
             xml.append("<instance_attributes id=\"");
@@ -158,15 +158,15 @@ public final class CRM {
                 xml.append("<operations>");
             }
             for (final String op : pacemakerOps.keySet()) {
-                Map<String, String> opHash = pacemakerOps.get(op);
+                final Map<String, String> opHash = pacemakerOps.get(op);
                 xml.append("<op");
                 for (final String name : opHash.keySet()) {
                     final String value = opHash.get(name);
-                    xml.append(" ");
+                    xml.append(' ');
                     xml.append(name);
                     xml.append("=\"");
                     xml.append(value);
-                    xml.append("\"");
+                    xml.append('"');
                 }
                 xml.append("/>");
             }
@@ -228,7 +228,7 @@ public final class CRM {
             locationId = "loc_" + heartbeatId + "_" + onHost;
             command = "-C";
         }
- 
+
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_location id=\"");
         xml.append(locationId);
@@ -267,7 +267,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString()); 
+                                             xml.toString());
         execCommand(host, command, true);
     }
 
@@ -291,8 +291,7 @@ public final class CRM {
         if (heartbeatId != null) {
             xml.append("<primitive id=\"");
             xml.append(heartbeatId);
-            xml.append("\">");
-            xml.append("</primitive>");
+            xml.append("\"></primitive>");
         }
         if (groupId != null) {
             xml.append("</group>");
@@ -301,7 +300,7 @@ public final class CRM {
         final String command = getCibCommand(
                                       "-D",
                                       "resources",
-                                      xml.toString()); 
+                                      xml.toString());
         execCommand(host, command, true);
     }
 
@@ -335,14 +334,17 @@ public final class CRM {
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
-        final String command = host.getDistCommand(cmd, replaceHash); 
+        final String command = host.getDistCommand(cmd, replaceHash);
         execCommand(host, command, true);
     }
 
+    /**
+     * Returns meta attributes xml.
+     */
     private static String getMetaAttributes(final Host host,
                                            final String heartbeatId,
                                            final Map<String, String> attrs) {
-        StringBuffer xml = new StringBuffer(360);
+        final StringBuffer xml = new StringBuffer(360);
         xml.append("<meta_attributes id=\"");
         xml.append(heartbeatId);
         xml.append("_meta_attrs\">");
@@ -445,16 +447,17 @@ public final class CRM {
      * Sets global heartbeat parameters.
      */
     public static void setGlobalParameters(final Host host,
-                                           final Map<String,String> args) {
+                                           final Map<String, String> args) {
         final StringBuffer xml = new StringBuffer(360);
-        xml.append("'<crm_config><cluster_property_set id=\"cib-bootstrap-options\">");
+        xml.append("'<crm_config>");
+        xml.append("<cluster_property_set id=\"cib-bootstrap-options\">");
         final String hbVersion = host.getHeartbeatVersion();
         if (Tools.compareVersions(hbVersion, "2.99.0") < 0) {
             /* 2.1.4 */
             xml.append("<attributes>");
         }
         for (String arg : args.keySet()) {
-            String id = "cib-bootstrap-options-" + arg;
+            final String id = "cib-bootstrap-options-" + arg;
             xml.append("<nvpair id=\"");
             xml.append(id);
             xml.append("\" name=\"");
@@ -470,7 +473,7 @@ public final class CRM {
         xml.append("</cluster_property_set></crm_config>'");
         final String command = getCibCommand("-U",
                                              "crm_config",
-                                             xml.toString()); 
+                                             xml.toString());
         execCommand(host, command, true);
     }
 
@@ -504,7 +507,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString()); 
+                                             xml.toString());
         execCommand(host, command, true);
     }
 
@@ -541,9 +544,9 @@ public final class CRM {
         xml.append("\" " + withRscString + "=\"");
         xml.append(parentHbId);
         xml.append("\"/>'");
-        final String command = getCibCommand("-C", 
+        final String command = getCibCommand("-C",
                                              "constraints",
-                                             xml.toString()); 
+                                             xml.toString());
         execCommand(host, command, true);
     }
 
@@ -582,7 +585,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString()); 
+                                             xml.toString());
         execCommand(host, command, true);
     }
 
@@ -627,7 +630,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-C",
                                              "constraints",
-                                             xml.toString()); 
+                                             xml.toString());
         execCommand(host, command, true);
     }
 

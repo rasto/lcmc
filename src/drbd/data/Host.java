@@ -1770,72 +1770,79 @@ public class Host implements Serializable {
      */
     public void parseInstallationInfo(final String line) {
         final String[] tokens = line.split(":|\\s+");
-        if (tokens.length == 2) {
-            if ("pm".equals(tokens[0])) {
-                final String version = tokens[1].trim();
-                if (!"".equals(version)) {
-                    pacemakerVersion = version;
-                }
-            } else if ("cs".equals(tokens[0])) {
-                final String version = tokens[1].trim();
-                if (!"".equals(version)) {
-                    if (corosyncVersion == null
-                        || "ok".equals(corosyncVersion)) {
-                        corosyncVersion = version;
-                    }
-                }
-            } else if ("ais".equals(tokens[0])) {
-                final String version = tokens[1].trim();
-                if (!"".equals(version)) {
-                    if (openaisVersion == null
-                        || "ok".equals(openaisVersion)) {
-                        openaisVersion = version;
-                    }
-                }
-            } else if ("ais-rc".equals(tokens[0])) {
-                final String aisRc = tokens[1].trim();
-                if (!"".equals(aisRc)) {
-                    openaisIsRc = aisRc;
-                }
-            } else if ("ais-conf".equals(tokens[0])) {
-                final String aisConf = tokens[1].trim();
-                if (!"".equals(aisConf)) {
-                    openaisConf = aisConf;
-                }
-            } else if ("ais-running".equals(tokens[0])) {
-                final String aisRunning = tokens[1].trim();
-                if (!"".equals(aisRunning)) {
-                    openaisRunning = aisRunning;
-                }
-            } else if ("hb".equals(tokens[0])) {
-                final String version = tokens[1].trim();
-                if (!"".equals(version)) {
-                    heartbeatVersion = version;
-                }
-            } else if ("hb-rc".equals(tokens[0])) {
-                final String hbRc = tokens[1].trim();
-                if (!"".equals(hbRc)) {
-                    heartbeatIsRc = hbRc;
-                }
-            } else if ("hb-conf".equals(tokens[0])) {
-                final String hbConf = tokens[1].trim();
-                if (!"".equals(hbConf)) {
-                    heartbeatConf = hbConf;
-                }
-            } else if ("hb-running".equals(tokens[0])) {
-                final String hbRunning = tokens[1].trim();
-                if (!"".equals(hbRunning)) {
-                    heartbeatRunning = hbRunning;
-                }
-            } else if ("drbd-loaded".equals(tokens[0])) {
-                final String dl = tokens[1].trim();
-                if (!"".equals(dl)) {
-                    drbdLoaded = dl;
-                }
-            } else if ("hn".equals(tokens[0])) { // hostname
-                hostname = tokens[1].trim();
-                setName(hostname);
+        if ("pm".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                pacemakerVersion = tokens[1].trim();
+            } else {
+                pacemakerVersion = null;
             }
+        } else if ("cs".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                corosyncVersion = tokens[1].trim();
+            } else {
+                corosyncVersion = null;
+            }
+        } else if ("ais".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                openaisVersion = tokens[1].trim();
+            } else {
+                openaisVersion = null;
+            }
+        } else if ("ais-rc".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                openaisIsRc = tokens[1].trim();
+            } else {
+                openaisIsRc = null;
+            }
+        } else if ("ais-conf".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                openaisConf = tokens[1].trim();
+            } else {
+                openaisConf = null;
+            }
+        } else if ("ais-running".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                openaisRunning = tokens[1].trim();
+            } else {
+                openaisRunning = null;
+            }
+        } else if ("hb".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                heartbeatVersion = tokens[1].trim();
+            } else {
+                heartbeatVersion = null;
+            }
+        } else if ("hb-rc".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                heartbeatIsRc = tokens[1].trim();
+            } else {
+                heartbeatIsRc = null;
+            }
+        } else if ("hb-conf".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                heartbeatConf = tokens[1].trim();
+            } else {
+                heartbeatConf = null;
+            }
+        } else if ("hb-running".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                heartbeatRunning = tokens[1].trim();
+            } else {
+                heartbeatRunning = null;
+            }
+        } else if ("drbd-loaded".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                drbdLoaded = tokens[1].trim();
+            } else {
+                drbdLoaded = null;
+            }
+        } else if ("hn".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                hostname = tokens[1].trim();
+            } else {
+                hostname = null;
+            }
+            setName(hostname);
         }
     }
 

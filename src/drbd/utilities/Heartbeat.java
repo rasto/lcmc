@@ -22,8 +22,6 @@
 package drbd.utilities;
 
 import drbd.data.Host;
-import java.util.Map;
-import java.util.HashMap;
 /**
  * This class provides heartbeat commands. There are commands that
  * operate on /etc/init.d/heartbeat script etc.
@@ -34,13 +32,13 @@ import java.util.HashMap;
  */
 public final class Heartbeat {
     /** Directory that contains ha config files. */
-    private static final String HA_CONF_DIR         = "/etc/ha.d/";
+    private static final String HA_CONF_DIR = "/etc/ha.d/";
     /** Main heartbeat config file. */
-    private static final String HA_CONF_NAME        = "ha.cf";
+    private static final String HA_CONF_NAME = "ha.cf";
     /** Permissions of the main heartbeat config file. */
-    private static final String HA_CONF_PERMS       = "0600";
+    private static final String HA_CONF_PERMS = "0600";
     /** Authkeys config file. */
-    private static final String AUTHKEYS_CONF_NAME  = "authkeys";
+    private static final String AUTHKEYS_CONF_NAME = "authkeys";
     /** Permissions of the authkeys config file. */
     private static final String AUTHKEYS_CONF_PERMS = "0600";
 

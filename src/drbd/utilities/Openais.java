@@ -22,8 +22,6 @@
 package drbd.utilities;
 
 import drbd.data.Host;
-import java.util.Map;
-import java.util.HashMap;
 /**
  * This class provides openais commands. There are commands that
  * operate on /etc/init.d/openais script and commands etc.
@@ -34,11 +32,11 @@ import java.util.HashMap;
  */
 public final class Openais {
     /** Directory that contains ais config files. */
-    private static final String AIS_CONF_DIR         = "/etc/ais/";
+    private static final String AIS_CONF_DIR = "/etc/ais/";
     /** Main openais.conf config file. */
-    private static final String AIS_CONF_NAME        = "openais.conf";
+    private static final String AIS_CONF_NAME = "openais.conf";
     /** Permissions of the openais.conf config file. */
-    private static final String AIS_CONF_PERMS       = "0600";
+    private static final String AIS_CONF_PERMS = "0600";
 
     /**
      * No instantiation.

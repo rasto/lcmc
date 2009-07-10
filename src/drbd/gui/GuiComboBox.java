@@ -61,6 +61,8 @@ import javax.swing.SpringLayout;
 import javax.swing.event.DocumentListener;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.regex.Pattern;
@@ -119,6 +121,9 @@ public class GuiComboBox extends JPanel {
     private static final int WIDGET_HEIGHT = 28;
     /** Widget enclosing component default height. */
     private static final int WIDGET_COMPONENT_HEIGHT = 30;
+    /** Name to component hash. */
+    private final Map<String, JComponent> componentsHash =
+                                             new HashMap<String, JComponent>();
     /**
      * Prepares a new <code>GuiComboBox</code> object with specified units.
      */
@@ -383,10 +388,11 @@ public class GuiComboBox extends JPanel {
                                      final Object[] items) {
         final ButtonGroup group = new ButtonGroup();
         final JPanel radioPanel = new JPanel(new GridLayout(1, 0));
-
+        componentsHash.clear();
         for (int i = 0; i < items.length; i++) {
             final String item = items[i].toString();
             final JRadioButton rb = new JRadioButton(item);
+            componentsHash.put(item, rb);
             rb.setActionCommand(item);
             group.add(rb);
             radioPanel.add(rb);
@@ -404,6 +410,16 @@ public class GuiComboBox extends JPanel {
         }
 
         return radioPanel;
+    }
+
+    /**
+     * Enables/Disables component in a group of components identified by
+     * specified string. This works only with RADIOGROUP in a moment.
+     */
+    public void setEnabled(final String s, final boolean enabled) {
+        if (componentsHash.containsKey(s)) {
+            componentsHash.get(s).setEnabled(enabled);
+        }
     }
 
     /**
@@ -639,6 +655,12 @@ public class GuiComboBox extends JPanel {
                 break;
 
             case RADIOGROUP:
+                if (item != null) {
+                    final JRadioButton rb =
+                                    (JRadioButton) componentsHash.get(item);
+                    rb.setSelected(true);
+                    radioGroupValue = (String) item;
+                }
                 break;
 
             case CHECKBOX:

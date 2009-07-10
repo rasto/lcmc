@@ -321,7 +321,20 @@ public class TextResource extends
         {"Dialog.ClusterConnect.Title",      "Cluster Connect"},
         {"Dialog.ClusterConnect.Description", "Trying to connect to all the hosts in the cluster."},
 
-        {"Dialog.ClusterAisConfig.Title",        "OpenAIS Config File"},
+        {"Dialog.ClusterChooseStack.Title",
+         "Cluster Communication Stack"},
+
+        {"Dialog.ClusterChooseStack.Description",
+         "Now you have to choose between OpenAIS and Heartbeat, if you have "
+         + "installed both. It is either one or another from now on, although "
+         + "theoretically you may be able seamlessly switch between them at "
+         + "any time. "
+         + "Heartbeat is more widely used and thus better "
+         + "tested at the moment, but probably will be completely displaced "
+         + "by OpenAIS in the future."},
+
+        {"Dialog.ClusterAisConfig.Title",
+         "OpenAIS Config File"},
 
         {"Dialog.ClusterAisConfig.Description",
          "In this step OpenAIS config (/etc/ais/openais.conf) is created and "
@@ -376,7 +389,7 @@ public class TextResource extends
          + "config if you have some special options. You can modify it by "
          + "hand on every host in the cluster. You have to press the "
          + "\"Create HB Config\" button to save the new configuration on all "
-         + "hosts. By the way it is ok to have ucast address to the node's "
+         + "hosts. By the way it is OK to have ucast address to the node's "
          + "own interface, it will be ignored, at the same time it allows to "
          + "have the same config file on all hosts."},
 

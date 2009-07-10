@@ -104,6 +104,12 @@ public class ClusterInit extends DialogCluster {
     private String button = null;
     /** Interval between checks. */
     private static final int CHECK_INTERVAL = 1000;
+    /** Switch to Heartbeat button text. */
+    private static final String HB_BUTTON_SWITCH =
+                        Tools.getString("Dialog.ClusterInit.HbButtonSwitch");
+    /** Switch to OpenAIS button text. */
+    private static final String AIS_BUTTON_SWITCH =
+                        Tools.getString("Dialog.ClusterInit.AisButtonSwitch");
 
     /**
      * Prepares a new <code>ClusterInit</code> object.
@@ -214,7 +220,6 @@ public class ClusterInit extends DialogCluster {
                                         new ExecCommandThread[hosts.length];
         int i = 0;
         for (final Host h : hosts) {
-            final int index = i;
             infoThreads[i] = h.execCommand("ClusterInit.getInstallationInfo",
                              (ProgressBar) null,
                              new ExecCallback() {
@@ -272,7 +277,7 @@ public class ClusterInit extends DialogCluster {
             boolean hbFailed = false;
             /* is drbd loaded */
             boolean drbdLoadedChanged = false;
-            boolean drbdLoaded = h.isDrbdLoaded();
+            final boolean drbdLoaded = h.isDrbdLoaded();
 
             if (lastDrbdLoadedExists) {
                 if (lastDrbdLoaded[i].booleanValue() != drbdLoaded) {
@@ -397,8 +402,7 @@ public class ClusterInit extends DialogCluster {
                                         Tools.getString(
                                                 "Dialog.ClusterInit.AisIsRc"));
                             } else if (heartbeatIsRunning || heartbeatIsRc) {
-                                aisStartButton.setText(Tools.getString(
-                                        "Dialog.ClusterInit.AisButtonSwitch"));
+                                aisStartButton.setText(AIS_BUTTON_SWITCH);
                                 aisStartButton.setVisible(true);
                             } else {
                                 aisStartButton.setText(
@@ -415,8 +419,7 @@ public class ClusterInit extends DialogCluster {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (heartbeatIsRunning || heartbeatIsRc) {
-                                aisStartButton.setText(Tools.getString(
-                                        "Dialog.ClusterInit.AisButtonSwitch"));
+                                aisStartButton.setText(AIS_BUTTON_SWITCH);
                             } else {
                                 aisStartButton.setText(Tools.getString(
                                          "Dialog.ClusterInit.StartAisButton"));
@@ -440,7 +443,7 @@ public class ClusterInit extends DialogCluster {
                     });
                 }
             }
-        
+
             /* Heartbeat */
             final JLabel hbStartedInfo = hbStartedInfos.get(i);
             final MyButton hbStartButton = hbStartButtons.get(i);
@@ -456,8 +459,7 @@ public class ClusterInit extends DialogCluster {
                                 hbStartedInfo.setText(Tools.getString(
                                                 "Dialog.ClusterInit.HbIsRc"));
                             } else if (openaisRunning || openaisIsRc) {
-                                hbStartButton.setText(Tools.getString(
-                                          "Dialog.ClusterInit.HbButtonSwitch"));
+                                hbStartButton.setText(HB_BUTTON_SWITCH);
                                 hbStartButton.setVisible(true);
                             } else {
                                 hbStartButton.setText(Tools.getString(
@@ -473,8 +475,7 @@ public class ClusterInit extends DialogCluster {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (openaisRunning || openaisIsRc) {
-                                hbStartButton.setText(Tools.getString(
-                                         "Dialog.ClusterInit.HbButtonSwitch"));
+                                hbStartButton.setText(HB_BUTTON_SWITCH);
                             } else {
                                 hbStartButton.setText(Tools.getString(
                                          "Dialog.ClusterInit.StartHbButton"));
@@ -626,9 +627,8 @@ public class ClusterInit extends DialogCluster {
                                       "Dialog.ClusterInit.AisButtonRc").equals(
                                         e.getActionCommand())) {
                                         Openais.addOpenaisToRc(host);
-                                    } else if (Tools.getString(
-                                    "Dialog.ClusterInit.AisButtonSwitch").equals(
-                                        e.getActionCommand())) {
+                                    } else if (AIS_BUTTON_SWITCH.equals(
+                                                    e.getActionCommand())) {
                                         Openais.switchToOpenais(host);
                                     } else {
                                         if (host.isOpenaisRc()) {
@@ -651,10 +651,8 @@ public class ClusterInit extends DialogCluster {
             /* Heartbeat */
             hbStartedInfos.add(new JLabel(
                         Tools.getString("Dialog.ClusterInit.CheckingHb")));
-            System.out.println(host.getName() + ": is openais running: " + host.isOpenaisRunning());
             if (host.isOpenaisRunning() || host.isOpenaisRc()) {
-                hbStartButtons.add(new MyButton(
-                        Tools.getString("Dialog.ClusterInit.HbButtonSwitch")));
+                hbStartButtons.add(new MyButton(HB_BUTTON_SWITCH));
             } else {
                 hbStartButtons.add(new MyButton(
                          Tools.getString("Dialog.ClusterInit.StartHbButton")));
@@ -678,9 +676,8 @@ public class ClusterInit extends DialogCluster {
                                       "Dialog.ClusterInit.HbButtonRc").equals(
                                         e.getActionCommand())) {
                                         Heartbeat.addHeartbeatToRc(host);
-                                    } else if (Tools.getString(
-                                    "Dialog.ClusterInit.HbButtonSwitch").equals(
-                                        e.getActionCommand())) {
+                                    } else if (HB_BUTTON_SWITCH.equals(
+                                                       e.getActionCommand())) {
                                         System.out.println("switching");
                                         Heartbeat.switchToHeartbeat(host);
                                         System.out.println("switching done");
