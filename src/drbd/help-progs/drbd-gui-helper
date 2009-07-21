@@ -21,6 +21,7 @@
 
 use strict;
 use warnings;
+$! = 1;
 
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use POSIX qw(:errno_h); # EAGAIN
@@ -581,6 +582,7 @@ sub get_cluster_events {
 		print "---start---\n";
 		print $info;
 		print "---done---\n";
+		my $last_info = $info;
 
 		my $rw_socket_name;
 		if (-S "/var/run/crm/cib_rw") {
@@ -645,10 +647,11 @@ sub get_cluster_events {
 			while (1) {
 				my $len = sysread($CB, $byte, 1);
 				if ($! == EAGAIN || $len != 1) {
-					sleep 2;
+					sleep 1;
 					if ($cibevent > 0) {
 						my $info = get_cluster_info();
-						if ($info) {
+						if ($info
+						    && $info ne $last_info) {
 							print "---start---\n";
 							print $info;
 							print "---done---\n";
@@ -665,9 +668,6 @@ sub get_cluster_events {
 					$count++;
 					if ($count == 3) {
 						$cibevent++;
-						if ($cibevent == 1) {
-							sleep 5;
-						}
 						$prev_byte = "";
 						$count = 0;
 					}
@@ -749,7 +749,7 @@ sub get_cluster_metadata {
 
 sub get_old_style_resources {
 	my $dir = "/etc/ha.d/resource.d/";
-	for (`ls $dir`) {
+	for (`ls $dir 2>/dev/null`) {
 		chomp;
 		print get_ocf_like_xml($_, $dir, "heartbeat");
 	}
@@ -866,11 +866,13 @@ sub get_drbd_xml {
 					$type = "numeric";
 				}
 				my ($part) = $desc =~ /valid options are:(.*)/si;
-				my @hs = $part =~ /&lt;b&gt;(.*?)&lt;\/b&gt;/g;
-				if (@hs > 0) {
-					$type = "handler";
-					for my $h (@hs) {
-						$handlers .= "<handler>$h</handler>";
+				if ($part) {
+					my @hs = $part =~ /&lt;b&gt;(.*?)&lt;\/b&gt;/g;
+					if (@hs > 0) {
+						$type = "handler";
+						for my $h (@hs) {
+							$handlers .= "<handler>$h</handler>";
+						}
 					}
 				}
 				if ($type eq "numeric") {
@@ -901,7 +903,7 @@ sub get_drbd_xml {
 
 	for ("net", "disk", "syncer") {
 		my $xml = `/sbin/drbdsetup xml $_`;
-		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.$descs{$2}.$3/egs;
+		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.($descs{$2} || "not documented").$3/egs;
 		print $xml;
 	}
 }
@@ -912,7 +914,7 @@ sub get_drbd_xml {
 sub is_script_rc {
 	my $script =  shift;
 	return "(/usr/sbin/update-rc.d -n $script defaults 1"
-              ." || /sbin/chkconfig $script|grep -v 'off\$') 2>/dev/null"
+              ." || /sbin/chkconfig --list $script 2>/dev/null) 2>/dev/null"
 	      ."|sed s/.*/on/";
 }
 
@@ -973,13 +975,13 @@ sub get_cluster_versions {
 	chomp $hb_isrc;
 	chomp $ais_isrc;
 
-	my $hb_running_cmd = is_running("heartbeat");
+	my $hb_running_cmd = "$libpath/heartbeat -s";
 	my $ais_running_cmd = is_running("openais");
 	my $hb_running = system($hb_running_cmd) >> 8 || "on";
 	my $ais_running = system($ais_running_cmd) >> 8 ||  "on";
 	my $drbd_loaded = system("lsmod |grep '\\<drbd\\>'") >> 8 || "on";
-	my $hb_conf = system("ls /etc/ha.d/ha.cf") >> 8 || "on";
-	my $ais_conf = system("ls /etc/ais/openais.conf") >> 8 || "on";
+	my $hb_conf = system("ls /etc/ha.d/ha.cf 2>/dev/null") >> 8 || "on";
+	my $ais_conf = system("ls /etc/ais/openais.conf 2>/dev/null") >> 8 || "on";
 	chomp $hb_running;
 	chomp $ais_running;
 	return "hb:$hb_version\n"
