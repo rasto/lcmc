@@ -56,7 +56,7 @@ public class DistResource_debian_LENNY extends
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
          + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
-         + " && /usr/sbin/update-rc.d openais-legacy start 75 2 3 4 5 . stop 05 0 1 6 . "},
+         + " && /usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
         /* openais/pacemaker madkiss */
         {"AisPmInst.install.text.2",

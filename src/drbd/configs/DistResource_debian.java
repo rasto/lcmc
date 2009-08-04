@@ -50,7 +50,6 @@ public class DistResource_debian extends
 
         {"DrbdInst.install", "echo | dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        //{"HbCheck.version", "/usr/bin/dpkg-query --showformat='${Status} ${Version}\n' -W heartbeat-2 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"},
         {"HbPmInst.install.text.1", "the debian way"},
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},

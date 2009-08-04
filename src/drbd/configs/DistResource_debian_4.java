@@ -54,6 +54,19 @@ public class DistResource_debian_4 extends
         },
 
         /* Heartbeat/Pacemaker Opensuse */
+        {"HbPmInst.install.text.1", "http://download.opensuse.org repository"},
+        {"HbPmInst.install.1",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"
+         + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
+
+        {"HbPmInst.install.text.2", "the debian way"},
+        {"HbPmInst.install.2",
+         "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+
+        /* Heartbeat/Pacemaker Opensuse */
         {"AisPmInst.install.text.1", "http://download.opensuse.org repository"},
         {"AisPmInst.install.1",
          "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
@@ -62,11 +75,6 @@ public class DistResource_debian_4 extends
          + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
          + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
          + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
-
-        /* Old Heartbeat */
-        {"HbPmInst.install.text.2", "etch repository"},
-        {"HbPmInst.install.2",
-         "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -91,5 +99,6 @@ public class DistResource_debian_4 extends
         /* disable drbd install method 3 */
         {"DrbdInst.install.text.3",
          ""},
+        {"Openais.reloadOpenais",  "/etc/init.d/openais force-reload"},
     };
 }

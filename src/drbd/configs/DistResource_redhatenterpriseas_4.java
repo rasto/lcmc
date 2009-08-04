@@ -86,7 +86,7 @@ public class DistResource_redhatenterpriseas_4 extends
          + " && up2date lm_sensors net-snmp-libs libtool-libs perl-TimeDate"
          + " && rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm"
          + " && /sbin/chkconfig --add openais"
-         + " && mv /etc/openais.conf /etc/openais.conf.orig;"
+         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig;"
          + "rm -rf /tmp/drbd-mc-hbinst/"},
 
         /* Heartbeat/Pacemaker Opensuse */
