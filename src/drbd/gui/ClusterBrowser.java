@@ -2997,7 +2997,6 @@ public class ClusterBrowser extends Browser {
                                                        null,
                                                        true);
 
-                System.out.println("ret: " + ret.trim());
                 if (ret == null || !"directory".equals(ret.trim())) {
                     String title =
                             Tools.getString("ClusterBrowser.CreateDir.Title");

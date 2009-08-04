@@ -633,9 +633,7 @@ public class ClusterInit extends DialogCluster {
                                         Heartbeat.addHeartbeatToRc(host);
                                     } else if (HB_BUTTON_SWITCH.equals(
                                                        e.getActionCommand())) {
-                                        System.out.println("switching");
                                         Heartbeat.switchToHeartbeat(host);
-                                        System.out.println("switching done");
                                     } else {
                                         if (host.isHeartbeatRc()) {
                                             Heartbeat.startHeartbeat(host);

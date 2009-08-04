@@ -549,7 +549,6 @@ public class ClusterHbConfig extends DialogCluster {
                 }
                 configPanel.revalidate();
                 configPanel.repaint();
-                System.out.println("config changed: " + configChanged);
                 if (configChanged) {
                     makeConfigButton.setEnabled(!castAddresses.isEmpty());
                 }

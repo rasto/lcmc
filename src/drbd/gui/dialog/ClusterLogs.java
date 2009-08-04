@@ -214,7 +214,6 @@ public class ClusterLogs extends ConfigDialog {
         int a = 0;
         String prevHost = "";
         for (String line : output) {
-            System.out.println("line: " + line);
             final String tok[] = line.split("\\s+");
             if (tok.length > 3) {
                 final String host = tok[3];

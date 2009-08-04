@@ -612,7 +612,6 @@ public class ClusterAisConfig extends DialogCluster {
         String port        = "";
 
         if (MCAST_TYPE.equals(type)) {
-            System.out.println("interface: " + ifaceCB.getValue());
             final NetInterface iface = (NetInterface) ifaceCB.getValue();
             bindnetaddr = iface.getBindnetaddr();
             address = addrCB.getStringValue();
