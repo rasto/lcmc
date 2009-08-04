@@ -117,6 +117,12 @@ public class HeartbeatXML extends XML {
             command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
                                           (ConvertCmdCallback) null);
         }
+
+        if (command == null && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
+                                          (ConvertCmdCallback) null);
+        }
+
         if (command == null) {
             command = host.getDistCommand("Heartbeat.getOCFParameters",
                                           (ConvertCmdCallback) null);
