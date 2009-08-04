@@ -158,9 +158,18 @@ public class DistResource extends
         /* gets all ocf resources and theirs meta-data */
         /* TODO: buggy xml in heartbeat 2.0.8 in ftp and mysql */
         /* TODO: implement version overwrite */
-        {"Heartbeat.2.0.8.getOCFParameters", "export OCF_ROOT=/usr/lib/ocf; for s in `ls -1 /usr/lib/ocf/resource.d/heartbeat/ | grep -v Pure-FTPd|grep -v mysql`; do /usr/lib/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done"},
+        {"Heartbeat.2.0.8.getOCFParameters",
+         "export OCF_ROOT=/usr/lib/ocf; for s in `ls -1 /usr/lib/ocf/resource.d/heartbeat/ | grep -v Pure-FTPd|grep -v mysql`; do /usr/lib/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done"},
+
+        {"Heartbeat.getOCFParameters",
+         "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/lib/ocf;"
+         + "for prov in `ls -1 /usr/lib/ocf/resource.d/`; do "
+         +  "for s in `ls -1 /usr/lib/ocf/resource.d/$prov/ `; do "
+         +  "/usr/lib/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
+         + "done;"
+         + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
+         + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
         /* vmxpath env is needed so that vmware meta-data does not hang */
-        {"Heartbeat.getOCFParameters", "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/lib/ocf; for s in `ls -1 /usr/lib/ocf/resource.d/heartbeat/ `; do /usr/lib/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done; /usr/local/bin/drbd-gui-helper get-old-style-resources; /usr/local/bin/drbd-gui-helper get-lsb-resources"},
         {"Heartbeat.getClusterMetadata", "/usr/local/bin/drbd-gui-helper get-cluster-metadata"},
         {"Heartbeat.getHbStatus",    "/usr/local/bin/drbd-gui-helper get-cluster-events"},
         {"Heartbeat.startHeartbeat", "/etc/init.d/heartbeat start"},
@@ -207,7 +216,7 @@ public class DistResource extends
         {"DRBD.adjust.dryrun", "echo|/sbin/drbdadm -d adjust @RESOURCE@"},
         {"DRBD.down",          "echo|/sbin/drbdadm down @RESOURCE@"},
         {"DRBD.up",            "echo|/sbin/drbdadm up @RESOURCE@"},
-        {"DRBD.makeFilesystem", "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@"},
+        {"DRBD.makeFilesystem", "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@;sync"},
 
         {"DRBD.getProcDrbd",   "cat /proc/drbd"},
         {"DRBD.getProcesses",  "ps aux|grep drbd"},
@@ -220,7 +229,9 @@ public class DistResource extends
          "ps aux|grep heartbeat|grep -v regevt"},
 
         {"Logs.hbLog",
-         "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null || grep @GREPPATTERN@ /var/log/syslog)|tail -500"},
+         "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null"
+         + " || grep @GREPPATTERN@ /var/log/syslog"
+         + " || grep @GREPPATTERN@ /var/log/messages)|tail -500"},
 
         {"DrbdLog.log",
          "grep @GREPPATTERN@ /var/log/kern.log | tail -500"},
