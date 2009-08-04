@@ -68,6 +68,12 @@ public class ConfigData implements Serializable {
     private final String idDSAPath;
     /** Id rsa path. */
     private final String idRSAPath;
+    /** Last installed clusterStack */
+    private String lastInstalledClusterStack = null;
+    /** Last installed method either Openais or Heartbeat with pacemaker. */
+    private String lastHbAisPmInstalledMethod = null;
+    /** Last installed drbd method. */
+    private String lastDrbdInstalledMethod = null;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -271,4 +277,49 @@ public class ConfigData implements Serializable {
     public final KnownHosts getKnownHosts() {
         return knownHosts;
     }
+
+    /**
+     * Sets what was the last installed cluster stack.
+     */
+    public final void setLastInstalledClusterStack(
+                                        final String lastInstalledClusterStack) {
+        this.lastInstalledClusterStack = lastInstalledClusterStack;
+    }
+
+    /**
+     * Returns what was the last installed cluster stack.
+     */
+     public final String getLastInstalledClusterStack() {
+         return lastInstalledClusterStack;
+     }
+
+    /**
+     * Sets last installed method of either Openais or Heartbeat.
+     */
+    public final void setLastHbAisPmInstalledMethod(
+                                    final String lastHbAisPmInstalledMethod) {
+        this.lastHbAisPmInstalledMethod = lastHbAisPmInstalledMethod;
+    }
+
+    /**
+     * Returns last installed method of either Openais or Heartbeat.
+     */
+     public final String getLastHbAisPmInstalledMethod() {
+         return lastHbAisPmInstalledMethod;
+     }
+
+    /**
+     * Sets last drbd installed method.
+     */
+    public final void setLastDrbdInstalledMethod(
+                                    final String lastDrbdInstalledMethod) {
+        this.lastDrbdInstalledMethod = lastDrbdInstalledMethod;
+    }
+
+    /**
+     * Returns last drbd installed method.
+     */
+     public final String getLastDrbdInstalledMethod() {
+         return lastDrbdInstalledMethod;
+     }
 }
