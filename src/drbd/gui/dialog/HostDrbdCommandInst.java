@@ -92,7 +92,8 @@ public class HostDrbdCommandInst extends DialogHost {
         final String drbdVersion = getHost().getDrbdVersionToInstall();
         final String drbdVersionUrlString =
                                   getHost().getDrbdVersionUrlStringToInstall();
-
+        Tools.getConfigData().setLastDrbdInstalledMethod(
+            getHost().getDistString("DrbdInst.install.text." + installMethod));
         getHost().execCommand(installCommand,
                          getProgressBar(),
                          new ExecCallback() {

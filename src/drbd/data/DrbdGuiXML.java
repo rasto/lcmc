@@ -94,7 +94,7 @@ public class DrbdGuiXML extends XML {
                                 Tools.getConfigData().getDownloadUser();
             final String downloadPasswd =
                                 Tools.getConfigData().getDownloadPassword();
-            if (downloadUser != null && downloadPasswd != null) { 
+            if (downloadUser != null && downloadPasswd != null) {
                 root.setAttribute(DOWNLOAD_USER_ATTR, downloadUser);
                 root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
             }
@@ -180,29 +180,7 @@ public class DrbdGuiXML extends XML {
                     continue;
                 }
                 Tools.getGUIData().addClusterTab(cluster);
-                boolean first = true;
-                String dsaKey = null;
-                String rsaKey = null;
-                String pwd = null;
-                for (final Host host : cluster.getHosts()) {
-                    host.setIsLoading();
-                    if (!first) {
-                        host.getSSH().setPasswords(dsaKey, rsaKey, pwd);
-                    }
-                    host.connect();
-                    if (first) {
-                        /* wait till it's connected and try the others with the
-                         * same password/key. */
-                        host.getSSH().waitForConnection();
-                        if (host.isConnected()) {
-                            dsaKey = host.getSSH().getLastDSAKey();
-                            rsaKey = host.getSSH().getLastRSAKey();
-                            pwd = host.getSSH().getLastPassword();
-                        }
-                    }
-                    first = false;
-                }
-
+                cluster.connect(null);
                 final Runnable runnable = new Runnable() {
                     public void run() {
                         for (final Host host : cluster.getHosts()) {

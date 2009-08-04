@@ -175,9 +175,13 @@ public class ClusterChooseStack extends DialogCluster {
      */
     protected final JComponent getInputPane() {
         final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
-        final String defaultValue = "OpenAIS";
+        String defaultValue =
+                         Tools.getConfigData().getLastInstalledClusterStack();
+        if (defaultValue == null) {
+            defaultValue = "Heartbeat";
+        }
         chooseStackCombo = new GuiComboBox(defaultValue,
-                                           new String[]{"OpenAIS", "Heartbeat"},
+                                           new String[]{"Heartbeat", "OpenAIS"},
                                            null,
                                            GuiComboBox.Type.RADIOGROUP,
                                            null,
@@ -187,5 +191,12 @@ public class ClusterChooseStack extends DialogCluster {
         chooseStackCombo.setBackground(Color.WHITE); // TODO: does not work
         p1.add(chooseStackCombo);
         return p1;
+    }
+
+    /**
+     * Enable skip button.
+     */
+    protected final boolean skipButtonEnabled() {
+        return true;
     }
 }

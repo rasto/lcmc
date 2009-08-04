@@ -29,8 +29,6 @@ import drbd.utilities.Tools;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import drbd.gui.SpringUtilities;
-import drbd.utilities.ConnectionCallback;
-import drbd.gui.SSHGui;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
@@ -56,7 +54,6 @@ public class ClusterConnect extends DialogCluster {
      * Returns the next dialog which is ClusterDrbdConf.
      */
     public final WizardDialog nextDialog() {
-        // TODO: or ClusterHbConfig
         return new ClusterChooseStack(this, getCluster());
     }
 
@@ -112,38 +109,14 @@ public class ClusterConnect extends DialogCluster {
     }
 
     /**
-     * Connects the specified host.
-     */
-    private String connectHost(final Host host) {
-        final String res = null;
-        final SSHGui sshGui = new SSHGui(getDialogPanel(), host, null);
-        host.connect(sshGui, null, //getProgressBar(),
-                     new ConnectionCallback() {
-                         public void done(final int flag) {
-                             checkHosts();
-                         }
-
-                         public void doneError(final String errorText) {
-                             checkHosts();
-                         }
-                      });
-        return res;
-    }
-
-    /**
      * Connects all cluster hosts.
      */
     protected final void connectHosts() {
-        boolean allConnected = true;
+        getCluster().connect(getDialogPanel());
         for (final Host host : getCluster().getHosts()) {
-            if (!host.isConnected()) {
-                allConnected = false;
-                connectHost(host);
-            }
+            host.waitOnLoading();
         }
-        if (allConnected) {
-            checkHosts();
-        }
+        checkHosts();
     }
 
     /**
@@ -155,14 +128,12 @@ public class ClusterConnect extends DialogCluster {
         enableComponentsLater(c);
         // TODO: Tools.startProgressIndicator
 
-        //SwingUtilities.invokeLater(new Runnable() { public void run() {
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 connectHosts();
             }
         });
         t.start();
-        //} });
     }
 
     /**

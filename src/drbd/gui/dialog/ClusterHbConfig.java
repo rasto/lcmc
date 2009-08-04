@@ -40,6 +40,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -143,6 +145,8 @@ public class ClusterHbConfig extends DialogCluster {
     private static final String HA_CF_ERROR_STRING = "error: read error";
     /** Newline. */
     private static final String NEWLINE = "\\r?\\n";
+    /** Config scroll pane. */
+    private volatile JScrollPane configScrollPane = null;
 
     /**
      * Prepares a new <code>ClusterHbConfig</code> object.
@@ -281,7 +285,7 @@ public class ClusterHbConfig extends DialogCluster {
                 }
             }
         }
-        updateConfigPanelEditable(false);
+        //updateConfigPanelEditable(false);
     }
 
     /**
@@ -292,6 +296,7 @@ public class ClusterHbConfig extends DialogCluster {
     private boolean updateOldHbConfig() { /* is run in a thread */
         final Host[] hosts = getCluster().getHostsArray();
         boolean configOk = false;
+        boolean noConfigs = true;
         ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
         configStatus.setText(Tools.getString("Dialog.ClusterHbConfig.Loading"));
         int i = 0;
@@ -331,6 +336,7 @@ public class ClusterHbConfig extends DialogCluster {
             });
             retry();
         } else {
+            noConfigs = false;
             int j;
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
@@ -368,19 +374,33 @@ public class ClusterHbConfig extends DialogCluster {
                 });
                 setNewConfig(configs[0]);
                 updateConfigPanelEditable(false);
+                hideRetryButton();
                 configOk = true;
             }
         }
         if (!configOk) {
+            final boolean noConfigsF = noConfigs;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    configCheckbox.setText(EDIT_CONFIG_STRING);
-                    configCheckbox.setSelected(false);
-                    statusPanel.setMaximumSize(
-                                statusPanel.getPreferredSize());
+                    if (noConfigsF) {
+                        configCheckbox.setText(SEE_EXISTING_STRING);
+                        configCheckbox.setSelected(false);
+                        statusPanel.setMaximumSize(
+                                    statusPanel.getPreferredSize());
+                    } else {
+                        configCheckbox.setText(EDIT_CONFIG_STRING);
+                        configCheckbox.setSelected(false);
+                        statusPanel.setMaximumSize(
+                                    statusPanel.getPreferredSize());
+                    }
                 }
             });
-            updateConfigPanelExisting();
+            if (noConfigs) {
+                setNewConfig(configs[0]);
+                updateConfigPanelEditable(false);
+            } else {
+                updateConfigPanelExisting();
+            }
         }
         return configOk;
     }
@@ -449,13 +469,6 @@ public class ClusterHbConfig extends DialogCluster {
                 configPanel.add(new JLabel(""));
                 configPanel.add(new JLabel(" "));
                 rows++;
-                /* addresses */
-                for (final CastAddress c : castAddresses) {
-                    configPanel.add(new JLabel(c.getConfigString()));
-                    configPanel.add(getRemoveButton(c));
-                    rows++;
-                }
-
                 if (castAddresses.size() < 2) {
                     JLabel l;
                     if (castAddresses.size() < 1) {
@@ -468,6 +481,26 @@ public class ClusterHbConfig extends DialogCluster {
                     l.setForeground(Color.RED);
                     configPanel.add(l);
                     configPanel.add(new JLabel(""));
+                    rows++;
+                    final JLabel label = l;
+                    l.addFocusListener(new FocusListener() {
+                        public void focusGained(final FocusEvent e) {
+                            if (configScrollPane != null) {
+                                configScrollPane.getViewport().setViewPosition(
+                                                  label.getBounds().getLocation());
+                                label.removeFocusListener(this); /* only once */
+                            }
+                        }
+                        public void focusLost(final FocusEvent e) {
+                            /* nothing */
+                        }
+                    });
+                    l.requestFocus();
+                }
+                /* addresses */
+                for (final CastAddress c : castAddresses) {
+                    configPanel.add(new JLabel(c.getConfigString()));
+                    configPanel.add(getRemoveButton(c));
                     rows++;
                 }
                 configPanel.add(new JLabel(""));
@@ -516,6 +549,7 @@ public class ClusterHbConfig extends DialogCluster {
                 }
                 configPanel.revalidate();
                 configPanel.repaint();
+                System.out.println("config changed: " + configChanged);
                 if (configChanged) {
                     makeConfigButton.setEnabled(!castAddresses.isEmpty());
                 }
@@ -898,7 +932,7 @@ public class ClusterHbConfig extends DialogCluster {
                 }
             });
 
-        final JScrollPane sNew = new JScrollPane(
+        configScrollPane = new JScrollPane(
                                     configPanel,
                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
@@ -944,8 +978,8 @@ public class ClusterHbConfig extends DialogCluster {
         statusPanel.add(configCheckbox);
         statusPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         pane.add(statusPanel);
-        pane.add(sNew);
-        sNew.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pane.add(configScrollPane);
+        configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mcast.add(new JLabel("# "));
         mcast.add(typeCB);

@@ -40,6 +40,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * An implementation of a dialog where
@@ -541,6 +543,7 @@ public class HostCheckInstallation extends DialogHost {
         final List<InstallMethods> aisPmMethods =
                                             new ArrayList<InstallMethods>();
         int i = 1;
+        String aisPmDefaultValue = null;
         while (true) {
             final String index = Integer.toString(i);
             final String text =
@@ -551,13 +554,12 @@ public class HostCheckInstallation extends DialogHost {
             final InstallMethods aisPmInstallMethod = new InstallMethods(
               Tools.getString("Dialog.HostCheckInstallation.AisPmInstallMethod")
               + text, i);
+            if (text.equals(
+                     Tools.getConfigData().getLastHbAisPmInstalledMethod())) {
+                aisPmDefaultValue = aisPmInstallMethod.toString();
+            }
             aisPmMethods.add(aisPmInstallMethod);
             i++;
-        }
-        // TODO: make default value also what was already installed. */
-        String aisPmDefaultValue = null;
-        if (!aisPmMethods.isEmpty()) {
-            aisPmDefaultValue = aisPmMethods.get(0).toString();
         }
         aisPmInstMethodCB = new GuiComboBox(
                    aisPmDefaultValue,
@@ -593,6 +595,7 @@ public class HostCheckInstallation extends DialogHost {
         final List<InstallMethods> hbPmMethods =
                                             new ArrayList<InstallMethods>();
         i = 1;
+        String hbPmDefaultValue = null;
         while (true) {
             final String index = Integer.toString(i);
             final String text =
@@ -604,12 +607,11 @@ public class HostCheckInstallation extends DialogHost {
                 Tools.getString("Dialog.HostCheckInstallation.HbPmInstallMethod")
                 + text, i);
             hbPmMethods.add(hbPmInstallMethod);
+            if (text.equals(
+                       Tools.getConfigData().getLastHbAisPmInstalledMethod())) {
+                hbPmDefaultValue = hbPmInstallMethod.toString();
+            }
             i++;
-        }
-        // TODO: make default value also what was already installed. */
-        String hbPmDefaultValue = null;
-        if (!hbPmMethods.isEmpty()) {
-            hbPmDefaultValue = hbPmMethods.get(0).toString();
         }
         hbPmInstMethodCB = new GuiComboBox(
                    hbPmDefaultValue,
@@ -643,8 +645,9 @@ public class HostCheckInstallation extends DialogHost {
             }, null);
         /* get drbd installation methods */
         final List<InstallMethods> drbdMethods =
-                                            new ArrayList<InstallMethods>();
+                                               new ArrayList<InstallMethods>();
         i = 1;
+        String drbdDefaultValue = null;
         while (true) {
             final String index = Integer.toString(i);
             final String text =
@@ -660,13 +663,16 @@ public class HostCheckInstallation extends DialogHost {
             final InstallMethods drbdInstallMethod = new InstallMethods(
                Tools.getString("Dialog.HostCheckInstallation.DrbdInstallMethod")
                + text, i, method);
+            if (text.equals(
+                        Tools.getConfigData().getLastDrbdInstalledMethod())) {
+                drbdDefaultValue = drbdInstallMethod.toString();
+            }
             drbdMethods.add(drbdInstallMethod);
             i++;
         }
         if (i > 1) {
             drbdInstallMethodsAvailable = true;
-            // TODO: make default value also what was already installed. */
-            final String drbdDefaultValue = drbdMethods.get(0).toString();
+
             drbdInstMethodCB = new GuiComboBox(
                        drbdDefaultValue,
                        (Object[]) drbdMethods.toArray(
@@ -705,16 +711,16 @@ public class HostCheckInstallation extends DialogHost {
             drbdInstMethodCB.setEnabled(false);
         }
 
-        pane.add(new JLabel("AIS/Pacemaker"));
-        pane.add(aisPmLabel);
-        pane.add(aisPmIcon);
-        pane.add(aisPmInstMethodCB);
-        pane.add(aisPmButton);
         pane.add(hbPmJLabel);
         pane.add(hbPmLabel);
         pane.add(hbPmIcon);
         pane.add(hbPmInstMethodCB);
         pane.add(hbPmButton);
+        pane.add(new JLabel("AIS/Pacemaker"));
+        pane.add(aisPmLabel);
+        pane.add(aisPmIcon);
+        pane.add(aisPmInstMethodCB);
+        pane.add(aisPmButton);
         pane.add(new JLabel("Drbd"));
         pane.add(drbdLabel);
         pane.add(drbdIcon);

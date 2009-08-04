@@ -443,7 +443,7 @@ public abstract class WizardDialog extends ConfigDialog {
     public final void hideRetryButton() {
         final MyButton rb = (MyButton) buttonClass(retryButton());
 
-        if (rb != null && rb.isVisible() && rb.isEnabled()) {
+        if (rb != null && rb.isVisible()) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     rb.setVisible(false);

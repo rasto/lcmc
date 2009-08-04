@@ -22,6 +22,9 @@
 
 package drbd.data;
 
+import drbd.gui.ClusterTab;
+import drbd.gui.ClusterBrowser;
+import drbd.gui.SSHGui;
 import drbd.data.resources.BlockDevice;
 import drbd.data.resources.Network;
 import drbd.utilities.Tools;
@@ -32,9 +35,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import java.awt.Color;
-
-import drbd.gui.ClusterTab;
-import drbd.gui.ClusterBrowser;
+import java.awt.Window;
 
 /**
  * This class holds cluster data and implementation of cluster related
@@ -129,7 +130,7 @@ public class Cluster {
      * Returns names of the hosts in this cluster.
      */
     public final String[] getHostNames() {
-        List<String> hostNames = new ArrayList<String>();
+        final List<String> hostNames = new ArrayList<String>();
         for (Host host : hosts) {
             hostNames.add(host.getName());
         }
@@ -273,7 +274,7 @@ public class Cluster {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
         }
         for (final Host host : hosts) {
-            if (node.toLowerCase().equals(host.getName().toLowerCase())) {
+            if (node.equalsIgnoreCase(host.getName())) {
                 return host.getColor();
             }
         }
@@ -293,5 +294,41 @@ public class Cluster {
             }
         }
         return null;
+    }
+
+    /**
+     * Connect all hosts in the cluster.
+     */
+    public final void connect(final Window rootPane) {
+        boolean first = true;
+        String dsaKey = null;
+        String rsaKey = null;
+        String pwd = null;
+        for (final Host host : getHosts()) {
+            host.setIsLoading();
+            if (host.isConnected()) {
+                host.setLoadingDone();
+                continue;
+            }
+            if (!first) {
+                host.getSSH().setPasswords(dsaKey, rsaKey, pwd);
+            }
+            if (rootPane == null) {
+                host.connect(null);
+            } else {
+                host.connect(new SSHGui(rootPane, host, null));
+            }
+            if (first) {
+                /* wait till it's connected and try the others with the
+                 * same password/key. */
+                host.getSSH().waitForConnection();
+                if (host.isConnected()) {
+                    dsaKey = host.getSSH().getLastDSAKey();
+                    rsaKey = host.getSSH().getLastRSAKey();
+                    pwd = host.getSSH().getLastPassword();
+                }
+            }
+            first = false;
+        }
     }
 }

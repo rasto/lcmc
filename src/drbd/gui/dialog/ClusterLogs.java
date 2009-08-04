@@ -139,7 +139,7 @@ public class ClusterLogs extends ConfigDialog {
             i++;
         }
         i = 0;
-        final StringBuffer ans = new StringBuffer();
+        final StringBuffer ans = new StringBuffer("");
         for (Thread t : threads) {
             try {
                 t.join();
@@ -214,8 +214,10 @@ public class ClusterLogs extends ConfigDialog {
         int a = 0;
         String prevHost = "";
         for (String line : output) {
-            try {
-                final String host = line.split("\\s+")[3];
+            System.out.println("line: " + line);
+            final String tok[] = line.split("\\s+");
+            if (tok.length > 3) {
+                final String host = tok[3];
                 if (!host.equals(prevHost)) {
                     if (a == 0) {
                         a++;
@@ -225,15 +227,18 @@ public class ClusterLogs extends ConfigDialog {
                         color = color2;
                     }
                 }
-                doc.insertString(start, line + "\n", color);
                 prevHost = host;
+            }
+            try {
+                doc.insertString(start, line + "\n", color);
+            } catch (Exception e) {
+                Tools.appError("Could not insert string", e);
+                continue;
+            }
 
-                start = start + line.length() + 1;
+            start = start + line.length() + 1;
                 logTextArea.setCaretPosition(
                                     logTextArea.getDocument().getLength());
-            } catch (Exception e) {
-                Tools.appError("Could not set caret position", e);
-            }
         }
 
         //logTextArea.setText(Tools.join("\n", output));

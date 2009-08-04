@@ -195,7 +195,7 @@ public class ClusterInit extends DialogCluster {
             new Runnable() {
                 public void run() {
                     while (!checkClusterStopped) {
-                        checkCluster();
+                        checkCluster(true);
                         if (!checkClusterStopped) {
                             try {
                                 Thread.sleep(CHECK_INTERVAL);
@@ -213,7 +213,7 @@ public class ClusterInit extends DialogCluster {
     /**
      * Checks drbds and heartbeats on all nodes of the cluster.
      */
-    private void checkCluster() {
+    private void checkCluster(boolean periodic) {
         /* check if modules are loaded. */
         final Host[] hosts = getCluster().getHostsArray();
         final ExecCommandThread[] infoThreads =
@@ -435,7 +435,7 @@ public class ClusterInit extends DialogCluster {
                             } else {
                                 aisStartedInfo.setText(Tools.getString(
                                            "Dialog.ClusterInit.AisIsStopped"));
-                                aisStartButton.setEnabled(true);
+                                aisStartButton.setEnabled(!heartbeatIsRunning);
                             }
                             aisStartButton.setVisible(true);
                             aisStartedInfo.setForeground(Color.RED);
@@ -491,7 +491,7 @@ public class ClusterInit extends DialogCluster {
                             } else {
                                 hbStartedInfo.setText(Tools.getString(
                                             "Dialog.ClusterInit.HbIsStopped"));
-                                hbStartButton.setEnabled(true);
+                                hbStartButton.setEnabled(!openaisRunning);
                             }
                             hbStartButton.setVisible(true);
                             hbStartedInfo.setForeground(Color.RED);
@@ -505,7 +505,7 @@ public class ClusterInit extends DialogCluster {
             i++;
         }
 
-        if (oneChanged) {
+        if (oneChanged || !periodic) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     mainPanel.invalidate();
@@ -592,7 +592,7 @@ public class ClusterInit extends DialogCluster {
                                     if (host.isDrbdUpgraded()) {
                                         DRBD.adjust(host, "all");
                                     }
-                                    checkCluster();
+                                    checkCluster(false);
                                 }
                             }
                         );
@@ -602,51 +602,6 @@ public class ClusterInit extends DialogCluster {
 
             pane.add(drbdLoadedInfos.get(i));
             pane.add(drbdLoadButtons.get(i));
-
-            /* OpenAIS */
-            aisStartedInfos.add(new JLabel(
-                        Tools.getString("Dialog.ClusterInit.CheckingAis")));
-            aisStartButtons.add(new MyButton(
-                        Tools.getString("Dialog.ClusterInit.StartAisButton")));
-            aisStartButtons.get(i).setVisible(false);
-
-            aisStartButtons.get(i).addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
-                                public void run() {
-                                    disableComponents();
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        public void run() {
-                                            aisStartButtons.get(
-                                                      index).setVisible(false);
-                                        }
-                                    });
-                                    if (Tools.getString(
-                                      "Dialog.ClusterInit.AisButtonRc").equals(
-                                        e.getActionCommand())) {
-                                        Openais.addOpenaisToRc(host);
-                                    } else if (AIS_BUTTON_SWITCH.equals(
-                                                    e.getActionCommand())) {
-                                        Openais.switchToOpenais(host);
-                                    } else {
-                                        if (host.isOpenaisRc()) {
-                                            Openais.startOpenais(host);
-                                        } else {
-                                            Openais.startOpenaisRc(host);
-                                        }
-                                    }
-                                    checkCluster();
-                                }
-                            }
-                        );
-                        thread.start();
-                    }
-                });
-
-            pane.add(aisStartedInfos.get(i));
-            pane.add(aisStartButtons.get(i));
 
             /* Heartbeat */
             hbStartedInfos.add(new JLabel(
@@ -688,7 +643,7 @@ public class ClusterInit extends DialogCluster {
                                             Heartbeat.startHeartbeatRc(host);
                                         }
                                     }
-                                    checkCluster();
+                                    checkCluster(false);
                                 }
                             }
                         );
@@ -699,6 +654,51 @@ public class ClusterInit extends DialogCluster {
             pane.add(hbStartedInfos.get(i));
             pane.add(hbStartButtons.get(i));
 
+
+            /* OpenAIS */
+            aisStartedInfos.add(new JLabel(
+                        Tools.getString("Dialog.ClusterInit.CheckingAis")));
+            aisStartButtons.add(new MyButton(
+                        Tools.getString("Dialog.ClusterInit.StartAisButton")));
+            aisStartButtons.get(i).setVisible(false);
+
+            aisStartButtons.get(i).addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(
+                            new Runnable() {
+                                public void run() {
+                                    disableComponents();
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                            aisStartButtons.get(
+                                                      index).setVisible(false);
+                                        }
+                                    });
+                                    if (Tools.getString(
+                                      "Dialog.ClusterInit.AisButtonRc").equals(
+                                        e.getActionCommand())) {
+                                        Openais.addOpenaisToRc(host);
+                                    } else if (AIS_BUTTON_SWITCH.equals(
+                                                    e.getActionCommand())) {
+                                        Openais.switchToOpenais(host);
+                                    } else {
+                                        if (host.isOpenaisRc()) {
+                                            Openais.startOpenais(host);
+                                        } else {
+                                            Openais.startOpenaisRc(host);
+                                        }
+                                    }
+                                    checkCluster(false);
+                                }
+                            }
+                        );
+                        thread.start();
+                    }
+                });
+
+            pane.add(aisStartedInfos.get(i));
+            pane.add(aisStartButtons.get(i));
             i++;
             SpringUtilities.makeCompactGrid(pane, 3, 2,  //rows, cols
                                                   1, 1,  //initX, initY

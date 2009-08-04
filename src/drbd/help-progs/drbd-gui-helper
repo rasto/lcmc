@@ -914,7 +914,8 @@ sub get_drbd_xml {
 sub is_script_rc {
 	my $script =  shift;
 	return "(/usr/sbin/update-rc.d -n $script defaults 1"
-              ." || /sbin/chkconfig --list $script 2>/dev/null) 2>/dev/null"
+              ." || /sbin/chkconfig --list $script 2>/dev/null"
+	      ."|grep ':on') 2>/dev/null"
 	      ."|sed s/.*/on/";
 }
 
@@ -977,8 +978,8 @@ sub get_cluster_versions {
 
 	my $hb_running_cmd = "$libpath/heartbeat -s";
 	my $ais_running_cmd = is_running("openais");
-	my $hb_running = system($hb_running_cmd) >> 8 || "on";
-	my $ais_running = system($ais_running_cmd) >> 8 ||  "on";
+	my $hb_running = system("$hb_running_cmd 2>/dev/null") >> 8 || "on";
+	my $ais_running = system("$ais_running_cmd 2>/dev/null") >> 8 ||  "on";
 	my $drbd_loaded = system("lsmod |grep '\\<drbd\\>'") >> 8 || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf 2>/dev/null") >> 8 || "on";
 	my $ais_conf = system("ls /etc/ais/openais.conf 2>/dev/null") >> 8 || "on";

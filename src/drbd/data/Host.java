@@ -115,14 +115,14 @@ public class Host implements Serializable {
     private final String installedDrbdVersion = null;
     /** Map of network interfaces of this host. */
     private Map<String, NetInterface> netInterfaces =
-                                            new LinkedHashMap<String, NetInterface>();
+                                     new LinkedHashMap<String, NetInterface>();
     /** Available file systems. */
     private final List<String> fileSystems = new ArrayList<String>();
     /** Mount points that exist in /mnt dir. */
     private final List<String> mountPoints = new ArrayList<String>();
     /** List of block devices of this host. */
     private Map<String, BlockDevice> blockDevices =
-                                             new LinkedHashMap<String, BlockDevice>();
+                                      new LinkedHashMap<String, BlockDevice>();
     /** Color of this host in graphs. */
     private Color color;
     /** Thread where drbd status command is running. */
@@ -184,13 +184,17 @@ public class Host implements Serializable {
     /** A gate that is used to synchronize the loading sequence. */
     private CountDownLatch isLoadingGate;
     /** List of gui elements that are to be enabled if the host is connected.*/
-    private List<JComponent> enableOnConnectList = new ArrayList<JComponent>();
+    private final List<JComponent> enableOnConnectList =
+                                                   new ArrayList<JComponent>();
     /** Openais/pacemaker installation method index. */
     private String aisPmInstallMethod;
     /** Heartbeat/pacemaker installation method index. */
     private String hbPmInstallMethod;
     /** Drbd installation method index. */
     private String drbdInstallMethod;
+    /** Default timeout for SSH commands. */
+    private static final int SSH_COMMAND_TIMEOUT =
+                                    Tools.getDefaultInt("SSH.Command.Timeout");
 
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
@@ -366,7 +370,8 @@ public class Host implements Serializable {
      * Returns net interfaces.
      */
     public final NetInterface[] getNetInterfaces() {
-        return netInterfaces.values().toArray(new NetInterface[netInterfaces.size()]);
+        return netInterfaces.values().toArray(
+                                    new NetInterface[netInterfaces.size()]);
     }
 
     /**
@@ -602,7 +607,7 @@ public class Host implements Serializable {
 
     /**
      * Sets the drbd version in the form that is in the source tarball on
-     * linbit website, like so: "8.3/drbd-8.3.1.tar.gz"
+     * linbit website, like so: "8.3/drbd-8.3.1.tar.gz".
      */
     public final void setDrbdVersionUrlStringToInstall(
                                   final String drbdVersionUrlStringToInstall) {
@@ -620,7 +625,7 @@ public class Host implements Serializable {
 
     /**
      * Gets drbd version of the source tarball in the form as it is on
-     * the linbit website: "8.3/drbd-8.3.1.tar.gz"
+     * the linbit website: "8.3/drbd-8.3.1.tar.gz".
      */
     public final String getDrbdVersionUrlStringToInstall() {
         return drbdVersionUrlStringToInstall;
@@ -902,7 +907,7 @@ public class Host implements Serializable {
     }
 
     /**
-     * Converts a string that is specific to the distribution distribution,
+     * Converts a string that is specific to the distribution distribution.
      */
     public final String getDistString(
                                  final String commandString) {
@@ -949,7 +954,6 @@ public class Host implements Serializable {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
-        
         return ssh.execCommand(Tools.getDistCommand(commandString,
                                                     dist,
                                                     distVersionString,
@@ -957,7 +961,7 @@ public class Host implements Serializable {
                                execCallback,
                                outputVisible,
                                true,
-                               Tools.getDefaultInt("SSH.Command.Timeout"));
+                               SSH_COMMAND_TIMEOUT);
     }
 
     /**
@@ -985,7 +989,7 @@ public class Host implements Serializable {
                                newOutputCallback,
                                outputVisible,
                                true,
-                               Tools.getDefaultInt("SSH.Command.Timeout"));
+                               SSH_COMMAND_TIMEOUT);
     }
 
 
@@ -1005,7 +1009,7 @@ public class Host implements Serializable {
                                callback,
                                outputVisible,
                                commandVisible,
-                               Tools.getDefaultInt("SSH.Command.Timeout"));
+                               SSH_COMMAND_TIMEOUT);
     }
 
     /**
@@ -1031,7 +1035,7 @@ public class Host implements Serializable {
                                callback,
                                outputVisible,
                                true,
-                               Tools.getDefaultInt("SSH.Command.Timeout"));
+                               SSH_COMMAND_TIMEOUT);
     }
 
     /**
@@ -1056,7 +1060,7 @@ public class Host implements Serializable {
                                callback,
                                outputVisible,
                                true,
-                               Tools.getDefaultInt("SSH.Command.Timeout"));
+                               SSH_COMMAND_TIMEOUT);
     }
 
     /**
@@ -1078,7 +1082,7 @@ public class Host implements Serializable {
                                execCallback,
                                outputVisible,
                                commandVisible,
-                               Tools.getDefaultInt("SSH.Command.Timeout"));
+                               SSH_COMMAND_TIMEOUT);
     }
 
     /**
@@ -1105,7 +1109,7 @@ public class Host implements Serializable {
                                true,
                                outputVisible,
                                true,
-                               Tools.getDefaultInt("SSH.Command.Timeout"));
+                               SSH_COMMAND_TIMEOUT);
     }
 
     /**
@@ -1450,12 +1454,12 @@ public class Host implements Serializable {
      * Register a component that will be enabled if the host connected and
      * disabled if disconnected.
      */
-    public final void registerEnableOnConnect(JComponent c) {
+    public final void registerEnableOnConnect(final JComponent c) {
         if (!enableOnConnectList.contains(c)) {
             enableOnConnectList.add(c);
         }
     }
-    
+
     /**
      * Is called after the host is connected or disconnected and
      * enables/disables the conponents that are registered to be enabled on
@@ -1470,49 +1474,46 @@ public class Host implements Serializable {
     /**
      * Make an ssh connection to the host.
      */
-    public final void connect() {
-        if (isConnected()) {
-            //connectButton.setText(
-            //            Tools.getString("HostViewPanel.DisconnectButton"));
-            //connectButton.setForeground(connectButtonForeground);
-        } else {
-            //connectButton.setEnabled(false);
+    public final void connect(SSHGui sshGui) {
+        if (!isConnected()) {
             final String hostName = getName();
             Tools.startProgressIndicator(hostName, "Connecting...");
-
-            final SSHGui sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
-                                             this,
-                                             null);
+            if (sshGui == null) {
+                sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
+                                    this,
+                                    null);
+            }
 
             connect(sshGui,
-                                new ConnectionCallback() {
-                                    public void done(final int flag) {
-                                        setConnected();
-                                        getSSH().installGuiHelper();
-                                        getAllInfo();
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            public void run() {
-                                                Tools.stopProgressIndicator(
-                                                                      hostName,
-                                                                      "Connecting...");
-                                            }
-                                        });
-                                    }
+                    new ConnectionCallback() {
+                        public void done(final int flag) {
+                            setConnected();
+                            getSSH().installGuiHelper();
+                            getAllInfo();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    Tools.stopProgressIndicator(
+                                                          hostName,
+                                                          "Connecting...");
+                                }
+                            });
+                        }
 
-                                    public void doneError(
-                                                    final String errorText) {
-                                        setLoadingError();
-                                        setConnected();
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            public void run() {
-                                                Tools.stopProgressIndicator(
-                                                            hostName,
-                                                            "Connecting..."); }
-                                        });
-                                    }
-                                });
+                        public void doneError(
+                                        final String errorText) {
+                            setLoadingError();
+                            setConnected();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    Tools.stopProgressIndicator(
+                                                hostName,
+                                                "Connecting..."); }
+                            });
+                        }
+                    });
         }
     }
+
     /**
      * Gets and stores info about the host.
      */
@@ -1682,12 +1683,12 @@ public class Host implements Serializable {
     public final void parseHostInfo(final String ans) {
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
-        List<String> versionLines = new ArrayList<String>();
+        final List<String> versionLines = new ArrayList<String>();
         final Map<String, BlockDevice> newBlockDevices =
-                                        new LinkedHashMap<String, BlockDevice>();
+                                     new LinkedHashMap<String, BlockDevice>();
         final Map<String, NetInterface> newNetInterfaces =
-                                        new LinkedHashMap<String, NetInterface>();
-         
+                                     new LinkedHashMap<String, NetInterface>();
+
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
                 break;
@@ -1713,7 +1714,8 @@ public class Host implements Serializable {
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
                 if (blockDevices.containsKey(blockDevice.getName())) {
-                    /* get the existing block device object, forget the new one. */
+                    /* get the existing block device object,
+                       forget the new one. */
                     blockDevice = blockDevices.get(blockDevice.getName());
                     blockDevice.update(line);
                 }
@@ -1768,7 +1770,7 @@ public class Host implements Serializable {
     /**
      * Parses the installation info.
      */
-    public void parseInstallationInfo(final String line) {
+    public final void parseInstallationInfo(final String line) {
         final String[] tokens = line.split(":|\\s+");
         if ("pm".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -2000,12 +2002,12 @@ public class Host implements Serializable {
     public final String getSSHPort() {
         return sshPort;
     }
-    
+
     /**
      * Returns ssh port as integer.
      */
     public final int getSSHPortInt() {
-        return new Integer(sshPort);
+        return Integer.valueOf(sshPort);
     }
 
     /**

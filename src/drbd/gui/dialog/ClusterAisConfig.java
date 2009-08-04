@@ -39,6 +39,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -130,6 +132,8 @@ public class ClusterAisConfig extends DialogCluster {
     private static final String NEWLINE = "\\r?\\n";
     /** Tabulator made from spaces. */
     private static final String SPACE_TAB = "        ";
+    /** Config scroll pane. */
+    private volatile JScrollPane configScrollPane = null;
 
     /**
      * Prepares a new <code>ClusterAisConfig</code> object.
@@ -293,7 +297,7 @@ public class ClusterAisConfig extends DialogCluster {
                 }
             }
         }
-        updateConfigPanelEditable(false);
+        //updateConfigPanelEditable(false);
         checkInterface();
     }
 
@@ -304,6 +308,7 @@ public class ClusterAisConfig extends DialogCluster {
      */
     private boolean updateOldAisConfig() { /* is run in a thread */
         final Host[] hosts = getCluster().getHostsArray();
+        boolean noConfigs = true;
         boolean configOk = false;
         ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
         configStatus.setText(
@@ -345,6 +350,7 @@ public class ClusterAisConfig extends DialogCluster {
             });
             retry();
         } else {
+            noConfigs = false;
             int j;
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
@@ -382,19 +388,33 @@ public class ClusterAisConfig extends DialogCluster {
                 });
                 setNewConfig(configs[0]);
                 updateConfigPanelEditable(false);
+                hideRetryButton();
                 configOk = true;
             }
         }
         if (!configOk) {
+            final boolean noConfigsF = noConfigs;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    configCheckbox.setText(EDIT_CONFIG_STRING);
-                    configCheckbox.setSelected(false);
-                    statusPanel.setMaximumSize(
-                                statusPanel.getPreferredSize());
+                    if (noConfigsF) {
+                        configCheckbox.setText(SEE_EXISTING_STRING);
+                        configCheckbox.setSelected(false);
+                        statusPanel.setMaximumSize(
+                                    statusPanel.getPreferredSize());
+                    } else {
+                        configCheckbox.setText(EDIT_CONFIG_STRING);
+                        configCheckbox.setSelected(false);
+                        statusPanel.setMaximumSize(
+                                    statusPanel.getPreferredSize());
+                    }
                 }
             });
-            updateConfigPanelExisting();
+            if (noConfigs) {
+                setNewConfig(configs[0]);
+                updateConfigPanelEditable(false);
+            } else {
+                updateConfigPanelExisting();
+            }
         }
         return configOk;
     }
@@ -486,8 +506,10 @@ public class ClusterAisConfig extends DialogCluster {
                     JLabel l;
                     if (aisCastAddresses.size() < 1) {
                         l = new JLabel(Tools.getString(
-                               "Dialog.ClusterAisConfig.WarningAtLeastTwoInt"));
+                              "Dialog.ClusterAisConfig.WarningAtLeastTwoInt"));
                     } else {
+                        // TODO: we need to check if there is bond interface
+                        // and one is enough
                         l = new JLabel(Tools.getString(
                        "Dialog.ClusterAisConfig.WarningAtLeastTwoInt.OneMore"));
                     }
@@ -495,7 +517,22 @@ public class ClusterAisConfig extends DialogCluster {
                     configPanel.add(l);
                     configPanel.add(new JLabel(""));
                     rows++;
+                    final JLabel label = l;
+                    l.addFocusListener(new FocusListener() {
+                        public void focusGained(final FocusEvent e) {
+                            if (configScrollPane != null) {
+                                configScrollPane.getViewport().setViewPosition(
+                                                  label.getBounds().getLocation());
+                                configScrollPane = null;
+                            }
+                        }
+                        public void focusLost(final FocusEvent e) {
+                            /* nothing */
+                        }
+                    });
+                    l.requestFocus();
                 }
+
                 configPanel.add(new JLabel(""));
                 configPanel.add(new JLabel(" "));
                 rows++;
@@ -575,6 +612,7 @@ public class ClusterAisConfig extends DialogCluster {
         String port        = "";
 
         if (MCAST_TYPE.equals(type)) {
+            System.out.println("interface: " + ifaceCB.getValue());
             final NetInterface iface = (NetInterface) ifaceCB.getValue();
             bindnetaddr = iface.getBindnetaddr();
             address = addrCB.getStringValue();
@@ -830,7 +868,7 @@ public class ClusterAisConfig extends DialogCluster {
                 }
             });
 
-        final JScrollPane sNew = new JScrollPane(
+        configScrollPane = new JScrollPane(
                                     configPanel,
                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
@@ -876,8 +914,8 @@ public class ClusterAisConfig extends DialogCluster {
         statusPanel.add(configCheckbox);
         statusPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         pane.add(statusPanel);
-        pane.add(sNew);
-        sNew.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pane.add(configScrollPane);
+        configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mcast.add(new JLabel("# "));
         mcast.add(typeCB);

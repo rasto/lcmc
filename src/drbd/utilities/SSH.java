@@ -322,7 +322,7 @@ public class SSH {
         *          whether the output of the command should be visible
         */
         private Object[] execOneCommand(final String command,
-                                        final boolean outputVisible) {
+                                        boolean outputVisible) {
             this.command = command;
             this.outputVisible = outputVisible;
             Integer exitCode = 100;
@@ -338,7 +338,13 @@ public class SSH {
                 if (sess == null) {
                     return new Object[]{"", 130};
                 }
-                //sess.requestPTY("dumb", 0, 0, 0, 0, null);
+                /* requestPTY mixes stdout and strerr together, but it works
+                better at the moment. */
+                if (command.indexOf("/etc/init.d/openais start") < 0) {
+                    /* aisexec does not work when pty is requested for some
+                     * reason, so here is the workaround. */
+                    sess.requestPTY("dumb", 0, 0, 0, 0, null);
+                }
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "
@@ -420,21 +426,10 @@ public class SSH {
                         }
 
                     }
-                    if (newOutputCallback != null && !cancelIt) {
-                        newOutputCallback.output(output.toString());
-                    }
-
-                    if (cancelIt) {
-                        return new Object[]{"", 130};
-                    }
-
-                    if (newOutputCallback == null) {
-                        res.append(output);
-                    }
 
                     /* stderr */
                     final StringBuffer errOutput = new StringBuffer("");
-                    while (stderr.available() > 0) {
+                    while (stderr.available() > 0 && !cancelIt) {
                         // this is unreachable.
                         // stdout and stderr are mixed in the stdout
                         // if pty is requested.
@@ -451,6 +446,18 @@ public class SSH {
                         }
                     }
                     res.append(errOutput);
+
+                    if (newOutputCallback != null && !cancelIt) {
+                        newOutputCallback.output(output.toString());
+                    }
+
+                    if (cancelIt) {
+                        return new Object[]{"", 130};
+                    }
+
+                    if (newOutputCallback == null) {
+                        res.append(output);
+                    }
                 }
 
                 if (outputVisible) {

@@ -347,7 +347,7 @@ public class TextResource extends
         {"Dialog.ClusterAisConfig.CreateAisConfig", "Create/Overwrite AIS Config"},
 
         {"Dialog.ClusterAisConfig.WarningAtLeastTwoInt",
-         "# (specify at least two interfaces)"},
+         "# (specify at least two interfaces)"}, // TODO: does not work so good
 
         {"Dialog.ClusterAisConfig.WarningAtLeastTwoInt.OneMore",
          "# (specify at least two interfaces: one more to go)"},
@@ -482,7 +482,6 @@ public class TextResource extends
         {"Dialog.About.Description",          
          "<b>DRBD Management Console by Rasto Levrinc (rasto@linbit.com).</b><br>"
          + "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br>"
-         + "(C)opyright 2002-2009 by Rasto Levrinc.<br><br>"
          + "Please visit the website http://www.drbd.org/mc/management-console/<br>"
          + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
 
@@ -897,8 +896,8 @@ public class TextResource extends
 
 + "<p>The host and cluster wizards allow you to install, configure, start and get\n"
 + "a visual overview of the DRBD, Pacemaker (Heartbeat) clusters.\n"
-+ "The configuration part of Pacemaker-Heartbeat is still very basic and\n"
-+ "Pacemaker-Openais is non-existent at the moment, so you would have to write\n"
++ "The configuration part of Openais or Heartbeat is still very basic and\n"
++ "so you may have to check it or write\n"
 + "the config file by yourself, till it is properly implemented.</p>"
 
 + "<p>Thanks.</p>"

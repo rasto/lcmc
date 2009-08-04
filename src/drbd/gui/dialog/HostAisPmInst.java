@@ -56,7 +56,7 @@ public class HostAisPmInst extends DialogHost {
      * Checks the answer of the installation and enables/disables the
      * components accordingly.
      */
-    public void checkAnswer(final String ans) {
+    public void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes
         nextDialogObject = new HostCheckInstallation(this, getHost());
         progressBarDone();
@@ -71,13 +71,13 @@ public class HostAisPmInst extends DialogHost {
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        installHeartbeat();
+        installAisPm();
     }
 
     /**
      * Installs the heartbeat.
      */
-    private void installHeartbeat() {
+    private void installAisPm() {
         String arch = getHost().getDistString("AisPmInst.install."
                                               + getHost().getArch());
         if (arch == null) {
@@ -89,13 +89,15 @@ public class HostAisPmInst extends DialogHost {
         if (installMethod != null) {
             installCommand = "AisPmInst.install." + installMethod; 
         }
-       
+        Tools.getConfigData().setLastHbAisPmInstalledMethod(
+           getHost().getDistString("AisPmInst.install.text." + installMethod));
+        Tools.getConfigData().setLastInstalledClusterStack("OpenAIS");
 
         getHost().execCommand(installCommand,
                          getProgressBar(),
                          new ExecCallback() {
                              public void done(final String ans) {
-                                 checkAnswer(ans);
+                                 checkAnswer(ans, installMethod);
                              }
                              public void doneError(final String ans,
                                                    final int exitCode) {

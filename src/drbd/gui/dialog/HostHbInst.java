@@ -56,7 +56,7 @@ public class HostHbInst extends DialogHost {
      * Checks the answer of the installation and enables/disables the
      * components accordingly.
      */
-    public void checkAnswer(final String ans) {
+    public void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes
         nextDialogObject = new HostCheckInstallation(this, getHost());
         progressBarDone();
@@ -89,13 +89,15 @@ public class HostHbInst extends DialogHost {
         if (installMethod != null) {
             installCommand = "HbPmInst.install." + installMethod; 
         }
-       
+        Tools.getConfigData().setLastHbAisPmInstalledMethod(
+            getHost().getDistString("HbPmInst.install.text." + installMethod));
+        Tools.getConfigData().setLastInstalledClusterStack("Heartbeat");
 
         getHost().execCommand(installCommand,
                          getProgressBar(),
                          new ExecCallback() {
                              public void done(final String ans) {
-                                 checkAnswer(ans);
+                                 checkAnswer(ans, installMethod);
                              }
                              public void doneError(final String ans,
                                                    final int exitCode) {
