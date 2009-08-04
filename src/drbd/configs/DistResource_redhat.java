@@ -80,5 +80,27 @@ public class DistResource_redhat extends
          "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
+
+        {"Openais.removeHeartbeatAddOpenais",
+         "/etc/init.d/heartbeat stop;/sbin/chkconfig --del heartbeat;"
+         + "/etc/init.d/openais start && "
+         + "/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.removeOpenaisAddHeartbeat",
+         "/etc/init.d/openais stop;/sbin/chkconfig --del openais;"
+         + "/etc/init.d/heartbeat start && "
+         + "/sbin/chkconfig --add heartbeat"},
+
+        {"Openais.addOpenaisToRc",
+         "/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.addHeartbeatToRc",
+         "/sbin/chkconfig --add heartbeat"},
+
+        {"Openais.startOpenaisRc",
+         "/etc/init.d/openais start;/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.startHeartbeatRc",
+         "/etc/init.d/heartbeat start;/sbin/chkconfig --add heartbeat"},
     };
 }

@@ -113,6 +113,5 @@ public class DistResource_suse extends
 
         {"Heartbeat.startHeartbeatRc",
          "/etc/init.d/heartbeat start;/sbin/chkconfig --add heartbeat"},
-
     };
 }

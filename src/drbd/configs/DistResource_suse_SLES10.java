@@ -47,10 +47,14 @@ public class DistResource_suse_SLES10 extends
         {"AisPmInst.install.text.1", "http://download.opensuse.org: rug" },
         {"AisPmInst.install.1",
          "rug service-delete ha-clustering; "
-         + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>' 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
+         + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>'"
+         + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
+         + " && rug key-add 'server\\x3aha-clustering OBS Project <server\\x3aha-clustering@build.opensuse.org>'"
+         + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
          + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
          + " && /usr/bin/zypper -n --no-gpg-checks install openais pacemaker" 
-         + " && /sbin/chkconfig --add openais"},
+         + " && /sbin/chkconfig --add openais"
+         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* Heartbeat/Pacemaker Opensuse*/
         {"HbPmInst.install.text.1", "http://download.opensuse.org: rug" },
@@ -93,6 +97,5 @@ public class DistResource_suse_SLES10 extends
 
         {"DrbdInst.install.3",
          "/usr/bin/zypper -n --no-gpg-checks install drbd drbd-kmp-default"},
-
     };
 }

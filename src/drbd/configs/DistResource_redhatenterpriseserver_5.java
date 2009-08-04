@@ -42,6 +42,16 @@ public class DistResource_redhatenterpriseserver_5 extends
 
         /* support */
         {"Support", "redhatenterpriseserver-5"},
+        /* Openais/Pacemaker opensuse */
+        {"AisPmInst.install.text.1", "http://download.opensuse.org" },
+
+        {"AisPmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
+         + "yum -y install heartbeat.`uname -m"
+         + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
+         + "/sbin/chkconfig --add openais && "
+         + "mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* Openais/Pacemaker opensuse */
         {"HbPmInst.install.text.1",
@@ -51,16 +61,6 @@ public class DistResource_redhatenterpriseserver_5 extends
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
          + "yum -y install openais.`uname -m"
-         + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
-         + "/sbin/chkconfig --add openais"},
-
-        /* Heartbeat/Pacemaker opensuse */
-        {"AisPmInst.install.text.1", "http://download.opensuse.org" },
-
-        {"AisPmInst.install.1",
-         "wget -N -nd -P /etc/yum.repos.d/"
-         + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
-         + "yum -y install heartbeat.`uname -m"
          + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
          + "/sbin/chkconfig --add heartbeat"},
 

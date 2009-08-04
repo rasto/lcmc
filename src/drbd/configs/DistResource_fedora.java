@@ -54,10 +54,12 @@ public class DistResource_fedora extends
          "/usr/bin/yum -y install heartbeat"},
         /* at least fedora 10 and fedora11 in version 2.1.3 and 2.14 has different
            ocf path. */
-        {"Heartbeat.getOCFParameters",
+        {"Heartbeat.2.1.4.getOCFParameters",
          "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/share/ocf;"
-         + "for s in `ls -1 /usr/share/ocf/resource.d/heartbeat/ `; do "
-         + "/usr/share/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null; done;"
+         + "for prov in `ls -1 /usr/share/ocf/resource.d/`; do "
+         + " for s in `ls -1 /usr/share/ocf/resource.d/$prov/ `; do "
+         + " /usr/share/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
+         + "done;"
          + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
 
@@ -65,5 +67,27 @@ public class DistResource_fedora extends
          "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
+
+        {"Openais.removeHeartbeatAddOpenais",
+         "/etc/init.d/heartbeat stop;/sbin/chkconfig --del heartbeat;"
+         + "/etc/init.d/openais start && "
+         + "/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.removeOpenaisAddHeartbeat",
+         "/etc/init.d/openais stop;/sbin/chkconfig --del openais;"
+         + "/etc/init.d/heartbeat start && "
+         + "/sbin/chkconfig --add heartbeat"},
+
+        {"Openais.addOpenaisToRc",
+         "/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.addHeartbeatToRc",
+         "/sbin/chkconfig --add heartbeat"},
+
+        {"Openais.startOpenaisRc",
+         "/etc/init.d/openais start;/sbin/chkconfig --add openais"},
+
+        {"Heartbeat.startHeartbeatRc",
+         "/etc/init.d/heartbeat start;/sbin/chkconfig --add heartbeat"},
     };
 }

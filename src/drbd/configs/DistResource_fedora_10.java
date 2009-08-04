@@ -51,8 +51,9 @@ public class DistResource_fedora_10 extends
          + " http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_10/server:ha-clustering.repo && "
          + "(/usr/sbin/groupadd haclient 2>/dev/null && "
          + "/usr/sbin/useradd -g haclient hacluster 2>/dev/null;"
-         + "yum -y install openais pacemaker && "
-         + "/sbin/chkconfig --add openais)"},
+         + "yum -y install openais pacemaker"
+         + "&& /sbin/chkconfig --add openais"
+         + "&& mv /etc/ais/openais.conf /etc/ais/openais.conf.orig)"},
 
         /* Heartbeat/Pacemaker */
         {"HbPmInst.install.text.1",

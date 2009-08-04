@@ -52,7 +52,8 @@ public class DistResource_redhat_5 extends
         {"AisPmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
          + "yum -y install openais pacemaker "
-         + "&& /sbin/chkconfig --add openais"},
+         + "&& /sbin/chkconfig --add openais;"
+         + "mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* Heartbeat/Pacemaker Opensuse */
         {"HbPmInst.install.text.1", "http://download.opensuse.org" },

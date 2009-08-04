@@ -54,7 +54,8 @@ public class DistResource_suse_OPENSUSE11_1 extends
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/openSUSE_11.1/server:ha-clustering.repo && "
          + "zypper -n --no-gpg-check install openais pacemaker"
-         + " && chkconfig --add openais"},
+         + " && chkconfig --add openais"
+         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* Heartbeat/Pacemaker Opensuse */
         {"HbPmInst.install.text.1", "http://download.opensuse.org: zypper" },

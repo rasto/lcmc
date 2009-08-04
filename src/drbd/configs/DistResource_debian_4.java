@@ -59,15 +59,9 @@ public class DistResource_debian_4 extends
          "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"},
-
-        /* Heartbeat/Pacemaker Opensuse */
-        {"AisPmInst.install.text.1", "http://download.opensuse.org repository"},
-        {"AisPmInst.install.1",
-         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
-         + " && apt-get update"
-         + " && apt-get -y -q --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"},
+         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
+         + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
+         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* Old Heartbeat */
         {"HbPmInst.install.text.2", "etch repository"},

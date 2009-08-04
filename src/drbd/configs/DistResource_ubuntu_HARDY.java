@@ -46,7 +46,9 @@ public class DistResource_ubuntu_HARDY extends
          "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/xUbuntu_8.04/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"},
+         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
+         + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
+         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* TODO: does not work? */
         /* Heartbeat/Pacemaker Opensuse */
@@ -82,6 +84,8 @@ public class DistResource_ubuntu_HARDY extends
 
         {"DrbdInst.install.method.2",
          "source"},
+
+        {"Openais.reloadOpenais",  "/etc/init.d/openais force-reload"},
 
     };
 }

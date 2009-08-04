@@ -54,9 +54,10 @@ public class DistResource_suse_SLES11 extends
 
         {"AisPmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
-         + " http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo && "
-         + "/usr/bin/zypper -n --no-gpg-check install openais pacemaker && "
-         + "/sbin/chkconfig --add openais"},
+         + " http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo"
+         + " && /usr/bin/zypper -n --no-gpg-check install openais pacemaker"
+         + " && /sbin/chkconfig --add openais"
+         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* Heartbeat/Pacemaker opensuse */
         {"HbPmInst.install.text.1",
