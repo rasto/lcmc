@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+# openais       Start the openais cluster service
+#
+# Author:       Martin Loschwitz <madkiss@debian.org>
+# Based on:     Work by Andrew Beekhof <abeekhof@suse.de>
+# License:      Revised BSD
+#
+# chkconfig: - 20 20
+# processname:  aisexec
+# description:  OpenAIS daemon
+#
+### BEGIN INIT INFO
+# Description: openais cluster services.
+# Short-Description: openais cluster services.
+# Provides: openais
+# Required-Start: $network
+# Should-Start: $syslog
+# Required-Stop: $network
+# Default-Start: 3 5
+# Default-Stop: 0 6
+# Should-Stop: $null
+### END INIT INFO
+
+# $PATH to go
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# some general stuff
+prog="aisexec"
+AISEXEC="/usr/sbin/aisexec"
+AISEXEC_PIDS="$(pidof $prog)"
+COREDUMPS="0"
+
+. /etc/default/openais
+
+if [ -x "$AISEXEC" ]; then
+  case "$1" in
+          start)
+                  if [ $COREDUMPS = "1" ]; then
+		    echo "Enabling coredump files for OpenAIS as requested."
+		    ulimit -c unlimited
+		  fi
+		  echo -n "Starting OpenAIS daemon ($prog): "
+                  start-stop-daemon --start --quiet --exec ${AISEXEC}
+                  echo "aisexec."
+                  ;;
+
+          stop)
+                  echo -n "Stopping OpenAIS daemon ($prog): "
+                  start-stop-daemon --stop --signal QUIT --retry 20 --quiet --oknodo --exec ${AISEXEC}
+                  echo "aisexec."
+                  ;;
+
+          restart|force-reload)
+                  echo -n "Restarting OpenAIS daemon ($prog): "
+                  start-stop-daemon --stop --signal QUIT --retry 20 --quiet --oknodo --exec ${AISEXEC}
+                  sleep 2
+                  if [ $COREDUMPS = "1" ]; then
+                    echo "Enabling coredump files for OpenAIS as requested."
+                    ulimit -c unlimited
+                  fi
+                  start-stop-daemon --start --quiet --exec ${AISEXEC}
+                  echo "aisexec."
+                  ;;
+          status|monitor)
+                  echo -n "$AISEXEC is "
+                  for AISEXEC_PID in $AISEXEC_PIDS
+                  do
+                          if [ "$(readlink -f /proc/$AISEXEC_PID/exe)" = "$AISEXEC" ]
+                          then
+                                  echo "running (PID=$AISEXEC_PID)."
+                                  exit 0
+                          fi
+                  done
+                  echo "stopped."
+                  exit 3
+                  ;;
+          *)
+                  echo "Usage: $0 {start|stop|restart|force-reload|status|monitor}"
+                  exit 1
+                  ;;
+  esac
+fi
+
+exit 0

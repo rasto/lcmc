@@ -548,7 +548,7 @@ public class SSH {
         private void exec() {
             // ;; separates commands, that are to be executed one after one,
             // if previous command has finished successfully.
-            final String[] commands = command.split(";;");
+            final String[] commands = command.split(";;;"); // TODO:not used?
             final StringBuffer ans = new StringBuffer("");
             for (int i = 0; i < commands.length; i++) {
                 commands[i].trim();
@@ -1346,10 +1346,12 @@ public class SSH {
     public final void installGuiHelper() {
         final String fileName = "/help-progs/drbd-gui-helper";
         final String file = Tools.getFile(fileName);
-        scp(file,
-            "/usr/local/bin/drbd-gui-helper",
-            "0700",
-            false);
+        if (file != null) {
+            scp(file,
+                "/usr/local/bin/drbd-gui-helper",
+                "0700",
+                false);
+        }
     }
 
     /**
@@ -1388,11 +1390,22 @@ public class SSH {
                           final String mode,
                           final boolean makeBackup) {
         String backupCommand = "";
+        StringBuffer commands = new StringBuffer("");
         if (makeBackup) {
-            backupCommand = "cp " + remoteFilename + "{,.`date +'%s'`};";
+            commands.append("cp ");
+            commands.append(remoteFilename);
+            commands.append("{,.`date +'%s'`};");
+        }
+        final int index = remoteFilename.lastIndexOf('/');
+        if (index > 0) {
+            final String dir = remoteFilename.substring(0, index);
+            commands.append("mkdir -p ");
+            commands.append(dir);
+            commands.append(';'); 
+            System.out.println("mkdir -p : " + dir);
         }
         final Thread t = host.execCommandRaw(
-                                backupCommand
+                                commands.toString()
                                 + "echo \""
                                 + host.escapeQuotes(fileContent, 1)
                                 + "\">" + remoteFilename

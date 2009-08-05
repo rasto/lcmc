@@ -1,0 +1,11 @@
+#
+# ENABLE ulimit core dumps
+# 
+# On Debian systems, the creation of core dump files is disabled
+# by default to avoid file system overflowing. However, as this
+# software is rather new and there might still me glitches and
+# problems with it, having OpenAIS coredumps might be useful to
+# ease the struggles of debugging. Setting the following option
+# to 1 enables core dump file creation for OpenAIS.
+#
+COREDUMPS="0"

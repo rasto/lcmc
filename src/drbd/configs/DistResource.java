@@ -173,8 +173,9 @@ public class DistResource extends
         {"Heartbeat.getClusterMetadata", "/usr/local/bin/drbd-gui-helper get-cluster-metadata"},
         {"Heartbeat.getHbStatus",    "/usr/local/bin/drbd-gui-helper get-cluster-events"},
         {"Heartbeat.startHeartbeat", "/etc/init.d/heartbeat start"},
+        // TODO: /etc/init.d/openais can also be /etc/init.d/openais-legacy
         {"Openais.startOpenais",   "/etc/init.d/openais start"},
-        {"Openais.reloadOpenais",  "/etc/init.d/openais reload"},
+        {"Openais.reloadOpenais",  "/etc/init.d/openais reload"}, 
         {"Heartbeat.reloadHeartbeat", "/etc/init.d/heartbeat reload"},
         {"Heartbeat.stopHeartbeat",  "/etc/init.d/heartbeat stop"},
         {"Heartbeat.getHbConfig",    "cat /etc/ha.d/ha.cf"},

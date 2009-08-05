@@ -99,6 +99,5 @@ public class DistResource_debian_4 extends
         /* disable drbd install method 3 */
         {"DrbdInst.install.text.3",
          ""},
-        {"Openais.reloadOpenais",  "/etc/init.d/openais force-reload"},
     };
 }

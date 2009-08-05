@@ -88,6 +88,24 @@ public class HostAisPmInst extends DialogHost {
         final String installMethod = getHost().getAisPmInstallMethod();
         if (installMethod != null) {
             installCommand = "AisPmInst.install." + installMethod;
+            final String filesStr =
+                      getHost().getDistString(
+                            "AisPmInst.install.files." + installMethod);
+            if (filesStr != null) {
+                final String[] parts = filesStr.split(":");
+                /* install files if specified */
+                int i = 0;
+                while (i < parts.length) {
+                    final String fileName = "/help-progs/" + parts[i];
+                    final String to = parts[i+1];
+                    final String perm = parts[i+2];
+                    final String file = Tools.getFile(fileName);
+                    if (file != null) {
+                        getHost().getSSH().scp(file, to, perm, true);
+                    }
+                    i += 3;
+                }
+            }
         }
         Tools.getConfigData().setLastHbAisPmInstalledMethod(
            getHost().getDistString("AisPmInst.install.text." + installMethod));

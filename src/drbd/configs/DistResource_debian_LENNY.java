@@ -39,7 +39,6 @@ public class DistResource_debian_LENNY extends
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
 
-
         /* distribution name that is used in the download url */
         {"distributiondir", "debian-lenny"},
 
@@ -57,6 +56,10 @@ public class DistResource_debian_LENNY extends
          + " && apt-get -y -q  --allow-unauthenticated install"
          + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
          + " && /usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
+
+        {"AisPmInst.install.files.1",
+         "openais-debian:/etc/init.d/openais:0755:"
+         + "openais-default-debian:/etc/default/openais:0644"},
 
         /* openais/pacemaker madkiss */
         {"AisPmInst.install.text.2",

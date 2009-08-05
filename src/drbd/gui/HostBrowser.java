@@ -1046,6 +1046,7 @@ public class HostBrowser extends Browser {
          */
         public boolean equals(final Object value) {
             if (Tools.isStringClass(value)) {
+                // TODO: race is here
                 return getNetInterface().getIp().equals(value.toString());
             } else {
                 return toString().equals(value.toString());

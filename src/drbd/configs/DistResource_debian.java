@@ -110,5 +110,8 @@ public class DistResource_debian extends
         {"Heartbeat.startHeartbeatRc",
          "/etc/init.d/heartbeat start;"
          + "/usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
+ 
+        {"Openais.reloadOpenais",
+         "/etc/init.d/openais force-reload"},
     };
 }
