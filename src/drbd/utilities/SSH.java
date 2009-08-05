@@ -34,8 +34,6 @@ import javax.swing.SwingUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.ServerHostKeyVerifier;
@@ -43,7 +41,6 @@ import com.trilead.ssh2.InteractiveCallback;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.KnownHosts;
-import com.trilead.ssh2.ConnectionMonitor;
 
 /**
  * Verifying server hostkeys with an existing known_hosts file
@@ -310,8 +307,8 @@ public class SSH {
         private final boolean commandVisible;
         /** Execution session object. */
         private Session sess = null;
-        /** Timeout for ssh command */
-        private int sshCommandTimeout;
+        /** Timeout for ssh command. */
+        private final int sshCommandTimeout;
 
        /**
         * Executes command on the host.
@@ -322,7 +319,7 @@ public class SSH {
         *          whether the output of the command should be visible
         */
         private Object[] execOneCommand(final String command,
-                                        boolean outputVisible) {
+                                        final boolean outputVisible) {
             this.command = command;
             this.outputVisible = outputVisible;
             Integer exitCode = 100;
@@ -433,7 +430,7 @@ public class SSH {
                         // this is unreachable.
                         // stdout and stderr are mixed in the stdout
                         // if pty is requested.
-                        int len = stderr.read(buff);
+                        final int len = stderr.read(buff);
                         if (len > 0) {
                             final String buffString =
                                             new String(buff, 0, len, "UTF-8");
@@ -871,15 +868,19 @@ public class SSH {
                 if (Tools.isLinux()) {
                     try {
                         KnownHosts.addHostkeyToFile(
-                              new File(Tools.getConfigData().getKnownHostPath()),
+                              new File(
+                                    Tools.getConfigData().getKnownHostPath()),
                               new String[] {hashedHostname},
                               serverHostKeyAlgorithm,
                               serverHostKey);
                     } catch (IOException ignore) {
-                        Tools.appError("SSH.AddHostKeyToFile.Failed", "", ignore);
+                        Tools.appError("SSH.AddHostKeyToFile.Failed",
+                                       "",
+                                       ignore);
                     }
                 } else {
-                    Tools.debug(this, "Not using known_hosts file, because this is not a Linux.");
+                    Tools.debug(this, "Not using known_hosts file, because"
+                                      + " this is not a Linux.");
                 }
 
                 return true;
@@ -1008,7 +1009,9 @@ public class SSH {
             try {
                 /* connect and verify server host key (with callback) */
                 Tools.debug(this, "verify host keys: " + hostname, 1);
-                final String[] hostkeyAlgos = Tools.getConfigData().getKnownHosts().getPreferredServerHostkeyAlgorithmOrder(hostname);
+                final String[] hostkeyAlgos =
+                    Tools.getConfigData().getKnownHosts().
+                        getPreferredServerHostkeyAlgorithmOrder(hostname);
 
                 if (hostkeyAlgos != null) {
                     conn.setServerHostKeyAlgorithms(hostkeyAlgos);
@@ -1025,7 +1028,8 @@ public class SSH {
                 //final ConnectionMonitor connectionMonitor =
                 //                               new ConnectionMonitor() {
                 //    public void connectionLost(java.lang.Throwable reason) {
-                //        System.out.println(host.getName() + ": connection lost");
+                //        System.out.println(host.getName()
+                //                           + ": connection lost");
                 //        if (!disconnectForGood) {
                 //            connection = null;
                 //        }
@@ -1047,13 +1051,12 @@ public class SSH {
                 while (!cancelIt) {
                     if (lastPassword == null) {
                         if (enablePublicKey
-                            && conn.isAuthMethodAvailable(username, "publickey")) {
-                            final File dsaKey =
-                                         new File(
-                                             Tools.getConfigData().getIdDSAPath());
-                            final File rsaKey =
-                                         new File(
-                                             Tools.getConfigData().getIdRSAPath());
+                            && conn.isAuthMethodAvailable(username,
+                                                          "publickey")) {
+                            final File dsaKey = new File(
+                                         Tools.getConfigData().getIdDSAPath());
+                            final File rsaKey = new File(
+                                         Tools.getConfigData().getIdRSAPath());
                             boolean res = false;
                             if (dsaKey.exists() || rsaKey.exists()) {
                                 String key = "";
@@ -1063,10 +1066,10 @@ public class SSH {
                                 /* try first passwordless authentication.  */
                                 if (lastRSAKey == null && dsaKey.exists()) {
                                     try {
-                                        res =
-                                           conn.authenticateWithPublicKey(username,
-                                                                          dsaKey,
-                                                                          key);
+                                        res = conn.authenticateWithPublicKey(
+                                                                      username,
+                                                                      dsaKey,
+                                                                      key);
                                     } catch (Exception e) {
                                         lastDSAKey = null;
                                         Tools.debug(this,
@@ -1074,8 +1077,8 @@ public class SSH {
                                     }
                                     if (res) {
                                         Tools.debug(
-                                               this,
-                                               "dsa passwordless auth successful");
+                                           this,
+                                           "dsa passwordless auth successful");
                                         lastDSAKey = key;
                                         lastRSAKey = null;
                                         lastPassword = null;
@@ -1092,9 +1095,10 @@ public class SSH {
                                 if (rsaKey.exists()) {
                                     try {
                                         res =
-                                           conn.authenticateWithPublicKey(username,
-                                                                          rsaKey,
-                                                                          key);
+                                           conn.authenticateWithPublicKey(
+                                                                      username,
+                                                                      rsaKey,
+                                                                      key);
                                     } catch (Exception e) {
                                         lastRSAKey = null;
                                         Tools.debug(this,
@@ -1102,8 +1106,8 @@ public class SSH {
                                     }
                                     if (res) {
                                         Tools.debug(
-                                               this,
-                                               "rsa passwordless auth successful");
+                                           this,
+                                           "rsa passwordless auth successful");
                                         lastRSAKey = key;
                                         lastDSAKey = null;
                                         lastPassword = null;
@@ -1118,10 +1122,10 @@ public class SSH {
 
                                 key = sshGui.enterSomethingDialog(
                                         Tools.getString(
-                                                     "SSH.RSA.DSA.Authentication"),
+                                                 "SSH.RSA.DSA.Authentication"),
                                         new String[] {lastError,
                                                       Tools.getString(
-                                                          "SSH.Enter.passphrase")},
+                                                       "SSH.Enter.passphrase")},
                                         Tools.getDefault("SSH.PublicKey"),
                                         true);
                                 if (key == null) {
@@ -1134,9 +1138,10 @@ public class SSH {
                                 if (dsaKey.exists()) {
                                     try {
                                         res =
-                                           conn.authenticateWithPublicKey(username,
-                                                                          dsaKey,
-                                                                          key);
+                                           conn.authenticateWithPublicKey(
+                                                                      username,
+                                                                      dsaKey,
+                                                                      key);
                                     } catch (Exception e) {
                                             lastDSAKey = null;
                                             Tools.debug(this,
@@ -1159,12 +1164,14 @@ public class SSH {
                                 if (rsaKey.exists()) {
                                     try {
                                         res =
-                                           conn.authenticateWithPublicKey(username,
-                                                                          rsaKey,
-                                                                          key);
+                                           conn.authenticateWithPublicKey(
+                                                                      username,
+                                                                      rsaKey,
+                                                                      key);
                                     } catch (Exception e) {
                                         lastRSAKey = null;
-                                        Tools.debug(this, "rsa key auth failed");
+                                        Tools.debug(this,
+                                                    "rsa key auth failed");
                                     }
                                     if (res) {
                                         Tools.debug(this,
@@ -1181,8 +1188,8 @@ public class SSH {
                                 }
 
                                 lastError =
-                                        Tools.getString(
-                                            "SSH.Publickey.Authentication.Failed");
+                                     Tools.getString(
+                                        "SSH.Publickey.Authentication.Failed");
                             } else {
                                 publicKeyTry = 0;
                             }
@@ -1338,23 +1345,11 @@ public class SSH {
      */
     public final void installGuiHelper() {
         final String fileName = "/help-progs/drbd-gui-helper";
-        try {
-            final BufferedReader br =
-                        new BufferedReader(
-                            new InputStreamReader(
-                               getClass().getResource(fileName).openStream()));
-            final StringBuffer file = new StringBuffer("");
-            while (br.ready()) {
-                file.append(br.readLine());
-                file.append('\n');
-            }
-            scp(file.toString(),
-                "/usr/local/bin/drbd-gui-helper",
-                "0700",
-                false);
-        } catch (IOException e) {
-            Tools.appError("install gui helper error", "", e);
-        }
+        final String file = Tools.getFile(fileName);
+        scp(file,
+            "/usr/local/bin/drbd-gui-helper",
+            "0700",
+            false);
     }
 
     /**
@@ -1394,7 +1389,7 @@ public class SSH {
                           final boolean makeBackup) {
         String backupCommand = "";
         if (makeBackup) {
-            backupCommand = "cp " + remoteFilename + "{,.`date +'%s'`};" ;
+            backupCommand = "cp " + remoteFilename + "{,.`date +'%s'`};";
         }
         final Thread t = host.execCommandRaw(
                                 backupCommand

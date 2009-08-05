@@ -39,7 +39,6 @@ import java.util.ResourceBundle;
 import java.util.Properties;
 import java.util.Locale;
 import java.util.Enumeration;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -70,6 +69,7 @@ import java.io.FileReader;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.InputStreamReader;
 
 /**
  * This class provides tools, that are not classified.
@@ -943,7 +943,7 @@ public final class Tools {
         final ResourceBundle resourceString =
                 ResourceBundle.getBundle("drbd.configs.DistResource", locale);
         try {
-            String ret = resourceString.getString(text);
+            final String ret = resourceString.getString(text);
             debug("ret: " + ret, 2);
             return ret;
         } catch (Exception e) {
@@ -1042,7 +1042,8 @@ public final class Tools {
      *          version of this distribution
      * @return string that represents distribution and version.
      */
-    public static String getDistVersionString(String dist, String version) {
+    public static String getDistVersionString(String dist,
+                                              final String version) {
         if (dist == null) {
             dist = "";
         }
@@ -1056,7 +1057,7 @@ public final class Tools {
         } catch (Exception e) {
             /* with wildcard */
             final StringBuffer buf = new StringBuffer(version);
-            for (int i = version.length() - 1; i >=0; i--) {
+            for (int i = version.length() - 1; i >= 0; i--) {
                 try {
                     distVersion = resourceCommand.getString("version:"
                                                             + buf.toString()
@@ -1498,9 +1499,30 @@ public final class Tools {
      */
     public static void setEditorFont(final JEditorPane ep) {
         final Font font = UIManager.getFont("Label.font");
-        final String bodyRule = "body { font-family: " + font.getFamily() +
-                                "; " +
-                                "font-size: " + font.getSize() + "pt; }";
+        final String bodyRule = "body { font-family: " + font.getFamily()
+                                + "; "
+                                + "font-size: " + font.getSize() + "pt; }";
         ((HTMLDocument) ep.getDocument()).getStyleSheet().addRule(bodyRule);
+    }
+
+    /**
+     * Reads and returns a content of a text file.
+     */
+    public static String getFile(final String fileName) {
+        try {
+            final BufferedReader br =
+                        new BufferedReader(
+                            new InputStreamReader(
+                               Tools.class.getResource(fileName).openStream()));
+            final StringBuffer content = new StringBuffer("");
+            while (br.ready()) {
+                content.append(br.readLine());
+                content.append('\n');
+            }
+            return content.toString();
+        } catch (IOException e) {
+            Tools.appError("could not read: " + fileName, "", e);
+            return null;
+        }
     }
 }
