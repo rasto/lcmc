@@ -63,7 +63,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     /** No host string. (none) */
     private static final String NO_HOST_STRING =
                     Tools.getString("Dialog.DrbdConfigCreateFS.NoHostString");
-    /** No file system (use existing data) */
+    /** No file system (use existing data). */
     private static final String NO_FILESYSTEM_STRING =
                 Tools.getString("Dialog.DrbdConfigCreateFS.SelectFilesystem");
     /** Width of the combo boxes. */
@@ -277,8 +277,8 @@ public class DrbdConfigCreateFS extends DrbdConfig {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 if (NO_HOST_STRING.equals(
-                                                hostCB.getStringValue()) &&
-                                    !NO_FILESYSTEM_STRING.equals(
+                                                hostCB.getStringValue())
+                                    && !NO_FILESYSTEM_STRING.equals(
                                             filesystemCB.getStringValue())) {
                                     hostCB.setValue(hostNames[1]);
                                 } else {

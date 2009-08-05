@@ -96,7 +96,7 @@ public class ProgressIndicatorPanel extends JComponent
     /** Duration of the veil's fade in/out. */
     private int rampDelay  = 1000;
     /** Ramp delay stop. */
-    private static final int rampDelayStop  = 1000;
+    private static final int RAMP_DELAY_STOP  = 1000;
     /** Alpha level of the veil. */
     private float shield     = 0.80f;
     /** Message displayed below the circular shape. */
@@ -467,8 +467,8 @@ public class ProgressIndicatorPanel extends JComponent
                         alphaLevel = MAX_ALPHA_LEVEL;
                     }
                 } else {
-                    alphaLevel -=
-                      (int) (MAX_ALPHA_LEVEL * (time - start) / rampDelayStop);
+                    alphaLevel -= (int) (MAX_ALPHA_LEVEL
+                                  * (time - start) / RAMP_DELAY_STOP);
                     if (alphaLevel <= 0) {
                         alphaLevel = 0;
                         try {

@@ -522,7 +522,7 @@ public class ClusterAisConfig extends DialogCluster {
                         public void focusGained(final FocusEvent e) {
                             if (configScrollPane != null) {
                                 configScrollPane.getViewport().setViewPosition(
-                                                  label.getBounds().getLocation());
+                                               label.getBounds().getLocation());
                                 configScrollPane = null;
                             }
                         }

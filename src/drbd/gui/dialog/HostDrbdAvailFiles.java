@@ -142,10 +142,11 @@ public class HostDrbdAvailFiles extends DialogHost {
                                                   final int exitCode) {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        printErrorAndRetry(Tools.getString(
-                                                "Dialog.HostDrbdAvailFiles.NoBuilds"),
-                                                           ans,
-                                                           exitCode);
+                                        printErrorAndRetry(
+                                         Tools.getString(
+                                          "Dialog.HostDrbdAvailFiles.NoBuilds"),
+                                         ans,
+                                         exitCode);
                                     }
                                 });
                             }
@@ -161,44 +162,45 @@ public class HostDrbdAvailFiles extends DialogHost {
 
         drbdBuildCombo.setEnabled(true);
         getHost().execCommandCache("DrbdAvailFiles",
-                          null, /* ProgresBar */
-                          new ExecCallback() {
-                            public void done(final String ans) {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        answerPaneSetText(ans);
-                                    }
-                                });
-                                final String[] files = ans.split("\\r?\\n");
-                                if (files.length == 2) {
-                                    getHost().setDrbdPackageToInstall(files[0]);
-                                    getHost().setDrbdModulePackageToInstall(
-                                                                     files[1]);
-                                    allDone();
-                                } else {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        public void run() {
-                                            printErrorAndRetry(Tools.getString(
-                                                "Dialog.HostDrbdAvailFiles.NoFiles"));
-                                        }
-                                    });
+                      null, /* ProgresBar */
+                      new ExecCallback() {
+                        public void done(final String ans) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    answerPaneSetText(ans);
                                 }
-                            }
-
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            });
+                            final String[] files = ans.split("\\r?\\n");
+                            if (files.length == 2) {
+                                getHost().setDrbdPackageToInstall(files[0]);
+                                getHost().setDrbdModulePackageToInstall(
+                                                                 files[1]);
+                                allDone();
+                            } else {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         printErrorAndRetry(Tools.getString(
-                                                "Dialog.HostDrbdAvailFiles.NoBuilds"),
-                                                           ans,
-                                                           exitCode);
+                                         "Dialog.HostDrbdAvailFiles.NoFiles"));
                                     }
                                 });
                             }
-                          },
-                          null,  /* ConvertCmdCallback */
-                          true); /* outputVisible */
+                        }
+
+                        public void doneError(final String ans,
+                                              final int exitCode) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    printErrorAndRetry(
+                                     Tools.getString(
+                                      "Dialog.HostDrbdAvailFiles.NoBuilds"),
+                                     ans,
+                                     exitCode);
+                                }
+                            });
+                        }
+                      },
+                      null,  /* ConvertCmdCallback */
+                      true); /* outputVisible */
     }
 
     /**

@@ -115,6 +115,7 @@ public class HostBrowser extends Browser {
     /** Host icon. */
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(
                                   Tools.getDefault("ClusterBrowser.HostIcon"));
+    /** Large host icon. */
     private static final ImageIcon HOST_ICON_LARGE = Tools.createImageIcon(
                                   Tools.getDefault("HostBrowser.HostIcon"));
     /** Remove icon. */
@@ -134,6 +135,7 @@ public class HostBrowser extends Browser {
     /** Color of the most of backgrounds. */
     private static final Color PANEL_BACKGROUND =
                                  Tools.getDefaultColor("ViewPanel.Background");
+    /** Color of the status backgrounds. */
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
     /** Block device infos lock. */
@@ -1850,7 +1852,8 @@ public class HostBrowser extends Browser {
                                             }
                                         });
                                     }
-                                    if (otherBdi.getName().equals(getBlockDevice().getName())) {
+                                    if (otherBdi.getName().equals(
+                                                getBlockDevice().getName())) {
                                         addSeparator();
                                     }
                                 }
@@ -1872,12 +1875,13 @@ public class HostBrowser extends Browser {
 
                                Tools.getString("HostBrowser.Drbd.Attach"),
                                HARDDISC_ICON,
-                               Tools.getString("HostBrowser.Drbd.Attach.ToolTip")
-                              ) {
+                               Tools.getString(
+                                        "HostBrowser.Drbd.Attach.ToolTip")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
-                        return !getBlockDevice().isDrbd() || getBlockDevice().isAttached();
+                        return !getBlockDevice().isDrbd()
+                               || getBlockDevice().isAttached();
                     }
 
                     public boolean enablePredicate() {
@@ -1888,7 +1892,8 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        if (this.getText().equals(Tools.getString("HostBrowser.Drbd.Attach"))) {
+                        if (this.getText().equals(
+                                Tools.getString("HostBrowser.Drbd.Attach"))) {
                             attach();
                         } else {
                             detach();
@@ -1920,12 +1925,14 @@ public class HostBrowser extends Browser {
                         return !getBlockDevice().isSyncing()
                             || ((getBlockDevice().isPrimary()
                                 && getBlockDevice().isSyncSource())
-                                || (getOtherBlockDevInfo().getBlockDevice().isPrimary()
+                                || (getOtherBlockDevInfo().getBlockDevice().
+                                                                    isPrimary()
                                     && getBlockDevice().isSyncTarget()));
                     }
 
                     public void action() {
-                        if (this.getText().equals(Tools.getString("HostBrowser.Drbd.Connect"))) {
+                        if (this.getText().equals(
+                                Tools.getString("HostBrowser.Drbd.Connect"))) {
                             connect();
                         } else {
                             disconnect();
@@ -1937,7 +1944,8 @@ public class HostBrowser extends Browser {
 
             /* set primary */
             final MyMenuItem setPrimaryItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetPrimaryOtherSecondary"),
+                new MyMenuItem(Tools.getString(
+                                  "HostBrowser.Drbd.SetPrimaryOtherSecondary"),
                                null,
                                null,
 
@@ -1951,7 +1959,7 @@ public class HostBrowser extends Browser {
                             return false;
                         }
                         return getBlockDevice().isSecondary()
-                            && getOtherBlockDevInfo().getBlockDevice().isPrimary();
+                         && getOtherBlockDevInfo().getBlockDevice().isPrimary();
                     }
 
                     public boolean enablePredicate() {
@@ -1976,7 +1984,8 @@ public class HostBrowser extends Browser {
             final MyMenuItem setSecondaryItem =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetSecondary"),
                                null,
-                               Tools.getString("HostBrowser.Drbd.SetSecondary.ToolTip")) {
+                               Tools.getString(
+                                    "HostBrowser.Drbd.SetSecondary.ToolTip")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -2017,9 +2026,10 @@ public class HostBrowser extends Browser {
 
             /* invalidate */
             final MyMenuItem invalidateItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Drbd.Invalidate"),
-                               null,
-                               Tools.getString("HostBrowser.Drbd.Invalidate.ToolTip")) {
+                new MyMenuItem(
+                       Tools.getString("HostBrowser.Drbd.Invalidate"),
+                       null,
+                       Tools.getString("HostBrowser.Drbd.Invalidate.ToolTip")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -2038,17 +2048,19 @@ public class HostBrowser extends Browser {
 
             /* resume / pause sync */
             final MyMenuItem resumeSyncItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Drbd.ResumeSync"),
-                               null,
-                               Tools.getString("HostBrowser.Drbd.ResumeSync.ToolTip"),
+                new MyMenuItem(
+                       Tools.getString("HostBrowser.Drbd.ResumeSync"),
+                       null,
+                       Tools.getString("HostBrowser.Drbd.ResumeSync.ToolTip"),
 
-                               Tools.getString("HostBrowser.Drbd.PauseSync"),
-                               null,
-                               Tools.getString("HostBrowser.Drbd.PauseSync.ToolTip")) {
+                       Tools.getString("HostBrowser.Drbd.PauseSync"),
+                       null,
+                       Tools.getString("HostBrowser.Drbd.PauseSync.ToolTip")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
-                        return getBlockDevice().isSyncing() && getBlockDevice().isPausedSync();
+                        return getBlockDevice().isSyncing()
+                               && getBlockDevice().isPausedSync();
                     }
 
                     public boolean enablePredicate() {
@@ -2059,7 +2071,8 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        if (this.getText().equals(Tools.getString("HostBrowser.Drbd.ResumeSync"))) {
+                        if (this.getText().equals(Tools.getString(
+                                             "HostBrowser.Drbd.ResumeSync"))) {
                             resumeSync();
                         } else {
                             pauseSync();
@@ -2073,7 +2086,8 @@ public class HostBrowser extends Browser {
             final MyMenuItem resizeItem =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.Resize"),
                                null,
-                               Tools.getString("HostBrowser.Drbd.Resize.ToolTip")) {
+                               Tools.getString(
+                                          "HostBrowser.Drbd.Resize.ToolTip")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -2094,7 +2108,8 @@ public class HostBrowser extends Browser {
             final MyMenuItem discardDataItem =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.DiscardData"),
                                null,
-                               Tools.getString("HostBrowser.Drbd.DiscardData.ToolTip")) {
+                               Tools.getString(
+                                     "HostBrowser.Drbd.DiscardData.ToolTip")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -2129,7 +2144,8 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         String device = getDrbdResourceInfo().getDevice();
-                        drbd.gui.dialog.DrbdLog l = new drbd.gui.dialog.DrbdLog(getHost(), device);
+                        drbd.gui.dialog.DrbdLog l =
+                                new drbd.gui.dialog.DrbdLog(getHost(), device);
                         l.showDialog();
                     }
                 };

@@ -118,10 +118,16 @@ public class Browser {
         treeModel = new DefaultTreeModel(treeTop);
     }
 
+    /**
+     * Sets the tree instance variable.
+     */
     protected final void setTree(final JTree tree) {
         this.tree = tree;
     }
 
+    /**
+     * Repaints the menu tree.
+     */
     protected final void repaintTree() {
         tree.repaint();
     }
@@ -357,7 +363,7 @@ public class Browser {
             this.updated = updated;
             animationIndex = 0;
         }
-        
+
         /**
          * Returns the animation index.
          */
@@ -841,19 +847,20 @@ public class Browser {
                         public void itemStateChanged(final ItemEvent e) {
                             if (paramCb.isCheckBox()
                                 || e.getStateChange() == ItemEvent.SELECTED) {
-                                final Thread thread = new Thread(new Runnable() {
+                                final Thread thread =
+                                                new Thread(new Runnable() {
                                     public void run() {
                                         paramCb.setEditable();
                                         realParamCb.setValue(
                                                         paramCb.getValue());
-                                        final boolean enable = 
+                                        final boolean enable =
                                                 checkResourceFieldsCorrect(
                                                     param, params);
                                         SwingUtilities.invokeLater(
                                             new Runnable() {
                                                 public void run() {
-                                                    wizardApplyButton.setEnabled(
-                                                                enable);
+                                                    wizardApplyButton.
+                                                            setEnabled(enable);
                                                 }
                                             }
                                         );
@@ -906,12 +913,13 @@ public class Browser {
                                                                        params);
                                         realParamCb.setValue(
                                                             paramCb.getValue());
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            public void run() {
-                                                wizardApplyButton.setEnabled(
-                                                                        check);
-                                            }
-                                        });
+                                        SwingUtilities.invokeLater(
+                                            new Runnable() {
+                                                public void run() {
+                                                    wizardApplyButton.
+                                                            setEnabled(check);
+                                                }
+                                            });
                                     }
                                 });
                             thread.start();
@@ -1006,15 +1014,16 @@ public class Browser {
                                     new Runnable() {
                                         public void run() {
                                             paramCb.setEditable();
-                                            final boolean check = 
+                                            final boolean check =
                                                     checkResourceFields(param,
                                                                         params);
-                                            SwingUtilities.invokeLater(new Runnable() {
-                                                public void run() {
-                                                    applyButton.setEnabled(
+                                            SwingUtilities.invokeLater(
+                                                new Runnable() {
+                                                    public void run() {
+                                                        applyButton.setEnabled(
                                                                         check);
-                                                }
-                                            });
+                                                    }
+                                                });
                                         }
                                     });
                                 thread.start();
@@ -1046,11 +1055,13 @@ public class Browser {
                                         final boolean check =
                                                   checkResourceFields(param,
                                                                       params);
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            public void run() {
-                                                applyButton.setEnabled(check);
-                                            }
-                                        });
+                                        SwingUtilities.invokeLater(
+                                            new Runnable() {
+                                                public void run() {
+                                                    applyButton.setEnabled(
+                                                                        check);
+                                                }
+                                            });
                                     }
                                 });
                             thread.start();

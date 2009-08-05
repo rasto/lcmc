@@ -94,7 +94,8 @@ public class HostDistDetection extends DialogHost {
      */
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        pane.add(getAnswerPane(Tools.getString("Dialog.HostDistDetection.Executing")));
+        pane.add(getAnswerPane(Tools.getString(
+                                       "Dialog.HostDistDetection.Executing")));
         SpringUtilities.makeCompactGrid(pane, 1, 1,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad

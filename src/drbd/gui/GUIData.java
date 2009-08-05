@@ -266,7 +266,7 @@ public class GUIData  {
             addClusterButton.setEnabled(enabled);
         }
     }
-    
+
     /**
      * Enable/Disable all 'Add Cluster' buttons.
      */

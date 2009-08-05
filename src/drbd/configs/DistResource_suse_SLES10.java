@@ -52,7 +52,7 @@ public class DistResource_suse_SLES10 extends
          + " && rug key-add 'server\\x3aha-clustering OBS Project <server\\x3aha-clustering@build.opensuse.org>'"
          + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
          + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
-         + " && /usr/bin/zypper -n --no-gpg-checks install openais pacemaker" 
+         + " && /usr/bin/zypper -n --no-gpg-checks install openais pacemaker"
          + " && /sbin/chkconfig --add openais"
          + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
@@ -62,13 +62,13 @@ public class DistResource_suse_SLES10 extends
          "rug service-delete ha-clustering; "
          + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>' 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
          + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
-         + " && /usr/bin/zypper -n --no-gpg-checks install heartbeat pacemaker" 
+         + " && /usr/bin/zypper -n --no-gpg-checks install heartbeat pacemaker"
          + " && /sbin/chkconfig --add heartbeat"},
 
         /* Heartbeat */
         {"HbPmInst.install.text.2", "the suse way: possibly too old" },
         {"HbPmInst.install.2",
-         "/usr/bin/zypper -n --no-gpg-checks install heartbeat &&" 
+         "/usr/bin/zypper -n --no-gpg-checks install heartbeat &&"
          + "/sbin/chkconfig --add heartbeat"},
 
         /* Drbd install method 2 */

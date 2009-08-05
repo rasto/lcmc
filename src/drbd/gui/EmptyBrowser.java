@@ -57,8 +57,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.Box;
-import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
@@ -408,12 +406,16 @@ public class EmptyBrowser extends Browser {
                                         final JCheckBox cb =
                                             allCheckboxes.get(cluster);
                                         if (cb.isSelected()) {
-                                            SwingUtilities.invokeLater(new Runnable() {
-                                                public void run() {
-                                                    clusterBackgrounds.get(cluster).setBackground(Color.WHITE);
-                                                }
-                                            });
-                                            selectedRunningClusters.add(cluster);
+                                            SwingUtilities.invokeLater(
+                                                new Runnable() {
+                                                    public void run() {
+                                                        clusterBackgrounds.get(
+                                                         cluster).setBackground(
+                                                                   Color.WHITE);
+                                                    }
+                                                });
+                                            selectedRunningClusters.add(
+                                                                       cluster);
                                         }
                                     }
                                 }
@@ -465,7 +467,7 @@ public class EmptyBrowser extends Browser {
         /**
          * Listener for checkboxes that is called from thread.
          */
-        private final void allCheckboxesListener(
+        private void allCheckboxesListener(
                                  final Set<Cluster> clusters,
                                  final Map<Cluster, JCheckBox> allCheckboxes,
                                  final Map<Cluster, MyButton> allStartButtons,
@@ -525,13 +527,13 @@ public class EmptyBrowser extends Browser {
                             startMarkedClustersBtn.setEnabled(false);
                             if (runningCount > 0) {
                                 stopMarkedClustersBtn.setEnabled(true);
-                            } 
+                            }
                         }
                         if (runningCount == 0) {
                             stopMarkedClustersBtn.setEnabled(false);
                             if (notRunningCount > 0) {
                                 startMarkedClustersBtn.setEnabled(true);
-                            } 
+                            }
                         }
                         if (runningCount + notRunningCount == 0) {
                             removeMarkedClustersBtn.setEnabled(false);

@@ -22,7 +22,6 @@
 
 package drbd.gui;
 
-import drbd.AddClusterDialog;
 import drbd.data.Clusters;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
@@ -30,15 +29,15 @@ import drbd.utilities.Tools;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.ImageIcon;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.UIManager;
+
 import java.awt.GridLayout;
 import java.awt.Component;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Insets;
-
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.UIManager;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,

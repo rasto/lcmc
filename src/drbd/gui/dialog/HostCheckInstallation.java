@@ -40,8 +40,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * An implementation of a dialog where
@@ -76,11 +74,11 @@ public class HostCheckInstallation extends DialogHost {
     /** Install heartbeat/pacemaker button. */
     private final MyButton hbPmButton = new MyButton(
             Tools.getString("Dialog.HostCheckInstallation.HbPmInstallButton"));
-    /** Openais/pacemaker installation method */
+    /** Openais/pacemaker installation method. */
     private GuiComboBox aisPmInstMethodCB;
-    /** Heartbeat/pacemaker installation method */
+    /** Heartbeat/pacemaker installation method. */
     private GuiComboBox hbPmInstMethodCB;
-    /** DRBD installation method */
+    /** DRBD installation method. */
     private GuiComboBox drbdInstMethodCB;
 
     /** Checking icon. */
@@ -113,8 +111,9 @@ public class HostCheckInstallation extends DialogHost {
     private boolean aisPmOk = false;
     /** Whether heartbeat/pacemaker installation was ok. */
     private boolean hbPmOk = false;
-    /** Whether there are drbd methods available */
+    /** Whether there are drbd methods available. */
     private boolean drbdInstallMethodsAvailable = false;
+    /** Label of heartbeat that can be with or without pacemaker. */
     private final JLabel hbPmJLabel = new JLabel("HB/Pacemaker");
 
     /**
@@ -276,7 +275,8 @@ public class HostCheckInstallation extends DialogHost {
                         }
                     } else {
                         drbdButton.setText(Tools.getString(
-                          "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"));
+                        "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"
+                        ));
                         if (drbdInstallMethodsAvailable) {
                             drbdButton.setEnabled(true);
                             drbdInstMethodCB.setEnabled(true);
@@ -365,7 +365,7 @@ public class HostCheckInstallation extends DialogHost {
                         hbPmJLabel.setText("Heartbeat");
                         hbPmLabel.setText(": " + hbVersionText);
                     } else {
-                        hbPmLabel.setText(": " + hbVersionText + "/" 
+                        hbPmLabel.setText(": " + hbVersionText + "/"
                                           + getHost().getPacemakerVersion());
                     }
                     hbPmIcon.setIcon(INSTALLED_ICON);
@@ -387,13 +387,13 @@ public class HostCheckInstallation extends DialogHost {
                 public void run() {
                     aisPmIcon.setIcon(INSTALLED_ICON);
                     aisPmLabel.setText(": "
-                                      + getHost().getOpenaisVersion() + "/" 
+                                      + getHost().getOpenaisVersion() + "/"
                                       + getHost().getPacemakerVersion());
                 }
             });
         }
 
-        if (drbdOk && (hbPmOk || aisPmOk)) { 
+        if (drbdOk && (hbPmOk || aisPmOk)) {
             progressBarDone();
             nextButtonSetEnabled(true);
             enableComponents();
@@ -444,7 +444,7 @@ public class HostCheckInstallation extends DialogHost {
         private final String name;
         /** Index of the method. */
         private final int index;
-        /** Method string */
+        /** Method string. */
         private final String method;
 
         /**
@@ -487,14 +487,14 @@ public class HostCheckInstallation extends DialogHost {
         }
 
         /**
-         * Returns whether the installation method is "source"
+         * Returns whether the installation method is "source".
          */
          public final boolean isSourceMethod() {
              return "source".equals(method);
          }
 
         /**
-         * Returns whether the installation method is "linbit"
+         * Returns whether the installation method is "linbit".
          */
          public final boolean isLinbitMethod() {
              return "linbit".equals(method);
@@ -505,7 +505,7 @@ public class HostCheckInstallation extends DialogHost {
      * Returns tool tip texts for ais/pm installation method combo box and
      * install button.
      */
-    private final String getAisPmInstToolTip(final String index) {
+    private String getAisPmInstToolTip(final String index) {
         return Tools.html(
             getHost().getDistString(
                 "AisPmInst.install." + index)).replaceAll(";", ";<br>&gt; ")
@@ -516,7 +516,7 @@ public class HostCheckInstallation extends DialogHost {
      * Returns tool tip texts for hb/pm installation method combo box and
      * install button.
      */
-    private final String getHbPmInstToolTip(final String index) {
+    private String getHbPmInstToolTip(final String index) {
         return Tools.html(
             getHost().getDistString(
                 "HbPmInst.install." + index)).replaceAll(";", ";<br>&gt; ")
@@ -527,7 +527,7 @@ public class HostCheckInstallation extends DialogHost {
      * Returns tool tip texts for drbd installation method combo box and install
      * button.
      */
-    private final String getDrbdInstToolTip(final String index) {
+    private String getDrbdInstToolTip(final String index) {
         return Tools.html(
             getHost().getDistString(
                 "DrbdInst.install." + index)).replaceAll(";", ";<br>&gt; ")
@@ -575,12 +575,13 @@ public class HostCheckInstallation extends DialogHost {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 InstallMethods method =
-                                     (InstallMethods) aisPmInstMethodCB.getValue();
+                                  (InstallMethods) aisPmInstMethodCB.getValue();
                                 final String toolTip =
-                                           getAisPmInstToolTip(method.getIndex());
+                                        getAisPmInstToolTip(method.getIndex());
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        aisPmInstMethodCB.setToolTipText(toolTip);
+                                        aisPmInstMethodCB.setToolTipText(
+                                                                      toolTip);
                                         aisPmButton.setToolTipText(toolTip);
                                     }
                                 });
@@ -599,13 +600,13 @@ public class HostCheckInstallation extends DialogHost {
         while (true) {
             final String index = Integer.toString(i);
             final String text =
-                      getHost().getDistString("HbPmInst.install.text." + index);
+                     getHost().getDistString("HbPmInst.install.text." + index);
             if (text == null || text.equals("")) {
                 break;
             }
             final InstallMethods hbPmInstallMethod = new InstallMethods(
-                Tools.getString("Dialog.HostCheckInstallation.HbPmInstallMethod")
-                + text, i);
+              Tools.getString("Dialog.HostCheckInstallation.HbPmInstallMethod")
+              + text, i);
             hbPmMethods.add(hbPmInstallMethod);
             if (text.equals(
                        Tools.getConfigData().getLastHbAisPmInstalledMethod())) {
@@ -627,12 +628,14 @@ public class HostCheckInstallation extends DialogHost {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 InstallMethods method =
-                                     (InstallMethods) hbPmInstMethodCB.getValue();
+                                     (InstallMethods) hbPmInstMethodCB.
+                                                                    getValue();
                                 final String toolTip =
-                                           getHbPmInstToolTip(method.getIndex());
+                                         getHbPmInstToolTip(method.getIndex());
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        hbPmInstMethodCB.setToolTipText(toolTip);
+                                        hbPmInstMethodCB.setToolTipText(
+                                                                      toolTip);
                                         hbPmButton.setToolTipText(toolTip);
                                     }
                                 });
@@ -687,11 +690,14 @@ public class HostCheckInstallation extends DialogHost {
                             final Thread thread = new Thread(new Runnable() {
                                 public void run() {
                                     InstallMethods method =
-                                       (InstallMethods) drbdInstMethodCB.getValue();
-                                    final String toolTip = getDrbdInstToolTip(method.getIndex());
+                                       (InstallMethods) drbdInstMethodCB.
+                                                                    getValue();
+                                    final String toolTip =
+                                         getDrbdInstToolTip(method.getIndex());
                                     SwingUtilities.invokeLater(new Runnable() {
                                         public void run() {
-                                           drbdInstMethodCB.setToolTipText(toolTip);
+                                           drbdInstMethodCB.setToolTipText(
+                                                                    toolTip);
                                            drbdButton.setToolTipText(toolTip);
                                         }
                                     });

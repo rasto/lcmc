@@ -91,7 +91,7 @@ public abstract class ConfigDialog {
     private CountDownLatch dialogGate;
     /** Skip button, can be null, if there is no skip button. */
     private JCheckBox skipButton = null;
-    /** Answer from the optionpane */
+    /** Answer from the optionpane. */
     private volatile Object optionPaneAnswer;
 
     /**

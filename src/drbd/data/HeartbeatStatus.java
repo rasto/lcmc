@@ -38,15 +38,15 @@ import java.util.ArrayList;
  * @version $Id$
  */
 public class HeartbeatStatus {
-    /** Host */
+    /** Host. */
     private final Host host;
     /** Data from cib query. */
     private volatile CibQuery cibQueryMap = new CibQuery();
     /** DC Node. */
     private String dc = null;
-    /** HeartbeatXML object */
+    /** HeartbeatXML object. */
     private final HeartbeatXML heartbeatXML;
-    /** On which node the resource is running */
+    /** On which node the resource is running. */
     private volatile Map<String, String> runningOnNodeHash = null;
 
     /**
@@ -96,7 +96,8 @@ public class HeartbeatStatus {
      * Returns value of parameter.
      */
     public final String getParameter(final String hbId, final String param) {
-        final Map<String, String> params = cibQueryMap.getParameters().get(hbId);
+        final Map<String, String> params =
+                                        cibQueryMap.getParameters().get(hbId);
         if (params != null) {
             return params.get(param);
         }
@@ -106,7 +107,8 @@ public class HeartbeatStatus {
     /**
      * Returns hash with parameter name and nvpair id of the specified service.
      */
-    public final Map<String, String> getParametersNvpairsIds(final String hbId) {
+    public final Map<String, String> getParametersNvpairsIds(
+                                                          final String hbId) {
         return cibQueryMap.getParametersNvpairsIds().get(hbId);
     }
 
@@ -433,14 +435,14 @@ public class HeartbeatStatus {
     /**
      * Parses output from crm_mon.
      */
-    private final void parseResStatus(final String resStatus) {
+    private void parseResStatus(final String resStatus) {
         runningOnNodeHash = heartbeatXML.parseResStatus(resStatus);
     }
 
     /**
      * Parses output from cibadmin command.
      */
-    private final void parseCibQuery(final String query) {
+    private void parseCibQuery(final String query) {
         cibQueryMap = heartbeatXML.parseCibQuery(query);
     }
 }

@@ -34,7 +34,7 @@ public class ComboInfo {
     private final String string;
     /** Name. */
     private final String name;
-       
+
     /**
      * Creates a new ComboInfo object.
      */

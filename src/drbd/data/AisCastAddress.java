@@ -34,7 +34,7 @@ public class AisCastAddress {
     private static final long serialVersionUID = 1L;
     /** Type of the cast address. */
     private final String type; /* only mcast at the moment*/
-    /** Bind net address like 192.168.122.0 */
+    /** Bind net address like 192.168.122.0. */
     private final String bindnetaddr;
     /** A multicast IP address. */
     private final String address;

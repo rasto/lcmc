@@ -84,10 +84,10 @@ public class HostAisPmInst extends DialogHost {
             arch = getHost().getArch();
         }
         final String archString = arch;
-        String installCommand = "AisPmInst.install"; 
+        String installCommand = "AisPmInst.install";
         final String installMethod = getHost().getAisPmInstallMethod();
         if (installMethod != null) {
-            installCommand = "AisPmInst.install." + installMethod; 
+            installCommand = "AisPmInst.install." + installMethod;
         }
         Tools.getConfigData().setLastHbAisPmInstalledMethod(
            getHost().getDistString("AisPmInst.install.text." + installMethod));
@@ -101,10 +101,11 @@ public class HostAisPmInst extends DialogHost {
                              }
                              public void doneError(final String ans,
                                                    final int exitCode) {
-                                 printErrorAndRetry(Tools.getString(
-                                                "Dialog.HostAisPmInst.InstError"),
-                                                    ans,
-                                                    exitCode);
+                                 printErrorAndRetry(
+                                        Tools.getString(
+                                             "Dialog.HostAisPmInst.InstError"),
+                                        ans,
+                                        exitCode);
                              }
                          },
                          new ConvertCmdCallback() {

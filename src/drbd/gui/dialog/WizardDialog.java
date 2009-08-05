@@ -224,6 +224,9 @@ public abstract class WizardDialog extends ConfigDialog {
      */
     public abstract WizardDialog nextDialog();
 
+    /**
+     * Enables components except the ones that are passed as the argument.
+     */
     protected void enableComponents(final JComponent[] componentsToDisable) {
         super.enableComponents(componentsToDisable);
         SwingUtilities.invokeLater(new Runnable() {
@@ -243,15 +246,24 @@ public abstract class WizardDialog extends ConfigDialog {
         });
     }
 
+    /**
+     * Requests focus.
+     */
     protected void requestFocusLater(final JButton b) {
         getDialogPanel().getRootPane().setDefaultButton(b);
         b.requestFocus();
     }
 
+    /**
+     * Enables components.
+     */
     protected void enableComponents() {
         enableComponents(new JComponent[]{});
     }
 
+    /**
+     * Inits the dialog.
+     */
     protected void initDialog() {
         /* align buttons to the right */
         final FlowLayout layout = new FlowLayout();

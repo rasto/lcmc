@@ -282,11 +282,11 @@ public final class Tools {
      *          warning message
      */
     public static void warning(final String msg) {
-        System.out.println("WARNING: " + getString(msg));
+        System.out.println("WARNING: " + Tools.getString(msg));
         JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
-                            getString(msg),
-                            getString("Warning.Title"),
+                            Tools.getString(msg),
+                            Tools.getString("Tools.Warning.Title"),
                             JOptionPane.WARNING_MESSAGE
                            );
 
@@ -303,7 +303,7 @@ public final class Tools {
         JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
                             getErrorString(msg),
-                            getString("Error.Title"),
+                            Tools.getString("Error.Title"),
                             JOptionPane.ERROR_MESSAGE
                            );
 
@@ -665,7 +665,7 @@ public final class Tools {
                                       final boolean showError) {
         BufferedReader in = null;
         final StringBuffer xml = new StringBuffer("");
-        //Tools.startProgressIndicator(getString("Tools.Loading"));
+        //Tools.startProgressIndicator(Tools.getString("Tools.Loading"));
         try {
             in = new BufferedReader(new FileReader(filename));
             String line = "";
@@ -673,8 +673,8 @@ public final class Tools {
                 xml.append(line);
             }
         } catch (Exception ex) {
-            //Tools.stopProgressIndicator(getString("Tools.Loading"));
-            //Tools.progressIndicatorFailed(getString("Tools.Loading")
+            //Tools.stopProgressIndicator(Tools.getString("Tools.Loading"));
+            //Tools.progressIndicatorFailed(Tools.getString("Tools.Loading")
             //                              + " failed");
             if (showError) {
                 infoDialog("Load Error",
@@ -683,7 +683,7 @@ public final class Tools {
             }
             return null;
         }
-        //Tools.stopProgressIndicator(getString("Tools.Loading"));
+        //Tools.stopProgressIndicator(Tools.getString("Tools.Loading"));
         if (in != null)  {
             try {
                 in.close();
@@ -764,7 +764,7 @@ public final class Tools {
      */
     public static void save(final String filename) {
         debug("save");
-        startProgressIndicator(getString("Tools.Saving"));
+        startProgressIndicator(Tools.getString("Tools.Saving"));
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
             drbdGuiXML.saveXML(fileOut);
@@ -787,7 +787,7 @@ public final class Tools {
                     }
                 }
             }
-            stopProgressIndicator(getString("Tools.Saving"));
+            stopProgressIndicator(Tools.getString("Tools.Saving"));
         }
 
     }
@@ -1186,21 +1186,21 @@ public final class Tools {
     public static String scoreToString(final String score) {
         String str = "";
         if ("-INFINITY".equals(score)) {
-            str = getString("Score.MinusInfinityString");
+            str = Tools.getString("Score.MinusInfinityString");
         } else if ("INFINITY".equals(score)) {
-            str = getString("Score.InfinityString");
+            str = Tools.getString("Score.InfinityString");
         } else {
             try {
                 final long scoreInt = Integer.valueOf(score);
                 if (scoreInt == 0) {
-                    str = getString("Score.ZeroString");
+                    str = Tools.getString("Score.ZeroString");
                 } else if (scoreInt > 0) {
-                    str = getString("Score.PlusString");
+                    str = Tools.getString("Score.PlusString");
                 } else {
-                    str = getString("Score.MinusString");
+                    str = Tools.getString("Score.MinusString");
                 }
             } catch (Exception e) {
-                str = getString("Score.Unknown");
+                str = Tools.getString("Score.Unknown");
             }
         }
         return str + " (" + scoreToHBString(score) + ")";
@@ -1325,7 +1325,7 @@ public final class Tools {
     public static void startProgressIndicator(final String text) {
         if (text == null) {
             getGUIData().getMainGlassPane().start(
-                                        getString("Tools.ExecutingCommand"));
+                                    Tools.getString("Tools.ExecutingCommand"));
         } else {
             getGUIData().getMainGlassPane().start(text);
         }

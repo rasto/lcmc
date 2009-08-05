@@ -72,17 +72,17 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Dimension of the big buttons. */
     private static final Dimension BIG_BUTTON_DIMENSION =
                                                     new Dimension(300, 100);
-    /** Logo panel for card layout */
+    /** Logo panel for card layout. */
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
-    /** Help panel for card layout */
+    /** Help panel for card layout. */
     private static final String HELP_PANEL_STRING = "HELP-STRING";
-    /** I am new here button text */
+    /** I am new here button text. */
     private static final String HELP_BUTTON_STRING =
                                 Tools.getString("EmptyViewPanel.HelpButton");
-    /** Button that hides the help text */
+    /** Button that hides the help text. */
     private static final String HIDE_HELP_BUTTON_STRING =
-                                Tools.getString("EmptyViewPanel.HideHelpButton");
-    /** I am new here help text */
+                               Tools.getString("EmptyViewPanel.HideHelpButton");
+    /** I am new here help text. */
     private static final String HELP_TEXT_STRING =
                                 Tools.getString("EmptyViewPanel.HelpText");
     /** Menu tree object. */

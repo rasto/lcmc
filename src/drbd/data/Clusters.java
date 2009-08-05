@@ -74,7 +74,7 @@ public class Clusters implements Serializable {
      */
     public final String getDefaultClusterName() {
         int index = 0;
-        final String defaultName = Tools.getString("ClusterDefaultName");
+        final String defaultName = Tools.getString("Clusters.DefaultName");
         if (clusters != null) {
             for (final Cluster cluster : clusters) {
             /* find the bigest index of cluster default name and increment it

@@ -25,8 +25,6 @@ import java.io.Serializable;
 import java.io.IOException;
 import java.io.File;
 import drbd.utilities.Tools;
-import java.util.Map;
-import java.util.List;
 import com.trilead.ssh2.KnownHosts;
 
 /**
@@ -68,7 +66,7 @@ public class ConfigData implements Serializable {
     private final String idDSAPath;
     /** Id rsa path. */
     private final String idRSAPath;
-    /** Last installed clusterStack */
+    /** Last installed clusterStack. */
     private String lastInstalledClusterStack = null;
     /** Last installed method either Openais or Heartbeat with pacemaker. */
     private String lastHbAisPmInstalledMethod = null;
@@ -282,7 +280,7 @@ public class ConfigData implements Serializable {
      * Sets what was the last installed cluster stack.
      */
     public final void setLastInstalledClusterStack(
-                                        final String lastInstalledClusterStack) {
+                                       final String lastInstalledClusterStack) {
         this.lastInstalledClusterStack = lastInstalledClusterStack;
     }
 

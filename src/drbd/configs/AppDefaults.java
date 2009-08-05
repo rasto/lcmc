@@ -250,7 +250,9 @@ public class AppDefaults extends
         {"ClusterViewPanel.ClusterIcon", "Icons/tango/32x32/cluster_32x32.png"},
         {"HostsPanel.HostIcon",          "Icons/tango/32x32/host_32x32.png"},
 
-        {"DrbdGraph.HarddiscIcon",      "Icons/tango/32x32/blockdevice_32x32.png"},
+        {"DrbdGraph.HarddiscIcon",
+         "Icons/tango/32x32/blockdevice_32x32.png"},
+
         {"DrbdGraph.NoHarddiscIcon",    "Icons/tango/32x32/noharddisc.png"},
         {"DrbdGraph.HostIcon",          "Icons/tango/32x32/host_32x32.png"},
 
@@ -276,17 +278,22 @@ public class AppDefaults extends
         {"Dialog.Dialog.FinishIcon",   "Icons/tango/16x16/finish2_16x16.png"},
 
         {"Dialog.HostCheckInstallation.CheckingIcon",
-                                        "Icons/32X32/dialog-information.png"},
-        {"Dialog.HostCheckInstallation.NotInstalledIcon",
-                                    "Icons/32X32/software-update-urgent.png"},
-        {"Dialog.HostCheckInstallation.InstalledIcon",
-                                            "Icons/32X32/weather-clear.png"},
-        {"Dialog.HostCheckInstallation.UpgrAvailIcon",
-                                "Icons/32X32/software-update-available.png"},
+         "Icons/32X32/dialog-information.png"},
 
-        {"Dialog.HostFinish.HostIcon", "Icons/tango/32x32/host_32x32.png"},
+        {"Dialog.HostCheckInstallation.NotInstalledIcon",
+         "Icons/32X32/software-update-urgent.png"},
+
+        {"Dialog.HostCheckInstallation.InstalledIcon",
+         "Icons/32X32/weather-clear.png"},
+
+        {"Dialog.HostCheckInstallation.UpgrAvailIcon",
+         "Icons/32X32/software-update-available.png"},
+
+        {"Dialog.HostFinish.HostIcon",
+         "Icons/tango/32x32/host_32x32.png"},
+
         {"Dialog.HostFinish.ClusterIcon",
-                                        "Icons/tango/32x32/cluster_32x32.png"},
+         "Icons/tango/32x32/cluster_32x32.png"},
 
         /*
          * ssh

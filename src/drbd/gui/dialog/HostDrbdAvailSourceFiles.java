@@ -92,7 +92,9 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
                     final List<ComboInfo> items = new ArrayList<ComboInfo>();
                     for (final String versionString : versions) {
                         final String version =
-                                versionString.substring(9, versionString.length() - 7);
+                                versionString.substring(
+                                                   9,
+                                                   versionString.length() - 7);
                         items.add(new ComboInfo(version, versionString));
                     }
                     drbdTarballCombo.clear();
@@ -135,7 +137,8 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
             answerPaneSetText("http://oss.linbit.com/drbd/"
                               + versionInfo.getStringValue());
             getHost().setDrbdVersionToInstall(versionInfo.toString());
-            getHost().setDrbdVersionUrlStringToInstall(versionInfo.getStringValue());
+            getHost().setDrbdVersionUrlStringToInstall(
+                                            versionInfo.getStringValue());
         }
         // TODO: do something different if we did not get any versions
         drbdTarballCombo.setEnabled(true);
@@ -218,8 +221,9 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getChoiceBoxes());
-        pane.add(getAnswerPane(
-                    Tools.getString("Dialog.HostDrbdAvailSourceFiles.Executing")));
+        pane.add(
+            getAnswerPane(
+                Tools.getString("Dialog.HostDrbdAvailSourceFiles.Executing")));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad

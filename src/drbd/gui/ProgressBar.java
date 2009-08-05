@@ -165,7 +165,7 @@ public class ProgressBar implements ActionListener {
                                     Tools.getDefaultInt("ProgressBar.Delay");
                     int threshold = DEBUG_THRESHOLD;
                     boolean isVisible = false;
-                    while (!stopNow) {// && progress <= timeout) {
+                    while (!stopNow) { // && progress <= timeout) {
                         try {
                             Thread.sleep(sleepTime);
                         } catch (InterruptedException ex) {

@@ -48,7 +48,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.awt.Paint;
-import java.awt.geom.RoundRectangle2D;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -1302,7 +1301,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final String runningOnNode = si.getRunningOnNode();
         if (runningOnNode != null && !"".equals(runningOnNode)) {
             return "running on: " + runningOnNode;
-        } 
+        }
         return "not running";
     }
 
@@ -1335,12 +1334,13 @@ public class HeartbeatGraph extends ResourceGraph {
             final double width = shape.getBounds().getWidth();
             final double freeWidth = width * (100 - used) / 100;
             g2d.setColor(new Color(255, 255, 255, 220));
-            g2d.fillRoundRect((int) (x + shape.getBounds().getWidth() - freeWidth),
-                              (int) (y + 2),
-                              (int) (freeWidth - 1),
-                              (int) (height - 4),
-                              20,
-                              20);
+            g2d.fillRoundRect(
+                          (int) (x + shape.getBounds().getWidth() - freeWidth),
+                          (int) (y + 2),
+                          (int) (freeWidth - 1),
+                          (int) (height - 4),
+                          20,
+                          20);
         }
     }
 }

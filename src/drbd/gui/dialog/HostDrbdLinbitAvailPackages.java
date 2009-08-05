@@ -61,11 +61,11 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /** Combo box with available architectures versions for this distribution.
      */
     private GuiComboBox drbdArchCombo = null;
-    /** List of items in the dist combo */
+    /** List of items in the dist combo. */
     private List<String> drbdDistItems = null;
-    /** List of items in the kernel versions combo */
+    /** List of items in the kernel versions combo. */
     private List<String> drbdKernelDirItems = null;
-    /** List of items in the arch combo */
+    /** List of items in the arch combo. */
     private List<String> drbdArchItems = null;
     /** No match string. */
     private static final String NO_MATCH_STRING = "No Match";

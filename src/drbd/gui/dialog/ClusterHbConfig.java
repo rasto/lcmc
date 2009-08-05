@@ -487,7 +487,7 @@ public class ClusterHbConfig extends DialogCluster {
                         public void focusGained(final FocusEvent e) {
                             if (configScrollPane != null) {
                                 configScrollPane.getViewport().setViewPosition(
-                                                  label.getBounds().getLocation());
+                                              label.getBounds().getLocation());
                                 label.removeFocusListener(this); /* only once */
                             }
                         }

@@ -115,7 +115,8 @@ public class Logs extends ConfigDialog {
                                          public void run() {
                                             logTextArea.setText(ans);
                                             logTextArea.setCaretPosition(
-                                                logTextArea.getDocument().getLength());
+                                                logTextArea.getDocument().
+                                                                 getLength());
                                          }
                                      });
                                      enableComponents();

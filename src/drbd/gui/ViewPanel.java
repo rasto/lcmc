@@ -104,7 +104,9 @@ public class ViewPanel extends JPanel {
                 final TreePath selPath = tree.getPathForLocation(e.getX(),
                                                                  e.getY());
                 if (selRow != -1 && e.getButton() > 1) {
-                    final Info nodeInfo = (Info) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
+                    final Info nodeInfo =
+                            (Info) ((DefaultMutableTreeNode) selPath.
+                                       getLastPathComponent()).getUserObject();
                     if (nodeInfo != null) {
                         nodeInfo.showPopup(tree, e.getX(), e.getY());
                         tree.setSelectionPath(selPath);

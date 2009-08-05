@@ -110,11 +110,11 @@ public class TerminalPanel extends JScrollPane {
         terminalColor.put("32",
                           Tools.getDefaultColor("TerminalPanel.TerminalGreen"));
         terminalColor.put("33",
-                          Tools.getDefaultColor("TerminalPanel.TerminalYellow"));
+                         Tools.getDefaultColor("TerminalPanel.TerminalYellow"));
         terminalColor.put("34",
                           Tools.getDefaultColor("TerminalPanel.TerminalBlue"));
         terminalColor.put("35",
-                          Tools.getDefaultColor("TerminalPanel.TerminalPurple"));
+                         Tools.getDefaultColor("TerminalPanel.TerminalPurple"));
         terminalColor.put("36",
                           Tools.getDefaultColor("TerminalPanel.TerminalCyan"));
         final Font f = new Font("Monospaced", Font.PLAIN, 14);
@@ -203,11 +203,11 @@ public class TerminalPanel extends JScrollPane {
     /**
      * Returns terminal output color.
      */
-    private final Color getColorFromString(final String s) {
+    private Color getColorFromString(final String s) {
         /* "]" default color */
         if ("[".equals(s)) {
             return null;
-        } 
+        }
         final Pattern p1 = Pattern.compile("^\\[\\d+;(\\d+)$");
         final Matcher m1 = p1.matcher(s);
         if (m1.matches()) {
@@ -229,7 +229,7 @@ public class TerminalPanel extends JScrollPane {
     /**
      * Get char count.
      */
-    private final int getCharCount(final String s) {
+    private int getCharCount(final String s) {
         final Pattern p1 = Pattern.compile("^\\[(\\d+)$");
         final Matcher m1 = p1.matcher(s);
         if (m1.matches()) {
@@ -270,7 +270,7 @@ public class TerminalPanel extends JScrollPane {
                 inside = true;
                 printit = false;
                 colorString = new StringBuffer(10);
-            } 
+            }
             String c = "";
             try {
                 c = new String(bytes, i, 1, "UTF-8");

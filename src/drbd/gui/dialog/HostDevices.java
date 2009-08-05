@@ -56,7 +56,8 @@ public class HostDevices extends DialogHost {
     public void checkAnswer(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
             progressBarDoneError();
-            answerPaneSetTextError(Tools.getString("Dialog.HostDevices.Error"));
+            answerPaneSetTextError(Tools.getString(
+                                            "Dialog.HostDevices.CheckError"));
             enableComponents();
             buttonClass(nextButton()).requestFocus();
         } else {
@@ -79,22 +80,23 @@ public class HostDevices extends DialogHost {
             new Runnable() {
                 public void run() {
                     getProgressBar().start(6000);
-                    final ExecCommandThread t = getHost().execCommand("installGuiHelper",
-                                     (ProgressBar) null, //getProgressBar(),
-                                     new ExecCallback() {
-                                         public void done(final String ans) {
-                                             getAllInfo();
-                                         }
-                                         public void doneError(final String ans,
-                                                               final int exitCode) {
-                                             /* in case of error, the next command will
-                                                find out, so it's not checked here. Gui
-                                                Helper can be installed anyway. */
-                                             getAllInfo();
-                                         }
-                                     },
-                                     null,   /* ConvertCmdCallback */
-                                     false); /* outputVisible */
+                    final ExecCommandThread t = getHost().execCommand(
+                             "installGuiHelper",
+                             (ProgressBar) null, //getProgressBar(),
+                             new ExecCallback() {
+                                 public void done(final String ans) {
+                                     getAllInfo();
+                                 }
+                                 public void doneError(final String ans,
+                                                       final int exitCode) {
+                                     /* in case of error, the next command will
+                                        find out, so it's not checked here. Gui
+                                        Helper can be installed anyway. */
+                                     getAllInfo();
+                                 }
+                             },
+                             null,   /* ConvertCmdCallback */
+                             false); /* outputVisible */
                     setCommandThread(t);
                 }
             });

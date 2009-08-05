@@ -21,8 +21,11 @@
 
 package drbd.gui;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Spring;
+import javax.swing.SpringLayout;
+
+import java.awt.Container;
+import java.awt.Component;
 
 /**
  * A 1.4 file that provides utility methods for
@@ -61,9 +64,10 @@ public class SpringUtilities {
                                 int xPad, int yPad) {
         SpringLayout layout;
         try {
-            layout = (SpringLayout)parent.getLayout();
+            layout = (SpringLayout) parent.getLayout();
         } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeGrid must use SpringLayout.");
+            System.err.println(
+                    "The first argument to makeGrid must use SpringLayout.");
             return;
         }
 
@@ -115,7 +119,8 @@ public class SpringUtilities {
             if (i / cols == 0) { //first row
                 cons.setY(initialYSpring);
             } else { //y position depends on previous row
-                cons.setY(Spring.sum(lastRowCons.getConstraint(SpringLayout.SOUTH),
+                cons.setY(Spring.sum(lastRowCons.getConstraint(
+                                                           SpringLayout.SOUTH),
                                      yPadSpring));
             }
             lastCons = cons;
@@ -133,7 +138,7 @@ public class SpringUtilities {
                                 lastCons.getConstraint(SpringLayout.EAST)));
     }
 
-    /* Used by makeCompactGrid. */
+    /** Used by makeCompactGrid. */
     private static SpringLayout.Constraints getConstraintsForCell(
                                                 int row, int col,
                                                 Container parent,
@@ -164,9 +169,10 @@ public class SpringUtilities {
                                        int xPad, int yPad) {
         SpringLayout layout;
         try {
-            layout = (SpringLayout)parent.getLayout();
+            layout = (SpringLayout) parent.getLayout();
         } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+            System.err.println(
+                "The first argument to makeCompactGrid must use SpringLayout.");
             return;
         }
 

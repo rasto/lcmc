@@ -366,7 +366,7 @@ public class ClusterBrowser extends Browser {
                                             Arrays.asList(HB_PAR_TIMEOUT,
                                                           HB_PAR_INTERVAL)));
 
-        HB_OPERATION_PARAMS.put(HB_OP_STATUS, 
+        HB_OPERATION_PARAMS.put(HB_OP_STATUS,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
                                                           HB_PAR_INTERVAL)));
@@ -1961,7 +1961,7 @@ public class ClusterBrowser extends Browser {
                     int i = 0;
                     int index = 0;
                     while (i < 11) {
-                        final String drbdDevStr = "/dev/drbd" 
+                        final String drbdDevStr = "/dev/drbd"
                                                   + Integer.toString(index);
                         if (!drbdDevHash.containsKey(drbdDevStr)) {
                             drbdDevices.add(drbdDevStr);
@@ -3073,7 +3073,6 @@ public class ClusterBrowser extends Browser {
                             }
                         }
                     },
-                
                     null);
 
                 paramComboBoxAdd(param, prefix, paramCb);
@@ -3182,7 +3181,7 @@ public class ClusterBrowser extends Browser {
             if (blockDeviceParamCb != null) {
                 final Object value = blockDeviceParamCb.getValue();
                 if (Tools.isStringClass(value)) {
-                    // TODO: 
+                    // TODO:
                     return -1;
                 }
                 final Info item = (Info) value;
@@ -3243,7 +3242,7 @@ public class ClusterBrowser extends Browser {
         public String getResourceName() {
             return getResource().getValue("1");
         }
- 
+
         /**
          * Sets resource name / parameter "1".
          */
@@ -3490,7 +3489,7 @@ public class ClusterBrowser extends Browser {
                         final MyMenu classItem =
                                             new MyMenu(HB_CLASS_MENU.get(cl));
                         DefaultListModel m = new DefaultListModel();
-                        for (final HeartbeatService hbService 
+                        for (final HeartbeatService hbService
                                                 : getAddGroupServiceList(cl)) {
                             final MyMenuItem mmi =
                                     new MyMenuItem(hbService.getMenuName()) {
@@ -3968,7 +3967,7 @@ public class ClusterBrowser extends Browser {
             }
             return false;
         }
-        
+
         /**
          * Returns whether the service is running.
          */
@@ -4437,9 +4436,9 @@ public class ClusterBrowser extends Browser {
             for (final String op : HB_OPERATIONS) {
                 for (final String param : HB_OPERATION_PARAMS.get(op)) {
                     GuiComboBox.Type type;
-                    Unit[] units = null; 
+                    Unit[] units = null;
                     final String regexp = "^-?\\d*$";
-                    type = GuiComboBox.Type.TEXTFIELDWITHUNIT; 
+                    type = GuiComboBox.Type.TEXTFIELDWITHUNIT;
                     // TODO: having this on two places
                     units = new Unit[] {
                         new Unit("", "", "", ""),
@@ -4457,7 +4456,7 @@ public class ClusterBrowser extends Browser {
                     };
                     String defaultValue =
                                       hbService.getOperationDefault(op, param);
-                    // TODO: old style resources 
+                    // TODO: old style resources
                     if (defaultValue == null) {
                         defaultValue = "0";
                     }
@@ -4486,7 +4485,7 @@ public class ClusterBrowser extends Browser {
                     }
 
                     addField(p,
-                             new JLabel(Tools.ucfirst(op) 
+                             new JLabel(Tools.ucfirst(op)
                                         + " / " + Tools.ucfirst(param)),
                              cb,
                              leftWidth,
@@ -4765,7 +4764,7 @@ public class ClusterBrowser extends Browser {
                         }
                     );
                 }
-            
+
                 /* add item listeners to the operations combos */
                 for (final String op : HB_OPERATIONS) {
                     for (final String param : HB_OPERATION_PARAMS.get(op)) {
@@ -4916,7 +4915,7 @@ public class ClusterBrowser extends Browser {
                     /* generate one */
                     opId = "op-" + heartbeatId + "-" + op;
                 }
-                
+
                 for (final String param : HB_OPERATION_PARAM_LIST) {
                     if (HB_OPERATION_PARAMS.get(op).contains(param)) {
                         final GuiComboBox cb =
@@ -4933,7 +4932,7 @@ public class ClusterBrowser extends Browser {
                         }
                     }
                     if (opHash.size() > 0) {
-                        operations.put(op, opHash); 
+                        operations.put(op, opHash);
                         opHash.put("id", opId);
                         opHash.put("name", op);
                     }
@@ -5172,11 +5171,11 @@ public class ClusterBrowser extends Browser {
                                                getService().getHeartbeatId());
             final String score =
                 heartbeatStatus.getOrderScore(
-                                    parent.getService().getHeartbeatId(), 
+                                    parent.getService().getHeartbeatId(),
                                     getService().getHeartbeatId());
             final String symmetrical =
                 heartbeatStatus.getOrderSymmetrical(
-                                    parent.getService().getHeartbeatId(), 
+                                    parent.getService().getHeartbeatId(),
                                     getService().getHeartbeatId());
             CRM.removeOrder(getDCHost(),
                             orderId,
@@ -5210,7 +5209,7 @@ public class ClusterBrowser extends Browser {
                                                 getService().getHeartbeatId());
             final String score =
                 heartbeatStatus.getColocationScore(
-                                    parent.getService().getHeartbeatId(), 
+                                    parent.getService().getHeartbeatId(),
                                     getService().getHeartbeatId());
             CRM.removeColocation(getDCHost(),
                                  colocationId,
@@ -5426,7 +5425,7 @@ public class ClusterBrowser extends Browser {
                             groupId = group;
                             groupInfo.getService().doneRemoving();
                         }
-                    } 
+                    }
                     CRM.removeResource(dcHost,
                                        getService().getHeartbeatId(),
                                        groupId);
@@ -5899,7 +5898,7 @@ public class ClusterBrowser extends Browser {
                 sb.append("</b><br>running on: ");
                 sb.append(node);
             }
-            if (!isManaged()) { 
+            if (!isManaged()) {
                 sb.append(" (unmanaged)");
             }
             return sb.toString();
@@ -6346,7 +6345,7 @@ public class ClusterBrowser extends Browser {
                     if (si != null) { /* not yet complete */
                         final ServiceInfo siP =
                                     heartbeatIdToServiceInfo.get(heartbeatIdP);
-                        if (siP != null && siP.getName() != null) { 
+                        if (siP != null && siP.getName() != null) {
                             /* dangling orders and colocations */
                             if (siP.getName().equals("drbddisk")
                                 && si.getName().equals("Filesystem")) {
@@ -6372,7 +6371,7 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
-           
+
             final Enumeration e = getNode().children();
             while (e.hasMoreElements()) {
                 DefaultMutableTreeNode n =

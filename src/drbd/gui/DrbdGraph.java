@@ -44,7 +44,6 @@ import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.impl.SparseVertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.VertexShapeFactory;
-import edu.uci.ics.jung.visualization.Coordinates;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -241,7 +240,8 @@ public class DrbdGraph extends ResourceGraph {
                     // TODO: get saved position is disabled at the moment,
                     // because it does more harm than good at the moment.
                 }
-                final Vertex bdv = blockDeviceToVertexMap.get(bdi.getBlockDevice());
+                final Vertex bdv = blockDeviceToVertexMap.get(
+                                                        bdi.getBlockDevice());
                 Point2D pos = null; // getSavedPosition(bdi);
                 if (pos == null) {
                     pos = new Point2D.Double(
@@ -369,7 +369,8 @@ public class DrbdGraph extends ResourceGraph {
                     String s = bdi.getBlockDevice().getName();
                     if (s.length() > MAX_RIGHT_CORNER_STRING_LENGTH) {
                         s = "..." + s.substring(
-                                      s.length() - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
+                                      s.length()
+                                      - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
                                       s.length());
                     }
                     return s;
@@ -412,7 +413,8 @@ public class DrbdGraph extends ResourceGraph {
                 l = getInfo((Vertex) v).getName();
             }
             if (l.length() > MAX_VERTEX_STRING_LENGTH) {
-                l = "..." + l.substring(l.length() - MAX_VERTEX_STRING_LENGTH + 3,
+                l = "..." + l.substring(l.length()
+                                        - MAX_VERTEX_STRING_LENGTH + 3,
                                         l.length());
             }
             return l;
@@ -632,13 +634,15 @@ public class DrbdGraph extends ResourceGraph {
     //        final PickedState ps = getVisualizationViewer().getPickedState();
     //        for (final Object vo : ps.getPickedVertices()) {
     //            final Vertex vertex = (Vertex) vo;
-    //            x = getVertexLocations().getLocation(hostVertex).getX() + BD_X_OFFSET;
+    //            x = getVertexLocations().getLocation(hostVertex).getX()
+    //                + BD_X_OFFSET;
     //            final double minY =
     //                    getVertexLocations().getLocation(hostVertex).getY()
     //                    + BD_STEP_Y;
 
     //            y = y < minY ? minY : y;
-    //            y = Math.floor((y - minY + BD_STEP_Y / 2) / BD_STEP_Y) * BD_STEP_Y + minY;
+    //            y = Math.floor((y - minY + BD_STEP_Y / 2) / BD_STEP_Y)
+    //                           * BD_STEP_Y + minY;
     //            y = y > MAX_Y_POS ? MAX_Y_POS : y;
     //            final Coordinates c = getLayout().getCoordinates(vertex);
     //            c.setX(x);
@@ -733,7 +737,8 @@ public class DrbdGraph extends ResourceGraph {
                 if (isVertexAvailable(v)) {
                     return super.getVertexFillColor(v);
                 } else {
-                    return Tools.getDefaultColor("DrbdGraph.FillPaintNotAvailable");
+                    return Tools.getDefaultColor(
+                                            "DrbdGraph.FillPaintNotAvailable");
                 }
             }
             if (isVertexPrimary(v)) {

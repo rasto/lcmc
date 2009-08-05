@@ -53,7 +53,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
  *
  */
 public class HeartbeatXML extends XML {
-    /** Host */
+    /** Host. */
     private final Host host;
     /** List of global parameters. */
     private final List<String> globalParams = new ArrayList<String>();
@@ -691,7 +691,7 @@ public class HeartbeatXML extends XML {
             isManagedParam = "is_managed";
         }
         hbService.addParameter(targetRoleParam);
-        hbService.setParamPossibleChoices(targetRoleParam, 
+        hbService.setParamPossibleChoices(targetRoleParam,
                                           new String[]{"started", "stopped"});
         hbService.setParamIsMetaAttr(targetRoleParam, true);
         hbService.setParamRequired(targetRoleParam, true);
@@ -704,7 +704,7 @@ public class HeartbeatXML extends XML {
         hbService.setParamDefault(targetRoleParam, "stopped");
 
         hbService.addParameter(isManagedParam);
-        hbService.setParamPossibleChoices(isManagedParam, 
+        hbService.setParamPossibleChoices(isManagedParam,
                                           new String[]{"true", "false"});
         hbService.setParamIsMetaAttr(isManagedParam, true);
         hbService.setParamRequired(isManagedParam, true);
@@ -880,7 +880,8 @@ public class HeartbeatXML extends XML {
             }
 
             /* <parameters> */
-            final Node parametersNode = getChildNode(resAgentNode, "parameters");
+            final Node parametersNode = getChildNode(resAgentNode,
+                                                     "parameters");
             if (parametersNode == null) {
                 return;
             }
@@ -890,7 +891,8 @@ public class HeartbeatXML extends XML {
                 final Node parameterNode = parameters.item(j);
                 if (parameterNode.getNodeName().equals("parameter")) {
                     final String param = getAttribute(parameterNode, "name");
-                    final String required = getAttribute(parameterNode, "required");
+                    final String required =
+                                        getAttribute(parameterNode, "required");
                     if (!globalParams.contains(param)) {
                         globalParams.add(param);
                     }
@@ -911,9 +913,11 @@ public class HeartbeatXML extends XML {
                     final Node contentParamNode = getChildNode(parameterNode,
                                                                "content");
                     if (contentParamNode != null) {
-                        final String type = getAttribute(contentParamNode, "type");
-                        final String defaultValue = getAttribute(contentParamNode,
-                                                                 "default");
+                        final String type = getAttribute(contentParamNode,
+                                                         "type");
+                        final String defaultValue =
+                                                getAttribute(contentParamNode,
+                                                             "default");
 
                         paramGlobalTypeMap.put(param, type);
                         paramGlobalDefaultMap.put(param, defaultValue);
@@ -950,7 +954,7 @@ public class HeartbeatXML extends XML {
     /**
      * Parses the <primitive> node.
      */
-    private final void parsePrimitive(
+    private void parsePrimitive(
                 final Node primitiveNode,
                 final List<String> groupResList,
                 final Map<String, HeartbeatService> resourceTypeMap,
@@ -1050,7 +1054,8 @@ public class HeartbeatXML extends XML {
             /* <attributtes> only til 2.1.4 */
             NodeList nvpairsMA;
             if (Tools.compareVersions(hbV, "2.99.0") < 0) {
-                final Node attrsNode = getChildNode(metaAttrsNode, "attributes");
+                final Node attrsNode =
+                                    getChildNode(metaAttrsNode, "attributes");
                 nvpairsMA = attrsNode.getChildNodes();
             } else {
                 nvpairsMA = metaAttrsNode.getChildNodes();
@@ -1073,8 +1078,8 @@ public class HeartbeatXML extends XML {
     /**
      * Returns a hash with resource information. (running_on)
      */
-    public final Map<String,String> parseResStatus(final String resStatus) {
-        final Map<String,String> runningOnNode = new HashMap<String,String>();
+    public final Map<String, String> parseResStatus(final String resStatus) {
+        final Map<String, String> runningOnNode = new HashMap<String, String>();
         final Document document = getXMLDocument(resStatus);
         if (document == null) {
             return null;
@@ -1091,14 +1096,17 @@ public class HeartbeatXML extends XML {
             final Node resourceNode = resources.item(i);
             if (resourceNode.getNodeName().equals("resource")) {
                 final String id = getAttribute(resourceNode, "id");
-                final String running_on =
+                final String runningOn =
                                       getAttribute(resourceNode, "running_on");
-                runningOnNode.put(id, running_on);
+                runningOnNode.put(id, runningOn);
             }
         }
         return runningOnNode;
     }
 
+    /**
+     * Parses the transient attributes.
+     */
     private void parseTransientAttributes(final String uname,
                                           final Node transientAttrNode,
                                           final MultiKeyMap failedMap,
@@ -1179,7 +1187,7 @@ public class HeartbeatXML extends XML {
         } else {
             nvpairs = cpsNode.getChildNodes();
         }
-        Map<String,String> crmConfMap = new HashMap<String,String>();
+        Map<String, String> crmConfMap = new HashMap<String, String>();
         /*              <nvpair...> */
         for (int i = 0; i < nvpairs.getLength(); i++) {
             final Node optionNode = nvpairs.item(i);
@@ -1342,11 +1350,13 @@ public class HeartbeatXML extends XML {
                     }
                     tos.add(rscTo);
                     orderMap.put(rscFrom, tos);
-                    orderDirectionMap.put(rscFrom, rscTo, "before"); //TODO: not needed in pacemaker anymore
+                    //TODO: before is not needed in pacemaker anymore
+                    orderDirectionMap.put(rscFrom, rscTo, "before");
                     orderScoreMap.put(rscFrom, rscTo, score);
                     orderSymmetricalMap.put(rscFrom, rscTo, symmetrical);
                     orderIdMap.put(rscFrom, rscTo, ordId);
-                } else if (constraintNode.getNodeName().equals("rsc_location")) {
+                } else if (constraintNode.getNodeName().equals(
+                                                            "rsc_location")) {
                     final String locId = getAttribute(constraintNode, "id");
                     final String node  = getAttribute(constraintNode, "node");
                     final String rsc   = getAttribute(constraintNode, "rsc");

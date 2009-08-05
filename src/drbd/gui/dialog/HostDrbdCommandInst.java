@@ -84,10 +84,10 @@ public class HostDrbdCommandInst extends DialogHost {
             arch = getHost().getArch();
         }
         final String archString = arch;
-        String installCommand = "DrbdInst.install"; 
+        String installCommand = "DrbdInst.install";
         final String installMethod = getHost().getDrbdInstallMethod();
         if (installMethod != null) {
-            installCommand = "DrbdInst.install." + installMethod; 
+            installCommand = "DrbdInst.install." + installMethod;
         }
         final String drbdVersion = getHost().getDrbdVersionToInstall();
         final String drbdVersionUrlString =
@@ -102,10 +102,11 @@ public class HostDrbdCommandInst extends DialogHost {
                              }
                              public void doneError(final String ans,
                                                    final int exitCode) {
-                                 printErrorAndRetry(Tools.getString(
-                                                "Dialog.HostDrbdCommandInst.InstError"),
-                                                    ans,
-                                                    exitCode);
+                                 printErrorAndRetry(
+                                    Tools.getString(
+                                       "Dialog.HostDrbdCommandInst.InstError"),
+                                    ans,
+                                    exitCode);
                              }
                          },
                          new ConvertCmdCallback() {
@@ -152,7 +153,8 @@ public class HostDrbdCommandInst extends DialogHost {
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(Tools.getString("Dialog.HostDrbdCommandInst.Executing")));
+        pane.add(getAnswerPane(Tools.getString(
+                                    "Dialog.HostDrbdCommandInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad

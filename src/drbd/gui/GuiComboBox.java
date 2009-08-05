@@ -81,12 +81,8 @@ import java.util.regex.Matcher;
 public class GuiComboBox extends JPanel {
 
     /** Widget type. */
-    public enum Type {TEXTFIELD,
-                      PASSWDFIELD,
-                      COMBOBOX,
-                      RADIOGROUP,
-                      CHECKBOX,
-                      TEXTFIELDWITHUNIT};
+    public enum Type { TEXTFIELD, PASSWDFIELD, COMBOBOX, RADIOGROUP, CHECKBOX,
+                       TEXTFIELDWITHUNIT };
 
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -626,7 +622,7 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
-     * Sets item/value in the component and waits till it is set
+     * Sets item/value in the component and waits till it is set.
      */
     public final void setValueAndWait(final Object item) {
         switch(type) {

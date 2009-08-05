@@ -23,26 +23,19 @@
 package drbd.gui.dialog;
 
 import drbd.data.Host;
-import drbd.data.Hosts;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.SSH.ExecCommandThread;
 import drbd.gui.ProgressBar;
+import drbd.gui.GuiComboBox;
 
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.Color;
-import java.util.Map;
-import java.util.LinkedHashMap;
-
-import javax.swing.JPanel;
-import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import java.awt.FlowLayout;
 
 import javax.swing.JComponent;
-import drbd.gui.GuiComboBox;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can

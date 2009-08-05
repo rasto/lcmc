@@ -410,7 +410,8 @@ public abstract class ResourceGraph {
         Float maxXPos = new Float(0);
 
         // TODO: have to lock vertex locations
-        for (final Iterator it = vertexLocations.getVertexIterator(); it.hasNext();) {
+        for (final Iterator it = vertexLocations.getVertexIterator();
+             it.hasNext();) {
             final Vertex vn = (Vertex) it.next();
             final Point2D loc = vertexLocations.getLocation(vn);
             if (loc != null) {
@@ -1034,13 +1035,6 @@ public abstract class ResourceGraph {
      */
     protected abstract ImageIcon getIconForVertex(final ArchetypeVertex v);
 
-    ///**
-    // * Returns how much of the disk is used and use it to cover proportional part of
-    // * the vertex. Probably useful only for disks.
-    // * -1 for not used or not applicable.
-    // */
-    //protected abstract int getUsed(final Vertex v);
-   
     /**
      * This method must be overridden to draw something in the vertex.
      */

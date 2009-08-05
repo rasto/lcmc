@@ -156,7 +156,8 @@ public class HostFinish extends DialogHost {
                                 nextDialog = new HostNewHost(thisClass,
                                                              newHost);
                                 Tools.getGUIData().allHostsUpdate();
-                                ((MyButton) buttonClass(nextButton())).pressButton();
+                                ((MyButton) buttonClass(nextButton())).
+                                                                pressButton();
                             }
                         });
                     }
@@ -176,7 +177,8 @@ public class HostFinish extends DialogHost {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 confClusterButton.setEnabled(false);
-                                ((MyButton) buttonClass(finishButton())).pressButton();
+                                ((MyButton) buttonClass(finishButton())).
+                                                                pressButton();
                             }
                         });
                         final AddClusterDialog c = new AddClusterDialog();
@@ -192,7 +194,7 @@ public class HostFinish extends DialogHost {
         }
         pane.add(confClusterButton);
         /* Save checkbox */
-        pane.add(saveCB); 
+        pane.add(saveCB);
         return pane;
     }
 }

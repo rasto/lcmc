@@ -84,10 +84,10 @@ public class HostHbInst extends DialogHost {
             arch = getHost().getArch();
         }
         final String archString = arch;
-        String installCommand = "HbPmInst.install"; 
+        String installCommand = "HbPmInst.install";
         final String installMethod = getHost().getHbPmInstallMethod();
         if (installMethod != null) {
-            installCommand = "HbPmInst.install." + installMethod; 
+            installCommand = "HbPmInst.install." + installMethod;
         }
         Tools.getConfigData().setLastHbAisPmInstalledMethod(
             getHost().getDistString("HbPmInst.install.text." + installMethod));

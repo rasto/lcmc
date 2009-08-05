@@ -87,7 +87,7 @@ public class CibQuery {
     private Map<String, Map<String, String>> resOpIds =
                                     new HashMap<String, Map<String, String>>();
     /** List of active nodes. */
-    private Set<String> activeNodes= new HashSet<String>();
+    private Set<String> activeNodes = new HashSet<String>();
     /** Group to resources map. */
     private Map<String, List<String>> groupsToResources =
                                            new HashMap<String, List<String>>();
@@ -106,7 +106,7 @@ public class CibQuery {
     /**
      * Returns crm config.
      */
-    public final Map<String,String> getCrmConfig() {
+    public final Map<String, String> getCrmConfig() {
         return crmConfig;
     }
 
@@ -122,7 +122,7 @@ public class CibQuery {
     /**
      * Returns the parameters map.
      */
-    public final Map<String ,Map<String, String>> getParameters() {
+    public final Map<String, Map<String, String>> getParameters() {
         return parameters;
     }
 
@@ -131,14 +131,14 @@ public class CibQuery {
      * resource id and the second key being the parameter name.
      */
     public final void setParametersNvpairsIds(
-                       final Map<String, Map<String, String>> parametersNvpairsIds) {
+                  final Map<String, Map<String, String>> parametersNvpairsIds) {
         this.parametersNvpairsIds = parametersNvpairsIds;
     }
 
     /**
      * Returns the parameters nvpairs id map.
      */
-    public final Map<String ,Map<String, String>> getParametersNvpairsIds() {
+    public final Map<String, Map<String, String>> getParametersNvpairsIds() {
         return parametersNvpairsIds;
     }
 
@@ -291,7 +291,8 @@ public class CibQuery {
     /**
      * Sets location map.
      */
-    public final void setLocation(final Map<String, Map<String, String>> location) {
+    public final void setLocation(
+                            final Map<String, Map<String, String>> location) {
         this.location = location;
     }
 
@@ -305,7 +306,8 @@ public class CibQuery {
     /**
      * Sets locations id map.
      */
-    public final void setLocationsId(final Map<String, List<String>> locationsId) {
+    public final void setLocationsId(
+                                final Map<String, List<String>> locationsId) {
         this.locationsId = locationsId;
     }
 
@@ -319,7 +321,8 @@ public class CibQuery {
     /**
      * Sets map from location id to the score.
      */
-    public final void setLocationScore(final Map<String, String> locationScore) {
+    public final void setLocationScore(
+                                    final Map<String, String> locationScore) {
         this.locationScore = locationScore;
     }
 
@@ -375,7 +378,8 @@ public class CibQuery {
     /**
      * Sets <op> tag id map.
      */
-    public final void setResOpIds(final Map<String, Map<String, String>> resOpIds) {
+    public final void setResOpIds(
+                            final Map<String, Map<String, String>> resOpIds) {
         this.resOpIds = resOpIds;
     }
 

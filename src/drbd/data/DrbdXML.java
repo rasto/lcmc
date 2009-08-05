@@ -23,7 +23,6 @@
 package drbd.data;
 
 import drbd.gui.DrbdGraph;
-import drbd.data.resources.BlockDevice;
 import drbd.gui.HostBrowser.BlockDevInfo;
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
@@ -128,7 +127,8 @@ public class DrbdXML extends XML {
     private final Map<String, Map<String, String>> resourceHostMetaDiskMap =
                                     new HashMap<String, Map<String, String>>();
     /** Map from drbd resource name and the host to the meta disk index. */
-    private final Map<String, Map<String, String>> resourceHostMetaDiskIndexMap =
+    private final Map<String, Map<String, String>>
+                resourceHostMetaDiskIndexMap =
                                     new HashMap<String, Map<String, String>>();
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
@@ -923,7 +923,9 @@ public class DrbdXML extends XML {
         }
         /* since drbd 8.3 there is ro: instead of st:
          */
-        Pattern p = Pattern.compile("^(\\d+)\\s+ST\\s+(\\d+)\\s+\\{\\s+cs:(\\S+)\\s+(?:st|ro):(\\S+)/(\\S+)\\s+ds:(\\S+)/(\\S+)\\s+(\\S+).*?");
+        Pattern p =
+            Pattern.compile(
+                "^(\\d+)\\s+ST\\s+(\\d+)\\s+\\{\\s+cs:(\\S+)\\s+(?:st|ro):(\\S+)/(\\S+)\\s+ds:(\\S+)/(\\S+)\\s+(\\S+).*?");
         Matcher m = p.matcher(output);
         if (m.matches()) {
             /* String counter      = m.group(1); // not used */
@@ -935,7 +937,8 @@ public class DrbdXML extends XML {
             final String ds2          = m.group(7);
             final String flags        = m.group(8);
             /* get blockdevice object from device */
-            final BlockDevInfo bdi = getBlockDevInfo(devNr, hostName, drbdGraph);
+            final BlockDevInfo bdi =
+                                  getBlockDevInfo(devNr, hostName, drbdGraph);
             if (bdi != null) {
                 bdi.getBlockDevice().setConnectionState(cs);
                 bdi.getBlockDevice().setNodeState(ro1);
@@ -952,7 +955,8 @@ public class DrbdXML extends XML {
             /* String counter      = m.group(1); // not used */
             final String devNr        = m.group(2);
             final String synced       = m.group(3);
-            final BlockDevInfo bdi = getBlockDevInfo(devNr, hostName, drbdGraph);
+            final BlockDevInfo bdi =
+                                   getBlockDevInfo(devNr, hostName, drbdGraph);
             if (bdi != null && bdi.getBlockDevice().isDrbd()) {
                 bdi.getBlockDevice().setSyncedProgress(synced);
                 bdi.updateInfo();

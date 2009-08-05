@@ -276,15 +276,18 @@ public class HostConfiguration extends DialogHost {
                             }
                         }
                         progressBarDone();
-                        SwingUtilities.invokeLater(new Runnable() { public void run() {
-                            getHost().setHostname(Tools.join(",", hostnames, getHops()));
-                            nameField.requestFocus();
-                            nameField.selectAll();
-                            checkFields(nameField);
-                            addCheckField(nameField);
-                            nameField.setValue(getHost().getName());
-                            enableComponents();
-                        } });
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getHost().setHostname(
+                                        Tools.join(",", hostnames, getHops()));
+                                nameField.requestFocus();
+                                nameField.selectAll();
+                                checkFields(nameField);
+                                addCheckField(nameField);
+                                nameField.setValue(getHost().getName());
+                                enableComponents();
+                            }
+                        });
                     }
                 });
             thread.start();
