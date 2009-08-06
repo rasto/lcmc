@@ -1398,11 +1398,10 @@ public class SSH {
         }
         final int index = remoteFilename.lastIndexOf('/');
         if (index > 0) {
-            final String dir = remoteFilename.substring(0, index);
+            final String dir = remoteFilename.substring(0, index + 1);
             commands.append("mkdir -p ");
             commands.append(dir);
             commands.append(';'); 
-            System.out.println("mkdir -p : " + dir);
         }
         final Thread t = host.execCommandRaw(
                                 commands.toString()
