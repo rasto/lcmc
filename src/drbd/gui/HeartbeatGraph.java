@@ -1023,17 +1023,15 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
-        if (si.isStarted()) {
+        if (si.isRunning()) {
             return SERVICE_RUNNING_ICON;
-        } else if (si.isStopped()) {
-            return SERVICE_NOT_RUNNING_ICON;
         }
         final String node =
                         ((ServiceInfo) getInfo((Vertex) v)).getRunningOnNode();
         if (node == null) {
             return SERVICE_NOT_RUNNING_ICON;
         }
-        return SERVICE_RUNNING_ICON;
+        return SERVICE_NOT_RUNNING_ICON;
     }
 
     /**
@@ -1261,9 +1259,19 @@ public class HeartbeatGraph extends ResourceGraph {
         }
         String targetRole = null;
         if (si.isStarted()) {
-            targetRole = "started";
+            if (si.isRunning()) {
+                targetRole = null;
+            } else if (si.isFailed()) {
+                targetRole = "starting failed";
+            } else {
+                targetRole = "starting...";
+            }
         } else if (si.isStopped()) {
-            targetRole = "stopped";
+            if (si.isRunning()) {
+                targetRole = "stopping...";
+            } else {
+                targetRole = null;
+            }
         }
         return targetRole;
     }
@@ -1296,7 +1304,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si.isFailed()) {
             return "not running: failed";
         } else if (si.isStopped()) {
-            return "not running";
+            return "stopped";
         }
         final String runningOnNode = si.getRunningOnNode();
         if (runningOnNode != null && !"".equals(runningOnNode)) {
