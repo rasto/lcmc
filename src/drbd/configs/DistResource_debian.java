@@ -40,8 +40,8 @@ public class DistResource_debian extends
         //{"distribution",        "debian"},
         {"version:3*",          "3"},
         {"version:5*",          "LENNY"},
-        {"version:debian-etch", "4"},
-        {"version:4*",          "4"},
+        {"version:debian-etch", "ETCH"},
+        {"version:4*",          "ETCH"},
 
         {"arch:x86_64",       "amd64"}, // convert arch to arch in the drbd download file
 

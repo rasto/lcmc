@@ -24,9 +24,9 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for debian verson 4.
+ * Here are commands for debian verson 4 (etch).
  */
-public class DistResource_debian_4 extends
+public class DistResource_debian_ETCH extends
             java.util.ListResourceBundle {
 
     /** Get contents. */
