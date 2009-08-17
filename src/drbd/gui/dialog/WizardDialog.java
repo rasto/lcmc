@@ -270,11 +270,7 @@ public abstract class WizardDialog extends ConfigDialog {
         layout.setAlignment(FlowLayout.RIGHT);
 
         if (buttonClass(cancelButton()) != null) {
-            //SwingUtilities.invokeLater(new Runnable() {
-            //    public void run() {
-                    buttonClass(cancelButton()).getParent().setLayout(layout);
-            //    }
-            //});
+            buttonClass(cancelButton()).getParent().setLayout(layout);
         }
 
         /* disable back button if there is no previous dialog */

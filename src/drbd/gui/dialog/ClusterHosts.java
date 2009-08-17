@@ -89,7 +89,17 @@ public class ClusterHosts extends DialogCluster {
      * Returns the next dialog.
      */
     public final WizardDialog nextDialog() {
-        return new ClusterConnect(this, getCluster());
+        boolean allConnected = true;
+        for (final Host host : getCluster().getHosts()) {
+            if (!host.isConnected()) {
+                allConnected = false;
+            }
+        }
+        if (allConnected) {
+            return new ClusterChooseStack(this, getCluster());
+        } else {
+            return new ClusterConnect(this, getCluster());
+        }
     }
 
     /**

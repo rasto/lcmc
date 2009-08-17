@@ -24,6 +24,7 @@ package drbd.gui.dialog;
 import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.CancelCallback;
+import drbd.utilities.MyButton;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.ConnectionCallback;
 import drbd.gui.SSHGui;
@@ -70,15 +71,15 @@ public class HostSSH extends DialogHost {
                                          "callback done flag: " + flag, 1);
                              getHost().setConnected();
                              progressBarDone();
+                             answerPaneSetText(
+                                Tools.getString("Dialog.HostSSH.Connected"));
+                             //enableComponents();
                              SwingUtilities.invokeLater(new Runnable() {
                                  public void run() {
-                                    answerPaneSetText(
-                                        Tools.getString(
-                                                "Dialog.HostSSH.Connected"));
-                                    enableComponents();
+                                    ((MyButton) buttonClass(
+                                                nextButton())).pressButton();
                                  }
                              });
-                             buttonClass(nextButton()).requestFocus();
                          }
 
                          public void doneError(final String errorText) {

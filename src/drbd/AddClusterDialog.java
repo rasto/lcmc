@@ -64,7 +64,9 @@ public class AddClusterDialog {
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
-            dialog = newdialog;
+            if (newdialog != null) {
+                dialog = newdialog;
+            }
         }
         cluster.getClusterTab().addClusterView();
         cluster.getClusterTab().requestFocus();

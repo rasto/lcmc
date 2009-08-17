@@ -145,17 +145,17 @@ public class HostFinish extends DialogHost {
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
                     public void run() {
+                        final Host newHost = new Host();
+                        newHost.getSSH().setPasswords(
+                                 getHost().getSSH().getLastDSAKey(),
+                                 getHost().getSSH().getLastRSAKey(),
+                                 getHost().getSSH().getLastPassword());
+                        nextDialog = new HostNewHost(thisClass,
+                                                     newHost);
+                        Tools.getGUIData().allHostsUpdate();
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 addAnotherHostButton.setEnabled(false);
-                                final Host newHost = new Host();
-                                newHost.getSSH().setPasswords(
-                                         getHost().getSSH().getLastDSAKey(),
-                                         getHost().getSSH().getLastRSAKey(),
-                                         getHost().getSSH().getLastPassword());
-                                nextDialog = new HostNewHost(thisClass,
-                                                             newHost);
-                                Tools.getGUIData().allHostsUpdate();
                                 ((MyButton) buttonClass(nextButton())).
                                                                 pressButton();
                             }

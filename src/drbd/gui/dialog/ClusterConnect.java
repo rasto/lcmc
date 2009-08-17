@@ -25,6 +25,7 @@ package drbd.gui.dialog;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -54,7 +55,7 @@ public class ClusterConnect extends DialogCluster {
      * Returns the next dialog which is ClusterDrbdConf.
      */
     public final WizardDialog nextDialog() {
-        return new ClusterChooseStack(this, getCluster());
+        return new ClusterChooseStack(getPreviousDialog(), getCluster());
     }
 
     /**
@@ -98,11 +99,15 @@ public class ClusterConnect extends DialogCluster {
              printErrorAndRetry(text.toString());
         } else {
              answerPaneSetText(text.toString());
-             answerPaneSetText(text.toString());
-             enableComponents();
+             try {
+                 Thread.sleep(1000);
+             } catch (InterruptedException ex) {
+                 Thread.currentThread().interrupt();
+             }
+
              SwingUtilities.invokeLater(new Runnable() {
                  public void run() {
-                    buttonClass(nextButton()).requestFocus();
+                    ((MyButton) buttonClass(nextButton())).pressButton();
                  }
              });
         }
@@ -124,10 +129,8 @@ public class ClusterConnect extends DialogCluster {
      */
     protected final void initDialog() {
         super.initDialog();
-        final JComponent[] c = {buttonClass(nextButton())};
-        enableComponentsLater(c);
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         // TODO: Tools.startProgressIndicator
-
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 connectHosts();

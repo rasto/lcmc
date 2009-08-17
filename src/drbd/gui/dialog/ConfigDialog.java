@@ -423,7 +423,6 @@ public abstract class ConfigDialog {
                     Tools.getDefaultColor("ConfigDialog.Background.Dark"));
             skipButton.addItemListener(skipButtonListener());
             allOptions.add(skipButton);
-
         }
         /* populate buttonToObjectMap */
         for (int i = 0; i < buttons.length; i++) {
@@ -455,7 +454,6 @@ public abstract class ConfigDialog {
                 }
             }
         });
-
 
         optionPane.setPreferredSize(new Dimension(dialogWidth(),
                                                   dialogHeight()));
@@ -590,12 +588,17 @@ public abstract class ConfigDialog {
          * Action performered on custom button.
          */
         public void actionPerformed(final ActionEvent event) {
-            SwingUtilities.invokeLater(new Runnable() {
+            final Thread t = new Thread(new Runnable() {
                 public void run() {
-                    optionPane.setValue(
-                                    ((JButton) event.getSource()).getText());
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            optionPane.setValue(
+                                      ((JButton) event.getSource()).getText());
+                        }
+                    });
                 }
             });
+            t.start();
         }
     }
 }
