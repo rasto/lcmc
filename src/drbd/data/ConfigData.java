@@ -72,6 +72,8 @@ public class ConfigData implements Serializable {
     private String lastHbAisPmInstalledMethod = null;
     /** Last installed drbd method. */
     private String lastDrbdInstalledMethod = null;
+    /** Whether drbd gui helper should be overwritten */
+    private boolean keepHelper = false;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -320,4 +322,20 @@ public class ConfigData implements Serializable {
      public final String getLastDrbdInstalledMethod() {
          return lastDrbdInstalledMethod;
      }
+
+     /**
+      * Sets whether the drbd gui helper should be kept or overwritten all
+      * the time.
+      */
+      public final void setKeepHelper(final boolean keepHelper) {
+          this.keepHelper = keepHelper;
+      }
+
+     /**
+      * Returns whether the drbd gui helper should be kept or overwritten
+      * all the time.
+      */
+      public final boolean getKeepHelper() {
+          return keepHelper;
+      }
 }

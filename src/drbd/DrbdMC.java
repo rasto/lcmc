@@ -52,11 +52,13 @@ public class DrbdMC extends JPanel {
      * Create the GUI and show it.
      */
     private static void createAndShowGUI() {
-        ToolTipManager.sharedInstance().setInitialDelay(TOOLTIP_INITIAL_DELAY);
-        ToolTipManager.sharedInstance().setDismissDelay(TOOLTIP_DISMISS_DELAY);
+        ToolTipManager.sharedInstance().setInitialDelay(
+                                                    TOOLTIP_INITIAL_DELAY);
+        ToolTipManager.sharedInstance().setDismissDelay(
+                                                    TOOLTIP_DISMISS_DELAY);
         /* Create and set up the window. */
         final JFrame mainFrame = new JFrame(
-                Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+               Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
         Tools.getGUIData().setMainFrame(mainFrame);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -76,7 +78,7 @@ public class DrbdMC extends JPanel {
 
         /* glass pane is used for progress bar etc. */
         final ProgressIndicatorPanel mainGlassPane =
-                                                new ProgressIndicatorPanel();
+                                             new ProgressIndicatorPanel();
         Tools.getGUIData().setMainGlassPane(mainGlassPane);
         mainFrame.setGlassPane(mainGlassPane);
 
@@ -110,11 +112,19 @@ public class DrbdMC extends JPanel {
                                        (Exception) ex);
                     }
                 });
-            //if (args.length != 0 && args[0].equals("load")) {
-            //    Tools.loadConfigData("drbdGui.ser");
-            //}
-            //Schedule a job for the event-dispatching thread:
-            //creating and showing this application's GUI.
+            for (final String arg : args) {
+                if ("--keep-helper".equals(arg)) {
+                    Tools.debug(null, "--keep-helper option specified");
+                    Tools.getConfigData().setKeepHelper(true);
+                } else if ("--help".equals(arg)) {
+                    System.out.println("--help print this help.");
+                    System.out.println("--keep-helper do not overwrite "
+                                       + "the drbd-gui-helper program.");
+                    System.exit(0);
+                }
+            }
+            /* Schedule a job for the event-dispatching thread:
+               creating and showing this application's GUI. */
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     createAndShowGUI();
