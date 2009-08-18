@@ -58,7 +58,9 @@ public class HostAisPmInst extends DialogHost {
      */
     public void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes
-        nextDialogObject = new HostCheckInstallation(this, getHost());
+        nextDialogObject = new HostCheckInstallation(
+                                        getPreviousDialog().getPreviousDialog(),
+                                        getHost());
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.HostAisPmInst.InstOk"));
         enableComponents();

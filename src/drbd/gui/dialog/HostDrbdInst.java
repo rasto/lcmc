@@ -65,6 +65,7 @@ public class HostDrbdInst extends DialogHost {
         //        buttonClass(cancelButton()).setEnabled(false);
         //    }
         //});
+        getProgressBar().start(50000);
 
         getHost().execCommand("DrbdInst.mkdir",
                           getProgressBar(),
@@ -166,8 +167,8 @@ public class HostDrbdInst extends DialogHost {
      */
     public void installationDone() {
         nextDialogObject = new HostCheckInstallation(
-                    getPreviousDialog().getPreviousDialog().getPreviousDialog(),
-                    getHost());
+                   getPreviousDialog().getPreviousDialog(),
+                   getHost());
 
         progressBarDone();
         answerPaneSetText(

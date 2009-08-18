@@ -57,9 +57,12 @@ public class HostDrbdCommandInst extends DialogHost {
      * components accordingly.
      */
     public void checkAnswer(final String ans) {
-        nextDialogObject = new HostCheckInstallation(this, getHost());
+        nextDialogObject = new HostCheckInstallation(
+                   getPreviousDialog().getPreviousDialog().getPreviousDialog(),
+                   getHost());
         progressBarDone();
-        answerPaneSetText(Tools.getString("Dialog.HostDrbdCommandInst.InstOk"));
+        answerPaneSetText(
+                    Tools.getString("Dialog.HostDrbdCommandInst.InstOk"));
         enableComponents();
         buttonClass(nextButton()).requestFocus();
     }
@@ -70,7 +73,7 @@ public class HostDrbdCommandInst extends DialogHost {
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        getProgressBar().start(2000);
+        getProgressBar().start(50000);
         installDrbd();
     }
 
@@ -91,9 +94,10 @@ public class HostDrbdCommandInst extends DialogHost {
         }
         final String drbdVersion = getHost().getDrbdVersionToInstall();
         final String drbdVersionUrlString =
-                                  getHost().getDrbdVersionUrlStringToInstall();
+                              getHost().getDrbdVersionUrlStringToInstall();
         Tools.getConfigData().setLastDrbdInstalledMethod(
-            getHost().getDistString("DrbdInst.install.text." + installMethod));
+            getHost().getDistString("DrbdInst.install.text."
+                                    + installMethod));
         getHost().execCommand(installCommand,
                          getProgressBar(),
                          new ExecCallback() {
@@ -153,8 +157,8 @@ public class HostDrbdCommandInst extends DialogHost {
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(Tools.getString(
-                                    "Dialog.HostDrbdCommandInst.Executing")));
+        pane.add(getAnswerPane(
+                    Tools.getString("Dialog.HostDrbdCommandInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad

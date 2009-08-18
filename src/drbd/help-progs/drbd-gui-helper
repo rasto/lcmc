@@ -916,14 +916,26 @@ sub is_script_rc {
 	return "(/usr/sbin/update-rc.d -n $script defaults 1"
               ." || /sbin/chkconfig --list $script 2>/dev/null"
 	      ."|grep ':on') 2>/dev/null"
-	      ."|sed s/.*/on/";
+	      ."|sed s/.*/on/|uniq";
 }
 
 #
 # Returns a portable command that determines if the init script is running.
 sub is_running {
-	my $script =  shift;
-	return "/etc/init.d/$script status>/dev/null";
+	my $script = shift;
+	return <<STATUS;
+if (/etc/init.d/openais status 2>&1|grep 'Usage:' >/dev/null); then \
+	PROG=/usr/sbin/aisexec; \
+	for PID in `pidof \$PROG`; do \
+		if [ "\$(readlink -f /proc/\$PID/exe)" = "\$PROG" ]; then \
+			exit 0; \
+		fi; \
+	done; \
+        exit 3; \
+else \
+	/etc/init.d/$script status>/dev/null; \
+fi
+STATUS
 }
 
 sub get_cluster_versions {

@@ -74,6 +74,7 @@ public class DistResource_debian_ETCH extends
          + " && apt-get -y -q --allow-unauthenticated install"
          + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
          + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
+         + " && /usr/sbin/update-rc.d -f heartbeat remove"
          + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
 
         /* Drbd install method 2 */
