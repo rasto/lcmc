@@ -41,7 +41,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class HostLogin extends DialogHost {
+public class HostLinbitLogin extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Field with user name. */
@@ -54,9 +54,9 @@ public class HostLogin extends DialogHost {
     private static final int CHECKBOX_WIDTH = 120;
 
     /**
-     * Prepares a new <code>HostLogin</code> object.
+     * Prepares a new <code>HostLinbitLogin</code> object.
      */
-    public HostLogin(final WizardDialog previousDialog,
+    public HostLinbitLogin(final WizardDialog previousDialog,
                      final Host host) {
         super(previousDialog, host);
     }
@@ -111,19 +111,19 @@ public class HostLogin extends DialogHost {
     }
 
     /**
-     * Returns the title of the dialog, defined as Dialog.HostLogin.Title in
-     * TextResources.
+     * Returns the title of the dialog, defined as
+     * Dialog.HostLinbitLogin.Title in TextResources.
      */
     protected String getHostDialogTitle() {
-        return Tools.getString("Dialog.HostLogin.Title");
+        return Tools.getString("Dialog.HostLinbitLogin.Title");
     }
 
     /**
      * Returns the description of the dialog, defined as
-     * Dialog.HostLogin.Description in TextResources.
+     * Dialog.HostLinbitLogin.Description in TextResources.
      */
     protected String getDescription() {
-        return Tools.getString("Dialog.HostLogin.Description");
+        return Tools.getString("Dialog.HostLinbitLogin.Description");
     }
 
     /**
@@ -132,8 +132,8 @@ public class HostLogin extends DialogHost {
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-
         enableComponents();
+        checkFields();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 downloadUserField.requestFocus();
@@ -150,7 +150,7 @@ public class HostLogin extends DialogHost {
 
         /* user */
         final JLabel userLabel = new JLabel(
-                                Tools.getString("Dialog.HostLogin.EnterUser"));
+                      Tools.getString("Dialog.HostLinbitLogin.EnterUser"));
         inputPane.add(userLabel);
         downloadUserField = new GuiComboBox(
                                         Tools.getConfigData().getDownloadUser(),
@@ -166,7 +166,7 @@ public class HostLogin extends DialogHost {
 
         /* password */
         final JLabel passwordLabel = new JLabel(
-                            Tools.getString("Dialog.HostLogin.EnterPassword"));
+                  Tools.getString("Dialog.HostLinbitLogin.EnterPassword"));
 
         inputPane.add(passwordLabel);
         downloadPasswordField = new GuiComboBox(
@@ -185,8 +185,9 @@ public class HostLogin extends DialogHost {
         final JLabel saveLabel = new JLabel("");
 
         inputPane.add(saveLabel);
-        saveCheckBox = new JCheckBox(Tools.getString("Dialog.HostLogin.Save"),
-                                     Tools.getConfigData().getLoginSave());
+        saveCheckBox = new JCheckBox(
+                            Tools.getString("Dialog.HostLinbitLogin.Save"),
+                            Tools.getConfigData().getLoginSave());
         saveLabel.setLabelFor(saveCheckBox);
         inputPane.add(saveCheckBox);
 

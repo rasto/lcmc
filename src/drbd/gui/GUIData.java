@@ -262,27 +262,39 @@ public class GUIData  {
     public final void checkAddClusterButtons() {
         final boolean enabled =
                             Tools.getConfigData().danglingHostsCount() >= 2;
-        for (JComponent addClusterButton : addClusterButtonList) {
-            addClusterButton.setEnabled(enabled);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (JComponent addClusterButton : addClusterButtonList) {
+                    addClusterButton.setEnabled(enabled);
+                }
+            }
+        });
     }
 
     /**
      * Enable/Disable all 'Add Cluster' buttons.
      */
     public final void enableAddClusterButtons(final boolean enable) {
-        for (JComponent addClusterButton : addClusterButtonList) {
-            addClusterButton.setEnabled(enable);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (JComponent addClusterButton : addClusterButtonList) {
+                    addClusterButton.setEnabled(enable);
+                }
+            }
+        });
     }
 
     /**
      * Enable/Disable all 'Add Host' buttons.
      */
     public final void enableAddHostButtons(final boolean enable) {
-        for (JComponent addHostButton : addHostButtonList) {
-            addHostButton.setEnabled(enable);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (JComponent addHostButton : addHostButtonList) {
+                    addHostButton.setEnabled(enable);
+                }
+            }
+        });
     }
 
 

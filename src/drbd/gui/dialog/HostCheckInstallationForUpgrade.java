@@ -98,7 +98,8 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
                     if (drbdOk) {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
-                    nextDialogObject = new HostLoginForUpgrade(thisClass,
+                    nextDialogObject = new HostLinbitLoginForUpgrade(
+                                                               thisClass,
                                                                getHost());
                     ((MyButton) buttonClass(nextButton())).pressButton();
                 }

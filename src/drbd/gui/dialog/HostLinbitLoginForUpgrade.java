@@ -31,15 +31,15 @@ import drbd.data.Host;
  * @version $Id$
  *
  */
-public class HostLoginForUpgrade extends HostLogin {
+public class HostLinbitLoginForUpgrade extends HostLinbitLogin {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Prepares a new <code>HostLoginForUpgrade</code> object.
+     * Prepares a new <code>HostLinbitLoginForUpgrade</code> object.
      */
-    public HostLoginForUpgrade(final WizardDialog previousDialog,
-                               final Host host) {
+    public HostLinbitLoginForUpgrade(final WizardDialog previousDialog,
+                                     final Host host) {
         super(previousDialog, host);
     }
 

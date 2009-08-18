@@ -210,7 +210,7 @@ public class HostDrbdAvailFiles extends DialogHost {
     protected void allDone() {
 
         //nextDialogObject = new HostDrbdInst(this, getHost());
-        nextDialogObject = new HostLogin(this, getHost());
+        nextDialogObject = new HostLinbitLogin(this, getHost());
         progressBarDone();
         enableComponents();
         buttonClass(nextButton()).requestFocus();

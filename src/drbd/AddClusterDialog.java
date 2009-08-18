@@ -45,6 +45,7 @@ public class AddClusterDialog {
 
     /**
      * Shows step by step dialogs that add and configure new cluster.
+     * Must allways be called from thread.
      */
     public void showDialogs() {
         Tools.getGUIData().enableAddClusterButtons(false);

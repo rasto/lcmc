@@ -180,6 +180,9 @@ public abstract class WizardDialog extends ConfigDialog {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     buttonClass(nextButton()).setEnabled(enable);
+                    if (enable) {
+                        requestFocusLater(buttonClass(nextButton()));
+                    }
                 }
             });
         }
@@ -252,6 +255,13 @@ public abstract class WizardDialog extends ConfigDialog {
     protected void requestFocusLater(final JButton b) {
         getDialogPanel().getRootPane().setDefaultButton(b);
         b.requestFocus();
+    }
+
+    /**
+     * Sets as default button.
+     */
+    protected void makeDefaultButton(final JButton b) {
+        getDialogPanel().getRootPane().setDefaultButton(b);
     }
 
     /**

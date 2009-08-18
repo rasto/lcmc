@@ -398,10 +398,10 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.DrbdInstallMethod",
          "Installation method: "},
 
-        {"Dialog.HostLogin.Title",
+        {"Dialog.HostLinbitLogin.Title",
          "Log in"},
 
-        {"Dialog.HostLogin.Description",
+        {"Dialog.HostLinbitLogin.Description",
          "You need to log in to the http://www.linbit.com/support download "
          + "area to get a package for your distribution. Please provide "
          + "your username and password. Contact LINBIT support to obtain "
@@ -411,13 +411,13 @@ public class TextResource extends
          + "about it, only in the next step, when you will be unable to "
          + "download anything."},
 
-        {"Dialog.HostLogin.EnterUser",
+        {"Dialog.HostLinbitLogin.EnterUser",
          "Username"},
 
-        {"Dialog.HostLogin.EnterPassword",
+        {"Dialog.HostLinbitLogin.EnterPassword",
          "Password"},
 
-        {"Dialog.HostLogin.Save",
+        {"Dialog.HostLinbitLogin.Save",
          "Save"},
 
         {"Dialog.HostDrbdAvailFiles.Title",
@@ -601,10 +601,10 @@ public class TextResource extends
         {"Dialog.ClusterConnect.Description",
          "Trying to connect to all the hosts in the cluster."},
 
-        {"Dialog.ClusterChooseStack.Title",
+        {"Dialog.ClusterCommStack.Title",
          "Cluster Communication Stack"},
 
-        {"Dialog.ClusterChooseStack.Description",
+        {"Dialog.ClusterCommStack.Description",
          "Now you have to choose between OpenAIS and Heartbeat, if you have "
          + "installed both. It is either one or another from now on, although "
          + "theoretically you may be able seamlessly switch between them at "

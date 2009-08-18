@@ -178,7 +178,8 @@ public class HostCheckInstallation extends DialogHost {
                             }
                         });
                     } else {
-                        nextDialogObject = new HostLogin(thisClass, getHost());
+                        nextDialogObject =
+                                 new HostLinbitLogin(thisClass, getHost());
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ((MyButton) buttonClass(

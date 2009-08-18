@@ -367,7 +367,6 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
             return new HostCheckInstallation(this, getHost());
         } else {
             return new HostDrbdAvailFiles(this, getHost());
-            //return new HostLogin(this, getHost());
         }
     }
 

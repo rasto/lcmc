@@ -35,9 +35,13 @@ import java.util.LinkedHashMap;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
-import java.awt.FlowLayout;
-
+import javax.swing.SwingUtilities;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+
+import java.awt.FlowLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
@@ -96,7 +100,7 @@ public class ClusterHosts extends DialogCluster {
             }
         }
         if (allConnected) {
-            return new ClusterChooseStack(this, getCluster());
+            return new ClusterCommStack(this, getCluster());
         } else {
             return new ClusterConnect(this, getCluster());
         }
@@ -114,9 +118,17 @@ public class ClusterHosts extends DialogCluster {
             }
         }
         if (selected >= 2) {
-            buttonClass(nextButton()).setEnabled(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    buttonClass(nextButton()).setEnabled(true);
+                }
+            });
         } else {
-            buttonClass(nextButton()).setEnabled(false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    buttonClass(nextButton()).setEnabled(false);
+                }
+            });
         }
     }
 
@@ -139,13 +151,12 @@ public class ClusterHosts extends DialogCluster {
      */
     protected final void initDialog() {
         super.initDialog();
-        final JComponent[] cl = {buttonClass(nextButton())};
-        enableComponentsLater(cl);
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponents();
 
         final Thread thread = new Thread(
             new Runnable() {
                 public void run() {
-                    enableComponents();
                     checkCheckBoxes();
                 }
             });
@@ -186,6 +197,10 @@ public class ClusterHosts extends DialogCluster {
             button.addItemListener(chListener);
             p1.add(button);
         }
-        return p1;
+        p1.setBackground(Color.WHITE);
+        p1.setPreferredSize(new Dimension(100, 100));
+        return new JScrollPane(p1,
+                               JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
 }

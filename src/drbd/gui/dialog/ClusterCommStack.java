@@ -45,7 +45,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class ClusterChooseStack extends DialogCluster {
+public class ClusterCommStack extends DialogCluster {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
@@ -53,9 +53,9 @@ public class ClusterChooseStack extends DialogCluster {
 
     //TODO: progressbar
     /**
-     * Prepares a new <code>ClusterChooseStack</code> object.
+     * Prepares a new <code>ClusterCommStack</code> object.
      */
-    public ClusterChooseStack(final WizardDialog previousDialog,
+    public ClusterCommStack(final WizardDialog previousDialog,
                         final Cluster cluster) {
         super(previousDialog, cluster);
     }
@@ -75,14 +75,14 @@ public class ClusterChooseStack extends DialogCluster {
      * Returns the title of the dialog.
      */
     protected final String getClusterDialogTitle() {
-        return Tools.getString("Dialog.ClusterChooseStack.Title");
+        return Tools.getString("Dialog.ClusterCommStack.Title");
     }
 
     /**
      * Returns the description of the dialog.
      */
     protected final String getDescription() {
-        return Tools.getString("Dialog.ClusterChooseStack.Description");
+        return Tools.getString("Dialog.ClusterCommStack.Description");
     }
 
     /**
@@ -158,6 +158,7 @@ public class ClusterChooseStack extends DialogCluster {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     buttonClass(nextButton()).setEnabled(true);
+                    requestFocusLater(buttonClass(nextButton()));
                 }
             });
         }
