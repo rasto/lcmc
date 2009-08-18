@@ -342,7 +342,7 @@ public class ProgressIndicatorPanel extends JComponent
             if (barPos < getWidth()) {
                 final int he = Tools.getGUIData().getTerminalPanelPos() - 25;
                 g2.setColor(new Color(250, 133, 34,
-                                      (int) (alphaLevel * shield * 0.5)));
+                                      (int) (alphaLevel * shield * 0.05)));
                 g2.fillRect(barPos, 25, 30, he);
                 g2.fillRect(getWidth() - barPos, 25, 30, he);
             }
