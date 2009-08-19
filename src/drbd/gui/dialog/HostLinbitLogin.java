@@ -160,7 +160,6 @@ public class HostLinbitLogin extends DialogHost {
                                         CHECKBOX_WIDTH);
 
         addCheckField(downloadUserField);
-        downloadUserField.selectAll();
         userLabel.setLabelFor(downloadUserField);
         inputPane.add(downloadUserField);
 
@@ -177,7 +176,6 @@ public class HostLinbitLogin extends DialogHost {
                                 CHECKBOX_WIDTH);
 
         addCheckField(downloadPasswordField);
-        downloadPasswordField.selectAll();
         passwordLabel.setLabelFor(downloadPasswordField);
         inputPane.add(downloadPasswordField);
 

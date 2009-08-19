@@ -116,7 +116,6 @@ public class ClusterName extends DialogCluster {
                     Tools.getGUIData().addClusterTab(getCluster());
                 }
                 nameField.requestFocus();
-                nameField.selectAll();
             }
         });
     }

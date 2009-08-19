@@ -199,7 +199,6 @@ public class HostNewHost extends DialogHost {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 hostField.requestFocus();
-                hostField.selectAll();
             }
         });
     }
@@ -224,7 +223,6 @@ public class HostNewHost extends DialogHost {
                                     null, null, regexp, FIELD_WIDTH);
 
         addCheckField(hostField);
-        hostField.selectAll();
         hostLabel.setLabelFor(hostField);
         inputPane.add(hostField);
         hostField.setBackground(getHost().getHostnameEntered(), true);
@@ -240,7 +238,6 @@ public class HostNewHost extends DialogHost {
                                         "^\\d+$",
                                         50);
         addCheckField(sshPortField);
-        sshPortField.selectAll();
         sshPortLabel.setLabelFor(sshPortField);
         inputPane.add(sshPortField);
         sshPortField.setBackground(getHost().getSSHPort(), true);
@@ -254,7 +251,6 @@ public class HostNewHost extends DialogHost {
         usernameField = new GuiComboBox(getHost().getUsername(),
                                         null, null, regexp, FIELD_WIDTH);
         addCheckField(usernameField);
-        usernameField.selectAll();
         usernameLabel.setLabelFor(usernameField);
         inputPane.add(usernameField);
         usernameField.setBackground(getHost().getUsername(), true);

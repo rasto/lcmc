@@ -965,6 +965,8 @@ public class GuiComboBox extends JPanel {
     private class MTextField extends JTextField {
         /** Serial Version UID. */
         private static final long serialVersionUID = 1L;
+        /** To select all only once. */
+        private volatile boolean selected = false;
 
         /**
          * Creates a new MTextField object.
@@ -987,8 +989,11 @@ public class GuiComboBox extends JPanel {
          */
         protected void processFocusEvent(FocusEvent e) {
             super.processFocusEvent(e);
-            if (e.getID() == FocusEvent.FOCUS_GAINED) {
-                selectAll();
+            if (!selected) {
+                selected = true;
+                if (e.getID() == FocusEvent.FOCUS_GAINED) {
+                    selectAll();
+                }
             }
         }
     }
