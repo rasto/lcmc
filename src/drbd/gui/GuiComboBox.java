@@ -266,14 +266,14 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
-     * Returns new JTextField with default value.
+     * Returns new MTextField with default value.
      */
     private JComponent getTextField(final String value, final String regexp) {
-        JTextField tf;
+        MTextField tf;
         if (regexp == null) {
-            tf = new JTextField(value);
+            tf = new MTextField(value);
         } else {
-            tf = new JTextField(new PatternDocument(regexp), value, 0);
+            tf = new MTextField(new PatternDocument(regexp), value, 0);
         }
         return tf;
     }
@@ -506,7 +506,7 @@ public class GuiComboBox extends JPanel {
         Object value = null;
         switch(type) {
             case TEXTFIELD:
-                value = ((JTextField) component).getText();
+                value = ((MTextField) component).getText();
                 break;
             case PASSWDFIELD:
                 value = new String(((JPasswordField) component).getPassword());
@@ -627,7 +627,7 @@ public class GuiComboBox extends JPanel {
     public final void setValueAndWait(final Object item) {
         switch(type) {
             case TEXTFIELD:
-                ((JTextField) component).setText((String) item);
+                ((MTextField) component).setText((String) item);
                 break;
             case PASSWDFIELD:
                 ((JPasswordField) component).setText((String) item);
@@ -708,7 +708,7 @@ public class GuiComboBox extends JPanel {
     public final Document getDocument() {
         switch(type) {
             case TEXTFIELD:
-                return ((JTextField) component).getDocument();
+                return ((MTextField) component).getDocument();
             case PASSWDFIELD:
                 return ((JPasswordField) component).getDocument();
             case COMBOBOX:
@@ -739,7 +739,7 @@ public class GuiComboBox extends JPanel {
     public final void selectSubnet() {
         switch(type) {
             case TEXTFIELD:
-                //ip = ((JTextField) component).getText();
+                //ip = ((MTextField) component).getText();
                 break;
             case PASSWDFIELD:
                 break;
@@ -960,6 +960,40 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
+     * TextField that selects all when focused.
+     */
+    private class MTextField extends JTextField {
+        /** Serial Version UID. */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates a new MTextField object.
+         */
+        public MTextField(final String text) {
+            super(text);
+        }
+            
+        /**
+         * Creates a new MTextField object.
+         */
+        public MTextField(final Document doc,
+                          final String text,
+                          final int columns) {
+            super(doc, text, columns);
+        }
+
+        /**
+         * Focus event.
+         */
+        protected void processFocusEvent(FocusEvent e) {
+            super.processFocusEvent(e);
+            if (e.getID() == FocusEvent.FOCUS_GAINED) {
+                selectAll();
+            }
+        }
+    }
+
+    /**
      * Sets flag that determines whether the combo box is always editable.
      */
     public final void setAlwaysEditable(final boolean alwaysEditable) {
@@ -974,7 +1008,7 @@ public class GuiComboBox extends JPanel {
 
         switch(type) {
             case TEXTFIELD:
-                ((JTextField) component).requestFocus();
+                ((MTextField) component).requestFocus();
                 break;
             case PASSWDFIELD:
                 ((JPasswordField) component).requestFocus();
@@ -1000,7 +1034,7 @@ public class GuiComboBox extends JPanel {
 
         switch(type) {
             case TEXTFIELD:
-                ((JTextField) component).selectAll();
+                ((MTextField) component).selectAll();
                 break;
             case PASSWDFIELD:
                 ((JPasswordField) component).selectAll();
@@ -1036,4 +1070,11 @@ public class GuiComboBox extends JPanel {
         repaint();
         component.repaint();
     }
+
+    /**
+     * Returns its component.
+     */
+     public final JComponent getJComponent() {
+         return component;
+     }
 }

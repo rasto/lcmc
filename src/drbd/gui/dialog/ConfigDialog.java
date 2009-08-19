@@ -327,15 +327,30 @@ public abstract class ConfigDialog {
         field.getDocument().addDocumentListener(
                 new DocumentListener() {
                     public void insertUpdate(final DocumentEvent e) {
-                        checkFields(field);
+                        final Thread t = new Thread(new Runnable() {
+                            public void run() {
+                                checkFields(field);
+                            }
+                        });
+                        t.start();
                     }
 
                     public void removeUpdate(final DocumentEvent e) {
-                        checkFields(field);
+                        final Thread t = new Thread(new Runnable() {
+                            public void run() {
+                                checkFields(field);
+                            }
+                        });
+                        t.start();
                     }
 
                     public void changedUpdate(final DocumentEvent e) {
-                        checkFields(field);
+                        final Thread t = new Thread(new Runnable() {
+                            public void run() {
+                                checkFields(field);
+                            }
+                        });
+                        t.start();
                     }
                 });
     }

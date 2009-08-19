@@ -31,6 +31,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -38,10 +40,15 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
+import javax.swing.Scrollable;
 
 import java.awt.FlowLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Component;
+import java.awt.LayoutManager;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
@@ -52,7 +59,6 @@ import java.awt.Dimension;
  *
  */
 public class ClusterHosts extends DialogCluster {
-
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Map from checkboxes to the host, which they choose. */
@@ -117,19 +123,31 @@ public class ClusterHosts extends DialogCluster {
                 selected++;
             }
         }
-        if (selected >= 2) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    buttonClass(nextButton()).setEnabled(true);
-                }
-            });
+        boolean enable = true;
+        final List<String> ips = new ArrayList<String>();
+        if (selected < 2) {
+            enable = false;
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    buttonClass(nextButton()).setEnabled(false);
+            /* check if some of the hosts are the same. It will not work all
+             * the time if hops are used. */
+            for (final JCheckBox button : checkBoxToHost.keySet()) {
+                if (button.isSelected()) {
+                    final Host host = checkBoxToHost.get(button);
+                    final String ip = host.getIp();
+                    if (ips.contains(ip)) {
+                        enable = false;
+                        break;
+                    }
+                    ips.add(ip);
                 }
-            });
+            }
         }
+        final boolean enableButton = enable;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(enableButton);
+            }
+        });
     }
 
     /**
@@ -168,7 +186,8 @@ public class ClusterHosts extends DialogCluster {
      */
     protected final JComponent getInputPane() {
         /* Hosts */
-        final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
+        final ScrollableFlowPanel p1 =
+            new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
         final Hosts hosts = Tools.getConfigData().getHosts();
 
         final ItemListener chListener = new ItemListener() {
@@ -176,19 +195,41 @@ public class ClusterHosts extends DialogCluster {
                     checkCheckBoxes();
                 }
             };
+        Host lastHost1 = null;
+        Host lastHost2 = null;
+        if (getCluster().getHosts().size() == 0) {
+            /* mark last two available hosts */
+            for (final Host host : hosts.getHostsArray()) {
+                if (!getCluster().getHosts().contains(host)) {
+                    if (lastHost2 != null
+                        && lastHost2.getIp() != null
+                        && lastHost2.getIp().equals(host.getIp())) {
+                        lastHost2 = host;
+                    } else {
+                        lastHost1 = lastHost2;
+                        lastHost2 = host;
+                    }
+                }
+            }
+        }
         for (final Host host : hosts.getHostsArray()) {
             final JCheckBox button = new JCheckBox(host.getName(),
                                                    HOST_UNCHECKED_ICON);
             button.setSelectedIcon(HOST_CHECKED_ICON);
-            if (host.isInCluster(getCluster())) {
+            if (getCluster().getBrowser() != null
+                && getCluster() == host.getCluster()) {
+                /* once we have browser the cluster members cannot be removed.
+                 * TODO: make it possible
+                 */
+                button.setEnabled(false);
+            } else if (host.isInCluster(getCluster())) {
                 button.setEnabled(false);
             }
             checkBoxToHost.put(button, host);
             if (getCluster().getHosts().contains(host)) {
                 button.setSelected(true);
             } else {
-                // !!!!!!FOR TESTING
-                if (hosts.size() == 2) {
+                if (host == lastHost1 || host == lastHost2) {
                     button.setSelected(true);
                 } else {
                     button.setSelected(false);
@@ -198,9 +239,71 @@ public class ClusterHosts extends DialogCluster {
             p1.add(button);
         }
         p1.setBackground(Color.WHITE);
-        p1.setPreferredSize(new Dimension(100, 100));
         return new JScrollPane(p1,
-                               JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                               JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    }
+
+    /**
+     * Workaround so that flow layout scrolls right.
+     */
+    private class ScrollableFlowPanel extends JPanel
+                                             implements Scrollable {
+        private static final long serialVersionUID = 1L;
+        public ScrollableFlowPanel(final LayoutManager layout) {
+            super(layout);
+        }
+
+        public void setBounds(final int x,
+                              final int y,
+                              final int width,
+                              final int height) {
+            super.setBounds(x, y, getParent().getWidth(), height);
+        }
+
+        public Dimension getPreferredSize() {
+            return new Dimension(getWidth(), getPreferredHeight());
+        }
+
+        public Dimension getPreferredScrollableViewportSize() {
+            return super.getPreferredSize();
+        }
+
+        public int getScrollableUnitIncrement(final Rectangle visibleRect,
+                                              final int orientation,
+                                              final int direction) {
+            final int hundredth = (orientation ==  SwingConstants.VERTICAL
+                    ? getParent().getHeight() : getParent().getWidth()) / 100;
+            return (hundredth == 0 ? 1 : hundredth);
+        }
+
+        public int getScrollableBlockIncrement(final Rectangle visibleRect,
+                                               final int orientation,
+                                               final int direction) {
+            return orientation == SwingConstants.VERTICAL
+                            ? getParent().getHeight() : getParent().getWidth();
+        }
+
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        public boolean getScrollableTracksViewportHeight() {
+            return false;
+        }
+
+        private int getPreferredHeight() {
+            final int rv = 0;
+            for (final int k = 0, count = getComponentCount(); k < count; k++) {
+                final Component comp = getComponent(k);
+                final Rectangle r = comp.getBounds();
+                final int height = r.y + r.height;
+                if (height > rv) {
+                    rv = height;
+                }
+            }
+            rv += ((FlowLayout) getLayout()).getVgap();
+            return rv;
+        }
     }
 }

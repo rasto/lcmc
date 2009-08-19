@@ -144,7 +144,12 @@ public class ClusterConnect extends DialogCluster {
      */
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        pane.add(getAnswerPane(""));
+        final StringBuffer text = new StringBuffer();
+        for (final Host host : getCluster().getHosts()) {
+            text.append(host.getName());
+            text.append(" connecting...\n");
+        }
+        pane.add(getAnswerPane(text.toString()));
 
         SpringUtilities.makeCompactGrid(pane, 1, 1,  // rows, cols
                                               1, 1,  // initX, initY

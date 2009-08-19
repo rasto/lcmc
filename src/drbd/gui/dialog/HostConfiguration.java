@@ -28,11 +28,14 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 
 import java.net.UnknownHostException;
 import java.net.InetAddress;
@@ -61,7 +64,7 @@ public class HostConfiguration extends DialogHost {
     /** Hostnames. */
     private String[] hostnames = new String[MAX_HOPS];
     /** Whether the hostname was ok. */
-    private boolean hostnameOk = false;
+    private volatile boolean hostnameOk = false;
     /** Width of the combo boxes. */
     private static final int COMBO_BOX_WIDTH = 120;
     /** DNS timeout. */
@@ -110,12 +113,16 @@ public class HostConfiguration extends DialogHost {
      * Checks the fields and if they are correct the buttons will be enabled.
      */
     protected void checkFields(final GuiComboBox field) {
-        boolean isValid = false;
         final String name = nameField.getStringValue().trim();
-        if (hostnameOk) {
-            isValid = (name.length() > 0);
-        }
-        buttonClass(nextButton()).setEnabled(isValid);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                boolean isValid = false;
+                if (hostnameOk) {
+                    isValid = (name.length() > 0);
+                }
+                buttonClass(nextButton()).setEnabled(isValid);
+            }
+        });
     }
 
     /**
@@ -221,15 +228,25 @@ public class HostConfiguration extends DialogHost {
                     Tools.getString("Dialog.HostConfiguration.DNSLookupError"));
             }
             if (hostnameOk) {
-                nameField.setEnabled(true);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        nameField.setEnabled(true);
+                    }
+                });
+
             }
             final String[] items = getHost().getIps(hop);
             if (items != null) {
-                ipCombo[hop].reloadComboBox(getHost().getIp(hop), items);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ipCombo[hop].reloadComboBox(getHost().getIp(hop),
+                                                    items);
 
-                if (items.length > 1) {
-                    ipCombo[hop].setEnabled(true);
-                }
+                        if (items.length > 1) {
+                            ipCombo[hop].setEnabled(true);
+                        }
+                    }
+                });
             }
         }
     }
@@ -276,33 +293,49 @@ public class HostConfiguration extends DialogHost {
                             }
                         }
                         progressBarDone();
+                        getHost().setHostname(
+                                Tools.join(",", hostnames, getHops()));
+                        checkFields(nameField);
+                        addCheckField(nameField);
+                        String name = getHost().getName();
+                        if (name == null || "null".equals(name)) {
+                            name = "";
+                        }
+                        enableComponents();
+                        final String nameValue = name;
+                                nameField.setValueAndWait(nameValue);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                getHost().setHostname(
-                                        Tools.join(",", hostnames, getHops()));
                                 nameField.requestFocus();
-                                nameField.selectAll();
-                                checkFields(nameField);
-                                addCheckField(nameField);
-                                nameField.setValue(getHost().getName());
-                                enableComponents();
                             }
                         });
                     }
                 });
             thread.start();
         } else {
-            getHost().setHostname(Tools.join(",", hostnames, getHops()));
-            nameField.requestFocus();
-            nameField.selectAll();
-            checkFields(nameField);
-            addCheckField(nameField);
-            nameField.setValue(getHost().getName());
-            for (int i = 0; i < getHops(); i++) {
-                hostnameField[i].setEnabled(false);
-            }
-            enableComponents();
-            hostnameOk = true;
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    getHost().setHostname(Tools.join(",", hostnames, getHops()));
+                    checkFields(nameField);
+                    addCheckField(nameField);
+                    String name = getHost().getName();
+                    if (name == null || "null".equals(name)) {
+                        name = "";
+                    }
+                    nameField.setValue(name);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            nameField.requestFocus();
+                            for (int i = 0; i < getHops(); i++) {
+                                hostnameField[i].setEnabled(false);
+                            }
+                        }
+                    });
+                    enableComponents();
+                    hostnameOk = true;
+                }
+            });
+            thread.start();
         }
     }
 
@@ -321,12 +354,15 @@ public class HostConfiguration extends DialogHost {
 
         inputPane.add(nameLabel);
         final String regexp = "^[\\w.-]+$";
-        nameField = new GuiComboBox(getHost().getName(),
+        String name = getHost().getName();
+        if (name == null) {
+            name = "";
+        }
+        nameField = new GuiComboBox(name,
                                     null,
                                     null,
                                     regexp,
                                     COMBO_BOX_WIDTH);
-        nameField.selectAll();
         inputPane.add(nameField);
         nameField.setBackground(getHost().getName(), true);
         for (int i = 0; i < hops - 1; i++) {
