@@ -334,7 +334,12 @@ public final class DRBD {
                                       final ExecCallback execCallback) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DRBDDEV_PH, blockDevice);
-        replaceHash.put(FILESYSTEM_PH, filesystem);
+        if ("jfs".equals(filesystem) ||
+            "reiserfs".equals(filesystem)) {
+            replaceHash.put(FILESYSTEM_PH, filesystem + " -q");
+        } else {
+            replaceHash.put(FILESYSTEM_PH, filesystem);
+        }
         String command = host.getDistCommand("DRBD.makeFilesystem",
                                              replaceHash);
         execCommand(host, command, execCallback, true);
