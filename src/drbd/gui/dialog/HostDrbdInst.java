@@ -144,7 +144,7 @@ public class HostDrbdInst extends DialogHost {
                          getHost().getDistString("DrbdInst.install.text."
                          + getHost().getDrbdInstallMethod()));
         answerPaneSetText(Tools.getString("Dialog.HostDrbdInst.Installing"));
-        getHost().execCommand("DrbdInst.install",
+        getHost().execCommand("DrbdInst.install;;;DRBD.load",
                           getProgressBar(),
                           new ExecCallback() {
                             public void done(final String ans) {

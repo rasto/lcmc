@@ -934,6 +934,7 @@ if (/etc/init.d/openais status 2>&1|grep 'Usage:' >/dev/null); then \
         exit 3; \
 else \
 	/etc/init.d/$script status>/dev/null; \
+	exit \$?
 fi
 STATUS
 }

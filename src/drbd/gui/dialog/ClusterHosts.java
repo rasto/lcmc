@@ -119,7 +119,7 @@ public class ClusterHosts extends DialogCluster {
         Tools.getConfigData().getHosts().removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
-            if (button.isSelected()) {
+            if (button.isSelected() && button.isEnabled()) {
                 selected++;
             }
         }
@@ -293,11 +293,11 @@ public class ClusterHosts extends DialogCluster {
         }
 
         private int getPreferredHeight() {
-            final int rv = 0;
-            for (final int k = 0, count = getComponentCount(); k < count; k++) {
+            int rv = 0;
+            for (int k = 0, count = getComponentCount(); k < count; k++) {
                 final Component comp = getComponent(k);
                 final Rectangle r = comp.getBounds();
-                final int height = r.y + r.height;
+                int height = r.y + r.height;
                 if (height > rv) {
                     rv = height;
                 }

@@ -969,7 +969,13 @@ public final class Tools {
                                  final String dist,
                                  final String version,
                                  final ConvertCmdCallback convertCmdCallback) {
-        String ret = getDistString(text, dist, version);
+        final String[] texts = text.split(";;;");
+        final List<String> results =  new ArrayList<String>();
+        for (final String t : texts) {
+            results.add(getDistString(t, dist, version));
+        }
+        String ret =
+                Tools.join(";;;", results.toArray(new String[results.size()]));
         if (convertCmdCallback != null) {
             ret = convertCmdCallback.convert(ret);
         }

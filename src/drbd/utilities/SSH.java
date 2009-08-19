@@ -531,12 +531,6 @@ public class SSH {
                         execCallback.doneError("not connected", 0);
                     }
                 } else {
-                    try {
-                        sess = connection.openSession();
-                    } catch (java.io.IOException e) {
-                        connection = null;
-                        Tools.appWarning("Could not open session");
-                    }
                     exec();
                 }
             }
@@ -546,11 +540,17 @@ public class SSH {
          * Executes the command.
          */
         private void exec() {
-            // ;; separates commands, that are to be executed one after one,
+            // ;;; separates commands, that are to be executed one after one,
             // if previous command has finished successfully.
-            final String[] commands = command.split(";;;"); // TODO:not used?
+            final String[] commands = command.split(";;;");
             final StringBuffer ans = new StringBuffer("");
             for (int i = 0; i < commands.length; i++) {
+                try {
+                    sess = connection.openSession();
+                } catch (java.io.IOException e) {
+                    connection = null;
+                    Tools.appWarning("Could not open session");
+                }
                 commands[i].trim();
                 //Tools.commandLock();
                 if (outputVisible) {
@@ -560,11 +560,9 @@ public class SSH {
                         host.getTerminalPanel().addCommand(consoleCommand);
                     }
                 }
-
                 final Object[] ret = execOneCommand(commands[i],
                                                     outputVisible);
                 ans.append(ret[0]);
-                //Tools.commandUnlock();
 
                 final Integer exitCode = (Integer) ret[1];
                 // don't execute after error
