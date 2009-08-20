@@ -50,6 +50,10 @@ public class ClusterCommStack extends DialogCluster {
     private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
     private GuiComboBox chooseStackCombo;
+    /** Name of the OpenAIS in the radio group. */
+    private static final String OPENAIS_NAME = "OpenAIS";
+    /** Name of the Heartbeat in the radio group. */
+    private static final String HEARTBEAT_NAME = "Heartbeat";
 
     //TODO: progressbar
     /**
@@ -64,7 +68,7 @@ public class ClusterCommStack extends DialogCluster {
      * Returns the next dialog.
      */
     public final WizardDialog nextDialog() {
-        if ("Heartbeat".equals(chooseStackCombo.getValue())) {
+        if (HEARTBEAT_NAME.equals(chooseStackCombo.getValue())) {
             return new ClusterHbConfig(this, getCluster());
         } else {
             return new ClusterAisConfig(this, getCluster());
@@ -137,7 +141,7 @@ public class ClusterCommStack extends DialogCluster {
             }
         }
         if (!aisIsPossible && hbIsPossible) {
-            chooseStackCombo.setValue("Heartbeat");
+            chooseStackCombo.setValue(HEARTBEAT_NAME);
         }
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
@@ -145,10 +149,10 @@ public class ClusterCommStack extends DialogCluster {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (ais) {
-                        chooseStackCombo.setEnabled("OpenAIS", true);
+                        chooseStackCombo.setEnabled(OPENAIS_NAME, true);
                     }
                     if (hb) {
-                        chooseStackCombo.setEnabled("Heartbeat", true);
+                        chooseStackCombo.setEnabled(HEARTBEAT_NAME, true);
                     }
                 }
             });
@@ -169,19 +173,62 @@ public class ClusterCommStack extends DialogCluster {
      */
     protected final JComponent getInputPane() {
         final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
-        String defaultValue =
-                         Tools.getConfigData().getLastInstalledClusterStack();
+        final Host[] hosts = getCluster().getHostsArray();
+        boolean hbImpossible = false;
+        boolean aisImpossible = false;
+        int aisIsRc = 0;
+        int hbIsRc = 0;
+        int aisIsRunning = 0;
+        int hbIsRunning = 0;
+        for (final Host host : hosts) {
+            if (host.getHeartbeatVersion() == null) {
+                hbImpossible = true;
+            }
+            if (host.getOpenaisVersion() == null) {
+                aisImpossible = true;
+            }
+            if (host.isOpenaisRc()) {
+                aisIsRc++;
+            }
+            if (host.isHeartbeatRc()) {
+                hbIsRc++;
+            }
+            if (host.isOpenaisRunning()) {
+                aisIsRunning++;
+            }
+            if (host.isHeartbeatRunning()) {
+                hbIsRunning++;
+            }
+        }
+        /* slight preference to Openais */
+        String defaultValue = null;
+        if (hbImpossible) {
+            defaultValue = OPENAIS_NAME;
+        } else if (aisImpossible) {
+            defaultValue = HEARTBEAT_NAME;
+        } else if (aisIsRc < hbIsRc) {
+            defaultValue = HEARTBEAT_NAME;
+        } else if (aisIsRc > hbIsRc) {
+            defaultValue = OPENAIS_NAME;
+        } else if (aisIsRunning < hbIsRunning) {
+            defaultValue = HEARTBEAT_NAME;
+        } else if (aisIsRunning > hbIsRunning) {
+            defaultValue = OPENAIS_NAME;
+        } else {
+            defaultValue = Tools.getConfigData().getLastInstalledClusterStack();
+        }
         if (defaultValue == null) {
-            defaultValue = "Heartbeat";
+            defaultValue = OPENAIS_NAME;
         }
         chooseStackCombo = new GuiComboBox(defaultValue,
-                                           new String[]{"Heartbeat", "OpenAIS"},
+                                           new String[]{HEARTBEAT_NAME,
+                                                        OPENAIS_NAME},
                                            null,
                                            GuiComboBox.Type.RADIOGROUP,
                                            null,
                                            500);
-        chooseStackCombo.setEnabled("OpenAIS", false);
-        chooseStackCombo.setEnabled("Heartbeat", false);
+        chooseStackCombo.setEnabled(OPENAIS_NAME, false);
+        chooseStackCombo.setEnabled(HEARTBEAT_NAME, false);
         chooseStackCombo.setBackground(Color.WHITE); // TODO: does not work
         p1.add(chooseStackCombo);
         return p1;
