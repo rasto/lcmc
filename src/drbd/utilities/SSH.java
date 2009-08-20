@@ -1122,8 +1122,10 @@ public class SSH {
                                         Tools.getString(
                                                  "SSH.RSA.DSA.Authentication"),
                                         new String[] {lastError,
-                                                      Tools.getString(
-                                                       "SSH.Enter.passphrase")},
+                                                      "<html>"
+                                                      + Tools.getString(
+                                                       "SSH.Enter.passphrase")
+                                                      + "</html>"},
                                         Tools.getDefault("SSH.PublicKey"),
                                         true);
                                 if (key == null) {
@@ -1247,8 +1249,11 @@ public class SSH {
                             ans = sshGui.enterSomethingDialog(
                                     "Password Authentication",
                                     new String[] {lastError,
-                                                  host.getUserAtHost()
-                                                  + "'s password:"},
+                                                  "<html>"
+                                                  + host.getUserAtHost()
+                                                  + Tools.getString(
+                                                       "SSH.Enter.password")
+                                                  + "</html>"},
                                     null,
                                     true);
                             if (ans == null) {

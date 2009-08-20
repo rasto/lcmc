@@ -1541,8 +1541,11 @@ public class TextResource extends
         {"Score.Unknown",
          "unknown"},
 
+        {"SSH.Enter.password",
+         "'s <font color=red>password</font>:"},
+
         {"SSH.Enter.passphrase",
-         "Enter passphrase for key: "},
+         "Enter <font color=red>passphrase</font> for key:"},
 
         {"SSH.Publickey.Authentication.Failed",
          "Authentication failed."},
