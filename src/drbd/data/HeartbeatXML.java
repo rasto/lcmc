@@ -686,7 +686,7 @@ public class HeartbeatXML extends XML {
         final String hbV = host.getHeartbeatVersion();
         String targetRoleParam = "target-role";
         String isManagedParam = "is-managed";
-        if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
             targetRoleParam = "target_role";
             isManagedParam = "is_managed";
         }
@@ -986,7 +986,7 @@ public class HeartbeatXML extends XML {
             final String iAId = getAttribute(instanceAttrNode, "id");
             resourceInstanceAttrIdMap.put(hbId, iAId);
             NodeList nvpairsRes;
-            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
                 final Node attrNode = getChildNode(instanceAttrNode,
                                                    "attributes");
@@ -1053,7 +1053,7 @@ public class HeartbeatXML extends XML {
             final String metaAttrsId = getAttribute(metaAttrsNode, "id");
             /* <attributtes> only til 2.1.4 */
             NodeList nvpairsMA;
-            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 final Node attrsNode =
                                     getChildNode(metaAttrsNode, "attributes");
                 nvpairsMA = attrsNode.getChildNodes();
@@ -1118,7 +1118,7 @@ public class HeartbeatXML extends XML {
         if (instanceAttrNode != null) {
             final String iAId = getAttribute(instanceAttrNode, "id");
             NodeList nvpairsRes;
-            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
                 final Node attrNode = getChildNode(instanceAttrNode,
                                                    "attributes");
@@ -1179,7 +1179,7 @@ public class HeartbeatXML extends XML {
         }
         NodeList nvpairs;
         final String hbV = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <attributtes> only til 2.1.4 */
             final Node attrNode = getChildNode(cpsNode,
                                                "attributes");
@@ -1312,7 +1312,7 @@ public class HeartbeatXML extends XML {
             String withRscString = "with-rsc";
             String firstString   = "first";
             String thenString    = "then";
-            if (Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 rscString     = "from";
                 withRscString = "to";
                 firstString   = "from";
