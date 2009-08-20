@@ -135,8 +135,11 @@ public abstract class ResourceGraph {
     private final List<Info> animationList = new ArrayList<Info>();
     /** This mutex is for protecting the animation list. */
     private final Mutex mAnimationListLock = new Mutex();
-    /** Map from vertex to its size. */
-    private final Map<Vertex, Integer>vertexSize =
+    /** Map from vertex to its width. */
+    private final Map<Vertex, Integer>vertexWidth =
+                                               new HashMap<Vertex, Integer>();
+    /** Map from vertex to its height. */
+    private final Map<Vertex, Integer>vertexHeight =
                                                new HashMap<Vertex, Integer>();
 
     /**
@@ -568,34 +571,62 @@ public abstract class ResourceGraph {
     public abstract String getEdgeToolTip(final Edge edge);
 
     /**
-     * Returns size of the service vertex shape.
+     * Returns the width of the service vertex shape.
      */
-    protected final int getVertexSize(final Vertex v) {
-        if (vertexSize.containsKey(v)) {
-            return vertexSize.get(v);
+    protected final int getVertexWidth(final Vertex v) {
+        if (vertexWidth.containsKey(v)) {
+            return vertexWidth.get(v);
         } else {
-            return getDefaultVertexSize(v);
+            return getDefaultVertexWidth(v);
+        }
+    }
+
+    /**
+     * Returns the height of the service vertex shape.
+     */
+    protected final int getVertexHeight(final Vertex v) {
+        if (vertexHeight.containsKey(v)) {
+            return vertexHeight.get(v);
+        } else {
+            return getDefaultVertexHeight(v);
         }
     }
 
     /**
      * Returns the default vertex width.
      */
-    protected int getDefaultVertexSize(final Vertex v) {
+    protected int getDefaultVertexWidth(final Vertex v) {
         return 1;
     }
 
     /**
-     * Sets the vertex size.
+     * Returns the default vertex height.
      */
-    protected final void setVertexSize(final Vertex v, final int size) {
-        vertexSize.put(v, size);
+    protected int getDefaultVertexHeight(final Vertex v) {
+        return 1;
+    }
+
+    /**
+     * Sets the vertex width.
+     */
+    protected final void setVertexWidth(final Vertex v, final int size) {
+        vertexWidth.put(v, size);
+    }
+
+    /**
+     * Sets the vertex height.
+     */
+    protected final void setVertexHeight(final Vertex v, final int size) {
+        vertexHeight.put(v, size);
     }
 
     /**
      * Returns aspect ratio of the vertex v.
      */
-    protected abstract float getVertexAspectRatio(final Vertex v);
+    protected final float getVertexAspectRatio(final Vertex v) {
+
+        return (float) getVertexHeight(v) / (float) getVertexWidth(v);
+    }
 
     /**
      * Returns shape of the vertex v.
@@ -609,7 +640,8 @@ public abstract class ResourceGraph {
      * This class provides size and shape of the vertices.
      * To change the values, following methods can be overwritten:
      *
-     * getVertexSize
+     * getVertexWidth
+     * getVertexHeight
      * getVertexAspectRatio
      * getVertexShape
      */
@@ -629,7 +661,7 @@ public abstract class ResourceGraph {
          * Returns size for vertex v.
          */
         public int getSize(final Vertex v) {
-            return getVertexSize(v);
+            return getVertexWidth(v);
         }
 
         /**
@@ -943,14 +975,13 @@ public abstract class ResourceGraph {
             final float x = (float) p.getX();
             final float y = (float) p.getY();
 
-            return new GradientPaint(
-                            x,
-                            y - getVertexSize(v) * getVertexAspectRatio(v) / 2,
-                            getVertexFillSecondaryColor(v),
-                            x,
-                            y + getVertexSize(v) * getVertexAspectRatio(v) / 2,
-                            getVertexFillColor(v),
-                            false);
+            return new GradientPaint(x,
+                                     y - getVertexHeight(v) / 2,
+                                     getVertexFillSecondaryColor(v),
+                                     x,
+                                     y + getVertexHeight(v) / 2,
+                                     getVertexFillColor(v),
+                                     false);
         }
     }
 
@@ -1055,7 +1086,8 @@ public abstract class ResourceGraph {
         public void paintShapeForVertex(final Graphics2D g2d,
                                         final Vertex v,
                                         final Shape shape) {
-            int shapeWidth = getDefaultVertexSize(v);
+            int shapeWidth = getDefaultVertexWidth(v);
+            int shapeHeight = getDefaultVertexHeight(v);
             /* main text */
             final String mainText = getMainText(v);
             TextLayout mainTextLayout = null;
@@ -1095,26 +1127,43 @@ public abstract class ResourceGraph {
             }
 
             /* subtext */
-            final String subtext = getSubtext(v);
-            TextLayout subtextLayout = null;
-            if (subtext != null && !subtext.equals("")) {
-                subtextLayout = getVertexTextLayout(g2d, subtext,
-                               0.8);
-                final int subtextWidth =
-                                (int) subtextLayout.getBounds().getWidth();
-                if (subtextWidth + 10 > shapeWidth) {
-                    shapeWidth = subtextWidth + 10;
+            final String[] subtexts = getSubtexts(v);
+            TextLayout[] subtextLayouts = null;
+            if (subtexts != null) {
+                subtextLayouts = new TextLayout[subtexts.length];
+                int i = 0;
+                for (final String subtext : subtexts) {
+                    subtextLayouts[i] = getVertexTextLayout(g2d, subtext, 0.8);
+                    final int subtextWidth =
+                                (int) subtextLayouts[i].getBounds().getWidth();
+                    if (subtextWidth + 10 > shapeWidth) {
+                        shapeWidth = subtextWidth + 10;
+                    }
+                    i++;
+                }
+                if (i > 1) {
+                    shapeHeight += (i - 1) * 8;
                 }
             }
-            final int oldShapeWidth = getVertexSize(v);
-            if (Math.abs(oldShapeWidth - shapeWidth) > 10) {
+            final int oldShapeWidth = getVertexWidth(v);
+            final int oldShapeHeight = getVertexHeight(v);
+            boolean widthChanged = Math.abs(oldShapeWidth - shapeWidth) > 5;
+            boolean heightChanged = Math.abs(oldShapeHeight - shapeHeight) > 1;
+            if (widthChanged || heightChanged) {
                 /* move it, so that left side has the same position, if it is
                  * resized */
-                setVertexSize(v, shapeWidth);
                 final Point2D pos = getVertexLocations().getLocation(v);
-                final double x = pos.getX();
-                pos.setLocation(x - (oldShapeWidth - shapeWidth) / 2,
-                                pos.getY());
+                double x = pos.getX();
+                double y = pos.getY();
+                if (widthChanged) {
+                    setVertexWidth(v, shapeWidth);
+                    x = x - (oldShapeWidth - shapeWidth) / 2;
+                }
+                if (heightChanged) {
+                    setVertexHeight(v, shapeHeight);
+                    y = y - (oldShapeHeight - shapeHeight) / 2;
+                }
+                pos.setLocation(x, y);
                 getVertexLocations().setLocation(v, pos);
                 scale();
             }
@@ -1122,15 +1171,16 @@ public abstract class ResourceGraph {
             super.paintShapeForVertex(g2d, v, shape);
             final Point2D loc = visualizationViewer.layoutTransform(
                                                     layout.getLocation(v));
-            final double x = loc.getX() - getVertexSize(v) / 2;
-            final double height = shape.getBounds().getHeight();
-            final double y = loc.getY() - height / 2;
+            final double x = loc.getX() - getVertexWidth(v) / 2;
+            //final double height = shape.getBounds().getHeight();
+            final double height = getDefaultVertexHeight(v);
+            final double y = loc.getY() - getVertexHeight(v) / 2;
             drawInside(v, g2d, x, y, shape);
 
             /* icon */
             final ImageIcon icon = getIconForVertex(v);
             if (icon != null) {
-                icon.setDescription("asdf");
+                icon.setDescription("sdf");
                 g2d.drawImage(
                       icon.getImage(),
                       (int) (x + 4),
@@ -1167,15 +1217,24 @@ public abstract class ResourceGraph {
                    new Color(0, 0, 255),
                    255);
             }
-
-            if (subtextLayout != null) {
-                drawVertexText(
-                           g2d,
-                           subtextLayout,
-                           x + 4,
-                           y + height - 4,
-                           new Color(0, 0, 0),
-                           255);
+            shapeHeight = (int) height;
+            if (subtextLayouts != null) {
+                int i = 0;
+                for (final TextLayout l : subtextLayouts) {
+                    int alpha = 255;
+                    if (subtexts[i].substring(0, 1).equals(" ")) {
+                        alpha = 128;
+                    }
+                    drawVertexText(
+                               g2d,
+                               l,
+                               x + 4,
+                               y + height - 4 + 8 * i,
+                               new Color(0, 0, 0),
+                               alpha);
+                    i++;
+                    shapeHeight += 8 * i;
+                }
             }
 
             final Info info = getInfo(v);
@@ -1191,10 +1250,10 @@ public abstract class ResourceGraph {
                 final int barPos = i * (shapeWidth - 7) / 100;
                 g2d.setColor(new Color(250, 133, 34,
                                        90));
-                g2d.fillRect((int) (x + barPos), (int) y, 7, (int) height);
+                g2d.fillRect((int) (x + barPos), (int) y, 7, shapeHeight);
                 g2d.fillRect((int) (x + shapeWidth - barPos - 7),
                              (int) y, 7,
-                             (int) height);
+                             shapeHeight);
             } else {
                 mAnimationListLock.release();
             }
@@ -1214,7 +1273,7 @@ public abstract class ResourceGraph {
     /**
      * Small text that appears down.
      */
-    protected abstract String getSubtext(final Vertex v);
+    protected abstract String[] getSubtexts(final Vertex v);
 
     /**
      * Returns positions of the vertices (by value).
@@ -1224,10 +1283,10 @@ public abstract class ResourceGraph {
             final Info info = getInfo((Vertex) v);
             final Point2D p = new Point2D.Double();
             p.setLocation(layout.getLocation((Vertex) v));
-            final double x = p.getX();
-            p.setLocation(x + (getDefaultVertexSize((Vertex) v)
-                            - getVertexSize((Vertex) v)) / 2,
-                          p.getY());
+            p.setLocation(p.getX() + (getDefaultVertexWidth((Vertex) v)
+                                      - getVertexWidth((Vertex) v)) / 2,
+                          p.getY() + (getDefaultVertexHeight((Vertex) v)
+                                      - getVertexHeight((Vertex) v)) / 2);
             if (info != null) {
                 final String id = getId(info);
                 if (id != null) {

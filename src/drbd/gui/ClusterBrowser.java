@@ -3588,7 +3588,7 @@ public class ClusterBrowser extends Browser {
                 DefaultMutableTreeNode n =
                                     (DefaultMutableTreeNode) e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                sb.append('\n');
+                sb.append("\n&nbsp;&nbsp;&nbsp;");
                 sb.append(child.getToolTipText());
             }
 
@@ -3629,6 +3629,33 @@ public class ClusterBrowser extends Browser {
                  }
              }
              return false;
+         }
+
+         final public String[] getSubtextsForGraph() {
+             final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+             final List<String> texts = new ArrayList<String>();
+             String prevSubtext = null;
+             if (resources != null) {
+                 for (final String hbId : resources) {
+                     final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
+                     if (si != null) {
+                         String[] subtexts = si.getSubtextsForGraph();
+                         String sSubtext = null;
+                         if (subtexts != null) {
+                            sSubtext = si.getSubtextsForGraph()[0];
+                         }
+                         if (!sSubtext.equals(prevSubtext)) {
+                             texts.add(sSubtext + ":");
+                             prevSubtext = sSubtext;
+                         }
+                         if (si != null) {
+                             texts.add("   " + si.toString());
+                         }
+                     }
+                 }
+             }
+             return texts.toArray(new String[texts.size()]);
          }
     }
 
@@ -5891,11 +5918,11 @@ public class ClusterBrowser extends Browser {
             sb.append("<b>");
             sb.append(toString());
             if (isFailed()) {
-                sb.append("</b><br><b>Failed</b>");
+                sb.append("</b> <b>Failed</b>");
             } else if (isStopped()) {
-                sb.append("</b><br>not running");
+                sb.append("</b> not running");
             } else {
-                sb.append("</b><br>running on: ");
+                sb.append("</b> running on: ");
                 sb.append(node);
             }
             if (!isManaged()) {
@@ -5921,6 +5948,22 @@ public class ClusterBrowser extends Browser {
                 heartbeatGraph.stopAnimation(this);
             }
             super.setUpdated(updated);
+        }
+
+        /**
+         * Returns text with lines as array that appears in the cluster graph.
+         */
+        protected String[] getSubtextsForGraph() {
+            if (isFailed()) {
+                return new String[]{"not running: failed"};
+            } else if (isStopped()) {
+                return new String[]{"stopped"};
+            }
+            final String runningOnNode = getRunningOnNode();
+            if (runningOnNode != null && !"".equals(runningOnNode)) {
+                return new String[]{"running on: " + runningOnNode};
+            }
+            return new String[]{"not running"};
         }
     }
 

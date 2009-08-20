@@ -48,6 +48,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.awt.Paint;
+import java.awt.geom.RoundRectangle2D;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -116,7 +117,7 @@ public class HeartbeatGraph extends ResourceGraph {
     /** Maximum vertical position. */
     private static final int MAX_Y_POS = 2600;
     /** Height of the vertices. */
-    private static final float VERTEX_HEIGHT = 50.0f;
+    private static final int VERTEX_HEIGHT = 50;
     /** Host icon. */
     private static final ImageIcon HOST_ICON =
                 Tools.createImageIcon(Tools.getDefault("DrbdGraph.HostIcon"));
@@ -552,13 +553,6 @@ public class HeartbeatGraph extends ResourceGraph {
     }
 
     /**
-     * Returns aspect ratio of the ellipse of the service vertex.
-     */
-    protected final float getVertexAspectRatio(final Vertex v) {
-        return VERTEX_HEIGHT / getVertexSize(v);
-    }
-
-    /**
      * Returns shape of the service vertex.
      */
     protected final Shape getVertexShape(final Vertex v,
@@ -566,7 +560,15 @@ public class HeartbeatGraph extends ResourceGraph {
         if (vertexToHostMap.containsKey(v)) {
             return factory.getRectangle(v);
         } else {
-            return factory.getRoundRectangle(v);
+            final RoundRectangle2D r = factory.getRoundRectangle(v);
+
+            return new RoundRectangle2D.Double(r.getX(),
+                                        r.getY(),
+                                        r.getWidth(),
+                                        r.getHeight(),
+                                        20,
+                                        20);
+            
         }
     }
 
@@ -673,8 +675,8 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final void vertexReleased(final Vertex v, final Point2D pos) {
         double x = pos.getX();
         double y = pos.getY();
-        final double minPos = (getVertexSize(v)
-                               - getDefaultVertexSize(v)) / 2;
+        final double minPos = (getVertexWidth(v)
+                               - getDefaultVertexWidth(v)) / 2;
         x = x < minPos ? minPos : x;
         x = x > MAX_X_POS ? MAX_X_POS : x;
         y = y < MIN_Y_POS ? MIN_Y_POS : y;
@@ -1293,7 +1295,7 @@ public class HeartbeatGraph extends ResourceGraph {
     /**
      * Small text that appears down.
      */
-    protected final String getSubtext(final Vertex v) {
+    protected final String[] getSubtexts(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             return null;
         }
@@ -1301,16 +1303,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
-        if (si.isFailed()) {
-            return "not running: failed";
-        } else if (si.isStopped()) {
-            return "stopped";
-        }
-        final String runningOnNode = si.getRunningOnNode();
-        if (runningOnNode != null && !"".equals(runningOnNode)) {
-            return "running on: " + runningOnNode;
-        }
-        return "not running";
+        return si.getSubtextsForGraph();
     }
 
     /**
@@ -1350,5 +1343,12 @@ public class HeartbeatGraph extends ResourceGraph {
                           20,
                           20);
         }
+    }
+
+    /**
+     * Returns height of the vertex.
+     */
+    protected final int getDefaultVertexHeight(final Vertex v) {
+        return VERTEX_HEIGHT;
     }
 }

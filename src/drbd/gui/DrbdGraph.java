@@ -112,9 +112,9 @@ public class DrbdGraph extends ResourceGraph {
     /** Host vertex size. */
     private static final int VERTEX_SIZE_HOST = 150;
     /** Height of the host vertices. */
-    private static final float HOST_VERTEX_HEIGHT = 50.0f;
+    private static final int HOST_VERTEX_HEIGHT = 50;
     /** Height of the block device vertices. */
-    private static final float VERTEX_HEIGHT = 50.0f;
+    private static final int VERTEX_HEIGHT = 50;
 
     /** Maximum length of the label in the vertex, after which the string will
      * be cut. */
@@ -186,18 +186,18 @@ public class DrbdGraph extends ResourceGraph {
 
             if (hostPos == null) {
                 hostPos = new Point2D.Double(
-                                hostDefaultXPos + getDefaultVertexSize(v) / 2,
+                                hostDefaultXPos + getDefaultVertexWidth(v) / 2,
                                 HOST_Y_POS);
                 hostDefaultXPos += HOST_STEP_X;
             }
             //final double hostXPos =
-            //                    hostPos.getX() - getDefaultVertexSize(v) / 2;
+            //                    hostPos.getX() - getDefaultVertexWidth(v) / 2;
             getVertexLocations().setLocation(sv, hostPos);
         }
         /* add block devices vertices */
         final Host host = hostInfo.getHost();
         final Point2D hostPos = getVertexLocations().getLocation(v);
-        final double hostXPos = hostPos.getX() - getDefaultVertexSize(v) / 2;
+        final double hostXPos = hostPos.getX() - getDefaultVertexWidth(v) / 2;
         //if (host.blockDevicesHaveChanged()) {
             int devYPos = HOST_Y_POS + BD_STEP_Y;
             List<Vertex> vertexList = hostBDVerticesMap.get(hostInfo);
@@ -245,7 +245,7 @@ public class DrbdGraph extends ResourceGraph {
                 Point2D pos = null; // getSavedPosition(bdi);
                 if (pos == null) {
                     pos = new Point2D.Double(
-                        hostXPos + BD_X_OFFSET + getDefaultVertexSize(bdv) / 2,
+                        hostXPos + BD_X_OFFSET + getDefaultVertexWidth(bdv) / 2,
                         devYPos);
                 }
                 getVertexLocations().setLocation(bdv, pos);
@@ -386,12 +386,13 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Small text that appears down.
      */
-    protected final String getSubtext(final Vertex v) {
+    protected final String[] getSubtexts(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null && bdi.getBlockDevice().isDrbd()) {
-                return bdi.getBlockDevice().getConnectionState() + " / "
-                       + bdi.getBlockDevice().getDiskState();
+                return new String[]{bdi.getBlockDevice().getConnectionState()
+                                    + " / "
+                                    + bdi.getBlockDevice().getDiskState()};
             }
         } else {
             /* TODO: host */
@@ -424,18 +425,7 @@ public class DrbdGraph extends ResourceGraph {
             return "";
         }
     }
-
-    /**
-     * Returns aspect ratio of the rectangle with block device or host.
-     */
-    protected final float getVertexAspectRatio(final Vertex v) {
-        if (isVertexBlockDevice(v)) {
-            return VERTEX_HEIGHT / getVertexSize(v);
-        } else {
-            return HOST_VERTEX_HEIGHT / getVertexSize(v);
-        }
-    }
-
+    
     /**
      * Returns shape of the block device vertex.
      */
@@ -889,13 +879,25 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Returns the default vertex width.
      */
-    protected final int getDefaultVertexSize(final Vertex v) {
+    protected final int getDefaultVertexWidth(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             return VERTEX_SIZE_BD;
         } else {
             return VERTEX_SIZE_HOST;
         }
     }
+
+    /**
+     * Returns height of the vertex.
+     */
+    protected final int getDefaultVertexHeight(final Vertex v) {
+        if (isVertexBlockDevice(v)) {
+            return VERTEX_HEIGHT;
+        } else {
+            return HOST_VERTEX_HEIGHT;
+        }
+    }
+
 
     /**
      * Returns how much of the disk is used.
