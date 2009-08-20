@@ -921,10 +921,10 @@ sub is_script_rc {
 
 #
 # Returns a portable command that determines if the init script is running.
-sub is_running {
+sub is_openais_running {
 	my $script = shift;
 	return <<STATUS;
-if (/etc/init.d/openais status 2>&1|grep 'Usage:' >/dev/null); then \
+if (/etc/init.d/$script status 2>&1|grep 'Usage:' >/dev/null); then \
 	PROG=/usr/sbin/aisexec; \
 	for PID in `pidof \$PROG`; do \
 		if [ "\$(readlink -f /proc/\$PID/exe)" = "\$PROG" ]; then \
@@ -973,6 +973,10 @@ sub get_cluster_versions {
 		}
 	}
 	my $ais_prog = "/usr/sbin/aisexec";
+	my $ais_script = "openais";
+	if (!-e "/etc/init.d/openais" && -e "/etc/init.d/openais-legacy") {
+		$ais_script = "openais-legacy";
+	}
 	my $ais_version = "";
 	if (-e $ais_prog) {
 		$ais_version =
@@ -983,14 +987,14 @@ sub get_cluster_versions {
 		}
 	}
 	my $hb_isrc_cmd = is_script_rc("heartbeat");
-	my $ais_isrc_cmd = is_script_rc("openais");
+	my $ais_isrc_cmd = is_script_rc($ais_script);
 	my $hb_isrc = `$hb_isrc_cmd` || "off";
 	my $ais_isrc = `$ais_isrc_cmd` || "off";
 	chomp $hb_isrc;
 	chomp $ais_isrc;
 
 	my $hb_running_cmd = "$libpath/heartbeat -s";
-	my $ais_running_cmd = is_running("openais");
+	my $ais_running_cmd = is_openais_running($ais_script);
 	my $hb_running = system("$hb_running_cmd 2>/dev/null") >> 8 || "on";
 	my $ais_running = system("$ais_running_cmd 2>/dev/null") >> 8 ||  "on";
 	my $drbd_loaded = system("lsmod |grep '\\<drbd\\>'") >> 8 || "on";
