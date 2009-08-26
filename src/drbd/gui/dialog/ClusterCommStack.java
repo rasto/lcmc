@@ -39,7 +39,7 @@ import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
- * be Openais or Heartbeat.
+ * be Corosync or Heartbeat.
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -50,8 +50,8 @@ public class ClusterCommStack extends DialogCluster {
     private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
     private GuiComboBox chooseStackCombo;
-    /** Name of the OpenAIS in the radio group. */
-    private static final String OPENAIS_NAME = "OpenAIS";
+    /** Name of the Corosync in the radio group. */
+    private static final String COROSYNC_NAME = "Corosync/OpenAIS";
     /** Name of the Heartbeat in the radio group. */
     private static final String HEARTBEAT_NAME = "Heartbeat";
 
@@ -69,8 +69,10 @@ public class ClusterCommStack extends DialogCluster {
      */
     public final WizardDialog nextDialog() {
         if (HEARTBEAT_NAME.equals(chooseStackCombo.getValue())) {
+            Tools.getConfigData().setLastInstalledClusterStack(HEARTBEAT_NAME);
             return new ClusterHbConfig(this, getCluster());
         } else {
+            Tools.getConfigData().setLastInstalledClusterStack(COROSYNC_NAME);
             return new ClusterAisConfig(this, getCluster());
         }
     }
@@ -133,7 +135,8 @@ public class ClusterCommStack extends DialogCluster {
         boolean aisIsPossible = true;
         boolean hbIsPossible = true;
         for (final Host host : hosts) {
-            if (host.getOpenaisVersion() == null) {
+            if (host.getCorosyncVersion() == null
+                && host.getOpenaisVersion() == null) {
                 aisIsPossible = false;
             }
             if (host.getHeartbeatVersion() == null) {
@@ -149,7 +152,7 @@ public class ClusterCommStack extends DialogCluster {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (ais) {
-                        chooseStackCombo.setEnabled(OPENAIS_NAME, true);
+                        chooseStackCombo.setEnabled(COROSYNC_NAME, true);
                     }
                     if (hb) {
                         chooseStackCombo.setEnabled(HEARTBEAT_NAME, true);
@@ -181,53 +184,62 @@ public class ClusterCommStack extends DialogCluster {
         int aisIsRunning = 0;
         int hbIsRunning = 0;
         for (final Host host : hosts) {
+            System.out.println("hbv: "   + host.getHeartbeatVersion() +
+                               ", cv: "  + host.getCorosyncVersion() +
+                               ", ov: "  + host.getOpenaisVersion() +
+                               ", orc: " + host.isCsAisRc() +
+                               ", hrc: " + host.isHeartbeatRc() +
+                               ", or: "  + host.isCsAisRunning() +
+                               ", hr: "  + host.isHeartbeatRunning());
             if (host.getHeartbeatVersion() == null) {
                 hbImpossible = true;
             }
-            if (host.getOpenaisVersion() == null) {
+            if (host.getCorosyncVersion() == null
+                && host.getOpenaisVersion() == null) {
                 aisImpossible = true;
             }
-            if (host.isOpenaisRc()) {
+            if (host.isCsAisRc()) {
                 aisIsRc++;
             }
             if (host.isHeartbeatRc()) {
                 hbIsRc++;
             }
-            if (host.isOpenaisRunning()) {
+            if (host.isCsAisRunning()) {
                 aisIsRunning++;
             }
             if (host.isHeartbeatRunning()) {
                 hbIsRunning++;
             }
         }
-        /* slight preference to Openais */
+        /* slight preference to corosync */
         String defaultValue = null;
         if (hbImpossible) {
-            defaultValue = OPENAIS_NAME;
+            defaultValue = COROSYNC_NAME;
         } else if (aisImpossible) {
             defaultValue = HEARTBEAT_NAME;
         } else if (aisIsRc < hbIsRc) {
             defaultValue = HEARTBEAT_NAME;
         } else if (aisIsRc > hbIsRc) {
-            defaultValue = OPENAIS_NAME;
+            defaultValue = COROSYNC_NAME;
         } else if (aisIsRunning < hbIsRunning) {
             defaultValue = HEARTBEAT_NAME;
         } else if (aisIsRunning > hbIsRunning) {
-            defaultValue = OPENAIS_NAME;
+            defaultValue = COROSYNC_NAME;
         } else {
             defaultValue = Tools.getConfigData().getLastInstalledClusterStack();
         }
         if (defaultValue == null) {
-            defaultValue = OPENAIS_NAME;
+            defaultValue = COROSYNC_NAME;
         }
+        System.out.println("default value: " + defaultValue);
         chooseStackCombo = new GuiComboBox(defaultValue,
                                            new String[]{HEARTBEAT_NAME,
-                                                        OPENAIS_NAME},
+                                                        COROSYNC_NAME},
                                            null,
                                            GuiComboBox.Type.RADIOGROUP,
                                            null,
                                            500);
-        chooseStackCombo.setEnabled(OPENAIS_NAME, false);
+        chooseStackCombo.setEnabled(COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(HEARTBEAT_NAME, false);
         chooseStackCombo.setBackground(Color.WHITE); // TODO: does not work
         p1.add(chooseStackCombo);

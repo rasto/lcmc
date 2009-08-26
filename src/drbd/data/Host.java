@@ -140,12 +140,12 @@ public class Host implements Serializable {
     private String pacemakerVersion = null;
     /** Openais version. */
     private String openaisVersion = null;
-    /** Is "on" if openais is in rc. */
-    private String openaisIsRc = null;
-    /** Is "on" if openais is running. */
-    private String openaisRunning = null;
-    /** Is "on" if openais config exists. */
-    private String openaisConf = null;
+    /** Is "on" if corosync/openais is in rc. */
+    private String csAisIsRc = null;
+    /** Is "on" if corosync/openais is running. */
+    private String csAisRunning = null;
+    /** Is "on" if corosync/openais config exists. */
+    private String csAisConf = null;
     /** Is "on" if heartbeat is in rc. */
     private String heartbeatIsRc = null;
     /** Is "on" if heartbeat is running. */
@@ -186,8 +186,8 @@ public class Host implements Serializable {
     /** List of gui elements that are to be enabled if the host is connected.*/
     private final List<JComponent> enableOnConnectList =
                                                    new ArrayList<JComponent>();
-    /** Openais/pacemaker installation method index. */
-    private String aisPmInstallMethod;
+    /** Corosync/Openais/pacemaker installation method index. */
+    private String pmInstallMethod;
     /** Heartbeat/pacemaker installation method index. */
     private String hbPmInstallMethod;
     /** Drbd installation method index. */
@@ -283,7 +283,7 @@ public class Host implements Serializable {
      * Returns whether hb status is available.
      */
     public final boolean isHbStatus() {
-        return hbStatus;
+        return hbStatus && isConnected();
     }
 
     /**
@@ -747,13 +747,16 @@ public class Host implements Serializable {
         distVersionString = Tools.getDistVersionString(dist, distVersion);
         distVersion = Tools.getDistString("distributiondir",
                                           detectedDist,
-                                          distVersionString);
+                                          distVersionString,
+                                          null);
         setKernelVersion(Tools.getKernelDownloadDir(detectedKernelVersion,
                                                     getDist(),
-                                                    distVersionString));
+                                                    distVersionString,
+                                                    null));
         setArch(Tools.getDistString("arch:" + detectedArch,
                                     getDist(),
-                                    distVersionString));
+                                    distVersionString,
+                                    null));
     }
 
     /**
@@ -779,7 +782,8 @@ public class Host implements Serializable {
                           + dV.replaceFirst("\\d.*", ""), 0);
         return Tools.getDistString("dist:" + dV.replaceFirst("\\d.*", ""),
                                    "",
-                                   "");
+                                   "",
+                                   null);
     }
 
 
@@ -903,6 +907,7 @@ public class Host implements Serializable {
         return Tools.getDistCommand(commandString,
                                     dist,
                                     distVersionString,
+                                    arch,
                                     convertCmdCallback);
     }
 
@@ -913,7 +918,8 @@ public class Host implements Serializable {
                                  final String commandString) {
         return Tools.getDistString(commandString,
                                    dist,
-                                   distVersionString);
+                                   distVersionString,
+                                   arch);
     }
 
     /**
@@ -926,6 +932,7 @@ public class Host implements Serializable {
                     commandString,
                     dist,
                     distVersionString,
+                    arch,
                     new ConvertCmdCallback() {
                         public final String convert(String command) {
                             for (final String tag : replaceHash.keySet()) {
@@ -957,6 +964,7 @@ public class Host implements Serializable {
         return ssh.execCommand(Tools.getDistCommand(commandString,
                                                     dist,
                                                     distVersionString,
+                                                    arch,
                                                     convertCmdCallback),
                                execCallback,
                                outputVisible,
@@ -984,6 +992,7 @@ public class Host implements Serializable {
         return ssh.execCommand(Tools.getDistCommand(commandString,
                                                     dist,
                                                     distVersionString,
+                                                    arch,
                                                     convertCmdCallback),
                                execCallback,
                                newOutputCallback,
@@ -1030,6 +1039,7 @@ public class Host implements Serializable {
         return ssh.execCommand(Tools.getDistCommand(commandString,
                                                     dist,
                                                     distVersionString,
+                                                    arch,
                                                     convertCmdCallback)
                                + params,
                                callback,
@@ -1055,6 +1065,7 @@ public class Host implements Serializable {
         return ssh.execCommand(Tools.getDistCommand(commandString,
                                                     dist,
                                                     distVersionString,
+                                                    arch,
                                                     convertCmdCallback),
                                progressBar,
                                callback,
@@ -1103,6 +1114,7 @@ public class Host implements Serializable {
         return ssh.execCommand(Tools.getDistCommand(commandString,
                                                     dist,
                                                     distVersionString,
+                                                    arch,
                                                     convertCmdCallback),
                                progressBar,
                                callback,
@@ -1126,6 +1138,7 @@ public class Host implements Serializable {
                                                 "DRBD.getDrbdStatus",
                                                 dist,
                                                 distVersionString,
+                                                arch,
                                                 null), /* ConvertCmdCallback */
                                     execCallback,
                                     outputCallback,
@@ -1176,6 +1189,7 @@ public class Host implements Serializable {
                             Tools.getDistCommand("Heartbeat.getHbStatus",
                                                  dist,
                                                  distVersionString,
+                                                 arch,
                                                  null), /* ConvertCmdCallback */
                                 execCallback,
                                 outputCallback,
@@ -1772,6 +1786,9 @@ public class Host implements Serializable {
      */
     public final void parseInstallationInfo(final String line) {
         final String[] tokens = line.split(":|\\s+");
+        if (tokens.length < 2) {
+            return;
+        }
         if ("pm".equals(tokens[0])) {
             if (tokens.length == 2) {
                 pacemakerVersion = tokens[1].trim();
@@ -1790,23 +1807,23 @@ public class Host implements Serializable {
             } else {
                 openaisVersion = null;
             }
-        } else if ("ais-rc".equals(tokens[0])) {
+        } else if ("cs-ais-rc".equals(tokens[0])) {
             if (tokens.length == 2) {
-                openaisIsRc = tokens[1].trim();
+                csAisIsRc = tokens[1].trim();
             } else {
-                openaisIsRc = null;
+                csAisIsRc = null;
             }
-        } else if ("ais-conf".equals(tokens[0])) {
+        } else if ("cs-ais-conf".equals(tokens[0])) {
             if (tokens.length == 2) {
-                openaisConf = tokens[1].trim();
+                csAisConf = tokens[1].trim();
             } else {
-                openaisConf = null;
+                csAisConf = null;
             }
-        } else if ("ais-running".equals(tokens[0])) {
+        } else if ("cs-ais-running".equals(tokens[0])) {
             if (tokens.length == 2) {
-                openaisRunning = tokens[1].trim();
+                csAisRunning = tokens[1].trim();
             } else {
-                openaisRunning = null;
+                csAisRunning = null;
             }
         } else if ("hb".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -1926,6 +1943,13 @@ public class Host implements Serializable {
     }
 
     /**
+     * Returns whether corosync is installed.
+     */
+    public final boolean isCorosync() {
+        return corosyncVersion != null;
+    }
+
+    /**
      * Returns the openais version.
      */
     public final String getOpenaisVersion() {
@@ -2020,15 +2044,15 @@ public class Host implements Serializable {
     /**
      * Sets openais/pacemaker installation method index.
      */
-    public final void setAisPmInstallMethod(final String aisPmInstallMethod) {
-        this.aisPmInstallMethod = aisPmInstallMethod;
+    public final void setPmInstallMethod(final String pmInstallMethod) {
+        this.pmInstallMethod = pmInstallMethod;
     }
 
     /**
      * Returns openais/pacemaker installation method.
      */
-    public final String getAisPmInstallMethod() {
-        return aisPmInstallMethod;
+    public final String getPmInstallMethod() {
+        return pmInstallMethod;
     }
 
     /**
@@ -2060,24 +2084,24 @@ public class Host implements Serializable {
     }
 
     /**
-     * Returns whether Openais is rc script.
+     * Returns whether Corosync/Openais is rc script.
      */
-    public final boolean isOpenaisRc() {
-       return openaisIsRc != null && openaisIsRc.equals("on");
+    public final boolean isCsAisRc() {
+       return csAisIsRc != null && csAisIsRc.equals("on");
     }
 
     /**
-     * Returns whether Openais is running script.
+     * Returns whether Corosync/Openais is running script.
      */
-    public final boolean isOpenaisRunning() {
-       return openaisRunning != null && openaisRunning.equals("on");
+    public final boolean isCsAisRunning() {
+       return csAisRunning != null && csAisRunning.equals("on");
     }
 
     /**
-     * Returns whether Openais config exists.
+     * Returns whether Corosync/Openais config exists.
      */
-    public final boolean isOpenaisConf() {
-       return openaisConf != null && openaisConf.equals("on");
+    public final boolean isCsAisConf() {
+       return csAisConf != null && csAisConf.equals("on");
     }
 
     /**

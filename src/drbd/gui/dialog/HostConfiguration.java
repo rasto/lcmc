@@ -28,14 +28,11 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
 
 import java.net.UnknownHostException;
 import java.net.InetAddress;
@@ -315,7 +312,8 @@ public class HostConfiguration extends DialogHost {
         } else {
             final Thread thread = new Thread(new Runnable() {
                 public void run() {
-                    getHost().setHostname(Tools.join(",", hostnames, getHops()));
+                    getHost().setHostname(
+                                       Tools.join(",", hostnames, getHops()));
                     checkFields(nameField);
                     addCheckField(nameField);
                     String name = getHost().getName();
