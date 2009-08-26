@@ -974,7 +974,7 @@ public class GuiComboBox extends JPanel {
         public MTextField(final String text) {
             super(text);
         }
-            
+
         /**
          * Creates a new MTextField object.
          */

@@ -62,8 +62,10 @@ public final class Openais {
      */
     public static void switchToOpenais(final Host host) {
         final String command = host.getDistCommand(
-                                        "Openais.removeHeartbeatAddOpenais",
-                                        (ConvertCmdCallback) null);
+                                                "Heartbeat.deleteFromRc"
+                                                + ";;;Openais.addToRc"
+                                                + ";;;Openais.startOpenais",
+                                                (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
 
@@ -81,7 +83,8 @@ public final class Openais {
      * Starts openais on host and adds it to the rc.
      */
     public static void startOpenaisRc(final Host host) {
-        final String command = host.getDistCommand("Openais.startOpenaisRc",
+        final String command = host.getDistCommand("Openais.startOpenais"
+                                                   + ";;;Openais.addToRc",
                                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
@@ -90,7 +93,7 @@ public final class Openais {
      * Adds openais to the rc.
      */
     public static void addOpenaisToRc(final Host host) {
-        final String command = host.getDistCommand("Openais.addOpenaisToRc",
+        final String command = host.getDistCommand("Openais.addToRc",
                                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }

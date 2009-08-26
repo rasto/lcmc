@@ -38,16 +38,16 @@ import javax.swing.JComponent;
  * @version $Id$
  *
  */
-public class HostAisPmInst extends DialogHost {
+public class HostPmInst extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /**
-     * Prepares a new <code>HostAisPmInst</code> object.
+     * Prepares a new <code>HostPmInst</code> object.
      */
-    public HostAisPmInst(final WizardDialog previousDialog,
+    public HostPmInst(final WizardDialog previousDialog,
                       final Host host) {
         super(previousDialog, host);
     }
@@ -62,7 +62,7 @@ public class HostAisPmInst extends DialogHost {
                                         getPreviousDialog().getPreviousDialog(),
                                         getHost());
         progressBarDone();
-        answerPaneSetText(Tools.getString("Dialog.HostAisPmInst.InstOk"));
+        answerPaneSetText(Tools.getString("Dialog.HostPmInst.InstOk"));
         enableComponents();
         buttonClass(nextButton()).requestFocus();
     }
@@ -73,34 +73,34 @@ public class HostAisPmInst extends DialogHost {
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        installAisPm();
+        installPm();
     }
 
     /**
      * Installs the heartbeat.
      */
-    private void installAisPm() {
-        String arch = getHost().getDistString("AisPmInst.install."
+    private void installPm() {
+        String arch = getHost().getDistString("PmInst.install."
                                               + getHost().getArch());
         if (arch == null) {
             arch = getHost().getArch();
         }
         final String archString = arch;
-        String installCommand = "AisPmInst.install";
-        final String installMethod = getHost().getAisPmInstallMethod();
+        String installCommand = "PmInst.install";
+        final String installMethod = getHost().getPmInstallMethod();
         if (installMethod != null) {
-            installCommand = "AisPmInst.install." + installMethod;
+            installCommand = "PmInst.install." + installMethod;
             final String filesStr =
                       getHost().getDistString(
-                            "AisPmInst.install.files." + installMethod);
+                            "PmInst.install.files." + installMethod);
             if (filesStr != null) {
                 final String[] parts = filesStr.split(":");
                 /* install files if specified */
                 int i = 0;
                 while (i < parts.length) {
                     final String fileName = "/help-progs/" + parts[i];
-                    final String to = parts[i+1];
-                    final String perm = parts[i+2];
+                    final String to = parts[i + 1];
+                    final String perm = parts[i + 2];
                     final String file = Tools.getFile(fileName);
                     if (file != null) {
                         getHost().getSSH().scp(file, to, perm, true);
@@ -109,9 +109,9 @@ public class HostAisPmInst extends DialogHost {
                 }
             }
         }
-        Tools.getConfigData().setLastHbAisPmInstalledMethod(
-           getHost().getDistString("AisPmInst.install.text." + installMethod));
-        Tools.getConfigData().setLastInstalledClusterStack("OpenAIS");
+        Tools.getConfigData().setLastHbPmInstalledMethod(
+           getHost().getDistString("PmInst.install.text." + installMethod));
+        Tools.getConfigData().setLastInstalledClusterStack("Corosync/OpenAIS");
 
         getHost().execCommand(installCommand,
                          getProgressBar(),
@@ -123,7 +123,7 @@ public class HostAisPmInst extends DialogHost {
                                                    final int exitCode) {
                                  printErrorAndRetry(
                                         Tools.getString(
-                                             "Dialog.HostAisPmInst.InstError"),
+                                             "Dialog.HostPmInst.InstError"),
                                         ans,
                                         exitCode);
                              }
@@ -146,18 +146,18 @@ public class HostAisPmInst extends DialogHost {
 
     /**
      * Returns the description of the dialog defined as
-     * Dialog.HostAisPmInst.Description in TextResources.
+     * Dialog.HostPmInst.Description in TextResources.
      */
     protected String getHostDialogTitle() {
-        return Tools.getString("Dialog.HostAisPmInst.Title");
+        return Tools.getString("Dialog.HostPmInst.Title");
     }
 
     /**
      * Returns the description of the dialog defined as
-     * Dialog.HostAisPmInst.Description in TextResources.
+     * Dialog.HostPmInst.Description in TextResources.
      */
     protected String getDescription() {
-        return Tools.getString("Dialog.HostAisPmInst.Description");
+        return Tools.getString("Dialog.HostPmInst.Description");
     }
 
     /**
@@ -167,7 +167,7 @@ public class HostAisPmInst extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(
-                        Tools.getString("Dialog.HostAisPmInst.Executing")));
+                        Tools.getString("Dialog.HostPmInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad

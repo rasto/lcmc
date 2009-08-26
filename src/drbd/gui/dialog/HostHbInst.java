@@ -91,7 +91,7 @@ public class HostHbInst extends DialogHost {
         if (installMethod != null) {
             installCommand = "HbPmInst.install." + installMethod;
         }
-        Tools.getConfigData().setLastHbAisPmInstalledMethod(
+        Tools.getConfigData().setLastHbPmInstalledMethod(
             getHost().getDistString("HbPmInst.install.text." + installMethod));
         Tools.getConfigData().setLastInstalledClusterStack("Heartbeat");
 

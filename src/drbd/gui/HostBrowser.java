@@ -967,6 +967,21 @@ public class HostBrowser extends Browser {
              // TODO: maybe the load?
              return -1;
          }
+
+         /**
+          * Returns subtexts that appears in the host vertex.
+          */
+         final public String[] getSubtextsForGraph() {
+             final List<String> texts = new ArrayList<String>();
+             if (getHost().isConnected()) {
+                 if (!getHost().isHbStatus()) {
+                    texts.add("waiting for cluster status...");
+                 }
+             } else {
+                 texts.add("connecting...");
+             }
+             return texts.toArray(new String[texts.size()]);
+         }
     }
 
 
@@ -1554,7 +1569,9 @@ public class HostBrowser extends Browser {
         }
 
         public final void makeFilesystem(final String filesystem) {
-            DRBD.makeFilesystem(host, getDrbdResourceInfo().getDevice(), filesystem);
+            DRBD.makeFilesystem(host,
+                                getDrbdResourceInfo().getDevice(),
+                                filesystem);
         }
 
         public final void forcePrimary() {

@@ -103,6 +103,7 @@ public class SSH {
                                      null);
             host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
             connectionThread = new ConnectionThread();
+            // TODO:  possible race here connectionThread can be null
             connectionThread.start();
         }
         return true;
@@ -337,7 +338,8 @@ public class SSH {
                 }
                 /* requestPTY mixes stdout and strerr together, but it works
                 better at the moment. */
-                if (command.indexOf("/etc/init.d/openais start") < 0) {
+                if (command.indexOf("/etc/init.d/openais start") < 0
+                    && command.indexOf("/etc/init.d/openais reload") < 0) {
                     /* aisexec does not work when pty is requested for some
                      * reason, so here is the workaround. */
                     sess.requestPTY("dumb", 0, 0, 0, 0, null);
@@ -348,6 +350,7 @@ public class SSH {
                                   + host.getHoppedCommand(command),
                                   1);
                 sess.execCommand(host.getHoppedCommand(command));
+
                 final InputStream stdout = sess.getStdout();
                 final InputStream stderr = sess.getStderr();
                 //byte[] buff = new byte[8192];
@@ -926,7 +929,9 @@ public class SSH {
                 final String[] content = new String[]{lastError,
                                                       name,
                                                       instruction,
-                                                      prompt[i]};
+                                                      "<html><font color=red>"
+                                                      + prompt[i] + "</font>"
+                                                      + "</html>"};
 
                 if (lastError != null) {
                     /* show lastError only once */
@@ -1187,8 +1192,7 @@ public class SSH {
                                                  kexTimeout);
                                 }
 
-                                lastError =
-                                     Tools.getString(
+                                lastError = Tools.getString(
                                         "SSH.Publickey.Authentication.Failed");
                             } else {
                                 publicKeyTry = 0;
@@ -1406,7 +1410,7 @@ public class SSH {
             final String dir = remoteFilename.substring(0, index + 1);
             commands.append("mkdir -p ");
             commands.append(dir);
-            commands.append(';'); 
+            commands.append(';');
         }
         final Thread t = host.execCommandRaw(
                                 commands.toString()

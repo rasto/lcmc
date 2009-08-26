@@ -75,21 +75,35 @@ public final class Heartbeat {
      * Starts heartbeat on host and adds it to the rc.
      */
     public static void startHeartbeatRc(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.startHeartbeatRc",
+        final String command = host.getDistCommand("Heartbeat.startHeartbeat"
+                                                   + ";;;Heartbeat.addToRc",
                                                    (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
+    /**
+     * Stops the corosync and starts the heartbeat on the specified host.
+     */
+    public static void switchFromCorosyncToHeartbeat(final Host host) {
+        final String command = host.getDistCommand(
+                                    "Corosync.deleteFromRc"
+                                    + ";;;Heartbeat.addToRc"
+                                    + ";;;Heartbeat.startHeartbeat",
+                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
 
     /**
      * Stops the openais and starts the heartbeat on the specified host.
      */
-    public static void switchToHeartbeat(final Host host) {
+    public static void switchFromOpenaisToHeartbeat(final Host host) {
         final String command = host.getDistCommand(
-                                        "Heartbeat.removeOpenaisAddHeartbeat",
-                                        (ConvertCmdCallback) null);
+                                    "Corosync.deleteFromRc"
+                                    + ";;;Heartbeat.addToRc"
+                                    + ";;;Heartbeat.startHeartbeat",
+                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
-
     /**
      * Adds heartbeat to the rc.
      */

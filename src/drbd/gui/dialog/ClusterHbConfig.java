@@ -377,8 +377,8 @@ public class ClusterHbConfig extends DialogCluster {
                                     statusPanel.getPreferredSize());
                     }
                 });
+                setNewConfig(configs[0]);
                 if (editableConfig) {
-                    setNewConfig(configs[0]);
                     updateConfigPanelEditable(false);
                 } else {
                     updateConfigPanelExisting();

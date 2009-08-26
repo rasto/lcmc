@@ -389,7 +389,9 @@ public class DrbdGraph extends ResourceGraph {
     protected final String[] getSubtexts(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
-            if (bdi != null && bdi.getBlockDevice().isDrbd()) {
+            if (bdi != null && bdi.getBlockDevice().isDrbd()
+                && bdi.getBlockDevice().getConnectionState() != null
+                && bdi.getBlockDevice().getDiskState() != null) {
                 return new String[]{bdi.getBlockDevice().getConnectionState()
                                     + " / "
                                     + bdi.getBlockDevice().getDiskState()};
@@ -425,7 +427,7 @@ public class DrbdGraph extends ResourceGraph {
             return "";
         }
     }
-    
+
     /**
      * Returns shape of the block device vertex.
      */

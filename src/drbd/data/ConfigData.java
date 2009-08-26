@@ -69,7 +69,7 @@ public class ConfigData implements Serializable {
     /** Last installed clusterStack. */
     private String lastInstalledClusterStack = null;
     /** Last installed method either Openais or Heartbeat with pacemaker. */
-    private String lastHbAisPmInstalledMethod = null;
+    private String lastHbPmInstalledMethod = null;
     /** Last installed drbd method. */
     private String lastDrbdInstalledMethod = null;
     /** Whether drbd gui helper should be overwritten */
@@ -296,16 +296,16 @@ public class ConfigData implements Serializable {
     /**
      * Sets last installed method of either Openais or Heartbeat.
      */
-    public final void setLastHbAisPmInstalledMethod(
-                                    final String lastHbAisPmInstalledMethod) {
-        this.lastHbAisPmInstalledMethod = lastHbAisPmInstalledMethod;
+    public final void setLastHbPmInstalledMethod(
+                                    final String lastHbPmInstalledMethod) {
+        this.lastHbPmInstalledMethod = lastHbPmInstalledMethod;
     }
 
     /**
      * Returns last installed method of either Openais or Heartbeat.
      */
-     public final String getLastHbAisPmInstalledMethod() {
-         return lastHbAisPmInstalledMethod;
+     public final String getLastHbPmInstalledMethod() {
+         return lastHbPmInstalledMethod;
      }
 
     /**

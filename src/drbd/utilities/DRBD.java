@@ -334,8 +334,8 @@ public final class DRBD {
                                       final ExecCallback execCallback) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DRBDDEV_PH, blockDevice);
-        if ("jfs".equals(filesystem) ||
-            "reiserfs".equals(filesystem)) {
+        if ("jfs".equals(filesystem)
+            || "reiserfs".equals(filesystem)) {
             replaceHash.put(FILESYSTEM_PH, filesystem + " -q");
         } else {
             replaceHash.put(FILESYSTEM_PH, filesystem);

@@ -228,6 +228,12 @@ public class ProgressIndicatorPanel extends JComponent
             Thread.currentThread().interrupt();
             return;
         }
+        if (texts.containsKey(text)) {
+            texts.put(text, MAX_ALPHA_LEVEL);
+            mTextsLock.release();
+            mAnimatorLock.release();
+            return;
+        }
         texts.put(text, MAX_ALPHA_LEVEL);
 
         if (texts.size() > 1) {

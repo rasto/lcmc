@@ -26,8 +26,6 @@ import drbd.data.Host;
 import drbd.utilities.Tools;
 
 import javax.swing.JDialog;
-import java.awt.Window;
-import java.awt.Frame;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JPanel;
@@ -35,9 +33,14 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import java.awt.Window;
+import java.awt.Frame;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An implementation of dialogs that are needed for establishing of a ssh
@@ -175,8 +178,17 @@ public class SSHGui {
                           final String defaultValue,
                           final boolean isPassword) {
             this.isPassword = isPassword;
-
-            host.getTerminalPanel().addCommandOutput(content);
+            int i = 0;
+            final List<String> strippedContent= new ArrayList<String>();
+            for (final String s : content) {
+                if (s != null && !s.equals("")) {
+                    /* strip some html */
+                    strippedContent.add(s.replaceAll("\\<.*?\\>", "")
+                                         .replaceAll("&nbsp;", " "));
+                }
+            }
+            host.getTerminalPanel().addCommandOutput(
+                  strippedContent.toArray(new String[strippedContent.size()]));
 
             if (progressBar != null) {
                 progressBar.hold();
@@ -188,11 +200,11 @@ public class SSHGui {
                 pan.add(new JLabel("host: " + host.getName()));
             }
 
-            for (int i = 0; i < content.length; i++) {
-                if ((content[i] == null) || (content[i].equals(""))) {
+            for (final String el : content) {
+                if ((el == null) || (el.equals(""))) {
                     continue;
                 }
-                final JLabel contentLabel = new JLabel(content[i]);
+                final JLabel contentLabel = new JLabel(el);
                 pan.add(contentLabel);
             }
 

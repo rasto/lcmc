@@ -1233,8 +1233,9 @@ public abstract class ResourceGraph {
                                new Color(0, 0, 0),
                                alpha);
                     i++;
-                    shapeHeight += 8 * i;
+                    shapeHeight += 8;
                 }
+                shapeHeight -= 8;
             }
 
             final Info info = getInfo(v);
@@ -1249,7 +1250,7 @@ public abstract class ResourceGraph {
                 mAnimationListLock.release();
                 final int barPos = i * (shapeWidth - 7) / 100;
                 g2d.setColor(new Color(250, 133, 34,
-                                       90));
+                                       50));
                 g2d.fillRect((int) (x + barPos), (int) y, 7, shapeHeight);
                 g2d.fillRect((int) (x + shapeWidth - barPos - 7),
                              (int) y, 7,

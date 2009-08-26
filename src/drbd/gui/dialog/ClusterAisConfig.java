@@ -24,6 +24,7 @@ package drbd.gui.dialog;
 
 import drbd.utilities.MyButton;
 import drbd.utilities.Openais;
+import drbd.utilities.Corosync;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.AisCastAddress;
@@ -64,7 +65,8 @@ import javax.swing.JComponent;
 import java.awt.Component;
 
 /**
- * An implementation of a dialog where openais is initialized on all hosts.
+ * An implementation of a dialog where corosync/openais is initialized on all
+ * hosts.
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -95,7 +97,7 @@ public class ClusterAisConfig extends DialogCluster {
     private GuiComboBox portCB;
     /** Add address button. */
     private MyButton addButton;
-    /** Array with openais.conf configs from all hosts. */
+    /** Array with corosync.conf or openais.conf configs from all hosts. */
     private String[] configs;
     /** Status panel. */
     private JPanel statusPanel;
@@ -165,13 +167,24 @@ public class ClusterAisConfig extends DialogCluster {
                                     config.append('\n');
                                 }
                                 config.append("}\n");
+                                final String serviceVersion =
+                                            hosts[0].getDistString(
+                                                    "Pacemaker.Service.Ver");
                                 config.append(aisConfigPacemaker(
                                                     "\t",
-                                                    mgmtdCB.isSelected()));
-
-                                Openais.createAISConfig(hosts, config);
+                                                    mgmtdCB.isSelected(),
+                                                    serviceVersion));
+                                if (hosts[0].isCorosync()) {
+                                    Corosync.createCorosyncConfig(hosts, config);
+                                } else {
+                                    Openais.createAISConfig(hosts, config);
+                                }
                                 boolean configOk = updateOldAisConfig();
-                                Openais.reloadOpenaises(hosts);
+                                if (hosts[0].isCorosync()) {
+                                    Corosync.reloadCorosyncs(hosts);
+                                } else {
+                                    Openais.reloadOpenaises(hosts);
+                                }
                                 enableComponents();
                                 if (configOk) {
                                     hideRetryButton();
@@ -243,12 +256,12 @@ public class ClusterAisConfig extends DialogCluster {
                   mcastport: 5405
           }
         */
-        final Pattern totemP = Pattern.compile("^\\s*totem\\s*\\{\\s*");
+        final Pattern totemP = Pattern.compile("\\s*totem\\s*\\{\\s*");
         final Pattern interfaceP =
-                            Pattern.compile("^\\s*interface\\s+\\{\\s*");
+                            Pattern.compile("\\s*interface\\s+\\{\\s*");
         final Pattern endParenthesesP = Pattern.compile("^\\s*}\\s*");
         final Pattern pattern =
-                            Pattern.compile("^\\s*(\\S+):\\s*(\\S+)\\s*");
+                            Pattern.compile("\\s*(\\S+):\\s*(\\S+)\\s*");
         aisCastAddresses.clear();
         boolean inTotem = false;
         boolean inInterface = false;
@@ -256,12 +269,15 @@ public class ClusterAisConfig extends DialogCluster {
         String mcastport = null;
         String bindnetaddr = null;
         for (String line : config) {
+            System.out.println("line: " + line);
             final Matcher totemM = totemP.matcher(line);
             if (!inTotem && totemM.matches()) {
+                System.out.println("in totem");
                 inTotem = true;
             } else if (inTotem && !inInterface) {
                 final Matcher interfaceM = interfaceP.matcher(line);
                 if (interfaceM.matches()) {
+                    System.out.println("in interface");
                     inInterface = true;
                 }
             } else if (inInterface) {
@@ -309,9 +325,17 @@ public class ClusterAisConfig extends DialogCluster {
                            Tools.getString("Dialog.ClusterAisConfig.Loading"));
         int i = 0;
 
+        String cf = "/etc/corosync/corosync.conf";
+        String command = "Corosync.getAisConfig";
+        if (!hosts[0].isCorosync()) {
+            cf = "/etc/ais/openais.conf";
+            command = "OpenAIS.getAisConfig";
+        }
+        final String configFile = cf;
         for (Host h : hosts) {
             final int index = i;
-            ts[i] = h.execCommand("OpenAis.getAisConfig",
+            ts[i] = h.execCommand(
+                             command,
                              (ProgressBar) null,
                              new ExecCallback() {
                                  public void done(final String ans) {
@@ -338,7 +362,7 @@ public class ClusterAisConfig extends DialogCluster {
         if (configs[0].equals(AIS_CONF_ERROR_STRING)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    configStatus.setText(hosts[0] + ": " + Tools.getString(
+                    configStatus.setText(hosts[0] + Tools.getString(
                                       "Dialog.ClusterAisConfig.NoConfigFound"));
                 }
             });
@@ -352,7 +376,8 @@ public class ClusterAisConfig extends DialogCluster {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             configStatus.setText(host + ": "
-                                                 + Tools.getString(
+                                 + configFile
+                                 + Tools.getString(
                                       "Dialog.ClusterAisConfig.NoConfigFound"));
                         }
                     });
@@ -379,7 +404,8 @@ public class ClusterAisConfig extends DialogCluster {
                 final boolean editableConfig = generated;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        configStatus.setText(Tools.getString(
+                        configStatus.setText(
+                                configFile + Tools.getString(
                                     "Dialog.ClusterAisConfig.ais.conf.ok"));
                         configCheckbox.setSelected(false);
                         if (editableConfig) {
@@ -391,8 +417,8 @@ public class ClusterAisConfig extends DialogCluster {
                                     statusPanel.getPreferredSize());
                     }
                 });
+                setNewConfig(configs[0]);
                 if (editableConfig) {
-                    setNewConfig(configs[0]);
                     updateConfigPanelEditable(false);
                 } else {
                     updateConfigPanelExisting();
@@ -416,9 +442,9 @@ public class ClusterAisConfig extends DialogCluster {
                 }
             });
             if (noConfigs) {
-                setNewConfig(configs[0]);
                 updateConfigPanelEditable(false);
             } else {
+                setNewConfig(configs[0]);
                 updateConfigPanelExisting();
             }
         }
@@ -426,7 +452,7 @@ public class ClusterAisConfig extends DialogCluster {
     }
 
     /**
-     * Shows all openais.conf config files.
+     * Shows all corosync or openais.conf config files.
      */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
@@ -471,6 +497,7 @@ public class ClusterAisConfig extends DialogCluster {
      */
     private void updateConfigPanelEditable(final boolean configChanged) {
         this.configChanged = configChanged;
+        final Host[] hosts = getCluster().getHostsArray();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (!configChanged) {
@@ -526,11 +553,15 @@ public class ClusterAisConfig extends DialogCluster {
                     final JLabel label = l;
                     l.addFocusListener(new FocusListener() {
                         public void focusGained(final FocusEvent e) {
-                            if (configScrollPane != null) {
-                                configScrollPane.getViewport().setViewPosition(
-                                               label.getBounds().getLocation());
-                                configScrollPane = null;
-                            }
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (configScrollPane != null) {
+                                        configScrollPane.getViewport().setViewPosition(
+                                                       label.getBounds().getLocation());
+                                        configScrollPane = null;
+                                    }
+                                }
+                            });
                         }
                         public void focusLost(final FocusEvent e) {
                             /* nothing */
@@ -551,10 +582,14 @@ public class ClusterAisConfig extends DialogCluster {
                 rows++;
 
                 /* service pacemaker */
+                final String serviceVersion =
+                            hosts[0].getDistString(
+                                    "Pacemaker.Service.Ver");
                 final String[] pacemakerLines =
                         aisConfigPacemaker(SPACE_TAB,
-                                           mgmtdCB.isSelected()).toString()
-                                                .split(NEWLINE);
+                                           mgmtdCB.isSelected(),
+                                           serviceVersion).toString()
+                                                          .split(NEWLINE);
                 final Pattern p = Pattern.compile("\\s*use_mgmtd\\s*:.*");
                 for (String line : pacemakerLines) {
                     configPanel.add(new JLabel(line));
@@ -642,7 +677,7 @@ public class ClusterAisConfig extends DialogCluster {
     }
 
     /**
-     * Returns the head of the openais config.
+     * Returns the head of the corosync or openais config.
      */
     private StringBuffer aisConfigHead(final boolean fake) {
         final StringBuffer config = new StringBuffer(500);
@@ -656,6 +691,11 @@ public class ClusterAisConfig extends DialogCluster {
         }
         config.append(Tools.getRelease());
         config.append("\n\naisexec {\n");
+        config.append(tab);
+        config.append("user: root\n");
+        config.append(tab);
+        config.append("group: root\n}");
+        config.append("\n\ncorosync {\n");
         config.append(tab);
         config.append("user: root\n");
         config.append(tab);
@@ -707,11 +747,14 @@ public class ClusterAisConfig extends DialogCluster {
      * mgmt config is commented out.
      */
     private StringBuffer aisConfigPacemaker(final String tab,
-                                            final boolean useMgmt) {
+                                            final boolean useMgmt,
+                                            final String serviceVersion) {
         final StringBuffer config = new StringBuffer(120);
         config.append("\nservice {\n");
         config.append(tab);
-        config.append("ver: 0\n");
+        config.append("ver: ");
+        config.append(serviceVersion);
+        config.append("\n");
         config.append(tab);
         config.append("name: pacemaker\n");
         if (useMgmt) {

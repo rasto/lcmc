@@ -403,12 +403,12 @@ sub get_disk_info {
 #
 # prints available filesystems on this host.
 sub get_filesystems_info {
-        for (`ls /sbin/mkfs.* 2>/dev/null`) {
-                chomp;
-                my ($fs) = /([^\.]+)$/;
-                `modinfo $fs >/dev/null 2>&1 || grep '\\<$fs\\>' /proc/filesystems`;
-                print "$fs\n" if !$?;
-        }
+	for (`ls /sbin/mkfs.* 2>/dev/null`) {
+		chomp;
+		my ($fs) = /([^\.]+)$/;
+		`modinfo $fs >/dev/null 2>&1 || grep '\\<$fs\\>' /proc/filesystems`;
+		print "$fs\n" if !$?;
+	}
 }
 
 # get_mount_points_info
@@ -538,16 +538,16 @@ sub is_smaller_v {
 
 sub get_message {
 	my $socket = shift;
-        my $msg = "";
-        while (<$socket>) {
-                if ($_ eq "<<<\n") {
-                        return $msg;
-                }
-                if ($_ !~ />>>/) {
-                        $msg .= $_;
-                }
-        }
-        die;
+	my $msg = "";
+	while (<$socket>) {
+		if ($_ eq "<<<\n") {
+			return $msg;
+		}
+		if ($_ !~ />>>/) {
+			$msg .= $_;
+		}
+	}
+	die;
 }
 
 sub cib_message {
@@ -555,8 +555,8 @@ sub cib_message {
 	my $msg = shift;
 	$msg = ">>>\n$msg<<<\n";
 	printf $socket pack "L", length $msg;
-        printf $socket pack "L", 0xabcd;
-        print $socket $msg;
+	printf $socket pack "L", 0xabcd;
+	print $socket $msg;
 }
 
 #
@@ -912,26 +912,27 @@ sub get_drbd_xml {
 # Returns a portable command that determines if the init script is in rc?.d
 # directories.
 sub is_script_rc {
-	my $script =  shift;
+	my $script = shift;
 	return "(/usr/sbin/update-rc.d -n $script defaults 1"
-              ." || /sbin/chkconfig --list $script 2>/dev/null"
+	      ." || /sbin/chkconfig --list $script 2>/dev/null"
 	      ."|grep ':on') 2>/dev/null"
 	      ."|sed s/.*/on/|uniq";
 }
 
 #
 # Returns a portable command that determines if the init script is running.
-sub is_openais_running {
+sub is_running {
 	my $script = shift;
+	my $prog = shift;
 	return <<STATUS;
 if (/etc/init.d/$script status 2>&1|grep 'Usage:' >/dev/null); then \
-	PROG=/usr/sbin/aisexec; \
+	PROG=$prog; \
 	for PID in `pidof \$PROG`; do \
 		if [ "\$(readlink -f /proc/\$PID/exe)" = "\$PROG" ]; then \
 			exit 0; \
 		fi; \
 	done; \
-        exit 3; \
+	exit 3; \
 else \
 	/etc/init.d/$script status>/dev/null; \
 	exit \$?
@@ -964,6 +965,7 @@ sub get_cluster_versions {
 	# after that only the package managers will be asked.
 	my $cs_prog = "/usr/sbin/corosync";
 	my $cs_version = "";
+	my $cs_script = "corosync";
 	if (-e $cs_prog) {
 		$cs_version =
 		`grep -m 1 -a -o '/BUILD/corosync-[^/]*' /usr/sbin/corosync|sed s/.*-// 2>/dev/null` || "";
@@ -987,30 +989,49 @@ sub get_cluster_versions {
 		}
 	}
 	my $hb_isrc_cmd = is_script_rc("heartbeat");
-	my $ais_isrc_cmd = is_script_rc($ais_script);
+	my $cs_ais_isrc_cmd;
+	if ($cs_version) {
+		$cs_ais_isrc_cmd = is_script_rc($cs_script);
+	} else {
+		$cs_ais_isrc_cmd = is_script_rc($ais_script);
+	}
 	my $hb_isrc = `$hb_isrc_cmd` || "off";
-	my $ais_isrc = `$ais_isrc_cmd` || "off";
+	my $cs_ais_isrc = `$cs_ais_isrc_cmd` || "off";
 	chomp $hb_isrc;
-	chomp $ais_isrc;
+	chomp $cs_ais_isrc;
 
 	my $hb_running_cmd = "$libpath/heartbeat -s";
-	my $ais_running_cmd = is_openais_running($ais_script);
+	my $cs_ais_running_cmd;
+	if ($cs_version) {
+		$cs_ais_running_cmd = is_running($cs_script, $cs_prog);
+	} else {
+		$cs_ais_running_cmd = is_running($ais_script, $ais_prog);
+	}
 	my $hb_running = system("$hb_running_cmd 2>/dev/null") >> 8 || "on";
-	my $ais_running = system("$ais_running_cmd 2>/dev/null") >> 8 ||  "on";
+	my $cs_ais_running = system("$cs_ais_running_cmd 2>/dev/null") >> 8
+								|| "on";
 	my $drbd_loaded = system("lsmod |grep '\\<drbd\\>'") >> 8 || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf 2>/dev/null") >> 8 || "on";
-	my $ais_conf = system("ls /etc/ais/openais.conf 2>/dev/null") >> 8 || "on";
+	my $cs_ais_conf;
+	if ($cs_version) {
+		$cs_ais_conf =
+		  system("ls /etc/corosync/corosync.conf 2>/dev/null") >> 8
+		  					 	      || "on";
+	} else {
+		$cs_ais_conf =
+		   system("ls /etc/ais/openais.conf 2>/dev/null") >> 8 || "on";
+	}
 	chomp $hb_running;
-	chomp $ais_running;
+	chomp $cs_ais_running;
 	return "hb:$hb_version\n"
 	       ."pm:$pm_version\n"
 	       ."cs:$cs_version\n"
 	       ."ais:$ais_version\n"
 	       ."hb-rc:$hb_isrc\n"
-	       ."ais-rc:$ais_isrc\n"
+	       ."cs-ais-rc:$cs_ais_isrc\n"
 	       ."hb-running:$hb_running\n"
-	       ."ais-running:$ais_running\n"
+	       ."cs-ais-running:$cs_ais_running\n"
 	       ."hb-conf:$hb_conf\n"
-	       ."ais-conf:$ais_conf\n"
+	       ."cs-ais-conf:$cs_ais_conf\n"
 	       ."drbd-loaded:$drbd_loaded\n"
 }

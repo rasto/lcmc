@@ -58,7 +58,8 @@ public class HostDistDetection extends DialogHost {
         final String support =
                       Tools.getDistString("Support",
                                           getHost().getDist(),
-                                          getHost().getDistVersionString());
+                                          getHost().getDistVersionString(),
+                                          getHost().getArch());
         final String answerText = "\nversion: " + getHost().getDetectedInfo()
                         + " (support file: "
                         + support + ")";

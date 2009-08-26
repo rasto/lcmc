@@ -447,6 +447,21 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
+     * Returns all hosts are don't get cluster status.
+     */
+     public final boolean allHostsDown() {
+        boolean hostsDown = true;
+        final Host[] hosts = cluster.getHostsArray();
+        for (Host host : hosts) {
+            if (host.isHbStatus()) {
+                hostsDown = false;
+                break;
+            }
+        }
+        return hostsDown;
+     }
+
+    /**
      * Initializes cluster resources for cluster view.
      */
     public final void initClusterResources() {
@@ -910,7 +925,8 @@ public class ClusterBrowser extends Browser {
                      }
 
                      public void doneError(final String ans, final int exitCode) {
-                         Tools.progressIndicatorFailed(hostName, "Heartbeat status failed");
+                         Tools.progressIndicatorFailed(hostName,
+                                    "Heartbeat status failed");
                          if (hbStatusFirstTime) {
                              Tools.debug(this, "hb status failed: "
                                                + host.getName()
@@ -927,6 +943,7 @@ public class ClusterBrowser extends Browser {
                          }
                          if (exitCode == 255) {
                              /* looks like connection was lost */
+                             heartbeatGraph.repaint();
                              host.getSSH().forceReconnect();
                          }
                          done(ans);
@@ -973,7 +990,12 @@ public class ClusterBrowser extends Browser {
                                              final String status = heartbeatStatusOutput.substring(i);
                                              heartbeatStatusOutput.delete(0, heartbeatStatusOutput.length() - 1);
                                              if ("---start---\r\nerror\r\n\r\n---done---\r\n".equals(status)) {
+                                                 final boolean oldStatus =
+                                                              host.isHbStatus();
                                                  host.setHbStatus(false);
+                                                 if (oldStatus) {
+                                                    heartbeatGraph.repaint();
+                                                 }
                                              } else {
                                                  heartbeatStatus.parseStatus(status);
                                                  // TODO; servicesInfo can be null
@@ -986,7 +1008,12 @@ public class ClusterBrowser extends Browser {
                                  }
                                  setHbStatus();
                              } else {
+                                final boolean oldStatus =
+                                             host.isHbStatus();
                                 host.setHbStatus(false);
+                                if (oldStatus) {
+                                   heartbeatGraph.repaint();
+                                }
                              }
                          }
                         if (prevHbStatusFailed != hbStatusFailed()) {
@@ -1226,7 +1253,6 @@ public class ClusterBrowser extends Browser {
             }
             i++;
         }
-
         if (dcHost == null) {
             int ix = lastHostIndex;
             do {
@@ -1238,7 +1264,7 @@ public class ClusterBrowser extends Browser {
                     lastDcHost = hosts.get(ix);
                     break;
                 }
-            } while (ix == lastHostIndex);
+            } while (ix != lastHostIndex);
             dcHost = lastDcHost;
             realDcHost = null;
         } else {
@@ -3631,6 +3657,9 @@ public class ClusterBrowser extends Browser {
              return false;
          }
 
+         /**
+          * Returns subtexts that appears in the service vertex.
+          */
          final public String[] getSubtextsForGraph() {
              final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
@@ -4022,7 +4051,7 @@ public class ClusterBrowser extends Browser {
                 return false;
             }
             for (final Host host : getClusterHosts()) {
-                if (!failedOnHost(host)) {
+                if (host.isHbStatus() && !failedOnHost(host)) {
                     return false;
                 }
             }
@@ -4080,12 +4109,7 @@ public class ClusterBrowser extends Browser {
          * TODO: broken icon, not managed icon.
          */
         public ImageIcon getMenuIcon() {
-            if (isStopped()) {
-                return SERVICE_STOPPED_ICON;
-            } else if (isStarted()) {
-                return SERVICE_STARTED_ICON;
-            }
-            if (getRunningOnNode() == null) {
+            if (allHostsDown() || getRunningOnNode() == null) {
                 return SERVICE_STOPPED_ICON;
             }
             return SERVICE_STARTED_ICON;
@@ -5914,6 +5938,10 @@ public class ClusterBrowser extends Browser {
             if (node == null) {
                 node = "none";
             }
+            final Host[] hosts = cluster.getHostsArray();
+            if (allHostsDown()) {
+                node = "unknown";
+            }
             final StringBuffer sb = new StringBuffer(200);
             sb.append("<b>");
             sb.append(toString());
@@ -5959,7 +5987,10 @@ public class ClusterBrowser extends Browser {
             } else if (isStopped()) {
                 return new String[]{"stopped"};
             }
-            final String runningOnNode = getRunningOnNode();
+            String runningOnNode = getRunningOnNode();
+            if (allHostsDown()) {
+                runningOnNode = "unknown";
+            }
             if (runningOnNode != null && !"".equals(runningOnNode)) {
                 return new String[]{"running on: " + runningOnNode};
             }
@@ -7501,6 +7532,8 @@ public class ClusterBrowser extends Browser {
             if (bd1 == null || bd2 == null) {
                 return;
             }
+            drbdGraph.startAnimation(bd1);
+            drbdGraph.startAnimation(bd2);
 
             if (name == null && drbdDevStr == null) {
                 int index = getNewDrbdResourceIndex();
@@ -7593,6 +7626,8 @@ public class ClusterBrowser extends Browser {
                             adrd.showDialogs();
                             if (adrd.isCanceled()) {
                                 driF.removeMyselfNoConfirm();
+                                drbdGraph.stopAnimation(bd1);
+                                drbdGraph.stopAnimation(bd2);
                                 return;
                             }
 
@@ -7605,6 +7640,8 @@ public class ClusterBrowser extends Browser {
             } else {
                 resetFilesystems();
             }
+            drbdGraph.stopAnimation(bd1);
+            drbdGraph.stopAnimation(bd2);
         }
     }
 

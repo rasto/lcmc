@@ -926,7 +926,8 @@ public final class Tools {
      */
     public static String getDistString(final String text,
                                        String dist,
-                                       String version) {
+                                       String version,
+                                       String arch) {
         if (dist == null) {
             dist = "";
         }
@@ -942,13 +943,24 @@ public final class Tools {
               + version, 2);
         final ResourceBundle resourceString =
                 ResourceBundle.getBundle("drbd.configs.DistResource", locale);
+        String ret;
         try {
-            final String ret = resourceString.getString(text);
-            debug("ret: " + ret, 2);
-            return ret;
+            ret = resourceString.getString(text + "." + arch);
         } catch (Exception e) {
-            return null;
+            ret = null;
         }
+        if (ret == null) {
+            try {
+                if (ret == null) {
+                    ret = resourceString.getString(text);
+                }
+                debug("ret: " + ret, 2);
+                return ret;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return ret;
     }
 
     /**
@@ -968,11 +980,12 @@ public final class Tools {
                                  final String text,
                                  final String dist,
                                  final String version,
+                                 final String arch,
                                  final ConvertCmdCallback convertCmdCallback) {
         final String[] texts = text.split(";;;");
         final List<String> results =  new ArrayList<String>();
         for (final String t : texts) {
-            results.add(getDistString(t, dist, version));
+            results.add(getDistString(t, dist, version, arch));
         }
         String ret;
         if (texts.length == 0) {
@@ -1030,8 +1043,9 @@ public final class Tools {
      */
     public static String getKernelDownloadDir(final String kernelVersion,
                                               final String dist,
-                                              final String version) {
-        final String regexp = getDistString("kerneldir", dist, version);
+                                              final String version,
+                                              final String arch) {
+        final String regexp = getDistString("kerneldir", dist, version, arch);
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
             final Matcher m = p.matcher(kernelVersion);
@@ -1074,6 +1088,7 @@ public final class Tools {
                                                             + buf.toString()
                                                             + "*");
                 } catch (Exception e2) {
+                    distVersion = null;
                 }
                 if (distVersion != null) {
                     break;

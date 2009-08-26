@@ -91,11 +91,14 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
                     }
                     final List<ComboInfo> items = new ArrayList<ComboInfo>();
                     for (final String versionString : versions) {
-                        final String version =
-                                versionString.substring(
+                        if (versionString != null
+                            && versionString.length() > 16) {
+                            final String version =
+                                    versionString.substring(
                                                    9,
                                                    versionString.length() - 7);
-                        items.add(new ComboInfo(version, versionString));
+                            items.add(new ComboInfo(version, versionString));
+                        }
                     }
                     drbdTarballCombo.clear();
                     SwingUtilities.invokeLater(new Runnable() {

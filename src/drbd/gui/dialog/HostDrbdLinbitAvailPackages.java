@@ -321,16 +321,16 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
             if (drbdDistItems == null || !drbdDistItems.contains(dist)) {
                 errorText.append(
                   Tools.getString(
-                    "Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Dist"));
+                      "Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Dist"));
             } else if (drbdKernelDirItems == null
                        || !drbdKernelDirItems.contains(kernel)) {
                 errorText.append(
                   Tools.getString(
-                    "Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Kernel"));
+                    "Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Kernel"));
             } else if (drbdArchItems == null || !drbdArchItems.contains(arch)) {
                 errorText.append(
                   Tools.getString(
-                    "Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Arch"));
+                    "Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Arch"));
             }
             errorText.append("\n\n");
             errorText.append(dist);

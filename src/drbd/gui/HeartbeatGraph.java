@@ -568,7 +568,6 @@ public class HeartbeatGraph extends ResourceGraph {
                                         r.getHeight(),
                                         20,
                                         20);
-            
         }
     }
 
@@ -789,7 +788,9 @@ public class HeartbeatGraph extends ResourceGraph {
             }
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
-        if (si.isFailed()) {
+        if (getClusterBrowser().allHostsDown()) {
+            return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
+        } else if (si.isFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
         } else if (si.isStopped()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
@@ -1025,13 +1026,8 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
-        if (si.isRunning()) {
+        if (si.isRunning() && !getClusterBrowser().allHostsDown()) {
             return SERVICE_RUNNING_ICON;
-        }
-        final String node =
-                        ((ServiceInfo) getInfo((Vertex) v)).getRunningOnNode();
-        if (node == null) {
-            return SERVICE_NOT_RUNNING_ICON;
         }
         return SERVICE_NOT_RUNNING_ICON;
     }
@@ -1283,6 +1279,12 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     protected final String getRightCornerText(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
+            final HostInfo hi = vertexToHostMap.get(v);
+            if (hi.getHost().isHbStatus()) {
+                return "online";
+            } else if (hi.getHost().isConnected()) {
+                return "offline";
+            }
             return null;
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
@@ -1297,7 +1299,7 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     protected final String[] getSubtexts(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
-            return null;
+            return vertexToHostMap.get(v).getSubtextsForGraph();
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         if (si == null) {
