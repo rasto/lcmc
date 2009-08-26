@@ -43,18 +43,24 @@ public class DistResource_suse_SLES10 extends
         {"distributiondir", "sles10"},
         {"Support", "suse-SLES10"},
 
-        /* Openais/Pacemaker Opensuse*/
-        {"AisPmInst.install.text.1", "http://download.opensuse.org: rug" },
-        {"AisPmInst.install.1",
+        /* Corosync/Openais/Pacemaker Opensuse*/
+        {"PmInst.install.text.1",
+         "http://download.opensuse.org: rug" },
+
+        {"PmInst.install.1",
          "rug service-delete ha-clustering; "
          + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>'"
          + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
          + " && rug key-add 'server\\x3aha-clustering OBS Project <server\\x3aha-clustering@build.opensuse.org>'"
          + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
          + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
-         + " && /usr/bin/zypper -n --no-gpg-checks install openais pacemaker"
-         + " && /sbin/chkconfig --add openais"
-         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
+         + " && /usr/bin/zypper -n --no-gpg-checks install pacemaker"
+         + " && (/sbin/chkconfig --add corosync"
+         + " || /sbin/chkconfig --add openais)"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
 
         /* Heartbeat/Pacemaker Opensuse*/
         {"HbPmInst.install.text.1", "http://download.opensuse.org: rug" },

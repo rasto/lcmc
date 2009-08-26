@@ -173,16 +173,21 @@ public class DistResource extends
         {"Heartbeat.getClusterMetadata", "/usr/local/bin/drbd-gui-helper get-cluster-metadata"},
         {"Heartbeat.getHbStatus",    "/usr/local/bin/drbd-gui-helper get-cluster-events"},
         {"Heartbeat.startHeartbeat", "/etc/init.d/heartbeat start"},
-        // TODO: /etc/init.d/openais can also be /etc/init.d/openais-legacy
-        {"Openais.startOpenais",   "/etc/init.d/openais start"},
-        {"Openais.reloadOpenais",  "/etc/init.d/openais reload"}, 
-        {"Heartbeat.reloadHeartbeat", "/etc/init.d/heartbeat reload"},
         {"Heartbeat.stopHeartbeat",  "/etc/init.d/heartbeat stop"},
+        {"Openais.startOpenais",   "/etc/init.d/openais start"},
+        {"Openais.stopOpenais",   "/etc/init.d/openais stop"},
+        {"Openais.reloadOpenais",  "/etc/init.d/openais reload"},
+        {"Corosync.startCorosync",   "/etc/init.d/corosync start"},
+        {"Corosync.stopCorosync",   "/etc/init.d/corosync start"},
+        {"Corosync.reloadCorosync",  "/etc/init.d/corosync reload"},
+        {"Heartbeat.reloadHeartbeat", "/etc/init.d/heartbeat reload"},
+
         {"Heartbeat.getHbConfig",    "cat /etc/ha.d/ha.cf"},
         {"CRM.standByOn",      "crm_standby -U @HOST@ -v on"},
         {"CRM.standByOff",     "crm_standby -U @HOST@ -v off"},
 
-        {"OpenAis.getAisConfig",     "cat /etc/ais/openais.conf"},
+        {"OpenAIS.getAisConfig",     "cat /etc/ais/openais.conf"},
+        {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
 
         {"ClusterInit.getInstallationInfo",
          "/usr/local/bin/drbd-gui-helper installation-info"},
@@ -231,7 +236,7 @@ public class DistResource extends
 
         {"Logs.hbLog",
          "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null"
-         + " || grep @GREPPATTERN@ /var/log/syslog"
+         + " || grep @GREPPATTERN@ /var/log/syslog 2>/dev/null"
          + " || grep @GREPPATTERN@ /var/log/messages)|tail -500"},
 
         {"DrbdLog.log",
@@ -241,5 +246,7 @@ public class DistResource extends
         {"DrbdInst.install.1",
                         " packages from www.linbit.com for LINBIT customers"},
         {"DrbdInst.install.method.1",       "linbit"},
+
+        {"Pacemaker.Service.Ver", "0"},
     };
 }

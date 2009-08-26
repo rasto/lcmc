@@ -46,14 +46,19 @@ public class DistResource_redhat_5 extends
         /* support */
         {"Support", "redhat-5"},
 
-        /* Openais/Pacemaker Opensuse */
-        {"AisPmInst.install.text.1", "http://download.opensuse.org" },
+        /* Corosync/Openais/Pacemaker Opensuse */
+        {"PmInst.install.text.1",
+         "http://download.opensuse.org" },
 
-        {"AisPmInst.install.1",
+        {"PmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
-         + "yum -y install openais pacemaker "
-         + "&& /sbin/chkconfig --add openais;"
-         + "mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
+         + "yum -y install pacemaker resource-agents "
+         + " && (/sbin/chkconfig --add corosync"
+         + " || /sbin/chkconfig --add openais)"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         /* Heartbeat/Pacemaker Opensuse */
         {"HbPmInst.install.text.1", "http://download.opensuse.org" },

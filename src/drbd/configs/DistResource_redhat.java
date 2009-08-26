@@ -81,26 +81,22 @@ public class DistResource_redhat extends
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
-        {"Openais.removeHeartbeatAddOpenais",
-         "/etc/init.d/heartbeat stop;/sbin/chkconfig --del heartbeat;"
-         + "/etc/init.d/openais start && "
-         + "/sbin/chkconfig --add openais"},
+        {"Heartbeat.deleteFromRc",
+         "/sbin/chkconfig --del heartbeat"},
 
-        {"Heartbeat.removeOpenaisAddHeartbeat",
-         "/etc/init.d/openais stop;/sbin/chkconfig --del openais;"
-         + "/etc/init.d/heartbeat start && "
-         + "/sbin/chkconfig --add heartbeat"},
-
-        {"Openais.addOpenaisToRc",
-         "/sbin/chkconfig --add openais"},
-
-        {"Heartbeat.addHeartbeatToRc",
+        {"Heartbeat.addToRc",
          "/sbin/chkconfig --add heartbeat"},
 
-        {"Openais.startOpenaisRc",
-         "/etc/init.d/openais start;/sbin/chkconfig --add openais"},
+        {"Corosync.addToRc",
+         "/sbin/chkconfig --add corosync"},
 
-        {"Heartbeat.startHeartbeatRc",
-         "/etc/init.d/heartbeat start;/sbin/chkconfig --add heartbeat"},
+        {"Corosync.deleteFromRc",
+         "/sbin/chkconfig --del corosync"},
+
+        {"Openais.addToRc",
+         "/sbin/chkconfig --add openais"},
+
+        {"Openais.deleteFromRc",
+         "/sbin/chkconfig --del openais"},
     };
 }

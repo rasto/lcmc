@@ -66,16 +66,19 @@ public class DistResource_debian_ETCH extends
         {"HbPmInst.install.2",
          "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
-        /* Heartbeat/Pacemaker Opensuse */
-        {"AisPmInst.install.text.1", "http://download.opensuse.org repository"},
-        {"AisPmInst.install.1",
+        /* Corosync/Heartbeat/Pacemaker Opensuse */
+        {"PmInst.install.text.1", "http://download.opensuse.org repository"},
+        {"PmInst.install.1",
          "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker"
          + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
          + " && /usr/sbin/update-rc.d -f heartbeat remove"
-         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi);"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",

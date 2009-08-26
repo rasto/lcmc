@@ -47,30 +47,40 @@ public class DistResource_debian_LENNY extends
         {"Support", "debian-LENNY"},
 
         /* openais/pacemaker opensuse */
-        {"AisPmInst.install.text.1", "http://download.opensuse.org repository"},
+        {"PmInst.install.text.1",
+         "http://download.opensuse.org repository"},
 
-        {"AisPmInst.install.1",
+        {"PmInst.install.1",
          "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_5.0/ ./'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
-         + " && /usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker"
+         + " && (/usr/sbin/update-rc.d corosync start 75 2 3 4 5 . stop 05 0 1 6 . "
+         + "     || /usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 .) "
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
+         + " if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
-        {"AisPmInst.install.files.1",
+        {"PmInst.install.files.1",
          "openais-debian:/etc/init.d/openais:0755:"
          + "openais-default-debian:/etc/default/openais:0644"},
 
         /* openais/pacemaker madkiss */
-        {"AisPmInst.install.text.2",
+        {"PmInst.install.text.2",
          "LINBIT/MADKISS repository (testing)"},
 
-        {"AisPmInst.install.2",
+        {"PmInst.install.2",
          "echo 'deb http://people.debian.org/~madkiss/ha lenny main'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"},
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         /* heartbeat/pacemaker opensuse */
         {"HbPmInst.install.text.1", "http://download.opensuse.org repository"},

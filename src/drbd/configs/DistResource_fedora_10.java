@@ -42,18 +42,20 @@ public class DistResource_fedora_10 extends
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
-        /* Openais/Pacemaker */
-        {"AisPmInst.install.text.1",
+        /* Corosync/Openais/Pacemaker */
+        {"PmInst.install.text.1",
          "http://download.opensuse.org" },
 
-        {"AisPmInst.install.1",
+        {"PmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_10/server:ha-clustering.repo && "
          + "(/usr/sbin/groupadd haclient 2>/dev/null && "
          + "/usr/sbin/useradd -g haclient hacluster 2>/dev/null;"
-         + "yum -y install openais pacemaker"
-         + "&& /sbin/chkconfig --add openais"
-         + "&& mv /etc/ais/openais.conf /etc/ais/openais.conf.orig)"},
+         + "yum -y install pacemaker"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
+         + " if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"},
 
         /* Heartbeat/Pacemaker */
         {"HbPmInst.install.text.1",

@@ -66,28 +66,28 @@ public class DistResource_fedora extends
         {"HbCheck.version",
          "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
-         + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
+         + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/';"
+         + "/bin/rpm -q -i corosync|perl -lne"
+         + " 'print \"cs:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
-        {"Openais.removeHeartbeatAddOpenais",
-         "/etc/init.d/heartbeat stop;/sbin/chkconfig --del heartbeat;"
-         + "/etc/init.d/openais start && "
-         + "/sbin/chkconfig --add openais"},
+        {"Heartbeat.deleteFromRc",
+         "/sbin/chkconfig --del heartbeat"},
 
-        {"Heartbeat.removeOpenaisAddHeartbeat",
-         "/etc/init.d/openais stop;/sbin/chkconfig --del openais;"
-         + "/etc/init.d/heartbeat start && "
-         + "/sbin/chkconfig --add heartbeat"},
-
-        {"Openais.addOpenaisToRc",
-         "/sbin/chkconfig --add openais"},
-
-        {"Heartbeat.addHeartbeatToRc",
+        {"Heartbeat.addToRc",
          "/sbin/chkconfig --add heartbeat"},
 
-        {"Openais.startOpenaisRc",
-         "/etc/init.d/openais start;/sbin/chkconfig --add openais"},
+        {"Corosync.addToRc",
+         "/sbin/chkconfig --level 2345 corosync on "
+         + "&& /sbin/chkconfig --level 016 corosync off"},
 
-        {"Heartbeat.startHeartbeatRc",
-         "/etc/init.d/heartbeat start;/sbin/chkconfig --add heartbeat"},
+        {"Corosync.deleteFromRc",
+         "/sbin/chkconfig --del corosync"},
+
+        {"Openais.addToRc",
+         "/sbin/chkconfig --level 2345 openais on "
+         + "&& /sbin/chkconfig --level 016 openais off"},
+
+        {"Openais.deleteFromRc",
+         "/sbin/chkconfig --del openais"},
     };
 }

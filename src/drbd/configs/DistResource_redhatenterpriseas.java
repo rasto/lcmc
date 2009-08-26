@@ -47,10 +47,10 @@ public class DistResource_redhatenterpriseas extends
         {"HbPmInst.install.i586", "i386" },
         {"HbPmInst.install.i686", "i386" },
 
-        {"AisPmInst.install.i386", "i386" },
-        {"AisPmInst.install.i486", "i386" },
-        {"AisPmInst.install.i586", "i386" },
-        {"AisPmInst.install.i686", "i386" },
+        {"PmInst.install.i386", "i386" },
+        {"PmInst.install.i486", "i386" },
+        {"PmInst.install.i586", "i386" },
+        {"PmInst.install.i686", "i386" },
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?EL\\d*).*"},
@@ -84,26 +84,24 @@ public class DistResource_redhatenterpriseas extends
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
-        {"Openais.removeHeartbeatAddOpenais",
-         "/etc/init.d/heartbeat stop;/sbin/chkconfig --del heartbeat;"
-         + "/etc/init.d/openais start && "
-         + "/sbin/chkconfig --add openais"},
+        {"Heartbeat.deleteFromRc",
+         "/sbin/chkconfig --del heartbeat"},
 
-        {"Heartbeat.removeOpenaisAddHeartbeat",
-         "/etc/init.d/openais stop;/sbin/chkconfig --del openais;"
-         + "/etc/init.d/heartbeat start && "
-         + "/sbin/chkconfig --add heartbeat"},
-
-        {"Openais.addOpenaisToRc",
-         "/sbin/chkconfig --add openais"},
-
-        {"Heartbeat.addHeartbeatToRc",
+        {"Heartbeat.addToRc",
          "/sbin/chkconfig --add heartbeat"},
 
-        {"Openais.startOpenaisRc",
-         "/etc/init.d/openais start;/sbin/chkconfig --add openais"},
+        {"Corosync.addToRc",
+         "/sbin/chkconfig --level 2345 corosync on "
+         + "&& /sbin/chkconfig --level 016 corosync off"},
 
-        {"Heartbeat.startHeartbeatRc",
-         "/etc/init.d/heartbeat start;/sbin/chkconfig --add heartbeat"},
+        {"Corosync.deleteFromRc",
+         "/sbin/chkconfig --del corosync"},
+
+        {"Openais.addToRc",
+         "/sbin/chkconfig --level 2345 openais on "
+         + "&& /sbin/chkconfig --level 016 openais off"},
+
+        {"Openais.deleteFromRc",
+         "/sbin/chkconfig --del openais"},
     };
 }

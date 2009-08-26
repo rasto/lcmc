@@ -48,16 +48,20 @@ public class DistResource_suse_SLES11 extends
           +     "> /etc/default/drbd; fi;"
           + "modprobe --allow-unsupported-modules drbd"},
 
-        /* Openais/Pacemaker opensuse */
-        {"AisPmInst.install.text.1",
+        /* Corosync/Openais/Pacemaker opensuse */
+        {"PmInst.install.text.1",
          "http://download.opensuse.org: zypper" },
 
-        {"AisPmInst.install.1",
+        {"PmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/SLE_11/server:ha-clustering.repo"
-         + " && /usr/bin/zypper -n --no-gpg-check install openais pacemaker"
-         + " && /sbin/chkconfig --add openais"
-         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
+         + " && /usr/bin/zypper -n --no-gpg-check install pacemaker"
+         + " && (/sbin/chkconfig --add corosync"
+         + " || /sbin/chkconfig --add openais)"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         /* Heartbeat/Pacemaker opensuse */
         {"HbPmInst.install.text.1",

@@ -262,13 +262,13 @@ public class TextResource extends
          + "package will be provided to you by LINBIT support (not free). "
          + "After that you may retry this step again."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Dist",
+        {"Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Dist",
          "There are no DRBD packages available for your distribution."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Kernel",
+        {"Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Kernel",
          "There are no DRBD packages available for your kernel version."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.DownloadNotAvailable.Arch",
+        {"Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Arch",
          "There are no DRBD packages available at www.linbit.com for your "
          + "kernel architecture."},
 
@@ -285,7 +285,7 @@ public class TextResource extends
          "Cannot determine the architecture"},
 
         {"Dialog.HostDrbdLinbitAvailPackages.Executing",
-         "Checking available packages..."},
+         "Looking for available packages..."},
 
         {"Dialog.HostDrbdLinbitAvailPackages.AvailVersions",
          "Available versions: "},
@@ -359,7 +359,7 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.DrbdNotInstalled",
          "not installed"},
 
-        {"Dialog.HostCheckInstallation.AisPmNotInstalled",
+        {"Dialog.HostCheckInstallation.PmNotInstalled",
          "not installed"},
 
         {"Dialog.HostCheckInstallation.HbPmNotInstalled",
@@ -374,13 +374,13 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.DrbdInstallButton",
          "Install"},
 
-        {"Dialog.HostCheckInstallation.AisPmInstallButton",
+        {"Dialog.HostCheckInstallation.PmInstallButton",
          "Install"},
 
         {"Dialog.HostCheckInstallation.HbPmInstallButton",
          "Install"},
 
-        {"Dialog.HostCheckInstallation.CheckingAisPm",
+        {"Dialog.HostCheckInstallation.CheckingPm",
          "checking..."},
 
         {"Dialog.HostCheckInstallation.CheckingHbPm",
@@ -389,7 +389,7 @@ public class TextResource extends
         {"Dialog.HostCheckInstallation.CheckingDrbd",
          "checking..."},
 
-        {"Dialog.HostCheckInstallation.AisPmInstallMethod",
+        {"Dialog.HostCheckInstallation.PmInstallMethod",
          "Installation method: "},
 
         {"Dialog.HostCheckInstallation.HbPmInstallMethod",
@@ -513,19 +513,19 @@ public class TextResource extends
          "Installation error: you may have to go to the command line and fix "
          + "whatever needs fixing there."},
 
-        {"Dialog.HostAisPmInst.Title",
-         "OpenAIS/Pacemaker Install"},
+        {"Dialog.HostPmInst.Title",
+         "Corosync/OpenAIS/Pacemaker Install"},
 
-        {"Dialog.HostAisPmInst.Description",
-         "OpenAIS and Pacemaker packages are being installed."},
+        {"Dialog.HostPmInst.Description",
+         "Pacemaker with Corosync and/or OpenAIS packages is being installed."},
 
-        {"Dialog.HostAisPmInst.Executing",
+        {"Dialog.HostPmInst.Executing",
          "Installing..."},
 
-        {"Dialog.HostAisPmInst.InstOk",
-         "OpenAIS and Pacemaker were successfully installed."},
+        {"Dialog.HostPmInst.InstOk",
+         "Pacemaker was successfully installed."},
 
-        {"Dialog.HostAisPmInst.InstError",
+        {"Dialog.HostPmInst.InstError",
          "Installation error: you may have to go to the command line and fix "
          + "whatever needs fixing there."},
 
@@ -605,27 +605,29 @@ public class TextResource extends
          "Cluster Communication Stack"},
 
         {"Dialog.ClusterCommStack.Description",
-         "Now you have to choose between OpenAIS and Heartbeat, if you have "
+         "Now you have to choose between Corosync/OpenAIS and Heartbeat, "
+         + "if you have "
          + "installed both. It is either one or another from now on, although "
          + "theoretically you may be able seamlessly switch between them at "
          + "any time. "
          + "Heartbeat is more widely used and thus better "
          + "tested at the moment, but probably will be completely displaced "
-         + "by OpenAIS in the future."},
+         + "by Corosync in the future."},
 
         {"Dialog.ClusterAisConfig.Title",
-         "OpenAIS Config File"},
+         "Corosync/OpenAIS Config File"},
 
         {"Dialog.ClusterAisConfig.Description",
-         "In this step OpenAIS config (/etc/ais/openais.conf) is created and "
+         "In this step Corosync config (/etc/corosync/corosync.conf) or "
+         + "OpenAIS config (/etc/ais/openais.conf) is created and "
          + "OpenAIS is started. You do not have to overwrite your old "
          + "config if you have some special options. You can modify it by "
          + "hand on every host in the cluster. You have to press the "
-         + "\"Create AIS Config\" button to save the new configuration on all "
+         + "\"Create Config\" button to save the new configuration on all "
          + "hosts. "},
 
         {"Dialog.ClusterAisConfig.CreateAisConfig",
-         "Create/Overwrite AIS Config"},
+         "Create/Overwrite Config"},
 
         {"Dialog.ClusterAisConfig.WarningAtLeastTwoInt",
          "# (specify at least two interfaces)"}, // TODO: does not work so good
@@ -652,7 +654,7 @@ public class TextResource extends
          ""},
 
         {"Dialog.ClusterAisConfig.NoConfigFound",
-         "/etc/ais/openais.conf: file not found"},
+         ": file not found"},
 
         {"Dialog.ClusterAisConfig.ConfigsNotTheSame",
          "configuration files are not the same on all hosts"},
@@ -667,7 +669,7 @@ public class TextResource extends
          "interfaces:"},
 
         {"Dialog.ClusterAisConfig.ais.conf.ok",
-         "/etc/ais/openais.conf the same on all nodes"},
+         " the same on all nodes"},
 
         {"Dialog.ClusterAisConfig.Checkbox.EditConfig",
          "edit a new config"},
@@ -740,11 +742,11 @@ public class TextResource extends
          "see the existing configs"},
 
         {"Dialog.ClusterInit.Title",
-         "Heartbeat/DRBD Initialization"},
+         "Cluster/DRBD Initialization"},
 
         {"Dialog.ClusterInit.Description",
-         "Heartbeat/DRBD Initialization. Load the DRBD and start the "
-         + "Heartbeat, if you wish at this point."},
+         "Cluster/DRBD Initialization. Load the DRBD and start the "
+         + "Corosync(OpenAIS) or Heartbeat, if you wish at this point."},
 
         {"Dialog.ClusterInit.CheckingDrbd",
          "checking..."},
@@ -752,32 +754,32 @@ public class TextResource extends
         {"Dialog.ClusterInit.LoadDrbdButton",
          "Load"},
 
-        {"Dialog.ClusterInit.CheckingAis",
+        {"Dialog.ClusterInit.CheckingPm",
          "checking..."},
 
-        {"Dialog.ClusterInit.StartAisButton",
+        {"Dialog.ClusterInit.StartCsAisButton",
          "Start"},
 
-        {"Dialog.ClusterInit.AisButtonRc",
+        {"Dialog.ClusterInit.CsAisButtonRc",
          "Run at system start-up"},
 
-        {"Dialog.ClusterInit.AisButtonSwitch",
-         "Switch to AIS"},
+        {"Dialog.ClusterInit.CsAisButtonSwitch",
+         "Switch to Corosync"},
 
-        {"Dialog.ClusterInit.AisIsRunning",
-         "OpenAIS is running"},
+        {"Dialog.ClusterInit.CsAisIsRunning",
+         " is running"},
 
-        {"Dialog.ClusterInit.AisIsRc",
-         "OpenAIS is running at system start-up"},
+        {"Dialog.ClusterInit.CsAisIsRc",
+         " is running at system start-up"},
 
-        {"Dialog.ClusterInit.AisIsStopped",
-         "OpenAIS is stopped"},
+        {"Dialog.ClusterInit.CsAisIsStopped",
+         " is stopped"},
 
-        {"Dialog.ClusterInit.AisIsNotInstalled",
-         "OpenAIS is not installed"},
+        {"Dialog.ClusterInit.CsAisIsNotInstalled",
+         " is not installed"},
 
-        {"Dialog.ClusterInit.AisIsNotConfigured",
-         "OpenAIS is not configured"},
+        {"Dialog.ClusterInit.CsAisIsNotConfigured",
+         " is not configured"},
 
         {"Dialog.ClusterInit.CheckingHb",
          "checking..."},
@@ -1182,7 +1184,7 @@ public class TextResource extends
          "Available Services"},
 
         {"ClusterBrowser.HbStatusFailed",
-         "<h2>Waiting for HB status...</h2>"},
+         "<h2>Waiting for cluster status...</h2>"},
 
         {"ClusterBrowser.Hb.RemoveAllServices",
          "Remove All Services"},
@@ -1542,10 +1544,10 @@ public class TextResource extends
          "unknown"},
 
         {"SSH.Enter.password",
-         "'s <font color=red>password</font>:"},
+         "'s&nbsp;<font color=red>password</font>:"},
 
         {"SSH.Enter.passphrase",
-         "Enter <font color=red>passphrase</font> for key:"},
+         "Enter&nbsp;<font color=red>passphrase</font>&nbsp;for&nbsp;key:"},
 
         {"SSH.Publickey.Authentication.Failed",
          "Authentication failed."},
@@ -1609,6 +1611,9 @@ public class TextResource extends
 
         {"Openais.ExecutingCommand",
          "Executing OpenAIS command..."},
+
+        {"Corosync.ExecutingCommand",
+         "Executing Corosync command..."},
 
         {"DRBD.ExecutingCommand",
          "Executing DRBD command..."},

@@ -73,21 +73,25 @@ public class DistResource_redhatenterpriseas_4 extends
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
 
-        /* Openais/Pacemaker Opensuse */
-        {"AisPmInst.install.text.1",
+        /* Corosync/Openais/Pacemaker Opensuse */
+        {"PmInst.install.text.1",
          "http://download.opensuse.org: wget & rpm -U" },
 
-        {"AisPmInst.install.1",
+        {"PmInst.install.1",
          "rm -rf /tmp/drbd-mc-hbinst/; "
          + "mkdir /tmp/drbd-mc-hbinst/"
          + " && wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/"
          + " && rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm"
-         + " && rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm"
+         + " && rm /tmp/drbd-mc-hbinst/ldirectord-*.rpm"
          + " && up2date lm_sensors net-snmp-libs libtool-libs perl-TimeDate"
+         + " OpenIPMI-libs"
          + " && rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm"
-         + " && /sbin/chkconfig --add openais"
+         + " && /sbin/chkconfig --add corosync"
          + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig;"
-         + "rm -rf /tmp/drbd-mc-hbinst/"},
+         + " if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
+         + " if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         /* Heartbeat/Pacemaker Opensuse */
         {"HbPmInst.install.text.1",
@@ -98,8 +102,10 @@ public class DistResource_redhatenterpriseas_4 extends
          + "mkdir /tmp/drbd-mc-hbinst/"
          + " && wget -nd -r -np -P /tmp/drbd-mc-hbinst/ http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_4/@ARCH@/"
          + " && rm /tmp/drbd-mc-hbinst/pacemaker-mgmt-*.rpm"
-         + " && rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm"
+         + " && rm /tmp/drbd-mc-hbinst/ldirectord-*.rpm"
+         + " && rm /tmp/drbd-mc-hbinst/*-devel-*.rpm"
          + " && up2date lm_sensors net-snmp-libs libtool-libs perl-TimeDate"
+         + " OpenIPMI-libs"
          + " && rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm"
          + " && /sbin/chkconfig --add heartbeat"
          + " && rm -rf /tmp/drbd-mc-hbinst/"},

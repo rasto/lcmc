@@ -87,31 +87,25 @@ public class DistResource_debian extends
          + "/usr/bin/dpkg-query -f='${Status} ais:${Version}\n' -W openais 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"
          + "|sed 's/-.*//'"},
 
-        {"Openais.removeHeartbeatAddOpenais",
-         "/etc/init.d/heartbeat stop;/usr/sbin/update-rc.d heartbeat remove;"
-         + "/etc/init.d/openais start"
-         + " && /usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
+//        {"Openais.reloadOpenais",
+//         "/etc/init.d/openais force-reload"},
 
-        {"Heartbeat.removeOpenaisAddHeartbeat",
-         "/etc/init.d/openais stop;/usr/sbin/update-rc.d openais remove;"
-         + "/etc/init.d/heartbeat start"
-         + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
+        {"Heartbeat.deleteFromRc",
+         "/usr/sbin/update-rc.d heartbeat remove"},
 
-        {"Openais.addOpenaisToRc",
-         "/usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
-
-        {"Heartbeat.addHeartbeatToRc",
+        {"Heartbeat.addToRc",
          "/usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
-        {"Openais.startOpenaisRc",
-         "/etc/init.d/openais start;"
-         + "/usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
+        {"Corosync.addToRc",
+         "/usr/sbin/update-rc.d corosync start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
-        {"Heartbeat.startHeartbeatRc",
-         "/etc/init.d/heartbeat start;"
-         + "/usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
- 
-        {"Openais.reloadOpenais",
-         "/etc/init.d/openais force-reload"},
+        {"Corosync.deleteFromRc",
+         "/usr/sbin/update-rc.d corosync remove"},
+
+        {"Openais.addToRc",
+         "/usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
+
+        {"Openais.deleteFromRc",
+         "/usr/sbin/update-rc.d openais remove"},
     };
 }
