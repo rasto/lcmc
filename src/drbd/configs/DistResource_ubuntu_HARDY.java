@@ -39,33 +39,57 @@ public class DistResource_ubuntu_HARDY extends
         {"Support",            "ubuntu-HARDY"},
         {"distributiondir",    "ubuntu-hardy-server"},
 
-        /* Openais/Pacemaker Opensuse */
-        {"AisPmInst.install.text.1", "http://download.opensuse.org"},
+        /* Corosync/Openais/Pacemaker Opensuse */
+        {"PmInst.install.text.1", "http://LaunchPad.net"},
 
-        {"AisPmInst.install.1",
+        {"PmInst.install.1",
+         "echo 'deb http://ppa.launchpad.net/ubuntu-ha/ppa/ubuntu hardy main'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"
+         + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync)"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+
+        {"PmInst.install.text.2", "http://download.opensuse.org"},
+
+        {"PmInst.install.2",
          "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/xUbuntu_8.04/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' openais pacemaker"
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker"
          + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
-         + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig"},
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
-        /* TODO: does not work? */
-        /* Heartbeat/Pacemaker Opensuse */
-        {"HbPmInst.install.text.1", "http://download.opensuse.org"},
+        /* Heartbeat/Pacemaker LaunchPad */
+        {"HbPmInst.install.text.1", "http://LaunchPad.net"},
 
         {"HbPmInst.install.1",
-         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/xUbuntu_8.04/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+         "echo 'deb http://ppa.launchpad.net/ubuntu-ha/ppa/ubuntu hardy main'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
+
+        {"HbPmInst.install.text.3", "http://download.opensuse.org"},
+
+        {"HbPmInst.install.2",
+         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/xUbuntu_8.04/ ./'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
+
+        {"HbPmInst.install.text.3", "apt-get"},
+        {"HbPmInst.install.3",
+         "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
          "from the source tarball"},
-
-        {"HbPmInst.install.text.2", "apt-get"},
-        {"HbPmInst.install.2",
-         "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         {"DrbdInst.install.2",
          "/bin/mkdir -p /tmp/drbdinst && "
