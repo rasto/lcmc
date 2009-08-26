@@ -397,7 +397,7 @@ public class DrbdGraph extends ResourceGraph {
                                     + bdi.getBlockDevice().getDiskState()};
             }
         } else {
-            /* TODO: host */
+            return vertexToHostMap.get(v).getSubtextsForDrbdGraph();
         }
         return null;
     }

@@ -45,7 +45,9 @@ public class DistResource_ubuntu extends
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+).*"},
 
-        {"DrbdInst.install", "dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+        {"DrbdInst.install",
+         "dpkg -i --force-confold"
+         + " /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
         /* pacemaker install method 1 */
         {"HbPmInst.install.text.1",

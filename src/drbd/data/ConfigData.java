@@ -74,6 +74,10 @@ public class ConfigData implements Serializable {
     private String lastDrbdInstalledMethod = null;
     /** Whether drbd gui helper should be overwritten */
     private boolean keepHelper = false;
+    /** Name of the Heartbeat comm stack. */
+    public static final String HEARTBEAT_NAME = "Heartbeat";
+    /** Name of the Corosync/Openais comm stack. */
+    public static final String COROSYNC_NAME = "Corosync/OpenAIS";
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts

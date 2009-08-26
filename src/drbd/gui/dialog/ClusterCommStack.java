@@ -51,9 +51,11 @@ public class ClusterCommStack extends DialogCluster {
     /** Radio Combo box. */
     private GuiComboBox chooseStackCombo;
     /** Name of the Corosync in the radio group. */
-    private static final String COROSYNC_NAME = "Corosync/OpenAIS";
+    private static final String COROSYNC_NAME =
+                                        Tools.getConfigData().COROSYNC_NAME;
     /** Name of the Heartbeat in the radio group. */
-    private static final String HEARTBEAT_NAME = "Heartbeat";
+    private static final String HEARTBEAT_NAME =
+                                        Tools.getConfigData().HEARTBEAT_NAME;
 
     //TODO: progressbar
     /**
@@ -184,13 +186,6 @@ public class ClusterCommStack extends DialogCluster {
         int aisIsRunning = 0;
         int hbIsRunning = 0;
         for (final Host host : hosts) {
-            System.out.println("hbv: "   + host.getHeartbeatVersion() +
-                               ", cv: "  + host.getCorosyncVersion() +
-                               ", ov: "  + host.getOpenaisVersion() +
-                               ", orc: " + host.isCsAisRc() +
-                               ", hrc: " + host.isHeartbeatRc() +
-                               ", or: "  + host.isCsAisRunning() +
-                               ", hr: "  + host.isHeartbeatRunning());
             if (host.getHeartbeatVersion() == null) {
                 hbImpossible = true;
             }
@@ -231,7 +226,6 @@ public class ClusterCommStack extends DialogCluster {
         if (defaultValue == null) {
             defaultValue = COROSYNC_NAME;
         }
-        System.out.println("default value: " + defaultValue);
         chooseStackCombo = new GuiComboBox(defaultValue,
                                            new String[]{HEARTBEAT_NAME,
                                                         COROSYNC_NAME},

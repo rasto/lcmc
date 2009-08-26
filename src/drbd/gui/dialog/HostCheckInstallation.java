@@ -38,6 +38,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -730,7 +731,19 @@ public class HostCheckInstallation extends DialogHost {
                                                0);
             drbdInstMethodCB.setEnabled(false);
         }
-
+        final String lastInstalled =
+                          Tools.getConfigData().getLastInstalledClusterStack();
+        System.out.println("last installed: " + lastInstalled);
+        if (lastInstalled != null) {
+            if (Tools.getConfigData().HEARTBEAT_NAME.equals(lastInstalled)) {
+                pmJLabel.setForeground(Color.LIGHT_GRAY);
+                pmLabel.setForeground(Color.LIGHT_GRAY);
+            } else if (
+                  Tools.getConfigData().COROSYNC_NAME.equals(lastInstalled)) {
+                hbPmJLabel.setForeground(Color.LIGHT_GRAY);
+                hbPmLabel.setForeground(Color.LIGHT_GRAY);
+            }
+        }
         pane.add(hbPmJLabel);
         pane.add(hbPmLabel);
         pane.add(hbPmIcon);

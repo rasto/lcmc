@@ -627,6 +627,7 @@ public class ClusterBrowser extends Browser {
                         } catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }
+                        cluster.connect(null);
                     }
                 } while (firstHost == null);
 
@@ -691,6 +692,7 @@ public class ClusterBrowser extends Browser {
             host.setIsLoading();
             host.getHWInfo();
             drbdGraph.addHost(host.getBrowser().getHostInfo());
+            updateDrbdResources();
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
@@ -1148,6 +1150,9 @@ public class ClusterBrowser extends Browser {
                         continue;
                     }
                 }
+                if (bdi.getBlockDevice().isDrbd()) {
+                    continue;
+                }
                 bdi.getBlockDevice().setValue(
                                       "DrbdNetInterfacePort",
                                       drbdXML.getVirtualInterfacePort(hostName,
@@ -1176,11 +1181,16 @@ public class ClusterBrowser extends Browser {
                     bd2 = bdi;
                 }
             }
-            drbdGraph.getDrbdInfo().addDrbdResource(resName,
-                                                    drbdDev,
-                                                    bd1,
-                                                    bd2,
-                                                    false);
+            if (bd1 != null
+                && bd2 != null
+                && !bd1.getBlockDevice().isDrbd()
+                && !bd2.getBlockDevice().isDrbd()) {
+                drbdGraph.getDrbdInfo().addDrbdResource(resName,
+                                                        drbdDev,
+                                                        bd1,
+                                                        bd2,
+                                                        false);
+            }
         }
     }
 
@@ -1242,7 +1252,7 @@ public class ClusterBrowser extends Browser {
         int lastHostIndex = -1;
         int i = 0;
         for (Host host : getClusterHosts()) {
-            if (host.getName().equals(dc)) {
+            if (host.getName().equals(dc) && host.isHbStatus()) {
                 dcHost = host;
                 break;
             }
@@ -4181,7 +4191,7 @@ public class ClusterBrowser extends Browser {
          */
         private void storeHostScoreInfos() {
             savedHostScoreInfos.clear();
-            for (Host host : getClusterHosts()) {
+            for (final Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
                 final HostScoreInfo hsi = (HostScoreInfo) cb.getValue();
@@ -5982,19 +5992,28 @@ public class ClusterBrowser extends Browser {
          * Returns text with lines as array that appears in the cluster graph.
          */
         protected String[] getSubtextsForGraph() {
+            final List<String> texts = new ArrayList<String>();
             if (isFailed()) {
-                return new String[]{"not running: failed"};
+                texts.add("not running: failed");
             } else if (isStopped()) {
-                return new String[]{"stopped"};
+                texts.add("stopped");
+            } else {
+                String runningOnNode = getRunningOnNode();
+                if (allHostsDown()) {
+                    runningOnNode = "unknown";
+                }
+                if (runningOnNode != null && !"".equals(runningOnNode)) {
+                    texts.add("running on: " + runningOnNode);
+                } else {
+                    texts.add("not running");
+                }
             }
-            String runningOnNode = getRunningOnNode();
-            if (allHostsDown()) {
-                runningOnNode = "unknown";
+            for (final Host host : getClusterHosts()) {
+                if (failedOnHost(host)) {
+                    texts.add("failed on: " + host.getName());
+                }
             }
-            if (runningOnNode != null && !"".equals(runningOnNode)) {
-                return new String[]{"running on: " + runningOnNode};
-            }
-            return new String[]{"not running"};
+            return texts.toArray(new String[texts.size()]);
         }
     }
 

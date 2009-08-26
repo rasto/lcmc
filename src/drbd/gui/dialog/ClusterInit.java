@@ -429,7 +429,7 @@ public class ClusterInit extends DialogCluster {
                                 csAisStartButton.setText(CS_AIS_BUTTON_SWITCH);
                             } else {
                                 csAisStartButton.setText(Tools.getString(
-                                         "Dialog.ClusterInit.StartCsAisButton"));
+                                        "Dialog.ClusterInit.StartCsAisButton"));
                             }
                             if (!csAisIsInstalled) {
                                 pmStartedInfo.setText(
@@ -439,13 +439,14 @@ public class ClusterInit extends DialogCluster {
                             } else if (!csAisIsConf) {
                                 pmStartedInfo.setText(
                                    initScript + Tools.getString(
-                                     "Dialog.ClusterInit.CsAisIsNotConfigured"));
+                                    "Dialog.ClusterInit.CsAisIsNotConfigured"));
                                 csAisStartButton.setEnabled(false);
                             } else {
                                 pmStartedInfo.setText(
                                    initScript + Tools.getString(
-                                           "Dialog.ClusterInit.CsAisIsStopped"));
-                                csAisStartButton.setEnabled(!heartbeatIsRunning);
+                                         "Dialog.ClusterInit.CsAisIsStopped"));
+                                csAisStartButton.setEnabled(
+                                                          !heartbeatIsRunning);
                             }
                             csAisStartButton.setVisible(true);
                             pmStartedInfo.setForeground(Color.RED);

@@ -167,7 +167,8 @@ public class HostDrbdInst extends DialogHost {
      */
     public void installationDone() {
         nextDialogObject = new HostCheckInstallation(
-                   getPreviousDialog().getPreviousDialog(),
+                   getPreviousDialog().getPreviousDialog().getPreviousDialog()
+                                      .getPreviousDialog().getPreviousDialog(),
                    getHost());
 
         progressBarDone();

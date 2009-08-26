@@ -158,6 +158,7 @@ public class DrbdConfigBlockDev extends DrbdConfig {
         extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         final String[] params = blockDevInfo.getParametersFromXML();
+        blockDevInfo.selectMyself();
         blockDevInfo.addWizardParams(
                  optionsPanel,
                  extraOptionsPanel,

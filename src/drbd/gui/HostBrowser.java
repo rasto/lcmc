@@ -177,17 +177,20 @@ public class HostBrowser extends Browser {
      */
     public final void initHostResources() {
         /* net interfaces */
-        netInterfacesNode = new DefaultMutableTreeNode(new CategoryInfo(Tools.getString("HostBrowser.NetInterfaces")));
+        netInterfacesNode = new DefaultMutableTreeNode(new CategoryInfo(
+                                Tools.getString("HostBrowser.NetInterfaces")));
         setNode(netInterfacesNode);
         topAdd(netInterfacesNode);
 
         /* block devices */
-        blockDevicesNode = new DefaultMutableTreeNode(new CategoryInfo(Tools.getString("HostBrowser.BlockDevices")));
+        blockDevicesNode = new DefaultMutableTreeNode(new CategoryInfo(
+                                 Tools.getString("HostBrowser.BlockDevices")));
         setNode(blockDevicesNode);
         topAdd(blockDevicesNode);
 
         /* file systems */
-        fileSystemsNode = new DefaultMutableTreeNode(new CategoryInfo(Tools.getString("HostBrowser.FileSystems")));
+        fileSystemsNode = new DefaultMutableTreeNode(new CategoryInfo(
+                                  Tools.getString("HostBrowser.FileSystems")));
         setNode(fileSystemsNode);
         topAdd(fileSystemsNode);
     }
@@ -286,7 +289,8 @@ public class HostBrowser extends Browser {
         }
         final Enumeration e = blockDevicesNode.children();
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode bdNode = (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode bdNode =
+                                      (DefaultMutableTreeNode) e.nextElement();
             final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
             blockDevInfos.add(bdi);
         }
@@ -299,7 +303,7 @@ public class HostBrowser extends Browser {
      */
     public final Map<BlockDevice, BlockDevInfo> getBlockDevicesMap() {
         final Map<BlockDevice, BlockDevInfo> blockDevices =
-                                             new HashMap<BlockDevice, BlockDevInfo>();
+                                      new HashMap<BlockDevice, BlockDevInfo>();
         try {
             mBlockDevInfosLock.acquire();
         } catch (InterruptedException e) {
@@ -308,7 +312,7 @@ public class HostBrowser extends Browser {
         final Enumeration e = blockDevicesNode.children();
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode bdNode =
-                                            (DefaultMutableTreeNode) e.nextElement();
+                                      (DefaultMutableTreeNode) e.nextElement();
             final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
             blockDevices.put(bdi.getBlockDevice(), bdi);
         }
@@ -321,7 +325,7 @@ public class HostBrowser extends Browser {
      */
     public final Map<NetInterface, NetInfo> getNetInterfacesMap() {
         final Map<NetInterface, NetInfo> netInterfaces =
-                                             new HashMap<NetInterface, NetInfo>();
+                                          new HashMap<NetInterface, NetInfo>();
         try {
             mNetInfosLock.acquire();
         } catch (InterruptedException e) {
@@ -330,7 +334,7 @@ public class HostBrowser extends Browser {
         final Enumeration e = netInterfacesNode.children();
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode niNode =
-                                            (DefaultMutableTreeNode) e.nextElement();
+                                      (DefaultMutableTreeNode) e.nextElement();
             final NetInfo nii = (NetInfo) niNode.getUserObject();
             netInterfaces.put(nii.getNetInterface(), nii);
         }
@@ -343,7 +347,7 @@ public class HostBrowser extends Browser {
      */
     public final Map<String, FilesystemInfo> getFilesystemsMap() {
         final Map<String, FilesystemInfo> filesystems =
-                                             new HashMap<String, FilesystemInfo>();
+                                         new HashMap<String, FilesystemInfo>();
         try {
             mFileSystemsLock.acquire();
         } catch (InterruptedException e) {
@@ -352,7 +356,7 @@ public class HostBrowser extends Browser {
         final Enumeration e = fileSystemsNode.children();
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode fsiNode =
-                                            (DefaultMutableTreeNode) e.nextElement();
+                                      (DefaultMutableTreeNode) e.nextElement();
             final FilesystemInfo fsi = (FilesystemInfo) fsiNode.getUserObject();
             filesystems.put(fsi.getName(), fsi);
         }
@@ -516,7 +520,8 @@ public class HostBrowser extends Browser {
                         ta.setText(ans);
                     }
 
-                    public void doneError(final String ans, final int exitCode) {
+                    public void doneError(final String ans,
+                                          final int exitCode) {
                         ta.setText("error");
                         Tools.sshError(host, "", ans, exitCode);
                     }
@@ -595,14 +600,17 @@ public class HostBrowser extends Browser {
             SpringUtilities.makeCompactGrid(p, 2, 2,  // rows, cols
                                                1, 1,  // initX, initY
                                                1, 1); // xPad, yPad
-            //JPanel panel = new JPanel();
             mainPanel.setMinimumSize(new Dimension(
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Width"),
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Height")
                         ));
             mainPanel.setPreferredSize(new Dimension(
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                        Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Width"),
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Height")
                         ));
             buttonPanel.add(p);
             mainPanel.add(new JScrollPane(ta));
@@ -736,7 +744,8 @@ public class HostBrowser extends Browser {
 
             /* change host color */
             final MyMenuItem changeHostColorItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
+                new MyMenuItem(Tools.getString(
+                                           "HostBrowser.Drbd.ChangeHostColor"),
                                null,
                                null) {
                     private static final long serialVersionUID = 1L;
@@ -747,7 +756,10 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         final JColorChooser tcc = new JColorChooser();
-                        Color newColor = tcc.showDialog(Tools.getGUIData().getMainFrame(), "asdf", host.getColor());
+                        Color newColor = tcc.showDialog(
+                                            Tools.getGUIData().getMainFrame(),
+                                            "asdf",
+                                            host.getColor());
                         if (newColor != null) {
                             host.setColor(newColor);
                         }
@@ -768,7 +780,8 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        drbd.gui.dialog.DrbdsLog l = new drbd.gui.dialog.DrbdsLog(host);
+                        drbd.gui.dialog.DrbdsLog l =
+                                            new drbd.gui.dialog.DrbdsLog(host);
                         l.showDialog();
                     }
                 };
@@ -788,7 +801,8 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                            if (bdi.getBlockDevice().isDrbd() && !bdi.getBlockDevice().isConnectedOrWF()) {
+                            if (bdi.getBlockDevice().isDrbd()
+                                && !bdi.getBlockDevice().isConnectedOrWF()) {
                                 bdi.connect();
                             }
                         }
@@ -799,7 +813,8 @@ public class HostBrowser extends Browser {
 
             /* disconnect all */
             final MyMenuItem disconnectAllItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Drbd.DisconnectAll"),
+                new MyMenuItem(Tools.getString(
+                                            "HostBrowser.Drbd.DisconnectAll"),
                                null,
                                null) {
                     private static final long serialVersionUID = 1L;
@@ -810,7 +825,8 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                            if (bdi.getBlockDevice().isDrbd() && bdi.getBlockDevice().isConnectedOrWF()) {
+                            if (bdi.getBlockDevice().isDrbd()
+                                && bdi.getBlockDevice().isConnectedOrWF()) {
                                 bdi.disconnect();
                             }
                         }
@@ -832,7 +848,8 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                            if (bdi.getBlockDevice().isDrbd() && !bdi.getBlockDevice().isAttached()) {
+                            if (bdi.getBlockDevice().isDrbd()
+                                && !bdi.getBlockDevice().isAttached()) {
                                 bdi.attach();
                             }
                         }
@@ -843,7 +860,8 @@ public class HostBrowser extends Browser {
 
             /* set all primary */
             final MyMenuItem setAllPrimaryItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
+                new MyMenuItem(Tools.getString(
+                                            "HostBrowser.Drbd.SetAllPrimary"),
                                null,
                                null) {
                     private static final long serialVersionUID = 1L;
@@ -854,7 +872,8 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                            if (bdi.getBlockDevice().isDrbd() && bdi.getBlockDevice().isSecondary()) {
+                            if (bdi.getBlockDevice().isDrbd()
+                                && bdi.getBlockDevice().isSecondary()) {
                                 bdi.setPrimary();
                             }
                         }
@@ -865,7 +884,8 @@ public class HostBrowser extends Browser {
 
             /* set all secondary */
             final MyMenuItem setAllSecondaryItem =
-                new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
+                new MyMenuItem(Tools.getString(
+                                           "HostBrowser.Drbd.SetAllSecondary"),
                                null,
                                null) {
                     private static final long serialVersionUID = 1L;
@@ -876,7 +896,8 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                            if (bdi.getBlockDevice().isDrbd() && bdi.getBlockDevice().isPrimary()) {
+                            if (bdi.getBlockDevice().isDrbd()
+                                && bdi.getBlockDevice().isPrimary()) {
                                 bdi.setSecondary();
                             }
                         }
@@ -969,13 +990,31 @@ public class HostBrowser extends Browser {
          }
 
          /**
-          * Returns subtexts that appears in the host vertex.
+          * Returns subtexts that appears in the host vertex in the cluster
+          * graph.
           */
-         final public String[] getSubtextsForGraph() {
+         public final String[] getSubtextsForGraph() {
              final List<String> texts = new ArrayList<String>();
              if (getHost().isConnected()) {
                  if (!getHost().isHbStatus()) {
                     texts.add("waiting for cluster status...");
+                 }
+             } else {
+                 texts.add("connecting...");
+             }
+             return texts.toArray(new String[texts.size()]);
+         }
+
+         /**
+          * Returns subtexts that appears in the host vertex in the drbd graph.
+          */
+         public final String[] getSubtextsForDrbdGraph() {
+             final List<String> texts = new ArrayList<String>();
+             if (getHost().isConnected()) {
+                 if (!getHost().isDrbdLoaded()) {
+                    texts.add("DRBD not loaded");
+                 } else if (!getHost().isDrbdStatus()) {
+                    texts.add("waiting...");
                  }
              } else {
                  texts.add("connecting...");
@@ -1081,7 +1120,8 @@ public class HostBrowser extends Browser {
         private DrbdResourceInfo drbdResourceInfo;
         /** map from paremeters to the fact if the last entered value was
          * correct. */
-        private final Map<String, Boolean> paramCorrectValueMap = new HashMap<String, Boolean>();
+        private final Map<String, Boolean> paramCorrectValueMap =
+                                                new HashMap<String, Boolean>();
         /** cache for the info panel. */
         private JComponent infoPanel = null;
 
@@ -1242,13 +1282,22 @@ public class HostBrowser extends Browser {
                 throws Exceptions.DrbdConfigException {
 
             if (drbdDevice == null) {
-                throw new Exceptions.DrbdConfigException("Drbd device not defined for host " + host.getName() + " (" + resource + ")");
+                throw new Exceptions.DrbdConfigException(
+                                        "Drbd device not defined for host "
+                                        + host.getName()
+                                        + " (" + resource + ")");
             }
             if (getBlockDevice().getDrbdNetInterfaceWithPort() == null) {
-                throw new Exceptions.DrbdConfigException("Net interface not defined for host " + host.getName() + " (" + resource + ")");
+                throw new Exceptions.DrbdConfigException(
+                                        "Net interface not defined for host "
+                                        + host.getName()
+                                        + " (" + resource + ")");
             }
             if (getBlockDevice().getName() == null) {
-                throw new Exceptions.DrbdConfigException("Block device not defined for host " + host.getName() + " (" + resource + ")");
+                throw new Exceptions.DrbdConfigException(
+                                        "Block device not defined for host "
+                                        + host.getName()
+                                        + " (" + resource + ")");
             }
 
             final StringBuffer config = new StringBuffer(120);
@@ -1287,7 +1336,8 @@ public class HostBrowser extends Browser {
         }
 
         public final int getNextVIPort() {
-            int port = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort") - 1;
+            int port =
+                   Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort") - 1;
             for (final String portString : drbdVIPortList) {
                 final int p = Integer.valueOf(portString);
                 if (p > port) {
@@ -1304,8 +1354,8 @@ public class HostBrowser extends Browser {
         }
 
         protected final GuiComboBox getParamComboBox(final String param,
-                                               final String prefix,
-                                               final int width) {
+                                                     final String prefix,
+                                                     final int width) {
             GuiComboBox gcb;
             if (DRBD_NI_PORT_PARAM.equals(param)) {
                 final List<String> drbdVIPorts = new ArrayList<String>();
@@ -1315,7 +1365,8 @@ public class HostBrowser extends Browser {
                 }
                 drbdVIPorts.add(defaultPort);
                 int i = 0;
-                int index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
+                int index = Tools.getDefaultInt(
+                                          "HostBrowser.DrbdNetInterfacePort");
                 while (i < 10) {
                     final String port = Integer.toString(index);
                     if (!drbdVIPortList.contains(port)) {
@@ -1328,8 +1379,12 @@ public class HostBrowser extends Browser {
                 if (isInteger(param)) {
                     regexp = "^\\d*$";
                 }
-                gcb = new GuiComboBox(defaultPort,
-                                      drbdVIPorts.toArray(new String[drbdVIPorts.size()]), null, regexp, width);
+                gcb = new GuiComboBox(
+                           defaultPort,
+                           drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
+                           null,
+                           regexp,
+                           width);
                 gcb.setValue(defaultPort);
                 paramComboBoxAdd(param, prefix, gcb);
                 gcb.setEnabled(true);
@@ -1353,8 +1408,10 @@ public class HostBrowser extends Browser {
                 ret = false;
             } else if (DRBD_MD_PARAM.equals(param)) {
                 final boolean internal = "internal".equals(value);
-                final GuiComboBox ind = paramComboBoxGet(DRBD_MD_INDEX_PARAM, null);
-                final GuiComboBox indW = paramComboBoxGet(DRBD_MD_INDEX_PARAM, "wizard");
+                final GuiComboBox ind = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
+                                                         null);
+                final GuiComboBox indW = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
+                                                          "wizard");
                 if (internal) {
                     ind.setValue(DRBD_MD_TYPE_FLEXIBLE);
                     if (indW != null) {
@@ -1420,37 +1477,56 @@ public class HostBrowser extends Browser {
             if (DRBD_NI_PARAM.equals(param)) {
                 /* net interfaces */
                 StringInfo defaultNetInterface = null;
-                String netInterfaceString = getBlockDevice().getValue(DRBD_NI_PARAM);
-                if (netInterfaceString == null || netInterfaceString.equals("")) {
-                    defaultNetInterface = new StringInfo(Tools.getString("HostBrowser.DrbdNetInterface.Select"), null);
+                String netInterfaceString =
+                                     getBlockDevice().getValue(DRBD_NI_PARAM);
+                if (netInterfaceString == null
+                    || netInterfaceString.equals("")) {
+                    defaultNetInterface =
+                                new StringInfo(
+                                    Tools.getString(
+                                       "HostBrowser.DrbdNetInterface.Select"),
+                                    null);
                     netInterfaceString = defaultNetInterface.toString();
-                    getBlockDevice().setDefaultValue(DRBD_NI_PARAM, netInterfaceString);
+                    getBlockDevice().setDefaultValue(DRBD_NI_PARAM,
+                                                     netInterfaceString);
                 }
-                return getNetInterfaces(defaultNetInterface, netInterfacesNode.children());
+                return getNetInterfaces(defaultNetInterface,
+                                        netInterfacesNode.children());
             } else if (DRBD_MD_PARAM.equals(param)) {
                 /* meta disk */
-                final StringInfo internalMetaDisk = new StringInfo(Tools.getString("HostBrowser.MetaDisk.Internal"), "internal");
-                final String defaultMetaDiskString = internalMetaDisk.getStringValue();
+                final StringInfo internalMetaDisk =
+                        new StringInfo(Tools.getString(
+                                            "HostBrowser.MetaDisk.Internal"),
+                                       "internal");
+                final String defaultMetaDiskString =
+                                            internalMetaDisk.getStringValue();
 
                 try {
                     mBlockDevInfosLock.acquire();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                final Info[] blockDevices = getAvailableBlockDevicesForMetaDisk(internalMetaDisk, getName(), blockDevicesNode.children());
+                final Info[] blockDevices =
+                                getAvailableBlockDevicesForMetaDisk(
+                                                internalMetaDisk,
+                                                getName(),
+                                                blockDevicesNode.children());
                 mBlockDevInfosLock.release();
 
-                getBlockDevice().setDefaultValue(DRBD_MD_PARAM, defaultMetaDiskString);
+                getBlockDevice().setDefaultValue(DRBD_MD_PARAM,
+                                                 defaultMetaDiskString);
                 return blockDevices;
             } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
 
-                String defaultMetaDiskIndex = getBlockDevice().getValue(DRBD_MD_INDEX_PARAM);
+                String defaultMetaDiskIndex = getBlockDevice().getValue(
+                                                           DRBD_MD_INDEX_PARAM);
 
                 String[] indeces = new String[11];
                 int index = 0;
                 if (defaultMetaDiskIndex == null) {
                     defaultMetaDiskIndex = DRBD_MD_TYPE_FLEXIBLE;
-                } else if (!DRBD_MD_TYPE_FLEXIBLE.equals(defaultMetaDiskIndex)) {
+                } else if (!DRBD_MD_TYPE_FLEXIBLE.equals(
+                                                       defaultMetaDiskIndex)) {
                     index = Integer.valueOf(defaultMetaDiskIndex) - 5;
                     if (index < 0) {
                         index = 0;
@@ -1481,7 +1557,8 @@ public class HostBrowser extends Browser {
             return paramCorrectValueMap.get(param).booleanValue();
         }
 
-        protected final Object[] getNetInterfaces(final Info defaultValue, final Enumeration e) {
+        protected final Object[] getNetInterfaces(final Info defaultValue,
+                                                  final Enumeration e) {
             final List<Object> list = new ArrayList<Object>();
 
             if (defaultValue != null) {
@@ -1489,24 +1566,30 @@ public class HostBrowser extends Browser {
             }
 
             while (e.hasMoreElements()) {
-                final Info i = (Info) ((DefaultMutableTreeNode) e.nextElement()).getUserObject();
+                final Info i =
+                        (Info) ((DefaultMutableTreeNode) e.nextElement())
+                                                             .getUserObject();
                 list.add(i);
             }
             return list.toArray(new Object[list.size()]);
         }
 
-        protected final Info[] getAvailableBlockDevicesForMetaDisk(final Info defaultValue,
-                                                             final String serviceName,
-                                                             final Enumeration e) {
+        protected final Info[] getAvailableBlockDevicesForMetaDisk(
+                                                     final Info defaultValue,
+                                                     final String serviceName,
+                                                     final Enumeration e) {
             final List<Info> list = new ArrayList<Info>();
-            final String savedMetaDisk = getBlockDevice().getValue(DRBD_MD_PARAM);
+            final String savedMetaDisk =
+                                      getBlockDevice().getValue(DRBD_MD_PARAM);
 
             if (defaultValue != null) {
                 list.add(defaultValue);
             }
 
             while (e.hasMoreElements()) {
-                final BlockDevInfo bdi = (BlockDevInfo) ((DefaultMutableTreeNode) e.nextElement()).getUserObject();
+                final BlockDevInfo bdi =
+                    (BlockDevInfo) ((DefaultMutableTreeNode) e.nextElement())
+                                                               .getUserObject();
                 final BlockDevice bd = bdi.getBlockDevice();
                 if (bd.toString().equals(savedMetaDisk)
                     || (!bd.isDrbdMetaDisk()
@@ -1629,7 +1712,8 @@ public class HostBrowser extends Browser {
             if (getBlockDevice().getMetaDisk() != null) {
                 getBlockDevice().getMetaDisk().setIsDrbdMetaDisk(false);
             }
-            drbdVIPortList.remove(getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
+            drbdVIPortList.remove(
+                               getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
 
             storeComboBoxValues(params);
 
@@ -1638,7 +1722,8 @@ public class HostBrowser extends Browser {
             if (Tools.isStringInfoClass(o)) {
                 getBlockDevice().setMetaDisk(null); /* internal */
             } else {
-                final BlockDevice metaDisk = ((BlockDevInfo) o).getBlockDevice();
+                final BlockDevice metaDisk =
+                                           ((BlockDevInfo) o).getBlockDevice();
                 getBlockDevice().setMetaDisk(metaDisk);
             }
             if (getBlockDevice().getMetaDisk() != null) {
@@ -1663,17 +1748,20 @@ public class HostBrowser extends Browser {
 
             final JPanel optionsPanel = new JPanel();
             optionsPanel.setBackground(PANEL_BACKGROUND);
-            optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+            optionsPanel.setLayout(new BoxLayout(optionsPanel,
+                                                 BoxLayout.Y_AXIS));
             optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             final JPanel extraOptionsPanel = new JPanel();
             extraOptionsPanel.setBackground(PANEL_BACKGROUND);
-            extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel, BoxLayout.Y_AXIS));
+            extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
+                                                      BoxLayout.Y_AXIS));
             extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             if (getBlockDevice().isDrbd()) {
                 /* expert mode */
-                buttonPanel.add(Tools.expertModeButton(extraOptionsPanel), BorderLayout.WEST);
+                buttonPanel.add(Tools.expertModeButton(extraOptionsPanel),
+                                BorderLayout.WEST);
             }
 
             /* Actions */
@@ -1709,8 +1797,9 @@ public class HostBrowser extends Browser {
                                 public void run() {
                                     apply();
                                     try {
-                                        drbdResourceInfo.getDrbdInfo().createDrbdConfig();
-                                    } catch (Exceptions.DrbdConfigException dce) {
+                                        drbdResourceInfo.getDrbdInfo()
+                                                        .createDrbdConfig();
+                                    } catch (Exceptions.DrbdConfigException e) {
                                         Tools.appError("config failed");
                                     }
                                 }
@@ -1722,18 +1811,9 @@ public class HostBrowser extends Browser {
 
             /* info */
             final Font f = new Font("Monospaced", Font.PLAIN, 12);
-            //final JEditorPane resourceInfoArea = new JEditorPane("text/plain", getInfo());
-            //resourceInfoArea.setEditable(false);
-            //resourceInfoArea.setFont(f);
-            //resourceInfoArea.setPreferredSize(new Dimension(
-            //            Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-            //            Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
-            //            ));
-            //resourceInfoArea.setMaximumSize(resourceInfoArea.getPreferredSize());
             final JPanel riaPanel = new JPanel();
             riaPanel.setBackground(PANEL_BACKGROUND);
             riaPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            //riaPanel.add(resourceInfoArea);
             riaPanel.add(super.getInfoPanel());
             mainPanel.add(riaPanel);
 
@@ -1762,7 +1842,8 @@ public class HostBrowser extends Browser {
         /**
          * Sets drbd resource for this block device.
          */
-        public final void setDrbdResourceInfo(final DrbdResourceInfo drbdResourceInfo) {
+        public final void setDrbdResourceInfo(
+                                    final DrbdResourceInfo drbdResourceInfo) {
             this.drbdResourceInfo = drbdResourceInfo;
         }
 
@@ -1784,7 +1865,8 @@ public class HostBrowser extends Browser {
          * Removes this block device from drbd data structures.
          */
         public final void removeFromDrbd() {
-            drbdVIPortList.remove(getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
+            drbdVIPortList.remove(
+                                getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
             setDrbd(false);
             setDrbdResourceInfo(null);
         }
@@ -1844,33 +1926,44 @@ public class HostBrowser extends Browser {
                             public void update() {
                                 super.update();
                                 removeAll();
-                                List<BlockDevInfo> blockDevInfos = oHost.getBrowser().getBlockDevInfos();
-                                List<BlockDevInfo> blockDevInfosS = new ArrayList<BlockDevInfo>();
-                                for (final BlockDevInfo otherBdi : blockDevInfos) {
-                                    if (otherBdi.getName().equals(getBlockDevice().getName())) {
-                                        blockDevInfosS.add(0, otherBdi);
+                                List<BlockDevInfo> blockDevInfos =
+                                        oHost.getBrowser().getBlockDevInfos();
+                                List<BlockDevInfo> blockDevInfosS =
+                                                new ArrayList<BlockDevInfo>();
+                                for (final BlockDevInfo oBdi : blockDevInfos) {
+                                    if (oBdi.getName().equals(
+                                                 getBlockDevice().getName())) {
+                                        blockDevInfosS.add(0, oBdi);
                                     } else {
-                                        blockDevInfosS.add(otherBdi);
+                                        blockDevInfosS.add(oBdi);
                                     }
                                 }
 
-                                for (final BlockDevInfo otherBdi : blockDevInfosS) {
-                                    if (otherBdi.getDrbdResourceInfo() == null && otherBdi.getBlockDevice().isAvailable()) {
-                                        add(new MyMenuItem(otherBdi.toString()) {
+                                for (final BlockDevInfo oBdi : blockDevInfosS) {
+                                    if (oBdi.getDrbdResourceInfo() == null
+                                        && oBdi.getBlockDevice()
+                                               .isAvailable()) {
+                                        add(new MyMenuItem(oBdi.toString()) {
                                             private static final long serialVersionUID = 1L;
                                             public void action() {
-                                                DrbdInfo drbdInfo = ((DrbdGraph) host.getCluster().getBrowser().getDrbdGraph()).getDrbdInfo();
+                                                DrbdInfo drbdInfo =
+                                                    ((DrbdGraph) host
+                                                               .getCluster()
+                                                               .getBrowser()
+                                                               .getDrbdGraph())
+                                                               .getDrbdInfo();
                                                 setInfoPanel(null);
-                                                otherBdi.setInfoPanel(null);
-                                                drbdInfo.addDrbdResource(null, null, thisClass, otherBdi, true);
-                                                //drbdResourceInfo.getDrbdInfo().addDrbdResource(null, null, thisClass, otherBdi, true);
-                                                //SwingUtilities.invokeLater(new Runnable() { public void run() {
-                                                //    scale();
-                                                //}});
+                                                oBdi.setInfoPanel(null);
+                                                drbdInfo.addDrbdResource(
+                                                                     null,
+                                                                     null,
+                                                                     thisClass,
+                                                                     oBdi,
+                                                                     true);
                                             }
                                         });
                                     }
-                                    if (otherBdi.getName().equals(
+                                    if (oBdi.getName().equals(
                                                 getBlockDevice().getName())) {
                                         addSeparator();
                                     }
@@ -1889,7 +1982,8 @@ public class HostBrowser extends Browser {
             final MyMenuItem attachMenu =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
                                NO_HARDDISC_ICON,
-                               Tools.getString("HostBrowser.Drbd.Detach.ToolTip"),
+                               Tools.getString(
+                                            "HostBrowser.Drbd.Detach.ToolTip"),
 
                                Tools.getString("HostBrowser.Drbd.Attach"),
                                HARDDISC_ICON,

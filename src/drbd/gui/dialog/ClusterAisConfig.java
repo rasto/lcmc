@@ -175,7 +175,8 @@ public class ClusterAisConfig extends DialogCluster {
                                                     mgmtdCB.isSelected(),
                                                     serviceVersion));
                                 if (hosts[0].isCorosync()) {
-                                    Corosync.createCorosyncConfig(hosts, config);
+                                    Corosync.createCorosyncConfig(hosts,
+                                                                  config);
                                 } else {
                                     Openais.createAISConfig(hosts, config);
                                 }
@@ -269,15 +270,12 @@ public class ClusterAisConfig extends DialogCluster {
         String mcastport = null;
         String bindnetaddr = null;
         for (String line : config) {
-            System.out.println("line: " + line);
             final Matcher totemM = totemP.matcher(line);
             if (!inTotem && totemM.matches()) {
-                System.out.println("in totem");
                 inTotem = true;
             } else if (inTotem && !inInterface) {
                 final Matcher interfaceM = interfaceP.matcher(line);
                 if (interfaceM.matches()) {
-                    System.out.println("in interface");
                     inInterface = true;
                 }
             } else if (inInterface) {
@@ -556,8 +554,9 @@ public class ClusterAisConfig extends DialogCluster {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     if (configScrollPane != null) {
-                                        configScrollPane.getViewport().setViewPosition(
-                                                       label.getBounds().getLocation());
+                                        configScrollPane.getViewport()
+                                            .setViewPosition(
+                                              label.getBounds().getLocation());
                                         configScrollPane = null;
                                     }
                                 }

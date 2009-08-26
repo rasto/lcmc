@@ -102,9 +102,9 @@ public class SSH {
                                      host,
                                      null);
             host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
-            connectionThread = new ConnectionThread();
-            // TODO:  possible race here connectionThread can be null
-            connectionThread.start();
+            final ConnectionThread ct = new ConnectionThread();
+            connectionThread = ct;
+            ct.start();
         }
         return true;
     }
@@ -128,8 +128,9 @@ public class SSH {
         }
 
         host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
-        connectionThread = new ConnectionThread();
-        connectionThread.start();
+        final ConnectionThread ct = new ConnectionThread();
+        connectionThread = ct;
+        ct.start();
     }
 
     /**
@@ -1330,7 +1331,7 @@ public class SSH {
                     Tools.debug(this, "authentication ok");
                 }
             } catch (IOException e) {
-                Tools.debug(this, e.getMessage(), 0);
+                Tools.debug(this, "connecting: " + e.getMessage(), 0);
                 connectionFailed = true;
                 if (!cancelIt) {
                     host.getTerminalPanel().addCommandOutput(e.getMessage()

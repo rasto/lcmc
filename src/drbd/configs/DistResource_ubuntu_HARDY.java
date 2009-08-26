@@ -110,6 +110,7 @@ public class DistResource_ubuntu_HARDY extends
          "source"},
 
         {"Openais.reloadOpenais",  "/etc/init.d/openais force-reload"},
+        {"Corosync.reloadCorosync", "/etc/init.d/corosync force-reload"},
 
     };
 }

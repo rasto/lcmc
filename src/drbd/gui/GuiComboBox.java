@@ -877,9 +877,9 @@ public class GuiComboBox extends JPanel {
                 // error
         }
         Color c;
-        if (required && false) {
+        if (required) {
             //TODO: required fields should be marked differently
-            c = Color.GREEN;
+            c = Color.BLACK;
         } else  {
             c = backgroundColor;
         }

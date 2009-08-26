@@ -111,7 +111,8 @@ public class HostPmInst extends DialogHost {
         }
         Tools.getConfigData().setLastHbPmInstalledMethod(
            getHost().getDistString("PmInst.install.text." + installMethod));
-        Tools.getConfigData().setLastInstalledClusterStack("Corosync/OpenAIS");
+        Tools.getConfigData().setLastInstalledClusterStack(
+                                        Tools.getConfigData().COROSYNC_NAME);
 
         getHost().execCommand(installCommand,
                          getProgressBar(),
