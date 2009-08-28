@@ -733,7 +733,6 @@ public class HostCheckInstallation extends DialogHost {
         }
         final String lastInstalled =
                           Tools.getConfigData().getLastInstalledClusterStack();
-        System.out.println("last installed: " + lastInstalled);
         if (lastInstalled != null) {
             if (Tools.getConfigData().HEARTBEAT_NAME.equals(lastInstalled)) {
                 pmJLabel.setForeground(Color.LIGHT_GRAY);

@@ -119,7 +119,7 @@ public class ClusterHosts extends DialogCluster {
         Tools.getConfigData().getHosts().removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
-            if (button.isSelected() && button.isEnabled()) {
+            if (button.isSelected()) {
                 selected++;
             }
         }
@@ -131,7 +131,7 @@ public class ClusterHosts extends DialogCluster {
             /* check if some of the hosts are the same. It will not work all
              * the time if hops are used. */
             for (final JCheckBox button : checkBoxToHost.keySet()) {
-                if (button.isSelected()) {
+                if (button.isSelected() && button.isEnabled()) {
                     final Host host = checkBoxToHost.get(button);
                     final String ip = host.getIp();
                     if (ips.contains(ip)) {

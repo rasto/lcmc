@@ -98,7 +98,7 @@ public final class Heartbeat {
      */
     public static void switchFromOpenaisToHeartbeat(final Host host) {
         final String command = host.getDistCommand(
-                                    "Corosync.deleteFromRc"
+                                    "Openais.deleteFromRc"
                                     + ";;;Heartbeat.addToRc"
                                     + ";;;Heartbeat.startHeartbeat",
                                     (ConvertCmdCallback) null);
