@@ -65,7 +65,7 @@ public class DistResource_redhat_5 extends
 
         {"HbPmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
-         + "yum -y install heartbeat pacemaker "
+         + "yum -y install heartbeat pacemaker resource-agents "
          + "&& /sbin/chkconfig --add heartbeat"},
 
         {"HbPmInst.install.text.2", "the centos way: possibly too old" },
@@ -74,5 +74,10 @@ public class DistResource_redhat_5 extends
          "/usr/sbin/useradd hacluster 2>/dev/null; "
          + "/usr/bin/yum -y install heartbeat "
          + "&& /sbin/chkconfig --add heartbeat"},
+
+        {"Openais.startOpenais.i686",
+         "echo '/etc/init.d/openais start'|at now"},
+        {"Openais.reloadOpenais.i686",
+         "echo '/etc/init.d/openais reload'|at now"},
     };
 }
