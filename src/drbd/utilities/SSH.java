@@ -41,6 +41,7 @@ import com.trilead.ssh2.InteractiveCallback;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.KnownHosts;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * Verifying server hostkeys with an existing known_hosts file
@@ -79,17 +80,30 @@ public class SSH {
     private String lastRSAKey = null;
     /** Last successful dsa key. */
     private String lastDSAKey = null;
+    /** Connection mutex */
+    private final Mutex mConnectionLock = new Mutex();
+    /** Connection thread mutex */
+    private final Mutex mConnectionThreadLock = new Mutex();
 
     /**
      * Reconnect.
      */
     public final boolean reconnect() {
+        try {
+            mConnectionThreadLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (connectionThread != null) {
             try {
-                connectionThread.join();
+                final ConnectionThread ct = connectionThread;
+                mConnectionThreadLock.release();
+                ct.join();
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+        } else {
+            mConnectionThreadLock.release();
         }
         if (disconnectForGood) {
             return false;
@@ -103,7 +117,13 @@ public class SSH {
                                      null);
             host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
             final ConnectionThread ct = new ConnectionThread();
+            try {
+                mConnectionThreadLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             connectionThread = ct;
+            mConnectionThreadLock.release();
             ct.start();
         }
         return true;
@@ -129,7 +149,13 @@ public class SSH {
 
         host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
         final ConnectionThread ct = new ConnectionThread();
+        try {
+            mConnectionThreadLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         connectionThread = ct;
+        mConnectionThreadLock.release();
         ct.start();
     }
 
@@ -174,12 +200,21 @@ public class SSH {
      * Waits till connection is established or is failed.
      */
     public final void waitForConnection() {
+        try {
+            mConnectionThreadLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (connectionThread != null) {
             try {
-                connectionThread.join();
+                final ConnectionThread ct = connectionThread;
+                mConnectionThreadLock.release();
+                ct.join();
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+        } else {
+            mConnectionThreadLock.release();
         }
     }
 
@@ -199,9 +234,15 @@ public class SSH {
      * Cancels the creating of connection to the sshd.
      */
     public final void cancelConnection() {
+        try {
+            mConnectionThreadLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (connectionThread != null) {
             connectionThread.cancel();
         }
+        mConnectionThreadLock.release();
         Tools.debug(this, "SSH cancel", 1);
         final String message = "canceled";
         Tools.debug(this, message, 1);
@@ -235,13 +276,21 @@ public class SSH {
      * Disconnects this host if it has been connected.
      */
     public final void disconnect() {
+        try {
+            mConnectionLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (connection != null) {
             disconnectForGood = true;
-            Tools.debug(this, "disconnecting: " + host.getName(), 0);
             connection.close();
             connection = null;
+            mConnectionLock.release();
+            Tools.debug(this, "disconnecting: " + host.getName(), 0);
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
+        } else {
+            mConnectionLock.release();
         }
     }
 
@@ -256,11 +305,19 @@ public class SSH {
      * After this method is called a reconnect will work as expected.
      */
     public final void forceReconnect() {
+        try {
+            mConnectionLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (connection != null) {
-            Tools.debug(this, "force reconnecting: " + host.getName(), 0);
             connection = null;
+            mConnectionLock.release();
+            Tools.debug(this, "force reconnecting: " + host.getName(), 0);
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
+        } else {
+            mConnectionLock.release();
         }
     }
 
@@ -268,12 +325,20 @@ public class SSH {
      * Force disconnection.
      */
     public final void forceDisconnect() {
+        try {
+            mConnectionLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (connection != null) {
             disconnectForGood = true;
-            Tools.debug(this, "force disconnecting: " + host.getName(), 0);
             connection = null;
+            mConnectionLock.release();
+            Tools.debug(this, "force disconnecting: " + host.getName(), 0);
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
+        } else {
+            mConnectionLock.release();
         }
     }
 
@@ -281,7 +346,14 @@ public class SSH {
      * Returns true if connection is established.
      */
     public final boolean isConnected() {
-        return connection != null;
+        try {
+            mConnectionLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final boolean ret = connection != null;
+        mConnectionLock.release();
+        return ret;
     }
 
     /**
@@ -326,8 +398,16 @@ public class SSH {
             this.outputVisible = outputVisible;
             Integer exitCode = 100;
             final StringBuffer res = new StringBuffer("");
+            try {
+                mConnectionLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             if (connection == null) {
+                mConnectionLock.release();
                 return new Object[]{"SSH.NotConnected", 1};
+            } else {
+                mConnectionLock.release();
             }
             if ("installGuiHelper".equals(command)) {
                 installGuiHelper();
@@ -530,12 +610,20 @@ public class SSH {
          */
         public final void run() {
             if (reconnect()) {
+                try {
+                    mConnectionLock.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
                 if (connection == null) {
+                    mConnectionLock.release();
                     if (execCallback != null) {
                         execCallback.doneError("not connected", 0);
                     }
                 } else {
-                    exec();
+                    final Connection conn = connection;
+                    mConnectionLock.release();
+                    exec(conn);
                 }
             }
         }
@@ -543,17 +631,24 @@ public class SSH {
         /**
          * Executes the command.
          */
-        private void exec() {
+        private void exec(final Connection conn) {
             // ;;; separates commands, that are to be executed one after one,
             // if previous command has finished successfully.
             final String[] commands = command.split(";;;");
             final StringBuffer ans = new StringBuffer("");
             for (int i = 0; i < commands.length; i++) {
                 try {
-                    sess = connection.openSession();
+                    sess = conn.openSession();
                 } catch (java.io.IOException e) {
+                    try {
+                        mConnectionLock.acquire();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                     connection = null;
+                    mConnectionLock.release();
                     Tools.appWarning("Could not open session");
+                    break;
                 }
                 commands[i].trim();
                 //Tools.commandLock();
@@ -1307,23 +1402,47 @@ public class SSH {
                     Tools.debug(
                       this,
                       "closing established connection because it was canceled");
+                    try {
+                        mConnectionThreadLock.acquire();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     connectionThread = null;
+                    mConnectionThreadLock.release();
                     host.setConnected();
                     if (callback != null) {
                         callback.doneError("");
                     }
+                    try {
+                        mConnectionLock.acquire();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     connection = null;
+                    mConnectionLock.release();
                     host.setConnected();
                 } else {
                     //  authentication ok.
+                    try {
+                        mConnectionLock.acquire();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     connection = conn;
+                    mConnectionLock.release();
                     host.setConnected();
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             host.getTerminalPanel().nextCommand();
                         }
                     });
+                    try {
+                        mConnectionThreadLock.acquire();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     connectionThread = null;
+                    mConnectionThreadLock.release();
                     host.setConnected();
                     if (callback != null) {
                         callback.done(0);
@@ -1341,8 +1460,20 @@ public class SSH {
                         callback.doneError(e.getMessage());
                     }
                 }
+                try {
+                    mConnectionThreadLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 connectionThread = null;
+                mConnectionThreadLock.release();
+                try {
+                    mConnectionLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 connection = null;
+                mConnectionLock.release();
                 host.setConnected();
             }
         }
