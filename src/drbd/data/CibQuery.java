@@ -24,6 +24,7 @@ package drbd.data;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -91,6 +92,11 @@ public class CibQuery {
     /** Group to resources map. */
     private Map<String, List<String>> groupsToResources =
                                            new HashMap<String, List<String>>();
+    /** Clone to its resource map. */
+    private Map<String, String> cloneToResource =
+                                               new HashMap<String, String>();
+    /** List of mater resources. */
+    private List<String> masterList = new ArrayList<String>();
     /** Designated co-ordinator. */
     private String dc = null;
     /** Map from nodename and resource to the fail-count. */
@@ -156,7 +162,6 @@ public class CibQuery {
     public final Map<String, HeartbeatService> getResourceType() {
         return resourceType;
     }
-
 
     /**
      * Sets the resource instance_attributes id map.
@@ -418,6 +423,36 @@ public class CibQuery {
     public final Map<String, List<String>> getGroupsToResources() {
         return groupsToResources;
     }
+
+    /**
+     * Sets the clone to resource map.
+     */
+    public final void setCloneToResource(
+                           final Map<String, String> cloneToResource) {
+        this.cloneToResource = cloneToResource;
+    }
+
+    /**
+     * Gets the clone to resource map.
+     */
+    public final Map<String, String> getCloneToResource() {
+        return cloneToResource;
+    }
+
+    /**
+     * Sets the master list.
+     */
+    public final void setMasterList(final List<String> masterList) {
+        this.masterList = masterList;
+    }
+
+    /**
+     * Gets the master list.
+     */
+    public final List<String> getMasterList() {
+        return masterList;
+    }
+
 
     /**
      * Sets the designated co-ordinator.

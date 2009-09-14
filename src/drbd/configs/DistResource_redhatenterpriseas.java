@@ -76,7 +76,7 @@ public class DistResource_redhatenterpriseas extends
          + "/usr/sbin/up2date -f kernel-devel && "
          + "/usr/sbin/up2date flex gcc && "
          + "make && make install && "
-         + "/sbin/chkconfig --add drbd && "
+         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",

@@ -22,6 +22,8 @@
 
 package drbd.data.resources;
 
+import drbd.utilities.Tools;
+
 /**
  * This class holds data of a service.
  *
@@ -48,10 +50,25 @@ public class Service extends Resource {
     private boolean modifying = false;
     /** Heartbeat class:  heartbeat, ocf, lsb. */
     private String heartbeatClass = null;
+    /** Whether this service master when it is clone. */
+    private boolean master = false;
     /** Heartbeat id prefix for resource. */
     private static final String RES_ID_PREFIX = "res_";
     /** Heartbeat id prefix for group. */
     private static final String GRP_ID_PREFIX = "grp_";
+    /** Pacemaker id prefix for clone. */
+    private static final String CL_ID_PREFIX = "cl_";
+    /** Pacemaker id prefix for master/slave. */
+    private static final String MS_ID_PREFIX = "ms_";
+    /** Name of the clone set pacemaker object. */
+    private static final String CLONE_SET_NAME =
+                                Tools.getConfigData().PM_CLONE_SET_NAME;
+    /** Name of the master / slave set pacemaker object. */
+    private static final String MASTER_SLAVE_SET_NAME =
+                                Tools.getConfigData().PM_MASTER_SLAVE_SET_NAME;
+    /** Name of the group pacemaker object. */
+    private static final String GROUP_NAME =
+                                           Tools.getConfigData().PM_GROUP_NAME;
 
     /**
      * Prepares a new <code>Service</code> object.
@@ -83,11 +100,27 @@ public class Service extends Resource {
      */
     public final void setHeartbeatId(final String heartbeatId) {
         this.heartbeatId = heartbeatId;
-        if ("Group".equals(getName())) {
+        if (GROUP_NAME.equals(getName())) {
             if (heartbeatId.equals(GRP_ID_PREFIX)) {
                 id = "";
             } else if (heartbeatId.startsWith(GRP_ID_PREFIX)) {
                 id = heartbeatId.substring(GRP_ID_PREFIX.length());
+            } else {
+                id = heartbeatId;
+            }
+        } else if (CLONE_SET_NAME.equals(getName())) {
+            if (heartbeatId.equals(CL_ID_PREFIX)) {
+                id = "";
+            } else if (heartbeatId.startsWith(CL_ID_PREFIX)) {
+                id = heartbeatId.substring(CL_ID_PREFIX.length());
+            } else {
+                id = heartbeatId;
+            }
+        } else if (MASTER_SLAVE_SET_NAME.equals(getName())) {
+            if (heartbeatId.equals(MS_ID_PREFIX)) {
+                id = "";
+            } else if (heartbeatId.startsWith(MS_ID_PREFIX)) {
+                id = heartbeatId.substring(MS_ID_PREFIX.length());
             } else {
                 id = heartbeatId;
             }
@@ -107,11 +140,23 @@ public class Service extends Resource {
      */
     public final void setId(final String id) {
         this.id = id;
-        if ("Group".equals(getName())) {
+        if (GROUP_NAME.equals(getName())) {
             if (id.startsWith(GRP_ID_PREFIX)) {
                 heartbeatId = id;
             } else {
                 heartbeatId = GRP_ID_PREFIX + id;
+            }
+        } else if (CLONE_SET_NAME.equals(getName())) {
+            if (id.startsWith(CL_ID_PREFIX)) {
+                heartbeatId = id;
+            } else {
+                heartbeatId = CL_ID_PREFIX + id;
+            }
+        } else if (MASTER_SLAVE_SET_NAME.equals(getName())) {
+            if (id.startsWith(MS_ID_PREFIX)) {
+                heartbeatId = id;
+            } else {
+                heartbeatId = MS_ID_PREFIX + id;
             }
         } else {
             if (id.startsWith(RES_ID_PREFIX + getName() + "_")) {
@@ -209,5 +254,19 @@ public class Service extends Resource {
      */
     public final String getHeartbeatClass() {
         return heartbeatClass;
+    }
+
+    /**
+     * Sets this service if it is master.
+     */
+    public final void setMaster(final boolean master) {
+        this.master = master;
+    }
+
+    /**
+     * Returns whether this clone is master, if it is clone.
+     */
+    public final boolean isMaster() {
+        return master;
     }
 }

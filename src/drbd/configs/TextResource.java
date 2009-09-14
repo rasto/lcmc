@@ -1165,6 +1165,9 @@ public class TextResource extends
         {"ClusterBrowser.HeartbeatId",
          "ID"},
 
+        {"ClusterBrowser.HeartbeatProvider",
+         "Provider"},
+
         {"ClusterBrowser.HeartbeatClass",
          "Class"},
 

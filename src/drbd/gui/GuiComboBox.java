@@ -596,6 +596,9 @@ public class GuiComboBox extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 component.setEnabled(enabled);
+                for (final JComponent c : componentsHash.values()) {
+                    c.setEnabled(enabled);
+                }
             }
         });
     }
@@ -789,6 +792,11 @@ public class GuiComboBox extends JPanel {
                 }
                 break;
             case RADIOGROUP:
+                if (il != null) {
+                    for (final JComponent c : componentsHash.values()) {
+                        ((JRadioButton) c).addItemListener(il);
+                    }
+                }
                 break;
             case CHECKBOX:
                 if (il != null) {
@@ -824,6 +832,9 @@ public class GuiComboBox extends JPanel {
                 break;
             case RADIOGROUP:
                 component.setBackground(ERROR_VALUE_BACKGROUND);
+                for (final JComponent c : componentsHash.values()) {
+                    c.setBackground(ERROR_VALUE_BACKGROUND);
+                }
                 break;
             case CHECKBOX:
                 component.setBackground(ERROR_VALUE_BACKGROUND);
@@ -842,7 +853,7 @@ public class GuiComboBox extends JPanel {
      * Must be called after combo box was already added to some panel.
      */
     public final void setBackground(final String defaultValue,
-                              final boolean required) {
+                                    final boolean required) {
         final String value = getStringValue();
 
         Color compColor = Color.WHITE;
@@ -866,8 +877,12 @@ public class GuiComboBox extends JPanel {
                 break;
             case RADIOGROUP:
                 component.setBackground(backgroundColor);
+                for (final JComponent c : componentsHash.values()) {
+                    c.setBackground(backgroundColor);
+                }
                 break;
             case CHECKBOX:
+                //System.out.println("cb set background: " + backgroundColor);
                 component.setBackground(backgroundColor);
                 break;
             case TEXTFIELDWITHUNIT:
@@ -883,7 +898,6 @@ public class GuiComboBox extends JPanel {
         } else  {
             c = backgroundColor;
         }
-
         switch(type) {
             case TEXTFIELD:
                 setBackground(c);
@@ -898,6 +912,7 @@ public class GuiComboBox extends JPanel {
                 setBackground(c);
                 break;
             case CHECKBOX:
+                //System.out.println("cb set background -c: " + c);
                 setBackground(c);
                 break;
             case TEXTFIELDWITHUNIT:
@@ -1082,4 +1097,19 @@ public class GuiComboBox extends JPanel {
      public final JComponent getJComponent() {
          return component;
      }
+
+    /**
+     * Sets background color.
+     */
+    public final void setBackgroundColor(final Color bg) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setBackground(bg);
+                component.setBackground(bg);
+                for (final JComponent c : componentsHash.values()) {
+                    c.setBackground(bg);
+                }
+            }
+        });
+    }
 }

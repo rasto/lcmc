@@ -42,6 +42,8 @@ public class HeartbeatService {
     private static final long serialVersionUID = 1L;
     /** Name of the service. */
     private final String name;
+    /** Name of the provider like "linbit". */
+    private final String provider;
     /** Class of the service, like ocf. */
     private final String heartbeatClass;
     /** Version of the hb service. */
@@ -69,6 +71,9 @@ public class HeartbeatService {
     /** Map from parameter to its default value. */
     private final Map<String, String> paramDefault =
                                                  new HashMap<String, String>();
+    /** Map from parameter to its preferred value. */
+    private final Map<String, String> paramPreferred =
+                                                 new HashMap<String, String>();
     /** Map from parameter to an array of its possible choices. */
     private final Map<String, String[]> paramPossibleChoices =
                                                 new HashMap<String, String[]>();
@@ -82,15 +87,22 @@ public class HeartbeatService {
     /**
      * Prepares a new <code>HeartbeatService</code> object.
      */
-    public HeartbeatService(final String name, final String heartbeatClass) {
+    public HeartbeatService(final String name,
+                            final String provider,
+                            final String heartbeatClass) {
         this.name = name;
+        this.provider = provider;
         this.heartbeatClass = heartbeatClass;
         hash = (name == null ? 0 : name.hashCode() * 31)
                + (heartbeatClass == null ? 0 : heartbeatClass.hashCode());
         if (isFilesystem()) {
             menuName = "Filesystem / DRBD";
         } else {
-            menuName = name;
+            if (!"heartbeat".equals(provider)) {
+                menuName = name + ":" + provider;
+            } else {
+                menuName = name;
+            }
         }
     }
 
@@ -99,6 +111,13 @@ public class HeartbeatService {
      */
     public final String getName() {
         return name;
+    }
+
+    /**
+     * returns the provider.
+     */
+    public final String getProvider() {
+        return provider;
     }
 
     /**
@@ -289,6 +308,26 @@ public class HeartbeatService {
     }
 
     /**
+     * Sets the preferred value of the parameter that is preferred over default
+     * value.
+     */
+    public final void setParamPreferred(final String param,
+                                        final String preferredValue) {
+        if (!parameters.contains(param)) {
+            wrongParameterError(param);
+            return;
+        }
+        paramPreferred.put(param, preferredValue);
+    }
+
+    /**
+     * Gets the preferred value of the parameter.
+     */
+    public final String getParamPreferred(final String param) {
+        return paramPreferred.get(param);
+    }
+
+    /**
      * Sets the possible choices for the parameter.
      */
     public final void setParamPossibleChoices(final String param,
@@ -370,8 +409,18 @@ public class HeartbeatService {
      * Returns whether this service/object is group.
      */
     public final boolean isGroup() {
-        return "Group".equals(name) && "group".equals(heartbeatClass);
+        return Tools.getConfigData().PM_GROUP_NAME.equals(name)
+               && "group".equals(heartbeatClass);
     }
+
+    /**
+     * Returns whether this service/object is clone set.
+     */
+    public final boolean isClone() {
+        return Tools.getConfigData().PM_CLONE_SET_NAME.equals(name)
+               && "clone".equals(heartbeatClass);
+    }
+
 
     /**
      * Returns whether this service is in the heartbeat class.

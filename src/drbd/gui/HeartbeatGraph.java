@@ -193,6 +193,9 @@ public class HeartbeatGraph extends ResourceGraph {
             return false;
         }
         final Vertex pv = getVertex(parent);
+        if (pv == null) {
+            return false;
+        }
         if (v.isSuccessorOf(pv) || isAncestor(v, pv)) {
             return true;
         }
@@ -327,6 +330,14 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     protected final String getId(final Info i) {
         return "hb=" + i.getId();
+    }
+
+    public final void exchangeObjectInTheVertex(final ServiceInfo newSI,
+                                                final ServiceInfo oldSI) {
+        Vertex v = getVertex(oldSI);
+        removeVertex(oldSI);
+        putInfoToVertex(newSI, v);
+        putVertexToInfo(v, (Info) newSI);
     }
 
     /**
@@ -540,10 +551,10 @@ public class HeartbeatGraph extends ResourceGraph {
             if (si.getService().isRemoved()) {
                 str = Tools.getString("HeartbeatGraph.Removing");
             } else if (vertexIsPresentList.contains(v)) {
-                str = si.toString();
+                str = si.getMainTextForGraph();
             } else {
                 if (si.getService().isNew()) {
-                    str = si.toString();
+                    str = si.getMainTextForGraph();
                 } else {
                     str = Tools.getString("HeartbeatGraph.Unconfigured");
                 }

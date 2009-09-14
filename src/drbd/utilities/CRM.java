@@ -70,6 +70,9 @@ public final class CRM {
                            final Host host,
                            final String command, /* -U or -C */
                            final String heartbeatId,
+                           final String cloneId,
+                           final boolean master,
+                           final Map<String, String> cloneMetaArgs,
                            final String groupId,
                            final String args,
                            final Map<String, String> pacemakerResAttrs,
@@ -79,10 +82,6 @@ public final class CRM {
                            final Map<String, String> nvpairIdsHash,
                            final Map<String, Map<String, String>> pacemakerOps,
                            String operationsId) {
-        if (args == null) {
-            return;
-        }
-
         if (instanceAttrId == null) {
             instanceAttrId = heartbeatId + "-instance_attributes";
         }
@@ -97,6 +96,21 @@ public final class CRM {
 
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
+        if (cloneId != null) {
+            if (master) {
+                xml.append("<master id=\"");
+            } else {
+                xml.append("<clone id=\"");
+            }
+            xml.append(cloneId);
+            xml.append("\">");
+            /* mater/slave meta_attributes */
+            if (!cloneMetaArgs.isEmpty()) {
+                xml.append(getMetaAttributes(host,
+                                             cloneId,
+                                             cloneMetaArgs));
+            }
+        }
         if (groupId != null) {
             xml.append("<group id=\"");
             xml.append(groupId);
@@ -181,6 +195,13 @@ public final class CRM {
         xml.append("</primitive>");
         if (groupId != null) {
             xml.append("</group>");
+        }
+        if (cloneId != null) {
+            if (master) {
+                xml.append("</master>");
+            } else {
+                xml.append("</clone>");
+            }
         }
         xml.append('\'');
 
@@ -278,7 +299,11 @@ public final class CRM {
      */
     public static void removeResource(final Host host,
                                       final String heartbeatId,
-                                      final String groupId) {
+                                      final String groupId,
+                                      final String cloneId,
+                                      final boolean master) {
+        System.out.println("remove resource: " + heartbeatId
+                           + ", gid: " + groupId + ", mid: " + cloneId);
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
         if (groupId != null) {
@@ -288,10 +313,26 @@ public final class CRM {
             xml.append(groupId);
             xml.append("\">");
         }
+        if (cloneId != null) {
+            if (master) {
+                xml.append("<master id=\"");
+            } else {
+                xml.append("<clone id=\"");
+            }
+            xml.append(cloneId);
+            xml.append("\">");
+        }
         if (heartbeatId != null) {
             xml.append("<primitive id=\"");
             xml.append(heartbeatId);
             xml.append("\"></primitive>");
+        }
+        if (cloneId != null) {
+            if (master) {
+                xml.append("</master>");
+            } else {
+                xml.append("</clone>");
+            }
         }
         if (groupId != null) {
             xml.append("</group>");
@@ -347,7 +388,8 @@ public final class CRM {
         final StringBuffer xml = new StringBuffer(360);
         xml.append("<meta_attributes id=\"");
         xml.append(heartbeatId);
-        xml.append("_meta_attrs\">");
+        xml.append("-meta_attributes\">");
+        //xml.append("_meta_attrs\">");
 
         final String hbV = host.getHeartbeatVersion();
         if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
@@ -357,7 +399,8 @@ public final class CRM {
         for (final String attr : attrs.keySet()) {
             xml.append("<nvpair id=\"");
             xml.append(heartbeatId);
-            xml.append("-meta-options-");
+            xml.append("-meta_attributes-");
+            //xml.append("-meta-options-");
             xml.append(attr);
             xml.append("\" name=\"");
             xml.append(attr);

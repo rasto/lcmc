@@ -50,6 +50,7 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.BorderLayout;
 import java.awt.geom.Point2D;
 
 import java.awt.event.ItemListener;
@@ -762,7 +763,7 @@ public class Browser {
          * Creates apply button and adds it to the panel.
          */
         protected final void addApplyButton(final JPanel panel) {
-            panel.add(applyButton);
+            panel.add(applyButton, BorderLayout.WEST);
             Tools.getGUIData().getMainFrame().getRootPane().setDefaultButton(
                                                                    applyButton);
         }
@@ -1142,12 +1143,15 @@ public class Browser {
                                              getParamPossibleChoices(param));
             /* set default value */
             String value = getResource().getValue(param);
-            String defaultValue;
+            String initValue;
             if (value == null || "".equals(value)) {
-                defaultValue = getParamDefault(param);
-                getResource().setValue(param, defaultValue);
+                initValue = getParamPreferred(param);
+                if (initValue == null) {
+                    initValue = getParamDefault(param);
+                }
+                getResource().setValue(param, initValue);
             } else {
-                defaultValue = value;
+                initValue = value;
             }
             String regexp = null;
             if (isInteger(param)) {
@@ -1169,18 +1173,16 @@ public class Browser {
                     new Unit("hr",   "h",  "Hour",        "Hours"),
                 };
             }
-
-            final GuiComboBox paramCb = new GuiComboBox(defaultValue,
+            final GuiComboBox paramCb = new GuiComboBox(initValue,
                                                   getPossibleChoices(param),
                                                   units,
                                                   type,
                                                   regexp,
                                                   width);
             paramComboBoxAdd(param, prefix, paramCb);
-
             paramCb.setEditable(true);
-
-            paramCb.setToolTipText(getToolTipText(param, defaultValue));
+            paramCb.setToolTipText(getToolTipText(param,
+                                                  getParamDefault(param)));
             return paramCb;
         }
 
@@ -1215,6 +1217,11 @@ public class Browser {
          * Returns default value of a parameter.
          */
         protected abstract String getParamDefault(String param);
+
+        /**
+         * Returns preferred value of a parameter.
+         */
+        protected abstract String getParamPreferred(String param);
 
         /**
          * Returns short description of a parameter.
@@ -1295,7 +1302,7 @@ public class Browser {
          * Can be called from dialog box, where it does not need to check if
          * fields have changed.
          */
-        public final boolean checkResourceFields(final String param,
+        public boolean checkResourceFields(final String param,
                                                  final String[] params) {
             final boolean cor = checkResourceFieldsCorrect(param, params);
             if (cor) {
@@ -1360,6 +1367,8 @@ public class Browser {
                     } else {
                         correctValue = correctValue
                                        && checkParamCache(otherParam);
+                        System.out.println("correct: " + otherParam + "cv: "
+                                           + correctValue);
                     }
                 }
             }
@@ -1398,6 +1407,9 @@ public class Browser {
                         oldValue = "";
                     }
                     if (!oldValue.equals(newValue)) {
+                        System.out.println("param changed: "
+                                           + param + " - "
+                                           + oldValue + " != " + newValue);
                         changedValue = true;
                     }
                 }

@@ -57,9 +57,11 @@ public class DistResource_fedora extends
         {"Heartbeat.2.1.4.getOCFParameters",
          "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/share/ocf;"
          + "for prov in `ls -1 /usr/share/ocf/resource.d/`; do "
-         + " for s in `ls -1 /usr/share/ocf/resource.d/$prov/ `; do "
-         + " /usr/share/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
+         +  "for s in `ls -1 /usr/share/ocf/resource.d/$prov/ `; do "
+         +   "echo -n 'provider:'; echo $prov;"
+         +  "/usr/share/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
          + "done;"
+         + "echo 'provider:heartbeat';"
          + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
 

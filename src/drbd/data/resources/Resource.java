@@ -21,7 +21,7 @@
 
 
 package drbd.data.resources;
-
+import drbd.utilities.Tools;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -48,6 +48,9 @@ public class Resource {
     /** Map from parameter name to its default value. */
     private final Map<String, String> defaultValueMap =
                                                 new HashMap<String, String>();
+    /** Map from parameter name to its preferred value. */
+    private final Map<String, String> preferredValueMap =
+                                                new HashMap<String, String>();
 
     /**
      * Prepares a new <code>Resource</code> object.
@@ -72,6 +75,10 @@ public class Resource {
      * Sets value for paramter.
      */
     public final void setValue(final String param, final String value) {
+        if ("notify".equals(param)) {
+            System.out.println(param + ": set value: " + value + "->" + savedValue.get(param));
+            Tools.printStackTrace();
+        }
         savedValue.put(param, value);
     }
 
@@ -161,7 +168,6 @@ public class Resource {
      */
     public final void setDefaultValue(final String param,
                                       final String defaultValue) {
-        defaultValueMap.remove(param);
         defaultValueMap.put(param, defaultValue);
     }
 
@@ -170,5 +176,20 @@ public class Resource {
      */
     public final String getDefaultValue(final String param) {
         return defaultValueMap.get(param);
+    }
+
+    /**
+     * Sets preferred value for the parameter.
+     */
+    public final void setPreferredValue(final String param,
+                                        final String preferredValue) {
+        preferredValueMap.put(param, preferredValue);
+    }
+
+    /**
+     * Returns the preferred value for the parameter.
+     */
+    public final String getPreferredValue(final String param) {
+        return preferredValueMap.get(param);
     }
 }

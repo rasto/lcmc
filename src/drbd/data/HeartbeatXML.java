@@ -47,6 +47,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * short and long description, data types etc. for defined types
  * of services in the hashes and provides methods to get this
  * information.
+ * TODO: must be renamed
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -71,6 +72,9 @@ public class HeartbeatXML extends XML {
     /** Map from global parameter to its default value. */
     private final Map<String, String> paramGlobalDefaultMap =
                                                 new HashMap<String, String>();
+    /** Map from global parameter to its preferred value. */
+    private final Map<String, String> paramGlobalPreferredMap =
+                                                new HashMap<String, String>();
     /** Map from global parameter to its type. */
     private final Map<String, String> paramGlobalTypeMap =
                                                 new HashMap<String, String>();
@@ -80,11 +84,15 @@ public class HeartbeatXML extends XML {
                                         new HashMap<String, String[]>();
 
     /** Predefined group as heartbeat service. */
-    private final HeartbeatService hbGroup = new HeartbeatService("Group",
-                                                                  "group");
+    private final HeartbeatService hbGroup =
+                      new HeartbeatService(Tools.getConfigData().PM_GROUP_NAME,
+                                           "",
+                                           "group");
+    /** Predefined clone as heartbeat service. */
+    private final HeartbeatService hbClone;
     /** Predefined drvbddisk as heartbeat service. */
     private final HeartbeatService hbDrbddisk =
-                                new HeartbeatService("drbddisk", "heartbeat");
+                    new HeartbeatService("drbddisk", "heartbeat", "heartbeat");
     /** Mapfrom heartbeat service defined by name and class to the hearbeat
      * service object.
      */
@@ -112,6 +120,56 @@ public class HeartbeatXML extends XML {
         super();
         this.host = host;
         String command = null;
+        hbClone = new HeartbeatService(
+                                Tools.getConfigData().PM_CLONE_SET_NAME,
+                                "",
+                                "clone");
+        /* clone-max */
+        hbClone.addParameter("clone-max");
+        hbClone.setParamIsMetaAttr("clone-max", true);
+        hbClone.setParamShortDesc("clone-max", "M/S Clone Max");
+        hbClone.setParamDefault("clone-max", "");
+        hbClone.setParamPreferred("clone-max", "2");
+        hbClone.setParamType("clone-max", "integer");
+
+        /* clone-node-max */
+        hbClone.addParameter("clone-node-max");
+        hbClone.setParamIsMetaAttr("clone-node-max", true);
+        hbClone.setParamShortDesc("clone-node-max", "M/S Clone Node Max");
+        hbClone.setParamDefault("clone-node-max", "1");
+        hbClone.setParamType("clone-node-max", "integer");
+
+        /* notify */
+        hbClone.addParameter("notify");
+        hbClone.setParamIsMetaAttr("notify", true);
+        hbClone.setParamShortDesc("notify", "M/S Notify");
+        hbClone.setParamDefault("notify", "false");
+        hbClone.setParamPreferred("notify", "true");
+        hbClone.setParamPossibleChoices("notify",
+                                         new String[]{"true", "false"});
+        /* globally-unique */
+        hbClone.addParameter("globally-unique");
+        hbClone.setParamIsMetaAttr("globally-unique", true);
+        hbClone.setParamShortDesc("globally-unique", "M/S Globally-Unique");
+        hbClone.setParamDefault("globally-unique", "true");
+        hbClone.setParamPossibleChoices("globally-unique",
+                                         new String[]{"true", "false"});
+        /* ordered */
+        hbClone.addParameter("ordered");
+        hbClone.setParamIsMetaAttr("ordered", true);
+        hbClone.setParamShortDesc("ordered", "M/S Ordered");
+        hbClone.setParamDefault("ordered", "false");
+        hbClone.setParamPossibleChoices("ordered",
+                                         new String[]{"true", "false"});
+        /* interleave */
+        hbClone.addParameter("interleave");
+        hbClone.setParamIsMetaAttr("interleave", true);
+        hbClone.setParamShortDesc("interleave", "M/S Interleave");
+        hbClone.setParamDefault("interleave", "false");
+        hbClone.setParamPossibleChoices("interleave",
+                                         new String[]{"true", "false"});
+
+
         final String hbV = host.getHeartbeatVersion();
         if (Tools.compareVersions(hbV, "2.1.3") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
@@ -139,15 +197,21 @@ public class HeartbeatXML extends XML {
             return;
         }
         final String[] lines = output.split("\\r?\\n");
+        final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
         final Pattern bp = Pattern.compile("^<resource-agent name=\"(.*?)\".*");
         final Pattern ep = Pattern.compile("^</resource-agent>$");
         final StringBuffer xml = new StringBuffer("");
+        String provider = null;
         String serviceName = null;
         boolean drbddiskPresent = false;
         for (int i = 0; i < lines.length; i++) {
             //<resource-agent name="AudibleAlarm">
             // ...
             //</resource-agent>
+            final Matcher pm = pp.matcher(lines[i]);
+            if (pm.matches()) {
+                provider = pm.group(1);
+            }
             final Matcher m = bp.matcher(lines[i]);
             if (m.matches()) {
                 serviceName = m.group(1);
@@ -160,7 +224,7 @@ public class HeartbeatXML extends XML {
                     if ("drbddisk".equals(serviceName)) {
                         drbddiskPresent = true;
                     }
-                    parseMetaData(serviceName, xml.toString());
+                    parseMetaData(serviceName, provider, xml.toString());
                     serviceName = null;
                     xml.delete(0, xml.length() - 1);
                 }
@@ -188,7 +252,8 @@ public class HeartbeatXML extends XML {
         paramGlobalShortDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalLongDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalTypeMap.put("stonith-enabled", PARAM_TYPE_BOOLEAN);
-        paramGlobalDefaultMap.put("stonith-enabled", HB_BOOLEAN_FALSE);
+        paramGlobalDefaultMap.put("stonith-enabled", HB_BOOLEAN_TRUE);
+        paramGlobalPreferredMap.put("stonith-enabled", HB_BOOLEAN_FALSE);
         paramGlobalPossibleChoices.put("stonith-enabled", booleanValues);
         globalRequiredParams.add("stonith-enabled");
 
@@ -211,6 +276,7 @@ public class HeartbeatXML extends XML {
         paramGlobalTypeMap.put("default-resource-stickiness",
                                PARAM_TYPE_INTEGER); // TODO: infinity?
         paramGlobalDefaultMap.put("default-resource-stickiness", "0");
+        paramGlobalPreferredMap.put("default-resource-stickiness", "100");
         globalRequiredParams.add("default-resource-stickiness");
 
         /* no quorum policy */
@@ -488,6 +554,21 @@ public class HeartbeatXML extends XML {
     }
 
     /**
+     * Returns the preferred value for the global parameter.
+     */
+    public final String getGlobalParamPreferred(final String param) {
+        return paramGlobalPreferredMap.get(param);
+    }
+
+    /**
+     * Returns the preferred value for this parameter.
+     */
+    public final String getParamPreferred(final HeartbeatService hbService,
+                                          final String param) {
+        return hbService.getParamPreferred(param);
+    }
+
+    /**
      * Returns default value for this parameter.
      */
     public final String getParamDefault(final HeartbeatService hbService,
@@ -750,7 +831,7 @@ public class HeartbeatXML extends XML {
                 if (contentParamNode != null) {
                     final String type = getAttribute(contentParamNode, "type");
                     final String defaultValue = getAttribute(contentParamNode,
-                                                             "default");
+                                                                    "default");
 
                     hbService.setParamType(param, type);
                     hbService.setParamDefault(param, defaultValue);
@@ -773,11 +854,13 @@ public class HeartbeatXML extends XML {
                 final String timeout = getAttribute(actionNode, "timeout");
                 final String interval = getAttribute(actionNode, "interval");
                 final String startDelay = getAttribute(actionNode,
-                                                       "start-delay");
+                                                               "start-delay");
+                final String role = getAttribute(actionNode, "role");
                 hbService.addOperationDefault(name, "depth", depth);
                 hbService.addOperationDefault(name, "timeout", timeout);
                 hbService.addOperationDefault(name, "interval", interval);
                 hbService.addOperationDefault(name, "start-delay", startDelay);
+                hbService.addOperationDefault(name, "role", role);
             }
         }
     }
@@ -787,6 +870,7 @@ public class HeartbeatXML extends XML {
      * "CRM Daemon"s are global config options.
      */
     public final void parseMetaData(final String serviceName,
+                                    final String provider,
                                     final String xml) {
         final Document document = getXMLDocument(xml);
         if (document == null) {
@@ -815,9 +899,14 @@ public class HeartbeatXML extends XML {
             && heartbeatClass.equals("heartbeat")) {
             hbService = hbDrbddisk;
         } else {
-            hbService = new HeartbeatService(serviceName, heartbeatClass);
+            hbService = new HeartbeatService(serviceName,
+                                             provider,
+                                             heartbeatClass);
         }
-        serviceToHbServiceMap.put(serviceName, heartbeatClass, hbService);
+        serviceToHbServiceMap.put(serviceName,
+                                  provider,
+                                  heartbeatClass,
+                                  hbService);
         hbServiceList.add(hbService);
 
         /* <version> */
@@ -932,8 +1021,10 @@ public class HeartbeatXML extends XML {
      * heartbeat class.
      */
     public final HeartbeatService getHbService(final String serviceName,
+                                               final String provider,
                                                final String hbClass) {
         return (HeartbeatService) serviceToHbServiceMap.get(serviceName,
+                                                            provider,
                                                             hbClass);
     }
 
@@ -952,34 +1043,34 @@ public class HeartbeatXML extends XML {
     }
 
     /**
-     * Parses the <primitive> node.
+     * Returns the heartbeat service object of the hearbeat clone set.
      */
-    private void parsePrimitive(
-                final Node primitiveNode,
-                final List<String> groupResList,
-                final Map<String, HeartbeatService> resourceTypeMap,
-                final Map<String, Map<String, String>> parametersMap,
-                final Map<String, Map<String, String>> parametersNvpairsIdsMap,
-                final Map<String, String> resourceInstanceAttrIdMap,
-                final MultiKeyMap operationsMap,
-                final Map<String, String> operationsIdMap,
-                final Map<String, Map<String, String>> resOpIdsMap) {
-        final String hbV = host.getHeartbeatVersion();
-        final String hbClass = getAttribute(primitiveNode, "class");
-        final String hbId = getAttribute(primitiveNode, "id");
-        final String provider = getAttribute(primitiveNode, "provider");
-        final String type = getAttribute(primitiveNode, "type");
-        resourceTypeMap.put(hbId, getHbService(type, hbClass));
-        groupResList.add(hbId);
+    public final HeartbeatService getHbClone() {
+        return hbClone;
+    }
+
+    /**
+     * Parses attributes, operations etc. from primitives and clones.
+     */
+    private void parseAttributes(
+              final Node resourceNode,
+              final String hbId,
+              final Map<String, Map<String, String>> parametersMap,
+              final Map<String, Map<String, String>> parametersNvpairsIdsMap,
+              final Map<String, String> resourceInstanceAttrIdMap,
+              final MultiKeyMap operationsMap,
+              final Map<String, String> operationsIdMap,
+              final Map<String, Map<String, String>> resOpIdsMap) {
         final Map<String, String> params =
                                         new HashMap<String, String>();
         parametersMap.put(hbId, params);
         final Map<String, String> nvpairIds =
                                         new HashMap<String, String>();
         parametersNvpairsIdsMap.put(hbId, nvpairIds);
+        final String hbV = host.getHeartbeatVersion();
         /* <instance_attributes> */
         final Node instanceAttrNode =
-                                   getChildNode(primitiveNode,
+                                   getChildNode(resourceNode,
                                                 "instance_attributes");
         /* <nvpair...> */
         if (instanceAttrNode != null) {
@@ -1007,7 +1098,7 @@ public class HeartbeatXML extends XML {
         }
 
         /* <operations> */
-        final Node operationsNode = getChildNode(primitiveNode,
+        final Node operationsNode = getChildNode(resourceNode,
                                                  "operations");
         if (operationsNode != null) {
             final String operationsId = getAttribute(operationsNode,
@@ -1047,8 +1138,8 @@ public class HeartbeatXML extends XML {
         }
 
         /* <meta_attributtes> */
-        final Node metaAttrsNode = getChildNode(primitiveNode,
-                                                 "meta_attributes");
+        final Node metaAttrsNode = getChildNode(resourceNode,
+                                                "meta_attributes");
         if (metaAttrsNode != null) {
             final String metaAttrsId = getAttribute(metaAttrsNode, "id");
             /* <attributtes> only til 2.1.4 */
@@ -1068,11 +1159,42 @@ public class HeartbeatXML extends XML {
                     final String nvpairId = getAttribute(maNode, "id");
                     final String name = getAttribute(maNode, "name");
                     final String value = getAttribute(maNode, "value");
+                    System.out.println("meta attr: " + name + " " + value + " "
+                                       + nvpairId);
                     params.put(name, value);
                     nvpairIds.put(name, nvpairId);
                 }
             }
         }
+    }
+
+    /**
+     * Parses the "primitive" node.
+     */
+    private void parsePrimitive(
+                final Node primitiveNode,
+                final List<String> groupResList,
+                final Map<String, HeartbeatService> resourceTypeMap,
+                final Map<String, Map<String, String>> parametersMap,
+                final Map<String, Map<String, String>> parametersNvpairsIdsMap,
+                final Map<String, String> resourceInstanceAttrIdMap,
+                final MultiKeyMap operationsMap,
+                final Map<String, String> operationsIdMap,
+                final Map<String, Map<String, String>> resOpIdsMap) {
+        final String hbClass = getAttribute(primitiveNode, "class");
+        final String hbId = getAttribute(primitiveNode, "id");
+        final String provider = getAttribute(primitiveNode, "provider");
+        final String type = getAttribute(primitiveNode, "type");
+        resourceTypeMap.put(hbId, getHbService(type, provider, hbClass));
+        groupResList.add(hbId);
+        parseAttributes(primitiveNode,
+                        hbId,
+                        parametersMap,
+                        parametersNvpairsIdsMap,
+                        resourceInstanceAttrIdMap,
+                        operationsMap,
+                        operationsIdMap,
+                        resOpIdsMap);
     }
 
     /**
@@ -1243,6 +1365,9 @@ public class HeartbeatXML extends XML {
                                     new HashMap<String, Map<String, String>>();
         final Map<String, List<String>> groupsToResourcesMap =
                                            new HashMap<String, List<String>>();
+        final Map<String, String> cloneToResourceMap =
+                                                 new HashMap<String, String>();
+        final List<String> masterList = new ArrayList<String>();
         final MultiKeyMap failedMap = new MultiKeyMap();
         groupsToResourcesMap.put("none", new ArrayList<String>());
 
@@ -1282,6 +1407,44 @@ public class HeartbeatXML extends XML {
                                        operationsMap,
                                        operationsIdMap,
                                        resOpIdsMap);
+                    }
+                }
+            } else if (primitiveGroupNode.getNodeName().equals("master")
+                       || primitiveGroupNode.getNodeName().equals("clone")) {
+                final NodeList primitives = primitiveGroupNode.getChildNodes();
+                final String cloneId = getAttribute(primitiveGroupNode, "id");
+                parametersMap.put(cloneId, new HashMap<String, String>());
+                List<String> resList = groupsToResourcesMap.get(cloneId);
+                if (resList == null) {
+                    resList = new ArrayList<String>();
+                    groupsToResourcesMap.put(cloneId, resList);
+                }
+                parseAttributes(primitiveGroupNode,
+                                cloneId,
+                                parametersMap,
+                                parametersNvpairsIdsMap,
+                                resourceInstanceAttrIdMap,
+                                operationsMap,
+                                operationsIdMap,
+                                resOpIdsMap);
+                for (int j = 0; j < primitives.getLength(); j++) {
+                    final Node primitiveNode = primitives.item(j);
+                    if (primitiveNode.getNodeName().equals("primitive")) {
+                        parsePrimitive(primitiveNode,
+                                       resList,
+                                       resourceTypeMap,
+                                       parametersMap,
+                                       parametersNvpairsIdsMap,
+                                       resourceInstanceAttrIdMap,
+                                       operationsMap,
+                                       operationsIdMap,
+                                       resOpIdsMap);
+                    }
+                }
+                if (resList.size() > 0) {
+                    cloneToResourceMap.put(cloneId, resList.get(0));
+                    if (primitiveGroupNode.getNodeName().equals("master")) {
+                        masterList.add(cloneId);
                     }
                 }
             }
@@ -1442,6 +1605,8 @@ public class HeartbeatXML extends XML {
         cibQueryData.setResOpIds(resOpIdsMap);
         cibQueryData.setActiveNodes(activeNodes);
         cibQueryData.setGroupsToResources(groupsToResourcesMap);
+        cibQueryData.setCloneToResource(cloneToResourceMap);
+        cibQueryData.setMasterList(masterList);
         cibQueryData.setFailed(failedMap);
         return cibQueryData;
     }

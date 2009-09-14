@@ -235,7 +235,7 @@ public class ClusterCommStack extends DialogCluster {
                                            500);
         chooseStackCombo.setEnabled(COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(HEARTBEAT_NAME, false);
-        chooseStackCombo.setBackground(Color.WHITE); // TODO: does not work
+        chooseStackCombo.setBackgroundColor(Color.WHITE);
         p1.add(chooseStackCombo);
         return p1;
     }

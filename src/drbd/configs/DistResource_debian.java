@@ -71,7 +71,7 @@ public class DistResource_debian extends
          + "/usr/bin/apt-get update && "
          + "/usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
          + "make && make install && "
-         + "/usr/sbin/update-rc.d drbd defaults 70 8 && "
+         //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         /* Drbd install method 3 */

@@ -304,6 +304,14 @@ public class DrbdXML extends XML {
     }
 
     /**
+     * Gets preferred value for the parameter.
+     */
+    public final String getParamPreferred(final String param) {
+        // TODO:
+        return null;
+    }
+
+    /**
      * Returns section in which this param is in.
      */
     public final String getSection(final String param) {

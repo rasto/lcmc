@@ -97,7 +97,7 @@ public class DistResource_debian_ETCH extends
          + "/usr/bin/apt-get update && "
          + "/usr/bin/apt-get -y install make gcc libc-dev flex linux-headers-`uname -r` && "
          + "make && make install && "
-         + "/usr/sbin/update-rc.d drbd defaults 70 8 && "
+         //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         /* disable drbd install method 3 */

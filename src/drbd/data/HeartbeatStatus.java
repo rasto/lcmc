@@ -151,6 +151,30 @@ public class HeartbeatStatus {
     }
 
     /**
+     * Returns all clone resources.
+     */
+    public final String[] getAllClones() {
+        final Map<String, String> cloneToResource =
+                                             cibQueryMap.getCloneToResource();
+        return cloneToResource.keySet().toArray(
+                                          new String[cloneToResource.size()]);
+    }
+
+    /**
+     * Returns whether clone is a master / slave resource.
+     */
+    public final boolean isMaster(final String pmId) {
+        return cibQueryMap.getMasterList().contains(pmId);
+    }
+
+    /**
+     * Returns resource belonging to the specified clone.
+     */
+    public final String getCloneResource(final String clone) {
+        return cibQueryMap.getCloneToResource().get(clone);
+    }
+
+    /**
      * Returns list of all resources.
      */
     public final String[] getAllResources() {
@@ -158,6 +182,20 @@ public class HeartbeatStatus {
                                                    cibQueryMap.getParameters();
         return parametersMap.keySet().toArray(
                                             new String[parametersMap.size()]);
+    }
+
+    /**
+     * Returns clone id.
+     */
+    public final String getResourceFromClone(final String cloneId) {
+        return cibQueryMap.getCloneToResource().get(cloneId);
+    }
+
+    /**
+     * Returns whether the id is of the clone set.
+     */
+    public final boolean isClone(final String cloneId) {
+        return cibQueryMap.getCloneToResource().containsKey(cloneId);
     }
 
     /**

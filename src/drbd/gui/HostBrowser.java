@@ -1136,7 +1136,6 @@ public class HostBrowser extends Browser {
         public BlockDevInfo(final String name, final BlockDevice blockDevice) {
             super(name);
             setResource(blockDevice);
-
             initApplyButton();
         }
 
@@ -1550,6 +1549,10 @@ public class HostBrowser extends Browser {
             return getBlockDevice().getDefaultValue(param);
         }
 
+        protected final String getParamPreferred(final String param) {
+            return getBlockDevice().getPreferredValue(param);
+        }
+
         protected final boolean checkParamCache(final String param) {
             if (paramCorrectValueMap.get(param) == null) {
                 return false;
@@ -1758,12 +1761,6 @@ public class HostBrowser extends Browser {
                                                       BoxLayout.Y_AXIS));
             extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            if (getBlockDevice().isDrbd()) {
-                /* expert mode */
-                buttonPanel.add(Tools.expertModeButton(extraOptionsPanel),
-                                BorderLayout.WEST);
-            }
-
             /* Actions */
             final JMenuBar mb = new JMenuBar();
             mb.setBackground(PANEL_BACKGROUND);
@@ -1784,11 +1781,15 @@ public class HostBrowser extends Browser {
 
 
                 /* apply button */
-                addApplyButton(mainPanel);
+                addApplyButton(buttonPanel);
 
                 applyButton.setEnabled(
                     checkResourceFields(null, params)
                 );
+
+                /* expert mode */
+                buttonPanel.add(Tools.expertModeButton(extraOptionsPanel),
+                                BorderLayout.WEST);
 
                 applyButton.addActionListener(
                     new ActionListener() {

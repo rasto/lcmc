@@ -165,8 +165,10 @@ public class DistResource extends
          "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/lib/ocf;"
          + "for prov in `ls -1 /usr/lib/ocf/resource.d/`; do "
          +  "for s in `ls -1 /usr/lib/ocf/resource.d/$prov/ `; do "
-         +  "/usr/lib/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
+         +  "echo -n 'provider:'; echo $prov;"
+         +   "/usr/lib/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
          + "done;"
+         + "echo 'provider:heartbeat';"
          + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
         /* vmxpath env is needed so that vmware meta-data does not hang */

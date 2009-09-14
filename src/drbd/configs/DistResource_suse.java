@@ -84,7 +84,7 @@ public class DistResource_suse extends
          + "|sed s/-[a-z].*//;` && "
          + "/usr/bin/zypper -n in flex gcc && "
          + "make && make install && "
-         + "/sbin/chkconfig --add drbd && "
+         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",

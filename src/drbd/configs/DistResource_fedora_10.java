@@ -98,7 +98,7 @@ public class DistResource_fedora_10 extends
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
          + "make && make install && "
-         + "/sbin/chkconfig --add drbd && "
+         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 }

@@ -66,7 +66,7 @@ public class DistResource_redhat extends
              + "|tr 5 -`-devel-`uname -r|sed 's/\\(PAE\\|xen\\|debug\\)$//'` &&"
          + "/usr/bin/yum -y install flex gcc && "
          + "make && make install && "
-         + "/sbin/chkconfig --add drbd && "
+         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         /* Drbd install method 3 */

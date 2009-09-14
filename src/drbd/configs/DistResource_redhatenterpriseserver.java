@@ -68,7 +68,7 @@ public class DistResource_redhatenterpriseserver extends
           + "|tr 5 -`-devel-`uname -r|sed 's/\\(PAE\\|xen\\|debug\\)$//'` && "
          + "/usr/bin/yum -y install glibc flex gcc && "
          + "make && make install && "
-         + "/sbin/chkconfig --add drbd && "
+         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",

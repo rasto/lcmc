@@ -103,7 +103,7 @@ public class DistResource_ubuntu_HARDY extends
          + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
            + "/lib/modules/`uname -r`/ubuntu/block/drbd/drbd.ko && "
          + "make && make install && "
-         + "/usr/sbin/update-rc.d drbd defaults 70 8 && "
+         //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"DrbdInst.install.method.2",
