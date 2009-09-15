@@ -401,7 +401,8 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
                                         null,
                                         GuiComboBox.Type.COMBOBOX,
                                         null,
-                                        0);
+                                        0,
+                                        null);
 
         drbdDistCombo.setEnabled(false);
         pane.add(drbdDistCombo);
@@ -409,7 +410,8 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
                                              null,
                                              GuiComboBox.Type.COMBOBOX,
                                              null,
-                                             0);
+                                             0,
+                                             null);
 
         drbdKernelDirCombo.setEnabled(false);
         pane.add(drbdKernelDirCombo);
@@ -417,7 +419,8 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
                                         null,
                                         GuiComboBox.Type.COMBOBOX,
                                         null,
-                                        0);
+                                        0,
+                                        null);
 
         drbdArchCombo.setEnabled(false);
         pane.add(drbdArchCombo);

@@ -694,6 +694,20 @@ public class Browser {
         protected final void registerMenuItem(final UpdatableItem m) {
             menuList.add(m);
         }
+
+        /**
+         * Returns units.
+         */
+        protected Unit[] getUnits() {
+            return new Unit[]{
+               new Unit("", "", "", ""),
+               new Unit("msec", "ms", "Millisecond", "Milliseconds"),
+               new Unit("usec", "us", "Microsecond", "Microseconds"),
+               new Unit("sec",  "s",  "Second",      "Seconds"),
+               new Unit("min",  "m",  "Minute",      "Minutes"),
+               new Unit("hr",   "h",  "Hour",        "Hours")
+           };
+        }
     }
 
     /**
@@ -1154,31 +1168,29 @@ public class Browser {
                 initValue = value;
             }
             String regexp = null;
+            Map<String, String> abbreviations = new HashMap<String, String>();
             if (isInteger(param)) {
-                regexp = "^-?\\d*$";
+                regexp = "^-?(\\d*|INFINITY)$";
+                abbreviations = new HashMap<String, String>();
+                abbreviations.put("i", "INFINITY");
+                abbreviations.put("I", "INFINITY");
             }
-
             GuiComboBox.Type type = null;
             Unit[] units = null;
             if (isCheckBox(param)) {
                 type = GuiComboBox.Type.CHECKBOX;
             } else if (isTimeType(param)) {
                 type = GuiComboBox.Type.TEXTFIELDWITHUNIT;
-                units = new Unit[] {
-                    new Unit("", "", "", ""),
-                    new Unit("msec", "ms", "Millisecond", "Milliseconds"),
-                    new Unit("usec", "us", "Microsecond", "Microseconds"),
-                    new Unit("sec",  "s",  "Second",      "Seconds"),
-                    new Unit("min",  "m",  "Minute",      "Minutes"),
-                    new Unit("hr",   "h",  "Hour",        "Hours"),
-                };
+                units = getUnits();
             }
-            final GuiComboBox paramCb = new GuiComboBox(initValue,
-                                                  getPossibleChoices(param),
-                                                  units,
-                                                  type,
-                                                  regexp,
-                                                  width);
+            final GuiComboBox paramCb = new GuiComboBox(
+                                                     initValue,
+                                                     getPossibleChoices(param),
+                                                     units,
+                                                     type,
+                                                     regexp,
+                                                     width,
+                                                     abbreviations);
             paramComboBoxAdd(param, prefix, paramCb);
             paramCb.setEditable(true);
             paramCb.setToolTipText(getToolTipText(param,
@@ -1367,8 +1379,6 @@ public class Browser {
                     } else {
                         correctValue = correctValue
                                        && checkParamCache(otherParam);
-                        System.out.println("correct: " + otherParam + "cv: "
-                                           + correctValue);
                     }
                 }
             }
@@ -1407,9 +1417,6 @@ public class Browser {
                         oldValue = "";
                     }
                     if (!oldValue.equals(newValue)) {
-                        System.out.println("param changed: "
-                                           + param + " - "
-                                           + oldValue + " != " + newValue);
                         changedValue = true;
                     }
                 }

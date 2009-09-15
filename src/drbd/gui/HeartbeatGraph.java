@@ -28,7 +28,6 @@ import drbd.gui.ClusterBrowser.ServiceInfo;
 import drbd.gui.Browser.Info;
 import drbd.gui.ClusterBrowser.ServicesInfo;
 import drbd.gui.ClusterBrowser.GroupInfo;
-import drbd.gui.ClusterBrowser.HostScoreInfo;
 import drbd.gui.ClusterBrowser.HbConnectionInfo;
 import drbd.gui.HostBrowser.HostInfo;
 
@@ -207,15 +206,15 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     private void setHomeNodeInAncestors(
                          final ServiceInfo si,
-                         final Map<HostInfo, HostScoreInfo> hostScoreInfos) {
-        si.setSavedHostScoreInfos(hostScoreInfos);
+                         final Map<HostInfo, String> hostScores) {
+        si.setSavedHostScores(hostScores);
         final Vertex v = getVertex(si);
         if (v != null) {
             for (final Object pV : v.getPredecessors()) {
                 final ServiceInfo pre =
                                     (ServiceInfo) getInfo((Vertex) pV);
-                pre.setSavedHostScoreInfos(hostScoreInfos);
-                setHomeNodeInAncestors(pre, hostScoreInfos);
+                pre.setSavedHostScores(hostScores);
+                setHomeNodeInAncestors(pre, hostScores);
             }
         }
     }
@@ -302,13 +301,13 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     private void setHomeNodeInDescendants(
                           final ServiceInfo si,
-                          final Map<HostInfo, HostScoreInfo> hostScoreInfos) {
+                          final Map<HostInfo, String> hostScores) {
         final Vertex v = getVertex(si);
         if (v != null) {
             for (Object pV : v.getSuccessors()) {
                 final ServiceInfo pre = (ServiceInfo) getInfo((Vertex) pV);
-                pre.setSavedHostScoreInfos(hostScoreInfos);
-                setHomeNodeInDescendants(pre, hostScoreInfos);
+                pre.setSavedHostScores(hostScores);
+                setHomeNodeInDescendants(pre, hostScores);
             }
         }
     }
@@ -319,10 +318,10 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void setHomeNode(
                           final ServiceInfo si,
-                          final Map<HostInfo, HostScoreInfo> hostScoreInfos) {
-        si.setSavedHostScoreInfos(hostScoreInfos);
-        setHomeNodeInDescendants(si, hostScoreInfos);
-        setHomeNodeInAncestors(si, hostScoreInfos);
+                          final Map<HostInfo, String> hostScores) {
+        si.setSavedHostScores(hostScores);
+        setHomeNodeInDescendants(si, hostScores);
+        setHomeNodeInAncestors(si, hostScores);
     }
 
     /**
@@ -380,7 +379,7 @@ public class HeartbeatGraph extends ResourceGraph {
             addColocation(parent, serviceInfo);
             addOrder(parent, serviceInfo);
             /* set host score as in parent */
-            setHomeNode(parent, parent.getSavedHostScoreInfos());
+            setHomeNode(parent, parent.getSavedHostScores());
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

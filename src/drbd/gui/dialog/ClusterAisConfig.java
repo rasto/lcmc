@@ -802,11 +802,17 @@ public class ClusterAisConfig extends DialogCluster {
                                  types,
                                  null,
                                  null,
-                                 TYPE_COMBOBOX_WIDTH);
+                                 TYPE_COMBOBOX_WIDTH,
+                                 null);
         typeCB.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        ifaceCB = new GuiComboBox(null, ni, null, null, INTF_COMBOBOX_WIDTH);
+        ifaceCB = new GuiComboBox(null,
+                                  ni,
+                                  null,
+                                  null,
+                                  INTF_COMBOBOX_WIDTH,
+                                  null);
 
         /* this matches something like this: 225.0.0.43 694 1 0
          * if you think that the regexp is too complicated for that, consider,
@@ -818,7 +824,8 @@ public class ClusterAisConfig extends DialogCluster {
                 null,
                 null,
                 regexp,
-                ADDR_COMBOBOX_WIDTH);
+                ADDR_COMBOBOX_WIDTH,
+                null);
 
         final ItemListener typeL = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
@@ -872,7 +879,8 @@ public class ClusterAisConfig extends DialogCluster {
                 null,
                 null,
                 portRegexp,
-                PORT_COMBOBOX_WIDTH);
+                PORT_COMBOBOX_WIDTH,
+                null);
         portCB.addListeners(portL, null);
 
         final DocumentListener addrL = new DocumentListener() {

@@ -25,6 +25,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.swing.text.DefaultStyledDocument;
 
@@ -41,6 +43,9 @@ public class PatternDocument extends DefaultStyledDocument {
     private static final long serialVersionUID = 1L;
     /** Pattern object that the document should match. */
     private final Pattern pattern;
+    /** Abbreviations, from one character to the string, e.g. when user presses
+     * i, the word infinity will be written. */
+    private final Map<String, String> abbreviations;
 
     /**
      * Prepares a new <code>PatternDocument</code> object.
@@ -51,18 +56,33 @@ public class PatternDocument extends DefaultStyledDocument {
     public PatternDocument(final String regexp) {
         super();
         pattern = Pattern.compile(regexp);
+        abbreviations = null;
     }
+
+    /**
+     * Prepares a new <code>PatternDocument</code> object.
+     */
+    public PatternDocument(final String regexp,
+                           final Map<String, String> abbreviations) {
+        super();
+        pattern = Pattern.compile(regexp);
+        this.abbreviations = abbreviations;
+    }
+
 
     /**
      * Inserts the string if the resulting string matches the pattern.
      */
     public final void insertString(final int offs,
-                                   final String s,
+                                   String s,
                                    final AttributeSet a)
     throws BadLocationException {
         try {
             final String text = getText(0, getLength());
             String texta;
+            if (abbreviations != null && abbreviations.containsKey(s)) {
+                s = abbreviations.get(s);
+            }
             if (text.length() > 0) {
                 texta = ((offs >= 0) ? text.substring(0, offs) : "")
                         + s

@@ -754,10 +754,16 @@ public class ClusterHbConfig extends DialogCluster {
                                  types,
                                  null,
                                  null,
-                                 TYPE_COMBOBOX_WIDTH);
+                                 TYPE_COMBOBOX_WIDTH,
+                                 null);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        ifaceCB = new GuiComboBox(null, ni, null, null, INTF_COMBOBOX_WIDTH);
+        ifaceCB = new GuiComboBox(null,
+                                  ni,
+                                  null,
+                                  null,
+                                  INTF_COMBOBOX_WIDTH,
+                                  null);
 
         /* ucast links */
         final List<UcastLink> ulList = new ArrayList<UcastLink>();
@@ -774,12 +780,14 @@ public class ClusterHbConfig extends DialogCluster {
                                        ucastLinks,
                                        null,
                                        null,
-                                       LINK_COMBOBOX_WIDTH);
+                                       LINK_COMBOBOX_WIDTH,
+                                       null);
         ucastLink2CB = new GuiComboBox(null,
                                        ucastLinks,
                                        null,
                                        null,
-                                       LINK_COMBOBOX_WIDTH);
+                                       LINK_COMBOBOX_WIDTH,
+                                       null);
 
         /* serial links */
         final String[] serialDevs = {"/dev/ttyS0",
@@ -791,7 +799,8 @@ public class ClusterHbConfig extends DialogCluster {
                                    serialDevs,
                                    null,
                                    null,
-                                   LINK_COMBOBOX_WIDTH);
+                                   LINK_COMBOBOX_WIDTH,
+                                   null);
 
         /* this matches something like this: 225.0.0.43 694 1 0
          * if you think that the regexp is too complicated for that, consider,
@@ -801,7 +810,7 @@ public class ClusterHbConfig extends DialogCluster {
                               + "(\\d\\.\\d{0,3})( \\d{0,3}(\\d \\d{0,3}"
                               + "(\\d \\d{0,3})?)?)?)?)?$";
         addrCB = new GuiComboBox("239.192.0.0 694 1 0",
-                                 null, null, regexp, ADDR_COMBOBOX_WIDTH);
+                                 null, null, regexp, ADDR_COMBOBOX_WIDTH, null);
 
         final ItemListener typeL = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {

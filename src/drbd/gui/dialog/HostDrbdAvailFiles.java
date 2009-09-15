@@ -254,7 +254,8 @@ public class HostDrbdAvailFiles extends DialogHost {
                                            null,
                                            GuiComboBox.Type.COMBOBOX,
                                            null,
-                                           0);
+                                           0,
+                                           null);
         //drbdVersionCombo.setEnabled(false);
         pane.add(drbdVersionCombo);
 
@@ -263,7 +264,8 @@ public class HostDrbdAvailFiles extends DialogHost {
                                          null,
                                          GuiComboBox.Type.COMBOBOX,
                                          null,
-                                         0);
+                                         0,
+                                         null);
 
         //drbdBuildCombo.setEnabled(false);
         pane.add(drbdBuildCombo);

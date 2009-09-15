@@ -232,7 +232,8 @@ public class ClusterCommStack extends DialogCluster {
                                            null,
                                            GuiComboBox.Type.RADIOGROUP,
                                            null,
-                                           500);
+                                           500,
+                                           null);
         chooseStackCombo.setEnabled(COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);

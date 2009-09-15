@@ -220,7 +220,7 @@ public class HostNewHost extends DialogHost {
         inputPane.add(hostLabel);
         final String regexp = "^[,\\w.-]+$";
         hostField = new GuiComboBox(getHost().getHostnameEntered(),
-                                    null, null, regexp, FIELD_WIDTH);
+                                    null, null, regexp, FIELD_WIDTH, null);
 
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField);
@@ -236,7 +236,8 @@ public class HostNewHost extends DialogHost {
                                         null,
                                         null,
                                         "^\\d+$",
-                                        50);
+                                        50,
+                                        null);
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField);
         inputPane.add(sshPortField);
@@ -249,7 +250,7 @@ public class HostNewHost extends DialogHost {
 
         inputPane.add(usernameLabel);
         usernameField = new GuiComboBox(getHost().getUsername(),
-                                        null, null, regexp, FIELD_WIDTH);
+                                        null, null, regexp, FIELD_WIDTH, null);
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField);
         inputPane.add(usernameField);

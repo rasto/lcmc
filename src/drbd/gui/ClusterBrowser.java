@@ -126,8 +126,6 @@ public class ClusterBrowser extends Browser {
     private DefaultMutableTreeNode availableServicesNode;
     /** Menu's heartbeat services node. */
     private DefaultMutableTreeNode servicesNode;
-    /** Menu's heartbeat scores node. */
-    private DefaultMutableTreeNode scoresNode;
     /** Menu's drbd node. */
     private DefaultMutableTreeNode drbdNode;
     /** Common file systems on all cluster nodes. */
@@ -147,9 +145,9 @@ public class ClusterBrowser extends Browser {
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo =
                                           new HashMap<String, ServiceInfo>();
-    /** Score to its info panel hash. */
-    private final Map<String, HostScoreInfo> hostScoreInfoMap =
-                                        new HashMap<String, HostScoreInfo>();
+    ///** Score to its info panel hash. */
+    //private final Map<String, String> hostScoresMap =
+    //                                            new HashMap<String, String>();
 
     /** List of heartbeat ids of all services. */
     private final List<String> heartbeatIdList = new ArrayList<String>();
@@ -536,27 +534,6 @@ public class ClusterBrowser extends Browser {
                 Tools.getString("ClusterBrowser.CommonBlockDevices")));
         setNode(commonBlockDevicesNode);
         /* heartbeatNode.add(commonBlockDevicesNode); */
-
-        /* scores TODO: make the scores editable? */
-        scoresNode = new DefaultMutableTreeNode(
-            new HbCategoryInfo(Tools.getString("ClusterBrowser.Scores")));
-        setNode(scoresNode);
-        /* heartbeatNode.add(scoresNode); */
-
-        /* scores */
-        final String[] scores = {"100",
-                           "INFINITY",
-                           "-INFINITY",
-                           "-100",
-                           "0"};
-        for (String score : scores) {
-            final HostScoreInfo hsi = new HostScoreInfo(score);
-            final DefaultMutableTreeNode hostScoreNode =
-                                            new DefaultMutableTreeNode(hsi);
-            hostScoreInfoMap.put(hsi.getName(), hsi);
-            setNode(hostScoreNode);
-            scoresNode.add(hostScoreNode);
-        }
 
         /* services */
         final ServicesInfo servicesInfo =
@@ -1396,7 +1373,8 @@ public class ClusterBrowser extends Browser {
         if (id == null) {
             if (PM_GROUP_NAME.equals(si.getName())) {
                 id = "grp_";
-            } else if (PM_CLONE_SET_NAME.equals(si.getName())) {
+            } else if (PM_CLONE_SET_NAME.equals(si.getName())
+                       || PM_MASTER_SLAVE_SET_NAME.equals(si.getName())) {
                 if (si.getService().isMaster()) {
                     id = "ms_";
                 } else {
@@ -1523,41 +1501,41 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * This class holds info data for a preferred host score.
-     * Nothing is displayed.
-     */
-    class HostScoreInfo extends HbCategoryInfo {
-        /** Heartbeat score to keep a service on a host. It can be number,
-         * INFINITY or -INFINITY.
-         */
-        private final String score;
+    ///**
+    // * This class holds info data for a preferred host score.
+    // * Nothing is displayed.
+    // */
+    //class HostScoreInfo extends HbCategoryInfo {
+    //    /** Heartbeat score to keep a service on a host. It can be number,
+    //     * INFINITY or -INFINITY.
+    //     */
+    //    private final String score;
 
-        /**
-         * Prepares a new <code>ScoreInfo</code> object.
-         *
-         * @param score
-         *      host score, it is either number, INFINITY or -INFINITY
-         */
-        HostScoreInfo(final String score) {
-            super(Tools.scoreToString(score));
-            this.score = score;
-        }
+    //    /**
+    //     * Prepares a new <code>ScoreInfo</code> object.
+    //     *
+    //     * @param score
+    //     *      host score, it is either number, INFINITY or -INFINITY
+    //     */
+    //    HostScoreInfo(final String score) {
+    //        super(Tools.scoreToString(score));
+    //        this.score = score;
+    //    }
 
-        /**
-         * Returns text about host score info.
-         */
-        public String getInfo() {
-            return null;
-        }
+    //    /**
+    //     * Returns text about host score info.
+    //     */
+    //    public String getInfo() {
+    //        return null;
+    //    }
 
-        /**
-         * Returns score as string.
-         */
-        public String getScore() {
-            return score;
-        }
-    }
+    //    /**
+    //     * Returns score as string.
+    //     */
+    //    public String getScore() {
+    //        return score;
+    //    }
+    //}
 
     /**
      * This class holds info data for a network.
@@ -2056,7 +2034,12 @@ public class ClusterBrowser extends Browser {
                 } else {
                     resName = getResource().getName();
                 }
-                paramCb = new GuiComboBox(resName, null, null, null, width);
+                paramCb = new GuiComboBox(resName,
+                                          null,
+                                          null,
+                                          null,
+                                          width,
+                                          null);
                 paramCb.setEnabled(!getDrbdResource().isCommited());
                 paramComboBoxAdd(param, prefix, paramCb);
             } else if (DRBD_RES_PARAM_DEV.equals(param)) {
@@ -2081,7 +2064,8 @@ public class ClusterBrowser extends Browser {
                                                 new String[drbdDevices.size()]),
                                               null,
                                               null,
-                                              width);
+                                              width,
+                                              null);
                     paramCb.setEditable(true);
                 } else {
                     final String defaultItem = getDevice();
@@ -2094,7 +2078,8 @@ public class ClusterBrowser extends Browser {
                                         getResource().getPossibleChoices(param),
                                         null,
                                         regexp,
-                                        width);
+                                        width,
+                                        null);
                 }
                 paramCb.setEnabled(!getDrbdResource().isCommited());
                 paramComboBoxAdd(param, prefix, paramCb);
@@ -2133,7 +2118,8 @@ public class ClusterBrowser extends Browser {
                                           l.toArray(new Object[l.size()]),
                                           null,
                                           null,
-                                          width);
+                                          width,
+                                          null);
 
                 paramComboBoxAdd(param, prefix, paramCb);
             } else if (hasUnitPrefix(param)) {
@@ -2188,7 +2174,8 @@ public class ClusterBrowser extends Browser {
                                           units,
                                           GuiComboBox.Type.TEXTFIELDWITHUNIT,
                                           regexp,
-                                          width);
+                                          width,
+                                          null);
 
                 paramComboBoxAdd(param, prefix, paramCb);
             } else {
@@ -2982,7 +2969,8 @@ public class ClusterBrowser extends Browser {
                                           networks,
                                           GuiComboBox.Type.COMBOBOX,
                                           regexp,
-                                          width);
+                                          width,
+                                          null);
 
                 paramCb.setAlwaysEditable(true);
                 paramComboBoxAdd(param, prefix, paramCb);
@@ -3150,7 +3138,8 @@ public class ClusterBrowser extends Browser {
                                           commonBlockDevInfos,
                                           null,
                                           null,
-                                          width);
+                                          width,
+                                          null);
                 blockDeviceParamCb = paramCb;
 
                 paramCb.addListeners(
@@ -3192,7 +3181,8 @@ public class ClusterBrowser extends Browser {
                                           getCommonFileSystems(defaultValue),
                                           null,
                                           null,
-                                          width);
+                                          width,
+                                          null);
                 fstypeParamCb = paramCb;
 
                 paramComboBoxAdd(param, prefix, paramCb);
@@ -3218,7 +3208,8 @@ public class ClusterBrowser extends Browser {
                                           items,
                                           null,
                                           regexp,
-                                          width);
+                                          width,
+                                          null);
                 paramComboBoxAdd(param, prefix, paramCb);
                 paramCb.setAlwaysEditable(true);
             } else {
@@ -3783,8 +3774,8 @@ public class ClusterBrowser extends Browser {
         private final Map<HostInfo, GuiComboBox> scoreComboBoxHash =
                                     new HashMap<HostInfo, GuiComboBox>();
         /** A map from host to stored score. */
-        private Map<HostInfo, HostScoreInfo> savedHostScoreInfos =
-                                    new HashMap<HostInfo, HostScoreInfo>();
+        private Map<HostInfo, String> savedHostScores =
+                                               new HashMap<HostInfo, String>();
         /** A map from operation to the stored value. First key is
          * operation name like "start" and second key is parameter like
          * "timeout". */
@@ -3937,7 +3928,8 @@ public class ClusterBrowser extends Browser {
                     } else {
                         ret = true;
                     }
-                } else if (PM_CLONE_SET_NAME.equals(getName())) {
+                } else if (PM_CLONE_SET_NAME.equals(getName())
+                           || PM_MASTER_SLAVE_SET_NAME.equals(getName())) {
                     String prefix;
                     if (getService().isMaster()) {
                         prefix = "ms_";
@@ -4002,7 +3994,6 @@ public class ClusterBrowser extends Browser {
             if (params != null) {
                 for (String param : params) {
                     String value = resourceNode.get(param);
-                    System.out.println("sp: " + param + " = " + value);
                     if (value == null) {
                         value = getParamDefault(param);
                     }
@@ -4010,10 +4001,6 @@ public class ClusterBrowser extends Browser {
                         value = "";
                     }
                     if (!value.equals(getResource().getValue(param))) {
-                        System.out.println("set param: "
-                                           + param + " - "
-                                           + value + " != "
-                                           + getResource().getValue(param));
                         getResource().setValue(param, value);
                         if (infoPanel != null) {
                             final GuiComboBox cb = paramComboBoxGet(param,
@@ -4035,14 +4022,14 @@ public class ClusterBrowser extends Browser {
                 if (score == null) {
                     score = "0";
                 }
-                final String scoreString = Tools.scoreToString(score);
-                if (!hostScoreInfoMap.get(scoreString).equals(savedHostScoreInfos.get(hi))) {
+                //final String scoreString = Tools.scoreToString(score);
+                //if (!hostScoreInfoMap.get(scoreString).equals(savedHostScoreInfos.get(hi))) {
                     final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                    savedHostScoreInfos.put(hi, hostScoreInfoMap.get(scoreString));
+                    //savedHostScoreInfos.put(hi, hostScoreInfoMap.get(scoreString));
                     if (cb != null) {
-                        cb.setValue(scoreString);
+                        cb.setValue(score);
                     }
-                }
+                //}
             }
 
             /* operations */
@@ -4065,13 +4052,11 @@ public class ClusterBrowser extends Browser {
                     if (!value.equals(savedOperation.get(op, param))) {
                         savedOperation.put(op, param, value);
                         if (cb != null && value != null) {
-                            System.out.println(op + ": set value: " + value);
                             cb.setValue(value);
                         }
                     }
                 }
             }
-
             getService().setAvailable();
         }
 
@@ -4268,19 +4253,17 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Saves the host score infos.
-         * TODO: check it.
+         * Saves the host scores.
          */
-        public void setSavedHostScoreInfos(
-                                    final Map<HostInfo, HostScoreInfo> hsi) {
-            savedHostScoreInfos = hsi;
+        public void setSavedHostScores(final Map<HostInfo, String> hs) {
+            savedHostScores = hs;
         }
 
         /**
-         * Gets saved host score infos.
+         * Gets saved host scores.
          */
-        public Map<HostInfo, HostScoreInfo> getSavedHostScoreInfos() {
-            return savedHostScoreInfos;
+        public Map<HostInfo, String> getSavedHostScores() {
+            return savedHostScores;
         }
 
 
@@ -4329,18 +4312,17 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Stores score infos for host.
+         * Stores scores for host.
          */
-        private void storeHostScoreInfos() {
-            savedHostScoreInfos.clear();
+        private void storeHostScores() {
+            savedHostScores.clear();
             for (final Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                final HostScoreInfo hsi = (HostScoreInfo) cb.getValue();
-                savedHostScoreInfos.put(hi, hsi);
+                savedHostScores.put(hi, cb.getStringValue());
             }
             // TODO: rename this
-            heartbeatGraph.setHomeNode(this, savedHostScoreInfos);
+            heartbeatGraph.setHomeNode(this, savedHostScores);
         }
 
         /**
@@ -4381,14 +4363,14 @@ public class ClusterBrowser extends Browser {
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                final HostScoreInfo hsiSaved = savedHostScoreInfos.get(hi);
+                final String hsSaved = savedHostScores.get(hi);
                 if (cb == null) {
                     return false;
                 }
-                final HostScoreInfo hsi = (HostScoreInfo) cb.getValue();
-                if (hsiSaved == null && !hsi.getScore().equals("0")) {
+                final String hs = cb.getStringValue();
+                if (hsSaved == null && !"0".equals(hs)) {
                     return true;
-                } else if (hsiSaved != null && !hsi.equals(hsiSaved)) {
+                } else if (hsSaved != null && !hs.equals(hsSaved)) {
                     return true;
                 }
             }
@@ -4471,7 +4453,7 @@ public class ClusterBrowser extends Browser {
         public final GuiComboBox createIdField(final int rightWidth) {
             final String id = getService().getId();
             final String regexp = "^[\\w-]+$";
-            idField = new GuiComboBox(id, null, null, regexp, rightWidth);
+            idField = new GuiComboBox(id, null, null, regexp, rightWidth, null);
             idField.setValue(id);
             final String[] params = getParametersFromXML();
             idField.getDocument().addDocumentListener(
@@ -4543,8 +4525,6 @@ public class ClusterBrowser extends Browser {
                                             final JPanel extraOptionsPanel,
                                             final int leftWidth,
                                             final int rightWidth) {
-            System.out.println("add fields master: "
-                               + cloneInfo.getService().isMaster());
             String title = "Clone Set";
             if (cloneInfo.getService().isMaster()) {
                 title = "Master/Slave Set";
@@ -4685,30 +4665,34 @@ public class ClusterBrowser extends Browser {
             scoreComboBoxHash.clear();
 
             final JPanel panel =
-                    getParamPanel(Tools.getString("ClusterBrowser.HostScores"));
+                   getParamPanel(Tools.getString("ClusterBrowser.HostScores"));
 
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
-                final Info[] scores = enumToInfoArray(null,
-                                                      getName(),
-                                                      scoresNode.children());
-                int defaultScore = scores.length - 1; // score )
-
+                final Map<String, String> abbreviations =
+                                                 new HashMap<String, String>();
+                abbreviations.put("i", "INFINITY");
+                abbreviations.put("I", "INFINITY");
                 final GuiComboBox cb =
-                            new GuiComboBox(scores[defaultScore].toString(),
-                                            scores,
-                                            GuiComboBox.Type.COMBOBOX,
-                                            null,
-                                            rightWidth);
-
-                defaultScore = 0; // score -infinity
+                                    new GuiComboBox("0", //TODO: none?
+                                                    new String[]{"0",
+                                                                 "2",
+                                                                 "100",
+                                                                 "INFINITY",
+                                                                 "-INFINITY"},
+                                                    null,
+                                                    null,
+                                                    "^-?(\\d*|INFINITY)$",
+                                                    rightWidth,
+                                                    abbreviations);
+                cb.setEditable(true);
                 scoreComboBoxHash.put(hi, cb);
 
                 /* set selected host scores in the combo box from
-                 * savedHostScoreInfos */
-                final HostScoreInfo hsiSaved = savedHostScoreInfos.get(hi);
-                if (hsiSaved != null) {
-                    cb.setValue(hsiSaved);
+                 * savedHostScores */
+                final String hsSaved = savedHostScores.get(hi);
+                if (hsSaved != null) {
+                    cb.setValue(hsSaved);
                 }
             }
 
@@ -4756,36 +4740,19 @@ public class ClusterBrowser extends Browser {
                         continue;
                     }
                     GuiComboBox.Type type;
-                    Unit[] units = null;
                     final String regexp = "^-?\\d*$";
                     type = GuiComboBox.Type.TEXTFIELDWITHUNIT;
-                    // TODO: having this on two places
-                    units = new Unit[] {
-                        new Unit("", "", "", ""),
-                        new Unit("ms",
-                                 "ms",
-                                 "Millisecond",
-                                 "Milliseconds"),
-                        new Unit("us",
-                                 "us",
-                                 "Microsecond",
-                                 "Microseconds"),
-                        new Unit("s",  "s",  "Second",      "Seconds"),
-                        new Unit("m",  "m",  "Minute",      "Minutes"),
-                        new Unit("h",   "h",  "Hour",        "Hours"),
-                    };
-                    System.out.println(op + " " + param + " dv: "
-                                       + defaultValue);
                     // TODO: old style resources
                     if (defaultValue == null) {
                         defaultValue = "0";
                     }
                     final GuiComboBox cb = new GuiComboBox(defaultValue,
                                                            null,
-                                                           units,
+                                                           getUnits(),
                                                            type,
                                                            regexp,
-                                                           rightWidth);
+                                                           rightWidth,
+                                                           null);
 
                     operationsComboBoxHash.put(op, param, cb);
                     final String savedValue =
@@ -5066,7 +5033,8 @@ public class ClusterBrowser extends Browser {
                                                  GuiComboBox.Type.RADIOGROUP,
                                                  null,
                                                  SERVICE_LABEL_WIDTH
-                                                 + SERVICE_FIELD_WIDTH);
+                                                 + SERVICE_FIELD_WIDTH,
+                                                 null);
                 typeRadioGroup.setBackgroundColor(PANEL_BACKGROUND);
 
                 if (!getService().isNew()) {
@@ -5128,67 +5096,6 @@ public class ClusterBrowser extends Browser {
                               extraOptionsPanel,
                               SERVICE_LABEL_WIDTH,
                               SERVICE_FIELD_WIDTH);
-                /* add item listeners to the host scores combos */
-                if (cloneInfo == null) {
-                    for (Host host : getClusterHosts()) {
-                        final HostInfo hi = host.getBrowser().getHostInfo();
-                        final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                        cb.addListeners(
-                            new ItemListener() {
-                                public void itemStateChanged(final ItemEvent e) {
-                                    if (cb.isCheckBox()
-                                        || e.getStateChange() == ItemEvent.SELECTED) {
-                                        final Thread thread = new Thread(new Runnable() {
-                                            public void run() {
-                                                final boolean enable =
-                                                          checkResourceFields("cached",
-                                                                              params);
-                                                SwingUtilities.invokeLater(
-                                                new Runnable() {
-                                                    public void run() {
-                                                        applyButton.setEnabled(enable);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        thread.start();
-                                    }
-                                }
-                            },
-
-                            new DocumentListener() {
-                                private void check() {
-                                    Thread thread = new Thread(new Runnable() {
-                                        public void run() {
-                                            final boolean enable =
-                                                checkResourceFields("cached", params);
-                                            SwingUtilities.invokeLater(
-                                            new Runnable() {
-                                                public void run() {
-                                                    applyButton.setEnabled(enable);
-                                                }
-                                            });
-                                        }
-                                    });
-                                    thread.start();
-                                }
-
-                                public void insertUpdate(final DocumentEvent e) {
-                                    check();
-                                }
-
-                                public void removeUpdate(final DocumentEvent e) {
-                                    check();
-                                }
-
-                                public void changedUpdate(final DocumentEvent e) {
-                                    check();
-                                }
-                            }
-                        );
-                    }
-                }
-
                 /* add item listeners to the operations combos */
                 for (final String op : HB_OPERATIONS) {
                     for (final String param : HB_OPERATION_PARAMS.get(op)) {
@@ -5255,7 +5162,68 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
+            if (!getHeartbeatService().isGroup()) {
+                /* add item listeners to the host scores combos */
+                if (cloneInfo == null) {
+                    for (Host host : getClusterHosts()) {
+                        final HostInfo hi = host.getBrowser().getHostInfo();
+                        final GuiComboBox cb = scoreComboBoxHash.get(hi);
+                        cb.addListeners(
+                            new ItemListener() {
+                                public void itemStateChanged(final ItemEvent e) {
+                                    if (cb.isCheckBox()
+                                        || e.getStateChange() == ItemEvent.SELECTED) {
+                                        final Thread thread = new Thread(new Runnable() {
+                                            public void run() {
+                                                final boolean enable =
+                                                          checkResourceFields("cached",
+                                                                              params);
+                                                SwingUtilities.invokeLater(
+                                                new Runnable() {
+                                                    public void run() {
+                                                        applyButton.setEnabled(enable);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        thread.start();
+                                    }
+                                }
+                            },
 
+                            new DocumentListener() {
+                                private void check() {
+                                    Thread thread = new Thread(new Runnable() {
+                                        public void run() {
+                                            final boolean enable =
+                                                checkResourceFields("cached", params);
+                                            SwingUtilities.invokeLater(
+                                            new Runnable() {
+                                                public void run() {
+                                                    applyButton.setEnabled(enable);
+                                                }
+                                            });
+                                        }
+                                    });
+                                    thread.start();
+                                }
+
+                                public void insertUpdate(final DocumentEvent e) {
+                                    check();
+                                }
+
+                                public void removeUpdate(final DocumentEvent e) {
+                                    check();
+                                }
+
+                                public void changedUpdate(final DocumentEvent e) {
+                                    check();
+                                }
+                            }
+                        );
+                    }
+                }
+            }
             /* apply button */
             addApplyButton(buttonPanel);
             applyButton.setEnabled(
@@ -5292,11 +5260,11 @@ public class ClusterBrowser extends Browser {
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                final HostScoreInfo hsi = (HostScoreInfo) cb.getValue();
-                final HostScoreInfo hsiSaved = savedHostScoreInfos.get(hi);
-                if (!hsi.equals(hsiSaved)) {
+                final String hs = cb.getStringValue();
+                final String hsSaved = savedHostScores.get(hi);
+                if (!hs.equals(hsSaved)) {
                     final String onHost = hi.getName();
-                    final String score = hsi.getScore();
+                    final String score = hs;
                     final String locationId =
                               heartbeatStatus.getLocationId(
                                                 getService().getHeartbeatId(),
@@ -5308,7 +5276,7 @@ public class ClusterBrowser extends Browser {
                                     locationId);
                 }
             }
-            storeHostScoreInfos();
+            storeHostScores();
         }
 
         /**
@@ -5336,8 +5304,8 @@ public class ClusterBrowser extends Browser {
                                 || HB_OP_PROMOTE.equals(op))) {
                             continue;
                         }
-                        //String defaultValue =
-                        //             hbService.getOperationDefault(op, param);
+                        String defaultValue =
+                                     hbService.getOperationDefault(op, param);
                         //if (defaultValue == null) {
                         //    continue;
                         //}
@@ -6517,6 +6485,20 @@ public class ClusterBrowser extends Browser {
         public GuiComboBox getIdField() {
             return idField;
         }
+
+        /**
+         * Returns units.
+         */
+        protected final Unit[] getUnits() {
+            return new Unit[]{
+                new Unit("", "", "", ""),
+                new Unit("ms", "ms", "Millisecond", "Milliseconds"),
+                new Unit("us", "us", "Microsecond", "Microseconds"),
+                new Unit("s",  "s",  "Second",      "Seconds"),
+                new Unit("m",  "m",  "Minute",      "Minutes"),
+                new Unit("h",   "h",  "Hour",        "Hours")
+            };
+        }
     }
 
     /**
@@ -6532,7 +6514,6 @@ public class ClusterBrowser extends Browser {
                          final String name,
                          final boolean master) {
             super(name, hbService);
-            System.out.println("master: " + master);
             getService().setMaster(master);
         }
 
@@ -7024,7 +7005,6 @@ public class ClusterBrowser extends Browser {
                                 final Map<String, String> resourceNode =
                                       heartbeatStatus.getParamValuePairs(
                                           newMi.getService().getHeartbeatId());
-                                System.out.println("get pvp: " + hbId);
                                 newMi.setParameters(resourceNode);
                                 newMi.setUpdated(false);
                                 heartbeatGraph.repaint();
@@ -7562,6 +7542,20 @@ public class ClusterBrowser extends Browser {
                 }
             }
             return existingServiceList;
+        }
+
+        /**
+         * Returns units.
+         */
+        protected final Unit[] getUnits() {
+            return new Unit[]{
+                new Unit("", "", "", ""),
+                new Unit("ms",  "ms", "Millisecond", "Milliseconds"),
+                new Unit("us",  "us", "Microsecond", "Microseconds"),
+                new Unit("s",   "s",  "Second",      "Seconds"),
+                new Unit("min", "m",  "Minute",      "Minutes"),
+                new Unit("h",   "h",  "Hour",        "Hours")
+            };
         }
     }
 

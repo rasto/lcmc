@@ -582,7 +582,8 @@ public class HostCheckInstallation extends DialogHost {
                                       new InstallMethods[pmMethods.size()]),
                    GuiComboBox.Type.COMBOBOX,
                    null,
-                   0);
+                   0,
+                   null);
         pmInstMethodCB.addListeners(
             new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -635,7 +636,8 @@ public class HostCheckInstallation extends DialogHost {
                                         new InstallMethods[hbPmMethods.size()]),
                    GuiComboBox.Type.COMBOBOX,
                    null,
-                   0);
+                   0,
+                   null);
         hbPmInstMethodCB.addListeners(
             new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -697,7 +699,8 @@ public class HostCheckInstallation extends DialogHost {
                                         new InstallMethods[drbdMethods.size()]),
                        GuiComboBox.Type.COMBOBOX,
                        null,
-                       0);
+                       0,
+                       null);
             drbdInstMethodCB.addListeners(
                 new ItemListener() {
                     public void itemStateChanged(final ItemEvent e) {
@@ -728,7 +731,8 @@ public class HostCheckInstallation extends DialogHost {
                                                null,
                                                GuiComboBox.Type.COMBOBOX,
                                                null,
-                                               0);
+                                               0,
+                                               null);
             drbdInstMethodCB.setEnabled(false);
         }
         final String lastInstalled =

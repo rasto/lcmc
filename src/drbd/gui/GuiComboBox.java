@@ -128,7 +128,8 @@ public class GuiComboBox extends JPanel {
                        final Unit[] units,
                        final Type type,
                        final String regexp,
-                       final int width) {
+                       final int width,
+                       final Map<String, String> abbreviations) {
         super();
         this.units = units;
         //setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
@@ -157,13 +158,16 @@ public class GuiComboBox extends JPanel {
 
         switch(this.type) {
             case TEXTFIELD:
-                component = getTextField(selectedValue, regexp);
+                component = getTextField(selectedValue, regexp, abbreviations);
                 break;
             case PASSWDFIELD:
                 component = getPasswdField(selectedValue, regexp);
                 break;
             case COMBOBOX:
-                component = getComboBox(selectedValue, items, regexp);
+                component = getComboBox(selectedValue,
+                                        items,
+                                        regexp,
+                                        abbreviations);
                 break;
             case TEXTFIELDWITHUNIT:
                 component = new JPanel();
@@ -182,11 +186,15 @@ public class GuiComboBox extends JPanel {
 
                 /* text field */
                 textFieldWithoutUnit = (JTextField) getTextField(number,
-                                                                 regexp);
+                                                                 regexp,
+                                                                 abbreviations);
                 component.add(textFieldWithoutUnit);
 
                 /* unit combo box */
-                unitComboBox = (JComboBox) getComboBox(unit, units, regexp);
+                unitComboBox = (JComboBox) getComboBox(unit,
+                                                       units,
+                                                       regexp,
+                                                       abbreviations);
 
                 component.add(unitComboBox);
                 SpringUtilities.makeCompactGrid(component, 1, 2,
@@ -240,8 +248,15 @@ public class GuiComboBox extends JPanel {
                        final Object[] items,
                        final Type typeOfBox,
                        final String regexp,
-                       final int width) {
-        this(selectedValue, items, null, typeOfBox, regexp, width);
+                       final int width,
+                       final Map<String, String> abbreviations) {
+        this(selectedValue,
+             items,
+             null,
+             typeOfBox,
+             regexp,
+             width,
+             abbreviations);
     }
 
     /**
@@ -260,7 +275,9 @@ public class GuiComboBox extends JPanel {
         if (regexp == null) {
             pf = new JPasswordField(value);
         } else {
-            pf = new JPasswordField(new PatternDocument(regexp), value, 0);
+            pf = new JPasswordField(new PatternDocument(regexp),
+                                    value,
+                                    0);
         }
         return pf;
     }
@@ -268,12 +285,16 @@ public class GuiComboBox extends JPanel {
     /**
      * Returns new MTextField with default value.
      */
-    private JComponent getTextField(final String value, final String regexp) {
+    private JComponent getTextField(final String value,
+                                    final String regexp,
+                                    final Map<String, String> abbreviations) {
         MTextField tf;
         if (regexp == null) {
             tf = new MTextField(value);
         } else {
-            tf = new MTextField(new PatternDocument(regexp), value, 0);
+            tf = new MTextField(new PatternDocument(regexp, abbreviations),
+                                value,
+                                0);
         }
         return tf;
     }
@@ -283,7 +304,8 @@ public class GuiComboBox extends JPanel {
      */
     private JComponent getComboBox(final String selectedValue,
                                    final Object[] items,
-                                   final String regexp) {
+                                   final String regexp,
+                                   final Map<String, String> abbreviations) {
         final List<Object> comboList = new ArrayList<Object>();
 
         final Object selectedValueInfo = addItems(comboList,
@@ -294,7 +316,7 @@ public class GuiComboBox extends JPanel {
         final JTextComponent editor =
                         (JTextComponent) cb.getEditor().getEditorComponent();
         if (regexp != null) {
-            editor.setDocument(new PatternDocument(regexp));
+            editor.setDocument(new PatternDocument(regexp, abbreviations));
         }
         cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
         if (selectedValueInfo != null) {
@@ -364,7 +386,6 @@ public class GuiComboBox extends JPanel {
         if (items != null) {
             for (int i = 0; i < items.length; i++) {
                 if (items[i] == null) {
-                    Tools.appError("item: " + i + " is null");
                     continue;
                 }
                 if (items[i].toString().equals(selectedValue)
@@ -373,6 +394,10 @@ public class GuiComboBox extends JPanel {
                 }
                 comboList.add(items[i]);
             }
+        }
+        if (selectedValueInfo == null) {
+            comboList.add(0, selectedValue);
+            selectedValueInfo = selectedValue;
         }
         return selectedValueInfo;
     }

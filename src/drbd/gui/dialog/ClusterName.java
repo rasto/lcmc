@@ -137,7 +137,7 @@ public class ClusterName extends DialogCluster {
         getCluster().setName(name);
         final String regexp = "^[ ,\\w.-]+$";
         nameField = new GuiComboBox(getCluster().getName(),
-                                    null, null, regexp, NAME_FIELD_WIDTH);
+                                    null, null, regexp, NAME_FIELD_WIDTH, null);
         addCheckField(nameField);
         nameLabel.setLabelFor(nameField);
         pane.add(nameField);

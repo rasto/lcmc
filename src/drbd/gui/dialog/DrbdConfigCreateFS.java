@@ -237,7 +237,8 @@ public class DrbdConfigCreateFS extends DrbdConfig {
                                  hostNames,
                                  GuiComboBox.Type.COMBOBOX,
                                  null,
-                                 COMBOBOX_WIDTH);
+                                 COMBOBOX_WIDTH,
+                                 null);
         hostCB.addListeners(
             new  ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -267,7 +268,8 @@ public class DrbdConfigCreateFS extends DrbdConfig {
                                        filesystems,
                                        GuiComboBox.Type.COMBOBOX,
                                        null,
-                                       COMBOBOX_WIDTH);
+                                       COMBOBOX_WIDTH,
+                                       null);
         inputPane.add(filesystemLabel);
         inputPane.add(filesystemCB);
         filesystemCB.addListeners(

@@ -157,7 +157,8 @@ public class HostLinbitLogin extends DialogHost {
                                         null,
                                         null,
                                         "^[,\\w.-]+$",
-                                        CHECKBOX_WIDTH);
+                                        CHECKBOX_WIDTH,
+                                        null);
 
         addCheckField(downloadUserField);
         userLabel.setLabelFor(downloadUserField);
@@ -173,7 +174,8 @@ public class HostLinbitLogin extends DialogHost {
                                 null,
                                 GuiComboBox.Type.PASSWDFIELD,
                                 null,
-                                CHECKBOX_WIDTH);
+                                CHECKBOX_WIDTH,
+                                null);
 
         addCheckField(downloadPasswordField);
         passwordLabel.setLabelFor(downloadPasswordField);

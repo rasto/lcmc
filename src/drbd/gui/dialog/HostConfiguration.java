@@ -360,7 +360,8 @@ public class HostConfiguration extends DialogHost {
                                     null,
                                     null,
                                     regexp,
-                                    COMBO_BOX_WIDTH);
+                                    COMBO_BOX_WIDTH,
+                                    null);
         inputPane.add(nameField);
         nameField.setBackground(getHost().getName(), true);
         for (int i = 0; i < hops - 1; i++) {
@@ -382,7 +383,8 @@ public class HostConfiguration extends DialogHost {
                                                null,
                                                null,
                                                null,
-                                               COMBO_BOX_WIDTH);
+                                               COMBO_BOX_WIDTH,
+                                               null);
 
             inputPane.add(hostnameField[i]);
         }
@@ -399,7 +401,8 @@ public class HostConfiguration extends DialogHost {
                                          getHost().getIps(i),
                                          GuiComboBox.Type.COMBOBOX,
                                          null,
-                                         COMBO_BOX_WIDTH);
+                                         COMBO_BOX_WIDTH,
+                                         null);
 
             inputPane.add(ipCombo[i]);
             ipCombo[i].setEnabled(false);

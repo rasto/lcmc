@@ -1204,36 +1204,36 @@ public final class Tools {
         return resultSet;
     }
 
-    /**
-     * converts score to the string.
-     *
-     * @param score
-     *          score, that is to be converted
-     *
-     * @return score as string
-     */
-    public static String scoreToString(final String score) {
-        String str = "";
-        if ("-INFINITY".equals(score)) {
-            str = Tools.getString("Score.MinusInfinityString");
-        } else if ("INFINITY".equals(score)) {
-            str = Tools.getString("Score.InfinityString");
-        } else {
-            try {
-                final long scoreInt = Integer.valueOf(score);
-                if (scoreInt == 0) {
-                    str = Tools.getString("Score.ZeroString");
-                } else if (scoreInt > 0) {
-                    str = Tools.getString("Score.PlusString");
-                } else {
-                    str = Tools.getString("Score.MinusString");
-                }
-            } catch (Exception e) {
-                str = Tools.getString("Score.Unknown");
-            }
-        }
-        return str + " (" + scoreToHBString(score) + ")";
-    }
+    ///**
+    // * converts score to the string.
+    // *
+    // * @param score
+    // *          score, that is to be converted
+    // *
+    // * @return score as string
+    // */
+    //public static String scoreToString(final String score) {
+    //    String str = "";
+    //    if ("-INFINITY".equals(score)) {
+    //        str = Tools.getString("Score.MinusInfinityString");
+    //    } else if ("INFINITY".equals(score)) {
+    //        str = Tools.getString("Score.InfinityString");
+    //    } else {
+    //        try {
+    //            final long scoreInt = Integer.valueOf(score);
+    //            if (scoreInt == 0) {
+    //                str = Tools.getString("Score.ZeroString");
+    //            } else if (scoreInt > 0) {
+    //                str = Tools.getString("Score.PlusString");
+    //            } else {
+    //                str = Tools.getString("Score.MinusString");
+    //            }
+    //        } catch (Exception e) {
+    //            str = Tools.getString("Score.Unknown");
+    //        }
+    //    }
+    //    return str + " (" + scoreToHBString(score) + ")";
+    //}
 
     /**
      * converts score to the score as used in the heartbeat.

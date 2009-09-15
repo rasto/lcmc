@@ -105,12 +105,6 @@ public class HeartbeatXML extends XML {
     private static final String PARAM_TYPE_STRING = "string";
     /** Time parameter type. */
     private static final String PARAM_TYPE_TIME = "time";
-    /** Heartbeat boolean false string. */
-    private static final String HB_BOOLEAN_FALSE =
-                                    Tools.getString("Heartbeat.Boolean.False");
-    /** Heartbeat boolean true string. */
-    private static final String HB_BOOLEAN_TRUE =
-                                    Tools.getString("Heartbeat.Boolean.True");
     /** Fail count prefix. */
     private static final String FAIL_COUNT_PREFIX = "fail-count-";
     /**
@@ -120,6 +114,11 @@ public class HeartbeatXML extends XML {
         super();
         this.host = host;
         String command = null;
+        final String hbV = host.getHeartbeatVersion();
+        String[] booleanValues = getGlobalCheckBoxChoices();
+        String[] integerValues = getIntegerValues();
+        final String hb_boolean_true = booleanValues[0];
+        final String hb_boolean_false = booleanValues[1];
         hbClone = new HeartbeatService(
                                 Tools.getConfigData().PM_CLONE_SET_NAME,
                                 "",
@@ -130,47 +129,43 @@ public class HeartbeatXML extends XML {
         hbClone.setParamShortDesc("clone-max", "M/S Clone Max");
         hbClone.setParamDefault("clone-max", "");
         hbClone.setParamPreferred("clone-max", "2");
-        hbClone.setParamType("clone-max", "integer");
+        hbClone.setParamType("clone-max", PARAM_TYPE_INTEGER);
+        hbClone.setParamPossibleChoices("clone-max", integerValues);
 
         /* clone-node-max */
         hbClone.addParameter("clone-node-max");
         hbClone.setParamIsMetaAttr("clone-node-max", true);
         hbClone.setParamShortDesc("clone-node-max", "M/S Clone Node Max");
         hbClone.setParamDefault("clone-node-max", "1");
-        hbClone.setParamType("clone-node-max", "integer");
+        hbClone.setParamType("clone-node-max", PARAM_TYPE_INTEGER);
+        hbClone.setParamPossibleChoices("clone-node-max", integerValues);
 
         /* notify */
         hbClone.addParameter("notify");
         hbClone.setParamIsMetaAttr("notify", true);
         hbClone.setParamShortDesc("notify", "M/S Notify");
-        hbClone.setParamDefault("notify", "false");
-        hbClone.setParamPreferred("notify", "true");
-        hbClone.setParamPossibleChoices("notify",
-                                         new String[]{"true", "false"});
+        hbClone.setParamDefault("notify", hb_boolean_false);
+        hbClone.setParamPreferred("notify", hb_boolean_true);
+        hbClone.setParamPossibleChoices("notify", booleanValues);
         /* globally-unique */
         hbClone.addParameter("globally-unique");
         hbClone.setParamIsMetaAttr("globally-unique", true);
         hbClone.setParamShortDesc("globally-unique", "M/S Globally-Unique");
-        hbClone.setParamDefault("globally-unique", "true");
-        hbClone.setParamPossibleChoices("globally-unique",
-                                         new String[]{"true", "false"});
+        hbClone.setParamDefault("globally-unique", hb_boolean_false);
+        hbClone.setParamPossibleChoices("globally-unique", booleanValues);
         /* ordered */
         hbClone.addParameter("ordered");
         hbClone.setParamIsMetaAttr("ordered", true);
         hbClone.setParamShortDesc("ordered", "M/S Ordered");
-        hbClone.setParamDefault("ordered", "false");
-        hbClone.setParamPossibleChoices("ordered",
-                                         new String[]{"true", "false"});
+        hbClone.setParamDefault("ordered", hb_boolean_false);
+        hbClone.setParamPossibleChoices("ordered", booleanValues);
         /* interleave */
         hbClone.addParameter("interleave");
         hbClone.setParamIsMetaAttr("interleave", true);
         hbClone.setParamShortDesc("interleave", "M/S Interleave");
-        hbClone.setParamDefault("interleave", "false");
-        hbClone.setParamPossibleChoices("interleave",
-                                         new String[]{"true", "false"});
+        hbClone.setParamDefault("interleave", hb_boolean_false);
+        hbClone.setParamPossibleChoices("interleave", booleanValues);
 
-
-        final String hbV = host.getHeartbeatVersion();
         if (Tools.compareVersions(hbV, "2.1.3") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
                                           (ConvertCmdCallback) null);
@@ -234,16 +229,13 @@ public class HeartbeatXML extends XML {
             Tools.appError("drbddisk heartbeat script is not present");
         }
 
-
-        String[] booleanValues = getGlobalCheckBoxChoices();
-
         /* hardcoding global params */
         /* symmetric cluster */
         globalParams.add("symmetric-cluster");
         paramGlobalShortDescMap.put("symmetric-cluster", "Symmetric Cluster");
         paramGlobalLongDescMap.put("symmetric-cluster", "Symmetric Cluster");
         paramGlobalTypeMap.put("symmetric-cluster", PARAM_TYPE_BOOLEAN);
-        paramGlobalDefaultMap.put("symmetric-cluster", HB_BOOLEAN_FALSE);
+        paramGlobalDefaultMap.put("symmetric-cluster", hb_boolean_false);
         paramGlobalPossibleChoices.put("symmetric-cluster", booleanValues);
         globalRequiredParams.add("symmetric-cluster");
 
@@ -252,8 +244,8 @@ public class HeartbeatXML extends XML {
         paramGlobalShortDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalLongDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalTypeMap.put("stonith-enabled", PARAM_TYPE_BOOLEAN);
-        paramGlobalDefaultMap.put("stonith-enabled", HB_BOOLEAN_TRUE);
-        paramGlobalPreferredMap.put("stonith-enabled", HB_BOOLEAN_FALSE);
+        paramGlobalDefaultMap.put("stonith-enabled", hb_boolean_true);
+        paramGlobalPreferredMap.put("stonith-enabled", hb_boolean_false);
         paramGlobalPossibleChoices.put("stonith-enabled", booleanValues);
         globalRequiredParams.add("stonith-enabled");
 
@@ -264,7 +256,8 @@ public class HeartbeatXML extends XML {
         paramGlobalLongDescMap.put("default-action-timeout",
                                 "Transition Timeout");
         paramGlobalTypeMap.put("default-action-timeout", PARAM_TYPE_INTEGER);
-        paramGlobalDefaultMap.put("default-action-timeout", "20"); // TODO: s?
+        paramGlobalDefaultMap.put("default-action-timeout", "20s");
+        paramGlobalPossibleChoices.put("default-action-timeout", integerValues);
         globalRequiredParams.add("default-action-timeout");
 
         /* resource stickiness */
@@ -274,7 +267,9 @@ public class HeartbeatXML extends XML {
         paramGlobalLongDescMap.put("default-resource-stickiness",
                                    "Resource Stickiness");
         paramGlobalTypeMap.put("default-resource-stickiness",
-                               PARAM_TYPE_INTEGER); // TODO: infinity?
+                               PARAM_TYPE_INTEGER);
+        paramGlobalPossibleChoices.put("default-resource-stickiness",
+                                       integerValues);
         paramGlobalDefaultMap.put("default-resource-stickiness", "0");
         paramGlobalPreferredMap.put("default-resource-stickiness", "100");
         globalRequiredParams.add("default-resource-stickiness");
@@ -299,7 +294,9 @@ public class HeartbeatXML extends XML {
         paramGlobalLongDescMap.put("default-resource-failure-stickiness",
                                    "Resource Failure Stickiness");
         paramGlobalTypeMap.put("default-resource-failure-stickiness",
-                               PARAM_TYPE_INTEGER); // TODO: infinity?
+                               PARAM_TYPE_INTEGER);
+        paramGlobalPossibleChoices.put("default-resource-failure-stickiness",
+                                       integerValues);
         paramGlobalDefaultMap.put("default-resource-failure-stickiness", "0");
         globalRequiredParams.add("default-resource-failure-stickiness");
 
@@ -350,32 +347,32 @@ public class HeartbeatXML extends XML {
                                            new String[]{"reboot", "poweroff"});
 
             paramGlobalTypeMap.put("is-managed-default", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("is-managed-default", HB_BOOLEAN_FALSE);
+            paramGlobalDefaultMap.put("is-managed-default", hb_boolean_false);
             paramGlobalPossibleChoices.put("is-managed-default", booleanValues);
 
             paramGlobalTypeMap.put("stop-orphan-resources", PARAM_TYPE_BOOLEAN);
             paramGlobalDefaultMap.put("stop-orphan-resources",
-                                                            HB_BOOLEAN_FALSE);
+                                                            hb_boolean_false);
             paramGlobalPossibleChoices.put("stop-orphan-resources",
                                            booleanValues);
 
             paramGlobalTypeMap.put("stop-orphan-actions", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("stop-orphan-actions", HB_BOOLEAN_FALSE);
+            paramGlobalDefaultMap.put("stop-orphan-actions", hb_boolean_false);
             paramGlobalPossibleChoices.put("stop-orphan-actions",
                                            booleanValues);
 
             paramGlobalTypeMap.put("remove-after-stop", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("remove-after-stop", HB_BOOLEAN_FALSE);
+            paramGlobalDefaultMap.put("remove-after-stop", hb_boolean_false);
             paramGlobalPossibleChoices.put("remove-after-stop", booleanValues);
 
             paramGlobalTypeMap.put("startup-fencing", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("startup-fencing", HB_BOOLEAN_FALSE);
+            paramGlobalDefaultMap.put("startup-fencing", hb_boolean_false);
             paramGlobalPossibleChoices.put("startup-fencing", booleanValues);
 
             paramGlobalTypeMap.put("start-failure-is-fatal",
                                    PARAM_TYPE_BOOLEAN);
             paramGlobalDefaultMap.put("start-failure-is-fatal",
-                                                            HB_BOOLEAN_FALSE);
+                                                            hb_boolean_false);
             paramGlobalPossibleChoices.put("start-failure-is-fatal",
                                            booleanValues);
         }
@@ -391,8 +388,17 @@ public class HeartbeatXML extends XML {
                 Tools.getString("Heartbeat.2.1.3.Boolean.True"),
                 Tools.getString("Heartbeat.2.1.3.Boolean.False")};
         } else {
-            return new String[]{HB_BOOLEAN_TRUE, HB_BOOLEAN_FALSE};
+            return new String[]{
+                Tools.getString("Heartbeat.Boolean.True"),
+                Tools.getString("Heartbeat.Boolean.False")};
         }
+    }
+
+    /**
+     * Returns choices for integer fields.
+     */
+    public final String[] getIntegerValues() {
+        return new String[]{"0", "INFINITY", "-INFINITY"};
     }
 
 
@@ -424,7 +430,9 @@ public class HeartbeatXML extends XML {
                 Tools.getString("Heartbeat.2.1.3.Boolean.True"),
                 Tools.getString("Heartbeat.2.1.3.Boolean.False")};
         } else {
-            return new String[]{HB_BOOLEAN_TRUE, HB_BOOLEAN_FALSE};
+            return new String[]{
+                Tools.getString("Heartbeat.Boolean.True"),
+                Tools.getString("Heartbeat.Boolean.False")};
         }
     }
 
@@ -691,7 +699,7 @@ public class HeartbeatXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !HB_BOOLEAN_TRUE.equals(value)
+                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
                 && !Tools.getString("Heartbeat.Boolean.False").equals(value)
                 && !Tools.getString(
                                 "Heartbeat.2.1.3.Boolean.True").equals(value)
@@ -700,11 +708,12 @@ public class HeartbeatXML extends XML {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^-?\\d*$");
+            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
             }
+            System.out.println("correct: " + correctValue);
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
@@ -729,7 +738,7 @@ public class HeartbeatXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !HB_BOOLEAN_TRUE.equals(value)
+                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
                 && !Tools.getString("Heartbeat.Boolean.False").equals(value)
                 && !Tools.getString(
                                 "Heartbeat.2.1.3.Boolean.True").equals(value)
@@ -739,7 +748,7 @@ public class HeartbeatXML extends XML {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^-?\\d*$");
+            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
@@ -962,6 +971,8 @@ public class HeartbeatXML extends XML {
 
         /* get <resource-agent> */
         final NodeList resAgents = metadataNode.getChildNodes();
+        final String[] booleanValues = getGlobalCheckBoxChoices();
+        final String[] integerValues = getIntegerValues();
         for (int i = 0; i < resAgents.getLength(); i++) {
             final Node resAgentNode = resAgents.item(i);
             if (!resAgentNode.getNodeName().equals("resource-agent")) {
@@ -1010,10 +1021,22 @@ public class HeartbeatXML extends XML {
 
                         paramGlobalTypeMap.put(param, type);
                         paramGlobalDefaultMap.put(param, defaultValue);
+                        if (PARAM_TYPE_BOOLEAN.equals(type)) {
+                            paramGlobalPossibleChoices.put(param,
+                                                           booleanValues);
+                        }
+                        if (PARAM_TYPE_INTEGER.equals(type)) {
+                            paramGlobalPossibleChoices.put(param,
+                                                           integerValues);
+                        }
                     }
                 }
             }
         }
+        /* stonith timeout, workaround, because of param type comming wrong
+         * from pacemaker */
+        paramGlobalTypeMap.put("stonith-timeout", PARAM_TYPE_TIME);
+
     }
 
     /**
@@ -1159,8 +1182,6 @@ public class HeartbeatXML extends XML {
                     final String nvpairId = getAttribute(maNode, "id");
                     final String name = getAttribute(maNode, "name");
                     final String value = getAttribute(maNode, "value");
-                    System.out.println("meta attr: " + name + " " + value + " "
-                                       + nvpairId);
                     params.put(name, value);
                     nvpairIds.put(name, nvpairId);
                 }

@@ -1383,7 +1383,8 @@ public class HostBrowser extends Browser {
                            drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
                            null,
                            regexp,
-                           width);
+                           width,
+                           null);
                 gcb.setValue(defaultPort);
                 paramComboBoxAdd(param, prefix, gcb);
                 gcb.setEnabled(true);

@@ -239,7 +239,8 @@ public class DrbdConfigCreateMD extends DrbdConfig {
                                          choices,
                                          GuiComboBox.Type.COMBOBOX,
                                          null,
-                                         COMBOBOX_WIDTH);
+                                         COMBOBOX_WIDTH,
+                                         null);
         } else {
             final String[] choices = {useExistingMetadata,
                                       createNewMetadata,
@@ -252,7 +253,8 @@ public class DrbdConfigCreateMD extends DrbdConfig {
                                          choices,
                                          GuiComboBox.Type.COMBOBOX,
                                          null,
-                                         COMBOBOX_WIDTH);
+                                         COMBOBOX_WIDTH,
+                                         null);
         }
 
         inputPane.add(metadataLabel);

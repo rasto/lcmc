@@ -189,7 +189,8 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
                                          null,
                                          GuiComboBox.Type.COMBOBOX,
                                          null,
-                                         0);
+                                         0,
+                                         null);
 
         //drbdTarballCombo.setEnabled(false);
         pane.add(drbdTarballCombo);

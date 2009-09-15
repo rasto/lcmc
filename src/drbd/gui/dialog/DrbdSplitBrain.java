@@ -147,7 +147,8 @@ public class DrbdSplitBrain extends DrbdConfig {
                                  hosts,
                                  GuiComboBox.Type.COMBOBOX,
                                  null,
-                                 COMBOBOX_WIDTH);
+                                 COMBOBOX_WIDTH,
+                                 null);
         inputPane.add(hostLabel);
         inputPane.add(hostCB);
         resolveButton.addActionListener(new ActionListener() {
