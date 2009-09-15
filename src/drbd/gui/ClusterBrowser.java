@@ -5023,7 +5023,8 @@ public class ClusterBrowser extends Browser {
                     defaultValue = "Clone";
                 }
             }
-            if (!getHeartbeatService().isClone()) {
+            if (!getHeartbeatService().isClone() &&
+                !getHeartbeatService().isGroup()) {
                 final ServiceInfo thisClass = this;
                 typeRadioGroup = new GuiComboBox(defaultValue,
                                                  new String[]{"Primitive",
