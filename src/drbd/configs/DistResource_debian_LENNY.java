@@ -72,7 +72,7 @@ public class DistResource_debian_LENNY extends
          "LINBIT/MADKISS repository (testing)"},
 
         {"PmInst.install.1",
-         "echo 'deb http://people.debian.org/~madkiss/ha lenny main'"
+         "echo 'deb http://people.debian.org/~madkiss/ha-corosync lenny main'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
@@ -97,13 +97,13 @@ public class DistResource_debian_LENNY extends
          "LINBIT/MADKISS repository (testing: pacemaker-heartbeat)"},
 
         {"HbPmInst.install.1",
-         "echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
+         "echo 'deb http://people.debian.org/~madkiss/ha-corosync lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"
-         + " && chmod g+w /var/run/heartbeat/crm" // TODO: remove workarounds
-                                                  // when not needed
-         + " && ln -s /var/run/heartbeat/crm/ /var/run/crm"},
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
+         //+ " && chmod g+w /var/run/heartbeat/crm" // TODO: remove workarounds
+         //                                         // when not needed
+         //+ " && ln -s /var/run/heartbeat/crm/ /var/run/crm"},
 
         /* heartbeat apt-get install */
         {"HbPmInst.install.text.2",
