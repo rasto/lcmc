@@ -395,10 +395,6 @@ public class GuiComboBox extends JPanel {
                 comboList.add(items[i]);
             }
         }
-        if (selectedValueInfo == null && selectedValue != null) {
-            comboList.add(0, selectedValue);
-            selectedValueInfo = selectedValue;
-        }
         return selectedValueInfo;
     }
 

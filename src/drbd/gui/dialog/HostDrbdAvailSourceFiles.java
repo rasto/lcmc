@@ -104,7 +104,7 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             drbdTarballCombo.reloadComboBox(
-                                   items.get(0).getStringValue(),
+                                   items.get(0).toString(),
                                    items.toArray(new ComboInfo[items.size()]));
                             final ComboInfo selectedItem =
                                    (ComboInfo) drbdTarballCombo.getValue();
@@ -186,11 +186,11 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
 
         /* build combo box */
         drbdTarballCombo = new GuiComboBox(null,
-                                         null,
-                                         GuiComboBox.Type.COMBOBOX,
-                                         null,
-                                         0,
-                                         null);
+                                           null,
+                                           GuiComboBox.Type.COMBOBOX,
+                                           null,
+                                           0,
+                                           null);
 
         //drbdTarballCombo.setEnabled(false);
         pane.add(drbdTarballCombo);
