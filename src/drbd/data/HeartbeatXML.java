@@ -713,7 +713,6 @@ public class HeartbeatXML extends XML {
             if (!m.matches()) {
                 correctValue = false;
             }
-            System.out.println("correct: " + correctValue);
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");

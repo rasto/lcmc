@@ -3424,20 +3424,11 @@ public class ClusterBrowser extends Browser {
                                           heartbeatId,
                                           parents);
             }
-            //setLocations(heartbeatId);
+            setLocations(heartbeatId);
             storeComboBoxValues(params);
 
             reload(getNode());
             heartbeatGraph.repaint();
-        }
-
-        /**
-         * Add host scores is disabled in group.
-         */
-        protected void addHostScores(final JPanel optionsPanel,
-                                     final int leftWidth,
-                                     final int rightWidth) {
-            /* no host scores in group. */
         }
 
         /**
@@ -3845,6 +3836,7 @@ public class ClusterBrowser extends Browser {
                            final Map<String, String> resourceNode) {
             this(name, hbService);
             getService().setHeartbeatId(heartbeatId);
+            //getInfoPanel();
             setParameters(resourceNode);
         }
 
@@ -3915,8 +3907,8 @@ public class ClusterBrowser extends Browser {
                 ret = true;
             } else if (cloneInfo != null
                        && cloneInfo.checkResourceFieldsChanged(
-                                     param,
-                                     cloneInfo.getParametersFromXML())) {
+                                           param,
+                                           cloneInfo.getParametersFromXML())) {
                 ret = true;
             } else {
                 final String id = idField.getStringValue();
@@ -4022,14 +4014,13 @@ public class ClusterBrowser extends Browser {
                 if (score == null) {
                     score = "0";
                 }
-                //final String scoreString = Tools.scoreToString(score);
-                //if (!hostScoreInfoMap.get(scoreString).equals(savedHostScoreInfos.get(hi))) {
-                    final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                    //savedHostScoreInfos.put(hi, hostScoreInfoMap.get(scoreString));
+                final GuiComboBox cb = scoreComboBoxHash.get(hi);
+                if (!score.equals(savedHostScores.get(hi))) {
+                    savedHostScores.put(hi, score);
                     if (cb != null) {
                         cb.setValue(score);
                     }
-                //}
+                }
             }
 
             /* operations */
@@ -4677,7 +4668,6 @@ public class ClusterBrowser extends Browser {
                                     new GuiComboBox("0", //TODO: none?
                                                     new String[]{"0",
                                                                  "2",
-                                                                 "100",
                                                                  "INFINITY",
                                                                  "-INFINITY"},
                                                     null,
@@ -4691,7 +4681,7 @@ public class ClusterBrowser extends Browser {
                 /* set selected host scores in the combo box from
                  * savedHostScores */
                 final String hsSaved = savedHostScores.get(hi);
-                if (hsSaved != null) {
+                if (hsSaved != null) { //does not work immediatly in m/s 
                     cb.setValue(hsSaved);
                 }
             }
@@ -5163,66 +5153,66 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
-            if (!getHeartbeatService().isGroup()) {
-                /* add item listeners to the host scores combos */
-                if (cloneInfo == null) {
-                    for (Host host : getClusterHosts()) {
-                        final HostInfo hi = host.getBrowser().getHostInfo();
-                        final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                        cb.addListeners(
-                            new ItemListener() {
-                                public void itemStateChanged(final ItemEvent e) {
-                                    if (cb.isCheckBox()
-                                        || e.getStateChange() == ItemEvent.SELECTED) {
-                                        final Thread thread = new Thread(new Runnable() {
-                                            public void run() {
-                                                final boolean enable =
-                                                          checkResourceFields("cached",
-                                                                              params);
-                                                SwingUtilities.invokeLater(
-                                                new Runnable() {
-                                                    public void run() {
-                                                        applyButton.setEnabled(enable);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        thread.start();
-                                    }
-                                }
-                            },
-
-                            new DocumentListener() {
-                                private void check() {
-                                    Thread thread = new Thread(new Runnable() {
+            /* add item listeners to the host scores combos */
+            if (cloneInfo == null) {
+                for (Host host : getClusterHosts()) {
+                    final HostInfo hi = host.getBrowser().getHostInfo();
+                    final GuiComboBox cb = scoreComboBoxHash.get(hi);
+                    cb.addListeners(
+                        new ItemListener() {
+                            public void itemStateChanged(final ItemEvent e) {
+                                if (cb.isCheckBox()
+                                    || e.getStateChange() == ItemEvent.SELECTED) {
+                                    final Thread thread = new Thread(
+                                                            new Runnable() {
                                         public void run() {
                                             final boolean enable =
-                                                checkResourceFields("cached", params);
+                                              checkResourceFields("cached",
+                                                                  params);
                                             SwingUtilities.invokeLater(
                                             new Runnable() {
                                                 public void run() {
-                                                    applyButton.setEnabled(enable);
+                                                    applyButton.setEnabled(
+                                                                    enable);
                                                 }
                                             });
                                         }
                                     });
                                     thread.start();
                                 }
-
-                                public void insertUpdate(final DocumentEvent e) {
-                                    check();
-                                }
-
-                                public void removeUpdate(final DocumentEvent e) {
-                                    check();
-                                }
-
-                                public void changedUpdate(final DocumentEvent e) {
-                                    check();
-                                }
                             }
-                        );
-                    }
+                        },
+
+                        new DocumentListener() {
+                            private void check() {
+                                Thread thread = new Thread(new Runnable() {
+                                    public void run() {
+                                        final boolean enable =
+                                            checkResourceFields("cached", params);
+                                        SwingUtilities.invokeLater(
+                                        new Runnable() {
+                                            public void run() {
+                                                applyButton.setEnabled(enable);
+                                            }
+                                        });
+                                    }
+                                });
+                                thread.start();
+                            }
+
+                            public void insertUpdate(final DocumentEvent e) {
+                                check();
+                            }
+
+                            public void removeUpdate(final DocumentEvent e) {
+                                check();
+                            }
+
+                            public void changedUpdate(final DocumentEvent e) {
+                                check();
+                            }
+                        }
+                    );
                 }
             }
             /* apply button */
@@ -5603,7 +5593,7 @@ public class ClusterBrowser extends Browser {
                         heartbeatStatus.getOperationsId(heartbeatId));
             }
 
-            if (groupInfo == null) {
+            if (groupInfo == null) { // TODO: what to do with res grp locations?
                 if (cloneInfo == null) {
                     setLocations(heartbeatId);
                 } else {
@@ -6987,30 +6977,34 @@ public class ClusterBrowser extends Browser {
                         continue;
                     }
                     GroupInfo newGi = null;
-                    CloneInfo newMi = null;
+                    CloneInfo newCi = null;
                     if (!"none".equals(group)) {
                         if (heartbeatStatus.isClone(group)) {
                             /* clone */
-                            newMi = (CloneInfo) heartbeatIdToServiceInfo.get(
+                            newCi = (CloneInfo) heartbeatIdToServiceInfo.get(
                                                                         group);
-                            if (newMi == null) {
+                            if (newCi == null) {
                                 final Point2D p = null;
-                                newMi = (CloneInfo) heartbeatGraph.getServicesInfo().addServicePanel(
+                                newCi = (CloneInfo) heartbeatGraph.getServicesInfo().addServicePanel(
                                             heartbeatXML.getHbClone(),
                                             p,
                                             true,
                                             group);
-                                newMi.getService().setNew(false);
-                                addToHeartbeatIdList(newMi);
+                                newCi.getService().setNew(false);
+                                addToHeartbeatIdList(newCi);
+                                final Map<String, String> resourceNode =
+                                      heartbeatStatus.getParamValuePairs(
+                                          newCi.getService().getHeartbeatId());
+                                newCi.setParameters(resourceNode);
                             } else {
                                 final Map<String, String> resourceNode =
                                       heartbeatStatus.getParamValuePairs(
-                                          newMi.getService().getHeartbeatId());
-                                newMi.setParameters(resourceNode);
-                                newMi.setUpdated(false);
+                                          newCi.getService().getHeartbeatId());
+                                newCi.setParameters(resourceNode);
+                                newCi.setUpdated(false);
                                 heartbeatGraph.repaint();
                             }
-                            heartbeatGraph.setVertexIsPresent(newMi);
+                            heartbeatGraph.setVertexIsPresent(newCi);
                         } else {
                             /* group */
                             newGi = (GroupInfo) heartbeatIdToServiceInfo.get(group);
@@ -7024,10 +7018,14 @@ public class ClusterBrowser extends Browser {
                                 //newGi.getService().setHeartbeatId(group); // TODO: to late
                                 newGi.getService().setNew(false);
                                 addToHeartbeatIdList(newGi);
-                            } else {
-                                // TODO: should it be group hb id?
                                 final Map<String, String> resourceNode =
-                                        heartbeatStatus.getParamValuePairs(hbId);
+                                      heartbeatStatus.getParamValuePairs(
+                                          newGi.getService().getHeartbeatId());
+                                newGi.setParameters(resourceNode);
+                            } else {
+                                final Map<String, String> resourceNode =
+                                        heartbeatStatus.getParamValuePairs(
+                                          newGi.getService().getHeartbeatId());
                                 newGi.setParameters(resourceNode);
                                 newGi.setUpdated(false);
                                 heartbeatGraph.repaint();
@@ -7073,8 +7071,8 @@ public class ClusterBrowser extends Browser {
 
                         if (newGi != null) {
                             newGi.addGroupServicePanel(newSi);
-                        } else if (newMi != null) {
-                            newMi.addCloneServicePanel(newSi);
+                        } else if (newCi != null) {
+                            newCi.addCloneServicePanel(newSi);
                         } else {
                             heartbeatGraph.getServicesInfo().addServicePanel(
                                                                         newSi,
@@ -7089,7 +7087,7 @@ public class ClusterBrowser extends Browser {
                     newSi.getService().setNew(false);
                     newSi.getTypeRadioGroup().setEnabled(false);
                     heartbeatGraph.setVertexIsPresent(newSi);
-                    if (newGi != null || newMi != null) {
+                    if (newGi != null || newCi != null) {
                         groupServiceIsPresent.add(newSi);
                     }
                 }

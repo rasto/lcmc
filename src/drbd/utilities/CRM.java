@@ -302,8 +302,6 @@ public final class CRM {
                                       final String groupId,
                                       final String cloneId,
                                       final boolean master) {
-        System.out.println("remove resource: " + heartbeatId
-                           + ", gid: " + groupId + ", mid: " + cloneId);
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
         if (groupId != null) {
