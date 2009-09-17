@@ -625,7 +625,11 @@ public class DrbdXML extends XML {
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             if (option.getNodeName().equals("device")) {
-                final String device = getText(option);
+                String device = getText(option);
+                if (device != null && "".equals(device)) {
+                    final String minor = getAttribute(option, "minor");
+                    device = "/dev/drbd" + minor;
+                }
                 resourceDeviceMap.put(resName, device);
                 deviceResourceMap.put(device, resName);
             } else if (option.getNodeName().equals("disk")) {
