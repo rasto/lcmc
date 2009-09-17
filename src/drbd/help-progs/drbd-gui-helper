@@ -382,7 +382,8 @@ sub get_disk_info {
 			disk_info_warning("unknown partition: $_");
 			next;
 		}
-		my $info = "$device $blocks";
+		my $readlink = readlink $device || $device;
+		my $info = "$device $readlink $blocks";
 		$info.= " ".$$dev_to_mount{$device} if $$dev_to_mount{$device};
 		$info.= " swap swap" if $$dev_to_swap{$device};
 		$info.= " ".$$dev_to_used{$device} if defined $$dev_to_used{$device};

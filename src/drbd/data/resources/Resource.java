@@ -75,9 +75,6 @@ public class Resource {
      * Sets value for paramter.
      */
     public final void setValue(final String param, final String value) {
-        if ("notify".equals(param)) {
-            Tools.printStackTrace();
-        }
         savedValue.put(param, value);
     }
 

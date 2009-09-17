@@ -36,6 +36,8 @@ public class BlockDevice extends Resource {
     private static final long serialVersionUID = 1L;
     /** Block size in blocks. */
     private String blockSize;
+    /** absolute path from readlink. */
+    private String readlink;
     /** Where is this block device mounted if it is at all. */
     private String mountedOn;
     /** Filesytem type. */
@@ -103,16 +105,17 @@ public class BlockDevice extends Resource {
             Tools.appError("cannot parse line: " + line);
         } else {
             final String device = cols[0];
+            this.readlink = cols[1];
             setName(device);
-            this.blockSize = cols[1];
+            this.blockSize = cols[2];
             this.mountedOn = null;
             this.fsType    = null;
-            if (cols.length > 3) {
-                this.mountedOn = cols[2];
-                this.fsType    = cols[3];
-            }
             if (cols.length > 4) {
-                this.used = Integer.parseInt(cols[4]);
+                this.mountedOn = cols[3];
+                this.fsType    = cols[4];
+            }
+            if (cols.length > 5) {
+                this.used = Integer.parseInt(cols[5]);
             }
         }
     }
@@ -591,5 +594,12 @@ public class BlockDevice extends Resource {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns absolute path obtained with readlink.
+     */
+    public final String getReadlink() {
+        return readlink;
     }
 }

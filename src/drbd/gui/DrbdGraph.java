@@ -788,7 +788,8 @@ public class DrbdGraph extends ResourceGraph {
         }
         for (final Vertex v : hostBDVerticesMap.get(hi)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
-            if (bdi.getName().equals(disk)) {
+            if (bdi.getName().equals(disk)
+                || bdi.getBlockDevice().getReadlink().equals(disk)) {
                 return bdi;
             }
         }

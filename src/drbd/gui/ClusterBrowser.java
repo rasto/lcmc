@@ -1173,8 +1173,8 @@ public class ClusterBrowser extends Browser {
                                                                      resName));
                 if (drbdMetaDisk != null && !drbdMetaDisk.equals("internal")) {
                     final BlockDevInfo mdI =
-                                drbdGraph.findBlockDevInfo(hostName,
-                                                           drbdMetaDisk);
+                                      drbdGraph.findBlockDevInfo(hostName,
+                                                                 drbdMetaDisk);
                     mdI.getBlockDevice().setIsDrbdMetaDisk(true);
                     bdi.getBlockDevice().setMetaDisk(mdI.getBlockDevice());
                 }
