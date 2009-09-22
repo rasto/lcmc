@@ -1649,9 +1649,9 @@ public class ClusterBrowser extends Browser {
                                 final BlockDevInfo blockDevInfo1,
                                 final BlockDevInfo blockDevInfo2) {
             super(name);
-            setResource(new DrbdResource(name, null));
+            setResource(new DrbdResource(name, null)); // TODO: ?
             initApplyButton();
-            setResource(new DrbdResource(name, drbdDev));
+            setResource(new DrbdResource(name, drbdDev)); // TODO: ?
             // TODO: drbdresource
             getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
             this.blockDevInfo1 = blockDevInfo1;
@@ -1901,7 +1901,7 @@ public class ClusterBrowser extends Browser {
 
         /**
          * Checks the new value of the parameter if it is conforms to its type
-         * and other constrains.
+         * and other constraints.
          */
         protected final boolean checkParam(final String param,
                                            final String newValue) {
@@ -3507,7 +3507,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Starts all resources in the group.
          */
-        final public void startResource() {
+        public final void startResource() {
             setUpdated(true);
             final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
@@ -3522,7 +3522,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Stops all resources in the group.
          */
-        final public void stopResource() {
+        public final void stopResource() {
             setUpdated(true);
             final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
@@ -3537,7 +3537,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Cleans up all resources in the group.
          */
-        final public void cleanupResource() {
+        public final void cleanupResource() {
             setUpdated(true);
             final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
@@ -3551,7 +3551,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Sets whether the group services are managed.
          */
-        final public void setManaged(final boolean isManaged) {
+        public final void setManaged(final boolean isManaged) {
             setUpdated(true);
             final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
@@ -3692,7 +3692,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether one of the services on one of the hosts failed.
          */
-         final public boolean isOneFailed() {
+         public final boolean isOneFailed() {
                 final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
              if (resources != null) {
@@ -3708,7 +3708,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether one of the services failed to start.
          */
-         final public boolean isFailed() {
+         public final boolean isFailed() {
              final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
              if (resources != null) {
@@ -3728,7 +3728,7 @@ public class ClusterBrowser extends Browser {
          /**
           * Returns subtexts that appears in the service vertex.
           */
-         final public String[] getSubtextsForGraph() {
+         public final String[] getSubtextsForGraph() {
              final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
              final List<String> texts = new ArrayList<String>();
@@ -3900,8 +3900,8 @@ public class ClusterBrowser extends Browser {
          * have changed. If param is null, only param will be checked,
          * otherwise all parameters will be checked.
          */
-        protected boolean checkResourceFieldsChanged(final String param,
-                                                     final String[] params) {
+        public boolean checkResourceFieldsChanged(final String param,
+                                                  final String[] params) {
             boolean ret;
             if (super.checkResourceFieldsChanged(param, params)) {
                 ret = true;
@@ -4137,7 +4137,7 @@ public class ClusterBrowser extends Browser {
          * Returns whether service is managed.
          * TODO: "default" value
          */
-        final public boolean isManaged() {
+        public final boolean isManaged() {
             final String hbV = getDCHost().getHeartbeatVersion();
             String isManagedString = "is-managed";
             if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
@@ -4155,7 +4155,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the service is running.
          */
-        final public boolean isRunning() {
+        public final boolean isRunning() {
             return !"".equals(getRunningOnNode());
         }
 
@@ -4189,7 +4189,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns fail-count.
          */
-         final public String failCount() {
+         public final String failCount() {
              StringBuffer fcString = new StringBuffer(10);
              for (final Host host : getClusterHosts()) {
                  final String fc = heartbeatStatus.getFailCount(
@@ -4256,7 +4256,6 @@ public class ClusterBrowser extends Browser {
         public Map<HostInfo, String> getSavedHostScores() {
             return savedHostScores;
         }
-
 
         /**
          * Returns list of all host names in this cluster.
@@ -4843,7 +4842,6 @@ public class ClusterBrowser extends Browser {
                                           param);
         }
 
-
         /**
          * Returns section to which the specified parameter belongs.
          */
@@ -4887,15 +4885,7 @@ public class ClusterBrowser extends Browser {
          * Returns whether parameter is checkbox.
          */
         protected boolean isCheckBox(final String param) {
-            final String type = heartbeatXML.getParamType(hbService,
-                                                   param);
-            if (type == null) {
-                return false;
-            }
-            if (DRBD_RES_BOOL_TYPE_NAME.equals(type)) {
-                return true;
-            }
-            return false;
+            return heartbeatXML.isBoolean(hbService, param);
         }
 
         /**
@@ -4953,12 +4943,75 @@ public class ClusterBrowser extends Browser {
                 heartbeatGraph.exchangeObjectInTheVertex(this, cloneInfo);
                 heartbeatIdToServiceInfo.remove(
                                     cloneInfo.getService().getHeartbeatId());
-                heartbeatIdList.remove(
-                                     cloneInfo.getService().getHeartbeatId());
+                heartbeatIdList.remove(cloneInfo.getService().getHeartbeatId());
                 removeFromServiceInfoHash(cloneInfo);
                 cloneInfo = null;
                 infoPanel = null;
                 selectMyself();
+            }
+        }
+
+        /**
+         * Adds host score listeners.
+         */
+        protected void addHostScoreListeners() {
+            final String[] params = getParametersFromXML();
+            for (Host host : getClusterHosts()) {
+                final HostInfo hi = host.getBrowser().getHostInfo();
+                final GuiComboBox cb = scoreComboBoxHash.get(hi);
+                cb.addListeners(
+                    new ItemListener() {
+                        public void itemStateChanged(final ItemEvent e) {
+                            if (cb.isCheckBox()
+                                || e.getStateChange() == ItemEvent.SELECTED) {
+                                final Thread thread = new Thread(
+                                                              new Runnable() {
+                                    public void run() {
+                                        final boolean enable =
+                                          checkResourceFields("cached", params);
+                                        SwingUtilities.invokeLater(
+                                        new Runnable() {
+                                            public void run() {
+                                                applyButton.setEnabled(enable);
+                                            }
+                                        });
+                                    }
+                                });
+                                thread.start();
+                            }
+                        }
+                    },
+
+                    new DocumentListener() {
+                        private void check() {
+                            Thread thread = new Thread(new Runnable() {
+                                public void run() {
+                                    final boolean enable =
+                                        checkResourceFields("cached", params);
+                                    SwingUtilities.invokeLater(
+                                    new Runnable() {
+                                        public void run() {
+                                            applyButton.setEnabled(enable);
+                                        }
+                                    });
+                                }
+                            });
+                            thread.start();
+                        }
+
+                        public void insertUpdate(final DocumentEvent e) {
+                            check();
+                        }
+
+                        public void removeUpdate(final DocumentEvent e) {
+                            check();
+                        }
+
+                        public void changedUpdate(final DocumentEvent e) {
+                            check();
+                        }
+                    }
+                );
             }
         }
 
@@ -5155,65 +5208,9 @@ public class ClusterBrowser extends Browser {
             }
             /* add item listeners to the host scores combos */
             if (cloneInfo == null) {
-                for (Host host : getClusterHosts()) {
-                    final HostInfo hi = host.getBrowser().getHostInfo();
-                    final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                    cb.addListeners(
-                        new ItemListener() {
-                            public void itemStateChanged(final ItemEvent e) {
-                                if (cb.isCheckBox()
-                                    || e.getStateChange() == ItemEvent.SELECTED) {
-                                    final Thread thread = new Thread(
-                                                            new Runnable() {
-                                        public void run() {
-                                            final boolean enable =
-                                              checkResourceFields("cached",
-                                                                  params);
-                                            SwingUtilities.invokeLater(
-                                            new Runnable() {
-                                                public void run() {
-                                                    applyButton.setEnabled(
-                                                                    enable);
-                                                }
-                                            });
-                                        }
-                                    });
-                                    thread.start();
-                                }
-                            }
-                        },
-
-                        new DocumentListener() {
-                            private void check() {
-                                Thread thread = new Thread(new Runnable() {
-                                    public void run() {
-                                        final boolean enable =
-                                            checkResourceFields("cached", params);
-                                        SwingUtilities.invokeLater(
-                                        new Runnable() {
-                                            public void run() {
-                                                applyButton.setEnabled(enable);
-                                            }
-                                        });
-                                    }
-                                });
-                                thread.start();
-                            }
-
-                            public void insertUpdate(final DocumentEvent e) {
-                                check();
-                            }
-
-                            public void removeUpdate(final DocumentEvent e) {
-                                check();
-                            }
-
-                            public void changedUpdate(final DocumentEvent e) {
-                                check();
-                            }
-                        }
-                    );
-                }
+                addHostScoreListeners();
+            } else {
+                cloneInfo.addHostScoreListeners();
             }
             /* apply button */
             addApplyButton(buttonPanel);
@@ -5472,7 +5469,7 @@ public class ClusterBrowser extends Browser {
                         }
                     }
                 }
-                for (String param : params) {
+                for (final String param : params) {
                     String value = getComboBoxValue(param);
                     if (value.equals(getParamDefault(param))
                         && !isMetaAttr(param)) {
@@ -6801,7 +6798,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Returns short description of the gloval parameter, that is used as
+         * Returns short description of the global parameter, that is used as
          * label.
          */
         protected String getParamShortDesc(final String param) {
@@ -6864,14 +6861,7 @@ public class ClusterBrowser extends Browser {
          * requires a checkbox.
          */
         protected boolean isCheckBox(final String param) {
-            final String type = heartbeatXML.getGlobalParamType(param);
-            if (type == null) {
-                return false;
-            }
-            if (DRBD_RES_BOOL_TYPE_NAME.equals(type)) {
-                return true;
-            }
-            return false;
+            return heartbeatXML.isGlobalBoolean(param);
         }
 
         /**
@@ -7567,89 +7557,646 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
-     * This class describes a connection between two heartbeat services.
-     * It can be order, colocation or both. Colocation although technically
-     * don't have child, parent relationship, they are stored as such.
+     * Interface for either order or colocation constraint.
      */
-    public class HbConnectionInfo extends Info {
-
-        /** Cache for the info panel. */
-        private JComponent infoPanel = null;
+    private interface HbConstraintInterface {
+        /** Returns true if it is order, false if colocation. */
+        boolean isOrder();
+        String[] getParametersFromXML();
+        void addParams(final JPanel optionsPanel,
+                       final JPanel extraOptionsPanel,
+                       final String[] params,
+                       final int leftWidth,
+                       final int rightWidth);
+        boolean checkResourceFields(final String param,
+                                    final String[] params);
+        boolean checkResourceFieldsCorrect(final String param,
+                                           final String[] params);
+        boolean checkResourceFieldsChanged(final String param,
+                                           final String[] params);
+        void apply();
+        Service getService();
+        void addField(final JPanel panel,
+                      final JComponent left,
+                      final JComponent right,
+                      final int leftWidth,
+                      final int rightWidth);
+        String getName();
+        String getRsc1();
+        String getRsc2();
+    }
+    
+    /**
+     * Object that holds an order constraint information.
+     */
+    private class HbOrderInfo extends EditableInfo
+                             implements HbConstraintInterface {
         /** Parent resource in order constraint. */
         private ServiceInfo serviceInfoParent;
         /** Child resource in order constraint. */
         private ServiceInfo serviceInfoChild;
+        /** Cache for the info panel. */
+        private JComponent infoPanel = null;
+        /** Connection that keeps this constraint. */
+        private HbConnectionInfo connectionInfo;
+
+        /**
+         * Prepares a new <code>HbOrderInfo</code> object.
+         */
+        public HbOrderInfo(final HbConnectionInfo connectionInfo,
+                           final ServiceInfo serviceInfoParent,
+                           final ServiceInfo serviceInfoChild) {
+            super("Order");
+            setResource(new Service("Order"));
+            this.connectionInfo = connectionInfo;
+            this.serviceInfoParent = serviceInfoParent;
+            this.serviceInfoChild = serviceInfoChild;
+        }
+
+        /**
+         * Sets the order's parameters.
+         */
+        public final void setParameters() {
+            final String rscParent = 
+                            serviceInfoParent.getService().getHeartbeatId();
+            final String rscChild = 
+                            serviceInfoChild.getService().getHeartbeatId();
+            final String score = heartbeatStatus.getOrderScore(rscParent,
+                                                               rscChild);
+            final String symmetrical = heartbeatStatus.getOrderSymmetrical(
+                                                                    rscParent,
+                                                                    rscChild);
+            final String firstAction = heartbeatStatus.getOrderFirstAction(
+                                                                    rscParent,
+                                                                    rscChild);
+            final String thenAction = heartbeatStatus.getOrderThenAction(
+                                                                    rscParent,
+                                                                    rscChild);
+            final String ordId = heartbeatStatus.getOrderId(rscParent,
+                                                            rscChild);
+            final Map<String, String> resourceNode =
+                                                new HashMap<String, String>();
+            resourceNode.put("score", score);
+            resourceNode.put("symmetrical", symmetrical);
+            resourceNode.put("first-action", firstAction);
+            resourceNode.put("then-action", thenAction);
+
+            final String[] params = heartbeatXML.getOrderParameters();
+            if (params != null) {
+                for (String param : params) {
+                    String value = resourceNode.get(param);
+                    if (value == null) {
+                        value = getParamDefault(param);
+                    }
+                    if (value == null) {
+                        value = "";
+                    }
+                    if (!value.equals(getResource().getValue(param))) {
+                        getResource().setValue(param, value);
+                        final GuiComboBox cb = paramComboBoxGet(param, null);
+                        if (cb != null) {
+                            cb.setValue(value);
+                        }
+                    }
+                }
+            }
+        }
+        /**
+         * Returns that this is order constraint.
+         */
+        public final boolean isOrder() {
+            return true;
+        }
+
+        /**
+         * Returns long description of the parameter, that is used for
+         * tool tips.
+         */
+        protected final String getParamLongDesc(final String param) {
+            final String text = heartbeatXML.getOrderParamLongDesc(param);
+            return text.replaceAll("@FIRST-RSC@", serviceInfoParent.toString())
+                       .replaceAll("@THEN-RSC@", serviceInfoChild.toString());
+        }
+
+        /**
+         * Returns short description of the parameter, that is used as * label.
+         */
+        protected final String getParamShortDesc(final String param) {
+            return heartbeatXML.getOrderParamShortDesc(param);
+        }
+
+        /**
+         * Checks if the new value is correct for the parameter type and
+         * constraints.
+         */
+        protected final boolean checkParam(final String param,
+                                     final String newValue) {
+            return heartbeatXML.checkOrderParam(param, newValue);
+        }
+
+        /**
+         * Returns default for this parameter.
+         */
+        protected final String getParamDefault(final String param) {
+            return heartbeatXML.getOrderParamDefault(param);
+        }
+
+        /**
+         * Returns preferred value for this parameter.
+         */
+        protected final String getParamPreferred(final String param) {
+            return heartbeatXML.getOrderParamPreferred(param);
+        }
+
+        /**
+         * Returns lsit of all parameters as an array.
+         */
+        public final String[] getParametersFromXML() {
+            return heartbeatXML.getOrderParameters();
+        }
+
+        /**
+         * Possible choices for pulldown menus, or null if it is not a pull
+         * down menu.
+         */
+        protected final Object[] getParamPossibleChoices(final String param) {
+            return heartbeatXML.getOrderParamPossibleChoices(param);
+        }
+
+        /**
+         * Returns parameter type, boolean etc.
+         */
+        protected final String getParamType(final String param) {
+            return heartbeatXML.getOrderParamType(param);
+        }
+
+        /**
+         * Returns section to which the global belongs.
+         */
+        protected final String getSection(final String param) {
+            return heartbeatXML.getOrderSection(param);
+        }
+
+        /**
+         * Returns whether the parameter is of the boolean type and needs the
+         * checkbox.
+         */
+        protected final boolean isCheckBox(final String param) {
+            return heartbeatXML.isOrderBoolean(param);
+        }
+
+        /**
+         * Returns true if the specified parameter is of time type.
+         */
+        protected final boolean isTimeType(final String param) {
+            return heartbeatXML.isOrderTimeType(param);
+        }
+
+        /**
+         * Returns true if the specified parameter is integer.
+         */
+        protected final boolean isInteger(final String param) {
+            return heartbeatXML.isOrderInteger(param);
+        }
+
+        /**
+         * Returns true if the specified parameter is required.
+         */
+        protected final boolean isRequired(final String param) {
+            return heartbeatXML.isOrderRequired(param);
+        }
+
+        /**
+         * Checks resource fields of all constraints that are in this
+         * connection with this constraint.
+         */
+        public final boolean checkResourceFields(final String param,
+                                           final String[] params) {
+            return connectionInfo.checkResourceFields(param, null);
+        }
+
+        /**
+         * Applies changes to the order parameters.
+         */
+        public final void apply() {
+            final String[] params = getParametersFromXML();
+            final Map<String, String> attrs = new HashMap<String, String>();
+            for (final String param : params) {
+                final String value = getComboBoxValue(param);
+                if (!value.equals(getResource().getValue(param))) {
+                    attrs.put(param, value);
+                }
+            }
+            if (attrs.size() > 0) {
+                CRM.setOrderParameters(getDCHost(),
+                                       getService().getHeartbeatId(),
+                                       attrs);
+                storeComboBoxValues(params);
+            }
+        }
+
+        /**
+         * Returns service that belongs to this info object.
+         */
+        public final Service getService() {
+            return (Service) getResource();
+        }
+
+        /**
+         * Get parent resource in order constraint.
+         */
+        public final String getRsc1() {
+            return serviceInfoParent.getName();
+        }
+
+        /**
+         * Get child resource in order constraint.
+         */
+        public final String getRsc2() {
+            return serviceInfoChild.getName();
+        }
+    }
+
+    /**
+     * Object that holds a colocation constraint information.
+     */
+    private class HbColocationInfo extends EditableInfo
+                                  implements HbConstraintInterface {
         /** Resource 1 in colocation constraint. */
         private ServiceInfo serviceInfoRsc;
         /** Resource 2 in colocation constraint. */
         private ServiceInfo serviceInfoWithRsc;
+        /** Cache for the info panel. */
+        private JComponent infoPanel = null;
+        /** Connection that keeps this constraint. */
+        private HbConnectionInfo connectionInfo;
+
+        /**
+         * Prepares a new <code>HbColocationInfo</code> object.
+         */
+        public HbColocationInfo(final HbConnectionInfo connectionInfo,
+                                final ServiceInfo serviceInfoRsc,
+                                final ServiceInfo serviceInfoWithRsc) {
+            super("Colocation");
+            setResource(new Service("Colocation"));
+            this.connectionInfo = connectionInfo;
+            this.serviceInfoRsc = serviceInfoRsc;
+            this.serviceInfoWithRsc = serviceInfoWithRsc;
+        }
+
+        /**
+         * Sets the colocation's parameters.
+         */
+        public final void setParameters() {
+            final String rsc = serviceInfoRsc.getService().getHeartbeatId();
+            final String withRsc =
+                              serviceInfoWithRsc.getService().getHeartbeatId();
+            final String score = heartbeatStatus.getColocationScore(rsc,
+                                                                    withRsc);
+            final String rscRole = heartbeatStatus.getColocationRscRole(
+                                                                      rsc,
+                                                                      withRsc);
+            final String withRscRole = heartbeatStatus.getColocationWithRscRole(
+                                                                      rsc,
+                                                                      withRsc);
+            final Map<String, String> resourceNode =
+                                                new HashMap<String, String>();
+            resourceNode.put("score", score);
+            resourceNode.put("rsc-role", rscRole);
+            resourceNode.put("with-rsc-role", withRscRole);
+
+            final String[] params = heartbeatXML.getColocationParameters();
+            if (params != null) {
+                for (String param : params) {
+                    String value = resourceNode.get(param);
+                    if (value == null) {
+                        value = getParamDefault(param);
+                    }
+                    if (value == null) {
+                        value = "";
+                    }
+                    if (!value.equals(getResource().getValue(param))) {
+                        getResource().setValue(param, value);
+                        final GuiComboBox cb = paramComboBoxGet(param, null);
+                        if (cb != null) {
+                            cb.setValue(value);
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Returns that this is order constraint.
+         */
+        public final boolean isOrder() {
+            return false;
+        }
+        /**
+         * Returns long description of the parameter, that is used for
+         * tool tips.
+         */
+        protected final String getParamLongDesc(final String param) {
+
+            final String text = heartbeatXML.getColocationParamLongDesc(param);
+            return text.replaceAll("@RSC@", serviceInfoRsc.toString())
+                       .replaceAll("@WITH-RSC@", serviceInfoWithRsc.toString());
+        }
+
+        /**
+         * Returns short description of the parameter, that is used as * label.
+         */
+        protected final String getParamShortDesc(final String param) {
+            return heartbeatXML.getColocationParamShortDesc(param);
+        }
+
+        /**
+         * Checks if the new value is correct for the parameter type and
+         * constraints.
+         */
+        protected final boolean checkParam(final String param,
+                                     final String newValue) {
+            return heartbeatXML.checkColocationParam(param, newValue);
+        }
+
+        /**
+         * Returns default for this parameter.
+         */
+        protected final String getParamDefault(final String param) {
+            return heartbeatXML.getColocationParamDefault(param);
+        }
+
+        /**
+         * Returns preferred value for this parameter.
+         */
+        protected final String getParamPreferred(final String param) {
+            return heartbeatXML.getColocationParamPreferred(param);
+        }
+
+        /**
+         * Returns lsit of all parameters as an array.
+         */
+        public final String[] getParametersFromXML() {
+            return heartbeatXML.getColocationParameters();
+        }
+
+        /**
+         * Possible choices for pulldown menus, or null if it is not a pull
+         * down menu.
+         */
+        protected final Object[] getParamPossibleChoices(
+                                                         final String param) {
+            return heartbeatXML.getColocationParamPossibleChoices(param);
+        }
+
+        /**
+         * Returns parameter type, boolean etc.
+         */
+        protected final String getParamType(final String param) {
+            return heartbeatXML.getColocationParamType(param);
+        }
+
+        /**
+         * Returns section to which the global belongs.
+         */
+        protected final String getSection(final String param) {
+            return heartbeatXML.getColocationSection(param);
+        }
+
+        /**
+         * Returns whether the parameter is of the boolean type and needs the
+         * checkbox.
+         */
+        protected final boolean isCheckBox(final String param) {
+            return heartbeatXML.isColocationBoolean(param);
+        }
+
+        /**
+         * Returns true if the specified parameter is of time type.
+         */
+        protected final boolean isTimeType(final String param) {
+            return heartbeatXML.isColocationTimeType(param);
+        }
+
+        /**
+         * Returns true if the specified parameter is integer.
+         */
+        protected final boolean isInteger(final String param) {
+            return heartbeatXML.isColocationInteger(param);
+        }
+
+        /**
+         * Returns true if the specified parameter is required.
+         */
+        protected final boolean isRequired(final String param) {
+            return heartbeatXML.isColocationRequired(param);
+        }
+
+        /**
+         * Checks resource fields of all constraints that are in this
+         * connection with this constraint.
+         */
+        public final boolean checkResourceFields(final String param,
+                                                 final String[] params) {
+            return connectionInfo.checkResourceFields(param, null);
+        }
+
+        /**
+         * Applies changes to the colocation parameters.
+         */
+        public final void apply() {
+            final String[] params = getParametersFromXML();
+            final Map<String, String> attrs = new HashMap<String, String>();
+            for (final String param : params) {
+                final String value = getComboBoxValue(param);
+                if (!value.equals(getResource().getValue(param))) {
+                    attrs.put(param, value);
+                }
+            }
+            if (attrs.size() > 0) {
+                CRM.setColocationParameters(getDCHost(),
+                                            getService().getHeartbeatId(),
+                                            attrs);
+            }
+            storeComboBoxValues(params);
+        }
+
+        /**
+         * Returns service that belongs to this info object.
+         */
+        public final Service getService() {
+            return (Service) getResource();
+        }
+
+        /**
+         * Resource 1 in colocation constraint.
+         */
+        public final String getRsc1() {
+            return serviceInfoRsc.getName();
+        }
+        /**
+         * Resource 2 in colocation constraint.
+         */
+        public final String getRsc2() {
+            return serviceInfoWithRsc.getName();
+        }
+    }
+
+    /**
+     * This class describes a connection between two heartbeat services.
+     * It can be order, colocation or both.
+     */
+    public class HbConnectionInfo extends EditableInfo {
+        /** Cache for the info panel. */
+        private JComponent infoPanel = null;
+        /** Constraints. */
+        private final List<HbConstraintInterface> constraints =
+                                       new ArrayList<HbConstraintInterface>();
+        /** Resource 1 in colocation constraint (the last one). */
+        private ServiceInfo lastServiceInfoRsc = null;
+        /** Resource 2 in colocation constraint (the last one). */
+        private ServiceInfo lastServiceInfoWithRsc = null;
+        /** Parent resource in order constraint (the last one). */
+        private ServiceInfo lastServiceInfoParent = null;
+        /** Child resource in order constraint (the last one). */
+        private ServiceInfo lastServiceInfoChild = null;
+        /** List of colocation ids. */
+        private Map<String, HbColocationInfo> colocationIds =
+                                       new HashMap<String, HbColocationInfo>();
+        /** List of order ids. */
+        private Map<String, HbOrderInfo> orderIds =
+                                            new HashMap<String, HbOrderInfo>();
 
         /**
          * Prepares a new <code>HbConnectionInfo</code> object.
          */
         public HbConnectionInfo() {
             super("HbConnectionInfo");
-            this.serviceInfoParent = serviceInfoParent;
-            this.serviceInfoChild = serviceInfoChild;
+            initApplyButton();
         }
 
         /**
-         * Sets parent resource in order constraint.
+         * Returns long description of the parameter, that is used for
+         * tool tips.
          */
-        public final void setServiceInfoParent(
-                                        final ServiceInfo serviceInfoParent) {
-            this.serviceInfoParent = serviceInfoParent;
+        protected final String getParamLongDesc(final String param) {
+            return null;
         }
 
         /**
-         * Sets child resource in order constraint.
+         * Returns short description of the parameter, that is used as * label.
          */
-        public final void setServiceInfoChild(
-                                        final ServiceInfo serviceInfoChild) {
-            this.serviceInfoChild = serviceInfoChild;
+        protected final String getParamShortDesc(final String param) {
+            return null;
         }
 
         /**
-         * Sets resource 1 in colocation constraint.
+         * Checks if the new value is correct for the parameter type and
+         * constraints.
          */
-        public final void setServiceInfoRsc(final ServiceInfo serviceInfoRsc) {
-            this.serviceInfoRsc = serviceInfoRsc;
+        protected final boolean checkParam(final String param,
+                                     final String newValue) {
+            return false;
         }
 
         /**
-         * Sets resource 2 in colocation constraint.
+         * Returns default for this parameter.
          */
-        public final void setServiceInfoWithRsc(
-                                        final ServiceInfo serviceInfoWithRsc) {
-            this.serviceInfoWithRsc = serviceInfoWithRsc;
+        protected final String getParamDefault(final String param) {
+            return null;
+        }
+
+        /**
+         * Returns preferred value for this parameter.
+         */
+        protected final String getParamPreferred(final String param) {
+            return null;
+        }
+
+        /**
+         * Returns lsit of all parameters as an array.
+         */
+        public final String[] getParametersFromXML() {
+            return null;
+        }
+
+        /**
+         * Possible choices for pulldown menus, or null if it is not a pull
+         * down menu.
+         */
+        protected final Object[] getParamPossibleChoices(final String param) {
+            return null;
+        }
+
+        /**
+         * Returns parameter type, boolean etc.
+         */
+        protected final String getParamType(final String param) {
+            return null;
+        }
+
+        /**
+         * Returns section to which the global belongs.
+         */
+        protected final String getSection(final String param) {
+            return null;
+        }
+
+        /**
+         * Returns whether the parameter is of the boolean type and needs the
+         * checkbox.
+         */
+        protected final boolean isCheckBox(final String param) {
+            return false;
+        }
+
+        /**
+         * Returns true if the specified parameter is of time type.
+         */
+        protected boolean isTimeType(final String param) {
+            return false;
+        }
+
+        /**
+         * Returns true if the specified parameter is integer.
+         */
+        protected final boolean isInteger(final String param) {
+            return false;
+        }
+
+        /**
+         * Returns true if the specified parameter is required.
+         */
+        protected final boolean isRequired(final String param) {
+            return true;
         }
 
         /**
          * Returns parent resource in order constraint.
          */
-        public final ServiceInfo getServiceInfoParent() {
-            return serviceInfoParent;
+        public final ServiceInfo getLastServiceInfoParent() {
+            return lastServiceInfoParent;
         }
 
         /**
          * Returns child resource in order constraint.
          */
-        public final ServiceInfo getServiceInfoChild() {
-            return serviceInfoChild;
+        public final ServiceInfo getLastServiceInfoChild() {
+            return lastServiceInfoChild;
         }
 
         /**
          * Returns resource 1 in colocation constraint.
          */
-        public final ServiceInfo getServiceInfoRsc() {
-            return serviceInfoRsc;
+        public final ServiceInfo getLastServiceInfoRsc() {
+            return lastServiceInfoRsc;
         }
 
         /**
          * Returns resource 2 in colocation constraint.
          */
-        public final ServiceInfo getServiceInfoWithRsc() {
-            return serviceInfoWithRsc;
+        public final ServiceInfo getLastServiceInfoWithRsc() {
+            return lastServiceInfoWithRsc;
         }
 
         /**
@@ -7660,6 +8207,51 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Applies the changes to the constraints.
+         */
+        public final void apply() {
+            for (final HbConstraintInterface c : constraints) {
+                c.apply();
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    applyButton.setEnabled(false);
+                }
+            });
+        }
+
+        /**
+         * Check order and colocation constraints.
+         */
+        public final boolean checkResourceFields(final String param,
+                                                 final String[] params) {
+            boolean correct = true;
+            for (final HbConstraintInterface c : constraints) {
+                final boolean cor = c.checkResourceFieldsCorrect(
+                                      param,
+                                      c.getParametersFromXML());
+                if (!cor) {
+                    correct = false;
+                    break;
+                }
+            }
+            if (correct) {
+                boolean changed = false;
+                for (final HbConstraintInterface c : constraints) {
+                    final boolean chg = c.checkResourceFieldsChanged(
+                                      param,
+                                      c.getParametersFromXML());
+                    if (chg) {
+                        changed = true;
+                        break;
+                    }
+                }
+                return changed;
+            }
+            return correct;
+        }
+
+        /**
          * Returns info panel for hb connection (order and/or colocation
          * constraint.
          */
@@ -7667,12 +8259,28 @@ public class ClusterBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
+            final JPanel mainPanel = new JPanel();
+            mainPanel.setBackground(PANEL_BACKGROUND);
+            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
             final JPanel buttonPanel = new JPanel(new BorderLayout());
             buttonPanel.setBackground(STATUS_BACKGROUND);
             buttonPanel.setMinimumSize(new Dimension(0, 50));
             buttonPanel.setPreferredSize(new Dimension(0, 50));
             buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+
+            final JPanel optionsPanel = new JPanel();
+            optionsPanel.setBackground(PANEL_BACKGROUND);
+            optionsPanel.setLayout(new BoxLayout(optionsPanel,
+                                                 BoxLayout.Y_AXIS));
+            optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            final JPanel extraOptionsPanel = new JPanel();
+            extraOptionsPanel.setBackground(EXTRA_PANEL_BACKGROUND);
+            extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
+                                                      BoxLayout.Y_AXIS));
+            extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            mainPanel.add(buttonPanel);
 
             /* Actions */
             final JMenuBar mb = new JMenuBar();
@@ -7682,10 +8290,69 @@ public class ClusterBrowser extends Browser {
             mb.add(serviceCombo);
             buttonPanel.add(mb, BorderLayout.EAST);
 
+            /* params */
+            for (final HbConstraintInterface c : constraints) {
+                final String[] params = c.getParametersFromXML();
+                /* heartbeat id */
+                final JPanel panel = getParamPanel(c.getName());
+                int rows = 3;
+                c.addField(panel,
+                         new JLabel(
+                                Tools.getString("ClusterBrowser.HeartbeatId")),
+                         new JLabel(c.getService().getHeartbeatId()),
+                         SERVICE_LABEL_WIDTH,
+                         SERVICE_FIELD_WIDTH);
+                c.addField(panel,
+                         new JLabel("rsc1"),
+                         new JLabel(c.getRsc1()),
+                         SERVICE_LABEL_WIDTH,
+                         SERVICE_FIELD_WIDTH);
+                c.addField(panel,
+                         new JLabel("rsc2"),
+                         new JLabel(c.getRsc2()),
+                         SERVICE_LABEL_WIDTH,
+                         SERVICE_FIELD_WIDTH);
+                SpringUtilities.makeCompactGrid(panel, rows, 2, // rows, cols
+                                                1, 1,        // initX, initY
+                                                1, 1);       // xPad, yPad
+
+                extraOptionsPanel.add(panel);
+                c.addParams(optionsPanel,
+                            extraOptionsPanel,
+                            params,
+                            SERVICE_LABEL_WIDTH,
+                            SERVICE_FIELD_WIDTH);
+            }
+
+            applyButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                hbStatusLock();
+                                apply();
+                                hbStatusUnlock();
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            );
+
+            /* apply button */
+            addApplyButton(buttonPanel);
+            applyButton.setEnabled(checkResourceFields(null, null));
+            /* expert mode */
+            buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
+
+            mainPanel.add(optionsPanel);
+            mainPanel.add(extraOptionsPanel);
+
             infoPanel = new JPanel();
             infoPanel.setBackground(PANEL_BACKGROUND);
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             infoPanel.add(buttonPanel);
+            infoPanel.add(new JScrollPane(mainPanel));
             infoPanel.add(Box.createVerticalGlue());
             infoPanel.setMinimumSize(new Dimension(
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
@@ -7751,8 +8418,8 @@ public class ClusterBrowser extends Browser {
                     } else {
                         /* there is colocation constraint so let's get the
                          * endpoints from it. */
-                        setServiceInfoParent(getServiceInfoRsc());
-                        setServiceInfoChild(getServiceInfoWithRsc());
+                        addOrder(getLastServiceInfoRsc(),
+                                 getLastServiceInfoWithRsc());
                         heartbeatGraph.addOrder(thisClass);
                     }
                 }
@@ -7790,10 +8457,15 @@ public class ClusterBrowser extends Browser {
                                        "ClusterBrowser.Hb.RemoveColocation"))) {
                         heartbeatGraph.removeColocation(thisClass);
                     } else {
+                        /* add colocation */
                         /* there is order constraint so let's get the endpoints
                          * from it. */
-                        setServiceInfoRsc(getServiceInfoParent());
-                        setServiceInfoWithRsc(getServiceInfoChild());
+                        addColocation(getLastServiceInfoParent(),
+                                      getLastServiceInfoChild());
+                        //constraints.add(
+                        //    (HbConstraintInterface) new HbColocationInfo(
+                        //                           getLastServiceInfoParent(),
+                        //                           getLastServiceInfoChild()));
                         heartbeatGraph.addColocation(thisClass);
                     }
                 }
@@ -7801,36 +8473,118 @@ public class ClusterBrowser extends Browser {
 
             registerMenuItem(removeColocationItem);
             items.add(removeColocationItem);
-            /* reverse order */
-            final MyMenuItem reverseOrderItem =
-                new MyMenuItem(
-                    Tools.getString("ClusterBrowser.Hb.ReverseOrder"),
-                    null,
-                    Tools.getString("ClusterBrowser.Hb.ReverseOrder.ToolTip")) {
-                private static final long serialVersionUID = 1L;
+            ///* TODO: reverse order */
+            //final MyMenuItem reverseOrderItem =
+            //    new MyMenuItem(
+            //        Tools.getString("ClusterBrowser.Hb.ReverseOrder"),
+            //        null,
+            //        Tools.getString("ClusterBrowser.Hb.ReverseOrder.ToolTip")) {
+            //    private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return heartbeatGraph.isOrder(thisClass);
-                }
+            //    public boolean enablePredicate() {
+            //        return heartbeatGraph.isOrder(thisClass);
+            //    }
 
-                public void action() {
-                    ServiceInfo child = serviceInfoChild;
-                    ServiceInfo parent = serviceInfoParent;
-                    heartbeatGraph.removeOrder(thisClass);
-                    // TODO: or should I wait till it is really removed?
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                    serviceInfoChild = parent;
-                    serviceInfoParent = child;
-                    heartbeatGraph.addOrder(thisClass);
-                }
-            };
-            registerMenuItem(reverseOrderItem);
-            items.add(reverseOrderItem);
+            //    public void action() {
+            //        ServiceInfo child = lastServiceInfoChild;
+            //        ServiceInfo parent = lastServiceInfoParent;
+            //        heartbeatGraph.removeOrder(thisClass);
+            //        // TODO: or should I wait till it is really removed?
+            //        try {
+            //            Thread.sleep(1000);
+            //        } catch (InterruptedException ex) {
+            //            Thread.currentThread().interrupt();
+            //        }
+            //        //serviceInfoChild = parent;
+            //        //serviceInfoParent = child;
+            //        constraints.removeOrders();
+            //        heartbeatGraph.addOrder(thisClass);
+            //    }
+            //};
+            //registerMenuItem(reverseOrderItem);
+            //items.add(reverseOrderItem);
             return items;
+        }
+
+        /**
+         * Removes colocations or orders.
+         */
+        private void removeOrdersOrColocations(boolean isOrder) {
+            final List<HbConstraintInterface> constraintsToRemove =
+                                        new ArrayList<HbConstraintInterface>();
+            for (final HbConstraintInterface c : constraints) {
+                if (c.isOrder() == isOrder) {
+                    constraintsToRemove.add(c);
+                }
+            }
+            for (final HbConstraintInterface c : constraintsToRemove) {
+               constraints.remove(c);
+            }
+        }
+
+        /**
+         * Removes all orders.
+         */
+        public final void removeOrders() {
+            removeOrdersOrColocations(true);
+        }
+
+        /**
+         * Removes all colocations.
+         */
+        public final void removeColocations() {
+            removeOrdersOrColocations(false);
+        }
+
+        /**
+         * Adds a new order.
+         */
+        public final void addOrder(final ServiceInfo serviceInfoParent,
+                                   final ServiceInfo serviceInfoChild) {
+            final String ordId = heartbeatStatus.getOrderId(
+                            serviceInfoParent.getService().getHeartbeatId(),
+                            serviceInfoChild.getService().getHeartbeatId());
+
+            if (orderIds.containsKey(ordId)) {
+                orderIds.get(ordId).setParameters();
+                return;
+            }
+            lastServiceInfoParent = serviceInfoParent;
+            lastServiceInfoChild = serviceInfoChild;
+            final HbOrderInfo oi = new HbOrderInfo(this,
+                                                   serviceInfoParent,
+                                                   serviceInfoChild);
+            orderIds.put(ordId, oi);
+            oi.getService().setHeartbeatId(ordId);
+            oi.applyButton = applyButton;
+            oi.setParameters();
+            constraints.add(oi);
+        }
+
+        /**
+         * Adds a new colocation.
+         */
+        public final void addColocation(final ServiceInfo serviceInfoRsc,
+                                        final ServiceInfo serviceInfoWithRsc) {
+            final String colId =
+            heartbeatStatus.getColocationId(
+                             serviceInfoRsc.getService().getHeartbeatId(),
+                             serviceInfoWithRsc.getService().getHeartbeatId());
+            if (colocationIds.containsKey(colId)) {
+                colocationIds.get(colId).setParameters();
+                return;
+            }
+            lastServiceInfoRsc = serviceInfoRsc;
+            lastServiceInfoWithRsc = serviceInfoWithRsc;
+            final HbColocationInfo ci = new HbColocationInfo(
+                                                       this,
+                                                       serviceInfoRsc,
+                                                       serviceInfoWithRsc);
+            colocationIds.put(colId, ci);
+            ci.getService().setHeartbeatId(colId);
+            ci.applyButton = applyButton;
+            ci.setParameters();
+            constraints.add(ci);
         }
     }
 

@@ -786,7 +786,7 @@ public class Browser {
          * Adds field with left and right component to the panel. Use panel
          * with spring layout for this.
          */
-        protected final void addField(final JPanel panel,
+        public final void addField(final JPanel panel,
                                 final JComponent left,
                                 final JComponent right,
                                 final int leftWidth,
@@ -1390,7 +1390,7 @@ public class Browser {
          * have changed. If param is null, only param will be checked,
          * otherwise all parameters will be checked.
          */
-        protected boolean checkResourceFieldsChanged(final String param,
+        public boolean checkResourceFieldsChanged(final String param,
                                                      final String[] params) {
             /* check if something is different from saved values */
             boolean changedValue = false;

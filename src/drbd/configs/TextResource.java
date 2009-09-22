@@ -1509,6 +1509,11 @@ public class TextResource extends
         {"HeartbeatXML.IsManaged.LongDesc",
          "Select whether the service should be managed by Heartbeat or not."},
 
+        {"HeartbeatXML.ColocationSectionParams",
+         "Parameters"},
+        {"HeartbeatXML.OrderSectionParams",
+         "Parameters"},
+
         {"GuiComboBox.Select",
          "Select..."},
 

@@ -592,6 +592,29 @@ public final class CRM {
     }
 
     /**
+     * Sets colocation parameters.
+     */
+    public static void setColocationParameters(
+                                             final Host host,
+                                             final String colId,
+                                             final Map<String, String> attrs) {
+        final String hbV = host.getHeartbeatVersion();
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_colocation id=\"");
+        xml.append(colId);
+        for (final String attr : attrs.keySet()) {
+            xml.append("\" " + attr + "=\"");
+            xml.append(attrs.get(attr));
+        }
+        xml.append("\"/>'");
+        final String command = getCibCommand("-U",
+                                             "constraints",
+                                             xml.toString());
+        execCommand(host, command, true);
+    }
+
+
+    /**
      * Removes order constraint with specified order id.
      */
     public static void removeOrder(final Host host,
@@ -670,6 +693,27 @@ public final class CRM {
         }
         xml.append("\"/>'");
         final String command = getCibCommand("-C",
+                                             "constraints",
+                                             xml.toString());
+        execCommand(host, command, true);
+    }
+
+    /**
+     * Sets order parameters.
+     */
+    public static void setOrderParameters(final Host host,
+                                          final String orderId,
+                                          final Map<String, String> attrs) {
+        final String hbV = host.getHeartbeatVersion();
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_order id=\"");
+        xml.append(orderId);
+        for (final String attr : attrs.keySet()) {
+            xml.append("\" " + attr + "=\"");
+            xml.append(attrs.get(attr));
+        }
+        xml.append("\"/>'");
+        final String command = getCibCommand("-U",
                                              "constraints",
                                              xml.toString());
         execCommand(host, command, true);

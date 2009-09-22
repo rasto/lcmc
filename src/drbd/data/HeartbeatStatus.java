@@ -252,6 +252,34 @@ public class HeartbeatStatus {
         return ret;
     }
 
+    /**
+     * Returns colocation rsc1 role.
+     */
+    public final String getColocationRscRole(final String rsc1,
+                                             final String rsc2) {
+        final String ret = (String) cibQueryMap.getColocationRscRole().get(
+                                                                         rsc1,
+                                                                         rsc2);
+        if (ret == null) {
+            return (String) cibQueryMap.getColocationRscRole().get(rsc2, rsc1);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns colocation rsc2 role.
+     */
+    public final String getColocationWithRscRole(final String rsc1,
+                                                 final String rsc2) {
+        final String ret = (String) cibQueryMap.getColocationWithRscRole().get(
+                                                                         rsc1,
+                                                                         rsc2);
+        if (ret == null) {
+            return (String) cibQueryMap.getColocationWithRscRole().get(rsc2,
+                                                                       rsc1);
+        }
+        return ret;
+    }
 
     /**
      * Returns order id of two resources.
@@ -272,6 +300,32 @@ public class HeartbeatStatus {
                                                                     rsc2);
         if (ret == null) {
             return (String) cibQueryMap.getOrderScore().get(rsc2, rsc1);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns order first-action of two resources.
+     */
+    public final String getOrderFirstAction(final String rsc1,
+                                            final String rsc2) {
+        final String ret = (String) cibQueryMap.getOrderFirstAction().get(rsc1,
+                                                                          rsc2);
+        if (ret == null) {
+            return (String) cibQueryMap.getOrderFirstAction().get(rsc2, rsc1);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns order then-action of two resources.
+     */
+    public final String getOrderThenAction(final String rsc1,
+                                           final String rsc2) {
+        final String ret = (String) cibQueryMap.getOrderThenAction().get(rsc1,
+                                                                         rsc2);
+        if (ret == null) {
+            return (String) cibQueryMap.getOrderThenAction().get(rsc2, rsc1);
         }
         return ret;
     }

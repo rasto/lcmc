@@ -56,6 +56,10 @@ public class CibQuery {
                                            new HashMap<String, List<String>>();
     /** Colocation score map. */
     private MultiKeyMap colocationScore;
+    /** Colocation rsc1 role map. */
+    private MultiKeyMap colocationRscRole = new MultiKeyMap();
+    /** Colocation's with-rsc-role map. */
+    private MultiKeyMap colocationWithRscRole = new MultiKeyMap();
     /** Colocation id map. */
     private MultiKeyMap colocationId;
     /** Order map. */
@@ -67,6 +71,10 @@ public class CibQuery {
     private MultiKeyMap orderSymmetrical;
     /** Order id map. */
     private MultiKeyMap orderId;
+    /** Order's first-action map. */
+    private  MultiKeyMap orderFirstAction = new MultiKeyMap();
+    /** Order's then-action map. */
+    private  MultiKeyMap orderThenAction = new MultiKeyMap();
     /** Order direction map. */
     private MultiKeyMap orderDirection;
     /** Location map. */
@@ -203,10 +211,41 @@ public class CibQuery {
     }
 
     /**
+     * Sets colocation rsc-role map.
+     */
+    public final void setColocationRscRole(
+                                     final MultiKeyMap colocationRscRole) {
+        this.colocationRscRole = colocationRscRole;
+    }
+
+
+    /**
+     * Sets colocation with-rsc-role map.
+     */
+    public final void setColocationWithRscRole(
+                                     final MultiKeyMap colocationWithRscRole) {
+        this.colocationWithRscRole = colocationWithRscRole;
+    }
+
+    /**
      * Returns colocation score map.
      */
     public final MultiKeyMap getColocationScore() {
         return colocationScore;
+    }
+
+    /**
+     * Returns colocation rsc1 role map.
+     */
+    public final MultiKeyMap getColocationRscRole() {
+        return colocationRscRole;
+    }
+
+    /**
+     * Returns colocation rsc2 role map.
+     */
+    public final MultiKeyMap getColocationWithRscRole() {
+        return colocationWithRscRole;
     }
 
     /**
@@ -245,6 +284,20 @@ public class CibQuery {
     }
 
     /**
+     * Sets order's first action map.
+     */
+    public final void setOrderFirstAction(final MultiKeyMap orderFirstAction) {
+        this.orderFirstAction = orderFirstAction;
+    }
+
+    /**
+     * Sets order's then action map.
+     */
+    public final void setOrderThenAction(final MultiKeyMap orderThenAction) {
+        this.orderThenAction = orderThenAction;
+    }
+
+    /**
      * Returns order id map.
      */
     public final MultiKeyMap getOrderId() {
@@ -263,6 +316,20 @@ public class CibQuery {
      */
     public final MultiKeyMap getOrderScore() {
         return orderScore;
+    }
+
+    /**
+     * Returns order first action map.
+     */
+    public final MultiKeyMap getOrderFirstAction() {
+        return orderFirstAction;
+    }
+
+    /**
+     * Returns order then action map.
+     */
+    public final MultiKeyMap getOrderThenAction() {
+        return orderThenAction;
     }
 
     /**

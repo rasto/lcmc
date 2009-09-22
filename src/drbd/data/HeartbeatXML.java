@@ -79,10 +79,54 @@ public class HeartbeatXML extends XML {
     private final Map<String, String> paramGlobalTypeMap =
                                                 new HashMap<String, String>();
     /** Map from global parameter to the array of possible choices. */
-    // TODO; does nothing?
     private final Map<String, String[]> paramGlobalPossibleChoices =
-                                        new HashMap<String, String[]>();
+                                              new HashMap<String, String[]>();
+    /** List of parameters for colocations. */
+    private final List<String> colParams = new ArrayList<String>();
+    /** List of required parameters for colocations. */
+    private final List<String> colRequiredParams = new ArrayList<String>();
+    /** Map from colocation parameter to its short description. */
+    private final Map<String, String> paramColShortDescMap =
+                                                new HashMap<String, String>();
+    /** Map from colocation parameter to its long description. */
+    private final Map<String, String> paramColLongDescMap =
+                                                new HashMap<String, String>();
+    /** Map from colocation parameter to its default value. */
+    private final Map<String, String> paramColDefaultMap =
+                                                new HashMap<String, String>();
+    /** Map from colocation parameter to its preferred value. */
+    private final Map<String, String> paramColPreferredMap =
+                                                new HashMap<String, String>();
+    /** Map from colocation parameter to its type. */
+    private final Map<String, String> paramColTypeMap =
+                                                new HashMap<String, String>();
+    /** Map from colocation parameter to the array of possible choices. */
+    private final Map<String, String[]> paramColPossibleChoices =
+                                              new HashMap<String, String[]>();
 
+
+    /** List of parameters for order. */
+    private final List<String> ordParams = new ArrayList<String>();
+    /** List of required parameters for orders. */
+    private final List<String> ordRequiredParams = new ArrayList<String>();
+    /** Map from order parameter to its short description. */
+    private final Map<String, String> paramOrdShortDescMap =
+                                                new HashMap<String, String>();
+    /** Map from order parameter to its long description. */
+    private final Map<String, String> paramOrdLongDescMap =
+                                                new HashMap<String, String>();
+    /** Map from order parameter to its default value. */
+    private final Map<String, String> paramOrdDefaultMap =
+                                                new HashMap<String, String>();
+    /** Map from order parameter to its preferred value. */
+    private final Map<String, String> paramOrdPreferredMap =
+                                                new HashMap<String, String>();
+    /** Map from order parameter to its type. */
+    private final Map<String, String> paramOrdTypeMap =
+                                                new HashMap<String, String>();
+    /** Map from order parameter to the array of possible choices. */
+    private final Map<String, String[]> paramOrdPossibleChoices =
+                                              new HashMap<String, String[]>();
     /** Predefined group as heartbeat service. */
     private final HeartbeatService hbGroup =
                       new HeartbeatService(Tools.getConfigData().PM_GROUP_NAME,
@@ -107,6 +151,16 @@ public class HeartbeatXML extends XML {
     private static final String PARAM_TYPE_TIME = "time";
     /** Fail count prefix. */
     private static final String FAIL_COUNT_PREFIX = "fail-count-";
+    /** Attribute roles. */
+    private static final String[] ATTRIBUTE_ROLES = {"Stopped",
+                                                     "Started",
+                                                     "Master",
+                                                     "Slave"};
+    /** Attribute actions. */
+    private static final String[] ATTRIBUTE_ACTIONS = {"start",
+                                                       "promote",
+                                                       "demote",
+                                                       "stop"};
     /**
      * Prepares a new <code>HeartbeatXML</code> object.
      */
@@ -229,7 +283,7 @@ public class HeartbeatXML extends XML {
             Tools.appError("drbddisk heartbeat script is not present");
         }
 
-        /* hardcoding global params */
+        /* Hardcoding global params */
         /* symmetric cluster */
         globalParams.add("symmetric-cluster");
         paramGlobalShortDescMap.put("symmetric-cluster", "Symmetric Cluster");
@@ -372,10 +426,60 @@ public class HeartbeatXML extends XML {
             paramGlobalTypeMap.put("start-failure-is-fatal",
                                    PARAM_TYPE_BOOLEAN);
             paramGlobalDefaultMap.put("start-failure-is-fatal",
-                                                            hb_boolean_false);
+                                      hb_boolean_false);
             paramGlobalPossibleChoices.put("start-failure-is-fatal",
                                            booleanValues);
         }
+
+        /* Hardcoding colocation params */
+        colParams.add("rsc-role");
+        paramColShortDescMap.put("rsc-role", "rsc1 col role");
+        paramColLongDescMap.put("rsc-role", "@RSC@ colocation role");
+        paramColTypeMap.put("rsc-role", PARAM_TYPE_STRING);
+        paramColDefaultMap.put("rsc-role", "Started");
+        paramColPossibleChoices.put("rsc-role", ATTRIBUTE_ROLES);
+
+        colParams.add("with-rsc-role");
+        paramColShortDescMap.put("with-rsc-role", "rsc2 col role");
+        paramColLongDescMap.put("with-rsc-role", "@WITH-RSC@ colocation role");
+        paramColTypeMap.put("with-rsc-role", PARAM_TYPE_STRING);
+        paramColDefaultMap.put("with-rsc-role", "Started");
+        paramColPossibleChoices.put("with-rsc-role", ATTRIBUTE_ROLES);
+
+        colParams.add("score");
+        paramColShortDescMap.put("score", "Score");
+        paramColLongDescMap.put("score", "Score");
+        paramColTypeMap.put("score", PARAM_TYPE_INTEGER);
+        paramColDefaultMap.put("score", "INFINITY");
+        paramColPossibleChoices.put("score", integerValues);
+        /* Hardcoding order params */
+        ordParams.add("first-action");
+        paramOrdShortDescMap.put("first-action", "rsc1 order action");
+        paramOrdLongDescMap.put("first-action", "@FIRST-RSC@ order action");
+        paramOrdTypeMap.put("first-action", PARAM_TYPE_STRING);
+        paramOrdDefaultMap.put("first-action", "start");
+        paramOrdPossibleChoices.put("first-action", ATTRIBUTE_ACTIONS);
+
+        ordParams.add("then-action");
+        paramOrdShortDescMap.put("then-action", "rsc2 order action");
+        paramOrdLongDescMap.put("then-action", "@THEN-RSC@ order action");
+        paramOrdTypeMap.put("then-action", PARAM_TYPE_STRING);
+        paramOrdDefaultMap.put("then-action", "start");
+        paramOrdPossibleChoices.put("then-action", ATTRIBUTE_ACTIONS);
+
+        ordParams.add("symmetrical");
+        paramOrdShortDescMap.put("symmetrical", "Symmetrical");
+        paramOrdLongDescMap.put("symmetrical", "Symmetrical");
+        paramOrdTypeMap.put("symmetrical", PARAM_TYPE_BOOLEAN);
+        paramOrdDefaultMap.put("symmetrical", hb_boolean_false);
+        paramOrdPossibleChoices.put("symmetrical", booleanValues);
+
+        ordParams.add("score");
+        paramOrdShortDescMap.put("score", "Score");
+        paramOrdLongDescMap.put("score", "Score");
+        paramOrdTypeMap.put("score", PARAM_TYPE_INTEGER);
+        paramOrdDefaultMap.put("score", "INFINITY");
+        paramOrdPossibleChoices.put("score", integerValues);
     }
 
     /**
@@ -546,6 +650,7 @@ public class HeartbeatXML extends XML {
     public final String getGlobalParamType(final String param) {
         return paramGlobalTypeMap.get(param);
     }
+
     /**
      * Returns type of the parameter. It can be string, integer, boolean...
      */
@@ -635,11 +740,28 @@ public class HeartbeatXML extends XML {
     }
 
     /**
+     * Returns whether the parameter expects a boolean value.
+     */
+    public final boolean isBoolean(final HeartbeatService hbService,
+                                   final String param) {
+        final String type = getParamType(hbService, param);
+        return PARAM_TYPE_BOOLEAN.equals(type);
+    }
+
+    /**
      * Returns whether the global parameter expects an integer value.
      */
     public final boolean isGlobalInteger(final String param) {
         final String type = getGlobalParamType(param);
         return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /**
+     * Returns whether the global parameter expects a boolean value.
+     */
+    public final boolean isGlobalBoolean(final String param) {
+        final String type = getGlobalParamType(param);
+        return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
     /**
@@ -686,7 +808,6 @@ public class HeartbeatXML extends XML {
             return Tools.getString("HeartbeatXML.OptionalOptions");
         }
     }
-
 
     /**
      * Checks parameter according to its type. Returns false if value does
@@ -1070,6 +1191,8 @@ public class HeartbeatXML extends XML {
     public final HeartbeatService getHbClone() {
         return hbClone;
     }
+
+    /**
 
     /**
      * Parses attributes, operations etc. from primitives and clones.
@@ -1475,10 +1598,14 @@ public class HeartbeatXML extends XML {
                                           new HashMap<String, List<String>>();
         final MultiKeyMap colocationIdMap = new MultiKeyMap();
         final MultiKeyMap colocationScoreMap = new MultiKeyMap();
+        final MultiKeyMap colocationRscRoleMap = new MultiKeyMap();
+        final MultiKeyMap colocationWithRscRoleMap = new MultiKeyMap();
 
         final Map<String, List<String>> orderMap =
                                            new HashMap<String, List<String>>();
         final MultiKeyMap orderIdMap = new MultiKeyMap();
+        final MultiKeyMap orderFirstActionMap = new MultiKeyMap();
+        final MultiKeyMap orderThenActionMap = new MultiKeyMap();
         final MultiKeyMap orderDirectionMap = new MultiKeyMap();
         final MultiKeyMap orderScoreMap = new MultiKeyMap();
         final MultiKeyMap orderSymmetricalMap = new MultiKeyMap();
@@ -1491,23 +1618,33 @@ public class HeartbeatXML extends XML {
         final Node constraintsNode = getChildNode(confNode, "constraints");
         if (constraintsNode != null) {
             final NodeList constraints = constraintsNode.getChildNodes();
-            String rscString     = "rsc";
-            String withRscString = "with-rsc";
-            String firstString   = "first";
-            String thenString    = "then";
+            String rscString         = "rsc";
+            String rscRoleString     = "rsc-role";
+            String withRscString     = "with-rsc";
+            String withRscRoleString = "with-rsc-role";
+            String firstString       = "first";
+            String thenString        = "then";
+            String firstActionString = "first-action";
+            String thenActionString  = "then-action";
             if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
-                rscString     = "from";
-                withRscString = "to";
-                firstString   = "from";
-                thenString    = "to";
+                rscString         = "from";
+                rscRoleString     = "from-role"; //TODO: just guessing
+                withRscString     = "to";
+                withRscRoleString = "to-role"; //TODO: just guessing
+                firstString       = "from";
+                thenString        = "to";
             }
             for (int i = 0; i < constraints.getLength(); i++) {
                 final Node constraintNode = constraints.item(i);
                 if (constraintNode.getNodeName().equals("rsc_colocation")) {
                     final String colId = getAttribute(constraintNode, "id");
                     final String rsc = getAttribute(constraintNode, rscString);
+                    final String rscRole = getAttribute(constraintNode,
+                                                            rscRoleString);
                     final String withRsc = getAttribute(constraintNode,
                                                         withRscString);
+                    final String withRscRole = getAttribute(constraintNode,
+                                                            withRscRoleString);
                     final String score = getAttribute(constraintNode, "score");
                     List<String> tos = colocationMap.get(rsc);
                     if (tos == null) {
@@ -1516,7 +1653,10 @@ public class HeartbeatXML extends XML {
                     tos.add(withRsc);
                     colocationMap.put(rsc, tos);
                     colocationScoreMap.put(rsc, withRsc, score);
+                    colocationRscRoleMap.put(rsc, withRsc, rscRole);
+                    colocationWithRscRoleMap.put(rsc, withRsc, withRscRole);
                     colocationIdMap.put(rsc, withRsc, colId);
+                    // TODO: node-attribute
                 } else if (constraintNode.getNodeName().equals("rsc_order")) {
                     final String ordId = getAttribute(constraintNode, "id");
                     final String rscFrom = getAttribute(constraintNode,
@@ -1526,7 +1666,11 @@ public class HeartbeatXML extends XML {
                     final String score = getAttribute(constraintNode, "score");
                     // TODO: symmetrical order stuff
                     final String symmetrical = getAttribute(constraintNode,
-                                                            "symmetrical");
+                                                               "symmetrical");
+                    final String firstAction = getAttribute(constraintNode,
+                                                               "first-action");
+                    final String thenAction = getAttribute(constraintNode,
+                                                               "then-action");
                     List<String> tos = orderMap.get(rscFrom);
                     if (tos == null) {
                         tos = new ArrayList<String>();
@@ -1538,6 +1682,8 @@ public class HeartbeatXML extends XML {
                     orderScoreMap.put(rscFrom, rscTo, score);
                     orderSymmetricalMap.put(rscFrom, rscTo, symmetrical);
                     orderIdMap.put(rscFrom, rscTo, ordId);
+                    orderFirstActionMap.put(rscFrom, rscTo, firstAction);
+                    orderThenActionMap.put(rscFrom, rscTo, thenAction);
                 } else if (constraintNode.getNodeName().equals(
                                                             "rsc_location")) {
                     final String locId = getAttribute(constraintNode, "id");
@@ -1609,10 +1755,14 @@ public class HeartbeatXML extends XML {
 
         cibQueryData.setColocation(colocationMap);
         cibQueryData.setColocationScore(colocationScoreMap);
+        cibQueryData.setColocationRscRole(colocationRscRoleMap);
+        cibQueryData.setColocationWithRscRole(colocationWithRscRoleMap);
         cibQueryData.setColocationId(colocationIdMap);
 
         cibQueryData.setOrder(orderMap);
         cibQueryData.setOrderId(orderIdMap);
+        cibQueryData.setOrderFirstAction(orderFirstActionMap);
+        cibQueryData.setOrderThenAction(orderThenActionMap);
         cibQueryData.setOrderScore(orderScoreMap);
         cibQueryData.setOrderSymmetrical(orderSymmetricalMap);
         cibQueryData.setOrderDirection(orderDirectionMap);
@@ -1629,5 +1779,285 @@ public class HeartbeatXML extends XML {
         cibQueryData.setMasterList(masterList);
         cibQueryData.setFailed(failedMap);
         return cibQueryData;
+    }
+
+    /**
+     * Returns order parameters.
+     */
+    public final String[] getOrderParameters() {
+        if (ordParams != null) {
+            return ordParams.toArray(new String[ordParams.size()]);
+        }
+        return null;
+    }
+
+    /**
+     * Checks if parameter is required or not.
+     */
+    public final boolean isOrderRequired(final String param) {
+        return ordRequiredParams.contains(param);
+    }
+
+    /**
+     * Returns short description of the order parameter.
+     */
+    public final String getOrderParamShortDesc(final String param) {
+        String shortDesc = paramOrdShortDescMap.get(param);
+        if (shortDesc == null) {
+            shortDesc = param;
+        }
+        return shortDesc;
+    }
+
+    /**
+     * Returns long description of the order parameter.
+     */
+    public final String getOrderParamLongDesc(final String param) {
+        final String shortDesc = getOrderParamShortDesc(param);
+        String longDesc = paramOrdLongDescMap.get(param);
+        if (longDesc == null) {
+            longDesc = "";
+        }
+        return Tools.html("<b>" + shortDesc + "</b>\n" + longDesc);
+    }
+
+    /**
+     * Returns type of a order parameter. It can be string, integer, boolean...
+     */
+    public final String getOrderParamType(final String param) {
+        return paramOrdTypeMap.get(param);
+    }
+
+    /**
+     * Returns default value for the order parameter.
+     */
+    public final String getOrderParamDefault(final String param) {
+        return paramOrdDefaultMap.get(param);
+    }
+
+    /**
+     * Returns the preferred value for the order parameter.
+     */
+    public final String getOrderParamPreferred(final String param) {
+        return paramOrdPreferredMap.get(param);
+    }
+
+    /**
+     * Returns possible choices for a order parameter, that will be displayed
+     * in the combo box.
+     */
+    public final String[] getOrderParamPossibleChoices(final String param) {
+        return paramOrdPossibleChoices.get(param);
+    }
+
+    /**
+     * Returns whether the order parameter expects an integer value.
+     */
+    public final boolean isOrderInteger(final String param) {
+        final String type = getOrderParamType(param);
+        return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /**
+     * Returns whether the order parameter expects a boolean value.
+     */
+    public final boolean isOrderBoolean(final String param) {
+        final String type = getOrderParamType(param);
+        return PARAM_TYPE_BOOLEAN.equals(type);
+    }
+
+    /**
+     * Whether the order parameter is of the time type.
+     */
+    public final boolean isOrderTimeType(final String param) {
+        final String type = getOrderParamType(param);
+        return PARAM_TYPE_TIME.equals(type);
+    }
+
+    /**
+     * Returns name of the section order parameter that will be
+     * displayed.
+     */
+    public final String getOrderSection(final String param) {
+        return Tools.getString("HeartbeatXML.OrderSectionParams");
+    }
+
+    /**
+     * Checks order parameter according to its type. Returns false if value
+     * does not fit the type.
+     */
+    public final boolean checkOrderParam(final String param,
+                                          final String value) {
+        final String type = getOrderParamType(param);
+        boolean correctValue = true;
+        if (PARAM_TYPE_BOOLEAN.equals(type)) {
+            if (!"yes".equals(value) && !"no".equals(value)
+                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
+                && !Tools.getString("Heartbeat.Boolean.False").equals(value)
+                && !Tools.getString(
+                                "Heartbeat.2.1.3.Boolean.True").equals(value)
+                && !Tools.getString(
+                              "Heartbeat.2.1.3.Boolean.False").equals(value)) {
+
+                correctValue = false;
+            }
+        } else if (PARAM_TYPE_INTEGER.equals(type)) {
+            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
+            final Matcher m = p.matcher(value);
+            if (!m.matches()) {
+                correctValue = false;
+            }
+        } else if (PARAM_TYPE_TIME.equals(type)) {
+            final Pattern p =
+                Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
+            final Matcher m = p.matcher(value);
+            if (!m.matches()) {
+                correctValue = false;
+            }
+        } else if ((value == null || "".equals(value))
+                   && isOrderRequired(param)) {
+            correctValue = false;
+        }
+        return correctValue;
+    }
+
+    /**
+     * Returns colocation parameters.
+     */
+    public final String[] getColocationParameters() {
+        if (colParams != null) {
+            return colParams.toArray(new String[colParams.size()]);
+        }
+        return null;
+    }
+
+    /**
+     * Checks if parameter is required or not.
+     */
+    public final boolean isColocationRequired(final String param) {
+        return colRequiredParams.contains(param);
+    }
+
+    /**
+     * Returns short description of the colocation parameter.
+     */
+    public final String getColocationParamShortDesc(final String param) {
+        String shortDesc = paramColShortDescMap.get(param);
+        if (shortDesc == null) {
+            shortDesc = param;
+        }
+        return shortDesc;
+    }
+
+    /**
+     * Returns long description of the colocation parameter.
+     */
+    public final String getColocationParamLongDesc(final String param) {
+        final String shortDesc = getColocationParamShortDesc(param);
+        String longDesc = paramColLongDescMap.get(param);
+        if (longDesc == null) {
+            longDesc = "";
+        }
+        return Tools.html("<b>" + shortDesc + "</b>\n" + longDesc);
+    }
+
+    /**
+     * Returns type of a colocation parameter. It can be string, integer...
+     */
+    public final String getColocationParamType(final String param) {
+        return paramColTypeMap.get(param);
+    }
+
+    /**
+     * Returns default value for the colocation parameter.
+     */
+    public final String getColocationParamDefault(final String param) {
+        return paramColDefaultMap.get(param);
+    }
+
+    /**
+     * Returns the preferred value for the colocation parameter.
+     */
+    public final String getColocationParamPreferred(final String param) {
+        return paramColPreferredMap.get(param);
+    }
+
+    /**
+     * Returns possible choices for a colocation parameter, that will be
+     * displayed in the combo box.
+     */
+    public final String[] getColocationParamPossibleChoices(final String param) {
+        return paramColPossibleChoices.get(param);
+    }
+
+    /**
+     * Returns whether the colocation parameter expects an integer value.
+     */
+    public final boolean isColocationInteger(final String param) {
+        final String type = getColocationParamType(param);
+        return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /**
+     * Returns whether the colocation parameter expects a boolean value.
+     */
+    public final boolean isColocationBoolean(final String param) {
+        final String type = getOrderParamType(param);
+        return PARAM_TYPE_BOOLEAN.equals(type);
+    }
+
+    /**
+     * Whether the colocation parameter is of the time type.
+     */
+    public final boolean isColocationTimeType(final String param) {
+        final String type = getColocationParamType(param);
+        return PARAM_TYPE_TIME.equals(type);
+    }
+
+    /**
+     * Returns name of the section colocation parameter that will be
+     * displayed.
+     */
+    public final String getColocationSection(final String param) {
+        return Tools.getString("HeartbeatXML.ColocationSectionParams");
+    }
+
+    /**
+     * Checks colocation parameter according to its type. Returns false if value
+     * does not fit the type.
+     */
+    public final boolean checkColocationParam(final String param,
+                                          final String value) {
+        final String type = getColocationParamType(param);
+        boolean correctValue = true;
+        if (PARAM_TYPE_BOOLEAN.equals(type)) {
+            if (!"yes".equals(value) && !"no".equals(value)
+                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
+                && !Tools.getString("Heartbeat.Boolean.False").equals(value)
+                && !Tools.getString(
+                                "Heartbeat.2.1.3.Boolean.True").equals(value)
+                && !Tools.getString(
+                              "Heartbeat.2.1.3.Boolean.False").equals(value)) {
+
+                correctValue = false;
+            }
+        } else if (PARAM_TYPE_INTEGER.equals(type)) {
+            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
+            final Matcher m = p.matcher(value);
+            if (!m.matches()) {
+                correctValue = false;
+            }
+        } else if (PARAM_TYPE_TIME.equals(type)) {
+            final Pattern p =
+                Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
+            final Matcher m = p.matcher(value);
+            if (!m.matches()) {
+                correctValue = false;
+            }
+        } else if ((value == null || "".equals(value))
+                   && isColocationRequired(param)) {
+            correctValue = false;
+        }
+        return correctValue;
     }
 }
