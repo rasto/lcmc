@@ -187,6 +187,8 @@ public class AppDefaults extends
 
         {"DrbdGraph.DrawPaintNotAvailable",       new Color(153, 153, 153) },
         {"Host.DefaultColor",                     Color.GREEN },
+        {"Host.ErrorColor",                       Color.RED },
+        {"Host.NoStatusColor",                    Color.LIGHT_GRAY },
 
         {"GuiComboBox.DefaultValue",              new Color(255, 255, 240) },
         {"GuiComboBox.ErrorValue",                new Color(255, 100, 100) },
