@@ -52,6 +52,7 @@ import drbd.data.resources.BlockDevice;
 import drbd.data.resources.Network;
 import drbd.data.resources.DrbdResource;
 import drbd.data.HeartbeatService;
+import drbd.data.Subtext;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 
@@ -91,8 +92,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -744,7 +747,7 @@ public class ClusterBrowser extends Browser {
      */
     public final void startDrbdStatus(final Host host) {
         boolean firstTime = true; // TODO: can use a latch for this shit too.
-        host.setDrbdStatus(true);
+        host.setDrbdStatus(false);
         final String hostName = host.getName();
         while (true) {
             final boolean ft = firstTime;
@@ -1609,6 +1612,7 @@ public class ClusterBrowser extends Browser {
         }
         return cfs;
     }
+
 
     /**
      * this class holds info data, menus and configuration
@@ -3487,21 +3491,24 @@ public class ClusterBrowser extends Browser {
          * all the services are running. Null if they running on different
          * nodes or not at all.
          */
-        public String getRunningOnNode() {
-            String node = null;
+        public final List<String> getRunningOnNodes() {
             final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
+            final List<String> allNodes = new ArrayList<String>();
             if (resources != null) {
                 for (final String hbId : resources) {
-                    final String n = heartbeatStatus.getRunningOnNode(hbId);
-                    if (node == null) {
-                        node = n;
-                    } else if (!node.toLowerCase().equals(n.toLowerCase())) {
-                        return null;
+                    final List<String> ns =
+                                        heartbeatStatus.getRunningOnNodes(hbId);
+                    if (ns != null) {
+                        for (final String n : ns) {
+                            if (!allNodes.contains(n)) {
+                                allNodes.add(n);
+                            }
+                        }
                     }
                 }
             }
-            return node;
+            return allNodes;
         }
 
         /**
@@ -3666,15 +3673,19 @@ public class ClusterBrowser extends Browser {
          * Returns tool tip for the group vertex.
          */
         public String getToolTipText() {
-            String hostName = getRunningOnNode();
-            if (hostName == null || "".equals(hostName)) {
-                hostName = "none";
-            }
+            final List<String> hostNames = getRunningOnNodes();
             final StringBuffer sb = new StringBuffer(220);
             sb.append("<b>");
             sb.append(toString());
-            sb.append(" running on node: ");
-            sb.append(hostName);
+            if (hostNames == null || hostNames.size() == 0) {
+                sb.append(" not running");
+            } else if (hostNames.size() == 1) {
+                sb.append(" running on node: ");
+            } else {
+                sb.append(" running on nodes: ");
+            }
+            sb.append(Tools.join(", ", hostNames.toArray(
+                                               new String[hostNames.size()])));
             sb.append("</b>");
 
             final Enumeration e = getNode().children();
@@ -3706,6 +3717,22 @@ public class ClusterBrowser extends Browser {
          }
 
         /**
+         * Returns whether one of the services on one of the hosts failed.
+         */
+         public final boolean isOneFailedCount() {
+                final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+             if (resources != null) {
+                 for (final String hbId : resources) {
+                     if (heartbeatIdToServiceInfo.get(hbId).isOneFailedCount()) {
+                         return true;
+                     }
+                 }
+             }
+             return false;
+         }
+
+        /**
          * Returns whether one of the services failed to start.
          */
          public final boolean isFailed() {
@@ -3715,7 +3742,7 @@ public class ClusterBrowser extends Browser {
                  for (final String hbId : resources) {
                      final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
                      if (si == null) {
-                         return false;
+                         continue;
                      }
                      if (si.isFailed()) {
                          return true;
@@ -3728,32 +3755,85 @@ public class ClusterBrowser extends Browser {
          /**
           * Returns subtexts that appears in the service vertex.
           */
-         public final String[] getSubtextsForGraph() {
+         public final Subtext[] getSubtextsForGraph() {
              final List<String> resources = heartbeatStatus.getGroupResources(
                                                 getService().getHeartbeatId());
-             final List<String> texts = new ArrayList<String>();
-             String prevSubtext = null;
+             final List<Subtext> texts = new ArrayList<Subtext>();
+             Subtext prevSubtext = null;
              if (resources != null) {
                  for (final String hbId : resources) {
                      final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
                      if (si != null) {
-                         String[] subtexts = si.getSubtextsForGraph();
-                         String sSubtext = null;
-                         if (subtexts != null) {
-                            sSubtext = si.getSubtextsForGraph()[0];
+                         Subtext[] subtexts = si.getSubtextsForGraph();
+                         Subtext sSubtext = null;
+                         if (subtexts == null || subtexts.length == 0) {
+                             continue;
                          }
-                         if (!sSubtext.equals(prevSubtext)) {
-                             texts.add(sSubtext + ":");
+                         sSubtext = subtexts[0];
+                         if (prevSubtext == null
+                             || !sSubtext.getSubtext().equals(
+                                                   prevSubtext.getSubtext())) {
+                             texts.add(new Subtext(sSubtext.getSubtext() + ":",
+                                                   sSubtext.getColor()));
                              prevSubtext = sSubtext;
                          }
                          if (si != null) {
-                             texts.add("   " + si.toString());
+                             texts.add(new Subtext("   " + si.toString(),
+                                                   sSubtext.getColor()));
+                             boolean skip = true;
+                             for (final Subtext st : subtexts) {
+                                 if (skip) {
+                                     skip = false;
+                                     continue;
+                                 }
+                                 texts.add(new Subtext("   " + st.getSubtext(),
+                                                       st.getColor()));
+                             }
                          }
                      }
                  }
              }
-             return texts.toArray(new String[texts.size()]);
+             return texts.toArray(new Subtext[texts.size()]);
          }
+
+        /**
+         * Returns whether one of the services is stopped.
+         */
+        public final boolean isStopped() {
+            final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
+                    if (si != null) {
+                        if (si.isStopped()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Returns true if all services in the group are running.
+         */
+        public final boolean isRunning() {
+            final List<String> resources = heartbeatStatus.getGroupResources(
+                                                getService().getHeartbeatId());
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
+                    if (si != null) {
+                        if (!si.isRunning()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
     }
 
     /**
@@ -4092,8 +4172,8 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns node name of the host where this service is running.
          */
-        public String getRunningOnNode() {
-            return heartbeatStatus.getRunningOnNode(
+        public List<String> getRunningOnNodes() {
+            return heartbeatStatus.getRunningOnNodes(
                                                 getService().getHeartbeatId());
         }
 
@@ -4155,60 +4235,92 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the service is running.
          */
-        public final boolean isRunning() {
-            return !"".equals(getRunningOnNode());
+        public boolean isRunning() {
+            final List<String> runningOnNodes = getRunningOnNodes();
+            return runningOnNodes != null && runningOnNodes.size() > 0;
         }
 
         /**
-         * Returns whether the reousrce failed on the specified host.
+         * Returns fail count string that appears in the graph.
          */
-        private boolean failedOnHost(final Host host) {
-             if (heartbeatStatus.getFailCount(
-                                    host.getName(),
-                                    getService().getHeartbeatId()) != null) {
-                 return true;
-             }
-             return false;
+        private String getFailCountString(final String hostName) {
+            String fcString = "";
+            final String failCount = getFailCount(hostName);
+            if (failCount != null) {
+                if ("INFINITY".equals(failCount)) {
+                    fcString = " failed";
+                } else {
+                    fcString = " failed: " + failCount;
+                }
+            }
+            return fcString;
+        }
+
+
+        /**
+         * Returns fail count.
+         */
+        protected String getFailCount(final String hostName) {
+             return heartbeatStatus.getFailCount(
+                                                hostName,
+                                                getService().getHeartbeatId());
+        }
+
+        /**
+         * Returns whether the resource failed on the specified host.
+         */
+        protected final boolean failedOnHost(final String hostName) {
+            final String failCount = getFailCount(hostName);
+            return failCount != null && "INFINITY".equals(failCount);
         }
 
         /**
          * Returns whether the resource has failed to start.
          */
         public boolean isFailed() {
-            if (isRunning()) {
-                return false;
-            }
             for (final Host host : getClusterHosts()) {
-                if (host.isHbStatus() && !failedOnHost(host)) {
-                    return false;
+                if (host.isHbStatus() && failedOnHost(host.getName())) {
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
 
-        /**
-         * Returns fail-count.
-         */
-         public final String failCount() {
-             StringBuffer fcString = new StringBuffer(10);
-             for (final Host host : getClusterHosts()) {
-                 final String fc = heartbeatStatus.getFailCount(
-                                         host.getName(),
-                                         getService().getHeartbeatId());
-                 if (fc != null) {
-                     fcString.append(fc);
-                     fcString.append(' ');
-                 }
-             }
-             return fcString.toString();
-         }
+        ///**
+        // * Returns fail-count.
+        // */
+        //public final String failCount() {
+        //    StringBuffer fcString = new StringBuffer(10);
+        //    for (final Host host : getClusterHosts()) {
+        //        final String fc = heartbeatStatus.getFailCount(
+        //                                host.getName(),
+        //                                getService().getHeartbeatId());
+        //        if (fc != null) {
+        //            fcString.append(fc);
+        //            fcString.append(' ');
+        //        }
+        //    }
+        //    return fcString.toString();
+        //}
 
         /**
          * Returns whether the resource has failed on one of the nodes.
          */
         public boolean isOneFailed() {
             for (final Host host : getClusterHosts()) {
-                if (failedOnHost(host)) {
+                if (failedOnHost(host.getName())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Returns whether the resource has fail-count on one of the nodes.
+         */
+        public boolean isOneFailedCount() {
+            for (final Host host : getClusterHosts()) {
+                if (getFailCount(host.getName()) != null) {
                     return true;
                 }
             }
@@ -4228,8 +4340,8 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns color for the host vertex.
          */
-        public Color getHostColor() {
-            return cluster.getHostColor(getRunningOnNode());
+        public List<Color> getHostColors() {
+            return cluster.getHostColors(getRunningOnNodes());
         }
 
         /**
@@ -4237,7 +4349,7 @@ public class ClusterBrowser extends Browser {
          * TODO: broken icon, not managed icon.
          */
         public ImageIcon getMenuIcon() {
-            if (allHostsDown() || getRunningOnNode() == null) {
+            if (allHostsDown() || !isRunning()) {
                 return SERVICE_STOPPED_ICON;
             }
             return SERVICE_STARTED_ICON;
@@ -5823,7 +5935,7 @@ public class ClusterBrowser extends Browser {
             setUpdated(true);
             List<Host> dirtyHosts = new ArrayList<Host>();
             for (final Host host : getClusterHosts()) {
-                if (failedOnHost(host)) {
+                if (getFailCount(host.getName()) != null) {
                     dirtyHosts.add(host);
                 }
             }
@@ -6235,14 +6347,22 @@ public class ClusterBrowser extends Browser {
             /* clean up resource */
             final MyMenuItem cleanupMenuItem =
                 new MyMenuItem(
-                        Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
-                        SERVICE_RUNNING_ICON,
-                        Tools.getString("ClusterBrowser.Hb.CleanUpResource")) {
+                   Tools.getString("ClusterBrowser.Hb.CleanUpFailedResource"),
+                   SERVICE_RUNNING_ICON,
+                   Tools.getString("ClusterBrowser.Hb.CleanUpFailedResource"),
+                   Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
+                   SERVICE_RUNNING_ICON,
+                   Tools.getString("ClusterBrowser.Hb.CleanUpResource")) {
                     private static final long serialVersionUID = 1L;
+
+                    public boolean predicate() {
+                        return getService().isAvailable()
+                               && isOneFailed();
+                    } 
 
                     public boolean enablePredicate() {
                         return getService().isAvailable()
-                               && isOneFailed();
+                               && isOneFailedCount();
                     }
 
                     public void action() {
@@ -6310,10 +6430,14 @@ public class ClusterBrowser extends Browser {
                         }
 
                         public boolean enablePredicate() {
-                            String runningOnNode = getRunningOnNode();
-                            if (runningOnNode != null) {
-                                runningOnNode = runningOnNode.toLowerCase();
+                            final List<String> runningOnNodes =
+                                                           getRunningOnNodes();
+                            if (runningOnNodes == null
+                                || runningOnNodes.size() == 0) {
+                                return false;
                             }
+                            final String runningOnNode =
+                                        runningOnNodes.get(0).toLowerCase();
                             return getService().isAvailable()
                                    && !hostName.toLowerCase().equals(
                                              runningOnNode)
@@ -6381,24 +6505,26 @@ public class ClusterBrowser extends Browser {
          * Returns tool tip for the hearbeat service.
          */
         public String getToolTipText() {
-            String node = getRunningOnNode();
-            if (node == null) {
-                node = "none";
+            String nodeString = null;
+            final List<String> nodes = getRunningOnNodes();
+            if (nodes != null && nodes.size() > 0) {
+                nodeString =
+                     Tools.join(", ", nodes.toArray(new String[nodes.size()]));
             }
             final Host[] hosts = cluster.getHostsArray();
             if (allHostsDown()) {
-                node = "unknown";
+                nodeString = "unknown";
             }
             final StringBuffer sb = new StringBuffer(200);
             sb.append("<b>");
             sb.append(toString());
             if (isFailed()) {
                 sb.append("</b> <b>Failed</b>");
-            } else if (isStopped()) {
+            } else if (isStopped() || nodeString == null) {
                 sb.append("</b> not running");
             } else {
                 sb.append("</b> running on: ");
-                sb.append(node);
+                sb.append(nodeString);
             }
             if (!isManaged()) {
                 sb.append(" (unmanaged)");
@@ -6428,29 +6554,47 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns text with lines as array that appears in the cluster graph.
          */
-        protected String[] getSubtextsForGraph() {
-            final List<String> texts = new ArrayList<String>();
+        protected Subtext[] getSubtextsForGraph() {
+            Color color = null;
+            final List<Subtext> texts = new ArrayList<Subtext>();
             if (isFailed()) {
-                texts.add("not running: failed");
+                texts.add(new Subtext("not running:", null));
             } else if (isStopped()) {
-                texts.add("stopped");
+                texts.add(new Subtext("stopped",
+                                      Tools.getDefaultColor(
+                                          "HeartbeatGraph.FillPaintStopped")));
             } else {
-                String runningOnNode = getRunningOnNode();
+                String runningOnNodeString = null;
                 if (allHostsDown()) {
-                    runningOnNode = "unknown";
-                }
-                if (runningOnNode != null && !"".equals(runningOnNode)) {
-                    texts.add("running on: " + runningOnNode);
+                    runningOnNodeString = "unknown";
                 } else {
-                    texts.add("not running");
+                    final List<String> runningOnNodes = getRunningOnNodes();
+                    if (runningOnNodes != null && runningOnNodes.size() > 0) {
+                        runningOnNodeString = runningOnNodes.get(0);
+                        color = cluster.getHostColors(runningOnNodes).get(0);
+                    }
+                }
+                if (runningOnNodeString != null) {
+                    texts.add(new Subtext("running on: " + runningOnNodeString,
+                                          color));
+                } else {
+                    texts.add(new Subtext("not running",
+                                          Tools.getDefaultColor(
+                                           "HeartbeatGraph.FillPaintStopped")));
                 }
             }
-            for (final Host host : getClusterHosts()) {
-                if (failedOnHost(host)) {
-                    texts.add("failed on: " + host.getName());
+            if (isOneFailedCount()) {
+                for (final Host host : getClusterHosts()) {
+                    if (host.isHbStatus()
+                        && getFailCount(host.getName()) != null) {
+                        texts.add(new Subtext("    " + host.getName()
+                                              + getFailCountString(
+                                                            host.getName()),
+                                  null));
+                    }
                 }
             }
-            return texts.toArray(new String[texts.size()]);
+            return texts.toArray(new Subtext[texts.size()]);
         }
 
         /**
@@ -6597,6 +6741,27 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns whether the resource has failed to start.
+         */
+        public boolean isFailed() {
+            final ServiceInfo ci = containedService;
+            if (ci != null) {
+                return ci.isFailed();
+            }
+            return false;
+        }
+        /**
+         * Returns fail count.
+         */
+        protected final String getFailCount(final String hostName) {
+            final ServiceInfo ci = containedService;
+            if (ci != null) {
+                return ci.getFailCount(hostName);
+            }
+            return "";
+        }
+
+        /**
          * Returns the main text that appears in the graph.
          */
         public final String getMainTextForGraph() {
@@ -6608,12 +6773,123 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns node name of the host where this service is slave.
+         */
+        public List<String> getSlaveOnNodes() {
+            return heartbeatStatus.getSlaveOnNodes(
+                                                getService().getHeartbeatId());
+        }
+
+        /**
+         * Returns color for the host vertex.
+         */
+        public List<Color> getHostColors() {
+             List<String> nodes = getRunningOnNodes();
+             final List<String> slaves = getSlaveOnNodes();
+             int nodesCount = 0;
+             if (nodes != null) {
+                 nodesCount = nodes.size();
+             } else {
+                 nodes = new ArrayList<String>();
+             }
+             int slavesCount = 0;
+             if (slaves != null) {
+                 slavesCount = slaves.size();
+             }
+             if (nodesCount + slavesCount < getClusterHosts().length) {
+                 final List<Color> colors = new ArrayList<Color>();
+                 colors.add(Tools.getDefaultColor(
+                                          "HeartbeatGraph.FillPaintStopped"));
+                 return colors;
+             } else {
+                 return cluster.getHostColors(nodes);
+             }
+        }
+
+        /**
+         * Returns fail count string that appears in the graph.
+         */
+        private String getFailCountString(final String hostName) {
+            String fcString = "";
+            if (containedService != null) {
+                final String failCount =
+                                       containedService.getFailCount(hostName);
+                if (failCount != null) {
+                    if ("INFINITY".equals(failCount)) {
+                        fcString = " failed";
+                    } else {
+                        fcString = " failed: " + failCount;
+                    }
+                }
+            }
+            return fcString;
+        }
+
+        /**
          * Returns text with lines as array that appears in the cluster graph.
          */
-        protected final String[] getSubtextsForGraph() {
-            final List<String> texts = new ArrayList<String>();
-            texts.add(toString());
-            return texts.toArray(new String[texts.size()]);
+        protected final Subtext[] getSubtextsForGraph() {
+            final List<Subtext> texts = new ArrayList<Subtext>();
+            final Set<String> notRunningOnNodes = new LinkedHashSet<String>();
+            for (final Host h : getClusterHosts()) {
+                notRunningOnNodes.add(h.getName());
+            }
+            texts.add(new Subtext(toString(), null));
+            List<String> runningOnNodes = getRunningOnNodes();
+            if (runningOnNodes != null && runningOnNodes.size() > 0) {
+                if (containedService != null
+                    && containedService.getHeartbeatService().isLinbitDrbd()) {
+                    texts.add(new Subtext("primary on:", null));
+                } else if (getService().isMaster()) {
+                    texts.add(new Subtext("master on:", null));
+                } else {
+                    texts.add(new Subtext("running on:", null));
+                }
+                final List<Color> colors =
+                                        cluster.getHostColors(runningOnNodes);
+                int i = 0;
+                for (final String n : runningOnNodes) {
+                    texts.add(new Subtext("    " + n + getFailCountString(n),
+                                          colors.get(i)));
+                    notRunningOnNodes.remove(n);
+                    i++;
+                }
+            }
+            if (getService().isMaster()) {
+                List<String> slaveOnNodes = getSlaveOnNodes();
+                if (slaveOnNodes != null && slaveOnNodes.size() > 0) {
+                    final List<Color> colors =
+                                           cluster.getHostColors(slaveOnNodes);
+                    int i = 0;
+                    if (containedService != null
+                        && containedService.getHeartbeatService().isLinbitDrbd()) {
+                        texts.add(new Subtext("secondary on:", null));
+                    } else {
+                        texts.add(new Subtext("slave on:", null));
+                    }
+                    for (final String n : slaveOnNodes) {
+                        texts.add(new Subtext("    " + n
+                                              + getFailCountString(n),
+                                              colors.get(i)));
+                        notRunningOnNodes.remove(n);
+                        i++;
+                    }
+                }
+            }
+            if (notRunningOnNodes.size() > 0) {
+                final Color nColor = Tools.getDefaultColor(
+                                          "HeartbeatGraph.FillPaintStopped");
+                texts.add(new Subtext("not running on:", nColor));
+                for (final String n : notRunningOnNodes) {
+                    Color color = nColor;
+                    if (failedOnHost(n)) {
+                        color = null;
+                    }
+                    texts.add(new Subtext("    " + n + getFailCountString(n),
+                                          color));
+                }
+            }
+            return texts.toArray(new Subtext[texts.size()]);
         }
 
         /**

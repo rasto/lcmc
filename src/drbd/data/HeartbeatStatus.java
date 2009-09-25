@@ -24,6 +24,7 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
+import drbd.data.HeartbeatXML.ResStatus;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -46,8 +47,8 @@ public class HeartbeatStatus {
     private String dc = null;
     /** HeartbeatXML object. */
     private final HeartbeatXML heartbeatXML;
-    /** On which node the resource is running. */
-    private volatile Map<String, String> runningOnNodeHash = null;
+    /** On which node the resource is running or is a slave. */
+    private volatile Map<String, ResStatus> resStatusMap = null;
 
     /**
      * Prepares a new <code>HeartbeatStatus</code> object.
@@ -424,13 +425,31 @@ public class HeartbeatStatus {
     }
 
     /**
-     * Returns on which node the resource is running.
+     * Returns on which nodes the resource is running.
      */
-    public final String getRunningOnNode(final String hbId) {
-        if (runningOnNodeHash == null) {
+    public final List<String> getRunningOnNodes(final String hbId) {
+        if (resStatusMap == null) {
             return null;
         }
-        return runningOnNodeHash.get(hbId);
+        final ResStatus resStatus = resStatusMap.get(hbId);
+        if (resStatus == null) {
+            return null;
+        }
+        return resStatus.getRunningOnNodes();
+    }
+
+    /**
+     * Returns on which nodes the resource is slave.
+     */
+    public final List<String> getSlaveOnNodes(final String hbId) {
+        if (resStatusMap == null) {
+            return null;
+        }
+        final ResStatus resStatus = resStatusMap.get(hbId);
+        if (resStatus == null) {
+            return null;
+        }
+        return resStatus.getSlaveOnNodes();
     }
 
     /**
@@ -528,7 +547,7 @@ public class HeartbeatStatus {
      * Parses output from crm_mon.
      */
     private void parseResStatus(final String resStatus) {
-        runningOnNodeHash = heartbeatXML.parseResStatus(resStatus);
+        resStatusMap = heartbeatXML.parseResStatus(resStatus);
     }
 
     /**

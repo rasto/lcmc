@@ -1341,10 +1341,44 @@ public class HeartbeatXML extends XML {
     }
 
     /**
+     * This class holds parsed status of resource, m/s set, or clone set.
+     */
+    class ResStatus {
+        /** On which nodes the resource runs, or is master. */
+        private final List<String> runningOnNodes;
+        /** On which nodes the resource is slave if it is m/s resource. */
+        private final List<String> slaveOnNodes;
+
+        /**
+         * Creates a new ResStatus object.
+         */
+        public ResStatus(final List<String> runningOnNodes,
+                         final List<String> slaveOnNodes) {
+            this.runningOnNodes = runningOnNodes;
+            this.slaveOnNodes = slaveOnNodes;
+        }
+
+        /**
+         * Gets on which nodes the resource runs, or is master.
+         */
+        public final List<String> getRunningOnNodes() {
+            return runningOnNodes;
+        }
+
+        /**
+         * Gets on which nodes the resource is slave if it is m/s resource.
+         */
+        public final List<String> getSlaveOnNodes() {
+            return slaveOnNodes;
+        }
+    }
+
+    /**
      * Returns a hash with resource information. (running_on)
      */
-    public final Map<String, String> parseResStatus(final String resStatus) {
-        final Map<String, String> runningOnNode = new HashMap<String, String>();
+    public final Map<String, ResStatus> parseResStatus(final String resStatus) {
+        final Map<String, ResStatus> resStatusMap =
+                                           new HashMap<String, ResStatus>();
         final Document document = getXMLDocument(resStatus);
         if (document == null) {
             return null;
@@ -1363,10 +1397,38 @@ public class HeartbeatXML extends XML {
                 final String id = getAttribute(resourceNode, "id");
                 final String runningOn =
                                       getAttribute(resourceNode, "running_on");
-                runningOnNode.put(id, runningOn);
+                if (runningOn != null && !"".equals(runningOn)) {
+                    final List<String> rList = new ArrayList<String>();
+                    rList.add(runningOn);
+                    resStatusMap.put(id, new ResStatus(rList, null));
+                }
+            } else if (resourceNode.getNodeName().equals("set")) {
+                final String id = getAttribute(resourceNode, "id");
+                final NodeList statusList = resourceNode.getChildNodes();
+                List<String> runningOnList = null;
+                List<String> slaveOnList = null;
+                for (int j = 0; j < statusList.getLength(); j++) {
+                    final Node setNode = statusList.item(j);
+                    if (setNode.getNodeName().equals("master")
+                        || setNode.getNodeName().equals("started")) {
+                        final String host = getText(setNode);
+                        if (runningOnList == null) {
+                            runningOnList = new ArrayList<String>();
+                        }
+                        runningOnList.add(host);
+                    } else if (setNode.getNodeName().equals("slave")) {
+                        final String host = getText(setNode);
+                        if (slaveOnList == null) {
+                            slaveOnList = new ArrayList<String>();
+                        }
+                        slaveOnList.add(host);
+                    }
+                }
+                resStatusMap.put(id,
+                                 new ResStatus(runningOnList, slaveOnList));
             }
         }
-        return runningOnNode;
+        return resStatusMap;
     }
 
     /**
@@ -1400,7 +1462,13 @@ public class HeartbeatXML extends XML {
                     if (name.indexOf(FAIL_COUNT_PREFIX) == 0) {
                         final String resId =
                                     name.substring(FAIL_COUNT_PREFIX.length());
-                        failedMap.put(uname, resId, value);
+                        final Pattern p = Pattern.compile("(.*):(\\d+)$");
+                        final Matcher m = p.matcher(resId);
+                        if (m.matches()) {
+                            failedMap.put(uname, m.group(1), value);
+                        } else {
+                            failedMap.put(uname, resId, value);
+                        }
                     }
                 }
             }

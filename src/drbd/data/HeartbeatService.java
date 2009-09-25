@@ -375,6 +375,13 @@ public class HeartbeatService {
     }
 
     /**
+     * Returns whether this service is linbit drbd ra.
+     */
+    public final boolean isLinbitDrbd() {
+        return "drbd".equals(name) && "linbit".equals(provider);
+    }
+
+    /**
      * Sets whether the supplied parameter is meta attribute.
      */
     public final void setParamIsMetaAttr(final String param,

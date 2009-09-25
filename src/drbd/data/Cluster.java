@@ -19,7 +19,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.data;
 
 import drbd.gui.ClusterTab;
@@ -59,9 +58,9 @@ public class Cluster {
     /** Default colors of the hosts. */
     private final Color[] hostColors = {
                                   Color.YELLOW,
-                                  new Color(255, 100, 0), /* orange */
-                                  new Color(184, 207, 229), /* blue */
+                                  new Color(102, 204, 255), /* blue */
                                   Color.PINK,
+                                  new Color(255, 100, 0), /* orange */
                                   Color.WHITE,
                                  };
 
@@ -269,19 +268,26 @@ public class Cluster {
     /**
      * Returns the color for graph for the specified host.
      */
-    public final Color getHostColor(final String node) {
-        if (node == null) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
+    public final List<Color> getHostColors(final List<String> nodes) {
+        final List<Color> colors = new ArrayList<Color>();
+        if (nodes == null || nodes.size() == 0) {
+            colors.add(
+                    Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped"));
+            return colors;
         }
-        for (final Host host : hosts) {
-            if (node.equalsIgnoreCase(host.getName())) {
-                return host.getColor();
+        for (final String node : nodes) {
+            for (final Host host : hosts) {
+                if (node.equalsIgnoreCase(host.getName())) {
+                    colors.add(host.getPmColors()[0]);
+                }
             }
         }
-        return Color.WHITE;
+        if (colors.size() == 0) {
+            colors.add(Color.WHITE);
+        }
         // TODO: checking against name is wrong
         //Tools.appError("Error in getHostColor");
-        //return null;
+        return colors;
     }
 
     /**

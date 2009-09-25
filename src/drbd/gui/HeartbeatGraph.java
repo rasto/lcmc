@@ -30,6 +30,7 @@ import drbd.gui.ClusterBrowser.ServicesInfo;
 import drbd.gui.ClusterBrowser.GroupInfo;
 import drbd.gui.ClusterBrowser.HbConnectionInfo;
 import drbd.gui.HostBrowser.HostInfo;
+import drbd.data.Subtext;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -48,6 +49,9 @@ import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.GradientPaint;
+import java.awt.BasicStroke;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -794,12 +798,7 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final Color getVertexFillColor(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
-            if (!hi.getHost().isHbStatus() || !hi.getHost().isConnected()) {
-                return Tools.getDefaultColor(
-                                            "HeartbeatGraph.FillPaintUnknown");
-            } else {
-                return vertexToHostMap.get(v).getHost().getColor();
-            }
+            return vertexToHostMap.get(v).getHost().getPmColors()[0];
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         if (getClusterBrowser().allHostsDown()) {
@@ -811,7 +810,12 @@ public class HeartbeatGraph extends ResourceGraph {
         } else if (getClusterBrowser().hbStatusFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (vertexIsPresentList.contains(v)) {
-            return si.getHostColor();
+            final List<Color> colors = si.getHostColors();
+            if (colors.size() >= 1) {
+                return colors.get(0);
+            } else {
+                return Color.WHITE; /* more colors */
+            }
         } else if (!si.getService().isNew()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintRemoved");
         } else {
@@ -1311,7 +1315,7 @@ public class HeartbeatGraph extends ResourceGraph {
     /**
      * Small text that appears down.
      */
-    protected final String[] getSubtexts(final Vertex v) {
+    protected final Subtext[] getSubtexts(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             return vertexToHostMap.get(v).getSubtextsForGraph();
         }
@@ -1335,30 +1339,71 @@ public class HeartbeatGraph extends ResourceGraph {
 
     /**
      * This method draws how much of the vertex is used for something.
+     * It draws more colors for verteces that have more background colors.
      */
     protected void drawInside(final Vertex v,
                               final Graphics2D g2d,
                               final double x,
                               final double y,
                               final Shape shape) {
+        final float height = (float) shape.getBounds().getHeight();
+        final float width = (float) shape.getBounds().getWidth();
         if (vertexToHostMap.containsKey(v)) {
-            return;
+            final HostInfo hi = (HostInfo) getInfo(v);
+            drawInsideVertex(g2d,
+                             v,
+                             hi.getHost().getPmColors(),
+                             x,
+                             y,
+                             height,
+                             width);
+        } else {
+            final ServiceInfo si = (ServiceInfo) getInfo(v);
+            final List<Color> colors = si.getHostColors();
+            final int number = colors.size();
+            if (number > 1) {
+                for (int i = 1; i < number; i++) {
+                    Paint p = new GradientPaint((float)x + width / number,
+                                             (float)y,
+                                             getVertexFillSecondaryColor(v),
+                                             (float)x + width / number,
+                                             (float)y + height,
+                                             colors.get(i),
+                                             false);
+                    g2d.setPaint(p);
+                    RoundRectangle2D s =
+                       new RoundRectangle2D.Double(
+                                        x + (width / number) * i - 5,
+                                        y,
+                                        width / number + (i < number - 1 ? 20 : 5),
+                                        height,
+                                        20,
+                                        20);
+                    g2d.fill(s);
+                }
+            }
+            final double used = getUsed(v);
+            if (used > 0) {
+                /** Show how much is used. */
+                final double freeWidth = width * (100 - used) / 100;
+                RoundRectangle2D freeShape =
+                   new RoundRectangle2D.Double(x + width - freeWidth,
+                                               y,
+                                               freeWidth,
+                                               height,
+                                               20,
+                                               20);
+                g2d.setColor(new Color(255, 255, 255, 220));
+                g2d.fill(freeShape);
+            }
         }
-        final double used = getUsed(v);
-        if (used > 0) {
-            /** Show how much is used. */
-            final double height = shape.getBounds().getHeight();
-            final double width = shape.getBounds().getWidth();
-            final double freeWidth = width * (100 - used) / 100;
-            g2d.setColor(new Color(255, 255, 255, 220));
-            g2d.fillRoundRect(
-                          (int) (x + shape.getBounds().getWidth() - freeWidth),
-                          (int) (y + 2),
-                          (int) (freeWidth - 1),
-                          (int) (height - 4),
-                          20,
-                          20);
+        if (isPicked(v)) {
+            g2d.setColor(Color.BLACK);
+        } else {
+            g2d.setColor(Color.WHITE);
         }
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.draw(shape);
     }
 
     /**

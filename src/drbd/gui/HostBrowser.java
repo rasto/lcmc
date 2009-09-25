@@ -30,6 +30,7 @@ import drbd.data.resources.NetInterface;
 import drbd.data.resources.BlockDevice;
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.data.Subtext;
 import drbd.gui.ClusterBrowser.DrbdInfo;
 import drbd.gui.ClusterBrowser.DrbdResourceInfo;
 import drbd.AddDrbdUpgradeDialog;
@@ -759,7 +760,7 @@ public class HostBrowser extends Browser {
                         Color newColor = tcc.showDialog(
                                             Tools.getGUIData().getMainFrame(),
                                             "asdf",
-                                            host.getColor());
+                                            host.getPmColors()[0]);
                         if (newColor != null) {
                             host.setColor(newColor);
                         }
@@ -993,33 +994,35 @@ public class HostBrowser extends Browser {
           * Returns subtexts that appears in the host vertex in the cluster
           * graph.
           */
-         public final String[] getSubtextsForGraph() {
-             final List<String> texts = new ArrayList<String>();
+         public final Subtext[] getSubtextsForGraph() {
+             final List<Subtext> texts = new ArrayList<Subtext>();
              if (getHost().isConnected()) {
                  if (!getHost().isHbStatus()) {
-                    texts.add("waiting for cluster status...");
+                    texts.add(new Subtext("waiting for cluster status...",
+                                          null));
                  }
              } else {
-                 texts.add("connecting...");
+                 texts.add(new Subtext("connecting...",
+                                       null));
              }
-             return texts.toArray(new String[texts.size()]);
+             return texts.toArray(new Subtext[texts.size()]);
          }
 
          /**
           * Returns subtexts that appears in the host vertex in the drbd graph.
           */
-         public final String[] getSubtextsForDrbdGraph() {
-             final List<String> texts = new ArrayList<String>();
+         public final Subtext[] getSubtextsForDrbdGraph() {
+             final List<Subtext> texts = new ArrayList<Subtext>();
              if (getHost().isConnected()) {
                  if (!getHost().isDrbdLoaded()) {
-                    texts.add("DRBD not loaded");
+                    texts.add(new Subtext("DRBD not loaded", null));
                  } else if (!getHost().isDrbdStatus()) {
-                    texts.add("waiting...");
+                    texts.add(new Subtext("waiting...", null));
                  }
              } else {
-                 texts.add("connecting...");
+                 texts.add(new Subtext("connecting...", null));
              }
-             return texts.toArray(new String[texts.size()]);
+             return texts.toArray(new Subtext[texts.size()]);
          }
     }
 

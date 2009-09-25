@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.gui.Browser.Info;
 import drbd.utilities.MyMenuItem;
 import drbd.data.Host;
+import drbd.data.Subtext;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -66,6 +67,8 @@ import java.awt.Shape;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.GradientPaint;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
@@ -100,6 +103,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
 public abstract class ResourceGraph {
     /** Cluster browser object. */
     private final ClusterBrowser clusterBrowser;
+        final PluggableRenderer pr = new MyPluggableRenderer();
     /** Vertex to resource info object map. */
     private final Map<Vertex, Info>vertexToInfoMap =
                                         new LinkedHashMap<Vertex, Info>();
@@ -228,7 +232,7 @@ public abstract class ResourceGraph {
 
         vertexLocations = new DefaultSettableVertexLocationFunction();
         layout = new StaticLayout(graph);
-        final PluggableRenderer pr = new MyPluggableRenderer();
+        //final PluggableRenderer pr = new MyPluggableRenderer();
         pr.setEdgeStringer(new MyEdgeStringer());
         pr.setVertexShapeFunction(new MyVertexShapeSize());
         pr.setVertexPaintFunction(new MyPickableVertexPaintFunction(
@@ -939,6 +943,13 @@ public abstract class ResourceGraph {
         return Color.WHITE;
     }
 
+        /**
+         * Returns whether the vertex is picked.
+         */
+        public final boolean isPicked(final Vertex v) {
+            return pr.isPicked(v);
+        }
+
     /**
      * This class provides methods for different paint colors for different
      * conditions.
@@ -964,6 +975,13 @@ public abstract class ResourceGraph {
             } else {
                 return getFillPaint(v);
             }
+        }
+
+        /**
+         * Returns whether the vertex is picked.
+         */
+        public final boolean isPicked(final Vertex v) {
+            return pi.isPicked(v);
         }
 
         /**
@@ -1067,6 +1085,37 @@ public abstract class ResourceGraph {
     protected abstract ImageIcon getIconForVertex(final ArchetypeVertex v);
 
     /**
+     * This method draws in the host vertex.
+     */
+    protected void drawInsideVertex(final Graphics2D g2d,
+                                    final Vertex v,
+                                    final Color[] colors,
+                                    final double x,
+                                    final double y,
+                                    final float height,
+                                    final float width) {
+        final int number = colors.length;
+        if (number > 1) {
+            for (int i = 1; i < number; i++) {
+                Paint p = new GradientPaint((float)x + width / number,
+                                         (float)y,
+                                         getVertexFillSecondaryColor(v),
+                                         (float)x + width / number,
+                                         (float)y + height,
+                                         colors[i],
+                                         false);
+                g2d.setPaint(p);
+                Rectangle2D s =
+                   new Rectangle2D.Double(
+                                x + width / 2 + (width / number / 2) * i,
+                                y,
+                                width / number / 2,
+                                height - 2);
+                g2d.fill(s);
+            }
+        }
+    }
+    /**
      * This method must be overridden to draw something in the vertex.
      */
     protected abstract void drawInside(final Vertex v,
@@ -1127,13 +1176,14 @@ public abstract class ResourceGraph {
             }
 
             /* subtext */
-            final String[] subtexts = getSubtexts(v);
+            final Subtext[] subtexts = getSubtexts(v);
             TextLayout[] subtextLayouts = null;
             if (subtexts != null) {
                 subtextLayouts = new TextLayout[subtexts.length];
                 int i = 0;
-                for (final String subtext : subtexts) {
-                    subtextLayouts[i] = getVertexTextLayout(g2d, subtext, 0.8);
+                for (final Subtext subtext : subtexts) {
+                    subtextLayouts[i] =
+                           getVertexTextLayout(g2d, subtext.getSubtext(), 0.8);
                     final int subtextWidth =
                                 (int) subtextLayouts[i].getBounds().getWidth();
                     if (subtextWidth + 10 > shapeWidth) {
@@ -1144,6 +1194,7 @@ public abstract class ResourceGraph {
                 if (i > 1) {
                     shapeHeight += (i - 1) * 8;
                 }
+                shapeHeight += 3;
             }
             final int oldShapeWidth = getVertexWidth(v);
             final int oldShapeHeight = getVertexHeight(v);
@@ -1217,13 +1268,28 @@ public abstract class ResourceGraph {
                    new Color(0, 0, 255),
                    255);
             }
-            shapeHeight = (int) height;
+            //shapeHeight = (int) height;
             if (subtextLayouts != null) {
                 int i = 0;
                 for (final TextLayout l : subtextLayouts) {
                     int alpha = 255;
-                    if (subtexts[i].substring(0, 1).equals(" ")) {
+                    final Subtext subtext = subtexts[i];
+                    if (subtext.getSubtext().substring(0, 1).equals(" ")) {
                         alpha = 128;
+                    }
+                    final Color color = subtext.getColor();
+                    if (color != null) {
+                        Paint p = new GradientPaint((float)x + shapeWidth / 2,
+                                                 (float)y,
+                                                 getVertexFillSecondaryColor(v),
+                                                 (float)x + shapeWidth / 2,
+                                                 (float)y + shapeHeight,
+                                                 color,
+                                                 false);
+                        g2d.setPaint(p);
+                        g2d.fillRect((int) x + 4,
+                                     (int) (y + height - 3 + 8 * (i - 1)),
+                                     shapeWidth - 8, 9);
                     }
                     drawVertexText(
                                g2d,
@@ -1233,9 +1299,9 @@ public abstract class ResourceGraph {
                                new Color(0, 0, 0),
                                alpha);
                     i++;
-                    shapeHeight += 8;
+                    //shapeHeight += 8;
                 }
-                shapeHeight -= 8;
+                //shapeHeight -= 8;
             }
 
             final Info info = getInfo(v);
@@ -1274,7 +1340,7 @@ public abstract class ResourceGraph {
     /**
      * Small text that appears down.
      */
-    protected abstract String[] getSubtexts(final Vertex v);
+    protected abstract Subtext[] getSubtexts(final Vertex v);
 
     /**
      * Returns positions of the vertices (by value).

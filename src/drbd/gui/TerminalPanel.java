@@ -191,7 +191,7 @@ public class TerminalPanel extends JScrollPane {
         StyleConstants.setForeground(outputColor, defaultOutputColor);
 
         promptColor = new SimpleAttributeSet();
-        StyleConstants.setForeground(promptColor, host.getColor());
+        StyleConstants.setForeground(promptColor, host.getPmColors()[0]);
 
         append(prompt(), promptColor);
         terminalArea.setEditable(true);
@@ -386,7 +386,7 @@ public class TerminalPanel extends JScrollPane {
      * cluster.
      */
     public final void resetPromptColor() {
-        StyleConstants.setForeground(promptColor, host.getColor());
+        StyleConstants.setForeground(promptColor, host.getPmColors()[0]);
         addCommand("");
         nextCommand();
     }

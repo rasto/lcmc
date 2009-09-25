@@ -690,27 +690,95 @@ sub get_cluster_events {
 sub get_resource_status {
 	my $in_rsc_list = 0;
 	my $info = "";
+	my $clone_or_ms;
+	my $set;
+	my %masters;
+	my %slaves;
+	my %started;
+	my %stopped;
+	my @sets;
 	for (`crm_mon -1 -r 2>/dev/null`) {
 		if (!$in_rsc_list) {
 			$in_rsc_list = /^Full list of resources/;
 		} else {
 			next if /^\t*$/;
+			if (/^\S/) {
+				$clone_or_ms = "";
+				$set = "";
+			}
+			if (m!^(Master/Slave|Clone) Set: (.*)!) {
+				$clone_or_ms = $1;
+				$set = $2;
+				push @sets, $set;
+				next;
+			} elsif (/^Resource Group: (.*)/) {
+				next;
+			} elsif (/\s+Masters:\s+\[\s+(.*)\s+\]/) {
+				push @{$masters{$set}}, split /\s+/, $1;
+				next;
+			} elsif (/\s+Slaves:\s+\[\s+(.*)\s+\]/) {
+				push @{$slaves{$set}}, split /\s+/, $1;
+				next;
+			} elsif (/\s+Started:\s+\[\s+(.*)\s+\]/) {
+				push @{$started{$set}}, split /\s+/, $1;
+				next;
+			} elsif (/\s+Stopped:\s+\[\s+(.*)\s+\]/) {
+				push @{$stopped{$set}}, split /\s+/, $1;
+				next;
+			}
 			my ($rsc, $type, $running, @rest) = split;
 			my $managed;
-			my $running_on = "";
-			if ($running eq "Started") {
-				$running_on = shift @rest;
-			}
 			if (@rest > 0 and $rest[0] eq "(unmanaged)") {
 				$managed = "unmanaged";
 			} else {
 				$managed = "managed";
 			}
-			$info.= "  <resource id=\"$rsc\""
-				." running=\"$running\""
-				." running_on=\"$running_on\""
-				." managed=\"$managed\" />\n";
+			if ($set) {
+				if ($running eq "Started") {
+					push @{$started{$set}}, shift @rest;
+				} elsif ($running eq "Master") {
+					push @{$masters{$set}}, shift @rest;
+				} elsif ($running eq "Slave") {
+					push @{$slaves{$set}}, shift @rest;
+				} elsif ($running eq "Stopped") {
+					push @{$stopped{$set}}, $rsc;
+				}
+
+			} else {
+				my $running_on = "";
+				if ($running eq "Started") {
+					$running_on = shift @rest;
+				}
+				$info.= "  <resource id=\"$rsc\""
+					." running=\"$running\""
+					." running_on=\"$running_on\""
+					." managed=\"$managed\" />\n";
+			}
 		}
+	}
+	for my $set (@sets) {
+		$info.= "  <set id=\"$set\">\n";
+		if ($masters{$set}) {
+			for (@{$masters{$set}}) {
+				$info.= "    <master>$_</master>\n";
+			}
+		}
+		if ($slaves{$set}) {
+			for (@{$slaves{$set}}) {
+				$info.= "    <slave>$_</slave>\n";
+			}
+		}
+		if ($started{$set}) {
+			for (@{$started{$set}}) {
+				$info.= "    <started>$_</started>\n";
+			}
+		}
+		if ($stopped{$set}) {
+			for (@{$stopped{$set}}) {
+				$info.= "    <stopped>$_</stopped>\n";
+			}
+		}
+		$info.= "  </set>\n";
 	}
 	if ($info) {
 		return "<resource_status>\n$info\n</resource_status>\n";

@@ -25,6 +25,7 @@ package drbd.gui;
 import drbd.utilities.Tools;
 import drbd.data.Host;
 import drbd.data.resources.BlockDevice;
+import drbd.data.Subtext;
 import drbd.gui.HostBrowser.HostInfo;
 import drbd.gui.ClusterBrowser.DrbdInfo;
 import drbd.gui.ClusterBrowser.DrbdResourceInfo;
@@ -36,6 +37,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.Paint;
 import java.awt.Color;
+import java.awt.BasicStroke;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -386,15 +388,17 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Small text that appears down.
      */
-    protected final String[] getSubtexts(final Vertex v) {
+    protected final Subtext[] getSubtexts(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null && bdi.getBlockDevice().isDrbd()
                 && bdi.getBlockDevice().getConnectionState() != null
                 && bdi.getBlockDevice().getDiskState() != null) {
-                return new String[]{bdi.getBlockDevice().getConnectionState()
-                                    + " / "
-                                    + bdi.getBlockDevice().getDiskState()};
+                return new Subtext[]{
+                    new Subtext(bdi.getBlockDevice().getConnectionState()
+                                     + " / "
+                                     + bdi.getBlockDevice().getDiskState(),
+                                null)};
             }
         } else {
             return vertexToHostMap.get(v).getSubtextsForDrbdGraph();
@@ -719,11 +723,12 @@ public class DrbdGraph extends ResourceGraph {
 
         final HostInfo hi = vertexToHostMap.get(v);
         final Vertex hostVertex = getVertex(hi);
-        if (!hi.getHost().isDrbdStatus()) {
-            return Tools.getDefaultColor("DrbdGraph.FillPaintUnknown");
-        } else if (v.equals(hostVertex)) {
+        if (v.equals(hostVertex)) {
             /* host */
-            return hi.getHost().getColor();
+            return hi.getHost().getDrbdColors()[0];
+        } else if (!hi.getHost().isDrbdStatus()
+                   && hi.getHost().isDrbdLoaded()) {
+            return Tools.getDefaultColor("DrbdGraph.FillPaintUnknown");
         } else {
             if (!isVertexDrbd(v)) {
                 if (isVertexAvailable(v)) {
@@ -747,13 +752,13 @@ public class DrbdGraph extends ResourceGraph {
      * Returns secondary color in the gradient.
      */
     protected final Color getVertexFillSecondaryColor(final Vertex v) {
-        if (isVertexBlockDevice(v)) {
-            final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
-            if (bdi != null && bdi.getBlockDevice().isDrbdMetaDisk()) {
-                return getVertexFillColor(blockDeviceToVertexMap.get(
-                        bdi.getBlockDevice().getMetaDiskOfBlockDevice()));
-            }
-        }
+        //if (isVertexBlockDevice(v)) {
+        //    final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+        //    if (bdi != null && bdi.getBlockDevice().isDrbdMetaDisk()) {
+        //        return getVertexFillColor(blockDeviceToVertexMap.get(
+        //                bdi.getBlockDevice().getMetaDiskOfBlockDevice()));
+        //    }
+        //}
         return super.getVertexFillSecondaryColor(v);
     }
 
@@ -924,16 +929,47 @@ public class DrbdGraph extends ResourceGraph {
                               final double y,
                               final Shape shape) {
         final double used = getUsed(v);
+        final float height = (float) shape.getBounds().getHeight();
+        final float width = (float) shape.getBounds().getWidth();
+        if (!isVertexBlockDevice(v)) {
+            final HostInfo hi = (HostInfo) getInfo(v);
+            drawInsideVertex(g2d,
+                             v,
+                             hi.getHost().getDrbdColors(),
+                             x,
+                             y,
+                             height,
+                             width);
+        } else {
+            final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi != null && bdi.getBlockDevice().isDrbdMetaDisk()) {
+                final Color[] colors = {null, null};
+                colors[1] = getVertexFillColor(blockDeviceToVertexMap.get(
+                             bdi.getBlockDevice().getMetaDiskOfBlockDevice()));
+                drawInsideVertex(g2d,
+                                 v,
+                                 colors,
+                                 x,
+                                 y,
+                                 height,
+                                 width);
+            }
+        }
         if (used > 0) {
             /** Show how much is used. */
-            final double height = shape.getBounds().getHeight();
-            final double width = shape.getBounds().getWidth();
             final double freeWidth = width * (100 - used) / 100;
             g2d.setColor(new Color(255, 255, 255, 220));
-            g2d.fillRect((int) (x + shape.getBounds().getWidth() - freeWidth),
-                         (int) (y + 2),
-                         (int) (freeWidth - 2),
-                         (int) (height - 2));
+            g2d.fillRect((int) (x + width - freeWidth),
+                         (int) (y),
+                         (int) (freeWidth),
+                         (int) (height));
         }
+        if (isPicked(v)) {
+            g2d.setColor(Color.BLACK);
+        } else {
+            g2d.setColor(Color.WHITE);
+        }
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.draw(shape);
     }
 }

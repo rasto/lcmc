@@ -241,13 +241,44 @@ public class Host implements Serializable {
     }
 
     /**
-     * Returns color object of this host.
+     * Returns color objects of this host for drbd graph.
      */
-    public final Color getColor() {
+    public final Color[] getDrbdColors() {
         if (color == null) {
-            return Tools.getDefaultColor("Host.DefaultColor");
+            color = Tools.getDefaultColor("Host.DefaultColor");
         }
-        return color;
+        Color secColor;
+        if (!isConnected()) {
+            secColor = Tools.getDefaultColor("Host.ErrorColor");
+        } else {
+            if (isDrbdStatus() && isDrbdLoaded()) {
+                return new Color[]{color};
+            } else {
+                secColor = Tools.getDefaultColor("Host.NoStatusColor");
+            }
+        }
+        return new Color[]{color, secColor};
+    }
+
+
+    /**
+     * Returns color objects of this host.
+     */
+    public final Color[] getPmColors() {
+        if (color == null) {
+            color = Tools.getDefaultColor("Host.DefaultColor");
+        }
+        Color secColor;
+        if (!isConnected()) {
+            secColor = Tools.getDefaultColor("Host.ErrorColor");
+        } else {
+            if (isHbStatus()) {
+                return new Color[]{color};
+            } else {
+                secColor = Tools.getDefaultColor("Host.NoStatusColor");
+            }
+        }
+        return new Color[]{color, secColor};
     }
 
     /**

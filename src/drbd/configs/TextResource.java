@@ -1273,8 +1273,11 @@ public class TextResource extends
         {"ClusterBrowser.Hb.AddColocation.ToolTip",
          "Add co-location dependency."},
 
+        {"ClusterBrowser.Hb.CleanUpFailedResource",
+         "Restart Failed (Clean Up)"},
+
         {"ClusterBrowser.Hb.CleanUpResource",
-         "Restart (Clean Up)"},
+         "Reset Fail-Count (Clean Up)"},
 
         {"ClusterBrowser.Hb.ViewLogs",
          "View Logs"},
@@ -1641,7 +1644,8 @@ public class TextResource extends
          "I am a DMC expert"},
 
         {"EmptyViewPanel.HelpText",
-"<h3>Welcome to the DRBD Management Console.</h3>"
+"<h3>Welcome to the DRBD Management Console</h3>"
++ "by Rasto Levrinc."
 + "<p>You can start by clicking on the \"Host Wizard\" button. When you have added at least\n"
 + "two hosts, you can combine them in a new cluster with \"Cluster Wizard\" button.\n"
 + "The same way you can also add an existing cluster, configured and running or any\n"
