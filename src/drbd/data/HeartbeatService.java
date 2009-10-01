@@ -82,7 +82,8 @@ public class HeartbeatService {
     /** Map that holds default values for operations. The keys are the name and
      * parameter. */
     private final MultiKeyMap opToDefault = new MultiKeyMap();
-    /** Whether the parameter is a meta attribute. */
+    /** Whether the service is probably master/slave resource. */
+    private boolean masterSlave = false;
 
     /**
      * Prepares a new <code>HeartbeatService</code> object.
@@ -459,5 +460,19 @@ public class HeartbeatService {
     public final String getOperationDefault(final String name,
                                             final String param) {
         return (String) opToDefault.get(name, param);
+    }
+
+    /**
+     * Sets if this service is master/slave service (with certain probability).
+     */
+    public final void setMasterSlave(final boolean masterSlave) {
+        this.masterSlave = masterSlave;
+    }
+
+    /**
+     * Returns whether the service is probably master/slave resource.
+     */
+    public final boolean isMasterSlave() {
+        return masterSlave;
     }
 }

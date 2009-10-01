@@ -985,45 +985,65 @@ public class HostBrowser extends Browser {
         /**
          * Returns how much of this is used.
          */
-         public final int getUsed() {
-             // TODO: maybe the load?
-             return -1;
-         }
+        public final int getUsed() {
+            // TODO: maybe the load?
+            return -1;
+        }
 
-         /**
-          * Returns subtexts that appears in the host vertex in the cluster
-          * graph.
-          */
-         public final Subtext[] getSubtextsForGraph() {
-             final List<Subtext> texts = new ArrayList<Subtext>();
-             if (getHost().isConnected()) {
-                 if (!getHost().isHbStatus()) {
-                    texts.add(new Subtext("waiting for cluster status...",
-                                          null));
-                 }
-             } else {
-                 texts.add(new Subtext("connecting...",
-                                       null));
-             }
-             return texts.toArray(new Subtext[texts.size()]);
-         }
+        /**
+         * Returns subtexts that appears in the host vertex in the cluster
+         * graph.
+         */
+        public final Subtext[] getSubtextsForGraph() {
+            final List<Subtext> texts = new ArrayList<Subtext>();
+            if (getHost().isConnected()) {
+                if (!getHost().isHbStatus()) {
+                   texts.add(new Subtext("waiting for cluster status...",
+                                         null));
+                }
+            } else {
+                texts.add(new Subtext("connecting...",
+                                      null));
+            }
+            return texts.toArray(new Subtext[texts.size()]);
+        }
 
-         /**
-          * Returns subtexts that appears in the host vertex in the drbd graph.
-          */
-         public final Subtext[] getSubtextsForDrbdGraph() {
-             final List<Subtext> texts = new ArrayList<Subtext>();
-             if (getHost().isConnected()) {
-                 if (!getHost().isDrbdLoaded()) {
-                    texts.add(new Subtext("DRBD not loaded", null));
-                 } else if (!getHost().isDrbdStatus()) {
-                    texts.add(new Subtext("waiting...", null));
-                 }
-             } else {
-                 texts.add(new Subtext("connecting...", null));
-             }
-             return texts.toArray(new Subtext[texts.size()]);
-         }
+        /**
+         * Returns subtexts that appears in the host vertex in the drbd graph.
+         */
+        public final Subtext[] getSubtextsForDrbdGraph() {
+            final List<Subtext> texts = new ArrayList<Subtext>();
+            if (getHost().isConnected()) {
+                if (!getHost().isDrbdLoaded()) {
+                   texts.add(new Subtext("DRBD not loaded", null));
+                } else if (!getHost().isDrbdStatus()) {
+                   texts.add(new Subtext("waiting...", null));
+                }
+            } else {
+                texts.add(new Subtext("connecting...", null));
+            }
+            return texts.toArray(new Subtext[texts.size()]);
+        }
+
+        /**
+         * Returns text that appears above the icon in the graph.
+         */
+        public String getIconTextForGraph() {
+            if (!getHost().isConnected()) {
+                return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
+            }
+            return null;
+        }
+
+        /**
+         * Returns text that appears above the icon in the drbd graph.
+         */
+        public String getIconTextForDrbdGraph() {
+            if (!getHost().isConnected()) {
+                return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
+            }
+            return null;
+        }
     }
 
 
@@ -1270,7 +1290,7 @@ public class HostBrowser extends Browser {
                     tt.append("</td></tr></table>");
                 } else {
                     tt.append('\n');
-                    tt.append(Tools.getString("HostBrowser.NoInfoAvailable"));
+                    tt.append(Tools.getString("HostBrowser.Hb.NoInfoAvailable"));
                 }
             }
             return tt.toString();
@@ -2281,5 +2301,18 @@ public class HostBrowser extends Browser {
              }
              return getBlockDevice().getUsed();
          }
+
+         /**
+          * Returns text that appears above the icon.
+          */
+        public String getIconTextForGraph() {
+            if (!getHost().isConnected()) {
+                return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
+            }
+            if (getBlockDevice().isDrbd()) {
+                return getBlockDevice().getNodeState();
+            }
+            return null;
+        }
     }
 }

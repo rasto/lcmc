@@ -53,13 +53,13 @@ public class Service extends Resource {
     /** Whether this service master when it is clone. */
     private boolean master = false;
     /** Heartbeat id prefix for resource. */
-    private static final String RES_ID_PREFIX = "res_";
+    public static final String RES_ID_PREFIX = "res_";
     /** Heartbeat id prefix for group. */
-    private static final String GRP_ID_PREFIX = "grp_";
+    public static final String GRP_ID_PREFIX = "grp_";
     /** Pacemaker id prefix for clone. */
-    private static final String CL_ID_PREFIX = "cl_";
+    public static final String CL_ID_PREFIX = "cl_";
     /** Pacemaker id prefix for master/slave. */
-    private static final String MS_ID_PREFIX = "ms_";
+    public static final String MS_ID_PREFIX = "ms_";
     /** Name of the clone set pacemaker object. */
     private static final String CLONE_SET_NAME =
                                 Tools.getConfigData().PM_CLONE_SET_NAME;

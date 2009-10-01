@@ -206,24 +206,6 @@ public class HeartbeatGraph extends ResourceGraph {
     }
 
     /**
-     * Sets host scores in all ancestors as it is in the si node.
-     */
-    private void setHomeNodeInAncestors(
-                         final ServiceInfo si,
-                         final Map<HostInfo, String> hostScores) {
-        si.setSavedHostScores(hostScores);
-        final Vertex v = getVertex(si);
-        if (v != null) {
-            for (final Object pV : v.getPredecessors()) {
-                final ServiceInfo pre =
-                                    (ServiceInfo) getInfo((Vertex) pV);
-                pre.setSavedHostScores(hostScores);
-                setHomeNodeInAncestors(pre, hostScores);
-            }
-        }
-    }
-
-    /**
      * Returns heartbeat ids of all services with colocation with this service.
      */
     public final String[] getColocationNeighbours(final ServiceInfo si) {
@@ -301,34 +283,6 @@ public class HeartbeatGraph extends ResourceGraph {
     }
 
     /**
-     * Sets host scores in all descendants as it is in the si node.
-     */
-    private void setHomeNodeInDescendants(
-                          final ServiceInfo si,
-                          final Map<HostInfo, String> hostScores) {
-        final Vertex v = getVertex(si);
-        if (v != null) {
-            for (Object pV : v.getSuccessors()) {
-                final ServiceInfo pre = (ServiceInfo) getInfo((Vertex) pV);
-                pre.setSavedHostScores(hostScores);
-                setHomeNodeInDescendants(pre, hostScores);
-            }
-        }
-    }
-
-    /**
-     * Sets host scores in all ancestors and descendants as in si node.
-     * This is to ensure, that all connected nodes have the same host scores.
-     */
-    public final void setHomeNode(
-                          final ServiceInfo si,
-                          final Map<HostInfo, String> hostScores) {
-        si.setSavedHostScores(hostScores);
-        setHomeNodeInDescendants(si, hostScores);
-        setHomeNodeInAncestors(si, hostScores);
-    }
-
-    /**
      * Returns id that is used for saving of the vertex positions to a file.
      */
     protected final String getId(final Info i) {
@@ -382,8 +336,6 @@ public class HeartbeatGraph extends ResourceGraph {
         if (parent != null) {
             addColocation(parent, serviceInfo);
             addOrder(parent, serviceInfo);
-            /* set host score as in parent */
-            setHomeNode(parent, parent.getSavedHostScores());
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -440,8 +392,6 @@ public class HeartbeatGraph extends ResourceGraph {
             edge = (MyEdge) getGraph().addEdge(new MyEdge(vP, v));
             if (colRsc != null) {
                 edgeIsColocationList.add(edge);
-                //hbci.setServiceInfoRsc(colRsc);
-                //hbci.setServiceInfoWithRsc(colWithRsc);
                 hbci.addColocation(colRsc, colWithRsc);
             }
             edgeToHbconnectionMap.put(edge, hbci);
@@ -449,8 +399,6 @@ public class HeartbeatGraph extends ResourceGraph {
         } else {
             hbci = edgeToHbconnectionMap.get(edge);
         }
-        //hbci.setServiceInfoParent(parent);
-        //hbci.setServiceInfoChild(serviceInfo);
         hbci.addOrder(parent, serviceInfo);
 
         if (!edgeIsOrderList.contains(edge)) {
@@ -494,18 +442,12 @@ public class HeartbeatGraph extends ResourceGraph {
         HbConnectionInfo hbci;
         if (edge == null) {
             hbci = getClusterBrowser().getNewHbConnectionInfo();
-            //hbci.addColocation(rsc, withRsc);
-            //hbci.setServiceInfoRsc(rsc);
-            //hbci.setServiceInfoWithRsc(withRsc);
-
             edge = (MyEdge) getGraph().addEdge(new MyEdge(vRsc, v));
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         } else {
             hbci = edgeToHbconnectionMap.get(edge);
         }
-        //hbci.setServiceInfoRsc(rsc);
-        //hbci.setServiceInfoWithRsc(withRsc);
         hbci.addColocation(rsc, withRsc);
         if (!edgeIsColocationList.contains(edge)) {
             edgeIsColocationList.add(edge);
@@ -1266,30 +1208,13 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     protected final String getIconText(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
-            // TODO: running etc
-            return null;
+            return vertexToHostMap.get(v).getIconTextForGraph();
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         if (si == null) {
             return null;
         }
-        String targetRole = null;
-        if (si.isStarted()) {
-            if (si.isRunning()) {
-                targetRole = null;
-            } else if (si.isFailed()) {
-                targetRole = "starting failed";
-            } else {
-                targetRole = "starting...";
-            }
-        } else if (si.isStopped()) {
-            if (si.isRunning()) {
-                targetRole = "stopping...";
-            } else {
-                targetRole = null;
-            }
-        }
-        return targetRole;
+        return si.getIconTextForGraph();
     }
 
     /**
@@ -1393,7 +1318,7 @@ public class HeartbeatGraph extends ResourceGraph {
                                                height,
                                                20,
                                                20);
-                g2d.setColor(new Color(255, 255, 255, 220));
+                g2d.setColor(new Color(255, 255, 255, 180));
                 g2d.fill(freeShape);
             }
         }

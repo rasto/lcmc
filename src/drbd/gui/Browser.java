@@ -783,14 +783,30 @@ public class Browser {
         }
 
         /**
+         * Adds jlabel field with tooltip.
+         */
+        public final void addLabelField(final JPanel panel,
+                                        final String left,
+                                        final String right,
+                                        final int leftWidth,
+                                        final int rightWidth) {
+            final JLabel leftLabel = new JLabel(left);
+            leftLabel.setToolTipText(left);
+            final JLabel rightLabel = new JLabel(right);
+            rightLabel.setToolTipText(right);
+            addField(panel, leftLabel, rightLabel, leftWidth, rightWidth);
+        }
+
+
+        /**
          * Adds field with left and right component to the panel. Use panel
          * with spring layout for this.
          */
         public final void addField(final JPanel panel,
-                                final JComponent left,
-                                final JComponent right,
-                                final int leftWidth,
-                                final int rightWidth) {
+                                   final JComponent left,
+                                   final JComponent right,
+                                   final int leftWidth,
+                                   final int rightWidth) {
             /* right component with fixed width. */
             Tools.setSize(left,
                           leftWidth,
@@ -1391,7 +1407,7 @@ public class Browser {
          * otherwise all parameters will be checked.
          */
         public boolean checkResourceFieldsChanged(final String param,
-                                                     final String[] params) {
+                                                  final String[] params) {
             /* check if something is different from saved values */
             boolean changedValue = false;
             if (params != null) {

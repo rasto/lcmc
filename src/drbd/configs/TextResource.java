@@ -1300,6 +1300,18 @@ public class TextResource extends
         {"ClusterBrowser.Hb.UnmanageResource.ToolTip",
          "Do not Manage by HB"},
 
+        {"ClusterBrowser.Hb.NoInfoAvailable",
+         "no info available"},
+
+        {"ClusterBrowser.Hb.StartingFailed",
+         "starting failed"},
+
+        {"ClusterBrowser.Hb.Starting",
+         "starting..."},
+
+        {"ClusterBrowser.Hb.Stopping",
+         "stopping..."},
+
         {"ClusterBrowser.HbUpdateResources",
          "updating heartbeat resources..."},
 
@@ -1485,7 +1497,10 @@ public class TextResource extends
         {"HostBrowser.DrbdNetInterface.Select",
          "Select..."},
 
-        {"HostBrowser.NoInfoAvailable",
+        {"HostBrowser.Hb.NoInfoAvailable",
+         "no info available"},
+
+        {"HostBrowser.Drbd.NoInfoAvailable",
          "no info available"},
 
         {"HeartbeatXML.RequiredOptions",
@@ -1513,12 +1528,15 @@ public class TextResource extends
          "Select whether the service should be managed by Heartbeat or not."},
 
         {"HeartbeatXML.ColocationSectionParams",
-         "Parameters"},
+         "Colocation Parameters"},
         {"HeartbeatXML.OrderSectionParams",
-         "Parameters"},
+         "Order Parameters"},
 
         {"GuiComboBox.Select",
          "Select..."},
+
+        {"GuiComboBox.NothingSelected",
+         "<<nothing selected>>"},
 
         {"HeartbeatGraph.ColOrd",
          "col / ord"},

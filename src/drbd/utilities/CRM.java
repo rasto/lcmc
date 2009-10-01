@@ -24,6 +24,7 @@ package drbd.utilities;
 import drbd.data.Host;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 /**
  * This class provides cib commands. There are commands that use cibadmin and
  * crm_resource commands to manipulate the cib, crm, etc.
@@ -74,7 +75,6 @@ public final class CRM {
                            final boolean master,
                            final Map<String, String> cloneMetaArgs,
                            final String groupId,
-                           final String args,
                            final Map<String, String> pacemakerResAttrs,
                            final Map<String, String> pacemakerResArgs,
                            final Map<String, String> pacemakerMetaArgs,
@@ -161,7 +161,7 @@ public final class CRM {
 
             final String hbV = host.getHeartbeatVersion();
             if (hbV == null || Tools.compareVersions(hbV, "2.99.0") >= 0) {
-                // 2.1.4 does not have the id.
+                /* 2.1.4 does not have the id. */
                 if (operationsId == null) {
                     operationsId = heartbeatId + "-operations";
                 }
@@ -227,12 +227,15 @@ public final class CRM {
      * Sets colocation and order constraint between service with heartbeatId
      * and parents.
      */
-    public static void setOrderAndColocation(final Host host,
-                                             final String heartbeatId,
-                                             final String[] parents) {
+    public static void setOrderAndColocation(
+                                          final Host host,
+                                          final String heartbeatId,
+                                          final String[] parents,
+                                          final Map<String, String> colAttrs,
+                                          final Map<String, String> ordAttrs) {
         for (int i = 0; i < parents.length; i++) {
-            addColocation(host, heartbeatId, parents[i]);
-            addOrder(host, parents[i], heartbeatId);
+            addColocation(host, null, heartbeatId, parents[i], colAttrs);
+            addOrder(host, null, parents[i], heartbeatId, ordAttrs);
         }
     }
 
@@ -387,7 +390,6 @@ public final class CRM {
         xml.append("<meta_attributes id=\"");
         xml.append(heartbeatId);
         xml.append("-meta_attributes\">");
-        //xml.append("_meta_attrs\">");
 
         final String hbV = host.getHeartbeatVersion();
         if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
@@ -398,7 +400,6 @@ public final class CRM {
             xml.append("<nvpair id=\"");
             xml.append(heartbeatId);
             xml.append("-meta_attributes-");
-            //xml.append("-meta-options-");
             xml.append(attr);
             xml.append("\" name=\"");
             xml.append(attr);
@@ -556,63 +557,57 @@ public final class CRM {
      * Adds colocation between service with heartbeatId and parentHbId.
      */
     public static void addColocation(final Host host,
+                                     final String colId,
                                      final String heartbeatId,
-                                     final String parentHbId) {
+                                     final String parentHbId,
+                                     Map<String, String> attrs) {
         String colocationId;
-        if (parentHbId.compareTo(heartbeatId) < 0) {
-            colocationId = "col_" + heartbeatId + "_" + parentHbId;
+        String cibadminOpt;
+        if (colId == null) {
+            cibadminOpt = "-C"; /* create */
+            if (parentHbId.compareTo(heartbeatId) < 0) {
+                colocationId = "col_" + heartbeatId + "_" + parentHbId;
+            } else {
+                colocationId = "col_" + parentHbId + "_" + heartbeatId;
+            }
         } else {
-            colocationId = "col_" + parentHbId + "_" + heartbeatId;
+            cibadminOpt = "-R"; /* replace */
+            colocationId = colId;
         }
-        final String score = "INFINITY";
-        String rscString = "rsc";
-        String withRscString = "with-rsc";
         final String hbV = host.getHeartbeatVersion();
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            /* <= 2.1.4 */
-            rscString = "from";
-            withRscString = "to";
+        if (attrs == null) {
+            attrs = new LinkedHashMap<String, String>();
         }
+        attrs.put("rsc", heartbeatId);
+        attrs.put("with-rsc", parentHbId);
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
-        xml.append("\" " + rscString + "=\"");
-        xml.append(heartbeatId);
-        if (score != null) {
-            xml.append("\" score=\"");
-            xml.append(score);
+        final Map<String, String> convertHash = new HashMap<String, String>();
+        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            /* <= 2.1.4 */
+            convertHash.put("rsc", "from");
+            convertHash.put("with-rsc", "to");
+            convertHash.put("rsc-role", "from_role");
+            convertHash.put("with-rsc-role", "to_role");
         }
-        xml.append("\" " + withRscString + "=\"");
-        xml.append(parentHbId);
-        xml.append("\"/>'");
-        final String command = getCibCommand("-C",
-                                             "constraints",
-                                             xml.toString());
-        execCommand(host, command, true);
-    }
-
-    /**
-     * Sets colocation parameters.
-     */
-    public static void setColocationParameters(
-                                             final Host host,
-                                             final String colId,
-                                             final Map<String, String> attrs) {
-        final String hbV = host.getHeartbeatVersion();
-        final StringBuffer xml = new StringBuffer(360);
-        xml.append("'<rsc_colocation id=\"");
-        xml.append(colId);
-        for (final String attr : attrs.keySet()) {
+        for (String attr : attrs.keySet()) {
+            final String value = attrs.get(attr);
+            if ("".equals(value)) {
+                continue;
+            }
+            if (convertHash.containsKey(attr)) {
+                attr = convertHash.get(attr);
+            }
             xml.append("\" " + attr + "=\"");
-            xml.append(attrs.get(attr));
+            xml.append(value);
         }
         xml.append("\"/>'");
-        final String command = getCibCommand("-U",
+        final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
         execCommand(host, command, true);
     }
-
 
     /**
      * Removes order constraint with specified order id.
@@ -657,12 +652,23 @@ public final class CRM {
      * Adds order constraint.
      */
     public static void addOrder(final Host host,
+                                final String ordId,
                                 final String parentHbId,
-                                final String heartbeatId) {
-        final String orderId = "ord_" + parentHbId + "_" + heartbeatId;
-        final String score = "INFINITY";
-        final String symmetrical = null; // TODO:
+                                final String heartbeatId,
+                                Map<String, String> attrs) {
+        String orderId;
+        String cibadminOpt;
+        if (ordId == null) {
+            cibadminOpt = "-C"; /* replace */
+            orderId = "ord_" + parentHbId + "_" + heartbeatId;
+        } else {
+            cibadminOpt = "-R"; /* replace */
+            orderId = ordId;
+        }
         final String hbV = host.getHeartbeatVersion();
+        if (attrs == null) {
+            attrs = new LinkedHashMap<String, String>();
+        }
         String firstString = "first";
         String thenString = "then";
         if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
@@ -673,47 +679,31 @@ public final class CRM {
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_order id=\"");
         xml.append(orderId);
-        xml.append("\" " + firstString + "=\"");
-        xml.append(parentHbId);
-        if (score != null) {
-            xml.append("\" score=\"");
-            xml.append(score);
-        }
-        if (symmetrical != null) {
-            xml.append("\" symmetrical=\"");
-            xml.append(symmetrical);
-        }
-        xml.append("\" " + thenString + "=\"");
-        xml.append(heartbeatId);
+        attrs.put("first", parentHbId);
+        attrs.put("then", heartbeatId);
+        final Map<String, String> convertHash = new HashMap<String, String>();
         if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <= 2.1.4 */
             final String type = "before"; //TODO: can be after
-            xml.append("\" type=\"");
-            xml.append(type);
+            attrs.put("type", type);
+            convertHash.put("first", "from");
+            convertHash.put("then", "to");
+            convertHash.put("first-action", "action");
+            convertHash.put("then-action", "to_action");
         }
-        xml.append("\"/>'");
-        final String command = getCibCommand("-C",
-                                             "constraints",
-                                             xml.toString());
-        execCommand(host, command, true);
-    }
-
-    /**
-     * Sets order parameters.
-     */
-    public static void setOrderParameters(final Host host,
-                                          final String orderId,
-                                          final Map<String, String> attrs) {
-        final String hbV = host.getHeartbeatVersion();
-        final StringBuffer xml = new StringBuffer(360);
-        xml.append("'<rsc_order id=\"");
-        xml.append(orderId);
-        for (final String attr : attrs.keySet()) {
+        for (String attr : attrs.keySet()) {
+            final String value = attrs.get(attr);
+            if ("".equals(value)) {
+                continue;
+            }
+            if (convertHash.containsKey(attr)) {
+                attr = convertHash.get(attr);
+            }
             xml.append("\" " + attr + "=\"");
-            xml.append(attrs.get(attr));
+            xml.append(value);
         }
         xml.append("\"/>'");
-        final String command = getCibCommand("-U",
+        final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
         execCommand(host, command, true);

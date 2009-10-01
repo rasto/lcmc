@@ -104,6 +104,10 @@ public class HeartbeatXML extends XML {
     private final Map<String, String[]> paramColPossibleChoices =
                                               new HashMap<String, String[]>();
 
+    /** Map from colocation parameter to the array of possible choices for
+     * master/slave resource. */
+    private final Map<String, String[]> paramColPossibleChoicesMS =
+                                              new HashMap<String, String[]>();
 
     /** List of parameters for order. */
     private final List<String> ordParams = new ArrayList<String>();
@@ -127,6 +131,10 @@ public class HeartbeatXML extends XML {
     /** Map from order parameter to the array of possible choices. */
     private final Map<String, String[]> paramOrdPossibleChoices =
                                               new HashMap<String, String[]>();
+    /** Map from order parameter to the array of possible choices for
+     * master/slave resource. */
+    private final Map<String, String[]> paramOrdPossibleChoicesMS =
+                                              new HashMap<String, String[]>();
     /** Predefined group as heartbeat service. */
     private final HeartbeatService hbGroup =
                       new HeartbeatService(Tools.getConfigData().PM_GROUP_NAME,
@@ -134,9 +142,12 @@ public class HeartbeatXML extends XML {
                                            "group");
     /** Predefined clone as heartbeat service. */
     private final HeartbeatService hbClone;
-    /** Predefined drvbddisk as heartbeat service. */
+    /** Predefined drbddisk as heartbeat service. */
     private final HeartbeatService hbDrbddisk =
-                    new HeartbeatService("drbddisk", "heartbeat", "heartbeat");
+                        new HeartbeatService("drbddisk", "heartbeat", "heartbeat");
+    /** Predefined linbit::drbd as pacemaker service. */
+    private final HeartbeatService hbLinbitDrbd =
+                                 new HeartbeatService("drbd", "linbit", "ocf");
     /** Mapfrom heartbeat service defined by name and class to the hearbeat
      * service object.
      */
@@ -152,15 +163,25 @@ public class HeartbeatXML extends XML {
     /** Fail count prefix. */
     private static final String FAIL_COUNT_PREFIX = "fail-count-";
     /** Attribute roles. */
-    private static final String[] ATTRIBUTE_ROLES = {"Stopped",
-                                                     "Started",
-                                                     "Master",
-                                                     "Slave"};
+    private static final String[] ATTRIBUTE_ROLES = {null,
+                                                     "Stopped",
+                                                     "Started"};
+    /** Atribute roles for master/slave resource. */
+    private static final String[] ATTRIBUTE_ROLES_MS = {null,
+                                                        "Stopped",
+                                                        "Started",
+                                                        "Master",
+                                                        "Slave"};
     /** Attribute actions. */
-    private static final String[] ATTRIBUTE_ACTIONS = {"start",
-                                                       "promote",
-                                                       "demote",
+    private static final String[] ATTRIBUTE_ACTIONS = {null,
+                                                       "start",
                                                        "stop"};
+    /** Attribute actions for master/slave. */
+    private static final String[] ATTRIBUTE_ACTIONS_MS = {null,
+                                                          "start",
+                                                          "promote",
+                                                          "demote",
+                                                          "stop"};
     /**
      * Prepares a new <code>HeartbeatXML</code> object.
      */
@@ -247,12 +268,15 @@ public class HeartbeatXML extends XML {
         }
         final String[] lines = output.split("\\r?\\n");
         final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
+        final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
         final Pattern bp = Pattern.compile("^<resource-agent name=\"(.*?)\".*");
         final Pattern ep = Pattern.compile("^</resource-agent>$");
         final StringBuffer xml = new StringBuffer("");
         String provider = null;
         String serviceName = null;
         boolean drbddiskPresent = false;
+        boolean linbitDrbdPresent = false;
+        boolean masterSlave = false; /* is probably m/s ...*/
         for (int i = 0; i < lines.length; i++) {
             //<resource-agent name="AudibleAlarm">
             // ...
@@ -260,6 +284,16 @@ public class HeartbeatXML extends XML {
             final Matcher pm = pp.matcher(lines[i]);
             if (pm.matches()) {
                 provider = pm.group(1);
+                continue;
+            }
+            final Matcher mm = mp.matcher(lines[i]);
+            if (mm.matches()) {
+                if ("".equals(mm.group(1))) {
+                    masterSlave = false;
+                } else {
+                    masterSlave = true;
+                }
+                continue;
             }
             final Matcher m = bp.matcher(lines[i]);
             if (m.matches()) {
@@ -272,15 +306,24 @@ public class HeartbeatXML extends XML {
                 if (m2.matches()) {
                     if ("drbddisk".equals(serviceName)) {
                         drbddiskPresent = true;
+                    } else if ("drbd".equals(serviceName)
+                               && "linbit".equals(provider)) {
+                        linbitDrbdPresent = true;
                     }
-                    parseMetaData(serviceName, provider, xml.toString());
+                    parseMetaData(serviceName,
+                                  provider,
+                                  xml.toString(),
+                                  masterSlave);
                     serviceName = null;
                     xml.delete(0, xml.length() - 1);
                 }
             }
         }
         if (!drbddiskPresent) {
-            Tools.appError("drbddisk heartbeat script is not present");
+            Tools.appWarning("drbddisk heartbeat script is not present");
+        }
+        if (!linbitDrbdPresent) {
+            Tools.appWarning("linbit::drbd ocf ra is not present");
         }
 
         /* Hardcoding global params */
@@ -299,7 +342,7 @@ public class HeartbeatXML extends XML {
         paramGlobalLongDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalTypeMap.put("stonith-enabled", PARAM_TYPE_BOOLEAN);
         paramGlobalDefaultMap.put("stonith-enabled", hb_boolean_true);
-        paramGlobalPreferredMap.put("stonith-enabled", hb_boolean_false);
+        //paramGlobalPreferredMap.put("stonith-enabled", hb_boolean_false);
         paramGlobalPossibleChoices.put("stonith-enabled", booleanValues);
         globalRequiredParams.add("stonith-enabled");
 
@@ -325,7 +368,7 @@ public class HeartbeatXML extends XML {
         paramGlobalPossibleChoices.put("default-resource-stickiness",
                                        integerValues);
         paramGlobalDefaultMap.put("default-resource-stickiness", "0");
-        paramGlobalPreferredMap.put("default-resource-stickiness", "100");
+        //paramGlobalPreferredMap.put("default-resource-stickiness", "100");
         globalRequiredParams.add("default-resource-stickiness");
 
         /* no quorum policy */
@@ -432,19 +475,19 @@ public class HeartbeatXML extends XML {
         }
 
         /* Hardcoding colocation params */
-        colParams.add("rsc-role");
-        paramColShortDescMap.put("rsc-role", "rsc1 col role");
-        paramColLongDescMap.put("rsc-role", "@RSC@ colocation role");
-        paramColTypeMap.put("rsc-role", PARAM_TYPE_STRING);
-        paramColDefaultMap.put("rsc-role", "Started");
-        paramColPossibleChoices.put("rsc-role", ATTRIBUTE_ROLES);
-
         colParams.add("with-rsc-role");
-        paramColShortDescMap.put("with-rsc-role", "rsc2 col role");
+        paramColShortDescMap.put("with-rsc-role", "rsc1 col role");
         paramColLongDescMap.put("with-rsc-role", "@WITH-RSC@ colocation role");
         paramColTypeMap.put("with-rsc-role", PARAM_TYPE_STRING);
-        paramColDefaultMap.put("with-rsc-role", "Started");
         paramColPossibleChoices.put("with-rsc-role", ATTRIBUTE_ROLES);
+        paramColPossibleChoicesMS.put("with-rsc-role", ATTRIBUTE_ROLES_MS);
+
+        colParams.add("rsc-role");
+        paramColShortDescMap.put("rsc-role", "rsc2 col role");
+        paramColLongDescMap.put("rsc-role", "@RSC@ colocation role");
+        paramColTypeMap.put("rsc-role", PARAM_TYPE_STRING);
+        paramColPossibleChoices.put("rsc-role", ATTRIBUTE_ROLES);
+        paramColPossibleChoicesMS.put("rsc-role", ATTRIBUTE_ROLES_MS);
 
         colParams.add("score");
         paramColShortDescMap.put("score", "Score");
@@ -457,21 +500,23 @@ public class HeartbeatXML extends XML {
         paramOrdShortDescMap.put("first-action", "rsc1 order action");
         paramOrdLongDescMap.put("first-action", "@FIRST-RSC@ order action");
         paramOrdTypeMap.put("first-action", PARAM_TYPE_STRING);
-        paramOrdDefaultMap.put("first-action", "start");
         paramOrdPossibleChoices.put("first-action", ATTRIBUTE_ACTIONS);
+        paramOrdPossibleChoicesMS.put("first-action", ATTRIBUTE_ACTIONS_MS);
+        paramOrdDefaultMap.put("first-action", null);
 
         ordParams.add("then-action");
         paramOrdShortDescMap.put("then-action", "rsc2 order action");
         paramOrdLongDescMap.put("then-action", "@THEN-RSC@ order action");
         paramOrdTypeMap.put("then-action", PARAM_TYPE_STRING);
-        paramOrdDefaultMap.put("then-action", "start");
         paramOrdPossibleChoices.put("then-action", ATTRIBUTE_ACTIONS);
+        paramOrdPossibleChoicesMS.put("then-action", ATTRIBUTE_ACTIONS_MS);
+        paramOrdDefaultMap.put("then-action", null);
 
         ordParams.add("symmetrical");
         paramOrdShortDescMap.put("symmetrical", "Symmetrical");
         paramOrdLongDescMap.put("symmetrical", "Symmetrical");
         paramOrdTypeMap.put("symmetrical", PARAM_TYPE_BOOLEAN);
-        paramOrdDefaultMap.put("symmetrical", hb_boolean_false);
+        paramOrdDefaultMap.put("symmetrical", hb_boolean_true);
         paramOrdPossibleChoices.put("symmetrical", booleanValues);
 
         ordParams.add("score");
@@ -1000,7 +1045,8 @@ public class HeartbeatXML extends XML {
      */
     public final void parseMetaData(final String serviceName,
                                     final String provider,
-                                    final String xml) {
+                                    final String xml,
+                                    final boolean masterSlave) {
         final Document document = getXMLDocument(xml);
         if (document == null) {
             return;
@@ -1027,6 +1073,10 @@ public class HeartbeatXML extends XML {
         if (serviceName.equals("drbddisk")
             && heartbeatClass.equals("heartbeat")) {
             hbService = hbDrbddisk;
+        } else if ("drbd".equals(serviceName)
+                   && "ocf".equals(heartbeatClass)
+                   && "linbit".equals(provider)) {
+            hbService = hbLinbitDrbd;
         } else {
             hbService = new HeartbeatService(serviceName,
                                              provider,
@@ -1066,6 +1116,7 @@ public class HeartbeatXML extends XML {
         if (actionsNode != null) {
             parseActions(hbService, actionsNode);
         }
+        hbService.setMasterSlave(masterSlave);
     }
 
     /**
@@ -1176,6 +1227,13 @@ public class HeartbeatXML extends XML {
      */
     public final HeartbeatService getHbDrbddisk() {
         return hbDrbddisk;
+    }
+
+    /**
+     * Returns the heartbeat service object of the linbit::drbd service.
+     */
+    public final HeartbeatService getHbLinbitDrbd() {
+        return hbLinbitDrbd;
     }
 
     /**
@@ -1696,11 +1754,13 @@ public class HeartbeatXML extends XML {
             String thenActionString  = "then-action";
             if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 rscString         = "from";
-                rscRoleString     = "from-role"; //TODO: just guessing
+                rscRoleString     = "from_role"; //TODO: just guessing
                 withRscString     = "to";
-                withRscRoleString = "to-role"; //TODO: just guessing
+                withRscRoleString = "to_role"; //TODO: just guessing
                 firstString       = "from";
                 thenString        = "to";
+                firstActionString = "action";
+                thenActionString  = "to_action";
             }
             for (int i = 0; i < constraints.getLength(); i++) {
                 final Node constraintNode = constraints.item(i);
@@ -1736,9 +1796,9 @@ public class HeartbeatXML extends XML {
                     final String symmetrical = getAttribute(constraintNode,
                                                                "symmetrical");
                     final String firstAction = getAttribute(constraintNode,
-                                                               "first-action");
+                                                            firstActionString);
                     final String thenAction = getAttribute(constraintNode,
-                                                               "then-action");
+                                                           thenActionString);
                     List<String> tos = orderMap.get(rscFrom);
                     if (tos == null) {
                         tos = new ArrayList<String>();
@@ -1914,8 +1974,13 @@ public class HeartbeatXML extends XML {
      * Returns possible choices for a order parameter, that will be displayed
      * in the combo box.
      */
-    public final String[] getOrderParamPossibleChoices(final String param) {
-        return paramOrdPossibleChoices.get(param);
+    public final String[] getOrderParamPossibleChoices(final String param,
+                                                       final boolean ms) {
+        if (ms) {
+            return paramOrdPossibleChoicesMS.get(param);
+        } else {
+            return paramOrdPossibleChoices.get(param);
+        }
     }
 
     /**
@@ -2054,8 +2119,13 @@ public class HeartbeatXML extends XML {
      * Returns possible choices for a colocation parameter, that will be
      * displayed in the combo box.
      */
-    public final String[] getColocationParamPossibleChoices(final String param) {
-        return paramColPossibleChoices.get(param);
+    public final String[] getColocationParamPossibleChoices(final String param,
+                                                            final boolean ms) {
+        if (ms) {
+            return paramColPossibleChoicesMS.get(param);
+        } else {
+            return paramColPossibleChoices.get(param);
+        }
     }
 
     /**

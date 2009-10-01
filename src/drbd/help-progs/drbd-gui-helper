@@ -697,9 +697,9 @@ sub get_resource_status {
 	my %started;
 	my %stopped;
 	my @sets;
-	for (`crm_mon -1 -r 2>/dev/null`) {
+	for (`crm_mon -1 -f 2>/dev/null`) {
 		if (!$in_rsc_list) {
-			$in_rsc_list = /^Full list of resources/;
+			$in_rsc_list = /^============/;
 		} else {
 			next if /^\t*$/;
 			if (/^\S/) {

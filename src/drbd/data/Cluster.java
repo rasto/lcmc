@@ -57,7 +57,7 @@ public class Cluster {
     private ClusterBrowser clusterBrowser;
     /** Default colors of the hosts. */
     private final Color[] hostColors = {
-                                  Color.YELLOW,
+                                  new Color(228, 228, 32),
                                   new Color(102, 204, 255), /* blue */
                                   Color.PINK,
                                   new Color(255, 100, 0), /* orange */

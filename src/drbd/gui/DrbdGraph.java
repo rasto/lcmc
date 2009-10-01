@@ -345,11 +345,11 @@ public class DrbdGraph extends ResourceGraph {
     protected final String getIconText(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
-            if (bdi != null && bdi.getBlockDevice().isDrbd()) {
-                return bdi.getBlockDevice().getNodeState();
+            if (bdi != null) {
+                return bdi.getIconTextForGraph();
             }
         } else {
-            /* TODO: host */
+            vertexToHostMap.get(v).getIconTextForDrbdGraph();
         }
         return null;
     }
@@ -752,13 +752,6 @@ public class DrbdGraph extends ResourceGraph {
      * Returns secondary color in the gradient.
      */
     protected final Color getVertexFillSecondaryColor(final Vertex v) {
-        //if (isVertexBlockDevice(v)) {
-        //    final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
-        //    if (bdi != null && bdi.getBlockDevice().isDrbdMetaDisk()) {
-        //        return getVertexFillColor(blockDeviceToVertexMap.get(
-        //                bdi.getBlockDevice().getMetaDiskOfBlockDevice()));
-        //    }
-        //}
         return super.getVertexFillSecondaryColor(v);
     }
 

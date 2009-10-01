@@ -166,6 +166,8 @@ public class DistResource extends
          + "for prov in `ls -1 /usr/lib/ocf/resource.d/`; do "
          +  "for s in `ls -1 /usr/lib/ocf/resource.d/$prov/ `; do "
          +  "echo -n 'provider:'; echo $prov;"
+         +  "echo -n 'master:';"
+         +  "grep -wl crm_master /usr/lib/ocf/resource.d/$prov/$s;echo;"
          +   "/usr/lib/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
          + "done;"
          + "echo 'provider:heartbeat';"

@@ -120,6 +120,9 @@ public class GuiComboBox extends JPanel {
     /** Name to component hash. */
     private final Map<String, JComponent> componentsHash =
                                              new HashMap<String, JComponent>();
+    /** Nothing selected string, that returns null, if selected. */
+    public static final String NOTHING_SELECTED =
+                                Tools.getString("GuiComboBox.NothingSelected");
     /**
      * Prepares a new <code>GuiComboBox</code> object with specified units.
      */
@@ -127,14 +130,16 @@ public class GuiComboBox extends JPanel {
                        final Object[] items,
                        final Unit[] units,
                        final Type type,
-                       final String regexp,
+                       String regexp,
                        final int width,
                        final Map<String, String> abbreviations) {
         super();
         this.units = units;
         //setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
         setLayout(new BorderLayout(0, 0));
-
+        if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
+            regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
+        }
         if (type == null) {
             if (items == null) {
                 this.type = Type.TEXTFIELD;
@@ -386,7 +391,7 @@ public class GuiComboBox extends JPanel {
         if (items != null) {
             for (int i = 0; i < items.length; i++) {
                 if (items[i] == null) {
-                    continue;
+                    items[i] = GuiComboBox.NOTHING_SELECTED;
                 }
                 if (items[i].toString().equals(selectedValue)
                     || items[i].equals(selectedValue)) {
@@ -589,6 +594,9 @@ public class GuiComboBox extends JPanel {
             default:
                 // error
         }
+        if (NOTHING_SELECTED.equals(value)) {
+            return null;
+        }
         return value;
     }
 
@@ -674,12 +682,20 @@ public class GuiComboBox extends JPanel {
                         (JTextComponent) cb.getEditor().getEditorComponent();
                     tc.setText((String) item);
                 } else if (Tools.isStringClass(item)) {
+                    Object selectedObject = null;
                     for (int i = 0; i < cb.getItemCount(); i++) {
                         final Object it = cb.getItemAt(i);
-                        if (it.toString().equals(item) || it.equals(item)) {
+                        if (it.toString().equals(item)
+                            || it.equals(item)
+                            || (NOTHING_SELECTED.equals(it) && item == null)) {
+                            selectedObject = it;
                             cb.setSelectedItem(it);
                             break;
                         }
+                    }
+                    if (selectedObject == null) {
+                        cb.addItem(item);
+                        cb.setSelectedItem(item);
                     }
                 }
                 break;
@@ -913,7 +929,6 @@ public class GuiComboBox extends JPanel {
                 }
                 break;
             case CHECKBOX:
-                //System.out.println("cb set background: " + backgroundColor);
                 component.setBackground(backgroundColor);
                 break;
             case TEXTFIELDWITHUNIT:
@@ -943,7 +958,6 @@ public class GuiComboBox extends JPanel {
                 setBackground(c);
                 break;
             case CHECKBOX:
-                //System.out.println("cb set background -c: " + c);
                 setBackground(c);
                 break;
             case TEXTFIELDWITHUNIT:

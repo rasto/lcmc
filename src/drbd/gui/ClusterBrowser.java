@@ -95,6 +95,7 @@ import java.util.Enumeration;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -148,10 +149,6 @@ public class ClusterBrowser extends Browser {
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo =
                                           new HashMap<String, ServiceInfo>();
-    ///** Score to its info panel hash. */
-    //private final Map<String, String> hostScoresMap =
-    //                                            new HashMap<String, String>();
-
     /** List of heartbeat ids of all services. */
     private final List<String> heartbeatIdList = new ArrayList<String>();
 
@@ -1443,7 +1440,7 @@ public class ClusterBrowser extends Browser {
                 if (csPmId == null) {
                     service.setId("1");
                 } else {
-                    service.setId(csPmId + "_1");
+                    service.setId(csPmId);
                 }
             }
         } else {
@@ -1503,42 +1500,6 @@ public class ClusterBrowser extends Browser {
             Heartbeat.startHeartbeat(host);
         }
     }
-
-    ///**
-    // * This class holds info data for a preferred host score.
-    // * Nothing is displayed.
-    // */
-    //class HostScoreInfo extends HbCategoryInfo {
-    //    /** Heartbeat score to keep a service on a host. It can be number,
-    //     * INFINITY or -INFINITY.
-    //     */
-    //    private final String score;
-
-    //    /**
-    //     * Prepares a new <code>ScoreInfo</code> object.
-    //     *
-    //     * @param score
-    //     *      host score, it is either number, INFINITY or -INFINITY
-    //     */
-    //    HostScoreInfo(final String score) {
-    //        super(Tools.scoreToString(score));
-    //        this.score = score;
-    //    }
-
-    //    /**
-    //     * Returns text about host score info.
-    //     */
-    //    public String getInfo() {
-    //        return null;
-    //    }
-
-    //    /**
-    //     * Returns score as string.
-    //     */
-    //    public String getScore() {
-    //        return score;
-    //    }
-    //}
 
     /**
      * This class holds info data for a network.
@@ -1809,10 +1770,7 @@ public class ClusterBrowser extends Browser {
             } catch (Exceptions.DrbdConfigException dce) {
                 throw dce;
             }
-            // startup
-            // disk
-            // syncer
-            // net
+            /* startup disk syncer net */
             config.append('\n');
             config.append(blockDevInfo1.drbdNodeConfig(getName(), getDevice()));
             config.append('\n');
@@ -2108,9 +2066,6 @@ public class ClusterBrowser extends Browser {
                               odri.getResource().getValue("after"))) != null) {
                         if (odri == this) {
                             cyclicRef = true;
-                            // cyclic reference
-                            //Tools.appError("cyclic reference: "
-                            //               + odri.toString());
                         }
                     }
                     if (r != this && !cyclicRef) {
@@ -2422,7 +2377,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Adds drbddisk service in the heartbeat and graph.
+         * Adds old style drbddisk service in the heartbeat and graph.
          *
          * @param fi
          *              File system before which this drbd info should be
@@ -2430,7 +2385,9 @@ public class ClusterBrowser extends Browser {
          */
         public final void addDrbdDisk(final FilesystemInfo fi) {
             final Point2D p = null;
-            final DrbddiskInfo di = (DrbddiskInfo) heartbeatGraph.getServicesInfo().addServicePanel(heartbeatXML.getHbDrbddisk(), p, true, null);
+            final DrbddiskInfo di =
+                (DrbddiskInfo) heartbeatGraph.getServicesInfo().addServicePanel(
+                                        heartbeatXML.getHbDrbddisk(), p, true, null);
             di.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(di);
             fi.setDrbddiskInfo(di);
@@ -2441,12 +2398,45 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Adds linbit::drbd service in the pacemaker graph.
+         *
+         * @param fi
+         *              File system before which this drbd info should be
+         *              started
+         */
+        public final void addLinbitDrbd(final FilesystemInfo fi) {
+            final Point2D p = null;
+            final LinbitDrbdInfo ldi =
+             (LinbitDrbdInfo) heartbeatGraph.getServicesInfo().addServicePanel(
+                                 heartbeatXML.getHbLinbitDrbd(), p, true, null);
+            ldi.setGroupInfo(fi.getGroupInfo());
+            addToHeartbeatIdList(ldi);
+            fi.setLinbitDrbdInfo(ldi);
+            ldi.getInfoPanel();
+            ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(
+                                                                    getName());
+            ldi.apply();
+            heartbeatGraph.addColocation(ldi.getCloneInfo(), fi);
+        }
+
+
+        /**
          * Remove drbddisk heartbeat service.
          */
         public final void removeDrbdDisk(final FilesystemInfo fi) {
             final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
             if (drbddiskInfo != null) {
                 drbddiskInfo.removeMyselfNoConfirm();
+            }
+        }
+
+        /**
+         * Remove drbddisk heartbeat service.
+         */
+        public final void removeLinbitDrbd(final FilesystemInfo fi) {
+            final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
+            if (linbitDrbdInfo != null) {
+                linbitDrbdInfo.removeMyselfNoConfirm();
             }
         }
 
@@ -2520,9 +2510,9 @@ public class ClusterBrowser extends Browser {
                            ) {
                 private static final long serialVersionUID = 1L;
                 public void action() {
-                    // this drbdResourceInfo remove myself and this calls
-                    // removeDrbdResource in this class, that removes the edge in
-                    // the graph.
+                    /* this drbdResourceInfo remove myself and this calls
+                       removeDrbdResource in this class, that removes the edge
+                       in the graph. */
                     removeMyself();
                 }
 
@@ -2991,7 +2981,7 @@ public class ClusterBrowser extends Browser {
         public String toString() {
             final String id = getService().getId();
             if (id == null) {
-                return super.toString(); // this is for 'new IPaddrInfo'
+                return super.toString(); /* this is for 'new IPaddrInfo' */
             }
 
             final StringBuffer s = new StringBuffer(getName());
@@ -3015,6 +3005,8 @@ public class ClusterBrowser extends Browser {
      * drbd device is selected, the drbddisk service will be added too.
      */
     class FilesystemInfo extends ServiceInfo {
+        /** linbit::drbd service object. */
+        private LinbitDrbdInfo linbitDrbdInfo = null;
         /** drbddisk service object. */
         private DrbddiskInfo drbddiskInfo = null;
         /** Block device combo box. */
@@ -3038,6 +3030,22 @@ public class ClusterBrowser extends Browser {
                               final String hbId,
                               final Map<String, String> resourceNode) {
             super(name, hbService, hbId, resourceNode);
+        }
+
+        /**
+         * Sets Linbit::drbd info object for this Filesystem service if it uses
+         * drbd block device.
+         */
+        public void setLinbitDrbdInfo(final LinbitDrbdInfo linbitDrbdInfo) {
+            this.linbitDrbdInfo = linbitDrbdInfo;
+        }
+
+        /**
+         * Returns linbit::drbd info object that is associated with the drbd device
+         * or null if it is not a drbd device.
+         */
+        public LinbitDrbdInfo getLinbitDrbdInfo() {
+            return linbitDrbdInfo;
         }
 
         /**
@@ -3228,7 +3236,7 @@ public class ClusterBrowser extends Browser {
         public String toString() {
             String id = getService().getId();
             if (id == null) {
-                return super.toString(); // this is for 'new Filesystem'
+                return super.toString(); /* this is for 'new Filesystem' */
             }
 
             final StringBuffer s = new StringBuffer(getName());
@@ -3251,30 +3259,46 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Adds DrbddiskInfo before the filesysteminfo is added.
+         * Adds DrbddiskInfo before the filesysteminfo is added, returns true
+         * if something was added.
          */
-        public void addResourceBefore() {
+        public final ServiceInfo addResourceBefore() {
             final DrbdResourceInfo oldDri =
                     drbdDevHash.get(getResource().getValue(DRBD_RES_PARAM_DEV));
             final DrbdResourceInfo newDri =
                     drbdDevHash.get(getComboBoxValue(DRBD_RES_PARAM_DEV));
             if (newDri == null || newDri.equals(oldDri)) {
-                return;
+                return null;
             }
-            //final DrbddiskInfo oddi = getDrbddiskInfo();
+            boolean oldDrbddisk = false;
+            if (getDrbddiskInfo() != null) {
+                oldDrbddisk = true;
+            }
             if (oldDri != null) {
-                oldDri.removeDrbdDisk(this);
+                if (oldDrbddisk) {
+                    oldDri.removeDrbdDisk(this);
+                } else {
+                    oldDri.removeLinbitDrbd(this);
+                }
                 oldDri.setUsedByCRM(false);
-                setDrbddiskInfo(null);
+                if (oldDrbddisk) {
+                    setDrbddiskInfo(null);
+                } else {
+                    setLinbitDrbdInfo(null);
+                }
             }
 
             if (newDri != null) {
                 newDri.setUsedByCRM(true);
-                newDri.addDrbdDisk(this);
+                if (oldDrbddisk) {
+                    newDri.addDrbdDisk(this);
+                    return getDrbddiskInfo();
+                } else {
+                    newDri.addLinbitDrbd(this);
+                    return getLinbitDrbdInfo();
+                }
             }
-            //if (oddi != null) {
-            //    oddi.cleanupResource();
-            //}
+            return null;
         }
 
         /**
@@ -3366,6 +3390,62 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
+     * linbit::drbd info class is used for drbd pacemaker service that is
+     * treated in special way.
+     */
+    class LinbitDrbdInfo extends ServiceInfo {
+        /**
+         * Creates new LinbitDrbdInfo object.
+         */
+        public LinbitDrbdInfo(final String name,
+                              final HeartbeatService hbService) {
+            super(name, hbService);
+        }
+
+        /**
+         * Creates new linbit::drbd info object.
+         */
+        public LinbitDrbdInfo(final String name,
+                              final HeartbeatService hbService,
+                              final String hbId,
+                              final Map<String, String> resourceNode) {
+            super(name, hbService, hbId, resourceNode);
+        }
+
+        /**
+         * Returns string representation of the linbit::drbd service.
+         */
+        public String toString() {
+            return getName() + " (" + getResource().getValue("drbd_resource") + ")";
+        }
+
+        /**
+         * Returns resource name.
+         */
+        public String getResourceName() {
+            return getResource().getValue("drbd_resource");
+        }
+
+        /**
+         * Sets resource name.
+         */
+        public void setResourceName(final String resourceName) {
+            getResource().setValue("drbd_resource", resourceName);
+        }
+
+        /**
+         * Removes the linbit::drbd service.
+         */
+        public void removeMyselfNoConfirm() {
+            super.removeMyselfNoConfirm();
+            final DrbdResourceInfo dri = drbdResHash.get(getResourceName());
+            if (dri != null) {
+                dri.setUsedByCRM(false);
+            }
+        }
+    }
+
+    /**
      * GroupInfo class holds data for heartbeat group, that is in some ways
      * like normal service, but it can contain other services.
      */
@@ -3426,7 +3506,9 @@ public class ClusterBrowser extends Browser {
                 final String[] parents = heartbeatGraph.getParents(this);
                 CRM.setOrderAndColocation(getDCHost(),
                                           heartbeatId,
-                                          parents);
+                                          parents,
+                                          null,
+                                          null);
             }
             setLocations(heartbeatId);
             storeComboBoxValues(params);
@@ -3460,7 +3542,7 @@ public class ClusterBrowser extends Browser {
                                     new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
             getNode().add(newServiceNode);
-            reload(getNode()); // TODO: something will not work I guess
+            reload(getNode());
             reload(newServiceNode);
         }
 
@@ -3473,6 +3555,8 @@ public class ClusterBrowser extends Browser {
             final String name = newHbService.getName();
             if (newHbService.isFilesystem()) {
                 newServiceInfo = new FilesystemInfo(name, newHbService);
+            } else if (newHbService.isLinbitDrbd()) {
+                newServiceInfo = new LinbitDrbdInfo(name, newHbService);
             } else if (newHbService.isDrbddisk()) {
                 newServiceInfo = new DrbddiskInfo(name, newHbService);
             } else if (newHbService.isIPaddr()) {
@@ -3916,7 +4000,6 @@ public class ClusterBrowser extends Browser {
                            final Map<String, String> resourceNode) {
             this(name, hbService);
             getService().setHeartbeatId(heartbeatId);
-            //getInfoPanel();
             setParameters(resourceNode);
         }
 
@@ -4091,12 +4174,16 @@ public class ClusterBrowser extends Browser {
                 String score = heartbeatStatus.getScore(
                                             getService().getHeartbeatId(),
                                             hi.getName());
-                if (score == null) {
-                    score = "0";
-                }
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                if (!score.equals(savedHostScores.get(hi))) {
-                    savedHostScores.put(hi, score);
+                final String savedScore = savedHostScores.get(hi);
+                if ((score == null && score != savedScore)
+                     || (score != null
+                         && !score.equals(savedScore))) {
+                    if (score == null) {
+                        savedHostScores.remove(hi);
+                    } else {
+                        savedHostScores.put(hi, score);
+                    }
                     if (cb != null) {
                         cb.setValue(score);
                     }
@@ -4286,23 +4373,6 @@ public class ClusterBrowser extends Browser {
             return false;
         }
 
-        ///**
-        // * Returns fail-count.
-        // */
-        //public final String failCount() {
-        //    StringBuffer fcString = new StringBuffer(10);
-        //    for (final Host host : getClusterHosts()) {
-        //        final String fc = heartbeatStatus.getFailCount(
-        //                                host.getName(),
-        //                                getService().getHeartbeatId());
-        //        if (fc != null) {
-        //            fcString.append(fc);
-        //            fcString.append(' ');
-        //        }
-        //    }
-        //    return fcString.toString();
-        //}
-
         /**
          * Returns whether the resource has failed on one of the nodes.
          */
@@ -4353,13 +4423,6 @@ public class ClusterBrowser extends Browser {
                 return SERVICE_STOPPED_ICON;
             }
             return SERVICE_STARTED_ICON;
-        }
-
-        /**
-         * Saves the host scores.
-         */
-        public void setSavedHostScores(final Map<HostInfo, String> hs) {
-            savedHostScores = hs;
         }
 
         /**
@@ -4421,10 +4484,15 @@ public class ClusterBrowser extends Browser {
             for (final Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                savedHostScores.put(hi, cb.getStringValue());
+                final String score = cb.getStringValue();
+                if (score == null || "".equals(score)) {
+                    savedHostScores.remove(hi);
+                } else {
+                    savedHostScores.put(hi, score);
+                }
             }
-            // TODO: rename this
-            heartbeatGraph.setHomeNode(this, savedHostScores);
+            //// TODO: rename this
+            //heartbeatGraph.setHomeNode(this, savedHostScores);
         }
 
         /**
@@ -4470,7 +4538,7 @@ public class ClusterBrowser extends Browser {
                     return false;
                 }
                 final String hs = cb.getStringValue();
-                if (hsSaved == null && !"0".equals(hs)) {
+                if (hsSaved == null && !"".equals(hs)) {
                     return true;
                 } else if (hsSaved != null && !hs.equals(hsSaved)) {
                     return true;
@@ -4607,9 +4675,9 @@ public class ClusterBrowser extends Browser {
             int rows = 1;
             createIdField(rightWidth);
             addField(panel, new JLabel("ID"), idField, leftWidth, rightWidth);
-            SpringUtilities.makeCompactGrid(panel, rows, 2, // rows, cols
-                                            1, 1,        // initX, initY
-                                            1, 1);       // xPad, yPad
+            SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
+                                            1, 1,           /* initX, initY */
+                                            1, 1);          /* xPad, yPad */
             optionsPanel.add(panel);
         }
 
@@ -4644,9 +4712,9 @@ public class ClusterBrowser extends Browser {
                      cloneInfo.getHeartbeatIdLabel(),
                      leftWidth,
                      rightWidth);
-            SpringUtilities.makeCompactGrid(panel, 2, 2, // rows, cols
-                                                   1, 1,    // initX, initY
-                                                   1, 1);   // xPad, yPad
+            SpringUtilities.makeCompactGrid(panel, 2, 2, /* rows, cols */
+                                                   1, 1, /* initX, initY */
+                                                   1, 1);/* xPad, yPad */
             optionsPanel.add(panel);
 
             cloneInfo.paramComboBoxClear();
@@ -4661,48 +4729,6 @@ public class ClusterBrowser extends Browser {
             cloneInfo.addHostScores(optionsPanel,
                                     SERVICE_LABEL_WIDTH,
                                     SERVICE_FIELD_WIDTH);
-            ///* heartbeat id */
-            //heartbeatIdLabel = new JLabel(getService().getHeartbeatId());
-            //final JPanel panel = getParamPanel("Heartbeat");
-            //addField(panel,
-            //         new JLabel(Tools.getString("ClusterBrowser.HeartbeatId")),
-            //         heartbeatIdLabel,
-            //         leftWidth,
-            //         rightWidth);
-            ///* heartbeat provider */
-            //final JLabel heartbeatProviderLabel =
-            //                     new JLabel(hbService.getProvider());
-            //addField(panel,
-            //         new JLabel(Tools.getString(
-            //                              "ClusterBrowser.HeartbeatProvider")),
-            //         heartbeatProviderLabel,
-            //         leftWidth,
-            //         rightWidth);
-            ///* heartbeat class */
-            //final JLabel heartbeatClassLabel =
-            //                     new JLabel(getService().getHeartbeatClass());
-            //addField(panel,
-            //         new JLabel(Tools.getString(
-            //                                 "ClusterBrowser.HeartbeatClass")),
-            //         heartbeatClassLabel,
-            //         leftWidth,
-            //         rightWidth);
-            //int rows = 3;
-
-            //if (groupInfo != null) {
-            //    final String groupId = groupInfo.getService().getHeartbeatId();
-            //    final JLabel groupLabel = new JLabel(groupId);
-            //    addField(panel,
-            //             new JLabel(Tools.getString("ClusterBrowser.Group")),
-            //             groupLabel,
-            //             leftWidth,
-            //             rightWidth);
-            //    rows++;
-            //}
-            //SpringUtilities.makeCompactGrid(panel, rows, 2, // rows, cols
-            //                                       1, 1,    // initX, initY
-            //                                       1, 1);   // xPad, yPad
-            //optionsPanel.add(panel);
         }
 
 
@@ -4751,9 +4777,9 @@ public class ClusterBrowser extends Browser {
                          rightWidth);
                 rows++;
             }
-            SpringUtilities.makeCompactGrid(panel, rows, 2, // rows, cols
-                                                   1, 1,    // initX, initY
-                                                   1, 1);   // xPad, yPad
+            SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
+                                            1, 1,           /* initX, initY */
+                                            1, 1);          /* xPad, yPad */
             optionsPanel.add(panel);
         }
 
@@ -4776,25 +4802,24 @@ public class ClusterBrowser extends Browser {
                 abbreviations.put("i", "INFINITY");
                 abbreviations.put("I", "INFINITY");
                 final GuiComboBox cb =
-                                    new GuiComboBox("0", //TODO: none?
-                                                    new String[]{"0",
-                                                                 "2",
-                                                                 "INFINITY",
-                                                                 "-INFINITY"},
-                                                    null,
-                                                    null,
-                                                    "^-?(\\d*|INFINITY)$",
-                                                    rightWidth,
-                                                    abbreviations);
+                    new GuiComboBox(null,
+                                    new String[]{null,
+                                                 "0",
+                                                 "2",
+                                                 "INFINITY",
+                                                 "-INFINITY"},
+                                    null,
+                                    null,
+                                    "^(-?(\\d*|INFINITY))|@NOTHING_SELECTED@$",
+                                    rightWidth,
+                                    abbreviations);
                 cb.setEditable(true);
                 scoreComboBoxHash.put(hi, cb);
 
                 /* set selected host scores in the combo box from
                  * savedHostScores */
                 final String hsSaved = savedHostScores.get(hi);
-                if (hsSaved != null) { //does not work immediatly in m/s 
-                    cb.setValue(hsSaved);
-                }
+                cb.setValue(hsSaved);
             }
 
             /* host score combo boxes */
@@ -4809,9 +4834,9 @@ public class ClusterBrowser extends Browser {
                 rows++;
             }
 
-            SpringUtilities.makeCompactGrid(panel, rows, 2, // rows, cols
-                                            1, 1,           // initX, initY
-                                            1, 1);          // xPad, yPad
+            SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
+                                            1, 1,           /* initX, initY */
+                                            1, 1);          /* xPad, yPad */
             optionsPanel.add(panel);
         }
 
@@ -4880,12 +4905,12 @@ public class ClusterBrowser extends Browser {
                 }
             }
 
-            SpringUtilities.makeCompactGrid(panel, rows, 2, // rows, cols
-                                            1, 1,           // initX, initY
-                                            1, 1);          // xPad, yPad
+            SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
+                                            1, 1,           /* initX, initY */
+                                            1, 1);          /* xPad, yPad */
             SpringUtilities.makeCompactGrid(extraPanel, extraRows, 2,
-                                            1, 1,           // initX, initY
-                                            1, 1);          // xPad, yPad
+                                            1, 1,
+                                            1, 1);
             optionsPanel.add(panel);
             extraOptionsPanel.add(extraPanel);
         }
@@ -5010,35 +5035,31 @@ public class ClusterBrowser extends Browser {
 
         /**
          * Is called before the service is added. This is for example used by
-         * FilesystemInfo so that it can add DrbddiskInfo before it adds
-         * itself.
+         * FilesystemInfo so that it can add LinbitDrbdInfo or DrbddiskInfo before
+         * it adds itself.
          */
-        public void addResourceBefore() {
+        public ServiceInfo addResourceBefore() {
+            return null;
         }
 
         /**
          * Change type to Master, Clone or Primitive.
          */
-        private void changeType(final String value) {
+        protected final void changeType(final String value) {
+            boolean masterSlave = false;
+            boolean clone = false;
             if ("Master / Slave".equals(value)) {
+                masterSlave = true;
+                clone = true;
+            } else if ("Clone".equals(value)) {
+                clone = true;
+            }
+
+            if (clone) {
                 final CloneInfo oldCI = cloneInfo;
                 cloneInfo = new CloneInfo(heartbeatXML.getHbClone(),
                                           PM_MASTER_SLAVE_SET_NAME,
-                                          true);
-                if (oldCI == null) {
-                    heartbeatGraph.exchangeObjectInTheVertex(cloneInfo, this);
-                } else {
-                    servicesNode.remove(oldCI.getNode());
-                    heartbeatGraph.exchangeObjectInTheVertex(cloneInfo, oldCI);
-                } 
-                cloneInfo.setCloneServicePanel(this);
-                infoPanel = null;
-                selectMyself();
-            } else if ("Clone".equals(value)) {
-                final CloneInfo oldCI = cloneInfo;
-                cloneInfo = new CloneInfo(heartbeatXML.getHbClone(),
-                                          PM_CLONE_SET_NAME,
-                                          false);
+                                          masterSlave);
                 if (oldCI == null) {
                     heartbeatGraph.exchangeObjectInTheVertex(cloneInfo, this);
                 } else {
@@ -5084,6 +5105,7 @@ public class ClusterBrowser extends Browser {
                                         SwingUtilities.invokeLater(
                                         new Runnable() {
                                             public void run() {
+                                                cb.setEditable();
                                                 applyButton.setEnabled(enable);
                                             }
                                         });
@@ -5362,18 +5384,26 @@ public class ClusterBrowser extends Browser {
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
                 final String hs = cb.getStringValue();
                 final String hsSaved = savedHostScores.get(hi);
-                if (!hs.equals(hsSaved)) {
+                if ((hsSaved == null && !"".equals(hs))
+                    || (hsSaved != null && !hs.equals(hsSaved))) {
                     final String onHost = hi.getName();
                     final String score = hs;
                     final String locationId =
                               heartbeatStatus.getLocationId(
                                                 getService().getHeartbeatId(),
                                                 onHost);
-                    CRM.setLocation(dcHost,
-                                    getService().getHeartbeatId(),
-                                    onHost,
-                                    score,
-                                    locationId);
+                    if (score == null || "".equals(score)) {
+                        CRM.removeLocation(dcHost,
+                                           locationId,
+                                           getService().getHeartbeatId(),
+                                           hsSaved);
+                    } else {
+                        CRM.setLocation(dcHost,
+                                        getService().getHeartbeatId(),
+                                        onHost,
+                                        score,
+                                        locationId);
+                    }
                 }
             }
             storeHostScores();
@@ -5406,9 +5436,6 @@ public class ClusterBrowser extends Browser {
                         }
                         String defaultValue =
                                      hbService.getOperationDefault(op, param);
-                        //if (defaultValue == null) {
-                        //    continue;
-                        //}
                         final GuiComboBox cb =
                             (GuiComboBox) operationsComboBoxHash.get(op,
                                                                      param);
@@ -5501,7 +5528,7 @@ public class ClusterBrowser extends Browser {
             addToHeartbeatIdList(this);
             addNameToServiceInfoHash(this);
 
-            addResourceBefore();
+            final ServiceInfo addedService = addResourceBefore();
 
             Map<String,String> cloneMetaArgs = new HashMap<String,String>();
             Map<String,String> pacemakerResAttrs =
@@ -5538,36 +5565,8 @@ public class ClusterBrowser extends Browser {
                 final String masterNodeMax = HB_NONE_ARG;
                 final String newGroup      = HB_NONE_ARG;
 
-                final StringBuffer args = new StringBuffer(120); //TODO: not used?
-
-                args.append(heartbeatId);
-                args.append(' ');
-                args.append(hbClass);
-                args.append(' ');
-                args.append(type);
-                args.append(' ');
-                args.append(provider);
-                args.append(' ');
-                args.append(group);
-                args.append(' ');
-                args.append(advance);
-                args.append(' ');
-                args.append(advanceId);
-                args.append(' ');
-                args.append(cloneMax);
-                args.append(' ');
-                args.append(cloneNodeMax);
-                args.append(' ');
-                args.append(masterMax);
-                args.append(' ');
-                args.append(masterNodeMax);
-
                 /* TODO: there are more attributes. */
                 final String hbV = dcHost.getHeartbeatVersion();
-                if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
-                    args.append(' ');
-                    args.append(newGroup);
-                }
                 if (cloneInfo != null) {
                     for (String param : cloneParams) {
                         String value = cloneInfo.getComboBoxValue(param);
@@ -5597,15 +5596,6 @@ public class ClusterBrowser extends Browser {
                             pacemakerResArgs.put(param, value);
                         }
                     }
-                    args.append(' ');
-                    args.append(heartbeatId);
-                    args.append('-');
-                    args.append(param);
-                    args.append(' ');
-                    args.append(param);
-                    args.append(" \"");
-                    args.append(value);
-                    args.append('"');
                 }
                 String command = "-C";
                 if ((groupInfo != null && !groupInfo.getService().isNew())
@@ -5619,7 +5609,6 @@ public class ClusterBrowser extends Browser {
                                   master,
                                   cloneMetaArgs,
                                   groupId,
-                                  args.toString(),
                                   pacemakerResAttrs,
                                   pacemakerResArgs,
                                   pacemakerMetaArgs,
@@ -5633,9 +5622,22 @@ public class ClusterBrowser extends Browser {
                     if (cloneInfo != null) {
                         hbId = cloneInfo.getService().getHeartbeatId();
                     }
+                    final Map<String, String> colAttrs =        
+                                           new LinkedHashMap<String, String>();
+                    final Map<String, String> ordAttrs =
+                                           new LinkedHashMap<String, String>();
+                    if (addedService != null
+                       && addedService.getCloneInfo() != null
+                       && addedService.getCloneInfo().getService().isMaster()) {
+                        colAttrs.put("with-rsc-role", "Master");
+                        ordAttrs.put("first-action", "promote");
+                        ordAttrs.put("then-action", "start");
+                    }
                     CRM.setOrderAndColocation(dcHost,
                                               hbId,
-                                              parents);
+                                              parents,
+                                              colAttrs,
+                                              ordAttrs);
                 }
             } else {
                 if (cloneInfo != null) {
@@ -5654,7 +5656,7 @@ public class ClusterBrowser extends Browser {
                         }
                     }
                 }
-                // update parameters
+                /* update parameters */
                 final StringBuffer args = new StringBuffer("");
                 for (String param : params) {
                     final String oldValue = getResource().getValue(param);
@@ -5672,17 +5674,7 @@ public class ClusterBrowser extends Browser {
                             pacemakerResArgs.put(param, value);
                         }
                     }
-                    args.append(' ');
-                    args.append(heartbeatId);
-                    args.append('-');
-                    args.append(param);
-                    args.append(' ');
-                    args.append(param);
-                    args.append(" \"");
-                    args.append(value);
-                    args.append('"');
                 }
-                args.insert(0, heartbeatId);
 
                 CRM.setParameters(
                         dcHost,
@@ -5692,7 +5684,6 @@ public class ClusterBrowser extends Browser {
                         master,
                         cloneMetaArgs,
                         groupId,
-                        args.toString(),
                         pacemakerResAttrs,
                         pacemakerResArgs,
                         pacemakerMetaArgs,
@@ -5753,8 +5744,10 @@ public class ClusterBrowser extends Browser {
             setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             CRM.addOrder(getDCHost(),
+                         null, /* order id */
                          parentHbId,
-                         getService().getHeartbeatId());
+                         getService().getHeartbeatId(),
+                         null); /* attrs */
         }
 
         /**
@@ -5788,8 +5781,10 @@ public class ClusterBrowser extends Browser {
             setUpdated(true);
             final String parentHbId = parent.getService().getHeartbeatId();
             CRM.addColocation(getDCHost(),
+                              null, /* col id */
                               parentHbId,
-                              getService().getHeartbeatId());
+                              getService().getHeartbeatId(),
+                              null); /* attrs */
         }
 
         /**
@@ -5811,6 +5806,8 @@ public class ClusterBrowser extends Browser {
             final String name = newHbService.getName();
             if (newHbService.isFilesystem()) {
                 newServiceInfo = new FilesystemInfo(name, newHbService);
+            } else if (newHbService.isLinbitDrbd()) {
+                newServiceInfo = new LinbitDrbdInfo(name, newHbService);
             } else if (newHbService.isDrbddisk()) {
                 newServiceInfo = new DrbddiskInfo(name, newHbService);
             } else if (newHbService.isIPaddr()) {
@@ -5847,14 +5844,15 @@ public class ClusterBrowser extends Browser {
             serviceInfo.getService().setHeartbeatClass(
                         serviceInfo.getHeartbeatService().getHeartbeatClass());
             if (heartbeatGraph.addResource(serviceInfo, this, pos)) {
-                // edge added
-
+                /* edge added */
                 final String parentId = getService().getHeartbeatId();
                 final String heartbeatId =
                                     serviceInfo.getService().getHeartbeatId();
                 CRM.setOrderAndColocation(getDCHost(),
                                           heartbeatId,
-                                          new String[]{parentId});
+                                          new String[]{parentId},
+                                          null,
+                                          null);
             } else {
                 addNameToServiceInfoHash(serviceInfo);
                 final DefaultMutableTreeNode newServiceNode =
@@ -5866,6 +5864,9 @@ public class ClusterBrowser extends Browser {
                     reload(servicesNode);
                     reload(newServiceNode);
                 }
+            }
+            if (serviceInfo.getHeartbeatService().isMasterSlave()) {
+                serviceInfo.changeType("Master / Slave");
             }
             heartbeatGraph.reloadServiceMenus();
         }
@@ -5955,7 +5956,6 @@ public class ClusterBrowser extends Browser {
                 cloneInfo.removeMyselfNoConfirm();
             }
 
-            //super.removeMyself();
             if (getService().isNew()) {
                 heartbeatGraph.getServicesInfo().setAllResources();
             } else {
@@ -6014,8 +6014,6 @@ public class ClusterBrowser extends Browser {
                                        master);
                 }
             }
-            //if (groupInfo == null)
-            //    heartbeatGraph.removeInfo(this);
             removeFromServiceInfoHash(this);
             infoPanel = null;
             getService().doneRemoving();
@@ -6186,7 +6184,6 @@ public class ClusterBrowser extends Browser {
                             final MyMenu classItem =
                                             new MyMenu(HB_CLASS_MENU.get(cl));
                             DefaultListModel m = new DefaultListModel();
-                            //Point2D pos = getPos();
                             for (final HeartbeatService hbService : getAddServiceList(cl)) {
                                 final MyMenuItem mmi =
                                        new MyMenuItem(hbService.getMenuName()) {
@@ -6267,7 +6264,7 @@ public class ClusterBrowser extends Browser {
                 final MyMenuItem moveUpMenuItem =
                     new MyMenuItem(Tools.getString(
                                             "ClusterBrowser.Hb.ResGrpMoveUp"),
-                                   null, // upIcon,
+                                   null, /* upIcon, */
                                    null) {
                         private static final long serialVersionUID = 1L;
 
@@ -6631,6 +6628,32 @@ public class ClusterBrowser extends Browser {
                 new Unit("h",   "h",  "Hour",        "Hours")
             };
         }
+
+        /**
+         * Returns text that appears above the icon in the graph.
+         */
+        public String getIconTextForGraph() {
+            if (allHostsDown()) {
+                return Tools.getString("ClusterBrowser.Hb.NoInfoAvailable");
+            }
+            if (isStarted()) {
+                if (isRunning()) {
+                    return null;
+                } else if (isFailed()) {
+                    return Tools.getString("ClusterBrowser.Hb.StartingFailed");
+
+                } else {
+                    return Tools.getString("ClusterBrowser.Hb.Starting");
+                }
+            } else if (isStopped()) {
+                if (isRunning()) {
+                    return Tools.getString("ClusterBrowser.Hb.Stopping");
+                } else {
+                    return null;
+                }
+            }
+            return null;
+        }
     }
 
     /**
@@ -6679,9 +6702,6 @@ public class ClusterBrowser extends Browser {
             addNameToServiceInfoHash(this);
             addToHeartbeatIdList(this);
             newServiceInfo.setCloneInfo(this);
-            //setNode(newServiceInfo.getNode());
-            //reload(getNode());
-            //reload(newServiceInfo.getNode());
             final DefaultMutableTreeNode node =
                                               new DefaultMutableTreeNode(this);
             setNode(node);
@@ -6736,7 +6756,6 @@ public class ClusterBrowser extends Browser {
                 return containedService.getInfoPanel();
             } else {
                 return new JPanel();
-                //return super.getInfoPanel();
             }
         }
 
@@ -6835,6 +6854,9 @@ public class ClusterBrowser extends Browser {
                 notRunningOnNodes.add(h.getName());
             }
             texts.add(new Subtext(toString(), null));
+            if (allHostsDown()) {
+                return texts.toArray(new Subtext[texts.size()]);
+            }
             List<String> runningOnNodes = getRunningOnNodes();
             if (runningOnNodes != null && runningOnNodes.size() > 0) {
                 if (containedService != null
@@ -6921,6 +6943,27 @@ public class ClusterBrowser extends Browser {
                                       containedService.getParametersFromXML());
             }
             return cor;
+        }
+
+        /**
+         * Returns whether service is started.
+         */
+        public boolean isStarted() {
+            final ServiceInfo cs = containedService;
+            if (cs != null) {
+                return cs.isStarted();
+            }
+            return false;
+        }
+        /**
+         * Returns whether service is started.
+         */
+        public boolean isStopped() {
+            final ServiceInfo cs = containedService;
+            if (cs != null) {
+                return cs.isStopped();
+            }
+            return false;
         }
     }
 
@@ -7196,9 +7239,6 @@ public class ClusterBrowser extends Browser {
             for (String param : params) {
                 String value = heartbeatStatus.getGlobalParam(param);
                 final String oldValue = getResource().getValue(param);
-                //if (value == null) {
-                //    value = "";
-                //}
                 if (value != null && !value.equals(oldValue)) {
                     getResource().setValue(param, value);
                     final GuiComboBox cb = paramComboBoxGet(param, null);
@@ -7216,6 +7256,27 @@ public class ClusterBrowser extends Browser {
             }
             if (infoPanel == null) {
                 selectMyself();
+            }
+        }
+
+        /**
+         * Check if this connection is filesystem with drbd ra and if so, set
+         * it.
+         */
+        private void setFilesystemWithDrbd(final ServiceInfo siP,
+                                           final ServiceInfo si) {
+            DrbdResourceInfo dri;
+            if (siP.getHeartbeatService().isLinbitDrbd()) {
+                /* linbit::drbd -> Filesystem */
+                ((FilesystemInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
+                dri = drbdResHash.get(((LinbitDrbdInfo) siP).getResourceName());
+            } else {
+                /* drbddisk -> Filesystem */
+                ((FilesystemInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
+                dri = drbdResHash.get(((DrbddiskInfo) siP).getResourceName());
+            }
+            if (dri != null) {
+                dri.setUsedByCRM(true);
             }
         }
 
@@ -7313,12 +7374,16 @@ public class ClusterBrowser extends Browser {
                                                        newHbService,
                                                        hbId,
                                                        resourceNode);
+                        } else if (newHbService.isLinbitDrbd()) {
+                            newSi = new LinbitDrbdInfo(serviceName,
+                                                       newHbService,
+                                                       hbId,
+                                                       resourceNode);
                         } else if (newHbService.isDrbddisk()) {
                             newSi = new DrbddiskInfo(serviceName,
                                                      newHbService,
                                                      hbId,
                                                      resourceNode);
-
                         } else if (newHbService.isIPaddr()) {
                             newSi = new IPaddrInfo(serviceName,
                                                    newHbService,
@@ -7364,7 +7429,6 @@ public class ClusterBrowser extends Browser {
             for (final String heartbeatIdP : colocationMap.keySet()) {
                 final List<String> tos = colocationMap.get(heartbeatIdP);
                 for (final String heartbeatId : tos) {
-                    //final String heartbeatId = colocationMap.get(heartbeatIdP);
                     final ServiceInfo si  =
                                     heartbeatIdToServiceInfo.get(heartbeatId);
                     final ServiceInfo siP =
@@ -7383,23 +7447,19 @@ public class ClusterBrowser extends Browser {
                     if (si != null) { /* not yet complete */
                         final ServiceInfo siP =
                                     heartbeatIdToServiceInfo.get(heartbeatIdP);
-                        if (siP != null && siP.getName() != null) {
+                        if (siP != null && siP.getHeartbeatService() != null) {
                             /* dangling orders and colocations */
-                            if (siP.getName().equals("drbddisk")
+                            if ((siP.getHeartbeatService().isDrbddisk()
+                                 || siP.getHeartbeatService().isLinbitDrbd()) 
                                 && si.getName().equals("Filesystem")) {
                                 final List<String> colIds =
-                                                colocationMap.get(heartbeatIdP);
+                                                    colocationMap.get(heartbeatIdP);
                                 // TODO: race here
                                 if (colIds != null) {
                                     for (String colId : colIds) {
                                         if (colId != null
                                             && colId.equals(heartbeatId)) {
-                                            /* drbddisk -> Filesystem */
-                                            ((FilesystemInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
-                                            final DrbdResourceInfo dri = drbdResHash.get(((DrbddiskInfo) siP).getResourceName());
-                                            if (dri != null) {
-                                                dri.setUsedByCRM(true);
-                                            }
+                                            setFilesystemWithDrbd(siP, si);
                                         }
                                     }
                                 }
@@ -7479,7 +7539,6 @@ public class ClusterBrowser extends Browser {
             infoPanel = new JPanel();
             infoPanel.setBackground(PANEL_BACKGROUND);
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            //infoPanel.add(getButtonPanel());
             if (heartbeatXML == null) {
                 return infoPanel;
             }
@@ -7574,6 +7633,8 @@ public class ClusterBrowser extends Browser {
             final String name = newHbService.getName();
             if (newHbService.isFilesystem()) {
                 newServiceInfo = new FilesystemInfo(name, newHbService);
+            } else if (newHbService.isLinbitDrbd()) {
+                newServiceInfo = new LinbitDrbdInfo(name, newHbService);
             } else if (newHbService.isDrbddisk()) {
                 newServiceInfo = new DrbddiskInfo(name, newHbService);
             } else if (newHbService.isIPaddr()) {
@@ -7624,6 +7685,9 @@ public class ClusterBrowser extends Browser {
                     reload(newServiceNode);
                 }
                 //heartbeatGraph.scale();
+            }
+            if (newServiceInfo.getHeartbeatService().isMasterSlave()) {
+                newServiceInfo.changeType("Master / Slave");
             }
             heartbeatGraph.reloadServiceMenus();
         }
@@ -7857,6 +7921,11 @@ public class ClusterBrowser extends Browser {
                       final JComponent right,
                       final int leftWidth,
                       final int rightWidth);
+        void addLabelField(final JPanel panel,
+                           final String left,
+                           final String right,
+                           final int leftWidth,
+                           final int rightWidth);
         String getName();
         String getRsc1();
         String getRsc2();
@@ -7996,7 +8065,19 @@ public class ClusterBrowser extends Browser {
          * down menu.
          */
         protected final Object[] getParamPossibleChoices(final String param) {
-            return heartbeatXML.getOrderParamPossibleChoices(param);
+            if ("first-action".equals(param)) {
+                return heartbeatXML.getOrderParamPossibleChoices(
+                                    param,
+                                    serviceInfoParent.getService().isMaster());
+            } else if ("then-action".equals(param)) {
+                return heartbeatXML.getOrderParamPossibleChoices(
+                                    param,
+                                    serviceInfoChild.getService().isMaster());
+            } else {
+                return heartbeatXML.getOrderParamPossibleChoices(
+                                    param,
+                                    false);
+            }
         }
 
         /**
@@ -8056,17 +8137,24 @@ public class ClusterBrowser extends Browser {
          */
         public final void apply() {
             final String[] params = getParametersFromXML();
-            final Map<String, String> attrs = new HashMap<String, String>();
+            final Map<String, String> attrs =
+                                          new LinkedHashMap<String, String>();
+            boolean changed = false;
             for (final String param : params) {
                 final String value = getComboBoxValue(param);
                 if (!value.equals(getResource().getValue(param))) {
+                    changed = true;
+                }
+                if (!value.equals(getParamDefault(param))) {
                     attrs.put(param, value);
                 }
             }
-            if (attrs.size() > 0) {
-                CRM.setOrderParameters(getDCHost(),
-                                       getService().getHeartbeatId(),
-                                       attrs);
+            if (changed) {
+                CRM.addOrder(getDCHost(),
+                             getService().getHeartbeatId(),
+                             serviceInfoParent.getService().getHeartbeatId(),
+                             serviceInfoChild.getService().getHeartbeatId(),
+                             attrs);
                 storeComboBoxValues(params);
             }
         }
@@ -8082,14 +8170,14 @@ public class ClusterBrowser extends Browser {
          * Get parent resource in order constraint.
          */
         public final String getRsc1() {
-            return serviceInfoParent.getName();
+            return serviceInfoParent.toString();
         }
 
         /**
          * Get child resource in order constraint.
          */
         public final String getRsc2() {
-            return serviceInfoChild.getName();
+            return serviceInfoChild.toString();
         }
     }
 
@@ -8222,7 +8310,19 @@ public class ClusterBrowser extends Browser {
          */
         protected final Object[] getParamPossibleChoices(
                                                          final String param) {
-            return heartbeatXML.getColocationParamPossibleChoices(param);
+            if ("with-rsc-role".equals(param)) {
+                return heartbeatXML.getColocationParamPossibleChoices(
+                                    param,
+                                    serviceInfoWithRsc.getService().isMaster());
+            } else if ("rsc-role".equals(param)) {
+                return heartbeatXML.getColocationParamPossibleChoices(
+                                    param,
+                                    serviceInfoRsc.getService().isMaster());
+            } else {
+                return heartbeatXML.getColocationParamPossibleChoices(
+                                    param,
+                                    false);
+            }
         }
 
         /**
@@ -8282,17 +8382,23 @@ public class ClusterBrowser extends Browser {
          */
         public final void apply() {
             final String[] params = getParametersFromXML();
-            final Map<String, String> attrs = new HashMap<String, String>();
+            final Map<String, String> attrs =
+                                          new LinkedHashMap<String, String>();
+            boolean changed = true;
             for (final String param : params) {
                 final String value = getComboBoxValue(param);
                 if (!value.equals(getResource().getValue(param))) {
-                    attrs.put(param, value);
+                    changed = true;
                 }
+                    attrs.put(param, value);
             }
-            if (attrs.size() > 0) {
-                CRM.setColocationParameters(getDCHost(),
-                                            getService().getHeartbeatId(),
-                                            attrs);
+            if (changed) {
+                CRM.addColocation(
+                              getDCHost(),
+                              getService().getHeartbeatId(),
+                              serviceInfoRsc.getService().getHeartbeatId(),
+                              serviceInfoWithRsc.getService().getHeartbeatId(),
+                              attrs);
             }
             storeComboBoxValues(params);
         }
@@ -8308,13 +8414,13 @@ public class ClusterBrowser extends Browser {
          * Resource 1 in colocation constraint.
          */
         public final String getRsc1() {
-            return serviceInfoRsc.getName();
+            return serviceInfoWithRsc.toString();
         }
         /**
          * Resource 2 in colocation constraint.
          */
         public final String getRsc2() {
-            return serviceInfoWithRsc.getName();
+            return serviceInfoRsc.toString();
         }
     }
 
@@ -8572,25 +8678,24 @@ public class ClusterBrowser extends Browser {
                 /* heartbeat id */
                 final JPanel panel = getParamPanel(c.getName());
                 int rows = 3;
-                c.addField(panel,
-                         new JLabel(
-                                Tools.getString("ClusterBrowser.HeartbeatId")),
-                         new JLabel(c.getService().getHeartbeatId()),
-                         SERVICE_LABEL_WIDTH,
-                         SERVICE_FIELD_WIDTH);
-                c.addField(panel,
-                         new JLabel("rsc1"),
-                         new JLabel(c.getRsc1()),
-                         SERVICE_LABEL_WIDTH,
-                         SERVICE_FIELD_WIDTH);
-                c.addField(panel,
-                         new JLabel("rsc2"),
-                         new JLabel(c.getRsc2()),
-                         SERVICE_LABEL_WIDTH,
-                         SERVICE_FIELD_WIDTH);
-                SpringUtilities.makeCompactGrid(panel, rows, 2, // rows, cols
-                                                1, 1,        // initX, initY
-                                                1, 1);       // xPad, yPad
+                c.addLabelField(panel,
+                                Tools.getString("ClusterBrowser.HeartbeatId"),
+                                c.getService().getHeartbeatId(),
+                                SERVICE_LABEL_WIDTH,
+                                SERVICE_FIELD_WIDTH);
+                c.addLabelField(panel,
+                                "rsc1",
+                                c.getRsc1(),
+                                SERVICE_LABEL_WIDTH,
+                                SERVICE_FIELD_WIDTH);
+                c.addLabelField(panel,
+                                "rsc2",
+                                c.getRsc2(),
+                                SERVICE_LABEL_WIDTH,
+                                SERVICE_FIELD_WIDTH);
+                SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
+                                                1, 1,        /* initX, initY */
+                                                1, 1);       /* xPad, yPad */
 
                 extraOptionsPanel.add(panel);
                 c.addParams(optionsPanel,
@@ -8720,7 +8825,6 @@ public class ClusterBrowser extends Browser {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
-                    //return edgeIsColocationList.contains(edge);
                     return heartbeatGraph.isColocation(thisClass);
                 }
 
@@ -8738,10 +8842,6 @@ public class ClusterBrowser extends Browser {
                          * from it. */
                         addColocation(getLastServiceInfoParent(),
                                       getLastServiceInfoChild());
-                        //constraints.add(
-                        //    (HbConstraintInterface) new HbColocationInfo(
-                        //                           getLastServiceInfoParent(),
-                        //                           getLastServiceInfoChild()));
                         heartbeatGraph.addColocation(thisClass);
                     }
                 }
@@ -8821,6 +8921,10 @@ public class ClusterBrowser extends Browser {
                             serviceInfoParent.getService().getHeartbeatId(),
                             serviceInfoChild.getService().getHeartbeatId());
 
+            if (ordId == null) {
+                /* we'll get it later with id. */
+                return;
+            }
             if (orderIds.containsKey(ordId)) {
                 orderIds.get(ordId).setParameters();
                 return;
@@ -8846,6 +8950,10 @@ public class ClusterBrowser extends Browser {
             heartbeatStatus.getColocationId(
                              serviceInfoRsc.getService().getHeartbeatId(),
                              serviceInfoWithRsc.getService().getHeartbeatId());
+            if (colId == null) {
+                /* we'll get it later with id. */
+                return;
+            }
             if (colocationIds.containsKey(colId)) {
                 colocationIds.get(colId).setParameters();
                 return;

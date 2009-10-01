@@ -56,9 +56,13 @@ public class DistResource_fedora extends
            ocf path. */
         {"Heartbeat.2.1.4.getOCFParameters",
          "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/share/ocf;"
+         + "mv /usr/lib/ocf/resource.d/linbit"
+         + " /usr/share/ocf/resource.d/ 2>/dev/null;"
          + "for prov in `ls -1 /usr/share/ocf/resource.d/`; do "
          +  "for s in `ls -1 /usr/share/ocf/resource.d/$prov/ `; do "
-         +   "echo -n 'provider:'; echo $prov;"
+         +  "echo -n 'provider:'; echo $prov;"
+         +  "echo -n 'master:';"
+         +  "grep -wl crm_master /usr/share/ocf/resource.d/$prov/$s;echo;"
          +  "/usr/share/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
          + "done;"
          + "echo 'provider:heartbeat';"
