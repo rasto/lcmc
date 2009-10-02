@@ -43,10 +43,9 @@ public class DistResource_suse_SLES11 extends
         {"distributiondir", "sles11"},
         {"Support", "suse-SLES11"},
         {"DRBD.load",
-            "if [ ! -e /etc/default/drbd ]; then "
-          + "echo 'MODPROBE=\"/sbin/modprobe --allow-unsupported-modules\"' "
-          +     "> /etc/default/drbd; fi;"
-          + "modprobe --allow-unsupported-modules drbd"},
+         "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
+         + " /etc/modprobe.d/unsupported-modules;"
+         + "modprobe drbd"},
 
         /* Corosync/Openais/Pacemaker opensuse */
         {"PmInst.install.text.1",

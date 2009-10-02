@@ -1186,7 +1186,7 @@ public class Browser {
             String regexp = null;
             Map<String, String> abbreviations = new HashMap<String, String>();
             if (isInteger(param)) {
-                regexp = "^-?(\\d*|INFINITY)$";
+                regexp = "^(-?(\\d*|INFINITY))|@NOTHING_SELECTED@$";
                 abbreviations = new HashMap<String, String>();
                 abbreviations.put("i", "INFINITY");
                 abbreviations.put("I", "INFINITY");

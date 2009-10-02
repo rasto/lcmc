@@ -25,6 +25,7 @@ import drbd.data.Host;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 /**
  * This class provides cib commands. There are commands that use cibadmin and
  * crm_resource commands to manipulate the cib, crm, etc.
@@ -69,7 +70,7 @@ public final class CRM {
      */
     public static void setParameters(
                            final Host host,
-                           final String command, /* -U or -C */
+                           final String command, /* -R or -C */
                            final String heartbeatId,
                            final String cloneId,
                            final boolean master,
@@ -228,14 +229,18 @@ public final class CRM {
      * and parents.
      */
     public static void setOrderAndColocation(
-                                          final Host host,
-                                          final String heartbeatId,
-                                          final String[] parents,
-                                          final Map<String, String> colAttrs,
-                                          final Map<String, String> ordAttrs) {
+                                final Host host,
+                                final String heartbeatId,
+                                final String[] parents,
+                                final List<Map<String, String>> colAttrsList,
+                                final List<Map<String, String>> ordAttrsList) {
         for (int i = 0; i < parents.length; i++) {
-            addColocation(host, null, heartbeatId, parents[i], colAttrs);
-            addOrder(host, null, parents[i], heartbeatId, ordAttrs);
+            addColocation(host,
+                          null,
+                          heartbeatId,
+                          parents[i],
+                          colAttrsList.get(i));
+            addOrder(host, null, parents[i], heartbeatId, ordAttrsList.get(i));
         }
     }
 
@@ -513,7 +518,7 @@ public final class CRM {
             xml.append("</attributes>");
         }
         xml.append("</cluster_property_set></crm_config>'");
-        final String command = getCibCommand("-U",
+        final String command = getCibCommand("-R",
                                              "crm_config",
                                              xml.toString());
         execCommand(host, command, true);

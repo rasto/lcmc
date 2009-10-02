@@ -182,6 +182,11 @@ public class HeartbeatXML extends XML {
                                                           "promote",
                                                           "demote",
                                                           "stop"};
+    /** Whether drbddisk ra is present. */
+    boolean drbddiskPresent = false;
+    /** Whether linbit::drbd ra is present. */
+    boolean linbitDrbdPresent = false;
+
     /**
      * Prepares a new <code>HeartbeatXML</code> object.
      */
@@ -274,8 +279,6 @@ public class HeartbeatXML extends XML {
         final StringBuffer xml = new StringBuffer("");
         String provider = null;
         String serviceName = null;
-        boolean drbddiskPresent = false;
-        boolean linbitDrbdPresent = false;
         boolean masterSlave = false; /* is probably m/s ...*/
         for (int i = 0; i < lines.length; i++) {
             //<resource-agent name="AudibleAlarm">
@@ -493,7 +496,8 @@ public class HeartbeatXML extends XML {
         paramColShortDescMap.put("score", "Score");
         paramColLongDescMap.put("score", "Score");
         paramColTypeMap.put("score", PARAM_TYPE_INTEGER);
-        paramColDefaultMap.put("score", "INFINITY");
+        paramColDefaultMap.put("score", null);
+        //paramColPreferredMap.put("score", "INFINITY");
         paramColPossibleChoices.put("score", integerValues);
         /* Hardcoding order params */
         ordParams.add("first-action");
@@ -523,8 +527,9 @@ public class HeartbeatXML extends XML {
         paramOrdShortDescMap.put("score", "Score");
         paramOrdLongDescMap.put("score", "Score");
         paramOrdTypeMap.put("score", PARAM_TYPE_INTEGER);
-        paramOrdDefaultMap.put("score", "INFINITY");
+        //paramOrdPreferredMap.put("score", "INFINITY");
         paramOrdPossibleChoices.put("score", integerValues);
+        paramOrdDefaultMap.put("score", null);
     }
 
     /**
@@ -547,7 +552,7 @@ public class HeartbeatXML extends XML {
      * Returns choices for integer fields.
      */
     public final String[] getIntegerValues() {
-        return new String[]{"0", "INFINITY", "-INFINITY"};
+        return new String[]{null, "0", "INFINITY", "-INFINITY"};
     }
 
 
@@ -946,17 +951,19 @@ public class HeartbeatXML extends XML {
             isManagedParam = "is_managed";
         }
         hbService.addParameter(targetRoleParam);
+        // TODO: Master, Slave
         hbService.setParamPossibleChoices(targetRoleParam,
-                                          new String[]{"started", "stopped"});
+                                     new String[]{"started", "stopped"});
         hbService.setParamIsMetaAttr(targetRoleParam, true);
-        hbService.setParamRequired(targetRoleParam, true);
+        hbService.setParamRequired(targetRoleParam, false);
         hbService.setParamShortDesc(
                          targetRoleParam,
                          Tools.getString("HeartbeatXML.TargetRole.ShortDesc"));
         hbService.setParamLongDesc(
                          targetRoleParam,
                          Tools.getString("HeartbeatXML.TargetRole.LongDesc"));
-        hbService.setParamDefault(targetRoleParam, "stopped");
+        // TODO: default is different in some prev hb */
+        hbService.setParamDefault(targetRoleParam, "started");
 
         hbService.addParameter(isManagedParam);
         hbService.setParamPossibleChoices(isManagedParam,
@@ -1191,7 +1198,10 @@ public class HeartbeatXML extends XML {
                                                              "default");
 
                         paramGlobalTypeMap.put(param, type);
-                        paramGlobalDefaultMap.put(param, defaultValue);
+                        if (!"expected-quorum-votes".equals(param)) {
+                            // TODO: workaround
+                            paramGlobalDefaultMap.put(param, defaultValue);
+                        }
                         if (PARAM_TYPE_BOOLEAN.equals(type)) {
                             paramGlobalPossibleChoices.put(param,
                                                            booleanValues);
@@ -2197,5 +2207,14 @@ public class HeartbeatXML extends XML {
             correctValue = false;
         }
         return correctValue;
+    }
+
+    /** Returns whether drbddisk ra is present. */
+    public final boolean isDrbddiskPresent() {
+        return drbddiskPresent;
+    }
+    /** Returns whether linbit::drbd ra is present. */
+    public final boolean isLinbitDrbdPresent() {
+        return linbitDrbdPresent;
     }
 }

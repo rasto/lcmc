@@ -43,10 +43,9 @@ public class DistResource_suse_OPENSUSE11_1 extends
         {"distributiondir", "sles11"},
         {"Support", "suse-OPENSUSE11_1"},
         {"DRBD.load",
-            "if [ ! -e /etc/default/drbd ]; then "
-          + "echo 'MODPROBE=\"/sbin/modprobe --allow-unsupported-modules\"' "
-          +     "> /etc/default/drbd; fi;"
-          + "modprobe --allow-unsupported-modules drbd"},
+         "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
+         + " /etc/modprobe.d/unsupported-modules;"
+         + "modprobe drbd"},
 
         /* Corosync/Openais/Pacemaker Opensuse */
         {"PmInst.install.text.1", "http://download.opensuse.org: zypper" },

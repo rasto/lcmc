@@ -717,7 +717,7 @@ public class Host implements Serializable {
         if (info == null) {
             return;
         }
-        // no breaks in the switch statement are intentional
+        /* no breaks in the switch statement are intentional */
         String lsbVersion = null;
         String lsbDist = null;
         switch (info.length) {
@@ -741,7 +741,6 @@ public class Host implements Serializable {
                 detectedKernelVersion = info[2];
             case 2:
                 detectedArch = info[1];
-                //initArch(info[1]);
             case 1:
                 detectedKernelName = info[0];
             case 0:
@@ -758,7 +757,6 @@ public class Host implements Serializable {
         Tools.debug(this, "kernel version: " + detectedKernelVersion, 1);
         Tools.debug(this, "arch: " + detectedArch, 1);
         Tools.debug(this, "dist version: " + detectedDistVersion, 1);
-        //Tools.debug(this, "dist version string: " + distVersionString, 1);
         Tools.debug(this, "dist: " + detectedDist, 1);
     }
 
@@ -805,7 +803,7 @@ public class Host implements Serializable {
      * with 'dist:' prefix.
      */
     public final String getDistFromDistVersion(final String dV) {
-        // remove numbers
+        /* remove numbers */
         if ("No Match".equals(dV)) {
             return null;
         }

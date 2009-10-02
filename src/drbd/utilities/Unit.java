@@ -39,6 +39,8 @@ public class Unit {
     private final String pluralName;
     /** Whether the unit should be in plural or not. */
     private boolean plural = true;
+    /** Whether the field to which this unit belongs is empty. */
+    private boolean empty = false;
 
     /**
      * Prepares new <code>Unit</code> object.
@@ -68,10 +70,27 @@ public class Unit {
     }
 
     /**
+     * Sets whether the field to which this unit belongs is empty.
+     */
+    public final void setEmpty(final boolean empty) {
+        this.empty = empty;
+    }
+
+    /**
+     * Returns whether the field to which this unit belongs is empty.
+     */
+    public final boolean isEmpty() {
+        return empty;
+    }
+
+    /**
      * Returns the unit, plural if it should be in plural.
      */
     @Override
     public final String toString() {
+        if (empty) {
+            return "";
+        }
         if (plural) {
             return pluralName;
         }

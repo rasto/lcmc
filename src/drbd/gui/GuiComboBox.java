@@ -577,8 +577,8 @@ public class GuiComboBox extends JPanel {
                 }
                 break;
             case TEXTFIELDWITHUNIT:
-                final StringBuffer s = new StringBuffer(
-                                            textFieldWithoutUnit.getText());
+                final String text = textFieldWithoutUnit.getText();
+                final StringBuffer s = new StringBuffer(text);
                 final Object unit = unitComboBox.getSelectedItem();
                 if (!Tools.isStringClass(unit)) {
                     final Unit u = (Unit) unit;
@@ -586,8 +586,28 @@ public class GuiComboBox extends JPanel {
                         u.setPlural(!"1".equals(s.toString()));
                         unitComboBox.repaint();
                     }
-
-                    s.append(u.getShortName());
+                    if ("".equals(text)) {
+                        if (!u.isEmpty()) {
+                            u.setEmpty(true);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    unitComboBox.repaint();
+                                    unitComboBox.setEnabled(false);
+                                }
+                            });
+                        }
+                    } else {
+                        if (u.isEmpty()) {
+                            u.setEmpty(false);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    unitComboBox.repaint();
+                                    unitComboBox.setEnabled(true);
+                                }
+                            });
+                        }
+                        s.append(u.getShortName());
+                    }
                 }
                 value = s.toString();
                 break;
