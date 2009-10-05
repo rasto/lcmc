@@ -1363,6 +1363,12 @@ public class TextResource extends
         {"ClusterBrowser.DifferentHbVersionsWarning",
          "<i>warning: different hb versions</i>"},
 
+        {"ClusterBrowser.linbitDrbdMenuName",
+         "Filesystem + Linbit:DRBD"},
+
+        {"ClusterBrowser.DrbddiskMenuName",
+         "Filesystem + drbddisk (old)"},
+
         {"HostBrowser.HostWizard",
          "Host Wizard"},
 

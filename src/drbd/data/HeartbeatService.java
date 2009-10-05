@@ -96,16 +96,10 @@ public class HeartbeatService {
         this.heartbeatClass = heartbeatClass;
         hash = (name == null ? 0 : name.hashCode() * 31)
                + (heartbeatClass == null ? 0 : heartbeatClass.hashCode());
-        if (isLinbitDrbd()) {
-            menuName = "Filesystem + Linbit:DRBD";
-        } else if (isDrbddisk()) {
-            menuName = "Filesystem + drbddisk (old)";
+        if (!"heartbeat".equals(provider)) {
+            menuName = provider + ":" + name;
         } else {
-            if (!"heartbeat".equals(provider)) {
-                menuName = provider + ":" + name;
-            } else {
-                menuName = name;
-            }
+            menuName = name;
         }
     }
 

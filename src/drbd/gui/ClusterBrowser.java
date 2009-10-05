@@ -5630,7 +5630,9 @@ public class ClusterBrowser extends Browser {
             String heartbeatId = getService().getHeartbeatId();
             pacemakerResAttrs.put("id",       heartbeatId);
             pacemakerResAttrs.put("class",    hbClass);
-            pacemakerResAttrs.put("provider", provider);
+            if (!HB_HEARTBEAT_CLASS.equals(hbClass)) {
+                pacemakerResAttrs.put("provider", provider);
+            }
             pacemakerResAttrs.put("type",     type);
             String groupId = null; /* for pacemaker */
             if (groupInfo != null) {
@@ -7911,8 +7913,8 @@ public class ClusterBrowser extends Browser {
                                                                 if it is not */
                         final HeartbeatService linbitDrbdService =
                                                heartbeatXML.getHbLinbitDrbd();
-                        final MyMenuItem ldMenuItem =
-                               new MyMenuItem(linbitDrbdService.getMenuName()) {
+                        final MyMenuItem ldMenuItem = new MyMenuItem(
+                         Tools.getString("ClusterBrowser.linbitDrbdMenuName")) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
                                 getPopup().setVisible(false);
@@ -7937,8 +7939,8 @@ public class ClusterBrowser extends Browser {
                                                            if it is not */
                         final HeartbeatService drbddiskService =
                                                heartbeatXML.getHbDrbddisk();
-                        final MyMenuItem ddMenuItem =
-                               new MyMenuItem(drbddiskService.getMenuName()) {
+                        final MyMenuItem ddMenuItem = new MyMenuItem(
+                         Tools.getString("ClusterBrowser.DrbddiskMenuName")) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
                                 getPopup().setVisible(false);

@@ -1394,7 +1394,10 @@ public class HeartbeatXML extends XML {
                 final Map<String, Map<String, String>> resOpIdsMap) {
         final String hbClass = getAttribute(primitiveNode, "class");
         final String hbId = getAttribute(primitiveNode, "id");
-        final String provider = getAttribute(primitiveNode, "provider");
+        String provider = getAttribute(primitiveNode, "provider");
+        if (provider == null) {
+            provider = "heartbeat";
+        }
         final String type = getAttribute(primitiveNode, "type");
         resourceTypeMap.put(hbId, getHbService(type, provider, hbClass));
         groupResList.add(hbId);
