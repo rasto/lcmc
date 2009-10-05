@@ -883,13 +883,17 @@ sub get_drbd_xml {
 	my $from = "";
 
 	for my $section ("global", "handlers", "startup") {
-		my ($part) = $manpage=~/^\\fB$section\\fR$(.*?)\.TP/sm;
-		my @options = $part =~ /\\fB(.*?)\\fR(?!\()/g;
+		my ($part) = $manpage=~/^\\fB$section\\fR$(.*?)\.[TP]P/sm;
+		my @options = map {s/\\-/-/g;$_} $part =~ /\\fB(.*?)\\fR(?!\()/g;
 		push @missing, $section;
 		$missing{$section} = \@options;
 	}
+	
+	$missing{"resource"} = ["protocol", "device"];
+	push @missing, "resource";
 
-	my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+\\fI|\\fR$).*?(?:\.RS.*?\.RE\n)?)\.TP/msg;
+	#my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+\\fI|\\fR).*?(?:\.RS.*?\.RE\n)?)\.[TP]P/msg;
+	my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+(?:\\fR\\fB)\\fI|\\fR$).*?)\.[TP]P/msg;
 	my %descs;
 	while (@a) {
 		if ($from && $a[1] ne "on-io-error") {
@@ -899,8 +903,30 @@ sub get_drbd_xml {
 		$from = "";
 		my $desc = shift @a;
 		my $command = shift @a;
+		# split lines that are max 80 characters long.
+		$desc =~ s/\n/ /g;
+		$desc =~ s/\.RS 4/\n/g;
+		$desc =~ s/\.sp/\n\n/g;
+		my $cols = 80;
+		$desc = join "\n",
+			map {
+			    my $a = $_;
+			    $_ = "";
+			    while (length $a >= $cols) {
+				    my $r = rindex $a, " ", $cols;
+				    my $b = substr $a,
+				    	  	   $r,
+						   length($a) - $r,
+						   "\n";
+				    $_.=$a;
+				    $a = $b;
+			    };
+			    $_.$a}
+			    split /\n/, $desc;
 		for ($desc, $command) {
-			s/\\&\././g;
+			s/\\-/-/g;
+			s/\\'/'/g;
+			s/\\&//g;
 			s/&/&amp;/g;
 			s/\\fI(.*?)\\fR/&lt;u&gt;&lt;i&gt;$1&lt;\/i&gt;&lt;\/u&gt;/g; # italic
 			s/\\fB(.*?)\\fR/&lt;b&gt;$1&lt;\/b&gt;/g; # bold
@@ -909,10 +935,12 @@ sub get_drbd_xml {
 			s/\\fB//g;
 			s/\.fR//g;
 			s/\\fR//g;
+			s/\.RS 4/&lt;br&gt;/g;
 			s/\.RS//g;
 			s/\.RE//g;
-			s/\.TP//g;
-			s/\n/&lt;br&gt;\n/g;
+			s/\.sp/&lt;br&gt;/g;
+			s/\.[TP]P//g;
+			s/\n/&lt;br&gt;/g;
 		}
 		$descs{$command} = "<desc>&lt;html&gt;$desc&lt;/html&gt;</desc>";
 	}
@@ -934,9 +962,11 @@ sub get_drbd_xml {
 				} elsif ($arg eq "count" || $arg eq "time") {
 					$type = "numeric";
 				}
-				my ($part) = $desc =~ /valid options are:(.*)/si;
+				my ($part) =
+			 	      $desc =~ /valid.*?options.*?are:(.*)/si;
 				if ($part) {
-					my @hs = $part =~ /&lt;b&gt;(.*?)&lt;\/b&gt;/g;
+					my @hs =
+					  $part =~ /&lt;b&gt;(.*?)&lt;\/b&gt;/g;
 					if (@hs > 0) {
 						$type = "handler";
 						for my $h (@hs) {
