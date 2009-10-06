@@ -47,7 +47,6 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * short and long description, data types etc. for defined types
  * of services in the hashes and provides methods to get this
  * information.
- * TODO: must be renamed
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -183,9 +182,9 @@ public class CRMXML extends XML {
                                                           "demote",
                                                           "stop"};
     /** Whether drbddisk ra is present. */
-    boolean drbddiskPresent = false;
+    private boolean drbddiskPresent = false;
     /** Whether linbit::drbd ra is present. */
-    boolean linbitDrbdPresent = false;
+    private boolean linbitDrbdPresent = false;
 
     /**
      * Prepares a new <code>CRMXML</code> object.
@@ -197,8 +196,8 @@ public class CRMXML extends XML {
         final String hbV = host.getHeartbeatVersion();
         String[] booleanValues = getGlobalCheckBoxChoices();
         String[] integerValues = getIntegerValues();
-        final String hb_boolean_true = booleanValues[0];
-        final String hb_boolean_false = booleanValues[1];
+        final String hbBooleanTrue = booleanValues[0];
+        final String hbBooleanFalse = booleanValues[1];
         hbClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
                                     "",
                                     "clone");
@@ -223,26 +222,26 @@ public class CRMXML extends XML {
         hbClone.addParameter("notify");
         hbClone.setParamIsMetaAttr("notify", true);
         hbClone.setParamShortDesc("notify", "M/S Notify");
-        hbClone.setParamDefault("notify", hb_boolean_false);
-        hbClone.setParamPreferred("notify", hb_boolean_true);
+        hbClone.setParamDefault("notify", hbBooleanFalse);
+        hbClone.setParamPreferred("notify", hbBooleanTrue);
         hbClone.setParamPossibleChoices("notify", booleanValues);
         /* globally-unique */
         hbClone.addParameter("globally-unique");
         hbClone.setParamIsMetaAttr("globally-unique", true);
         hbClone.setParamShortDesc("globally-unique", "M/S Globally-Unique");
-        hbClone.setParamDefault("globally-unique", hb_boolean_false);
+        hbClone.setParamDefault("globally-unique", hbBooleanFalse);
         hbClone.setParamPossibleChoices("globally-unique", booleanValues);
         /* ordered */
         hbClone.addParameter("ordered");
         hbClone.setParamIsMetaAttr("ordered", true);
         hbClone.setParamShortDesc("ordered", "M/S Ordered");
-        hbClone.setParamDefault("ordered", hb_boolean_false);
+        hbClone.setParamDefault("ordered", hbBooleanFalse);
         hbClone.setParamPossibleChoices("ordered", booleanValues);
         /* interleave */
         hbClone.addParameter("interleave");
         hbClone.setParamIsMetaAttr("interleave", true);
         hbClone.setParamShortDesc("interleave", "M/S Interleave");
-        hbClone.setParamDefault("interleave", hb_boolean_false);
+        hbClone.setParamDefault("interleave", hbBooleanFalse);
         hbClone.setParamPossibleChoices("interleave", booleanValues);
 
         if (Tools.compareVersions(hbV, "2.1.3") <= 0) {
@@ -334,7 +333,7 @@ public class CRMXML extends XML {
         paramGlobalShortDescMap.put("symmetric-cluster", "Symmetric Cluster");
         paramGlobalLongDescMap.put("symmetric-cluster", "Symmetric Cluster");
         paramGlobalTypeMap.put("symmetric-cluster", PARAM_TYPE_BOOLEAN);
-        paramGlobalDefaultMap.put("symmetric-cluster", hb_boolean_false);
+        paramGlobalDefaultMap.put("symmetric-cluster", hbBooleanFalse);
         paramGlobalPossibleChoices.put("symmetric-cluster", booleanValues);
         globalRequiredParams.add("symmetric-cluster");
 
@@ -343,8 +342,8 @@ public class CRMXML extends XML {
         paramGlobalShortDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalLongDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalTypeMap.put("stonith-enabled", PARAM_TYPE_BOOLEAN);
-        paramGlobalDefaultMap.put("stonith-enabled", hb_boolean_true);
-        //paramGlobalPreferredMap.put("stonith-enabled", hb_boolean_false);
+        paramGlobalDefaultMap.put("stonith-enabled", hbBooleanTrue);
+        //paramGlobalPreferredMap.put("stonith-enabled", hbBooleanFalse);
         paramGlobalPossibleChoices.put("stonith-enabled", booleanValues);
         globalRequiredParams.add("stonith-enabled");
 
@@ -377,7 +376,7 @@ public class CRMXML extends XML {
         globalParams.add("no-quorum-policy");
         paramGlobalShortDescMap.put("no-quorum-policy", "No Quorum Policy");
         paramGlobalLongDescMap.put("no-quorum-policy", "No Quorum Policy");
-        // TODO: ignore, stop, freeze
+        // TODO: ignore, stop, freeze, there is more
         paramGlobalTypeMap.put("no-quorum-policy", PARAM_TYPE_STRING);
         paramGlobalDefaultMap.put("no-quorum-policy", "stop");
         paramGlobalPossibleChoices.put("no-quorum-policy",
@@ -446,32 +445,32 @@ public class CRMXML extends XML {
                                            new String[]{"reboot", "poweroff"});
 
             paramGlobalTypeMap.put("is-managed-default", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("is-managed-default", hb_boolean_false);
+            paramGlobalDefaultMap.put("is-managed-default", hbBooleanFalse);
             paramGlobalPossibleChoices.put("is-managed-default", booleanValues);
 
             paramGlobalTypeMap.put("stop-orphan-resources", PARAM_TYPE_BOOLEAN);
             paramGlobalDefaultMap.put("stop-orphan-resources",
-                                                            hb_boolean_false);
+                                                            hbBooleanFalse);
             paramGlobalPossibleChoices.put("stop-orphan-resources",
                                            booleanValues);
 
             paramGlobalTypeMap.put("stop-orphan-actions", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("stop-orphan-actions", hb_boolean_false);
+            paramGlobalDefaultMap.put("stop-orphan-actions", hbBooleanFalse);
             paramGlobalPossibleChoices.put("stop-orphan-actions",
                                            booleanValues);
 
             paramGlobalTypeMap.put("remove-after-stop", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("remove-after-stop", hb_boolean_false);
+            paramGlobalDefaultMap.put("remove-after-stop", hbBooleanFalse);
             paramGlobalPossibleChoices.put("remove-after-stop", booleanValues);
 
             paramGlobalTypeMap.put("startup-fencing", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("startup-fencing", hb_boolean_false);
+            paramGlobalDefaultMap.put("startup-fencing", hbBooleanFalse);
             paramGlobalPossibleChoices.put("startup-fencing", booleanValues);
 
             paramGlobalTypeMap.put("start-failure-is-fatal",
                                    PARAM_TYPE_BOOLEAN);
             paramGlobalDefaultMap.put("start-failure-is-fatal",
-                                      hb_boolean_false);
+                                      hbBooleanFalse);
             paramGlobalPossibleChoices.put("start-failure-is-fatal",
                                            booleanValues);
         }
@@ -519,7 +518,7 @@ public class CRMXML extends XML {
         paramOrdShortDescMap.put("symmetrical", "Symmetrical");
         paramOrdLongDescMap.put("symmetrical", "Symmetrical");
         paramOrdTypeMap.put("symmetrical", PARAM_TYPE_BOOLEAN);
-        paramOrdDefaultMap.put("symmetrical", hb_boolean_true);
+        paramOrdDefaultMap.put("symmetrical", hbBooleanTrue);
         paramOrdPossibleChoices.put("symmetrical", booleanValues);
 
         ordParams.add("score");
@@ -1124,8 +1123,6 @@ public class CRMXML extends XML {
      * Strange stuff
      *
      * which can be pengine or crmd
-     *
-     * TODO: check if it works with hb != 2.1.[34]
      */
     public final void parseClusterMetaData(final String xml) {
         final Document document = getXMLDocument(xml);
@@ -1474,17 +1471,17 @@ public class CRMXML extends XML {
                     final Node setNode = statusList.item(j);
                     if (setNode.getNodeName().equals("master")
                         || setNode.getNodeName().equals("started")) {
-                        final String host = getText(setNode);
+                        final String node = getText(setNode);
                         if (runningOnList == null) {
                             runningOnList = new ArrayList<String>();
                         }
-                        runningOnList.add(host);
+                        runningOnList.add(node);
                     } else if (setNode.getNodeName().equals("slave")) {
-                        final String host = getText(setNode);
+                        final String node = getText(setNode);
                         if (slaveOnList == null) {
                             slaveOnList = new ArrayList<String>();
                         }
-                        slaveOnList.add(host);
+                        slaveOnList.add(node);
                     }
                 }
                 resStatusMap.put(id,
@@ -1648,7 +1645,8 @@ public class CRMXML extends XML {
         final NodeList primitivesGroups = resourcesNode.getChildNodes();
         for (int i = 0; i < primitivesGroups.getLength(); i++) {
             final Node primitiveGroupNode = primitivesGroups.item(i);
-            if (primitiveGroupNode.getNodeName().equals("primitive")) {
+            final String nodeName = primitiveGroupNode.getNodeName();
+            if ("primitive".equals(nodeName)) {
                 List<String> resList = groupsToResourcesMap.get("none");
                 parsePrimitive(primitiveGroupNode,
                                resList,
@@ -1659,7 +1657,7 @@ public class CRMXML extends XML {
                                operationsMap,
                                operationsIdMap,
                                resOpIdsMap);
-            } else if (primitiveGroupNode.getNodeName().equals("group")) {
+            } else if ("group".equals(nodeName)) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String groupId = getAttribute(primitiveGroupNode, "id");
                 parametersMap.put(groupId, new HashMap<String, String>());
@@ -1683,8 +1681,9 @@ public class CRMXML extends XML {
                                        resOpIdsMap);
                     }
                 }
-            } else if (primitiveGroupNode.getNodeName().equals("master")
-                       || primitiveGroupNode.getNodeName().equals("clone")) {
+            } else if ("master".equals(nodeName)
+                       || "master_slave".equals(nodeName)
+                       || "clone".equals(nodeName)) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String cloneId = getAttribute(primitiveGroupNode, "id");
                 parametersMap.put(cloneId, new HashMap<String, String>());
@@ -1717,7 +1716,8 @@ public class CRMXML extends XML {
                 }
                 if (resList.size() > 0) {
                     cloneToResourceMap.put(cloneId, resList.get(0));
-                    if (primitiveGroupNode.getNodeName().equals("master")) {
+                    if ("master".equals(nodeName)
+                        || "master_slave".equals(nodeName)) {
                         masterList.add(cloneId);
                     }
                 }
@@ -1797,7 +1797,6 @@ public class CRMXML extends XML {
                     final String rscTo = getAttribute(constraintNode,
                                                       thenString);
                     final String score = getAttribute(constraintNode, "score");
-                    // TODO: symmetrical order stuff
                     final String symmetrical = getAttribute(constraintNode,
                                                                "symmetrical");
                     final String firstAction = getAttribute(constraintNode,
