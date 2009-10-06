@@ -97,9 +97,14 @@ public final class CRM {
 
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
+        final String hbV = host.getHeartbeatVersion();
         if (cloneId != null) {
             if (master) {
-                xml.append("<master id=\"");
+                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    xml.append("<master_slave id=\"");
+                } else {
+                    xml.append("<master id=\"");
+                }
             } else {
                 xml.append("<clone id=\"");
             }
@@ -125,7 +130,6 @@ public final class CRM {
             xml.append("<instance_attributes id=\"");
             xml.append(instanceAttrId);
             xml.append("\">");
-            final String hbV = host.getHeartbeatVersion();
             if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* 2.1.4 */
                 xml.append("<attributes>");
@@ -159,8 +163,6 @@ public final class CRM {
         }
         /* operations */
         if (!pacemakerOps.isEmpty()) {
-
-            final String hbV = host.getHeartbeatVersion();
             if (hbV == null || Tools.compareVersions(hbV, "2.99.0") >= 0) {
                 /* 2.1.4 does not have the id. */
                 if (operationsId == null) {
@@ -199,7 +201,11 @@ public final class CRM {
         }
         if (cloneId != null) {
             if (master) {
-                xml.append("</master>");
+                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    xml.append("</master_slave>");
+                } else {
+                    xml.append("</master>");
+                }
             } else {
                 xml.append("</clone>");
             }

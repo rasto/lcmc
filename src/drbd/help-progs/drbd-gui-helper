@@ -892,8 +892,7 @@ sub get_drbd_xml {
 	$missing{"resource"} = ["protocol", "device"];
 	push @missing, "resource";
 
-	#my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+\\fI|\\fR).*?(?:\.RS.*?\.RE\n)?)\.[TP]P/msg;
-	my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+(?:\\fR\\fB)\\fI|\\fR$).*?)\.[TP]P/msg;
+	my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+(?:\\fR\\fB)?\\fI|\\fR$).*?)\.[TP]P/msg;
 	my %descs;
 	while (@a) {
 		if ($from && $a[1] ne "on-io-error") {
@@ -904,7 +903,7 @@ sub get_drbd_xml {
 		my $desc = shift @a;
 		my $command = shift @a;
 		# split lines that are max 80 characters long.
-		$desc =~ s/\n/ /g;
+		$desc =~ s/\n(?!\n)/ /g;
 		$desc =~ s/\.RS 4/\n/g;
 		$desc =~ s/\.sp/\n\n/g;
 		my $cols = 80;

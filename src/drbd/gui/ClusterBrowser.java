@@ -1,8 +1,8 @@
 /*
- * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
- * written by Rasto Levrinc.
+ * This file is part of DRBD Management Console by Rasto Levrinc,
+ * LINBIT HA-Solutions GmbH
  *
- * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+ * Copyright (C) 2009, Rastislav Levrinc.
  *
  * DRBD Management Console is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -141,10 +141,10 @@ public class ClusterBrowser extends Browser {
     private final Map<String, Map<String, ServiceInfo>> nameToServiceInfoHash =
                                 new HashMap<String, Map<String, ServiceInfo>>();
     /** drbd resource name string to drbd resource info hash. */
-    private final Map<String, DrbdResourceInfo> drbdResHash                  =
+    private final Map<String, DrbdResourceInfo> drbdResHash =
                                 new HashMap<String, DrbdResourceInfo>();
     /** drbd resource device string to drbd resource info hash. */
-    private final Map<String, DrbdResourceInfo> drbdDevHash                  =
+    private final Map<String, DrbdResourceInfo> drbdDevHash =
                                 new HashMap<String, DrbdResourceInfo>();
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo =
@@ -362,6 +362,9 @@ public class ClusterBrowser extends Browser {
         HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "heartbeat 1 (hb)");
         HB_CLASS_MENU.put(HB_LSB_CLASS,       "lsb (init.d)");
 
+    }
+
+    private void initOperations() {
         HB_OPERATION_PARAMS.put(HB_OP_START,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
@@ -386,11 +389,20 @@ public class ClusterBrowser extends Browser {
 
         // TODO: need two monitors for role='Slave' and 'Master' in
         // master/slave resources
-        HB_OPERATION_PARAMS.put(HB_OP_MONITOR,
+        final String hbV = getDCHost().getHeartbeatVersion();
+
+        if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            HB_OPERATION_PARAMS.put(HB_OP_MONITOR,
+                                new ArrayList<String>(
+                                            Arrays.asList(HB_PAR_TIMEOUT,
+                                                          HB_PAR_INTERVAL)));
+        } else {
+            HB_OPERATION_PARAMS.put(HB_OP_MONITOR,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
                                                           HB_PAR_INTERVAL,
                                                           HB_PAR_START_DELAY)));
+        }
         HB_OPERATION_PARAMS.put(HB_OP_PROMOTE,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
@@ -662,6 +674,7 @@ public class ClusterBrowser extends Browser {
 
                 heartbeatXML = new HeartbeatXML(firstHost);
                 heartbeatStatus = new HeartbeatStatus(firstHost, heartbeatXML);
+                initOperations();
                 drbdXML = new DrbdXML(cluster.getHostsArray());
                 /* available services */
                 final String clusterName = getCluster().getName();
