@@ -49,7 +49,7 @@ public class Service extends Resource {
     /** Whether the service is being modified. */
     private boolean modifying = false;
     /** Heartbeat class:  heartbeat, ocf, lsb. */
-    private String heartbeatClass = null;
+    private String resourceClass = null;
     /** Whether this service master when it is clone. */
     private boolean master = false;
     /** Heartbeat id prefix for resource. */
@@ -245,15 +245,15 @@ public class Service extends Resource {
      * Sets heartbeat resource class heartbeat (old style), ocf, lsb (from
      * init.d).
      */
-    public final void setHeartbeatClass(final String heartbeatClass) {
-        this.heartbeatClass = heartbeatClass;
+    public final void setResourceClass(final String resourceClass) {
+        this.resourceClass = resourceClass;
     }
 
     /**
      * Returns the heartbeat class of this service.
      */
-    public final String getHeartbeatClass() {
-        return heartbeatClass;
+    public final String getResourceClass() {
+        return resourceClass;
     }
 
     /**

@@ -24,7 +24,7 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
-import drbd.data.HeartbeatXML.ResStatus;
+import drbd.data.CRMXML.ResStatus;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -32,32 +32,32 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * This class parses heartbeat status, stores information
+ * This class parses pacemaker/heartbeat status, stores information
  * in the hashes and provides methods to get this information.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class HeartbeatStatus {
+public class ClusterStatus {
     /** Host. */
     private final Host host;
     /** Data from cib query. */
     private volatile CibQuery cibQueryMap = new CibQuery();
     /** DC Node. */
     private String dc = null;
-    /** HeartbeatXML object. */
-    private final HeartbeatXML heartbeatXML;
+    /** CRMXML object. */
+    private final CRMXML crmXML;
     /** On which node the resource is running or is a slave. */
     private volatile Map<String, ResStatus> resStatusMap = null;
 
     /**
-     * Prepares a new <code>HeartbeatStatus</code> object.
+     * Prepares a new <code>ClusterStatus</code> object.
      * Gets and parses metadata from pengine and crmd.
      */
-    public HeartbeatStatus(final Host host,
-                           final HeartbeatXML heartbeatXML) {
+    public ClusterStatus(final Host host,
+                         final CRMXML crmXML) {
         this.host = host;
-        this.heartbeatXML = heartbeatXML;
+        this.crmXML = crmXML;
         final String command =
                    host.getDistCommand("Heartbeat.getClusterMetadata",
                                        (ConvertCmdCallback) null);
@@ -69,7 +69,7 @@ public class HeartbeatStatus {
                             false, /* outputVisible */
                             Tools.getString("Heartbeat.getClusterMetadata"));
         if (output != null) {
-            heartbeatXML.parseClusterMetaData(output);
+            crmXML.parseClusterMetaData(output);
         }
     }
 
@@ -202,7 +202,7 @@ public class HeartbeatStatus {
     /**
      * Returns type of the service, e.g. IPAddr
      */
-    public final HeartbeatService getResourceType(final String hbId) {
+    public final ResourceAgent getResourceType(final String hbId) {
         return cibQueryMap.getResourceType().get(hbId);
     }
 
@@ -547,13 +547,13 @@ public class HeartbeatStatus {
      * Parses output from crm_mon.
      */
     private void parseResStatus(final String resStatus) {
-        resStatusMap = heartbeatXML.parseResStatus(resStatus);
+        resStatusMap = crmXML.parseResStatus(resStatus);
     }
 
     /**
      * Parses output from cibadmin command.
      */
     private void parseCibQuery(final String query) {
-        cibQueryMap = heartbeatXML.parseCibQuery(query);
+        cibQueryMap = crmXML.parseCibQuery(query);
     }
 }

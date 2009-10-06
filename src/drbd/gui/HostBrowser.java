@@ -497,7 +497,7 @@ public class HostBrowser extends Browser {
             if (!host.isConnected()) {
                 tt.append('\n');
                 tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
-            } else if (!host.isDrbdStatus() && !host.isHbStatus()) {
+            } else if (!host.isDrbdStatus() && !host.isClStatus()) {
                 tt.append('\n');
                 tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
             }
@@ -915,7 +915,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return getHost().isHbStatus();
+                        return getHost().isClStatus();
                     }
 
                     public void action() {
@@ -933,7 +933,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return getHost().isHbStatus();
+                        return getHost().isClStatus();
                     }
 
                     public void action() {
@@ -997,7 +997,7 @@ public class HostBrowser extends Browser {
         public final Subtext[] getSubtextsForGraph() {
             final List<Subtext> texts = new ArrayList<Subtext>();
             if (getHost().isConnected()) {
-                if (!getHost().isHbStatus()) {
+                if (!getHost().isClStatus()) {
                    texts.add(new Subtext("waiting for cluster status...",
                                          null));
                 }

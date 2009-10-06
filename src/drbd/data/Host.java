@@ -128,7 +128,7 @@ public class Host implements Serializable {
     /** Thread where drbd status command is running. */
     private ExecCommandThread drbdStatusThread = null;
     /** Thread where hb status command is running. */
-    private ExecCommandThread hbStatusThread = null;
+    private ExecCommandThread clStatusThread = null;
     /** List of positions of the services.
      *  Question is this: the saved positions can be different on different
      *  hosts, but only one can be used in the hb graph.
@@ -163,7 +163,7 @@ public class Host implements Serializable {
     /** Whether drbd was newly installed. */
     private boolean drbdWasInstalled = false;
     /** Whether heartbeat status is ok. */
-    private boolean hbStatus = false;
+    private boolean clStatus = false;
     /** Whether drbd status is ok. */
     private boolean drbdStatus = false;
 
@@ -272,7 +272,7 @@ public class Host implements Serializable {
         if (!isConnected()) {
             secColor = Tools.getDefaultColor("Host.ErrorColor");
         } else {
-            if (isHbStatus()) {
+            if (isClStatus()) {
                 return new Color[]{color};
             } else {
                 secColor = Tools.getDefaultColor("Host.NoStatusColor");
@@ -294,8 +294,8 @@ public class Host implements Serializable {
     /**
      * Sets if hb status failed or not.
      */
-    public final void setHbStatus(final boolean hbStatus) {
-        this.hbStatus = hbStatus;
+    public final void setClStatus(final boolean clStatus) {
+        this.clStatus = clStatus;
     }
 
     /**
@@ -313,8 +313,8 @@ public class Host implements Serializable {
     /**
      * Returns whether hb status is available.
      */
-    public final boolean isHbStatus() {
-        return hbStatus && isConnected();
+    public final boolean isClStatus() {
+        return clStatus && isConnected();
     }
 
     /**
@@ -1210,12 +1210,12 @@ public class Host implements Serializable {
     /**
      * Executes an hb status command.
      */
-    public final void execHbStatusCommand(
+    public final void execClStatusCommand(
                                 final ExecCallback execCallback,
                                 final NewOutputCallback outputCallback) {
-        if (hbStatusThread == null) {
-            hbStatusThread = ssh.execCommand(
-                            Tools.getDistCommand("Heartbeat.getHbStatus",
+        if (clStatusThread == null) {
+            clStatusThread = ssh.execCommand(
+                            Tools.getDistCommand("Heartbeat.getClStatus",
                                                  dist,
                                                  distVersionString,
                                                  arch,
@@ -1233,24 +1233,24 @@ public class Host implements Serializable {
     /**
      * Waits while the hb status thread finishes.
      */
-    public final void waitOnHbStatus() {
+    public final void waitOnClStatus() {
         try {
-            hbStatusThread.join();
+            clStatusThread.join();
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        hbStatusThread = null;
+        clStatusThread = null;
     }
 
     /**
      * Stops hb status background process.
      */
-    public final void stopHbStatus() {
-        if (hbStatusThread == null) {
+    public final void stopClStatus() {
+        if (clStatusThread == null) {
             Tools.appWarning("trying to stop stopped hb status");
             return;
         }
-        hbStatusThread.cancel();
+        clStatusThread.cancel();
     }
 
     /**

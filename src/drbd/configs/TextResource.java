@@ -1168,7 +1168,7 @@ public class TextResource extends
         {"ClusterBrowser.HeartbeatProvider",
          "Provider"},
 
-        {"ClusterBrowser.HeartbeatClass",
+        {"ClusterBrowser.ResourceClass",
          "Class"},
 
         {"ClusterBrowser.Group",
@@ -1186,7 +1186,7 @@ public class TextResource extends
         {"ClusterBrowser.availableServices",
          "Available Services"},
 
-        {"ClusterBrowser.HbStatusFailed",
+        {"ClusterBrowser.ClStatusFailed",
          "<h2>Waiting for cluster status...</h2>"},
 
         {"ClusterBrowser.Hb.RemoveAllServices",
@@ -1509,33 +1509,33 @@ public class TextResource extends
         {"HostBrowser.Drbd.NoInfoAvailable",
          "no info available"},
 
-        {"HeartbeatXML.RequiredOptions",
+        {"CRMXML.RequiredOptions",
          "Required Options"},
 
-        {"HeartbeatXML.MetaAttrOptions",
+        {"CRMXML.MetaAttrOptions",
          "Meta Attributes"},
 
-        {"HeartbeatXML.OptionalOptions",
+        {"CRMXML.OptionalOptions",
          "Advanced Options"},
 
-        {"HeartbeatXML.GetOCFParameters",
+        {"CRMXML.GetOCFParameters",
          "Getting Heartbeat OCF parameters..."},
 
-        {"HeartbeatXML.TargetRole.ShortDesc",
+        {"CRMXML.TargetRole.ShortDesc",
          "Target Role"},
 
-        {"HeartbeatXML.TargetRole.LongDesc",
+        {"CRMXML.TargetRole.LongDesc",
          "Select whether the service should be started or should be stopped."},
 
-        {"HeartbeatXML.IsManaged.ShortDesc",
+        {"CRMXML.IsManaged.ShortDesc",
          "Is Managed By HB"},
 
-        {"HeartbeatXML.IsManaged.LongDesc",
+        {"CRMXML.IsManaged.LongDesc",
          "Select whether the service should be managed by Heartbeat or not."},
 
-        {"HeartbeatXML.ColocationSectionParams",
+        {"CRMXML.ColocationSectionParams",
          "Colocation Parameters"},
-        {"HeartbeatXML.OrderSectionParams",
+        {"CRMXML.OrderSectionParams",
          "Order Parameters"},
 
         {"GuiComboBox.Select",

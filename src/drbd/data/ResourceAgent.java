@@ -29,7 +29,7 @@ import java.util.HashMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
- * This class describes a heartbeat service with its name and class.
+ * This class describes a resource agent with its name and class.
  * This is important in otder to distinguish services that have the same name
  * int the heartbeat, ocf or lsb classes.
  *
@@ -37,7 +37,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * @version $Id$
  *
  */
-public class HeartbeatService {
+public class ResourceAgent {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the service. */
@@ -45,7 +45,7 @@ public class HeartbeatService {
     /** Name of the provider like "linbit". */
     private final String provider;
     /** Class of the service, like ocf. */
-    private final String heartbeatClass;
+    private final String resourceClass;
     /** Version of the hb service. */
     private String version;
     /** Long description of the hb service. */
@@ -86,16 +86,16 @@ public class HeartbeatService {
     private boolean masterSlave = false;
 
     /**
-     * Prepares a new <code>HeartbeatService</code> object.
+     * Prepares a new <code>ResourceAgent</code> object.
      */
-    public HeartbeatService(final String name,
-                            final String provider,
-                            final String heartbeatClass) {
+    public ResourceAgent(final String name,
+                         final String provider,
+                         final String resourceClass) {
         this.name = name;
         this.provider = provider;
-        this.heartbeatClass = heartbeatClass;
+        this.resourceClass = resourceClass;
         hash = (name == null ? 0 : name.hashCode() * 31)
-               + (heartbeatClass == null ? 0 : heartbeatClass.hashCode());
+               + (resourceClass == null ? 0 : resourceClass.hashCode());
         if (!"heartbeat".equals(provider)) {
             menuName = provider + ":" + name;
         } else {
@@ -126,10 +126,10 @@ public class HeartbeatService {
     }
 
     /**
-     * Returns the heartbeat class of the service, like ocf.
+     * Returns the class of the service, like ocf.
      */
-    public final String getHeartbeatClass() {
-        return heartbeatClass;
+    public final String getResourceClass() {
+        return resourceClass;
     }
 
     /**
@@ -150,14 +150,14 @@ public class HeartbeatService {
         if (oth == null || !getClass().isInstance(oth)) {
             return false;
         }
-        final HeartbeatService other = getClass().cast(oth);
+        final ResourceAgent other = getClass().cast(oth);
         return (name == null ? other.name == null : name.equals(other.name))
-               && (heartbeatClass == null ? other.heartbeatClass == null
-                                : heartbeatClass.equals(other.heartbeatClass));
+               && (resourceClass == null ? other.resourceClass == null
+                                : resourceClass.equals(other.resourceClass));
     }
 
     /**
-     * Sets heartbeat ocf script version for service.
+     * Sets ocf script version for service.
      */
     public final void setVersion(final String version) {
         this.version = version;
@@ -414,7 +414,7 @@ public class HeartbeatService {
      */
     public final boolean isGroup() {
         return Tools.getConfigData().PM_GROUP_NAME.equals(name)
-               && "group".equals(heartbeatClass);
+               && "group".equals(resourceClass);
     }
 
     /**
@@ -422,7 +422,7 @@ public class HeartbeatService {
      */
     public final boolean isClone() {
         return Tools.getConfigData().PM_CLONE_SET_NAME.equals(name)
-               && "clone".equals(heartbeatClass);
+               && "clone".equals(resourceClass);
     }
 
 
@@ -430,14 +430,14 @@ public class HeartbeatService {
      * Returns whether this service is in the heartbeat class.
      */
     public final boolean isHeartbeatClass() {
-        return "heartbeat".equals(heartbeatClass);
+        return "heartbeat".equals(resourceClass);
     }
 
     /**
      * Returns whether this service is in the ocf class.
      */
     public final boolean isOCFClass() {
-        return "ocf".equals(heartbeatClass);
+        return "ocf".equals(resourceClass);
     }
 
     /**

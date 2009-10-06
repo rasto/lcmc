@@ -48,7 +48,7 @@ public class CibQuery {
     /** Map with resources and parameters nvpair ids. */
     private Map<String, Map<String, String>> parametersNvpairsIds;
     /** Map with resource type. */
-    private Map<String, HeartbeatService> resourceType;
+    private Map<String, ResourceAgent> resourceType;
     /** Map with resource instance_attributes id. */
     private Map<String, String> resourceInstanceAttrId;
     /** Colocation map. */
@@ -160,14 +160,14 @@ public class CibQuery {
      * Sets the resource type map.
      */
     public final void setResourceType(
-                            final Map<String, HeartbeatService> resourceType) {
+                            final Map<String, ResourceAgent> resourceType) {
         this.resourceType = resourceType;
     }
 
     /**
      * Returns the resource type map.
      */
-    public final Map<String, HeartbeatService> getResourceType() {
+    public final Map<String, ResourceAgent> getResourceType() {
         return resourceType;
     }
 

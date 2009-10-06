@@ -749,7 +749,7 @@ public class HeartbeatGraph extends ResourceGraph {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
         } else if (si.isStopped()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
-        } else if (getClusterBrowser().hbStatusFailed()) {
+        } else if (getClusterBrowser().clStatusFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (vertexIsPresentList.contains(v)) {
             final List<Color> colors = si.getHostColors();
@@ -908,7 +908,7 @@ public class HeartbeatGraph extends ResourceGraph {
             if (!vertexIsPresentList.contains(v)) {
                 final ServiceInfo si = (ServiceInfo) getInfo(v);
                 if (!si.getService().isNew()
-                    && !getClusterBrowser().hbStatusFailed()) {
+                    && !getClusterBrowser().clStatusFailed()) {
 
                     si.setUpdated(false);
                     getVertexLocations().setLocation(v, null); //TODO: asdf
@@ -1223,7 +1223,7 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final String getRightCornerText(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
-            if (hi.getHost().isHbStatus()) {
+            if (hi.getHost().isClStatus()) {
                 return "online";
             } else if (hi.getHost().isConnected()) {
                 return "offline";

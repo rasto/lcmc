@@ -175,7 +175,7 @@ public class DistResource extends
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
         /* vmxpath env is needed so that vmware meta-data does not hang */
         {"Heartbeat.getClusterMetadata", "/usr/local/bin/drbd-gui-helper get-cluster-metadata"},
-        {"Heartbeat.getHbStatus",    "/usr/local/bin/drbd-gui-helper get-cluster-events"},
+        {"Heartbeat.getClStatus",    "/usr/local/bin/drbd-gui-helper get-cluster-events"},
         {"Heartbeat.startHeartbeat", "/etc/init.d/heartbeat start"},
         {"Heartbeat.stopHeartbeat",  "/etc/init.d/heartbeat stop"},
         {"Openais.startOpenais",   "/etc/init.d/openais start"},

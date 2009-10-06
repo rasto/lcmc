@@ -43,7 +43,7 @@ import java.util.Collections;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
- * This class parses ocf heartbeat xml, stores information like
+ * This class parses ocf crm xml, stores information like
  * short and long description, data types etc. for defined types
  * of services in the hashes and provides methods to get this
  * information.
@@ -53,16 +53,16 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * @version $Id$
  *
  */
-public class HeartbeatXML extends XML {
+public class CRMXML extends XML {
     /** Host. */
     private final Host host;
     /** List of global parameters. */
     private final List<String> globalParams = new ArrayList<String>();
     /** List of required global parameters. */
     private final List<String> globalRequiredParams = new ArrayList<String>();
-    /** Map from class to the list of all heartbeat services. */
-    private final Map<String, List<HeartbeatService>> classToServicesMap =
-                                new HashMap<String, List<HeartbeatService>>();
+    /** Map from class to the list of all crm services. */
+    private final Map<String, List<ResourceAgent>> classToServicesMap =
+                                new HashMap<String, List<ResourceAgent>>();
     /** Map from global parameter to its short description. */
     private final Map<String, String> paramGlobalShortDescMap =
                                                 new HashMap<String, String>();
@@ -136,22 +136,22 @@ public class HeartbeatXML extends XML {
     private final Map<String, String[]> paramOrdPossibleChoicesMS =
                                               new HashMap<String, String[]>();
     /** Predefined group as heartbeat service. */
-    private final HeartbeatService hbGroup =
-                      new HeartbeatService(Tools.getConfigData().PM_GROUP_NAME,
-                                           "",
-                                           "group");
+    private final ResourceAgent hbGroup =
+                      new ResourceAgent(Tools.getConfigData().PM_GROUP_NAME,
+                                        "",
+                                        "group");
     /** Predefined clone as heartbeat service. */
-    private final HeartbeatService hbClone;
+    private final ResourceAgent hbClone;
     /** Predefined drbddisk as heartbeat service. */
-    private final HeartbeatService hbDrbddisk =
-                        new HeartbeatService("drbddisk", "heartbeat", "heartbeat");
+    private final ResourceAgent hbDrbddisk =
+                        new ResourceAgent("drbddisk", "heartbeat", "heartbeat");
     /** Predefined linbit::drbd as pacemaker service. */
-    private final HeartbeatService hbLinbitDrbd =
-                                 new HeartbeatService("drbd", "linbit", "ocf");
+    private final ResourceAgent hbLinbitDrbd =
+                                 new ResourceAgent("drbd", "linbit", "ocf");
     /** Mapfrom heartbeat service defined by name and class to the hearbeat
      * service object.
      */
-    private final MultiKeyMap serviceToHbServiceMap = new MultiKeyMap();
+    private final MultiKeyMap serviceToResourceAgentMap = new MultiKeyMap();
     /** Boolean parameter type. */
     private static final String PARAM_TYPE_BOOLEAN = "boolean";
     /** Integer parameter type. */
@@ -188,9 +188,9 @@ public class HeartbeatXML extends XML {
     boolean linbitDrbdPresent = false;
 
     /**
-     * Prepares a new <code>HeartbeatXML</code> object.
+     * Prepares a new <code>CRMXML</code> object.
      */
-    public HeartbeatXML(final Host host) {
+    public CRMXML(final Host host) {
         super();
         this.host = host;
         String command = null;
@@ -199,10 +199,9 @@ public class HeartbeatXML extends XML {
         String[] integerValues = getIntegerValues();
         final String hb_boolean_true = booleanValues[0];
         final String hb_boolean_false = booleanValues[1];
-        hbClone = new HeartbeatService(
-                                Tools.getConfigData().PM_CLONE_SET_NAME,
-                                "",
-                                "clone");
+        hbClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
+                                    "",
+                                    "clone");
         /* clone-max */
         hbClone.addParameter("clone-max");
         hbClone.setParamIsMetaAttr("clone-max", true);
@@ -266,7 +265,7 @@ public class HeartbeatXML extends XML {
                             command,
                             null,  /* ExecCallback */
                             false, /* outputVisible */
-                            Tools.getString("HeartbeatXML.GetOCFParameters"));
+                            Tools.getString("CRMXML.GetOCFParameters"));
         if (output == null) {
             //Tools.appError("heartbeat ocf output is null");
             return;
@@ -561,9 +560,9 @@ public class HeartbeatXML extends XML {
      * The problem is, that heartbeat kept changing the lower and upper case in
      * the true and false values.
      */
-    public final String[] getCheckBoxChoices(final HeartbeatService hbService,
+    public final String[] getCheckBoxChoices(final ResourceAgent ra,
                                              final String param) {
-        final String paramDefault = getParamDefault(hbService, param);
+        final String paramDefault = getParamDefault(ra, param);
         if (paramDefault != null) {
             if ("yes".equals(paramDefault) || "no".equals(paramDefault)) {
                 return new String[]{"yes", "no"};
@@ -594,15 +593,15 @@ public class HeartbeatXML extends XML {
      * Returns all services as array of strings, sorted, with filesystem and
      * ipaddr in the begining.
      */
-    public final List<HeartbeatService> getServices(final String cl) {
-        final List<HeartbeatService> services = classToServicesMap.get(cl);
+    public final List<ResourceAgent> getServices(final String cl) {
+        final List<ResourceAgent> services = classToServicesMap.get(cl);
         if (services == null) {
-            return new ArrayList<HeartbeatService>();
+            return new ArrayList<ResourceAgent>();
         }
         Collections.sort(services,
-                         new Comparator<HeartbeatService>() {
-                              public int compare(final HeartbeatService s1,
-                                                 final HeartbeatService s2) {
+                         new Comparator<ResourceAgent>() {
+                              public int compare(final ResourceAgent s1,
+                                                 final ResourceAgent s2) {
                                   return s1.getName().compareToIgnoreCase(
                                                                 s2.getName());
                               }
@@ -614,9 +613,9 @@ public class HeartbeatXML extends XML {
      * Returns parameters for service. Parameters are obtained from
      * ocf meta-data.
      */
-    public final String[] getParameters(final HeartbeatService hbService) {
+    public final String[] getParameters(final ResourceAgent ra) {
         /* return cached values */
-        return hbService.getParameters();
+        return ra.getParameters();
     }
 
     /**
@@ -632,22 +631,22 @@ public class HeartbeatXML extends XML {
     /**
      * Return version of the service ocf script.
      */
-    public final String getVersion(final HeartbeatService hbService) {
-        return hbService.getVersion();
+    public final String getVersion(final ResourceAgent ra) {
+        return ra.getVersion();
     }
 
     /**
      * Return short description of the service.
      */
-    public final String getShortDesc(final HeartbeatService hbService) {
-        return hbService.getShortDesc();
+    public final String getShortDesc(final ResourceAgent ra) {
+        return ra.getShortDesc();
     }
 
     /**
      * Return long description of the service.
      */
-    public final String getLongDesc(final HeartbeatService hbService) {
-        return hbService.getLongDesc();
+    public final String getLongDesc(final ResourceAgent ra) {
+        return ra.getLongDesc();
     }
 
     /**
@@ -664,9 +663,9 @@ public class HeartbeatXML extends XML {
     /**
      * Returns short description of the service parameter.
      */
-    public final String getParamShortDesc(final HeartbeatService hbService,
+    public final String getParamShortDesc(final ResourceAgent ra,
                                           final String param) {
-        return hbService.getParamShortDesc(param);
+        return ra.getParamShortDesc(param);
     }
 
     /**
@@ -684,10 +683,10 @@ public class HeartbeatXML extends XML {
     /**
      * Returns long description of the parameter and service.
      */
-    public final String getParamLongDesc(final HeartbeatService hbService,
+    public final String getParamLongDesc(final ResourceAgent ra,
                                          final String param) {
-        final String shortDesc = getParamShortDesc(hbService, param);
-        String longDesc = hbService.getParamLongDesc(param);
+        final String shortDesc = getParamShortDesc(ra, param);
+        String longDesc = ra.getParamLongDesc(param);
         if (longDesc == null) {
             longDesc = "";
         }
@@ -704,9 +703,9 @@ public class HeartbeatXML extends XML {
     /**
      * Returns type of the parameter. It can be string, integer, boolean...
      */
-    public final String getParamType(final HeartbeatService hbService,
-                               final String param) {
-        return hbService.getParamType(param);
+    public final String getParamType(final ResourceAgent ra,
+                                     final String param) {
+        return ra.getParamType(param);
     }
 
     /**
@@ -726,17 +725,17 @@ public class HeartbeatXML extends XML {
     /**
      * Returns the preferred value for this parameter.
      */
-    public final String getParamPreferred(final HeartbeatService hbService,
+    public final String getParamPreferred(final ResourceAgent ra,
                                           final String param) {
-        return hbService.getParamPreferred(param);
+        return ra.getParamPreferred(param);
     }
 
     /**
      * Returns default value for this parameter.
      */
-    public final String getParamDefault(final HeartbeatService hbService,
+    public final String getParamDefault(final ResourceAgent ra,
                                         final String param) {
-        return hbService.getParamDefault(param);
+        return ra.getParamDefault(param);
     }
 
     /**
@@ -751,10 +750,9 @@ public class HeartbeatXML extends XML {
      * Returns possible choices for a parameter, that will be displayed in
      * the combo box.
      */
-    public final String[] getParamPossibleChoices(
-                                            final HeartbeatService hbService,
-                                            final String param) {
-        return hbService.getParamPossibleChoices(param); // TODO: dead code
+    public final String[] getParamPossibleChoices(final ResourceAgent ra,
+                                                  final String param) {
+        return ra.getParamPossibleChoices(param);
     }
 
     /**
@@ -767,34 +765,34 @@ public class HeartbeatXML extends XML {
     /**
      * Checks if parameter is required or not.
      */
-    public final boolean isRequired(final HeartbeatService hbService,
+    public final boolean isRequired(final ResourceAgent ra,
                                     final String param) {
-        return hbService.isRequired(param);
+        return ra.isRequired(param);
     }
 
     /**
      * Returns whether the parameter is meta attribute or not.
      */
-    public final boolean isMetaAttr(final HeartbeatService hbService,
+    public final boolean isMetaAttr(final ResourceAgent ra,
                                     final String param) {
-        return hbService.isParamMetaAttr(param);
+        return ra.isParamMetaAttr(param);
     }
 
     /**
      * Returns whether the parameter expects an integer value.
      */
-    public final boolean isInteger(final HeartbeatService hbService,
+    public final boolean isInteger(final ResourceAgent ra,
                                    final String param) {
-        final String type = getParamType(hbService, param);
+        final String type = getParamType(ra, param);
         return PARAM_TYPE_INTEGER.equals(type);
     }
 
     /**
      * Returns whether the parameter expects a boolean value.
      */
-    public final boolean isBoolean(final HeartbeatService hbService,
+    public final boolean isBoolean(final ResourceAgent ra,
                                    final String param) {
-        final String type = getParamType(hbService, param);
+        final String type = getParamType(ra, param);
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
@@ -817,9 +815,9 @@ public class HeartbeatXML extends XML {
     /**
      * Whether the service parameter is of the time type.
      */
-    public final boolean isTimeType(final HeartbeatService hbService,
+    public final boolean isTimeType(final ResourceAgent ra,
                                     final String param) {
-        final String type = getParamType(hbService, param);
+        final String type = getParamType(ra, param);
         return PARAM_TYPE_TIME.equals(type);
     }
 
@@ -836,14 +834,13 @@ public class HeartbeatXML extends XML {
      * Returns name of the section for service and parameter that will be
      * displayed.
      */
-    public final String getSection(final HeartbeatService hbService,
-                                   final String param) {
-        if (isMetaAttr(hbService, param)) {
-            return Tools.getString("HeartbeatXML.MetaAttrOptions");
-        } else if (isRequired(hbService, param)) {
-            return Tools.getString("HeartbeatXML.RequiredOptions");
+    public final String getSection(final ResourceAgent ra, final String param) {
+        if (isMetaAttr(ra, param)) {
+            return Tools.getString("CRMXML.MetaAttrOptions");
+        } else if (isRequired(ra, param)) {
+            return Tools.getString("CRMXML.RequiredOptions");
         } else {
-            return Tools.getString("HeartbeatXML.OptionalOptions");
+            return Tools.getString("CRMXML.OptionalOptions");
         }
     }
 
@@ -853,9 +850,9 @@ public class HeartbeatXML extends XML {
      */
     public final String getGlobalSection(final String param) {
         if (isGlobalRequired(param)) {
-            return Tools.getString("HeartbeatXML.RequiredOptions");
+            return Tools.getString("CRMXML.RequiredOptions");
         } else {
-            return Tools.getString("HeartbeatXML.OptionalOptions");
+            return Tools.getString("CRMXML.OptionalOptions");
         }
     }
 
@@ -863,10 +860,10 @@ public class HeartbeatXML extends XML {
      * Checks parameter according to its type. Returns false if value does
      * not fit the type.
      */
-    public final boolean checkParam(final HeartbeatService hbService,
+    public final boolean checkParam(final ResourceAgent ra,
                                     final String param,
                                     final String value) {
-        final String type = getParamType(hbService, param);
+        final String type = getParamType(ra, param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
@@ -892,7 +889,7 @@ public class HeartbeatXML extends XML {
                 correctValue = false;
             }
         } else if ((value == null || "".equals(value))
-                   && isRequired(hbService, param)) {
+                   && isRequired(ra, param)) {
             correctValue = false;
         }
         return correctValue;
@@ -940,7 +937,7 @@ public class HeartbeatXML extends XML {
     /**
      * Parses the parameters.
      */
-    private void parseParameters(final HeartbeatService hbService,
+    private void parseParameters(final ResourceAgent ra,
                                  final Node parametersNode) {
         /* target-role */
         final String hbV = host.getHeartbeatVersion();
@@ -950,33 +947,30 @@ public class HeartbeatXML extends XML {
             targetRoleParam = "target_role";
             isManagedParam = "is_managed";
         }
-        hbService.addParameter(targetRoleParam);
+        ra.addParameter(targetRoleParam);
         // TODO: Master, Slave
-        hbService.setParamPossibleChoices(targetRoleParam,
-                                     new String[]{"started", "stopped"});
-        hbService.setParamIsMetaAttr(targetRoleParam, true);
-        hbService.setParamRequired(targetRoleParam, false);
-        hbService.setParamShortDesc(
-                         targetRoleParam,
-                         Tools.getString("HeartbeatXML.TargetRole.ShortDesc"));
-        hbService.setParamLongDesc(
-                         targetRoleParam,
-                         Tools.getString("HeartbeatXML.TargetRole.LongDesc"));
+        ra.setParamPossibleChoices(targetRoleParam,
+                                   new String[]{"started", "stopped"});
+        ra.setParamIsMetaAttr(targetRoleParam, true);
+        ra.setParamRequired(targetRoleParam, false);
+        ra.setParamShortDesc(targetRoleParam,
+                             Tools.getString("CRMXML.TargetRole.ShortDesc"));
+        ra.setParamLongDesc(targetRoleParam,
+                            Tools.getString("CRMXML.TargetRole.LongDesc"));
         // TODO: default is different in some prev hb */
-        hbService.setParamDefault(targetRoleParam, "started");
+        ra.setParamDefault(targetRoleParam, "started");
 
-        hbService.addParameter(isManagedParam);
-        hbService.setParamPossibleChoices(isManagedParam,
-                                          new String[]{"true", "false"});
-        hbService.setParamIsMetaAttr(isManagedParam, true);
-        hbService.setParamRequired(isManagedParam, true);
-        hbService.setParamShortDesc(
-                         isManagedParam,
-                         Tools.getString("HeartbeatXML.IsManaged.ShortDesc"));
-        hbService.setParamLongDesc(
-                         isManagedParam,
-                         Tools.getString("HeartbeatXML.IsManaged.LongDesc"));
-        hbService.setParamDefault(isManagedParam, "true");
+        ra.addParameter(isManagedParam);
+        ra.setParamPossibleChoices(isManagedParam,
+                                   new String[]{"true", "false"});
+        ra.setParamIsMetaAttr(isManagedParam, true);
+        ra.setParamRequired(isManagedParam, true);
+        ra.setParamShortDesc(isManagedParam,
+                             Tools.getString("CRMXML.IsManaged.ShortDesc"));
+        ra.setParamLongDesc(
+                                 isManagedParam,
+                                 Tools.getString("CRMXML.IsManaged.LongDesc"));
+        ra.setParamDefault(isManagedParam, "true");
 
         final NodeList parameters = parametersNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); i++) {
@@ -984,10 +978,10 @@ public class HeartbeatXML extends XML {
             if (parameterNode.getNodeName().equals("parameter")) {
                 final String param = getAttribute(parameterNode, "name");
                 final String required = getAttribute(parameterNode, "required");
-                hbService.addParameter(param);
+                ra.addParameter(param);
 
                 if (required != null && required.equals("1")) {
-                    hbService.setParamRequired(param, true);
+                    ra.setParamRequired(param, true);
                 }
 
                 /* <longdesc lang="en"> */
@@ -995,7 +989,7 @@ public class HeartbeatXML extends XML {
                                                             "longdesc");
                 if (longdescParamNode != null) {
                     final String longDesc = getText(longdescParamNode);
-                    hbService.setParamLongDesc(param, longDesc);
+                    ra.setParamLongDesc(param, longDesc);
                 }
 
                 /* <shortdesc lang="en"> */
@@ -1003,7 +997,7 @@ public class HeartbeatXML extends XML {
                                                              "shortdesc");
                 if (shortdescParamNode != null) {
                     final String shortDesc = getText(shortdescParamNode);
-                    hbService.setParamShortDesc(param, shortDesc);
+                    ra.setParamShortDesc(param, shortDesc);
                 }
 
                 /* <content> */
@@ -1014,8 +1008,8 @@ public class HeartbeatXML extends XML {
                     final String defaultValue = getAttribute(contentParamNode,
                                                                     "default");
 
-                    hbService.setParamType(param, type);
-                    hbService.setParamDefault(param, defaultValue);
+                    ra.setParamType(param, type);
+                    ra.setParamDefault(param, defaultValue);
                 }
             }
         }
@@ -1024,7 +1018,7 @@ public class HeartbeatXML extends XML {
     /**
      * Parses the actions node.
      */
-    private void parseActions(final HeartbeatService hbService,
+    private void parseActions(final ResourceAgent ra,
                               final Node actionsNode) {
         final NodeList actions = actionsNode.getChildNodes();
         for (int i = 0; i < actions.getLength(); i++) {
@@ -1037,11 +1031,11 @@ public class HeartbeatXML extends XML {
                 final String startDelay = getAttribute(actionNode,
                                                                "start-delay");
                 final String role = getAttribute(actionNode, "role");
-                hbService.addOperationDefault(name, "depth", depth);
-                hbService.addOperationDefault(name, "timeout", timeout);
-                hbService.addOperationDefault(name, "interval", interval);
-                hbService.addOperationDefault(name, "start-delay", startDelay);
-                hbService.addOperationDefault(name, "role", role);
+                ra.addOperationDefault(name, "depth", depth);
+                ra.addOperationDefault(name, "timeout", timeout);
+                ra.addOperationDefault(name, "interval", interval);
+                ra.addOperationDefault(name, "start-delay", startDelay);
+                ra.addOperationDefault(name, "role", role);
             }
         }
     }
@@ -1066,64 +1060,62 @@ public class HeartbeatXML extends XML {
         }
 
         /* class */
-        String heartbeatClass = getAttribute(raNode, "class");
-        if (heartbeatClass == null) {
-            heartbeatClass = "ocf";
+        String resourceClass = getAttribute(raNode, "class");
+        if (resourceClass == null) {
+            resourceClass = "ocf";
         }
-        List<HeartbeatService> hbServiceList =
-                                        classToServicesMap.get(heartbeatClass);
-        if (hbServiceList == null) {
-            hbServiceList = new ArrayList<HeartbeatService>();
-            classToServicesMap.put(heartbeatClass, hbServiceList);
+        List<ResourceAgent> raList =
+                                        classToServicesMap.get(resourceClass);
+        if (raList == null) {
+            raList = new ArrayList<ResourceAgent>();
+            classToServicesMap.put(resourceClass, raList);
         }
-        HeartbeatService hbService;
+        ResourceAgent ra;
         if (serviceName.equals("drbddisk")
-            && heartbeatClass.equals("heartbeat")) {
-            hbService = hbDrbddisk;
+            && resourceClass.equals("heartbeat")) {
+            ra = hbDrbddisk;
         } else if ("drbd".equals(serviceName)
-                   && "ocf".equals(heartbeatClass)
+                   && "ocf".equals(resourceClass)
                    && "linbit".equals(provider)) {
-            hbService = hbLinbitDrbd;
+            ra = hbLinbitDrbd;
         } else {
-            hbService = new HeartbeatService(serviceName,
-                                             provider,
-                                             heartbeatClass);
+            ra = new ResourceAgent(serviceName, provider, resourceClass);
         }
-        serviceToHbServiceMap.put(serviceName,
-                                  provider,
-                                  heartbeatClass,
-                                  hbService);
-        hbServiceList.add(hbService);
+        serviceToResourceAgentMap.put(serviceName,
+                                      provider,
+                                      resourceClass,
+                                      ra);
+        raList.add(ra);
 
         /* <version> */
         final Node versionNode = getChildNode(raNode, "version");
         if (versionNode != null) {
-            hbService.setVersion(getText(versionNode));
+            ra.setVersion(getText(versionNode));
         }
 
         /* <longdesc lang="en"> */
         final Node longdescNode = getChildNode(raNode, "longdesc");
         if (longdescNode != null) {
-            hbService.setLongDesc(getText(longdescNode));
+            ra.setLongDesc(getText(longdescNode));
         }
 
         /* <shortdesc lang="en"> */
         final Node shortdescNode = getChildNode(raNode, "shortdesc");
         if (shortdescNode != null) {
-            hbService.setShortDesc(getText(shortdescNode));
+            ra.setShortDesc(getText(shortdescNode));
         }
 
         /* <parameters> */
         final Node parametersNode = getChildNode(raNode, "parameters");
         if (parametersNode != null) {
-            parseParameters(hbService, parametersNode);
+            parseParameters(ra, parametersNode);
         }
         /* <actions> */
         final Node actionsNode = getChildNode(raNode, "actions");
         if (actionsNode != null) {
-            parseActions(hbService, actionsNode);
+            parseActions(ra, actionsNode);
         }
-        hbService.setMasterSlave(masterSlave);
+        ra.setMasterSlave(masterSlave);
     }
 
     /**
@@ -1224,39 +1216,39 @@ public class HeartbeatXML extends XML {
      * Returns the heartbeat service object for the specified service name and
      * heartbeat class.
      */
-    public final HeartbeatService getHbService(final String serviceName,
-                                               final String provider,
-                                               final String hbClass) {
-        return (HeartbeatService) serviceToHbServiceMap.get(serviceName,
-                                                            provider,
-                                                            hbClass);
+    public final ResourceAgent getResourceAgent(final String serviceName,
+                                                final String provider,
+                                                final String raClass) {
+        return (ResourceAgent) serviceToResourceAgentMap.get(serviceName,
+                                                             provider,
+                                                             raClass);
     }
 
     /**
      * Returns the heartbeat service object of the drbddisk service.
      */
-    public final HeartbeatService getHbDrbddisk() {
+    public final ResourceAgent getHbDrbddisk() {
         return hbDrbddisk;
     }
 
     /**
      * Returns the heartbeat service object of the linbit::drbd service.
      */
-    public final HeartbeatService getHbLinbitDrbd() {
+    public final ResourceAgent getHbLinbitDrbd() {
         return hbLinbitDrbd;
     }
 
     /**
      * Returns the heartbeat service object of the hearbeat group.
      */
-    public final HeartbeatService getHbGroup() {
+    public final ResourceAgent getHbGroup() {
         return hbGroup;
     }
 
     /**
      * Returns the heartbeat service object of the hearbeat clone set.
      */
-    public final HeartbeatService getHbClone() {
+    public final ResourceAgent getHbClone() {
         return hbClone;
     }
 
@@ -1385,21 +1377,21 @@ public class HeartbeatXML extends XML {
     private void parsePrimitive(
                 final Node primitiveNode,
                 final List<String> groupResList,
-                final Map<String, HeartbeatService> resourceTypeMap,
+                final Map<String, ResourceAgent> resourceTypeMap,
                 final Map<String, Map<String, String>> parametersMap,
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
                 final Map<String, String> resourceInstanceAttrIdMap,
                 final MultiKeyMap operationsMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap) {
-        final String hbClass = getAttribute(primitiveNode, "class");
+        final String raClass = getAttribute(primitiveNode, "class");
         final String hbId = getAttribute(primitiveNode, "id");
         String provider = getAttribute(primitiveNode, "provider");
         if (provider == null) {
             provider = "heartbeat";
         }
         final String type = getAttribute(primitiveNode, "type");
-        resourceTypeMap.put(hbId, getHbService(type, provider, hbClass));
+        resourceTypeMap.put(hbId, getResourceAgent(type, provider, raClass));
         groupResList.add(hbId);
         parseAttributes(primitiveNode,
                         hbId,
@@ -1636,8 +1628,8 @@ public class HeartbeatXML extends XML {
                                     new HashMap<String, Map<String, String>>();
         final Map<String, Map<String, String>> parametersNvpairsIdsMap =
                                     new HashMap<String, Map<String, String>>();
-        final Map<String, HeartbeatService> resourceTypeMap =
-                                      new HashMap<String, HeartbeatService>();
+        final Map<String, ResourceAgent> resourceTypeMap =
+                                      new HashMap<String, ResourceAgent>();
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
         final MultiKeyMap operationsMap = new MultiKeyMap();
@@ -2025,7 +2017,7 @@ public class HeartbeatXML extends XML {
      * displayed.
      */
     public final String getOrderSection(final String param) {
-        return Tools.getString("HeartbeatXML.OrderSectionParams");
+        return Tools.getString("CRMXML.OrderSectionParams");
     }
 
     /**
@@ -2170,7 +2162,7 @@ public class HeartbeatXML extends XML {
      * displayed.
      */
     public final String getColocationSection(final String param) {
-        return Tools.getString("HeartbeatXML.ColocationSectionParams");
+        return Tools.getString("CRMXML.ColocationSectionParams");
     }
 
     /**
