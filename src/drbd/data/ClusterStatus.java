@@ -39,12 +39,8 @@ import java.util.ArrayList;
  * @version $Id$
  */
 public class ClusterStatus {
-    /** Host. */
-    private final Host host;
     /** Data from cib query. */
     private volatile CibQuery cibQueryMap = new CibQuery();
-    /** DC Node. */
-    private String dc = null;
     /** CRMXML object. */
     private final CRMXML crmXML;
     /** On which node the resource is running or is a slave. */
@@ -56,7 +52,6 @@ public class ClusterStatus {
      */
     public ClusterStatus(final Host host,
                          final CRMXML crmXML) {
-        this.host = host;
         this.crmXML = crmXML;
         final String command =
                    host.getDistCommand("Heartbeat.getClusterMetadata",
@@ -417,7 +412,8 @@ public class ClusterStatus {
      * Returns id from heartbeat id and operation name.
      */
     public final String getOpId(final String hbId, final String op) {
-        Map<String, String> opIds = cibQueryMap.getResOpIds().get(hbId);
+        final Map<String, String> opIds =
+                                cibQueryMap.getResOpIds().get(hbId);
         if (opIds == null) {
             return null;
         }
@@ -496,7 +492,6 @@ public class ClusterStatus {
         String command    = null;
         List<String> data = null;
 
-        dc = null;
         boolean failed = false;
 
         /* remove all hashes */

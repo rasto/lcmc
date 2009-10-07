@@ -325,9 +325,14 @@ public final class CRM {
             xml.append(groupId);
             xml.append("\">");
         }
+        final String hbV = host.getHeartbeatVersion();
         if (cloneId != null) {
             if (master) {
-                xml.append("<master id=\"");
+                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    xml.append("<master_slave id=\"");
+                } else {
+                    xml.append("<master id=\"");
+                }
             } else {
                 xml.append("<clone id=\"");
             }
@@ -341,7 +346,11 @@ public final class CRM {
         }
         if (cloneId != null) {
             if (master) {
-                xml.append("</master>");
+                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    xml.append("</master_slave>");
+                } else {
+                    xml.append("</master>");
+                }
             } else {
                 xml.append("</clone>");
             }

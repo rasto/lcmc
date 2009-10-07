@@ -114,10 +114,10 @@ public class CRMXML extends XML {
     private final List<String> ordRequiredParams = new ArrayList<String>();
     /** Map from order parameter to its short description. */
     private final Map<String, String> paramOrdShortDescMap =
-                                                new HashMap<String, String>();
+                                             new HashMap<String, String>();
     /** Map from order parameter to its long description. */
     private final Map<String, String> paramOrdLongDescMap =
-                                                new HashMap<String, String>();
+                                             new HashMap<String, String>();
     /** Map from order parameter to its default value. */
     private final Map<String, String> paramOrdDefaultMap =
                                                 new HashMap<String, String>();
@@ -151,6 +151,11 @@ public class CRMXML extends XML {
      * service object.
      */
     private final MultiKeyMap serviceToResourceAgentMap = new MultiKeyMap();
+    /** Whether drbddisk ra is present. */
+    private boolean drbddiskPresent = false;
+    /** Whether linbit::drbd ra is present. */
+    private boolean linbitDrbdPresent = false;
+
     /** Boolean parameter type. */
     private static final String PARAM_TYPE_BOOLEAN = "boolean";
     /** Integer parameter type. */
@@ -181,11 +186,6 @@ public class CRMXML extends XML {
                                                           "promote",
                                                           "demote",
                                                           "stop"};
-    /** Whether drbddisk ra is present. */
-    private boolean drbddiskPresent = false;
-    /** Whether linbit::drbd ra is present. */
-    private boolean linbitDrbdPresent = false;
-
     /**
      * Prepares a new <code>CRMXML</code> object.
      */
@@ -194,13 +194,16 @@ public class CRMXML extends XML {
         this.host = host;
         String command = null;
         final String hbV = host.getHeartbeatVersion();
-        String[] booleanValues = getGlobalCheckBoxChoices();
-        String[] integerValues = getIntegerValues();
+        final String[] booleanValues = getGlobalCheckBoxChoices();
+        final String[] integerValues = getIntegerValues();
         final String hbBooleanTrue = booleanValues[0];
         final String hbBooleanFalse = booleanValues[1];
         hbClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
                                     "",
                                     "clone");
+        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            setMetaAttributes(hbClone, "target_role", "is_managed");
+        }
         /* clone-max */
         hbClone.addParameter("clone-max");
         hbClone.setParamIsMetaAttr("clone-max", true);
@@ -934,18 +937,11 @@ public class CRMXML extends XML {
     }
 
     /**
-     * Parses the parameters.
+     * Sets meta attributes for resource agent.
      */
-    private void parseParameters(final ResourceAgent ra,
-                                 final Node parametersNode) {
-        /* target-role */
-        final String hbV = host.getHeartbeatVersion();
-        String targetRoleParam = "target-role";
-        String isManagedParam = "is-managed";
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            targetRoleParam = "target_role";
-            isManagedParam = "is_managed";
-        }
+    private void setMetaAttributes(final ResourceAgent ra,
+                                   final String targetRoleParam,
+                                   final String isManagedParam) {
         ra.addParameter(targetRoleParam);
         // TODO: Master, Slave
         ra.setParamPossibleChoices(targetRoleParam,
@@ -971,6 +967,19 @@ public class CRMXML extends XML {
                                  Tools.getString("CRMXML.IsManaged.LongDesc"));
         ra.setParamDefault(isManagedParam, "true");
 
+    }
+
+    /**
+     * Parses the parameters.
+     */
+    private void parseParameters(final ResourceAgent ra,
+                                 final Node parametersNode) {
+        final String hbV = host.getHeartbeatVersion();
+        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            setMetaAttributes(ra, "target_role", "is_managed");
+        } else {
+            setMetaAttributes(ra, "target-role", "is-managed");
+        }
         final NodeList parameters = parametersNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); i++) {
             final Node parameterNode = parameters.item(i);
@@ -1070,8 +1079,8 @@ public class CRMXML extends XML {
             classToServicesMap.put(resourceClass, raList);
         }
         ResourceAgent ra;
-        if (serviceName.equals("drbddisk")
-            && resourceClass.equals("heartbeat")) {
+        if ("drbddisk".equals(serviceName)
+            && "heartbeat".equals(resourceClass)) {
             ra = hbDrbddisk;
         } else if ("drbd".equals(serviceName)
                    && "ocf".equals(resourceClass)
@@ -1306,7 +1315,7 @@ public class CRMXML extends XML {
             final String operationsId = getAttribute(operationsNode,
                                                      "id");
             operationsIdMap.put(hbId, operationsId);
-            Map<String, String> opIds = new HashMap<String, String>();
+            final Map<String, String> opIds = new HashMap<String, String>();
             resOpIdsMap.put(hbId, opIds);
             /* <op> */
             final NodeList ops = operationsNode.getChildNodes();
@@ -1580,7 +1589,8 @@ public class CRMXML extends XML {
         } else {
             nvpairs = cpsNode.getChildNodes();
         }
-        Map<String, String> crmConfMap = new HashMap<String, String>();
+        final Map<String, String> crmConfMap =
+                                            new HashMap<String, String>();
         /*              <nvpair...> */
         for (int i = 0; i < nvpairs.getLength(); i++) {
             final Node optionNode = nvpairs.item(i);
@@ -1647,7 +1657,8 @@ public class CRMXML extends XML {
             final Node primitiveGroupNode = primitivesGroups.item(i);
             final String nodeName = primitiveGroupNode.getNodeName();
             if ("primitive".equals(nodeName)) {
-                List<String> resList = groupsToResourcesMap.get("none");
+                final List<String> resList =
+                                        groupsToResourcesMap.get("none");
                 parsePrimitive(primitiveGroupNode,
                                resList,
                                resourceTypeMap,
@@ -1714,7 +1725,7 @@ public class CRMXML extends XML {
                                        resOpIdsMap);
                     }
                 }
-                if (resList.size() > 0) {
+                if (!resList.isEmpty()) {
                     cloneToResourceMap.put(cloneId, resList.get(0));
                     if ("master".equals(nodeName)
                         || "master_slave".equals(nodeName)) {
@@ -1842,7 +1853,7 @@ public class CRMXML extends XML {
         }
 
         /* <status> */
-        Set<String> activeNodes = new HashSet<String>();
+        final Set<String> activeNodes = new HashSet<String>();
         final Node statusNode = getChildNode(cibNode, "status");
         if (statusNode != null) {
             /* <node_state ...> */
@@ -1850,17 +1861,18 @@ public class CRMXML extends XML {
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node nodeStateNode = nodes.item(i);
                 if ("node_state".equals(nodeStateNode.getNodeName())) {
-                    final String id = getAttribute(nodeStateNode, "id");
                     final String uname = getAttribute(nodeStateNode, "uname");
-                    final String crmd = getAttribute(nodeStateNode, "crmd");
-                    final String shutdown =
-                                        getAttribute(nodeStateNode, "shutdown");
-                    final String inCcm = getAttribute(nodeStateNode, "in_ccm");
-                    /* active / dead */
                     final String ha = getAttribute(nodeStateNode, "ha");
-                    final String join = getAttribute(nodeStateNode, "join");
-                    final String expected =
-                                    getAttribute(nodeStateNode, "expected");
+                    //final String id = getAttribute(nodeStateNode, "id");
+                    //final String crmd = getAttribute(nodeStateNode, "crmd");
+                    //final String shutdown =
+                    //                 getAttribute(nodeStateNode, "shutdown");
+                    //final String inCcm =
+                    //                   getAttribute(nodeStateNode, "in_ccm");
+                    ///* active / dead */
+                    //final String join = getAttribute(nodeStateNode, "join");
+                    //final String expected =
+                    //                getAttribute(nodeStateNode, "expected");
                     /* TODO: check and use other stuff too. */
                     if ("active".equals(ha)) {
                         activeNodes.add(uname);

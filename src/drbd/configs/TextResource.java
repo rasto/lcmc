@@ -1098,6 +1098,23 @@ public class TextResource extends
         {"ClusterBrowser.confirmRemoveGroup.No",
          "Cancel"},
 
+        {"ClusterBrowser.confirmLinbitDrbd.Title",
+         "Create Linbit:DRBD Service"},
+
+        {"ClusterBrowser.confirmLinbitDrbd.Description",
+         "<b>This is not a good idea!</b><br>"
+         + " Your Heartbeat @VERSION@(!) is too old for Linbit:DRBD resource"
+         + " agent to work properly."
+         + " You should upgrade to the Pacemaker or use the <b>drbddisk</b>"
+         + " resouce agent.<br>"
+         + "<b>Are you sure?!<b>"},
+
+        {"ClusterBrowser.confirmLinbitDrbd.Yes",
+         "Yes (Don't click)"},
+
+        {"ClusterBrowser.confirmLinbitDrbd.No",
+         "Cancel"},
+
         {"ClusterBrowser.CreateDir.Title",
          "@DIR@ does not exist"},
 

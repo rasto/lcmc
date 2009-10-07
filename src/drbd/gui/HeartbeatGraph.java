@@ -747,7 +747,7 @@ public class HeartbeatGraph extends ResourceGraph {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (si.isFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
-        } else if (si.isStopped()) {
+        } else if (!si.isRunning()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
         } else if (getClusterBrowser().clStatusFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
@@ -984,7 +984,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
-        if (si.isRunning() && !getClusterBrowser().allHostsDown()) {
+        if (!si.isStopped() && !getClusterBrowser().allHostsDown()) {
             return SERVICE_RUNNING_ICON;
         }
         return SERVICE_NOT_RUNNING_ICON;

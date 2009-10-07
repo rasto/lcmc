@@ -52,6 +52,7 @@ import javax.swing.JList;
 import javax.swing.DefaultListModel;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -1499,11 +1500,20 @@ public final class Tools {
         final JList list = new JList(m);
         list.addMouseListener(new MouseAdapter() {
             public void mousePressed(final MouseEvent evt) {
-                final int index = list.locationToIndex(evt.getPoint());
-                list.setSelectedIndex(index);
-                menu.setPopupMenuVisible(false);
-                menu.setSelected(false);
-                ((MyMenuItem) m.elementAt(index)).action();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        final int index = list.locationToIndex(evt.getPoint());
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                list.setSelectedIndex(index);
+                                menu.setPopupMenuVisible(false);
+                                menu.setSelected(false);
+                            }
+                        });
+                        ((MyMenuItem) m.elementAt(index)).action();
+                    }
+                });
+                thread.start();
             }
         });
 

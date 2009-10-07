@@ -71,7 +71,7 @@ public class HostNewHost extends DialogHost {
     /**
      * Finishes the dialog, stores the values and adds the host tab.
      */
-    protected void finishDialog() {
+    protected final void finishDialog() {
         final String hostnameEntered = hostField.getStringValue().trim();
         getHost().setHostnameEntered(hostnameEntered);
         getHost().setUsername(usernameField.getStringValue().trim());
@@ -86,7 +86,7 @@ public class HostNewHost extends DialogHost {
     /**
      * Sets nextDialog to HostConfiguration.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return new HostConfiguration(this, getHost());
     }
 
@@ -94,7 +94,7 @@ public class HostNewHost extends DialogHost {
      * Checks host and username field and if both are not empty enables
      * next and finish buttons.
      */
-    protected void checkFields(final GuiComboBox field) {
+    protected final void checkFields(final GuiComboBox field) {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
         final String ps = sshPortField.getStringValue().trim();

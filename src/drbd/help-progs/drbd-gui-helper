@@ -697,7 +697,8 @@ sub get_resource_status {
 	my %started;
 	my %stopped;
 	my @sets;
-	for (`crm_mon -1 -f 2>/dev/null`) {
+	# 2.1.3 does not have -f option
+	for (`crm_mon -1 -f 2>/dev/null || crm_mon -1 2>/dev/null`) {
 		if ($in_rsc_list < 2) {
 			$in_rsc_list += /^============/;
 		} else {
@@ -770,7 +771,11 @@ sub get_resource_status {
 		}
 		if ($started{$set}) {
 			for (@{$started{$set}}) {
-				$info.= "    <started>$_</started>\n";
+				if ($clone_or_ms eq "Master/Slave") {
+					$info.= "    <slave>$_</slave>\n";
+				} else {
+					$info.= "    <started>$_</started>\n";
+				}
 			}
 		}
 		if ($stopped{$set}) {

@@ -2029,7 +2029,7 @@ public class Host implements Serializable {
         try {
             isLoadingGate.await();
         } catch (InterruptedException ignored) {
-            /* ignored */
+            Thread.currentThread().interrupt();
         }
     }
 

@@ -148,8 +148,8 @@ public class ConfirmDialog extends ConfigDialog {
      * Inits the dialog.
      */
     protected void initDialog() {
-        super.initDialog();
-        enableComponents();
+        //super.initDialog();
+        //enableComponents();
     }
 
     /**

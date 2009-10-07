@@ -72,7 +72,7 @@ public class ConfigData implements Serializable {
     private String lastHbPmInstalledMethod = null;
     /** Last installed drbd method. */
     private String lastDrbdInstalledMethod = null;
-    /** Whether drbd gui helper should be overwritten */
+    /** Whether drbd gui helper should be overwritten. */
     private boolean keepHelper = false;
     /** Name of the Heartbeat comm stack. */
     public static final String HEARTBEAT_NAME = "Heartbeat";

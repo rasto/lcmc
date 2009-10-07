@@ -270,7 +270,7 @@ public class Cluster {
      */
     public final List<Color> getHostColors(final List<String> nodes) {
         final List<Color> colors = new ArrayList<Color>();
-        if (nodes == null || nodes.size() == 0) {
+        if (nodes == null || nodes.isEmpty()) {
             colors.add(
                     Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped"));
             return colors;
@@ -282,7 +282,7 @@ public class Cluster {
                 }
             }
         }
-        if (colors.size() == 0) {
+        if (colors.isEmpty()) {
             colors.add(Color.WHITE);
         }
         // TODO: checking against name is wrong

@@ -92,7 +92,7 @@ public class CibQuery {
     private MultiKeyMap operations = new MultiKeyMap();
     /** Operations id map. */
     private Map<String, String> operationsId = new HashMap<String, String>();
-    /** <op> tag id map. */
+    /** "op" tag id map. */
     private Map<String, Map<String, String>> resOpIds =
                                     new HashMap<String, Map<String, String>>();
     /** List of active nodes. */
@@ -448,7 +448,7 @@ public class CibQuery {
     }
 
     /**
-     * Sets <op> tag id map.
+     * Sets "op" tag id map.
      */
     public final void setResOpIds(
                             final Map<String, Map<String, String>> resOpIds) {
@@ -456,7 +456,7 @@ public class CibQuery {
     }
 
     /**
-     * Returns <op> tag id map.
+     * Returns "op" tag id map.
      */
     public final Map<String, Map<String, String>> getResOpIds() {
         return resOpIds;
