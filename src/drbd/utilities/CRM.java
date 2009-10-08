@@ -409,7 +409,7 @@ public final class CRM {
         final StringBuffer xml = new StringBuffer(360);
         final String hbV = host.getHeartbeatVersion();
         String idPostfix = "-meta_attributes";
-        if (hbV != null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
+        if (hbV != null && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             idPostfix = "-meta-options";
         }
         xml.append("<meta_attributes id=\"");

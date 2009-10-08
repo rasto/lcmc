@@ -4543,6 +4543,9 @@ public class ClusterBrowser extends Browser {
          * Returns whether the resource has failed to start.
          */
         public boolean isFailed() {
+            if (isRunning()) {
+                return false;
+            }
             for (final Host host : getClusterHosts()) {
                 if (host.isClStatus() && failedOnHost(host.getName())) {
                     return true;
