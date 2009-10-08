@@ -614,12 +614,6 @@ public class Browser {
         }
 
         /**
-         * Is called when popup should be updated.
-         */
-        public void updatePopup() {
-        }
-
-        /**
          * Returns the popup widget. The createPopup must be defined with menu
          * items.
          */
@@ -674,7 +668,22 @@ public class Browser {
                         menu.add((JMenuItem) u);
                     }
                 }
+                menu.addItemListener(
+                    new ItemListener() {
+                        public void itemStateChanged(final ItemEvent e) {
+                            if (e.getStateChange() == ItemEvent.SELECTED) {
+                                final Thread thread = new Thread(
+                                    new Runnable() {
+                                        public void run() {
+                                            updateMenus(null);
+                                        }
+                                    });
+                                thread.start();
+                            }
+                        }
+                    });
             }
+            updateMenus(null);
             return menu;
         }
 

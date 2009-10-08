@@ -5360,8 +5360,14 @@ public class ClusterBrowser extends Browser {
             /* Actions */
             final JMenuBar mb = new JMenuBar();
             mb.setBackground(PANEL_BACKGROUND);
-            final JMenu serviceCombo = getActionsMenu();
-            updateMenus(null);
+            JMenu serviceCombo;
+            if (cloneInfo == null) {
+                serviceCombo = getActionsMenu();
+                updateMenus(null);
+            } else {
+                serviceCombo = cloneInfo.getActionsMenu();
+                cloneInfo.updateMenus(null);
+            }
             mb.add(serviceCombo);
             buttonPanel.add(mb, BorderLayout.EAST);
             String defaultValue = "Primitive";
