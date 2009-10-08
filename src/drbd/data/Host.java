@@ -1989,6 +1989,9 @@ public class Host implements Serializable {
      * Returns the heartbeat version.
      */
     public final String getHeartbeatVersion() {
+        if (heartbeatVersion == null && pacemakerVersion != null) {
+            return "3.0.0"; // TODO: for now
+        }
         return heartbeatVersion;
     }
 
