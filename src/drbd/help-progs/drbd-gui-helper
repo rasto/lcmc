@@ -690,7 +690,7 @@ sub get_cluster_events {
 sub get_resource_status {
 	my $in_rsc_list = 0;
 	my $info = "";
-	my $clone_or_ms;
+	my %clone_or_ms;
 	my $set;
 	my %masters;
 	my %slaves;
@@ -704,12 +704,11 @@ sub get_resource_status {
 		} else {
 			next if /^\t*$/;
 			if (/^\S/) {
-				$clone_or_ms = "";
 				$set = "";
 			}
 			if (m!^(Master/Slave|Clone) Set: (.*)!) {
-				$clone_or_ms = $1;
 				$set = $2;
+				$clone_or_ms{$set} = $1;
 				push @sets, $set;
 				next;
 			} elsif (/^Resource Group: (.*)/) {
@@ -771,7 +770,7 @@ sub get_resource_status {
 		}
 		if ($started{$set}) {
 			for (@{$started{$set}}) {
-				if ($clone_or_ms eq "Master/Slave") {
+				if ($clone_or_ms{$set} eq "Master/Slave") {
 					$info.= "    <slave>$_</slave>\n";
 				} else {
 					$info.= "    <started>$_</started>\n";
