@@ -407,11 +407,16 @@ public final class CRM {
                                            final String heartbeatId,
                                            final Map<String, String> attrs) {
         final StringBuffer xml = new StringBuffer(360);
+        final String hbV = host.getHeartbeatVersion();
+        String idPostfix = "-meta_attributes";
+        if (hbV != null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
+            idPostfix = "-meta-options";
+        }
         xml.append("<meta_attributes id=\"");
         xml.append(heartbeatId);
-        xml.append("-meta_attributes\">");
+        xml.append(idPostfix);
+        xml.append("\">");
 
-        final String hbV = host.getHeartbeatVersion();
         if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* 2.1.4 */
             xml.append("<attributes>");
@@ -419,7 +424,8 @@ public final class CRM {
         for (final String attr : attrs.keySet()) {
             xml.append("<nvpair id=\"");
             xml.append(heartbeatId);
-            xml.append("-meta_attributes-");
+            xml.append(idPostfix);
+            xml.append("-");
             xml.append(attr);
             xml.append("\" name=\"");
             xml.append(attr);
