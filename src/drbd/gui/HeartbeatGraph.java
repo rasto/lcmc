@@ -707,11 +707,19 @@ public class HeartbeatGraph extends ResourceGraph {
 
 
         if (edgeIsOrder && edgeIsColocation) {
-            state = "colocated & ordered";
+            if (edgeToHbconnectionMap.get(edge).isColScoreNegative()) {
+                state = "repelled & ordered";
+            } else {
+                state = "colocated & ordered";
+            }
         } else if (edgeIsOrder) {
             state = "ordered";
         } else if (edgeIsColocation) {
-            state = "colocated";
+            if (edgeToHbconnectionMap.get(edge).isColScoreNegative()) {
+                state = "repelled";
+            } else {
+                state = "colocated";
+            }
         }
 
         s.append(siP.toString());
@@ -725,7 +733,11 @@ public class HeartbeatGraph extends ResourceGraph {
             s.append(" are located");
         }
         if (edgeIsColocation) {
-            s.append(" on the same host");
+            if (edgeToHbconnectionMap.get(edge).isColScoreNegative()) {
+                s.append(" not on the same host");
+            } else {
+                s.append(" on the same host");
+            } 
         } else {
             s.append(" not necessarily on the same host");
         }
@@ -784,11 +796,20 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo s2 = (ServiceInfo) getInfo((Vertex) p.getFirst());
         String ret;
         if (edgeIsOrder && edgeIsColocation) {
-            ret = Tools.getString("HeartbeatGraph.ColOrd");
+            // TODO: no colocation & order
+            if (edgeToHbconnectionMap.get((Edge) e).isColScoreNegative()) {
+                ret = Tools.getString("HeartbeatGraph.NoColOrd");
+            } else {
+                ret = Tools.getString("HeartbeatGraph.ColOrd");
+            }
         } else if (edgeIsOrder) {
             ret = Tools.getString("HeartbeatGraph.Order");
         } else if (edgeIsColocation) {
-            ret = Tools.getString("HeartbeatGraph.Colocation");
+            if (edgeToHbconnectionMap.get((Edge) e).isColScoreNegative()) {
+                ret = Tools.getString("HeartbeatGraph.NoColocation");
+            } else {
+                ret = Tools.getString("HeartbeatGraph.Colocation");
+            }
         } else if (s1.getService().isNew() || s2.getService().isNew()) {
             ret = Tools.getString("HeartbeatGraph.Unconfigured");
         } else {

@@ -1567,6 +1567,9 @@ public class TextResource extends
         {"HeartbeatGraph.Colocation",
          "colocated"},
 
+        {"HeartbeatGraph.NoColocation",
+         "repelled"},
+
         {"HeartbeatGraph.Order",
          "ordered"},
 

@@ -8961,6 +8961,24 @@ public class ClusterBrowser extends Browser {
         public final String getRsc2() {
             return serviceInfoRsc.toString();
         }
+
+        /**
+         * Returns the score of this colocation.
+         */
+        public final int getScore() {
+            final String rsc = serviceInfoRsc.getService().getHeartbeatId();
+            final String withRsc =
+                              serviceInfoWithRsc.getService().getHeartbeatId();
+            final String score = clusterStatus.getColocationScore(rsc, withRsc);
+            if (score == null) {
+                return 0;
+            } else if ("INFINITY".equals(score)) {
+                return 1000000;
+            } else if ("-INFINITY".equals(score)) {
+                return -1000000;
+            }
+            return Integer.parseInt(score);
+        }
     }
 
     /**
@@ -9508,6 +9526,17 @@ public class ClusterBrowser extends Browser {
             ci.applyButton = applyButton;
             ci.setParameters();
             constraints.add(ci);
+        }
+
+        /**
+         * Returns whether the colocation score is negative.
+         */
+        public final boolean isColScoreNegative() {
+            int score = 0;
+            for (final String colId : colocationIds.keySet()) {
+                score += colocationIds.get(colId).getScore();
+            }
+            return score < 0;
         }
     }
 
