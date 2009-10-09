@@ -44,7 +44,20 @@ public class DistResource_fedora_11 extends
         {"DrbdInst.install",
          "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        // TODO: Fedora_11 does not exist yet, it's just an assumption
+        /* Corosync/Openais/Pacemaker */
+        {"PmInst.install.text.1",
+         "http://download.opensuse.org" },
+
+        {"PmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_11/server:ha-clustering.repo && "
+         + "(/usr/sbin/groupadd haclient 2>/dev/null && "
+         + "/usr/sbin/useradd -g haclient hacluster 2>/dev/null;"
+         + "yum -y install pacemaker"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
+         + " if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"},
         {"HbPmInst.install.text.1",
          "http://download.opensuse.org" },
 
@@ -64,6 +77,7 @@ public class DistResource_fedora_11 extends
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
          + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         //TODO: fedora11 has the it?
          /* it installs eather kernel-devel- or kernel-PAE-devel-, etc. */
          /* the fedora 10 does not keep old devel packages so for old kernels
           * the kernel-devel pacakge will be downloaded from rpmfind.net.
