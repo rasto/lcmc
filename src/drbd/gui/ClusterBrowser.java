@@ -5869,6 +5869,9 @@ public class ClusterBrowser extends Browser {
                         clusterStatus.getParametersNvpairsIds(heartbeatId),
                         getOperations(heartbeatId),
                         clusterStatus.getOperationsId(heartbeatId));
+                if (isFailed()) {
+                    cleanupResource();
+                }
             }
 
             if (groupInfo == null) { // TODO: what to do with res grp locations?

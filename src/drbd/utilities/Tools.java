@@ -488,6 +488,7 @@ public final class Tools {
     public static void appWarning(final String msg) {
         if (appWarning) {
             System.out.println("APPWARNING: " + msg);
+            printStackTrace();
         } else {
             debug("APPWARNING: " + msg, 2);
         }
