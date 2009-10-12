@@ -108,7 +108,7 @@ public final class Heartbeat {
      * Adds heartbeat to the rc.
      */
     public static void addHeartbeatToRc(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.addHeartbeatToRc",
+        final String command = host.getDistCommand("Heartbeat.addToRc",
                                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }

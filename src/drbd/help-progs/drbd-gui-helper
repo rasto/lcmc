@@ -447,10 +447,11 @@ sub get_installation_info {
 sub get_version_info {
 	my $cmd = 
 	  'uname; uname -m; uname -r; '
-	 .'for d in redhat debian gentoo SuSE; do '
+	 .'for d in redhat debian gentoo SuSE distro; do '
 	   .'v=`head -1 -q /etc/"$d"_version /etc/"$d"-release 2>/dev/null`; '
 	   .'if [ ! -z "$v" ]; then echo "$v"; echo "$d"; fi; '
-	 .'done; '
+	 .'done '
+	 .'| sed "s/distro/openfiler/";'
 	 .'lsb_release -i -r 2>/dev/null '
 	 .'| sed "s/CentOS/redhat/"|sed "s/SUSE LINUX/suse/" '
 	 .'| perl -lne "print lc((split /:\s*/)[1])"';

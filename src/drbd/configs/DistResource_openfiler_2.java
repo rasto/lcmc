@@ -24,9 +24,9 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for ubuntu jaunty
+ * Here are commands for openfiler NSA 2
  */
-public class DistResource_ubuntu_JAUNTY extends
+public class DistResource_openfiler_2 extends
             java.util.ListResourceBundle {
 
     /** Get contents. */
@@ -36,7 +36,6 @@ public class DistResource_ubuntu_JAUNTY extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "ubuntu-JAUNTY"},
-        {"distributiondir",    "ubuntu-jaunty-server"},
+        {"Support",            "openfiler-2"},
     };
 }

@@ -59,12 +59,13 @@ public class DistResource extends
 
         {"kerneldir",                 "(.*)"},
 
-        {"WhichDist",
-         "uname; uname -m; uname -r;\n"
-           + "for d in [ redhat debian gentoo SuSE ]; do \n"
-           + "v=`head -1 -q /etc/\"$d\"_version /etc/\"$d\"-release 2>/dev/null`; \n"
-           + "if [ ! -z \"$v\" ]; then echo \"$v\"; echo \"$d\"; fi; \n"
-           + "done; lsb_release -i -r 2>/dev/null|sed 's/CentOS/redhat/'|sed 's/SUSE LINUX/suse/'|perl -lne 'print lc((split /:\\s*/)[1])' "},
+        //{"WhichDist",
+        // "uname; uname -m; uname -r;\n"
+        //   + "for d in [ redhat debian gentoo SuSE ]; do \n"
+        //   + "v=`head -1 -q /etc/\"$d\"_version /etc/\"$d\"-release 2>/dev/null`; \n"
+        //   + "if [ ! -z \"$v\" ]; then echo \"$v\"; echo \"$d\"; fi; \n"
+        //   + "done; lsb_release -i -r 2>/dev/null|sed 's/CentOS/redhat/'|sed 's/SUSE LINUX/suse/'|perl -lne 'print lc((split /:\\s*/)[1])' "},
+
         /* DrbdCheck.version has exit code != 0 if nothing is installed */
         {"DrbdCheck.version",
          "echo|drbdadm help | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
