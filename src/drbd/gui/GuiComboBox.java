@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.PatternDocument;
 import drbd.gui.Browser.Info;
+import drbd.gui.Browser.StringInfo;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -393,7 +394,12 @@ public class GuiComboBox extends JPanel {
                 if (items[i] == null) {
                     items[i] = GuiComboBox.NOTHING_SELECTED;
                 }
-                if (items[i].toString().equals(selectedValue)
+                if (items[i] instanceof StringInfo
+                    && ((StringInfo) items[i]).getStringValue() != null
+                    && ((StringInfo) items[i]).getStringValue().equals(
+                                                             selectedValue)) {
+                    selectedValueInfo = items[i];
+                } else if (items[i].toString().equals(selectedValue)
                     || items[i].equals(selectedValue)) {
                     selectedValueInfo = items[i];
                 }

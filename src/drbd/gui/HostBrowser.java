@@ -1522,7 +1522,7 @@ public class HostBrowser extends Browser {
                                             "HostBrowser.MetaDisk.Internal"),
                                        "internal");
                 final String defaultMetaDiskString =
-                                            internalMetaDisk.getStringValue();
+                                            internalMetaDisk.toString();
 
                 try {
                     mBlockDevInfosLock.acquire();
@@ -1543,6 +1543,10 @@ public class HostBrowser extends Browser {
 
                 String defaultMetaDiskIndex = getBlockDevice().getValue(
                                                            DRBD_MD_INDEX_PARAM);
+                if ("internal".equals(defaultMetaDiskIndex)) {
+                    defaultMetaDiskIndex =
+                             Tools.getString("HostBrowser.MetaDisk.Internal");
+                }
 
                 String[] indeces = new String[11];
                 int index = 0;

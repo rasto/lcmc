@@ -1212,7 +1212,7 @@ public class ClusterBrowser extends Browser {
                                             "DrbdMetaDiskIndex",
                                             drbdXML.getMetaDiskIndex(hostName,
                                                                      resName));
-                if (drbdMetaDisk != null && !drbdMetaDisk.equals("internal")) {
+                if (!"internal".equals(drbdMetaDisk)) {
                     final BlockDevInfo mdI =
                                       drbdGraph.findBlockDevInfo(hostName,
                                                                  drbdMetaDisk);
@@ -1928,6 +1928,11 @@ public class ClusterBrowser extends Browser {
          */
         protected final boolean checkParam(final String param,
                                            final String newValue) {
+            if (DRBD_RES_PARAM_AFTER.equals(param)) {
+                /* drbdsetup xml syncer says it should be numeric and it is
+                 * wrong. drbd 8.3.4 */
+                return true;
+            }
             return drbdXML.checkParam(param, newValue);
         }
 
@@ -2115,7 +2120,7 @@ public class ClusterBrowser extends Browser {
                                         Tools.getString("ClusterBrowser.None"),
                                         "-1");
                 l.add(di);
-                if (defaultItem == null) {
+                if (defaultItem == null || "-1".equals(defaultItem)) {
                     defaultItem = Tools.getString("ClusterBrowser.None");
                 }
 
@@ -2431,10 +2436,10 @@ public class ClusterBrowser extends Browser {
 
         /**
          * Returns the device name that is used as the string value of the drbd
-         * resource in Filesystem hb service.
+         * resource in after option in drbd.conf.
          */
         public final String getStringValue() {
-            return getDevice();
+            return getName();
         }
 
         /**
@@ -3196,8 +3201,12 @@ public class ClusterBrowser extends Browser {
                                                final int width) {
             GuiComboBox paramCb;
             if (DRBD_RES_PARAM_DEV.equals(param)) {
-                final String selectedValue =
-                                    getResource().getValue(DRBD_RES_PARAM_DEV);
+                final DrbdResourceInfo selectedInfo = drbdDevHash.get(
+                        getResource().getValue(DRBD_RES_PARAM_DEV));
+                String selectedValue = null;
+                if (selectedInfo != null) {
+                    selectedValue = selectedInfo.toString();
+                }
                 Info defaultValue = null;
                 if (selectedValue == null) {
                     defaultValue = new StringInfo(
@@ -3227,7 +3236,7 @@ public class ClusterBrowser extends Browser {
                                             return;
                                         }
                                         final String selectedValue =
-                                                    getResource().getValue("fstype");
+                                              getResource().getValue("fstype");
                                         String createdFs;
                                         if (selectedValue != null) {
                                             createdFs = selectedValue;
