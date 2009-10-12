@@ -190,6 +190,10 @@ public class ClusterAisConfig extends DialogCluster {
                                 if (configOk) {
                                     hideRetryButton();
                                     nextButtonSetEnabled(true);
+                                    if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                                        Tools.sleep(1000);
+                                        pressNextButton();
+                                    }
                                 }
                             }
                         }
@@ -238,6 +242,10 @@ public class ClusterAisConfig extends DialogCluster {
                     enableComponents();
                     if (configOk) {
                         nextButtonSetEnabled(true);
+                        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                            Tools.sleep(1000);
+                            pressNextButton();
+                        }
                     }
                 }
             });
@@ -365,6 +373,10 @@ public class ClusterAisConfig extends DialogCluster {
                 }
             });
             retry();
+            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                Tools.sleep(1000);
+                addButton.pressButton();
+            }
         } else {
             noConfigs = false;
             int j;
@@ -610,6 +622,11 @@ public class ClusterAisConfig extends DialogCluster {
                 configPanel.repaint();
                 if (configChanged) {
                     makeConfigButton.setEnabled(!aisCastAddresses.isEmpty());
+                    if (!Tools.getConfigData().getAutoClusters().isEmpty()
+                        && !aisCastAddresses.isEmpty()) {
+                        Tools.sleep(1000);
+                        makeConfigButton.pressButton();
+                    }
                 }
             }
         });

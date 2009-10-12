@@ -65,6 +65,10 @@ public class HostDrbdCommandInst extends DialogHost {
                     Tools.getString("Dialog.HostDrbdCommandInst.InstOk"));
         enableComponents();
         buttonClass(nextButton()).requestFocus();
+        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

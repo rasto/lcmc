@@ -1149,6 +1149,10 @@ public class SSH {
                                          authentification */
                 while (!cancelIt) {
                     if (lastPassword == null) {
+                        lastPassword =
+                                Tools.getConfigData().getAutoOptionHost("pw");
+                    }
+                    if (lastPassword == null) {
                         if (enablePublicKey
                             && conn.isAuthMethodAvailable(username,
                                                           "publickey")) {

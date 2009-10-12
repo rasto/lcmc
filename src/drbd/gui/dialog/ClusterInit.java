@@ -536,6 +536,10 @@ public class ClusterInit extends DialogCluster {
                 nextButtonSetEnabled(true);
             }
             enableComponents();
+            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                Tools.sleep(1000);
+                pressNextButton();
+            }
         }
     }
 

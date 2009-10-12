@@ -65,6 +65,10 @@ public class HostPmInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.HostPmInst.InstOk"));
         enableComponents();
         buttonClass(nextButton()).requestFocus();
+        if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

@@ -65,6 +65,10 @@ public class HostHbInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.HostHbInst.InstOk"));
         enableComponents();
         buttonClass(nextButton()).requestFocus();
+        if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

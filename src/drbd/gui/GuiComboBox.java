@@ -773,6 +773,33 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
+     * Sets selected index.
+     */
+    public final void setSelectedIndex(final int index) {
+        switch(type) {
+            case TEXTFIELD:
+                break;
+            case PASSWDFIELD:
+                break;
+            case COMBOBOX:
+                final JComboBox cb = (JComboBox) component;
+                cb.setSelectedIndex(index);
+                break;
+
+            case RADIOGROUP:
+                break;
+
+            case CHECKBOX:
+                break;
+
+            case TEXTFIELDWITHUNIT:
+                break;
+            default:
+                Tools.appError("impossible type");
+        }
+    }
+
+    /**
      * Returns document object of the component.
      */
     public final Document getDocument() {

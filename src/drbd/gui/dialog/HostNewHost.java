@@ -199,8 +199,18 @@ public class HostNewHost extends DialogHost {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 hostField.requestFocus();
+
             }
         });
+        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    hostField.setValue(
+                                Tools.getConfigData().getAutoHosts().get(0));
+                }
+            });
+            pressNextButton();
+        }
     }
 
     /**

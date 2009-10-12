@@ -148,6 +148,10 @@ public class ClusterHosts extends DialogCluster {
                 buttonClass(nextButton()).setEnabled(enableButton);
             }
         });
+        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

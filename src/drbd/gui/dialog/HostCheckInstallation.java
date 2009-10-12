@@ -418,6 +418,12 @@ public class HostCheckInstallation extends DialogHost {
                                         "Dialog.HostCheckInstallation.AllOk"));
                 }
             });
+            if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null
+                || Tools.getConfigData().getAutoOptionHost("hbinst") != null
+                || Tools.getConfigData().getAutoOptionHost("pminst") != null) {
+                Tools.sleep(1000);
+                pressNextButton();
+            }
         } else {
             progressBarDoneError();
             Tools.debug(this, "drbd: " + drbdOk
@@ -425,6 +431,31 @@ public class HostCheckInstallation extends DialogHost {
                               + ", hb/pm: " + hbPmOk);
             printErrorAndRetry(Tools.getString(
                                 "Dialog.HostCheckInstallation.SomeFailed"));
+        }
+        if (!drbdOk
+            && Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    Tools.sleep(1000);
+                    drbdButton.pressButton();
+                }
+            });
+        } else if (!hbPmOk
+            && Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    Tools.sleep(1000);
+                    hbPmButton.pressButton();
+                }
+            });
+        } else if (!pmOk
+            && Tools.getConfigData().getAutoOptionHost("pminst") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    Tools.sleep(1000);
+                    pmButton.pressButton();
+                }
+            });
         }
     }
 
@@ -584,6 +615,16 @@ public class HostCheckInstallation extends DialogHost {
                    null,
                    0,
                    null);
+        if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    pmInstMethodCB.setSelectedIndex(
+                        Integer.parseInt(
+                            Tools.getConfigData().getAutoOptionHost(
+                                                                "pminst")));
+                }
+            });
+        }
         pmInstMethodCB.addListeners(
             new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -638,6 +679,16 @@ public class HostCheckInstallation extends DialogHost {
                    null,
                    0,
                    null);
+        if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    hbPmInstMethodCB.setSelectedIndex(
+                        Integer.parseInt(
+                            Tools.getConfigData().getAutoOptionHost(
+                                                                "hbinst")));
+                }
+            });
+        }
         hbPmInstMethodCB.addListeners(
             new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -692,7 +743,6 @@ public class HostCheckInstallation extends DialogHost {
         }
         if (i > 1) {
             drbdInstallMethodsAvailable = true;
-
             drbdInstMethodCB = new GuiComboBox(
                        drbdDefaultValue,
                        (Object[]) drbdMethods.toArray(
@@ -734,6 +784,16 @@ public class HostCheckInstallation extends DialogHost {
                                                0,
                                                null);
             drbdInstMethodCB.setEnabled(false);
+        }
+        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    drbdInstMethodCB.setSelectedIndex(
+                        Integer.parseInt(
+                            Tools.getConfigData().getAutoOptionHost(
+                                                                "drbdinst")));
+                }
+            });
         }
         final String lastInstalled =
                           Tools.getConfigData().getLastInstalledClusterStack();

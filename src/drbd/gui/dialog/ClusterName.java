@@ -118,6 +118,15 @@ public class ClusterName extends DialogCluster {
                 nameField.requestFocus();
             }
         });
+        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            final String name = Tools.getConfigData().getAutoClusters().get(0);
+            if (!".".equals(name)) {
+                Tools.sleep(1000);
+                nameField.setValue(name);
+            }
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

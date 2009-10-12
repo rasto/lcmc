@@ -1564,4 +1564,56 @@ public final class Tools {
             return null;
         }
     }
+
+    /**
+     * Parses arguments from --auto command line option, it makes some
+     * automatical gui actions, that help to test the gui and can find some
+     * other uses later.
+     * To find out which options are available, you'd have to grep for
+     * getAutoOptionHost and getAutoOptionCluster
+     */
+    public static void parseAutoArgs(final String line) {
+        final String[] args = line.split(",");
+        String host = null;
+        String cluster = null;
+        for (final String arg : args) {
+            final String[] pair = arg.split(":");
+            if (pair == null || pair.length != 2) {
+                appWarning("cannot parse: " + line);
+                return;
+            }
+            final String option = pair[0];
+            final String value = pair[1];
+            if ("host".equals(option)) {
+                cluster = null;
+                host = value;
+                Tools.getConfigData().addAutoHost(host);
+                continue;
+            } else if ("cluster".equals(option)) {
+                host = null;
+                cluster = value;
+                Tools.getConfigData().addAutoCluster(cluster);
+                continue;
+            }
+            if (host != null) {
+                Tools.getConfigData().addAutoOption(host, option, value);
+            } else if (cluster != null) {
+                Tools.getConfigData().addAutoOption(cluster, option, value);
+            } else {
+                appWarning("cannot parse: " + line);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Convenience sleep wrapper.
+     */
+    public static void sleep(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }

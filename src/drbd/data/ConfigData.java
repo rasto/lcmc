@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.io.File;
 import drbd.utilities.Tools;
 import com.trilead.ssh2.KnownHosts;
+import org.apache.commons.collections.map.MultiKeyMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * ConfigData
@@ -74,6 +77,12 @@ public class ConfigData implements Serializable {
     private String lastDrbdInstalledMethod = null;
     /** Whether drbd gui helper should be overwritten. */
     private boolean keepHelper = false;
+    /** Hosts that have auto options. */
+    private final List<String> autoHosts = new ArrayList<String>();
+    /** Clusters that have auto options. */
+    private final List<String> autoClusters = new ArrayList<String>();
+    /** Auto options, that make automatic actions in the gui. */
+    private final MultiKeyMap autoOptions = new MultiKeyMap();
     /** Name of the Heartbeat comm stack. */
     public static final String HEARTBEAT_NAME = "Heartbeat";
     /** Name of the Corosync/Openais comm stack. */
@@ -84,6 +93,7 @@ public class ConfigData implements Serializable {
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     /** Name of the group pacemaker object. */
     public static final String PM_GROUP_NAME = "Group";
+    
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -347,5 +357,88 @@ public class ConfigData implements Serializable {
       */
       public final boolean getKeepHelper() {
           return keepHelper;
+      }
+
+      /**
+       * Adds auto option that starts automatic actions in the gui.
+       */
+      public final void addAutoOption(final String hostOrCluster,
+                                      final String option,
+                                      final String value) {
+          autoOptions.put(hostOrCluster, option, value);
+      }
+
+      /**
+       * Adds host on which automatic actions will be performed.
+       */
+      public final void addAutoHost(final String host) {
+          autoHosts.add(host);
+      }
+
+      /**
+       * Returns hosts on which automatic actions will be performed.
+       */
+      public final List<String> getAutoHosts() {
+          return autoHosts;
+      }
+
+      /**
+       * Removes host after it is done.
+       */
+      public final void removeAutoHost() {
+          if (!autoHosts.isEmpty()) {
+              autoHosts.remove(0);
+          }
+      }
+
+      /**
+       * Adds cluster on which automatic actions will be performed.
+       */
+      public final void addAutoCluster(final String cluster) {
+          autoClusters.add(cluster);
+      }
+
+      /**
+       * Returns clusters on which automatic actions will be performed.
+       */
+      public final List<String> getAutoClusters() {
+          return autoClusters;
+      }
+
+      /**
+       * Removes cluster after it is done.
+       */
+      public final void removeAutoCluster() {
+          if (!autoClusters.isEmpty()) {
+              autoClusters.remove(0);
+          }
+      }
+
+      /**
+       * Returns an auto option for gui testing.
+       */
+      public final String getAutoOption(final String hostOrCluster,
+                                        final String option) {
+          return (String) autoOptions.get(hostOrCluster, option);
+      }
+
+      /**
+       * Returns an auto option for the first host in the list.
+       */
+      public final String getAutoOptionHost(final String option) {
+          if (autoHosts.isEmpty()) {
+              return null;
+          }
+          return (String) autoOptions.get(autoHosts.get(0), option);
+      }
+
+      /**
+       * Returns an auto option for first cluster in the list.
+       */
+      public final String getAutoOptionCluster(final String option) {
+          if (autoClusters.isEmpty()) {
+              return null;
+          }
+          return (String) autoOptions.get(autoClusters.get(0), option);
       }
 }

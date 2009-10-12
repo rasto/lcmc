@@ -139,6 +139,10 @@ public class HostLinbitLogin extends DialogHost {
                 downloadUserField.requestFocus();
             }
         });
+        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

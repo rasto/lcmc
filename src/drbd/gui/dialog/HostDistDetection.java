@@ -65,6 +65,10 @@ public class HostDistDetection extends DialogHost {
                         + support + ")";
         answerPaneSetText(answerText);
         enableComponents();
+        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

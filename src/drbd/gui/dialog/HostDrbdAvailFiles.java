@@ -218,6 +218,10 @@ public class HostDrbdAvailFiles extends DialogHost {
             addListeners();
             listenersAdded = true;
         }
+        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**

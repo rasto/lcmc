@@ -170,6 +170,10 @@ public class ClusterCommStack extends DialogCluster {
                     requestFocusLater(buttonClass(nextButton()));
                 }
             });
+            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                Tools.sleep(1000);
+                pressNextButton();
+            }
         }
     }
 

@@ -111,6 +111,24 @@ public class HostFinish extends DialogHost {
                 }
             });
         }
+        Tools.getConfigData().removeAutoHost();
+        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+            Tools.sleep(1000);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    addAnotherHostButton.pressButton();
+                }
+            });
+        } else {
+            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                Tools.sleep(1000);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        confClusterButton.pressButton();
+                    }
+                });
+            }
+        }
     }
 
     /**

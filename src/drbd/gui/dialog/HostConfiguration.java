@@ -306,6 +306,10 @@ public class HostConfiguration extends DialogHost {
                                 nameField.requestFocus();
                             }
                         });
+                        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+                            Tools.sleep(1000);
+                            pressNextButton();
+                        }
                     }
                 });
             thread.start();
@@ -331,6 +335,10 @@ public class HostConfiguration extends DialogHost {
                     });
                     enableComponents();
                     hostnameOk = true;
+                    if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+                        Tools.sleep(1000);
+                        pressNextButton();
+                    }
                 }
             });
             thread.start();

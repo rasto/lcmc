@@ -23,6 +23,7 @@ package drbd.gui.dialog;
 
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
 import java.awt.Color;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -77,6 +78,11 @@ public class ClusterFinish extends DialogCluster {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
         enableComponents(new JComponent[]{buttonClass(nextButton())});
+        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            Tools.getConfigData().removeAutoCluster();
+            Tools.sleep(1000);
+            ((MyButton) buttonClass(finishButton())).pressButton();
+        }
     }
 
     /**

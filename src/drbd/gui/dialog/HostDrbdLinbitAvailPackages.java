@@ -346,6 +346,11 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
                     Tools.getString(
                         "Dialog.HostDrbdLinbitAvailPackages.AvailVersions")
                     + " " + Tools.join(", ", versions));
+            
+            if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+                Tools.sleep(1000);
+                pressNextButton();
+            }
         }
         addListeners();
     }

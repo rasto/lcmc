@@ -112,15 +112,21 @@ public class DrbdMC extends JPanel {
                                        (Exception) ex);
                     }
                 });
+            boolean auto = false;
             for (final String arg : args) {
-                if ("--keep-helper".equals(arg)) {
+                if (auto) {
+                    Tools.parseAutoArgs(arg);
+                } else if ("--keep-helper".equals(arg)) {
                     Tools.debug(null, "--keep-helper option specified");
                     Tools.getConfigData().setKeepHelper(true);
                 } else if ("--help".equals(arg)) {
                     System.out.println("--help print this help.");
                     System.out.println("--keep-helper do not overwrite "
                                        + "the drbd-gui-helper program.");
+                    System.out.println("--auto for testing");
                     System.exit(0);
+                } else if ("--auto".equals(arg)) {
+                    auto = true;
                 }
             }
             /* Schedule a job for the event-dispatching thread:

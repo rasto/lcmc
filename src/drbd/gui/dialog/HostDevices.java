@@ -67,6 +67,10 @@ public class HostDevices extends DialogHost {
             enableComponents();
             buttonClass(nextButton()).requestFocus();
         }
+        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+            Tools.sleep(1000);
+            pressNextButton();
+        }
     }
 
     /**
