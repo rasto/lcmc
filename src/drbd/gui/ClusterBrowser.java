@@ -206,6 +206,9 @@ public class ClusterBrowser extends Browser {
     private static final ImageIcon START_ICON = SERVICE_RUNNING_ICON;
     /** Stop service icon. */
     private static final ImageIcon STOP_ICON  = SERVICE_NOT_RUNNING_ICON;
+    /** Unmanaged subtext. */ 
+    private static final Subtext UNMANAGED_SUBTEXT =
+                                         new Subtext("(unmanaged)", Color.RED);
 
     /** Whether drbd status was canceled by user. */
     private boolean drbdStatusCanceled = true;
@@ -6902,6 +6905,16 @@ public class ClusterBrowser extends Browser {
                 heartbeatGraph.stopAnimation(this);
             }
             super.setUpdated(updated);
+        }
+
+        /**
+         * Returns text that appears in the corner of the graph.
+         */
+        protected Subtext getRightCornerTextForGraph() {
+            if (!isManaged()) {
+                return UNMANAGED_SUBTEXT;
+            }
+            return null;
         }
 
         /**

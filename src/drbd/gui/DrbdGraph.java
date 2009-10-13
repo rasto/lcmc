@@ -121,8 +121,6 @@ public class DrbdGraph extends ResourceGraph {
     /** Maximum length of the label in the vertex, after which the string will
      * be cut. */
     private static final int MAX_VERTEX_STRING_LENGTH = 18;
-    /** String length after the cut. */
-    private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
     /** Maximum length of the label in the edge, after which the string will
      * be cut. */
     private static final int MAX_EDGE_STRING_LENGTH = 10;
@@ -269,16 +267,20 @@ public class DrbdGraph extends ResourceGraph {
      * Returns an icon for vertex, depending on if it is host or block device,
      * if it is started or stopped and so on.
      */
-    protected final ImageIcon getIconForVertex(final ArchetypeVertex v) {
+    protected final List<ImageIcon> getIconsForVertex(final ArchetypeVertex v) {
+        final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         if (isVertexBlockDevice((Vertex) v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo((Vertex) v);
             if (bdi.getBlockDevice().isDiskless()) {
-                return NO_HARDDISC_ICON;
+                icons.add(NO_HARDDISC_ICON);
+                return icons;
             } else {
-                return HARDDISC_ICON;
+                icons.add(HARDDISC_ICON);
+                return icons;
             }
         } else {
-            return HOST_ICON;
+            icons.add(HOST_ICON);
+            return icons;
         }
     }
 
@@ -357,30 +359,31 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Small text that appears in the right corner.
      */
-    protected final String getRightCornerText(final Vertex v) {
+    protected final Subtext getRightCornerText(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null) {
-                if (bdi.getBlockDevice().isDrbdMetaDisk()) {
-                    return "meta-disk";
-                } else if (bdi.getBlockDevice().isSwap()) {
-                    return "swap";
-                } else if (bdi.getBlockDevice().getMountedOn() != null) {
-                    return "mounted";
-                } else if (bdi.getBlockDevice().isDrbd()) {
-                    String s = bdi.getBlockDevice().getName();
-                    if (s.length() > MAX_RIGHT_CORNER_STRING_LENGTH) {
-                        s = "..." + s.substring(
-                                      s.length()
-                                      - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
-                                      s.length());
-                    }
-                    return s;
-                }
+                //if (bdi.getBlockDevice().isDrbdMetaDisk()) {
+                //    return "meta-disk";
+                //} else if (bdi.getBlockDevice().isSwap()) {
+                //    return "swap";
+                //} else if (bdi.getBlockDevice().getMountedOn() != null) {
+                //    return "mounted";
+                //} else if (bdi.getBlockDevice().isDrbd()) {
+                //    String s = bdi.getBlockDevice().getName();
+                //    if (s.length() > MAX_RIGHT_CORNER_STRING_LENGTH) {
+                //        s = "..." + s.substring(
+                //                      s.length()
+                //                      - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
+                //                      s.length());
+                //    }
+                //    return s;
+                //}
+                return bdi.getRightCornerTextForDrbdGraph();
 
             }
         } else {
-            /* TODO: host */
+            return vertexToHostMap.get(v).getRightCornerTextForDrbdGraph();
         }
         return null;
     }

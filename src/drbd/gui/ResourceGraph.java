@@ -1082,7 +1082,8 @@ public abstract class ResourceGraph {
     /**
      * Returns an icon for vertex.
      */
-    protected abstract ImageIcon getIconForVertex(final ArchetypeVertex v);
+    protected abstract List<ImageIcon> getIconsForVertex(
+                                                      final ArchetypeVertex v);
 
     /**
      * This method draws in the host vertex.
@@ -1160,12 +1161,12 @@ public abstract class ResourceGraph {
             }
 
             /* right corner text */
-            final String rightCornerText = getRightCornerText(v);
+            final Subtext rightCornerText = getRightCornerText(v);
             TextLayout rightCornerTextLayout = null;
             if (rightCornerText != null && !rightCornerText.equals("")) {
                 rightCornerTextLayout = getVertexTextLayout(
                                g2d,
-                               rightCornerText,
+                               rightCornerText.getSubtext(),
                                0.8);
                 final int rightCornerTextWidth =
                         (int) rightCornerTextLayout.getBounds().getWidth();
@@ -1229,14 +1230,16 @@ public abstract class ResourceGraph {
             drawInside(v, g2d, x, y, shape);
 
             /* icon */
-            final ImageIcon icon = getIconForVertex(v);
-            if (icon != null) {
-                icon.setDescription("sdf");
-                g2d.drawImage(
-                      icon.getImage(),
-                      (int) (x + 4),
-                      (int) (y + height / 2 - icon.getIconHeight() / 2),
-                      null);
+            final List<ImageIcon> icons = getIconsForVertex(v);
+            if (icons != null) {
+                for (final ImageIcon icon : icons) {
+                    icon.setDescription("sdf");
+                    g2d.drawImage(
+                          icon.getImage(),
+                          (int) (x + 4),
+                          (int) (y + height / 2 - icon.getIconHeight() / 2),
+                          null);
+                }
             }
 
             /* texts are drawn from left down corner. */
@@ -1265,7 +1268,7 @@ public abstract class ResourceGraph {
                    x + shapeWidth
                      - rightCornerTextLayout.getBounds().getWidth() - 4,
                    y + 11,
-                   new Color(0, 0, 255),
+                   rightCornerText.getColor(),
                    255);
             }
             //shapeHeight = (int) height;
@@ -1335,7 +1338,7 @@ public abstract class ResourceGraph {
     /**
      * Small text that appears in the right corner.
      */
-    protected abstract String getRightCornerText(final Vertex v);
+    protected abstract Subtext getRightCornerText(final Vertex v);
 
     /**
      * Small text that appears down.

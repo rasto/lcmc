@@ -139,6 +139,23 @@ public class HostBrowser extends Browser {
     /** Color of the status backgrounds. */
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Offline subtext. */ 
+    private static final Subtext OFFLINE_SUBTEXT =
+                                         new Subtext("offline", Color.BLUE);
+    /** Online subtext. */ 
+    private static final Subtext ONLINE_SUBTEXT =
+                                          new Subtext("online", Color.BLUE);
+    /** Meta-disk subtext. */ 
+    private static final Subtext METADISK_SUBTEXT =
+                                          new Subtext("meta-disk", Color.BLUE);
+    /** Swap subtext. */ 
+    private static final Subtext SWAP_SUBTEXT =
+                                          new Subtext("swap", Color.BLUE);
+    /** Mounted subtext. */ 
+    private static final Subtext MOUNTED_SUBTEXT =
+                                          new Subtext("mounted", Color.BLUE);
+    /** String length after the cut. */
+    private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
     /** Block device infos lock. */
     private final Mutex mBlockDevInfosLock = new Mutex();
     /** Net Interface infos lock. */
@@ -1044,8 +1061,26 @@ public class HostBrowser extends Browser {
             }
             return null;
         }
-    }
 
+        /**
+         * Returns text that appears in the corner of the graph.
+         */
+        protected Subtext getRightCornerTextForGraph() {
+            if (getHost().isClStatus()) {
+                return ONLINE_SUBTEXT;
+            } else if (getHost().isConnected()) {
+                return OFFLINE_SUBTEXT;
+            }
+            return null;
+        }
+
+        /**
+         * Returns text that appears in the corner of the drbd graph.
+         */
+        protected Subtext getRightCornerTextForDrbdGraph() {
+            return null;
+        }
+    }
 
     /**
      * This class holds info data for a net interface.
@@ -2317,6 +2352,30 @@ public class HostBrowser extends Browser {
                 return getBlockDevice().getNodeState();
             }
             return null;
+        }
+
+        /**
+         * Returns text that appears in the corner of the drbd graph.
+         */
+        protected Subtext getRightCornerTextForDrbdGraph() {
+             if (getBlockDevice().isDrbdMetaDisk()) {
+                 return METADISK_SUBTEXT;
+             } else if (getBlockDevice().isSwap()) {
+                 return SWAP_SUBTEXT;
+             } else if (getBlockDevice().getMountedOn() != null) {
+                 return MOUNTED_SUBTEXT;
+             } else if (getBlockDevice().isDrbd()) {
+                 String s = getBlockDevice().getName();
+                 // TODO: cache that
+                 if (s.length() > MAX_RIGHT_CORNER_STRING_LENGTH) {
+                     s = "..." + s.substring(
+                                   s.length()
+                                   - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
+                                   s.length());
+                 }
+                 return new Subtext(s, Color.BLUE);
+             }
+             return null;
         }
     }
 }

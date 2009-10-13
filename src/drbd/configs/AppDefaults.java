@@ -227,6 +227,10 @@ public class AppDefaults extends
         {"ClusterBrowser.HostIcon", "Icons/tango/16x16/host_16x16.png"},
         {"HeartbeatGraph.ServiceRunningIcon",
                                 "Icons/tango/32x32/service_active_32x32.png"},
+        {"HeartbeatGraph.ServiceMigratedIcon",
+                                "Icons/tango/32x32/service_migrated_32x32.png"},
+        {"HeartbeatGraph.ServiceUnmanagedIcon",
+                               "Icons/tango/32x32/service_unmanaged_32x32.png"},
 
         {"HeartbeatGraph.ServiceNotRunningIcon",
                                         "Icons/tango/32x32/service_32x32.png"},

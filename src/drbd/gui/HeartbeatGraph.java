@@ -128,6 +128,14 @@ public class HeartbeatGraph extends ResourceGraph {
     private static final ImageIcon SERVICE_RUNNING_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
                                        "HeartbeatGraph.ServiceRunningIcon"));
+    /** Icon that indicates an unmanaged service. */
+    private static final ImageIcon SERVICE_UNMANAGED_ICON =
+                                     Tools.createImageIcon(Tools.getDefault(
+                                       "HeartbeatGraph.ServiceUnmanagedIcon"));
+    /** Icon that indicates a migrated service. */
+    private static final ImageIcon SERVICE_MIGRATED_ICON =
+                                     Tools.createImageIcon(Tools.getDefault(
+                                       "HeartbeatGraph.ServiceMigratedIcon"));
     /** Icon that indicates a not running service. */
     private static final ImageIcon SERVICE_NOT_RUNNING_ICON =
                                 Tools.createImageIcon(Tools.getDefault(
@@ -996,9 +1004,11 @@ public class HeartbeatGraph extends ResourceGraph {
     /**
      * Returns an icon for the vertex.
      */
-    protected final ImageIcon getIconForVertex(final ArchetypeVertex v) {
+    protected final List<ImageIcon> getIconsForVertex(final ArchetypeVertex v) {
+        final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         if (vertexToHostMap.containsKey(v)) {
-            return HOST_ICON;
+            icons.add(HOST_ICON);
+            return icons;
         }
 
         final ServiceInfo si = (ServiceInfo) getInfo((Vertex) v);
@@ -1006,9 +1016,17 @@ public class HeartbeatGraph extends ResourceGraph {
             return null;
         }
         if (!si.isStopped() && !getClusterBrowser().allHostsDown()) {
-            return SERVICE_RUNNING_ICON;
+            icons.add(SERVICE_RUNNING_ICON);
+        } else {
+            icons.add(SERVICE_NOT_RUNNING_ICON);
         }
-        return SERVICE_NOT_RUNNING_ICON;
+        if (!si.isManaged()) {
+            icons.add(SERVICE_UNMANAGED_ICON);
+        }
+        //if (si.isMigrated()) {
+        //    icons.add(SERVICE_MIGRATED_ICON);
+        //}
+        return icons;
     }
 
     /**
@@ -1241,19 +1259,20 @@ public class HeartbeatGraph extends ResourceGraph {
     /**
      * Small text that appears in the right corner.
      */
-    protected final String getRightCornerText(final Vertex v) {
+    protected final Subtext getRightCornerText(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
-            if (hi.getHost().isClStatus()) {
-                return "online";
-            } else if (hi.getHost().isConnected()) {
-                return "offline";
-            }
-            return null;
+            return hi.getRightCornerTextForGraph();
+            //if (hi.getHost().isClStatus()) {
+            //    return "online";
+            //} else if (hi.getHost().isConnected()) {
+            //    return "offline";
+            //}
+            //return null;
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
-        if (si != null && !si.isManaged()) {
-            return "(unmanaged)";
+        if (si != null) {
+            return si.getRightCornerTextForGraph();
         }
         return null;
     }
