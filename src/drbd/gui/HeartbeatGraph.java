@@ -1023,9 +1023,9 @@ public class HeartbeatGraph extends ResourceGraph {
         if (!si.isManaged()) {
             icons.add(SERVICE_UNMANAGED_ICON);
         }
-        //if (si.isMigrated()) {
-        //    icons.add(SERVICE_MIGRATED_ICON);
-        //}
+        if (si.getMigratedTo() != null) {
+            icons.add(SERVICE_MIGRATED_ICON);
+        }
         return icons;
     }
 

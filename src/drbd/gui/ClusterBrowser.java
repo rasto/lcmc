@@ -209,6 +209,9 @@ public class ClusterBrowser extends Browser {
     /** Unmanaged subtext. */ 
     private static final Subtext UNMANAGED_SUBTEXT =
                                          new Subtext("(unmanaged)", Color.RED);
+    /** Migrated subtext. */ 
+    private static final Subtext MIGRATED_SUBTEXT =
+                                         new Subtext("(migrated)", Color.RED);
 
     /** Whether drbd status was canceled by user. */
     private boolean drbdStatusCanceled = true;
@@ -4510,6 +4513,22 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns whether the service where was migrated or null.
+         */
+        public final Host getMigratedTo() {
+            for (Host host : getClusterHosts()) {
+                final HostInfo hi = host.getBrowser().getHostInfo();
+                String score = clusterStatus.getScore(
+                                            getService().getHeartbeatId(),
+                                            hi.getName());
+                if ("INFINITY".equals(score)) {
+                    return host;
+                }
+            }
+            return null;
+        }
+
+        /**
          * Returns whether the service is running.
          */
         public boolean isRunning() {
@@ -6913,6 +6932,8 @@ public class ClusterBrowser extends Browser {
         protected Subtext getRightCornerTextForGraph() {
             if (!isManaged()) {
                 return UNMANAGED_SUBTEXT;
+            } else if (getMigratedTo() != null) {
+                return MIGRATED_SUBTEXT;
             }
             return null;
         }
@@ -7005,6 +7026,7 @@ public class ClusterBrowser extends Browser {
             if (allHostsDown()) {
                 return Tools.getString("ClusterBrowser.Hb.NoInfoAvailable");
             }
+            final Host migratedTo = getMigratedTo();
             if (isStarted()) {
                 if (isRunning()) {
                     return null;
@@ -7019,6 +7041,12 @@ public class ClusterBrowser extends Browser {
                     return Tools.getString("ClusterBrowser.Hb.Stopping");
                 } else {
                     return null;
+                }
+            } else if (migratedTo != null) {
+                final List<String> runningOnNodes = getRunningOnNodes();
+                if (runningOnNodes != null
+                    && !runningOnNodes.contains(migratedTo)) {
+                    return Tools.getString("ClusterBrowser.Hb.Migrating");
                 }
             }
             return null;

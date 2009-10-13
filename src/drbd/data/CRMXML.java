@@ -1827,8 +1827,8 @@ public class CRMXML extends XML {
                     orderIdMap.put(rscFrom, rscTo, ordId);
                     orderFirstActionMap.put(rscFrom, rscTo, firstAction);
                     orderThenActionMap.put(rscFrom, rscTo, thenAction);
-                } else if (constraintNode.getNodeName().equals(
-                                                            "rsc_location")) {
+                } else if ("rsc_location".equals(
+                                              constraintNode.getNodeName())) {
                     final String locId = getAttribute(constraintNode, "id");
                     final String node  = getAttribute(constraintNode, "node");
                     final String rsc   = getAttribute(constraintNode, "rsc");
@@ -1845,9 +1845,42 @@ public class CRMXML extends XML {
                         hostScoreMap = new HashMap<String, String>();
                         locationMap.put(rsc, hostScoreMap);
                     }
-                    hostScoreMap.put(node, score);
-                    resHostToLocIdMap.put(rsc, node, locId);
+                    if (node != null) {
+                        resHostToLocIdMap.put(rsc, node, locId);
+                    }
+                    if (score != null) {
+                        hostScoreMap.put(node, score);
+                    }
                     locs.add(locId);
+                    final Node ruleNode = getChildNode(constraintNode,
+                                                       "rule");
+                    if (ruleNode != null) {
+                        final String score2 = getAttribute(ruleNode, "score");
+                        final String booleanOp = getAttribute(ruleNode,
+                                                              "boolean-op");
+                        // TODO: I know only "and", ignoring everything we
+                        // don't know.
+                        final Node expNode = getChildNode(ruleNode,
+                                                          "expression");
+                        if (expNode != null) {
+                            if ("expression".equals(expNode.getNodeName())) {
+                                final String attr =
+                                         getAttribute(expNode, "attribute");
+                                final String op =
+                                         getAttribute(expNode, "operation");
+                                final String type =
+                                         getAttribute(expNode, "type");
+                                final String node2 =
+                                         getAttribute(expNode, "value");
+                                if ("and".equals(booleanOp)
+                                    && "#uname".equals(attr)
+                                    && "string".equals(type)
+                                    && "eq".equals(op)) {
+                                    hostScoreMap.put(node2, score2);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

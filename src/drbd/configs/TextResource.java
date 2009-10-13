@@ -1343,6 +1343,9 @@ public class TextResource extends
         {"ClusterBrowser.Hb.Stopping",
          "stopping..."},
 
+        {"ClusterBrowser.Hb.Migrating",
+         "migrating..."},
+
         {"ClusterBrowser.HbUpdateResources",
          "updating heartbeat resources..."},
 
