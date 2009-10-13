@@ -28,12 +28,13 @@ import drbd.utilities.AllHostsUpdatable;
 import drbd.utilities.MyButton;
 
 import javax.swing.JTree;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.BoxLayout;
+import javax.swing.JEditorPane;
 
 import java.awt.FlowLayout;
 import java.awt.Color;
@@ -127,9 +128,13 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         helpPanel.add(sp);
         logoPanel.add(helpPanel, HELP_PANEL_STRING);
         /* add "I am new here" button */
-        final EmptyViewPanel thisPanel = this;
+        final JPanel smallButtonPanel = new JPanel();
+        smallButtonPanel.setBackground(STATUS_BACKGROUND);
+        smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel,
+                                   BoxLayout.Y_AXIS));
         final MyButton newButton = new MyButton("I am new here");
-        buttonPanel.add(newButton);
+        smallButtonPanel.add(newButton);
+        buttonPanel.add(smallButtonPanel);
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(
@@ -155,6 +160,9 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                 thread.start();
             }
         });
+        /* check for upgrade field. */
+        smallButtonPanel.add(
+            Tools.getGUIData().getClustersPanel().registerUpgradeTextField());
         /* add new host button */
         final MyButton addHostButton = new MyButton(
                                     Tools.getString("ClusterTab.AddNewHost"),

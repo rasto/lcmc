@@ -72,6 +72,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.InputStreamReader;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URI;
+
+
 /**
  * This class provides tools, that are not classified.
  *
@@ -1425,11 +1430,14 @@ public final class Tools {
         }
         final String[] v1a = version1.split("\\.");
         final String[] v2a = version2.split("\\.");
-        if (v1a.length != 3 || v2a.length != 3) {
+        if (v1a.length < 1 || v2a.length < 1) {
             return -100;
         }
         int i = 0;
         for (String v1 : v1a) {
+            if (i == v1a.length || i == v2a.length) {
+                break;
+            }
             final String v2 = v2a[i];
             final int v1i = Integer.parseInt(v1);
             final int v2i = Integer.parseInt(v2);
@@ -1615,6 +1623,53 @@ public final class Tools {
             Thread.sleep(ms);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Returns the latest version of this application.
+     */
+    public static String getLatestVersion() {
+        String version = null;
+        final Pattern vp = Pattern.compile(
+                                    ".*<a\\s+href=\"drbd-mc-(.*?)\\.tar\\..*");
+        try {
+            final String url = "http://oss.linbit.com/drbd-mc/?drbd-mc-check-"
+                               + getRelease();
+            final BufferedReader reader = new BufferedReader(
+                             new InputStreamReader(new URL(url).openStream()));
+            String line;
+            do {
+                line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                final Matcher m = vp.matcher(line);
+                if (m.matches()) {
+                    final String v = m.group(1);
+                    if (version == null || compareVersions(v, version) > 0) {
+                        version = v;
+                    }
+                }
+            } while (true);
+        } catch (MalformedURLException mue) {
+            return null;
+        } catch (IOException ioe) {
+            return version;
+        }
+        return version;
+    }
+
+    /**
+     * Opens default browser.
+     */
+    public static void openBrowswer(final String url) {
+        try {
+            java.awt.Desktop.getDesktop().browse(new URI(url)); 
+        } catch (java.io.IOException e) {
+            Tools.appError("wrong uri", e);
+        } catch (java.net.URISyntaxException e) {
+            Tools.appError("error opening browser", e);
         }
     }
 }

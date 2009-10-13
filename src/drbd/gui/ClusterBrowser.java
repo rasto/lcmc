@@ -267,7 +267,7 @@ public class ClusterBrowser extends Browser {
     /** Name of the group hearbeat service. */
     private static final String PM_GROUP_NAME =
                                         Tools.getConfigData().PM_GROUP_NAME;
-        
+
     /** Name of the clone service. */
     private static final String PM_CLONE_SET_NAME =
                                 Tools.getConfigData().PM_CLONE_SET_NAME;
@@ -3600,14 +3600,14 @@ public class ClusterBrowser extends Browser {
             final String heartbeatId = getService().getHeartbeatId();
             if (getService().isNew()) {
                 final String[] parents = heartbeatGraph.getParents(this);
-                final List<Map<String, String>> colAttrsList =        
+                final List<Map<String, String>> colAttrsList =
                                        new ArrayList<Map<String, String>>();
                 final List<Map<String, String>> ordAttrsList =
                                        new ArrayList<Map<String, String>>();
                 for (final String parentId : parents) {
                     final ServiceInfo parentInfo =
                                     heartbeatIdToServiceInfo.get(parentId);
-                    final Map<String, String> colAttrs =        
+                    final Map<String, String> colAttrs =
                                        new LinkedHashMap<String, String>();
                     final Map<String, String> ordAttrs =
                                        new LinkedHashMap<String, String>();
@@ -3991,7 +3991,7 @@ public class ClusterBrowser extends Browser {
                              if (!si.isManaged()) {
                                  unmanaged = " / unmanaged";
                              }
-                             texts.add(new Subtext("   " + si.toString() 
+                             texts.add(new Subtext("   " + si.toString()
                                                    + unmanaged,
                                                    sSubtext.getColor()));
                              boolean skip = true;
@@ -5249,7 +5249,7 @@ public class ClusterBrowser extends Browser {
                 } else {
                     servicesNode.remove(oldCI.getNode());
                     heartbeatGraph.exchangeObjectInTheVertex(cloneInfo, oldCI);
-                } 
+                }
                 cloneInfo.setCloneServicePanel(this);
                 infoPanel = null;
                 selectMyself();
@@ -5796,14 +5796,14 @@ public class ClusterBrowser extends Browser {
                     if (cloneInfo != null) {
                         hbId = cloneInfo.getService().getHeartbeatId();
                     }
-                    final List<Map<String, String>> colAttrsList =        
+                    final List<Map<String, String>> colAttrsList =
                                new ArrayList<Map<String, String>>();
                     final List<Map<String, String>> ordAttrsList =
                                new ArrayList<Map<String, String>>();
                     for (final String parentId : parents) {
                         final ServiceInfo parentInfo =
                                         heartbeatIdToServiceInfo.get(parentId);
-                        final Map<String, String> colAttrs =        
+                        final Map<String, String> colAttrs =
                                            new LinkedHashMap<String, String>();
                         final Map<String, String> ordAttrs =
                                            new LinkedHashMap<String, String>();
@@ -6687,7 +6687,7 @@ public class ClusterBrowser extends Browser {
                     public boolean predicate() {
                         return getService().isAvailable()
                                && isOneFailed();
-                    } 
+                    }
 
                     public boolean enablePredicate() {
                         return getService().isAvailable()
@@ -6772,7 +6772,7 @@ public class ClusterBrowser extends Browser {
             items.add(viewLogMenu);
             return items;
         }
-        
+
         /**
          * Adds migrate and unmigrate menu items.
          */
@@ -7929,7 +7929,7 @@ public class ClusterBrowser extends Browser {
                         if (siP != null && siP.getResourceAgent() != null) {
                             /* dangling orders and colocations */
                             if ((siP.getResourceAgent().isDrbddisk()
-                                 || siP.getResourceAgent().isLinbitDrbd()) 
+                                 || siP.getResourceAgent().isLinbitDrbd())
                                 && si.getName().equals("Filesystem")) {
                                 final List<String> colIds =
                                                     colocationMap.get(heartbeatIdP);
@@ -8481,7 +8481,7 @@ public class ClusterBrowser extends Browser {
         String getRsc1();
         String getRsc2();
     }
-    
+
     /**
      * Object that holds an order constraint information.
      */
@@ -8513,9 +8513,9 @@ public class ClusterBrowser extends Browser {
          * Sets the order's parameters.
          */
         public final void setParameters() {
-            final String rscParent = 
+            final String rscParent =
                             serviceInfoParent.getService().getHeartbeatId();
-            final String rscChild = 
+            final String rscChild =
                             serviceInfoChild.getService().getHeartbeatId();
             final String score = clusterStatus.getOrderScore(rscParent,
                                                                rscChild);
@@ -8790,7 +8790,7 @@ public class ClusterBrowser extends Browser {
                     if ("".equals(value)) {
                         value = null;
                     }
-                    final String oldValue = getResource().getValue(param); 
+                    final String oldValue = getResource().getValue(param);
                     if ((value == null && value != oldValue)
                         || (value != null && !value.equals(oldValue))) {
                         getResource().setValue(param, value);

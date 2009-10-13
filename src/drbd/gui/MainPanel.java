@@ -58,7 +58,6 @@ public class MainPanel extends JPanel {
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(1);
         Tools.getGUIData().setTerminalSplitPane(splitPane);
-
         add(splitPane, BorderLayout.CENTER);
     }
 }

@@ -95,6 +95,20 @@ public class TextResource extends
         {"MainPanel.HostsAlt",
          "Click here for hosts view"},
 
+        {"MainPanel.UpgradeCheck",
+         "checking for available upgrades..."},
+
+        {"MainPanel.UpgradeCheckFailed",
+         ""},
+
+        {"MainPanel.UpgradeAvailable",
+         "<font color=black>there&nbsp;is&nbsp;a&nbsp;new&nbsp;DRBD-MC&nbsp;@LATEST@&nbsp;"
+         + "available</font><br><a href=\"http://oss.linbit.com/drbd-mc/"
+         + "DMC-@LATEST@.jar?from-drbd-mc\">Get it here</a>!"},
+
+        {"MainPanel.NoUpgradeAvailable",
+         ""},
+
         /** Clusters panel */
         {"ClustersPanel.NewTabTip",
          "New Cluster"},
