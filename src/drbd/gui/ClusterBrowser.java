@@ -266,6 +266,8 @@ public class ClusterBrowser extends Browser {
     private static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
     /** Name of the drbd after parameter. */
     private static final String DRBD_RES_PARAM_AFTER    = "after";
+    /** Name of the device parameter in the file system. */
+    private static final String FS_RES_PARAM_DEV      = "device";
 
     /** Name of the empty parameter, that is used while passing the parameters
      * to the drbd-gui-helper script. */
@@ -3157,7 +3159,7 @@ public class ClusterBrowser extends Browser {
             if (!ret) {
                 return false;
             }
-            final GuiComboBox cb = paramComboBoxGet(DRBD_RES_PARAM_DEV, null);
+            final GuiComboBox cb = paramComboBoxGet(FS_RES_PARAM_DEV, null);
             if (cb == null || cb.getValue() == null) {
                 return false;
             }
@@ -3206,9 +3208,9 @@ public class ClusterBrowser extends Browser {
                                                final String prefix,
                                                final int width) {
             GuiComboBox paramCb;
-            if (DRBD_RES_PARAM_DEV.equals(param)) {
-                final DrbdResourceInfo selectedInfo = drbdDevHash.get(
-                        getResource().getValue(DRBD_RES_PARAM_DEV));
+            if (FS_RES_PARAM_DEV.equals(param)) {
+                final DrbdResourceInfo selectedInfo = drbdResHash.get(
+                        getResource().getValue(FS_RES_PARAM_DEV));
                 String selectedValue = null;
                 if (selectedInfo != null) {
                     selectedValue = selectedInfo.toString();
@@ -3317,9 +3319,9 @@ public class ClusterBrowser extends Browser {
 
             final StringBuffer s = new StringBuffer(getName());
             final DrbdResourceInfo dri =
-                drbdDevHash.get(getResource().getValue(DRBD_RES_PARAM_DEV));
+                drbdResHash.get(getResource().getValue(FS_RES_PARAM_DEV));
             if (dri == null) {
-                id = getResource().getValue(DRBD_RES_PARAM_DEV);
+                id = getResource().getValue(FS_RES_PARAM_DEV);
             } else {
                 id = dri.getName();
                 s.delete(0, s.length());
@@ -3340,9 +3342,9 @@ public class ClusterBrowser extends Browser {
          */
         public final ServiceInfo addResourceBefore() {
             final DrbdResourceInfo oldDri =
-                    drbdDevHash.get(getResource().getValue(DRBD_RES_PARAM_DEV));
+                    drbdResHash.get(getResource().getValue(FS_RES_PARAM_DEV));
             final DrbdResourceInfo newDri =
-                    drbdDevHash.get(getComboBoxValue(DRBD_RES_PARAM_DEV));
+                    drbdResHash.get(getComboBoxValue(FS_RES_PARAM_DEV));
             if (newDri == null || newDri.equals(oldDri)) {
                 return null;
             }
@@ -3365,7 +3367,8 @@ public class ClusterBrowser extends Browser {
                     setLinbitDrbdInfo(null);
                 }
             }
-
+            System.out.println("old drbd disk: "+oldDrbddisk);
+            System.out.println("drbddiskIsPreferred"+oldDrbddisk);
             if (newDri != null) {
                 newDri.setUsedByCRM(true);
                 if (oldDrbddisk) {
@@ -7026,9 +7029,17 @@ public class ClusterBrowser extends Browser {
             if (allHostsDown()) {
                 return Tools.getString("ClusterBrowser.Hb.NoInfoAvailable");
             }
-            final Host migratedTo = getMigratedTo();
             if (isStarted()) {
                 if (isRunning()) {
+                    final Host migratedTo = getMigratedTo();
+                    if (migratedTo != null) {
+                        final List<String> runningOnNodes = getRunningOnNodes();
+                        if (runningOnNodes != null
+                            && !runningOnNodes.contains(migratedTo.getName())) {
+                            return Tools.getString(
+                                                "ClusterBrowser.Hb.Migrating");
+                        }
+                    }
                     return null;
                 } else if (isFailed()) {
                     return Tools.getString("ClusterBrowser.Hb.StartingFailed");
@@ -7041,12 +7052,6 @@ public class ClusterBrowser extends Browser {
                     return Tools.getString("ClusterBrowser.Hb.Stopping");
                 } else {
                     return null;
-                }
-            } else if (migratedTo != null) {
-                final List<String> runningOnNodes = getRunningOnNodes();
-                if (runningOnNodes != null
-                    && !runningOnNodes.contains(migratedTo)) {
-                    return Tools.getString("ClusterBrowser.Hb.Migrating");
                 }
             }
             return null;
