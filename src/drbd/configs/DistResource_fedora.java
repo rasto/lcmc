@@ -66,6 +66,7 @@ public class DistResource_fedora extends
          +  "/usr/share/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
          + "done;"
          + "echo 'provider:heartbeat';"
+         + "echo 'master:';"
          + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
 
