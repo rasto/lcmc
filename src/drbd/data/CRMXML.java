@@ -1872,7 +1872,8 @@ public class CRMXML extends XML {
                                          getAttribute(expNode, "type");
                                 final String node2 =
                                          getAttribute(expNode, "value");
-                                if ("and".equals(booleanOp)
+                                if ((booleanOp == null
+                                     || "and".equals(booleanOp))
                                     && "#uname".equals(attr)
                                     && "string".equals(type)
                                     && "eq".equals(op)) {
