@@ -194,7 +194,6 @@ public class Browser {
             return iPanel;
         } else {
             final Dimension d = iPanel.getPreferredSize();
-
             /* + 20 scrollbar */
             iPanel.setMinimumSize(new Dimension((int) d.getWidth() + 20,
                                                 (int) d.getHeight()));
@@ -454,7 +453,7 @@ public class Browser {
          * Returns info panel for this resource.
          */
         public JComponent getInfoPanel() {
-            setTerminalPanel();
+            //setTerminalPanel();
             final String info = getInfo();
             resourceInfoArea = null;
             if (info == null) {
@@ -774,7 +773,8 @@ public class Browser {
         public final void initApplyButton() {
             if (oldApplyButton == null) {
                 applyButton = new MyButton(
-                        Tools.getString("Browser.ApplyResource"), APPLY_ICON);
+                        Tools.getString("Browser.ApplyResource"),
+                        APPLY_ICON);
                 oldApplyButton = applyButton;
             } else {
                 applyButton = oldApplyButton;
@@ -788,7 +788,7 @@ public class Browser {
         protected final void addApplyButton(final JPanel panel) {
             panel.add(applyButton, BorderLayout.WEST);
             Tools.getGUIData().getMainFrame().getRootPane().setDefaultButton(
-                                                                   applyButton);
+                                                                  applyButton);
         }
 
         /**
@@ -1011,7 +1011,6 @@ public class Browser {
                 final GuiComboBox paramCb = getParamComboBox(param,
                                                              null,
                                                              rightWidth);
-
                 /* sub panel */
                 final String section = getSection(param);
                 final boolean isRequired = isRequired(param);

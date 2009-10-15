@@ -35,11 +35,12 @@ import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.tree.TreeSelectionModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeModelEvent;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
@@ -198,8 +199,12 @@ public class ViewPanel extends JPanel {
 
         final Object nodeInfo = node.getUserObject();
         if (nodeInfo != null) {
-            final JComponent p = browser.getInfoPanel(nodeInfo);
-            viewSP.setRightComponent(p);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    final JComponent p = browser.getInfoPanel(nodeInfo);
+                    viewSP.setRightComponent(p);
+                }
+            });
         }
     }
 
@@ -209,10 +214,14 @@ public class ViewPanel extends JPanel {
     public final void setRightComponentInView(final Browser browser,
                                               final Info i) {
         if (viewSP != null) {
-            final JComponent p = browser.getInfoPanel(i);
-            if (p != null) {
-                viewSP.setRightComponent(p);
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    final JComponent p = browser.getInfoPanel(i);
+                    if (p != null) {
+                        viewSP.setRightComponent(p);
+                    }
+                }
+            });
         }
     }
 }

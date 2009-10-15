@@ -702,8 +702,12 @@ public class ClusterBrowser extends Browser {
                 //});
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
-                drbdGraph.getDrbdInfo().getInfoPanel();
-                drbdGraph.getDrbdInfo().selectMyself();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        drbdGraph.getDrbdInfo().getInfoPanel();
+                        //drbdGraph.getDrbdInfo().selectMyself();
+                    }
+                });
                 Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
                 cluster.getBrowser().startServerStatus();
@@ -989,9 +993,9 @@ public class ClusterBrowser extends Browser {
                          host.setClStatus(false);
                          clusterStatus.setDC(null);
                          clStatusUnlock();
-                         if (prevClStatusFailed != clStatusFailed()) {
-                             heartbeatGraph.getServicesInfo().selectMyself();
-                         }
+                         //if (prevClStatusFailed != clStatusFailed()) {
+                         //    heartbeatGraph.getServicesInfo().getInfoPanel();
+                         //}
                          if (exitCode == 255) {
                              /* looks like connection was lost */
                              heartbeatGraph.repaint();
@@ -1024,9 +1028,9 @@ public class ClusterBrowser extends Browser {
                          }
                          if (output == null) {
                              host.setClStatus(false);
-                             if (prevClStatusFailed != clStatusFailed()) {
-                                 heartbeatGraph.getServicesInfo().selectMyself();
-                             }
+                             //if (prevClStatusFailed != clStatusFailed()) {
+                             //    heartbeatGraph.getServicesInfo().getInfoPanel();
+                             //}
                          } else {
                              clusterStatusOutput.append(output);
                              if (clusterStatusOutput.length() > 12) {
@@ -1070,9 +1074,9 @@ public class ClusterBrowser extends Browser {
                                 }
                              }
                          }
-                        if (prevClStatusFailed != clStatusFailed()) {
-                             heartbeatGraph.getServicesInfo().selectMyself();
-                        }
+                         //if (prevClStatusFailed != clStatusFailed()) {
+                         //     heartbeatGraph.getServicesInfo().getInfoPanel();
+                         //}
                          if (clStatusFirstTime) {
                              clStatusFirstTime = false;
                              selectServices();
@@ -1684,13 +1688,17 @@ public class ClusterBrowser extends Browser {
                                 final BlockDevInfo blockDevInfo2) {
             super(name);
             setResource(new DrbdResource(name, null)); // TODO: ?
-            initApplyButton();
+            //initApplyButton(); // TODO: twice?
             setResource(new DrbdResource(name, drbdDev)); // TODO: ?
             // TODO: drbdresource
             getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
             this.blockDevInfo1 = blockDevInfo1;
             this.blockDevInfo2 = blockDevInfo2;
-            initApplyButton(); // TODO: twice?
+            //SwingUtilities.invokeLater(new Runnable() {
+            //    public void run() {
+            //        initApplyButton();
+            //    }
+            //});
         }
 
         /**
@@ -1784,13 +1792,16 @@ public class ClusterBrowser extends Browser {
                                 sectionConfig.append("\t\t" + param + ";\n");
                             } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
                                 /* after parameter */
+                                /* we get drbd device here, so it is converted
+                                 * to the resource. */
                                 if (!value.equals(Tools.getString(
                                                     "ClusterBrowser.None"))) {
+                                    final String v =
+                                            drbdDevHash.get(value).getName();
                                     sectionConfig.append("\t\t");
                                     sectionConfig.append(param);
                                     sectionConfig.append('\t');
-                                    sectionConfig.append(
-                                                    Tools.escapeConfig(value));
+                                    sectionConfig.append(Tools.escapeConfig(v));
                                     sectionConfig.append(";\n");
                                 }
                             } else { /* name value parameter */
@@ -2137,7 +2148,7 @@ public class ClusterBrowser extends Browser {
                     DrbdResourceInfo odri = r;
                     boolean cyclicRef = false;
                     while ((odri = drbdResHash.get(
-                              odri.getResource().getValue("after"))) != null) {
+                  odri.getResource().getValue(DRBD_RES_PARAM_AFTER))) != null) {
                         if (odri == this) {
                             cyclicRef = true;
                         }
@@ -2261,6 +2272,7 @@ public class ClusterBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
+            initApplyButton();
 
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -2341,12 +2353,13 @@ public class ClusterBrowser extends Browser {
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
 
-            infoPanel = new JPanel();
-            infoPanel.setBackground(PANEL_BACKGROUND);
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            infoPanel.add(buttonPanel);
-            infoPanel.add(new JScrollPane(mainPanel));
-            infoPanel.add(Box.createVerticalGlue());
+            final JPanel newPanel = new JPanel();
+            newPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+            newPanel.add(buttonPanel);
+            newPanel.add(new JScrollPane(mainPanel));
+            newPanel.add(Box.createVerticalGlue());
+            infoPanel = newPanel;
             return infoPanel;
         }
 
@@ -2443,11 +2456,11 @@ public class ClusterBrowser extends Browser {
         //}
 
         /**
-         * Returns the device name that is used as the string value of the drbd
-         * resource in after option in drbd.conf.
+         * Returns the device name that is used as the string value of
+         * the device in the filesystem resource.
          */
         public final String getStringValue() {
-            return getName();
+            return getDevice();
         }
 
         /**
@@ -2467,8 +2480,8 @@ public class ClusterBrowser extends Browser {
             fi.setDrbddiskInfo(di);
             di.getInfoPanel();
             di.paramComboBoxGet("1", null).setValueAndWait(getName());
-            di.apply();
             heartbeatGraph.addColocation(di, fi);
+            di.apply();
         }
 
         /**
@@ -2486,11 +2499,12 @@ public class ClusterBrowser extends Browser {
             ldi.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(ldi);
             fi.setLinbitDrbdInfo(ldi);
-            ldi.getInfoPanel();
-            ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(
-                                                                    getName());
-            ldi.apply();
+            ldi.getCloneInfo().getInfoPanel();
+            //ldi.getInfoPanel();
+            ldi.paramComboBoxGet("drbd_resource",
+                                 null).setValueAndWait(getName());
             heartbeatGraph.addColocation(ldi.getCloneInfo(), fi);
+            ldi.apply();
         }
 
 
@@ -3167,15 +3181,17 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Applies changes to the Filesystem service paramters.
+         * Applies changes to the Filesystem service parameters.
          */
         public void apply() {
             final String dir = getComboBoxValue("directory");
+            boolean confirm = false; /* confirm only once */
             for (Host host : getClusterHosts()) {
                 final String hostName = host.getName();
                 final String ret = Tools.execCommandProgressIndicator(
                                                        host,
-                                                       "stat -c \"%F\" " + dir,
+                                                       "stat -c \"%F\" " + dir
+                                                       + "||true",
                                                        null,
                                                        true);
 
@@ -3188,12 +3204,13 @@ public class ClusterBrowser extends Browser {
                     title = title.replaceAll("@HOST@", host.getName());
                     desc  = desc.replaceAll("@DIR@", dir);
                     desc  = desc.replaceAll("@HOST@", host.getName());
-                    if (Tools.confirmDialog(
+                    if (confirm || Tools.confirmDialog(
                             title,
                             desc,
                             Tools.getString("ClusterBrowser.CreateDir.Yes"),
                             Tools.getString("ClusterBrowser.CreateDir.No"))) {
                         Tools.execCommandProgressIndicator(host, "mkdir " + dir, null, true);
+                        confirm = true;
                     }
                 }
             }
@@ -3210,7 +3227,7 @@ public class ClusterBrowser extends Browser {
             GuiComboBox paramCb;
             if (FS_RES_PARAM_DEV.equals(param)) {
                 final DrbdResourceInfo selectedInfo = drbdResHash.get(
-                        getResource().getValue(FS_RES_PARAM_DEV));
+                                getResource().getValue(FS_RES_PARAM_DEV));
                 String selectedValue = null;
                 if (selectedInfo != null) {
                     selectedValue = selectedInfo.toString();
@@ -3340,13 +3357,13 @@ public class ClusterBrowser extends Browser {
          * Adds DrbddiskInfo before the filesysteminfo is added, returns true
          * if something was added.
          */
-        public final ServiceInfo addResourceBefore() {
+        public final void addResourceBefore() {
             final DrbdResourceInfo oldDri =
                     drbdResHash.get(getResource().getValue(FS_RES_PARAM_DEV));
             final DrbdResourceInfo newDri =
                     drbdResHash.get(getComboBoxValue(FS_RES_PARAM_DEV));
             if (newDri == null || newDri.equals(oldDri)) {
-                return null;
+                return;
             }
             boolean oldDrbddisk = false;
             if (getDrbddiskInfo() != null) {
@@ -3367,19 +3384,15 @@ public class ClusterBrowser extends Browser {
                     setLinbitDrbdInfo(null);
                 }
             }
-            System.out.println("old drbd disk: "+oldDrbddisk);
-            System.out.println("drbddiskIsPreferred"+oldDrbddisk);
             if (newDri != null) {
                 newDri.setUsedByCRM(true);
                 if (oldDrbddisk) {
                     newDri.addDrbdDisk(this);
-                    return getDrbddiskInfo();
                 } else {
                     newDri.addLinbitDrbd(this);
-                    return getLinbitDrbdInfo();
                 }
             }
-            return null;
+            return;
         }
 
         /**
@@ -4145,28 +4158,6 @@ public class ClusterBrowser extends Browser {
             super(name);
             this.resourceAgent = resourceAgent;
             setResource(new Service(name));
-
-            /* init save button */
-            initApplyButton();
-            /* add item listeners to the apply button. */
-            applyButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
-                                public void run() {
-                                    clStatusLock();
-                                    apply();
-                                    clStatusUnlock();
-                                }
-                            }
-                        );
-                        thread.start();
-                    }
-                }
-            );
-
-
             getService().setNew(true);
         }
 
@@ -4323,6 +4314,10 @@ public class ClusterBrowser extends Browser {
          * Sets service parameters with values from resourceNode hash.
          */
         public void setParameters(final Map<String, String> resourceNode) {
+            boolean infoPanelOk = true;
+            if (infoPanel == null) {
+                infoPanelOk = false;
+            }
             if (crmXML == null) {
                 Tools.appError("crmXML is null");
                 return;
@@ -4341,7 +4336,7 @@ public class ClusterBrowser extends Browser {
                     if ((value == null && value != oldValue)
                         || (value != null && !value.equals(oldValue))) {
                         getResource().setValue(param, value);
-                        if (infoPanel != null) {
+                        if (infoPanelOk) {
                             final GuiComboBox cb = paramComboBoxGet(param,
                                                                     null);
                             if (cb != null) {
@@ -4358,7 +4353,6 @@ public class ClusterBrowser extends Browser {
                 String score = clusterStatus.getScore(
                                             getService().getHeartbeatId(),
                                             hi.getName());
-                final GuiComboBox cb = scoreComboBoxHash.get(hi);
                 final String savedScore = savedHostScores.get(hi);
                 if ((score == null && score != savedScore)
                      || (score != null
@@ -4368,7 +4362,8 @@ public class ClusterBrowser extends Browser {
                     } else {
                         savedHostScores.put(hi, score);
                     }
-                    if (cb != null) {
+                    if (infoPanelOk) {
+                        final GuiComboBox cb = scoreComboBoxHash.get(hi);
                         cb.setValue(score);
                     }
                 }
@@ -4382,8 +4377,6 @@ public class ClusterBrowser extends Browser {
                     if (defaultValue == null) {
                         continue;
                     }
-                    final GuiComboBox cb =
-                            (GuiComboBox) operationsComboBoxHash.get(op, param);
                     String value = clusterStatus.getOperation(
                                                 getService().getHeartbeatId(),
                                                 op,
@@ -4393,8 +4386,13 @@ public class ClusterBrowser extends Browser {
                     }
                     if (!value.equals(savedOperation.get(op, param))) {
                         savedOperation.put(op, param, value);
-                        if (cb != null && value != null) {
-                            cb.setValue(value);
+                        if (infoPanelOk) {
+                            final GuiComboBox cb =
+                               (GuiComboBox) operationsComboBoxHash.get(op,
+                                                                        param);
+                            if (value != null) {
+                                cb.setValue(value);
+                            }
                         }
                     }
                 }
@@ -5065,6 +5063,7 @@ public class ClusterBrowser extends Browser {
                                      final int rightWidth) {
             int rows = 0;
             int extraRows = 0;
+            // TODO: need lock operationsComboBoxHash
             operationsComboBoxHash.clear();
 
             final JPanel panel = getParamPanel(
@@ -5247,8 +5246,8 @@ public class ClusterBrowser extends Browser {
          * FilesystemInfo so that it can add LinbitDrbdInfo or DrbddiskInfo before
          * it adds itself.
          */
-        public ServiceInfo addResourceBefore() {
-            return null;
+        public void addResourceBefore() {
+            return;
         }
 
         /**
@@ -5371,6 +5370,25 @@ public class ClusterBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
+            /* init save button */
+            initApplyButton();
+            /* add item listeners to the apply button. */
+            applyButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(
+                            new Runnable() {
+                                public void run() {
+                                    clStatusLock();
+                                    apply();
+                                    clStatusUnlock();
+                                }
+                            }
+                        );
+                        thread.start();
+                    }
+                }
+            );
             /* main, button and options panels */
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -5559,8 +5577,6 @@ public class ClusterBrowser extends Browser {
             /* add item listeners to the host scores combos */
             if (cloneInfo == null) {
                 addHostScoreListeners();
-            } else {
-                cloneInfo.addHostScoreListeners();
             }
             /* apply button */
             addApplyButton(buttonPanel);
@@ -5572,14 +5588,15 @@ public class ClusterBrowser extends Browser {
 
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
-            infoPanel = new JPanel();
-            infoPanel.setBackground(PANEL_BACKGROUND);
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            infoPanel.add(buttonPanel);
-            infoPanel.add(new JScrollPane(mainPanel));
-            infoPanel.add(Box.createVerticalGlue());
+            final JPanel newPanel = new JPanel();
+            newPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+            newPanel.add(buttonPanel);
+            newPanel.add(new JScrollPane(mainPanel));
+            newPanel.add(Box.createVerticalGlue());
             /* if id textfield was changed and this id is not used,
              * enable apply button */
+            infoPanel = newPanel;
             return infoPanel;
         }
 
@@ -5741,8 +5758,11 @@ public class ClusterBrowser extends Browser {
             setHeartbeatIdLabel();
             addToHeartbeatIdList(this);
             addNameToServiceInfoHash(this);
-
-            final ServiceInfo addedService = addResourceBefore();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    addResourceBefore();
+                }
+            });
 
             Map<String,String> cloneMetaArgs = new HashMap<String,String>();
             Map<String,String> pacemakerResAttrs =
@@ -7154,8 +7174,9 @@ public class ClusterBrowser extends Browser {
             return items;
         }
         public final JComponent getInfoPanel() {
-            if (containedService != null) {
-                return containedService.getInfoPanel();
+            final ServiceInfo cs = containedService;
+            if (cs != null) {
+                return cs.getInfoPanel();
             } else {
                 return new JPanel();
             }
@@ -7611,7 +7632,6 @@ public class ClusterBrowser extends Browser {
             super(name);
             setResource(new Resource(name));
             heartbeatGraph.setServicesInfo(this);
-            initApplyButton();
         }
 
         /**
@@ -7780,7 +7800,11 @@ public class ClusterBrowser extends Browser {
                 }
             }
             if (infoPanel == null) {
-                selectMyself();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getInfoPanel();
+                    }
+                });
             }
         }
 
@@ -7941,7 +7965,7 @@ public class ClusterBrowser extends Browser {
                         heartbeatGraph.repaint();
                     }
                     newSi.getService().setNew(false);
-                    newSi.getTypeRadioGroup().setEnabled(false);
+                    //newSi.getTypeRadioGroup().setEnabled(false);
                     heartbeatGraph.setVertexIsPresent(newSi);
                     if (newGi != null || newCi != null) {
                         groupServiceIsPresent.add(newSi);
@@ -8061,12 +8085,13 @@ public class ClusterBrowser extends Browser {
                 heartbeatGraph.pickBackground();
                 return infoPanel;
             }
-            infoPanel = new JPanel();
-            infoPanel.setBackground(PANEL_BACKGROUND);
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            final JPanel newPanel = new JPanel();
+            newPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
             if (crmXML == null) {
-                return infoPanel;
+                return newPanel;
             }
+            initApplyButton();
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
             mainPanel.setLayout(new BoxLayout(mainPanel,
@@ -8096,7 +8121,7 @@ public class ClusterBrowser extends Browser {
             mb.add(serviceCombo);
             buttonPanel.add(mb, BorderLayout.EAST);
 
-            infoPanel.add(buttonPanel);
+            newPanel.add(buttonPanel);
 
             final String[] params = getParametersFromXML();
             addParams(optionsPanel,
@@ -8132,10 +8157,11 @@ public class ClusterBrowser extends Browser {
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
 
-            infoPanel.add(new JScrollPane(mainPanel));
-            infoPanel.add(Box.createVerticalGlue());
+            newPanel.add(new JScrollPane(mainPanel));
+            newPanel.add(Box.createVerticalGlue());
 
             heartbeatGraph.pickBackground();
+            infoPanel = newPanel;
             return infoPanel;
         }
 
@@ -8559,6 +8585,10 @@ public class ClusterBrowser extends Browser {
          * Sets the order's parameters.
          */
         public final void setParameters() {
+            boolean infoPanelOk = true;
+            if (infoPanel == null) {
+                infoPanelOk = false;
+            }
             final String rscParent =
                             serviceInfoParent.getService().getHeartbeatId();
             final String rscChild =
@@ -8597,8 +8627,9 @@ public class ClusterBrowser extends Browser {
                     if ((value == null && value != oldValue)
                         || (value != null && !value.equals(oldValue))) {
                         getResource().setValue(param, value);
-                        final GuiComboBox cb = paramComboBoxGet(param, null);
-                        if (cb != null) {
+                        if (infoPanelOk) {
+                            final GuiComboBox cb =
+                                                 paramComboBoxGet(param, null);
                             cb.setValue(value);
                         }
                     }
@@ -8809,6 +8840,10 @@ public class ClusterBrowser extends Browser {
          * Sets the colocation's parameters.
          */
         public final void setParameters() {
+            boolean infoPanelOk = true;
+            if (infoPanel == null) {
+                infoPanelOk = false;
+            }
             final String rsc = serviceInfoRsc.getService().getHeartbeatId();
             final String withRsc =
                               serviceInfoWithRsc.getService().getHeartbeatId();
@@ -8840,8 +8875,9 @@ public class ClusterBrowser extends Browser {
                     if ((value == null && value != oldValue)
                         || (value != null && !value.equals(oldValue))) {
                         getResource().setValue(param, value);
-                        final GuiComboBox cb = paramComboBoxGet(param, null);
-                        if (cb != null) {
+                        if (infoPanelOk) {
+                            final GuiComboBox cb =
+                                                 paramComboBoxGet(param, null);
                             cb.setValue(value);
                         }
                     }
@@ -9344,20 +9380,21 @@ public class ClusterBrowser extends Browser {
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
 
-            infoPanel = new JPanel();
-            infoPanel.setBackground(PANEL_BACKGROUND);
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            infoPanel.add(buttonPanel);
-            infoPanel.add(new JScrollPane(mainPanel));
-            infoPanel.add(Box.createVerticalGlue());
-            infoPanel.setMinimumSize(new Dimension(
+            final JPanel newPanel = new JPanel();
+            newPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+            newPanel.add(buttonPanel);
+            newPanel.add(new JScrollPane(mainPanel));
+            newPanel.add(Box.createVerticalGlue());
+            newPanel.setMinimumSize(new Dimension(
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
                     ));
-            infoPanel.setPreferredSize(new Dimension(
+            newPanel.setPreferredSize(new Dimension(
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
                     ));
+            infoPanel = newPanel;
             return infoPanel;
         }
 
@@ -9607,7 +9644,7 @@ public class ClusterBrowser extends Browser {
         /** Selected block device. */
         private BlockDevInfo selectedBD = null;
         /** Cache for the info panel. */
-        private JComponent infoPanel    = null;
+        private JComponent infoPanel = null;
 
         /**
          * Prepares a new <code>DrbdInfo</code> object.
@@ -9619,7 +9656,6 @@ public class ClusterBrowser extends Browser {
             super(name);
             setResource(new Resource(name));
             drbdGraph.setDrbdInfo(this);
-            initApplyButton();
         }
 
         /**
@@ -9872,6 +9908,7 @@ public class ClusterBrowser extends Browser {
                 mainPanel.add(new JLabel("drbd info not available"));
                 return mainPanel;
             }
+            initApplyButton();
             mainPanel.setBackground(PANEL_BACKGROUND);
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
@@ -9935,12 +9972,13 @@ public class ClusterBrowser extends Browser {
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
 
-            infoPanel = new JPanel();
-            infoPanel.setBackground(PANEL_BACKGROUND);
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            infoPanel.add(buttonPanel);
-            infoPanel.add(new JScrollPane(mainPanel));
-            infoPanel.add(Box.createVerticalGlue());
+            final JPanel newPanel = new JPanel();
+            newPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+            newPanel.add(buttonPanel);
+            newPanel.add(new JScrollPane(mainPanel));
+            newPanel.add(Box.createVerticalGlue());
+            infoPanel = newPanel;
             return infoPanel;
         }
 
@@ -10081,14 +10119,14 @@ public class ClusterBrowser extends Browser {
                 bd1.setDrbdResourceInfo(dri);
                 bd1.setInfoPanel(null); /* reload panel */
                 bd1.getInfoPanel();
-                bd1.selectMyself();
+                //bd1.selectMyself();
             }
             if (bd2 != null) {
                 bd2.setDrbd(true);
                 bd2.setDrbdResourceInfo(dri);
                 bd2.setInfoPanel(null); /* reload panel */
                 bd2.getInfoPanel();
-                bd2.selectMyself();
+                //bd2.selectMyself();
             }
 
             final DefaultMutableTreeNode drbdResourceNode =
@@ -10107,6 +10145,7 @@ public class ClusterBrowser extends Browser {
             drbdResourceNode.add(drbdBDNode2);
 
             drbdGraph.addDrbdResource(dri, bd1, bd2);
+            dri.getInfoPanel();
             final DrbdResourceInfo driF = dri;
             if (interactive) {
                 final Thread thread = new Thread(
@@ -10161,10 +10200,10 @@ public class ClusterBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
-            infoPanel = new JPanel();
+            final JPanel newPanel = new JPanel();
 
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            infoPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+            newPanel.setBackground(PANEL_BACKGROUND);
             final JPanel bPanel =
                            new JPanel(new BorderLayout());
             bPanel.setMaximumSize(new Dimension(10000, 60));
@@ -10175,7 +10214,8 @@ public class ClusterBrowser extends Browser {
             updateMenus(null);
             mb.add(actionsMenu);
             bPanel.add(mb, BorderLayout.EAST);
-            infoPanel.add(bPanel);
+            newPanel.add(bPanel);
+            infoPanel = newPanel;
             return infoPanel;
         }
 

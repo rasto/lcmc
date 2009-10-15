@@ -1194,7 +1194,6 @@ public class HostBrowser extends Browser {
         public BlockDevInfo(final String name, final BlockDevice blockDevice) {
             super(name);
             setResource(blockDevice);
-            initApplyButton();
         }
 
         /**
@@ -1754,7 +1753,7 @@ public class HostBrowser extends Browser {
         }
 
         public final JComponent getInfoPanel() {
-            setTerminalPanel();
+            //setTerminalPanel();
             return getInfoPanelBD();
         }
 
@@ -1798,9 +1797,10 @@ public class HostBrowser extends Browser {
         }
 
         public final JComponent getInfoPanelBD() {
-            //if (infoPanel != null) {
-            //    return infoPanel;
-            //}
+            if (infoPanel != null) {
+                return infoPanel;
+            }
+            initApplyButton();
 
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -1889,12 +1889,13 @@ public class HostBrowser extends Browser {
             //}
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
-            infoPanel = new JPanel();
-            infoPanel.setBackground(PANEL_BACKGROUND);
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            infoPanel.add(buttonPanel);
-            infoPanel.add(new JScrollPane(mainPanel));
-            infoPanel.add(Box.createVerticalGlue());
+            final JPanel newPanel = new JPanel();
+            newPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+            newPanel.add(buttonPanel);
+            newPanel.add(new JScrollPane(mainPanel));
+            newPanel.add(Box.createVerticalGlue());
+            infoPanel = newPanel;
             return infoPanel;
         }
 
