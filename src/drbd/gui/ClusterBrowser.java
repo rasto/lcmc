@@ -662,8 +662,8 @@ public class ClusterBrowser extends Browser {
                             notConnected = false;
                             break;
                         } else {
-                            //jfinal HostBrowser hostBrowser = host.getBrowser();
-                            //jdrbdGraph.addHost(hostBrowser.getHostInfo());
+                            //final HostBrowser hostBrowser = host.getBrowser();
+                            //drbdGraph.addHost(hostBrowser.getHostInfo());
                         }
                     }
                     if (!notConnected) {
@@ -721,8 +721,9 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
-     * Starts polling of the server status on all hosts, for all the stuff that can
-     * change on the server on the fly, like for example the block devices.
+     * Starts polling of the server status on all hosts, for all the stuff
+     * that can change on the server on the fly, like for example the block
+     * devices.
      */
     public final void startServerStatus() {
         final Host[] hosts = cluster.getHostsArray();
@@ -979,7 +980,8 @@ public class ClusterBrowser extends Browser {
                          }
                      }
 
-                     public void doneError(final String ans, final int exitCode) {
+                     public void doneError(final String ans,
+                                           final int exitCode) {
                          Tools.progressIndicatorFailed(hostName,
                                     "Heartbeat status failed");
                          if (clStatusFirstTime) {
@@ -1028,9 +1030,6 @@ public class ClusterBrowser extends Browser {
                          }
                          if (output == null) {
                              host.setClStatus(false);
-                             //if (prevClStatusFailed != clStatusFailed()) {
-                             //    heartbeatGraph.getServicesInfo().getInfoPanel();
-                             //}
                          } else {
                              clusterStatusOutput.append(output);
                              if (clusterStatusOutput.length() > 12) {
@@ -1074,9 +1073,6 @@ public class ClusterBrowser extends Browser {
                                 }
                              }
                          }
-                         //if (prevClStatusFailed != clStatusFailed()) {
-                         //     heartbeatGraph.getServicesInfo().getInfoPanel();
-                         //}
                          if (clStatusFirstTime) {
                              clStatusFirstTime = false;
                              selectServices();
@@ -1288,6 +1284,14 @@ public class ClusterBrowser extends Browser {
         //}
         //Tools.appError("Could not find any hosts");
         return null;
+    }
+
+    /**
+     * Returns whether the host is in stand by.
+     */
+    public final boolean isStandby(final Host host) {
+        return "on".equals(clusterStatus.getNodeParameter(host.getName(),
+                                                          "standby"));
     }
 
     /**
@@ -3226,7 +3230,7 @@ public class ClusterBrowser extends Browser {
                                                final int width) {
             GuiComboBox paramCb;
             if (FS_RES_PARAM_DEV.equals(param)) {
-                final DrbdResourceInfo selectedInfo = drbdResHash.get(
+                final DrbdResourceInfo selectedInfo = drbdDevHash.get(
                                 getResource().getValue(FS_RES_PARAM_DEV));
                 String selectedValue = null;
                 if (selectedInfo != null) {
@@ -3359,9 +3363,9 @@ public class ClusterBrowser extends Browser {
          */
         public final void addResourceBefore() {
             final DrbdResourceInfo oldDri =
-                    drbdResHash.get(getResource().getValue(FS_RES_PARAM_DEV));
+                    drbdDevHash.get(getResource().getValue(FS_RES_PARAM_DEV));
             final DrbdResourceInfo newDri =
-                    drbdResHash.get(getComboBoxValue(FS_RES_PARAM_DEV));
+                    drbdDevHash.get(getComboBoxValue(FS_RES_PARAM_DEV));
             if (newDri == null || newDri.equals(oldDri)) {
                 return;
             }
@@ -6235,7 +6239,8 @@ public class ClusterBrowser extends Browser {
                         heartbeatGraph.removeColocation(hbci);
                     }
 
-                    for (String locId : clusterStatus.getLocationIds(getService().getHeartbeatId())) {
+                    for (String locId : clusterStatus.getLocationIds(
+                                              getService().getHeartbeatId())) {
                         final String locScore =
                             clusterStatus.getLocationScore(locId);
                         CRM.removeLocation(dcHost,
@@ -6250,7 +6255,8 @@ public class ClusterBrowser extends Browser {
                         /* get group id only if there is only one resource in a
                          * group.
                          */
-                        final String group = groupInfo.getService().getHeartbeatId();
+                        final String group =
+                                        groupInfo.getService().getHeartbeatId();
                         final Enumeration e = groupInfo.getNode().children();
                         while (e.hasMoreElements()) {
                             DefaultMutableTreeNode n =
@@ -6425,7 +6431,8 @@ public class ClusterBrowser extends Browser {
                             final ResourceAgent linbitDrbdService =
                                                       crmXML.getHbLinbitDrbd();
                             final MyMenuItem ldMenuItem = new MyMenuItem(
-                             Tools.getString("ClusterBrowser.linbitDrbdMenuName")) {
+                             Tools.getString(
+                                        "ClusterBrowser.linbitDrbdMenuName")) {
                                 private static final long serialVersionUID = 1L;
                                 public void action() {
                                     SwingUtilities.invokeLater(new Runnable() {
@@ -6438,11 +6445,11 @@ public class ClusterBrowser extends Browser {
                                     }
 
                                     final FilesystemInfo fsi = (FilesystemInfo)
-                                                                   addServicePanel(
-                                                                        fsService,
-                                                                        getPos(),
-                                                                        true,
-                                                                        false);
+                                                               addServicePanel(
+                                                                    fsService,
+                                                                    getPos(),
+                                                                    true,
+                                                                    false);
                                     fsi.setDrbddiskIsPreferred(false);
                                     heartbeatGraph.getVisualizationViewer().repaint();
                                 }

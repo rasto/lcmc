@@ -124,6 +124,9 @@ public class HeartbeatGraph extends ResourceGraph {
     /** Host icon. */
     private static final ImageIcon HOST_ICON =
                 Tools.createImageIcon(Tools.getDefault("DrbdGraph.HostIcon"));
+    /** Host standby icon. */
+    private static final ImageIcon HOST_STANDBY_ICON =
+     Tools.createImageIcon(Tools.getDefault("HeartbeatGraph.HostStandbyIcon"));
     /** Icon that indicates a running service. */
     private static final ImageIcon SERVICE_RUNNING_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
@@ -664,7 +667,6 @@ public class HeartbeatGraph extends ResourceGraph {
             final HostInfo hi = vertexToHostMap.get(v);
             hi.setGraph(this);
             getClusterBrowser().setRightComponentInView(hi);
-            hi.setGraph(null);
         } else {
             final ServiceInfo si = (ServiceInfo) getInfo(v);
             si.selectMyself();
@@ -1006,8 +1008,12 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     protected final List<ImageIcon> getIconsForVertex(final ArchetypeVertex v) {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
-        if (vertexToHostMap.containsKey(v)) {
+        final HostInfo hi = vertexToHostMap.get(v);
+        if (hi != null) {
             icons.add(HOST_ICON);
+            if (hi.isStandby()) {
+                icons.add(HOST_STANDBY_ICON);
+            }
             return icons;
         }
 

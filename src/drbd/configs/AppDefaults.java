@@ -229,6 +229,8 @@ public class AppDefaults extends
                                 "Icons/tango/32x32/service_active_32x32.png"},
         {"HeartbeatGraph.ServiceMigratedIcon",
                                 "Icons/tango/32x32/service_migrated_32x32.png"},
+        {"HeartbeatGraph.HostStandbyIcon",
+                                "Icons/tango/32x32/host_standby_32x32.png"},
         {"HeartbeatGraph.ServiceUnmanagedIcon",
                                "Icons/tango/32x32/service_unmanaged_32x32.png"},
 

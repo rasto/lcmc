@@ -588,7 +588,8 @@ public class DrbdGraph extends ResourceGraph {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             drbdInfo.setSelectedNode(bdi);
-            drbdInfo.selectMyself();
+            //drbdInfo.selectMyself();
+            getClusterBrowser().setRightComponentInView(bdi);
             //oldLocation = getVertexLocations().getLocation(v).getY();
         } else {
             pickHost(v);
@@ -596,7 +597,6 @@ public class DrbdGraph extends ResourceGraph {
             final HostInfo hi = vertexToHostMap.get(v);
             hi.setGraph(this);
             getClusterBrowser().setRightComponentInView(hi);
-            hi.setGraph(null);
         }
     }
 

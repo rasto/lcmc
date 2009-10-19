@@ -1543,6 +1543,40 @@ public class CRMXML extends XML {
             }
         }
     }
+   
+    /**
+     * Parses node, to get info like if it is in stand by.
+     */
+    public final void parseNode(final String node,
+                                final Node nodeNode,
+                                final MultiKeyMap nodeParametersMap) {
+        /* <instance_attributes> */
+        final Node instanceAttrNode = getChildNode(nodeNode,
+                                                   "instance_attributes");
+        /* <nvpair...> */
+        if (instanceAttrNode != null) {
+            final String iAId = getAttribute(instanceAttrNode, "id");
+            NodeList nvpairsRes;
+            final String hbV = host.getHeartbeatVersion();
+            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                /* <attributtes> only til 2.1.4 */
+                final Node attrNode = getChildNode(instanceAttrNode,
+                                                   "attributes");
+                nvpairsRes = attrNode.getChildNodes();
+            } else {
+                nvpairsRes = instanceAttrNode.getChildNodes();
+            }
+            for (int j = 0; j < nvpairsRes.getLength(); j++) {
+                final Node optionNode = nvpairsRes.item(j);
+                if (optionNode.getNodeName().equals("nvpair")) {
+                    final String nvpairId = getAttribute(optionNode, "id");
+                    final String name = getAttribute(optionNode, "name");
+                    final String value = getAttribute(optionNode, "value");
+                    nodeParametersMap.put(node, name, value);
+                }
+            }
+        }
+    }
 
     /**
      * Returns CibQuery object with information from the cib node.
@@ -1606,6 +1640,7 @@ public class CRMXML extends XML {
         /* xml node with cluster node make stupid variable names, but let's
          * keep the convention. */
         String dc = null;
+        final MultiKeyMap nodeParametersMap = new MultiKeyMap();
         final Node nodesNode = getChildNode(confNode, "nodes");
         if (nodesNode != null) {
             final NodeList nodes = nodesNode.getChildNodes();
@@ -1620,6 +1655,7 @@ public class CRMXML extends XML {
                     if (dcUuid != null && dcUuid.equals(uuid)) {
                         dc = uname;
                     }
+                    parseNode(uname, nodeNode, nodeParametersMap);
                 }
             }
         }
@@ -1926,6 +1962,7 @@ public class CRMXML extends XML {
             }
         }
         cibQueryData.setDC(dc);
+        cibQueryData.setNodeParameters(nodeParametersMap);
         cibQueryData.setParameters(parametersMap);
         cibQueryData.setParametersNvpairsIds(parametersNvpairsIdsMap);
         cibQueryData.setResourceType(resourceTypeMap);

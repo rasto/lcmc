@@ -341,8 +341,6 @@ public class ClustersPanel extends JPanel {
         upgradeField.addHyperlinkListener(new HyperlinkListener() {
             public final void hyperlinkUpdate(final HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    System.out.println("hyper link update: "
-                        + e.getURL().toString());
                     Tools.openBrowswer(e.getURL().toString());
                 }
             }

@@ -54,6 +54,8 @@ public class CibQuery {
     /** Colocation map. */
     private Map<String, List<String>> colocation =
                                            new HashMap<String, List<String>>();
+    /** Node parameters map. */
+    private MultiKeyMap nodeParameters;
     /** Colocation score map. */
     private MultiKeyMap colocationScore;
     /** Colocation rsc1 role map. */
@@ -201,6 +203,20 @@ public class CibQuery {
      */
     public final Map<String, List<String>> getColocation() {
         return colocation;
+    }
+
+    /**
+     * Sets node parameters map.
+     */
+    public final void setNodeParameters(final MultiKeyMap nodeParameters) {
+        this.nodeParameters = nodeParameters;
+    }
+
+    /**
+     * Gets node parameters map.
+     */
+    public final MultiKeyMap getNodeParameters() {
+        return nodeParameters;
     }
 
     /**

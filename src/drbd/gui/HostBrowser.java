@@ -139,6 +139,9 @@ public class HostBrowser extends Browser {
     /** Color of the status backgrounds. */
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Standby subtext. */ 
+    private static final Subtext STANDBY_SUBTEXT =
+                                         new Subtext("STANDBY", Color.RED);
     /** Offline subtext. */ 
     private static final Subtext OFFLINE_SUBTEXT =
                                          new Subtext("offline", Color.BLUE);
@@ -932,7 +935,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return getHost().isClStatus();
+                        return getHost().isClStatus() && !isStandby();
                     }
 
                     public void action() {
@@ -950,7 +953,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return getHost().isClStatus();
+                        return getHost().isClStatus() && isStandby();
                     }
 
                     public void action() {
@@ -1063,11 +1066,22 @@ public class HostBrowser extends Browser {
         }
 
         /**
+         * Returns whether this host is in stand by.
+         */
+        public final boolean isStandby() {
+            return host.getCluster().getBrowser().isStandby(host);
+        }
+
+        /**
          * Returns text that appears in the corner of the graph.
          */
         protected Subtext getRightCornerTextForGraph() {
             if (getHost().isClStatus()) {
-                return ONLINE_SUBTEXT;
+                if (isStandby()) {
+                    return STANDBY_SUBTEXT;
+                } else {
+                    return ONLINE_SUBTEXT;
+                }
             } else if (getHost().isConnected()) {
                 return OFFLINE_SUBTEXT;
             }
@@ -1741,9 +1755,9 @@ public class HostBrowser extends Browser {
         public final JPanel getGraphicalView() {
             if (getBlockDevice().isDrbd()) {
                 drbdResourceInfo.getDrbdInfo().setSelectedNode(this);
-                return drbdResourceInfo.getDrbdInfo().getGraphicalView();
             }
-            return null;
+            return ((DrbdGraph) host.getCluster().getBrowser().getDrbdGraph())
+                        .getDrbdInfo().getGraphicalView();
         }
 
         protected final void setTerminalPanel() {
@@ -1830,10 +1844,9 @@ public class HostBrowser extends Browser {
             final JMenu serviceCombo = getActionsMenu();
             updateMenus(null);
             mb.add(serviceCombo);
-            buttonPanel.add(mb, BorderLayout.EAST);
-
 
             if (getBlockDevice().isDrbd()) {
+                buttonPanel.add(mb, BorderLayout.EAST);
                 final String[] params = getParametersFromXML();
 
                 addParams(optionsPanel,
@@ -1851,8 +1864,7 @@ public class HostBrowser extends Browser {
                 );
 
                 /* expert mode */
-                buttonPanel.add(Tools.expertModeButton(extraOptionsPanel),
-                                BorderLayout.WEST);
+                buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
 
                 applyButton.addActionListener(
                     new ActionListener() {

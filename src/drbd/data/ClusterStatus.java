@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
  * This class parses pacemaker/heartbeat status, stores information
@@ -461,6 +462,19 @@ public class ClusterStatus {
      public final String getFailCount(final String node, final String res) {
          return cibQueryMap.getFailCount(node, res);
      }
+
+     /**
+      * Returns value for specified node and parameter.
+      */
+    public final String getNodeParameter(final String node,
+                                         final String param) {
+        final MultiKeyMap nodeParams = cibQueryMap.getNodeParameters();
+        if (nodeParams == null) {
+            return null;
+        } else {
+            return (String) nodeParams.get(node, param);
+        }
+    }
 
     /**
      * Parses the command with data.

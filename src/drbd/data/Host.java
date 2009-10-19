@@ -311,7 +311,7 @@ public class Host implements Serializable {
     }
 
     /**
-     * Returns whether hb status is available.
+     * Returns whether cluster status is available.
      */
     public final boolean isClStatus() {
         return clStatus && isConnected();

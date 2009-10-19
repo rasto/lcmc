@@ -99,7 +99,7 @@ public class TextResource extends
          "checking for available upgrades..."},
 
         {"MainPanel.UpgradeCheckFailed",
-         "check failed"},
+         "check for upgrade failed"},
 
         {"MainPanel.UpgradeAvailable",
          "<font color=black>there&nbsp;is&nbsp;a&nbsp;new&nbsp;DRBD-MC&nbsp;@LATEST@&nbsp;"

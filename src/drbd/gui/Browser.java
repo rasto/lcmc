@@ -771,6 +771,9 @@ public class Browser {
          * Inits apply button.
          */
         public final void initApplyButton() {
+            if (applyButton != null) {
+                Tools.appWarning("wrong call to initApplyButton: " + getName());
+            }
             if (oldApplyButton == null) {
                 applyButton = new MyButton(
                         Tools.getString("Browser.ApplyResource"),
