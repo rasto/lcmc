@@ -653,6 +653,13 @@ public final class Tools {
     }
 
     /**
+     * Prints stack trace with text.
+     */
+    public static void printStackTrace(final String text) {
+        System.out.println(text);
+        printStackTrace();
+    }
+    /**
      * Prints stack trace.
      */
     public static void printStackTrace() {

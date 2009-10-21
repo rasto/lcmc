@@ -318,6 +318,7 @@ public class HeartbeatGraph extends ResourceGraph {
                                      final Point2D pos) {
 
         //vv.stop();
+        System.out.println("add resource");
         boolean vertexExists = true;
         Vertex v = getVertex(serviceInfo);
         if (v == null) {
@@ -348,11 +349,6 @@ public class HeartbeatGraph extends ResourceGraph {
             addColocation(parent, serviceInfo);
             addOrder(parent, serviceInfo);
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              scale();
-            }
-        });
         return vertexExists;
     }
 
@@ -665,7 +661,6 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final void oneVertexPressed(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
-            hi.setGraph(this);
             getClusterBrowser().setRightComponentInView(hi);
         } else {
             final ServiceInfo si = (ServiceInfo) getInfo(v);
@@ -1240,11 +1235,6 @@ public class HeartbeatGraph extends ResourceGraph {
             }
             getVertexLocations().setLocation(sv, hostPos);
             // TODO: vertexLocations needs locking
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                  scale();
-                }
-            });
         }
     }
 
