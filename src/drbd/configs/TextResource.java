@@ -1320,16 +1320,16 @@ public class TextResource extends
          "Move Down"},
 
         {"ClusterBrowser.Hb.ManageResource",
-         "Manage by HB"},
+         "Manage by CRM"},
 
         {"ClusterBrowser.Hb.ManageResource.ToolTip",
-         "Manage by HB"},
+         "Manage by CRM"},
 
         {"ClusterBrowser.Hb.UnmanageResource",
-         "Do not manage by HB"},
+         "Do not manage by CRM"},
 
         {"ClusterBrowser.Hb.UnmanageResource.ToolTip",
-         "Do not Manage by HB"},
+         "Do not Manage by CRM"},
 
         {"ClusterBrowser.Hb.NoInfoAvailable",
          "no info available"},
@@ -1510,10 +1510,10 @@ public class TextResource extends
          "Set All DRBDs Secondary"},
 
         {"HostBrowser.CRM.StandByOn",
-         "Cluster Standby On"},
+         "Go Into Standby"},
 
         {"HostBrowser.CRM.StandByOff",
-         "Cluster Standby Off"},
+         "Go Out of Standby"},
 
         {"HostBrowser.RemoveHost",
          "Remove"},

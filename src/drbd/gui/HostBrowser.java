@@ -97,6 +97,8 @@ public class HostBrowser extends Browser {
     private final Host host;
     /** Host info object of the host of this browser. */
     private final HostInfo hostInfo;
+    /** Host info object of the host in drbd view of this browser. */
+    private final HostDrbdInfo hostDrbdInfo;
 
     /** Harddisc icon. */
     private static final ImageIcon HARDDISC_ICON = Tools.createImageIcon(
@@ -119,6 +121,13 @@ public class HostBrowser extends Browser {
     /** Large host icon. */
     private static final ImageIcon HOST_ICON_LARGE = Tools.createImageIcon(
                                   Tools.getDefault("HostBrowser.HostIcon"));
+    /** Host standby icon. */
+    private static final ImageIcon HOST_STANDBY_ICON =
+     Tools.createImageIcon(Tools.getDefault("HeartbeatGraph.HostStandbyIcon"));
+    /** Host standby off icon. */
+    private static final ImageIcon HOST_STANDBY_OFF_ICON =
+             Tools.createImageIcon(
+                        Tools.getDefault("HeartbeatGraph.HostStandbyOffIcon"));
     /** Remove icon. */
     private static final ImageIcon HOST_REMOVE_ICON =
         Tools.createImageIcon(
@@ -183,6 +192,7 @@ public class HostBrowser extends Browser {
         super();
         this.host = host;
         hostInfo = new HostInfo();
+        hostDrbdInfo = new HostDrbdInfo();
         setTreeTop(hostInfo);
     }
 
@@ -191,6 +201,13 @@ public class HostBrowser extends Browser {
      */
     public final HostInfo getHostInfo() {
         return hostInfo;
+    }
+
+    /**
+     * Returns host for drbd view info for this browser.
+     */
+    public final HostDrbdInfo getHostDrbdInfo() {
+        return hostDrbdInfo;
     }
 
     /**
@@ -262,7 +279,7 @@ public class HostBrowser extends Browser {
                 bdi = new BlockDevInfo(bd.getName(), bd);
             }
             resource = new DefaultMutableTreeNode(bdi);
-            setNode(resource);
+            //setNode(resource);
             blockDevicesNode.add(resource);
         }
         reload(blockDevicesNode);
@@ -466,13 +483,388 @@ public class HostBrowser extends Browser {
      * It shows host view, just like in the host tab.
      */
     public class HostInfo extends Info {
-        /** Graph that will be shown by this host. It's eigher heartbeat or
-         * drbd graph. */
-        private ResourceGraph graph = null;
         /**
          * Prepares a new <code>HostInfo</code> object.
          */
         HostInfo() {
+            super(host.getName());
+        }
+
+        /**
+         * Returns a host icon for the menu.
+         */
+        public final ImageIcon getMenuIcon() {
+            return HOST_ICON;
+        }
+
+        /**
+         * Returns id, which is name of the host.
+         */
+        public final String getId() {
+            return host.getName();
+        }
+
+        /**
+         * Returns a host icon for the category in the menu.
+         */
+        public final ImageIcon getCategoryIcon() {
+            return HOST_ICON;
+        }
+
+        /**
+         * Returns tooltip for the host.
+         */
+        public final String getToolTipForGraph() {
+            final StringBuffer tt = new StringBuffer(80);
+            tt.append("<b>" + host.getName() + "</b>");
+            if (host.getCluster().getBrowser().isRealDcHost(host)) {
+                tt.append(" (designated co-ordinator)");
+            }
+            if (!host.isConnected()) {
+                tt.append('\n');
+                tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
+            } else if (!host.isDrbdStatus() && !host.isClStatus()) {
+                tt.append('\n');
+                tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
+            }
+            return tt.toString();
+        }
+
+        /**
+         * Returns info panel.
+         *
+         * @return info panel
+         */
+        public final JComponent getInfoPanel() {
+            Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
+            final Font f = new Font("Monospaced", Font.PLAIN, 12);
+            final JTextArea ta = new JTextArea();
+            ta.setFont(f);
+
+            final ExecCallback execCallback =
+                new ExecCallback() {
+                    public void done(final String ans) {
+                        ta.setText(ans);
+                    }
+
+                    public void doneError(final String ans,
+                                          final int exitCode) {
+                        ta.setText("error");
+                        Tools.sshError(host, "", ans, exitCode);
+                    }
+
+                };
+            final MyButton crmMonButton = new MyButton("crm_mon");
+            crmMonButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    host.execCommand("HostBrowser.getCrmMon",
+                                     execCallback,
+                                     null,  /* ConvertCmdCallback */
+                                     true); /* outputVisible */
+                }
+            });
+            host.registerEnableOnConnect(crmMonButton);
+
+            final MyButton crmConfigureShowButton =
+                                            new MyButton("crm configure show");
+            crmConfigureShowButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    host.execCommand("HostBrowser.getCrmConfigureShow",
+                                     execCallback,
+                                     null,  /* ConvertCmdCallback */
+                                     true); /* outputVisible */
+                }
+            });
+            host.registerEnableOnConnect(crmConfigureShowButton);
+
+            final JPanel mainPanel = new JPanel();
+            mainPanel.setBackground(PANEL_BACKGROUND);
+            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+            final JPanel buttonPanel = new JPanel(new BorderLayout());
+            buttonPanel.setBackground(STATUS_BACKGROUND);
+            buttonPanel.setMinimumSize(new Dimension(0, 50));
+            buttonPanel.setPreferredSize(new Dimension(0, 50));
+            buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+            mainPanel.add(buttonPanel);
+
+            /* Actions */
+            final JMenuBar mb = new JMenuBar();
+            mb.setBackground(PANEL_BACKGROUND);
+            final JMenu serviceCombo = getActionsMenu();
+            updateMenus(null);
+            mb.add(serviceCombo);
+            buttonPanel.add(mb, BorderLayout.EAST);
+            final JPanel p = new JPanel(new SpringLayout());
+            p.setBackground(STATUS_BACKGROUND);
+
+            p.add(crmMonButton);
+            p.add(crmConfigureShowButton);
+            SpringUtilities.makeCompactGrid(p, 2, 1,  // rows, cols
+                                               1, 1,  // initX, initY
+                                               1, 1); // xPad, yPad
+            mainPanel.setMinimumSize(new Dimension(
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Width"),
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Height")
+                        ));
+            mainPanel.setPreferredSize(new Dimension(
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Width"),
+                        Tools.getDefaultInt(
+                                        "HostBrowser.ResourceInfoArea.Height")
+                        ));
+            buttonPanel.add(p);
+            mainPanel.add(new JScrollPane(ta));
+            //mainPanel.add(panel);
+            return mainPanel;
+        }
+
+        /**
+         * Gets host.
+         *
+         * @return host of this info
+         */
+        public final Host getHost() {
+            return host;
+        }
+
+        /**
+         * Compares this host info name with specified hostinfo's name.
+         *
+         * @param otherHI
+         *              other host info
+         * @return true if they are equal
+         */
+        public final boolean equals(final HostInfo otherHI) {
+            if (otherHI == null) {
+                return false;
+            }
+            return otherHI.toString().equals(host.getName());
+        }
+
+        /**
+         * Returns string representation of the host. It's same as name.
+         */
+        public final String toString() {
+            return host.getName();
+        }
+
+        /**
+         * Returns name of the host.
+         */
+        public final String getName() {
+            return host.getName();
+        }
+
+        /**
+         * Creates the popup for the host.
+         */
+        public final List<UpdatableItem> createPopup() {
+            final List<UpdatableItem>items = new ArrayList<UpdatableItem>();
+
+            /* host wizard */
+            final MyMenuItem hostWizardItem =
+                new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
+                               HOST_ICON_LARGE,
+                               null) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return true;
+                    }
+
+                    public void action() {
+                        final EditHostDialog dialog = new EditHostDialog(host);
+                        dialog.showDialogs();
+                    }
+                };
+            items.add(hostWizardItem);
+            registerMenuItem(hostWizardItem);
+            Tools.getGUIData().registerAddHostButton(hostWizardItem);
+            /* heartbeat standby on */
+            final MyMenuItem standByOnItem =
+                new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
+                               HOST_STANDBY_ICON,
+                               null,
+
+                               Tools.getString("HostBrowser.CRM.StandByOff"),
+                               HOST_STANDBY_OFF_ICON,
+                               null) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean predicate() {
+                        return !isStandby();
+                    }
+
+                    public boolean enablePredicate() {
+                        return getHost().isClStatus();
+                    }
+
+                    public void action() {
+                        if (isStandby()) {
+                            CRM.standByOff(host);
+                        } else {
+                            CRM.standByOn(host);
+                        }
+                    }
+                };
+            items.add(standByOnItem);
+            registerMenuItem(standByOnItem);
+            /* change host color */
+            final MyMenuItem changeHostColorItem =
+                new MyMenuItem(Tools.getString(
+                                           "HostBrowser.Drbd.ChangeHostColor"),
+                               null,
+                               null) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return true;
+                    }
+
+                    public void action() {
+                        final JColorChooser tcc = new JColorChooser();
+                        Color newColor = tcc.showDialog(
+                                            Tools.getGUIData().getMainFrame(),
+                                            "asdf",
+                                            host.getPmColors()[0]);
+                        if (newColor != null) {
+                            host.setColor(newColor);
+                        }
+                    }
+                };
+            items.add(changeHostColorItem);
+            registerMenuItem(changeHostColorItem);
+
+            /* view logs */
+            final MyMenuItem viewLogsItem =
+                new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
+                               null,
+                               null) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return getHost().isConnected();
+                    }
+
+                    public void action() {
+                        drbd.gui.dialog.Logs l =
+                                            new drbd.gui.dialog.Logs(host);
+                        l.showDialog();
+                    }
+                };
+            items.add(viewLogsItem);
+            registerMenuItem(viewLogsItem);
+            /* remove host from gui */
+            final MyMenuItem removeHostItem =
+                new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
+                               HOST_REMOVE_ICON,
+                               null) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return getHost().getCluster() == null;
+                    }
+
+                    public void action() {
+                        getHost().disconnect();
+                        Tools.getConfigData().removeHostFromHosts(getHost());
+                        Tools.getGUIData().allHostsUpdate();
+                    }
+                };
+            registerMenuItem(removeHostItem);
+            items.add(removeHostItem);
+
+            return items;
+        }
+
+        /**
+         * Returns grahical view if there is any.
+         */
+        public final JPanel getGraphicalView() {
+            final Cluster c = host.getCluster();
+            if (c == null) {
+                return null;
+            }
+            return ((HeartbeatGraph) c.getBrowser()
+                    .getHeartbeatGraph()).getServicesInfo().getGraphicalView();
+        }
+
+        /**
+         * Returns how much of this is used.
+         */
+        public final int getUsed() {
+            // TODO: maybe the load?
+            return -1;
+        }
+
+        /**
+         * Returns subtexts that appears in the host vertex in the cluster
+         * graph.
+         */
+        public final Subtext[] getSubtextsForGraph() {
+            final List<Subtext> texts = new ArrayList<Subtext>();
+            if (getHost().isConnected()) {
+                if (!getHost().isClStatus()) {
+                   texts.add(new Subtext("waiting for cluster status...",
+                                         null));
+                }
+            } else {
+                texts.add(new Subtext("connecting...",
+                                      null));
+            }
+            return texts.toArray(new Subtext[texts.size()]);
+        }
+
+        /**
+         * Returns text that appears above the icon in the graph.
+         */
+        public String getIconTextForGraph() {
+            if (!getHost().isConnected()) {
+                return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
+            }
+            return null;
+        }
+
+        /**
+         * Returns whether this host is in stand by.
+         */
+        public final boolean isStandby() {
+            final Cluster c = host.getCluster();
+            if (c == null) {
+                return false;
+            }
+            return c.getBrowser().isStandby(host);
+        }
+
+        /**
+         * Returns text that appears in the corner of the graph.
+         */
+        protected Subtext getRightCornerTextForGraph() {
+            if (getHost().isClStatus()) {
+                if (isStandby()) {
+                    return STANDBY_SUBTEXT;
+                } else {
+                    return ONLINE_SUBTEXT;
+                }
+            } else if (getHost().isConnected()) {
+                return OFFLINE_SUBTEXT;
+            }
+            return null;
+        }
+    }
+
+    /**
+     * This class holds info data for a host.
+     * It shows host view, just like in the host tab.
+     */
+    public class HostDrbdInfo extends Info {
+        /**
+         * Prepares a new <code>HostDrbdInfo</code> object.
+         */
+        HostDrbdInfo() {
             super(host.getName());
         }
 
@@ -571,28 +963,6 @@ public class HostBrowser extends Browser {
             });
             host.registerEnableOnConnect(drbdProcsButton);
 
-            final MyButton crmMonButton = new MyButton("crm_mon");
-            crmMonButton.addActionListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("HostBrowser.getCrmMon",
-                                     execCallback,
-                                     null,  /* ConvertCmdCallback */
-                                     true); /* outputVisible */
-                }
-            });
-            host.registerEnableOnConnect(crmMonButton);
-
-            final MyButton hbProcsButton = new MyButton("Heartbeat Processes");
-            hbProcsButton.addActionListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    host.execCommand("HostBrowser.Heartbeat.getProcesses",
-                                     execCallback,
-                                     null,  /* ConvertCmdCallback */
-                                     true); /* outputVisible */
-                }
-            });
-            host.registerEnableOnConnect(hbProcsButton);
-
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -616,9 +986,7 @@ public class HostBrowser extends Browser {
 
             p.add(procDrbdButton);
             p.add(drbdProcsButton);
-            p.add(crmMonButton);
-            p.add(hbProcsButton);
-            SpringUtilities.makeCompactGrid(p, 2, 2,  // rows, cols
+            SpringUtilities.makeCompactGrid(p, 2, 1,  // rows, cols
                                                1, 1,  // initX, initY
                                                1, 1); // xPad, yPad
             mainPanel.setMinimumSize(new Dimension(
@@ -650,13 +1018,13 @@ public class HostBrowser extends Browser {
 
 
         /**
-         * Compares this host info name with specified hostinfo's name.
+         * Compares this host info name with specified hostdrbdinfo's name.
          *
          * @param otherHI
          *              other host info
          * @return true if they are equal
          */
-        public final boolean equals(final HostInfo otherHI) {
+        public final boolean equals(final HostDrbdInfo otherHI) {
             if (otherHI == null) {
                 return false;
             }
@@ -927,42 +1295,6 @@ public class HostBrowser extends Browser {
             items.add(setAllSecondaryItem);
             registerMenuItem(setAllSecondaryItem);
 
-            /* heartbeat standby on */
-            final MyMenuItem standByOnItem =
-                new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
-                               null,
-                               null) {
-                    private static final long serialVersionUID = 1L;
-
-                    public boolean enablePredicate() {
-                        return getHost().isClStatus() && !isStandby();
-                    }
-
-                    public void action() {
-                        CRM.standByOn(host);
-                    }
-                };
-            items.add(standByOnItem);
-            registerMenuItem(standByOnItem);
-
-            /* heartbeat standby off */
-            final MyMenuItem standByOffItem =
-                new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOff"),
-                               null,
-                               null) {
-                    private static final long serialVersionUID = 1L;
-
-                    public boolean enablePredicate() {
-                        return getHost().isClStatus() && isStandby();
-                    }
-
-                    public void action() {
-                        CRM.standByOff(host);
-                    }
-                };
-            registerMenuItem(standByOffItem);
-            items.add(standByOffItem);
-
             /* remove host from gui */
             final MyMenuItem removeHostItem =
                 new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
@@ -987,20 +1319,13 @@ public class HostBrowser extends Browser {
         }
 
         /**
-         * Sets the graphical view for this host.
-         */
-        public final void setGraph(final ResourceGraph graph) {
-            this.graph = graph;
-        }
-
-        /**
          * Returns grahical view if there is any.
          */
         public final JPanel getGraphicalView() {
-            if (graph == null) {
-                return null;
-            }
-            return graph.getGraphPanel();
+            final DrbdGraph dg =
+                    (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+            dg.getDrbdInfo().setSelectedNode(null);
+            return dg.getDrbdInfo().getGraphicalView();
         }
         /**
          * Returns how much of this is used.
@@ -1046,44 +1371,11 @@ public class HostBrowser extends Browser {
         }
 
         /**
-         * Returns text that appears above the icon in the graph.
-         */
-        public String getIconTextForGraph() {
-            if (!getHost().isConnected()) {
-                return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
-            }
-            return null;
-        }
-
-        /**
          * Returns text that appears above the icon in the drbd graph.
          */
         public String getIconTextForDrbdGraph() {
             if (!getHost().isConnected()) {
                 return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
-            }
-            return null;
-        }
-
-        /**
-         * Returns whether this host is in stand by.
-         */
-        public final boolean isStandby() {
-            return host.getCluster().getBrowser().isStandby(host);
-        }
-
-        /**
-         * Returns text that appears in the corner of the graph.
-         */
-        protected Subtext getRightCornerTextForGraph() {
-            if (getHost().isClStatus()) {
-                if (isStandby()) {
-                    return STANDBY_SUBTEXT;
-                } else {
-                    return ONLINE_SUBTEXT;
-                }
-            } else if (getHost().isConnected()) {
-                return OFFLINE_SUBTEXT;
             }
             return null;
         }
@@ -1386,7 +1678,7 @@ public class HostBrowser extends Browser {
         }
 
         public final void selectMyself() {
-            nodeChanged(getNode());
+            super.selectMyself();
         }
 
         public final void setDrbd(final boolean drbd) {

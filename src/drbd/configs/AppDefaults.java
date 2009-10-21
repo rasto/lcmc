@@ -231,6 +231,8 @@ public class AppDefaults extends
                                 "Icons/tango/32x32/service_migrated_32x32.png"},
         {"HeartbeatGraph.HostStandbyIcon",
                                 "Icons/tango/32x32/host_standby_32x32.png"},
+        {"HeartbeatGraph.HostStandbyOffIcon",
+                                "Icons/tango/32x32/host_standbyoff_32x32.png"},
         {"HeartbeatGraph.ServiceUnmanagedIcon",
                                "Icons/tango/32x32/service_unmanaged_32x32.png"},
 
@@ -267,7 +269,10 @@ public class AppDefaults extends
         {"HeartbeatGraph.ServiceIcon",  "Icons/tango/32x32/service1_32x32.png"},
         {"HeartbeatGraph.StartIcon",     "Icons/tango/32x32/ok_32x32.png"},
         //{"HeartbeatGraph.StopIcon",     "Icons/tango/32x32/cancel_32x32.png"},
-        {"HeartbeatGraph.MigrateIcon",   "Icons/tango/32x32/host_32x32.png"},
+        {"HeartbeatGraph.MigrateIcon", 
+                                "Icons/tango/32x32/service_migrated_32x32.png"},
+        {"HeartbeatGraph.UnmigrateIcon", 
+                              "Icons/tango/32x32/service_unmigrate_32x32.png"},
 
         {"ClusterViewPanel.HostIcon",    "Icons/tango/32x32/host_32x32.png"},
         {"ClusterTab.ClusterIcon",      "Icons/tango/32x32/cluster_32x32.png"},

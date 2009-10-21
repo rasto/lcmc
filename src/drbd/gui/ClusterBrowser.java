@@ -188,9 +188,11 @@ public class ClusterBrowser extends Browser {
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.RemoveIcon"));
     /** Migrate icon. */
-    private static final ImageIcon MIGRATE_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("HeartbeatGraph.MigrateIcon"));
+    private static final ImageIcon MIGRATE_ICON = Tools.createImageIcon(
+                            Tools.getDefault("HeartbeatGraph.MigrateIcon"));
+    /** Unmigrate icon. */
+    private static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
+                            Tools.getDefault("HeartbeatGraph.UnmigrateIcon"));
     /** Running service icon. */
     private static final ImageIcon SERVICE_RUNNING_ICON =
         Tools.createImageIcon(
@@ -204,6 +206,9 @@ public class ClusterBrowser extends Browser {
                                         Tools.getDefault("HostTab.HostIcon"));
     /** Start service icon. */
     private static final ImageIcon START_ICON = SERVICE_RUNNING_ICON;
+    /** Unmanage service icon. */
+    private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
+                      Tools.getDefault("HeartbeatGraph.ServiceUnmanagedIcon"));
     /** Stop service icon. */
     private static final ImageIcon STOP_ICON  = SERVICE_NOT_RUNNING_ICON;
     /** Unmanaged subtext. */ 
@@ -651,7 +656,7 @@ public class ClusterBrowser extends Browser {
                 final Host[] hosts = cluster.getHostsArray();
                 for (final Host host : hosts) {
                     final HostBrowser hostBrowser = host.getBrowser();
-                    drbdGraph.addHost(hostBrowser.getHostInfo());
+                    drbdGraph.addHost(hostBrowser.getHostDrbdInfo());
                 }
                 do { /* wait here until a host is connected. */
                     boolean notConnected = true;
@@ -705,7 +710,6 @@ public class ClusterBrowser extends Browser {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         drbdGraph.getDrbdInfo().getInfoPanel();
-                        //drbdGraph.getDrbdInfo().selectMyself();
                     }
                 });
                 Tools.stopProgressIndicator(clusterName,
@@ -745,12 +749,12 @@ public class ClusterBrowser extends Browser {
         while (true) {
             host.setIsLoading();
             host.getHWInfo();
-            drbdGraph.addHost(host.getBrowser().getHostInfo());
+            drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
-                         drbdGraph.scale();
+                         drbdGraph.repaint();
                     }
                 });
             try {
@@ -865,14 +869,31 @@ public class ClusterBrowser extends Browser {
                                                }
                                            }
                                        );
-                                   }
-                               });
-                           thread.start();
                            if (ft) {
+            SwingUtilities.invokeLater(
+                new Runnable() {
+                    public void run() {
+                         drbdGraph.scale();
+                    }
+                });
+                               SwingUtilities.invokeLater(new Runnable() {
+                                       public void run() {
+                           System.out.println("select myself 2");
+                           drbdGraph.getDrbdInfo().selectMyself();
+                                       }});
+                               SwingUtilities.invokeLater(new Runnable() {
+                                       public void run() {
+                               //System.out.println("select myself 1");
+                               //drbdGraph.getDrbdInfo().selectMyself();
                                Tools.stopProgressIndicator(
                                                 hostName,
                                                 ": updating drbd status...");
+                                       }});
+
                            }
+                                   }
+                               });
+                           thread.start();
                        }
                    });
             if (!host.isDrbdStatus()) {
@@ -5258,6 +5279,7 @@ public class ClusterBrowser extends Browser {
          * Change type to Master, Clone or Primitive.
          */
         protected final void changeType(final String value) {
+            Tools.printStackTrace("change type");
             boolean masterSlave = false;
             boolean clone = false;
             if ("Master / Slave".equals(value)) {
@@ -6136,10 +6158,19 @@ public class ClusterBrowser extends Browser {
                     reload(newServiceNode);
                 }
             }
-            if (serviceInfo.getResourceAgent().isMasterSlave()) {
-                serviceInfo.changeType("Master / Slave");
+            if (reloadNode) {
+                if (serviceInfo.getResourceAgent().isMasterSlave()) {
+                    serviceInfo.changeType("Master / Slave");
+                }
             }
             heartbeatGraph.reloadServiceMenus();
+            if (reloadNode) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        heartbeatGraph.scale();
+                    }
+                });
+            }
         }
 
         /**
@@ -6763,11 +6794,11 @@ public class ClusterBrowser extends Browser {
             final MyMenuItem manageMenuItem =
                 new MyMenuItem(
                       Tools.getString("ClusterBrowser.Hb.ManageResource"),
-                      START_ICON, // TODO: icons
+                      START_ICON,
                       Tools.getString("ClusterBrowser.Hb.ManageResource.ToolTip"),
 
                       Tools.getString("ClusterBrowser.Hb.UnmanageResource"),
-                      STOP_ICON, // TODO: icons
+                      UNMANAGE_ICON,
                       Tools.getString("ClusterBrowser.Hb.UnmanageResource.ToolTip")
                      ) {
                     private static final long serialVersionUID = 1L;
@@ -6885,12 +6916,15 @@ public class ClusterBrowser extends Browser {
             /* unmigrate resource */
             final MyMenuItem unmigrateMenuItem =
                 new MyMenuItem(Tools.getString(
-                                    "ClusterBrowser.Hb.UnmigrateResource")) {
+                                    "ClusterBrowser.Hb.UnmigrateResource"),
+                                    UNMIGRATE_ICON,
+                                    null) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
                         // TODO: if it was migrated
-                        return getService().isAvailable();
+                        return getService().isAvailable()
+                               && getMigratedTo() != null;
                     }
 
                     public void action() {
@@ -7099,6 +7133,7 @@ public class ClusterBrowser extends Browser {
                          final boolean master) {
             super(name, ra);
             getService().setMaster(master);
+            Tools.printStackTrace("new clone info");
         }
 
         /**
@@ -8051,6 +8086,7 @@ public class ClusterBrowser extends Browser {
             }
             heartbeatGraph.killRemovedEdges();
             heartbeatGraph.killRemovedVertices();
+            heartbeatGraph.scale();
         }
 
         /**
@@ -8221,7 +8257,7 @@ public class ClusterBrowser extends Browser {
 
         /**
          * Adds new service to the specified position. If position is null, it
-         * will be computed later. ReloadNode specifies if the node in
+         * will be computed later. reloadNode specifies if the node in
          * the menu should be reloaded and get uptodate.
          */
         public void addServicePanel(final ServiceInfo newServiceInfo,
@@ -8241,11 +8277,17 @@ public class ClusterBrowser extends Browser {
                     /* show it */
                     reload(servicesNode);
                     reload(newServiceNode);
+                    if (newServiceInfo.getResourceAgent().isMasterSlave()) {
+                        /* only if it was added manually. */
+                        newServiceInfo.changeType("Master / Slave");
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            heartbeatGraph.scale();
+                        }
+                    });
                 }
                 //heartbeatGraph.scale();
-            }
-            if (newServiceInfo.getResourceAgent().isMasterSlave()) {
-                newServiceInfo.changeType("Master / Slave");
             }
             heartbeatGraph.reloadServiceMenus();
         }
@@ -10062,10 +10104,10 @@ public class ClusterBrowser extends Browser {
          *              whether dialog box will be displayed
          */
         public final void addDrbdResource(String name,
-                             String drbdDevStr,
-                             final BlockDevInfo bd1,
-                             final BlockDevInfo bd2,
-                             final boolean interactive) {
+                                          String drbdDevStr,
+                                          final BlockDevInfo bd1,
+                                          final BlockDevInfo bd2,
+                                          final boolean interactive) {
             DrbdResourceInfo dri;
             if (bd1 == null || bd2 == null) {
                 return;
@@ -10114,8 +10156,7 @@ public class ClusterBrowser extends Browser {
             bd1.setDefaultVIPort(viPort + 1);
             bd2.setDefaultVIPort(viPort + 1);
 
-            dri.getDrbdResource().setDefaultValue(DRBD_RES_PARAM_NAME,
-                                                  name);
+            dri.getDrbdResource().setDefaultValue(DRBD_RES_PARAM_NAME, name);
             dri.getDrbdResource().setDefaultValue(DRBD_RES_PARAM_DEV,
                                                   drbdDevStr);
             drbdResHash.put(name, dri);
@@ -10137,16 +10178,16 @@ public class ClusterBrowser extends Browser {
             }
 
             final DefaultMutableTreeNode drbdResourceNode =
-                new DefaultMutableTreeNode(dri);
+                                               new DefaultMutableTreeNode(dri);
             dri.setNode(drbdResourceNode);
 
             drbdNode.add(drbdResourceNode);
 
             final DefaultMutableTreeNode drbdBDNode1 =
-                new DefaultMutableTreeNode(bd1);
+                                               new DefaultMutableTreeNode(bd1);
             bd1.setNode(drbdBDNode1);
             final DefaultMutableTreeNode drbdBDNode2 =
-                new DefaultMutableTreeNode(bd2);
+                                               new DefaultMutableTreeNode(bd2);
             bd2.setNode(drbdBDNode2);
             drbdResourceNode.add(drbdBDNode1);
             drbdResourceNode.add(drbdBDNode2);
@@ -10155,26 +10196,26 @@ public class ClusterBrowser extends Browser {
             dri.getInfoPanel();
             final DrbdResourceInfo driF = dri;
             if (interactive) {
-                final Thread thread = new Thread(
-                    new Runnable() {
-                        public void run() {
-                            //reload(getNode());
-                            reload(drbdResourceNode);
-                            AddDrbdConfigDialog adrd
-                                = new AddDrbdConfigDialog(driF);
-                            adrd.showDialogs();
-                            if (adrd.isCanceled()) {
-                                driF.removeMyselfNoConfirm();
-                                drbdGraph.stopAnimation(bd1);
-                                drbdGraph.stopAnimation(bd2);
-                                return;
-                            }
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        //reload(getNode());
+                        reload(drbdResourceNode);
+                        AddDrbdConfigDialog adrd
+                            = new AddDrbdConfigDialog(driF);
+                        adrd.showDialogs();
+                        if (adrd.isCanceled()) {
+                            driF.removeMyselfNoConfirm();
+                            drbdGraph.stopAnimation(bd1);
+                            drbdGraph.stopAnimation(bd2);
+                            return;
+                        }
 
-                            updateCommonBlockDevices();
-                            drbdXML.update(bd1.getHost());
-                            drbdXML.update(bd2.getHost());
-                            resetFilesystems();
-                        } });
+                        updateCommonBlockDevices();
+                        drbdXML.update(bd1.getHost());
+                        drbdXML.update(bd2.getHost());
+                        resetFilesystems();
+                    }
+                });
                 thread.start();
             } else {
                 resetFilesystems();

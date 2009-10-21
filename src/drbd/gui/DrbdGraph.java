@@ -26,7 +26,7 @@ import drbd.utilities.Tools;
 import drbd.data.Host;
 import drbd.data.resources.BlockDevice;
 import drbd.data.Subtext;
-import drbd.gui.HostBrowser.HostInfo;
+import drbd.gui.HostBrowser.HostDrbdInfo;
 import drbd.gui.ClusterBrowser.DrbdInfo;
 import drbd.gui.ClusterBrowser.DrbdResourceInfo;
 import drbd.gui.HostBrowser.BlockDevInfo;
@@ -65,11 +65,11 @@ import javax.swing.ImageIcon;
  */
 public class DrbdGraph extends ResourceGraph {
     /** Map from vertex to host. */
-    private final Map<Vertex, HostInfo>vertexToHostMap =
-                                 new LinkedHashMap<Vertex, HostInfo>();
+    private final Map<Vertex, HostDrbdInfo>vertexToHostMap =
+                                 new LinkedHashMap<Vertex, HostDrbdInfo>();
     /** Map from host to vertex. */
-    private final Map<HostInfo, Vertex>hostToVertexMap =
-                                 new LinkedHashMap<HostInfo, Vertex>();
+    private final Map<HostDrbdInfo, Vertex>hostToVertexMap =
+                                 new LinkedHashMap<HostDrbdInfo, Vertex>();
     /** Map from block device info object to vertex. */
     private final Map<BlockDevInfo, Vertex>bdiToVertexMap =
                                  new LinkedHashMap<BlockDevInfo, Vertex>();
@@ -77,8 +77,8 @@ public class DrbdGraph extends ResourceGraph {
     private final Map<BlockDevice, Vertex>blockDeviceToVertexMap =
                                  new LinkedHashMap<BlockDevice, Vertex>();
     /** Map from host to the list of block devices. */
-    private final Map<HostInfo, List<Vertex>>hostBDVerticesMap =
-                                 new LinkedHashMap<HostInfo, List<Vertex>>();
+    private final Map<HostDrbdInfo, List<Vertex>>hostBDVerticesMap =
+                                 new LinkedHashMap<HostDrbdInfo, List<Vertex>>();
     /** Map from graph edge to the drbd resource info object. */
     private final Map<Edge, DrbdResourceInfo>edgeToDrbdResourceMap =
                                  new LinkedHashMap<Edge, DrbdResourceInfo>();
@@ -170,19 +170,19 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Adds host with all its block devices to the graph.
      */
-    public final void addHost(final HostInfo hostInfo) {
-        Vertex v = getVertex(hostInfo);
+    public final void addHost(final HostDrbdInfo hostDrbdInfo) {
+        Vertex v = getVertex(hostDrbdInfo);
         if (v == null) {
             /* add host vertex */
             final SparseVertex sv = new SparseVertex();
             v = getGraph().addVertex(sv);
-            putInfoToVertex(hostInfo, v);
-            vertexToHostMap.put(v, hostInfo);
-            hostToVertexMap.put(hostInfo, v);
-            putVertexToInfo(v, (Info) hostInfo);
+            putInfoToVertex(hostDrbdInfo, v);
+            vertexToHostMap.put(v, hostDrbdInfo);
+            hostToVertexMap.put(hostDrbdInfo, v);
+            putVertexToInfo(v, (Info) hostDrbdInfo);
             // TODO: get saved position is disabled at the moment,
             // because it does more harm than good at the moment.
-            Point2D hostPos = null; // getSavedPosition(hostInfo);
+            Point2D hostPos = null; // getSavedPosition(hostDrbdInfo);
 
             if (hostPos == null) {
                 hostPos = new Point2D.Double(
@@ -195,16 +195,16 @@ public class DrbdGraph extends ResourceGraph {
             getVertexLocations().setLocation(sv, hostPos);
         }
         /* add block devices vertices */
-        final Host host = hostInfo.getHost();
+        final Host host = hostDrbdInfo.getHost();
         final Point2D hostPos = getVertexLocations().getLocation(v);
         final double hostXPos = hostPos.getX() - getDefaultVertexWidth(v) / 2;
         //if (host.blockDevicesHaveChanged()) {
             int devYPos = HOST_Y_POS + BD_STEP_Y;
-            List<Vertex> vertexList = hostBDVerticesMap.get(hostInfo);
+            List<Vertex> vertexList = hostBDVerticesMap.get(hostDrbdInfo);
             List<Vertex> oldVertexList = null;
             if (vertexList == null) {
                 vertexList = new ArrayList<Vertex>();
-                hostBDVerticesMap.put(hostInfo, vertexList);
+                hostBDVerticesMap.put(hostDrbdInfo, vertexList);
             } else {
                 oldVertexList = new ArrayList<Vertex>(vertexList);
             }
@@ -235,7 +235,7 @@ public class DrbdGraph extends ResourceGraph {
                     blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
                     putVertexToInfo(bdv, (Info) bdi);
                     putInfoToVertex(bdi, bdv);
-                    vertexToHostMap.put(bdv, hostInfo);
+                    vertexToHostMap.put(bdv, hostDrbdInfo);
                     vertexList.add(bdv);
                     // TODO: get saved position is disabled at the moment,
                     // because it does more harm than good at the moment.
@@ -460,7 +460,7 @@ public class DrbdGraph extends ResourceGraph {
             return bdi.getPopup();
         } else {
             /* host */
-            final HostInfo hi = (HostInfo) getInfo(v);
+            final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
             return hi.getPopup();
         }
     }
@@ -539,7 +539,7 @@ public class DrbdGraph extends ResourceGraph {
     //                          final Point2D newLocation) {
     //    final double oldY = oldLocation;
     //    final double newY = newLocation.getY();
-    //    final HostInfo hi = vertexToHostMap.get(vertex);
+    //    final HostDrbdInfo hi = vertexToHostMap.get(vertex);
     //    final PickedState ps = getVisualizationViewer().getPickedState();
     //    final Point2D hl = getVertexLocations().getLocation(getVertex(hi));
     //    final double x = hl.getX() + BD_X_OFFSET;
@@ -570,6 +570,11 @@ public class DrbdGraph extends ResourceGraph {
     public final void pickBlockDevice(final BlockDevInfo bdi) {
         final Vertex v = bdiToVertexMap.get(bdi);
         pickVertex(v);
+        bdi.selectMyself();
+        //final HostDrbdInfo hi = vertexToHostMap.get(v);
+        //if (hi != null) {
+        //    Tools.getGUIData().setTerminalPanel(hi.getHost().getTerminalPanel());
+        //}
     }
 
     /**
@@ -577,7 +582,7 @@ public class DrbdGraph extends ResourceGraph {
      */
     private void pickHost(final Vertex v) {
         pickVertex(v);
-        final HostInfo hi = vertexToHostMap.get(v);
+        final HostDrbdInfo hi = vertexToHostMap.get(v);
         Tools.getGUIData().setTerminalPanel(hi.getHost().getTerminalPanel());
     }
 
@@ -588,14 +593,13 @@ public class DrbdGraph extends ResourceGraph {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             drbdInfo.setSelectedNode(bdi);
-            //drbdInfo.selectMyself();
+            drbdInfo.selectMyself();
             getClusterBrowser().setRightComponentInView(bdi);
             //oldLocation = getVertexLocations().getLocation(v).getY();
         } else {
             pickHost(v);
             //oldLocation = getVertexLocations().getLocation(v).getY();
-            final HostInfo hi = vertexToHostMap.get(v);
-            hi.setGraph(this);
+            final HostDrbdInfo hi = vertexToHostMap.get(v);
             getClusterBrowser().setRightComponentInView(hi);
         }
     }
@@ -609,7 +613,7 @@ public class DrbdGraph extends ResourceGraph {
     //protected final void vertexReleased(final Vertex v, final Point2D pos) {
     //    double y = pos.getY();
     //    double x = pos.getX();
-    //    final HostInfo hi = vertexToHostMap.get(v);
+    //    final HostDrbdInfo hi = vertexToHostMap.get(v);
     //    final Vertex hostVertex = getVertex(hi);
     //    if (hostVertex.equals(v)) {
     //        getVertexLocations().setLocation(v, pos);
@@ -724,7 +728,7 @@ public class DrbdGraph extends ResourceGraph {
      */
     protected final Color getVertexFillColor(final Vertex v) {
 
-        final HostInfo hi = vertexToHostMap.get(v);
+        final HostDrbdInfo hi = vertexToHostMap.get(v);
         final Vertex hostVertex = getVertex(hi);
         if (v.equals(hostVertex)) {
             /* host */
@@ -777,8 +781,8 @@ public class DrbdGraph extends ResourceGraph {
      */
     public final BlockDevInfo findBlockDevInfo(final String hostName,
                                                final String disk) {
-        HostInfo hi = null;
-        for (final HostInfo h : hostBDVerticesMap.keySet()) {
+        HostDrbdInfo hi = null;
+        for (final HostDrbdInfo h : hostBDVerticesMap.keySet()) {
             hi = h;
             if (hi.toString().equals(hostName)) {
                 break;
@@ -874,7 +878,7 @@ public class DrbdGraph extends ResourceGraph {
         final Vertex v = getVertex(i);
         String hiId = "";
         if (v != null) {
-            final HostInfo hi = vertexToHostMap.get(v);
+            final HostDrbdInfo hi = vertexToHostMap.get(v);
             hiId = hi.getId();
         }
         return "dr=" + hiId + i.getId();
@@ -912,7 +916,7 @@ public class DrbdGraph extends ResourceGraph {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             return bdi.getUsed();
         }
-        final HostInfo hi = vertexToHostMap.get(v);
+        final HostDrbdInfo hi = vertexToHostMap.get(v);
         return hi.getUsed();
     }
 
@@ -928,7 +932,7 @@ public class DrbdGraph extends ResourceGraph {
         final float height = (float) shape.getBounds().getHeight();
         final float width = (float) shape.getBounds().getWidth();
         if (!isVertexBlockDevice(v)) {
-            final HostInfo hi = (HostInfo) getInfo(v);
+            final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
             drawInsideVertex(g2d,
                              v,
                              hi.getHost().getDrbdColors(),

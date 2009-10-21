@@ -469,6 +469,7 @@ public abstract class ResourceGraph {
         //    }
         //}
         //TODO: it may hang here, check it
+        System.out.println("visualizationViewer restart");
         visualizationViewer.restart();
         visualizationViewer.repaint();
     }

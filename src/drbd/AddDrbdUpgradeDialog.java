@@ -26,7 +26,7 @@ import drbd.utilities.Tools;
 
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.dialog.HostDistForUpgrade;
-import drbd.gui.HostBrowser.HostInfo;
+import drbd.gui.HostBrowser.HostDrbdInfo;
 
 /**
  * AddDrbdUpgradeDialog.
@@ -40,20 +40,21 @@ public class AddDrbdUpgradeDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Host on which the drbd will be upgraded. */
-    private final HostInfo hostInfo;
+    private final HostDrbdInfo hostDrbdInfo;
 
     /**
      * Prepares a new <code>AddDrbdUpgradeDialog</code> object.
      */
-    public AddDrbdUpgradeDialog(final HostInfo hostInfo) {
-        this.hostInfo = hostInfo;
+    public AddDrbdUpgradeDialog(final HostDrbdInfo hostDrbdInfo) {
+        this.hostDrbdInfo = hostDrbdInfo;
     }
 
     /**
      * Shows step by step dialogs that upgrade the drbd.
      */
     public void showDialogs() {
-        WizardDialog dialog = new HostDistForUpgrade(null, hostInfo.getHost());
+        WizardDialog dialog = new HostDistForUpgrade(null,
+                                                     hostDrbdInfo.getHost());
         while (true) {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {

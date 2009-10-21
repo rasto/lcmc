@@ -553,7 +553,6 @@ public class Browser {
          */
         public void selectMyself() {
             // this fires an event in ViewPanel.
-
             reload(node);
             nodeChanged(node);
         }

@@ -237,8 +237,8 @@ public class DistResource extends
 
         {"HostBrowser.getCrmMon",
          "crm_mon -1"},
-        {"HostBrowser.Heartbeat.getProcesses",
-         "ps aux|grep heartbeat|grep -v regevt"},
+        {"HostBrowser.getCrmConfigureShow",
+         "crm configure show"},
 
         {"Logs.hbLog",
          "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null"
