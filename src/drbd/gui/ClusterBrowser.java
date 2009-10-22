@@ -638,6 +638,11 @@ public class ClusterBrowser extends Browser {
 
         /* networks */
         updateNetworks();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                heartbeatGraph.scale();
+            }
+        });
 
         updateHeartbeatDrbdThread();
     }
@@ -750,7 +755,7 @@ public class ClusterBrowser extends Browser {
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
-                         drbdGraph.repaint();
+                         drbdGraph.scale();
                     }
                 });
             try {
@@ -8254,7 +8259,6 @@ public class ClusterBrowser extends Browser {
 
             newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
-
             if (!heartbeatGraph.addResource(newServiceInfo, null, pos)) {
                 addNameToServiceInfoHash(newServiceInfo);
                 final DefaultMutableTreeNode newServiceNode =

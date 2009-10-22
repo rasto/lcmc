@@ -176,6 +176,7 @@ public class DrbdGraph extends ResourceGraph {
             /* add host vertex */
             final SparseVertex sv = new SparseVertex();
             v = getGraph().addVertex(sv);
+            somethingChanged();
             putInfoToVertex(hostDrbdInfo, v);
             vertexToHostMap.put(v, hostDrbdInfo);
             hostToVertexMap.put(hostDrbdInfo, v);
@@ -224,6 +225,7 @@ public class DrbdGraph extends ResourceGraph {
                         blockDeviceToVertexMap.remove(bdi.getBlockDevice());
                         vertexToHostMap.remove(bdv);
                         vertexList.remove(bdv);
+                        somethingChanged();
                     }
                 }
             }
@@ -231,6 +233,7 @@ public class DrbdGraph extends ResourceGraph {
                 if (!blockDeviceToVertexMap.containsKey(bdi.getBlockDevice())) {
                     final SparseVertex bdsv = new SparseVertex();
                     final Vertex bdv = getGraph().addVertex(bdsv);
+                    somethingChanged();
                     bdiToVertexMap.put(bdi, bdv);
                     blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
                     putVertexToInfo(bdv, (Info) bdi);

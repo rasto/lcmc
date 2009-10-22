@@ -84,6 +84,7 @@ import java.awt.Paint;
 import java.awt.GradientPaint;
 import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 import java.awt.geom.Area;
 
@@ -145,6 +146,8 @@ public abstract class ResourceGraph {
     /** Map from vertex to its height. */
     private final Map<Vertex, Integer>vertexHeight =
                                                new HashMap<Vertex, Integer>();
+    /** Whether something in the graph changed that requires vv to restart. */
+    private volatile boolean changed = false;
 
     /**
      * Prepares a new <code>ResourceGraph</code> object.
@@ -440,7 +443,7 @@ public abstract class ResourceGraph {
 
     /**
      * Scales the graph, so that all vertices can be seen. The graph can
-     * get smaller but not bigger.
+     * get smaller but not bigger. 
      */
     public final void scale() { // TODO: synchronize differently
         //TODO: disabling it till it works properly
@@ -469,8 +472,10 @@ public abstract class ResourceGraph {
         //    }
         //}
         //TODO: it may hang here, check it
-        System.out.println("visualizationViewer restart");
-        visualizationViewer.restart();
+        if (changed) {
+            somethingChangedReset();
+            visualizationViewer.restart();
+        }
         visualizationViewer.repaint();
     }
 
@@ -1203,6 +1208,7 @@ public abstract class ResourceGraph {
             boolean widthChanged = Math.abs(oldShapeWidth - shapeWidth) > 5;
             boolean heightChanged = Math.abs(oldShapeHeight - shapeHeight) > 1;
             if (widthChanged || heightChanged) {
+                somethingChanged();
                 /* move it, so that left side has the same position, if it is
                  * resized */
                 final Point2D pos = getVertexLocations().getLocation(v);
@@ -1218,7 +1224,11 @@ public abstract class ResourceGraph {
                 }
                 pos.setLocation(x, y);
                 getVertexLocations().setLocation(v, pos);
-                scale();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        scale();
+                    }
+                });
             }
             /* shape */
             super.paintShapeForVertex(g2d, v, shape);
@@ -1426,5 +1436,18 @@ public abstract class ResourceGraph {
                                color.getBlue(),
                                alpha));
         textLayout.draw(g2d, (float) x, (float) y);
+    }
+
+    /**
+     * Resets something changed flag.
+     */
+    private final void somethingChangedReset() {
+        changed = false;
+    }
+    /**
+     * Is called when something in the graph changed.
+     */
+    protected final void somethingChanged() {
+        changed = true;
     }
 }

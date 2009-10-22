@@ -306,6 +306,7 @@ public class HeartbeatGraph extends ResourceGraph {
         removeVertex(oldSI);
         putInfoToVertex(newSI, v);
         putVertexToInfo(v, (Info) newSI);
+        somethingChanged();
     }
 
     /**
@@ -318,7 +319,6 @@ public class HeartbeatGraph extends ResourceGraph {
                                      final Point2D pos) {
 
         //vv.stop();
-        System.out.println("add resource");
         boolean vertexExists = true;
         Vertex v = getVertex(serviceInfo);
         if (v == null) {
@@ -340,6 +340,7 @@ public class HeartbeatGraph extends ResourceGraph {
             }
 
             v = getGraph().addVertex(sv);
+            somethingChanged();
             putInfoToVertex(serviceInfo, v);
             putVertexToInfo(v, (Info) serviceInfo);
             vertexExists = false;
@@ -947,6 +948,7 @@ public class HeartbeatGraph extends ResourceGraph {
                     vertexToAddServiceMap.remove(v);
                     vertexToAddExistingServiceMap.remove(v);
                     //TODO: positions are still there
+                    somethingChanged();
                 }
             }
         }
@@ -1224,6 +1226,7 @@ public class HeartbeatGraph extends ResourceGraph {
             /* add host vertex */
             final SparseVertex sv = new SparseVertex();
             v = getGraph().addVertex(sv);
+            somethingChanged();
             putInfoToVertex(hostInfo, v);
             vertexToHostMap.put(v, hostInfo);
             hostToVertexMap.put(hostInfo, v);
