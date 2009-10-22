@@ -241,7 +241,6 @@ public final class CRM {
                                 final List<Map<String, String>> colAttrsList,
                                 final List<Map<String, String>> ordAttrsList) {
         for (int i = 0; i < parents.length; i++) {
-            System.out.println("oc id: " + heartbeatId + ", p: " + parents[i]);
             addColocation(host,
                           null,
                           heartbeatId,

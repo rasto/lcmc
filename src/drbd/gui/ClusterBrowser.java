@@ -99,6 +99,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.concurrent.CountDownLatch;
 
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -798,11 +799,31 @@ public class ClusterBrowser extends Browser {
      * Starts drbd status on host.
      */
     public final void startDrbdStatus(final Host host) {
-        boolean firstTime = true; // TODO: can use a latch for this shit too.
+        final CountDownLatch firstTime = new CountDownLatch(1);
         host.setDrbdStatus(false);
         final String hostName = host.getName();
+        /* now what we do if the status finished for the first time. */
+        Tools.startProgressIndicator(hostName, ": updating drbd status...");
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    firstTime.await();
+                } catch (InterruptedException ignored) {
+                    /* ignored */
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                         drbdGraph.scale();
+                         drbdGraph.getDrbdInfo().selectMyself();
+                    }
+                });
+                Tools.stopProgressIndicator(hostName,
+                                            ": updating drbd status...");
+            }
+        });
+        thread.start();
+
         while (true) {
-            final boolean ft = firstTime;
             drbdStatusCanceled = false;
             host.execDrbdStatusCommand(
                   new ExecCallback() {
@@ -844,11 +865,6 @@ public class ClusterBrowser extends Browser {
                            } else {
                                host.setDrbdStatus(true);
                            }
-                           if (ft) {
-                               Tools.startProgressIndicator(
-                                                hostName,
-                                                ": updating drbd status...");
-                           }
                            final String[] lines = output.split("\n");
                            drbdXML.update(host);
                            host.setDrbdStatus(true);
@@ -869,28 +885,6 @@ public class ClusterBrowser extends Browser {
                                                }
                                            }
                                        );
-                           if (ft) {
-            SwingUtilities.invokeLater(
-                new Runnable() {
-                    public void run() {
-                         drbdGraph.scale();
-                    }
-                });
-                               SwingUtilities.invokeLater(new Runnable() {
-                                       public void run() {
-                           System.out.println("select myself 2");
-                           drbdGraph.getDrbdInfo().selectMyself();
-                                       }});
-                               SwingUtilities.invokeLater(new Runnable() {
-                                       public void run() {
-                               //System.out.println("select myself 1");
-                               //drbdGraph.getDrbdInfo().selectMyself();
-                               Tools.stopProgressIndicator(
-                                                hostName,
-                                                ": updating drbd status...");
-                                       }});
-
-                           }
                                    }
                                });
                            thread.start();
@@ -904,9 +898,8 @@ public class ClusterBrowser extends Browser {
                 }
             }
             host.waitOnDrbdStatus();
-            firstTime = false;
+            firstTime.countDown();
             if (drbdStatusCanceled) {
-                firstTime = true;
                 break;
             }
         }
@@ -2505,7 +2498,7 @@ public class ClusterBrowser extends Browser {
             fi.setDrbddiskInfo(di);
             di.getInfoPanel();
             di.paramComboBoxGet("1", null).setValueAndWait(getName());
-            heartbeatGraph.addColocation(di, fi);
+            //heartbeatGraph.addColocation(di, fi);
             di.apply();
         }
 
@@ -2524,12 +2517,14 @@ public class ClusterBrowser extends Browser {
             ldi.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(ldi);
             fi.setLinbitDrbdInfo(ldi);
-            ldi.getCloneInfo().getInfoPanel();
-            //ldi.getInfoPanel();
+            /* it adds coloation only to the graph. */
+            heartbeatGraph.addColocation(ldi.getCloneInfo(), fi);
+            /* this must be executed after the getInfoPanel is executed. */
+            ldi.waitForInfoPanel();
             ldi.paramComboBoxGet("drbd_resource",
                                  null).setValueAndWait(getName());
-            heartbeatGraph.addColocation(ldi.getCloneInfo(), fi);
-            ldi.apply();
+            ldi.apply(); /* apply gets parents from graph and adds
+                            colocations. */
         }
 
 
@@ -3498,7 +3493,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Sets resource name / parameter "1".
+         * Sets resource name / parameter "1". TODO: not used?
          */
         public void setResourceName(final String resourceName) {
             getResource().setValue("1", resourceName);
@@ -3570,7 +3565,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Sets resource name.
+         * Sets resource name. TODO: not used?
          */
         public void setResourceName(final String resourceName) {
             getResource().setValue("drbd_resource", resourceName);
@@ -4173,6 +4168,8 @@ public class ClusterBrowser extends Browser {
         private JLabel heartbeatIdLabel = null;
         /** Radio buttons for clone/master/slave primitive resources. */
         private GuiComboBox typeRadioGroup;
+        /** Is counted down, first time the info panel is initialized. */
+        private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
 
         /**
          * Prepares a new <code>ServiceInfo</code> object and creates
@@ -5279,7 +5276,6 @@ public class ClusterBrowser extends Browser {
          * Change type to Master, Clone or Primitive.
          */
         protected final void changeType(final String value) {
-            Tools.printStackTrace("change type");
             boolean masterSlave = false;
             boolean clone = false;
             if ("Master / Slave".equals(value)) {
@@ -5382,7 +5378,16 @@ public class ClusterBrowser extends Browser {
                 );
             }
         }
-
+        /**
+         * Waits till the info panel is done for the first time.
+         */
+        public final void waitForInfoPanel() {
+            try {
+                infoPanelLatch.await();
+            } catch (InterruptedException ignored) {
+                /* ignored */
+            }
+        }
         /**
          * Returns info panel with comboboxes for service parameters.
          */
@@ -5623,6 +5628,7 @@ public class ClusterBrowser extends Browser {
             /* if id textfield was changed and this id is not used,
              * enable apply button */
             infoPanel = newPanel;
+            infoPanelLatch.countDown();
             return infoPanel;
         }
 
@@ -5784,11 +5790,7 @@ public class ClusterBrowser extends Browser {
             setHeartbeatIdLabel();
             addToHeartbeatIdList(this);
             addNameToServiceInfoHash(this);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    addResourceBefore();
-                }
-            });
+            addResourceBefore();
 
             Map<String,String> cloneMetaArgs = new HashMap<String,String>();
             Map<String,String> pacemakerResAttrs =
@@ -5968,7 +5970,6 @@ public class ClusterBrowser extends Browser {
 
             reload(getNode());
             heartbeatGraph.repaint();
-
         }
 
         /**
@@ -7133,7 +7134,6 @@ public class ClusterBrowser extends Browser {
                          final boolean master) {
             super(name, ra);
             getService().setMaster(master);
-            Tools.printStackTrace("new clone info");
         }
 
         /**
@@ -7999,7 +7999,8 @@ public class ClusterBrowser extends Browser {
                             heartbeatGraph.getServicesInfo().addServicePanel(
                                                                         newSi,
                                                                         p,
-                                                                        true);
+                                                                        true,
+                                                                        false);
                         }
                     } else {
                         newSi.setParameters(resourceNode);
@@ -8086,7 +8087,11 @@ public class ClusterBrowser extends Browser {
             }
             heartbeatGraph.killRemovedEdges();
             heartbeatGraph.killRemovedVertices();
-            heartbeatGraph.scale();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    heartbeatGraph.scale();
+                }
+            });
         }
 
         /**
@@ -8251,7 +8256,7 @@ public class ClusterBrowser extends Browser {
                 addToHeartbeatIdList(newServiceInfo);
                 newServiceInfo.getService().setHeartbeatId(heartbeatId);
             }
-            addServicePanel(newServiceInfo, pos, reloadNode);
+            addServicePanel(newServiceInfo, pos, reloadNode, true);
             return newServiceInfo;
         }
 
@@ -8262,7 +8267,8 @@ public class ClusterBrowser extends Browser {
          */
         public void addServicePanel(final ServiceInfo newServiceInfo,
                                     final Point2D pos,
-                                    final boolean reloadNode) {
+                                    final boolean reloadNode,
+                                    final boolean interactive) {
 
             newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
@@ -8273,21 +8279,21 @@ public class ClusterBrowser extends Browser {
                                     new DefaultMutableTreeNode(newServiceInfo);
                 newServiceInfo.setNode(newServiceNode);
                 servicesNode.add(newServiceNode);
+                if (interactive
+                    && newServiceInfo.getResourceAgent().isMasterSlave()) {
+                    /* only if it was added manually. */
+                    newServiceInfo.changeType("Master / Slave");
+                }
                 if (reloadNode) {
                     /* show it */
                     reload(servicesNode);
                     reload(newServiceNode);
-                    if (newServiceInfo.getResourceAgent().isMasterSlave()) {
-                        /* only if it was added manually. */
-                        newServiceInfo.changeType("Master / Slave");
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            heartbeatGraph.scale();
-                        }
-                    });
                 }
-                //heartbeatGraph.scale();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        heartbeatGraph.scale();
+                    }
+                });
             }
             heartbeatGraph.reloadServiceMenus();
         }
