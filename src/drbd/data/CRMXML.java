@@ -553,7 +553,7 @@ public class CRMXML extends XML {
      * Returns choices for integer fields.
      */
     public final String[] getIntegerValues() {
-        return new String[]{null, "0", "INFINITY", "-INFINITY"};
+        return new String[]{null, "0", "2", "100", "INFINITY", "-INFINITY"};
     }
 
 

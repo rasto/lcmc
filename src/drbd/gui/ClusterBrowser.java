@@ -5024,18 +5024,23 @@ public class ClusterBrowser extends Browser {
                                                  new HashMap<String, String>();
                 abbreviations.put("i", "INFINITY");
                 abbreviations.put("I", "INFINITY");
+                abbreviations.put("a", "ALWAYS");
+                abbreviations.put("n", "NEVER");
                 final GuiComboBox cb =
-                    new GuiComboBox(null,
-                                    new String[]{null,
-                                                 "0",
-                                                 "2",
-                                                 "INFINITY",
-                                                 "-INFINITY"},
-                                    null,
-                                    null,
-                                    "^(-?(\\d*|INFINITY))|@NOTHING_SELECTED@$",
-                                    rightWidth,
-                                    abbreviations);
+                    new GuiComboBox(
+                        null,
+                        new String[]{null,
+                                     "0",
+                                     "2",
+                                     "ALWAYS",
+                                     "NEVER",
+                                     "INFINITY",
+                                     "-INFINITY"},
+                        null,
+                        null,
+                        "^(-?(\\d*|INFINITY))|ALWAYS|NEVER|@NOTHING_SELECTED@$",
+                        rightWidth,
+                        abbreviations);
                 cb.setEditable(true);
                 scoreComboBoxHash.put(hi, cb);
 
@@ -5634,7 +5639,13 @@ public class ClusterBrowser extends Browser {
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                final String hs = cb.getStringValue();
+                String hs = cb.getStringValue();
+                if ("ALWAYS".equals(hs)) {
+                    hs = "INFINITY";
+                } else if ("NEVER".equals(hs)) {
+                    hs = "-INFINITY";
+                }
+
                 final String hsSaved = savedHostScores.get(hi);
                 if ((hsSaved == null && !"".equals(hs))
                     || (hsSaved != null && !hs.equals(hsSaved))) {

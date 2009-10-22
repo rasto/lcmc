@@ -660,6 +660,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * vertices were selected, it does not do anything.
      */
     protected final void oneVertexPressed(final Vertex v) {
+        pickVertex(v);
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             getClusterBrowser().setRightComponentInView(hi);
