@@ -134,11 +134,17 @@ public class Service extends Resource {
         }
         setValue("id", id);
     }
-
+    
     /**
-     * Sets the id and heartbeat id.
+     * Sets the id.
      */
     public final void setId(final String id) {
+        this.id = id;
+    }
+    /**
+     * Sets the id and crm id.
+     */
+    public final void setIdAndCrmId(final String id) {
         this.id = id;
         if (GROUP_NAME.equals(getName())) {
             if (id.startsWith(GRP_ID_PREFIX)) {

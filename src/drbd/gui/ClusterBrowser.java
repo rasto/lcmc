@@ -3613,7 +3613,7 @@ public class ClusterBrowser extends Browser {
             }
             if (getService().isNew()) {
                 final String id = idField.getStringValue();
-                getService().setId(id);
+                getService().setIdAndCrmId(id);
             }
             setHeartbeatIdLabel();
             addToHeartbeatIdList(this);
@@ -4279,10 +4279,13 @@ public class ClusterBrowser extends Browser {
                         ret = true;
                     }
                 } else {
-                    if (heartbeatId.equals(
-                                 Service.RES_ID_PREFIX + getName() + "_" + id)
+                    if (heartbeatId == null) {
+                        ret = true;
+                    } else if (heartbeatId.equals(
+                                Service.RES_ID_PREFIX + getName() + "_" + id)
                         || heartbeatId.equals(id)) {
-                        ret = checkHostScoreFieldsChanged() || checkOperationFieldsChanged();
+                        ret = checkHostScoreFieldsChanged()
+                              || checkOperationFieldsChanged();
                     } else {
                         ret = true;
                     }
@@ -4441,13 +4444,6 @@ public class ClusterBrowser extends Browser {
                 }
             }
             return s.toString();
-        }
-
-        /**
-         * Sets id in the service object.
-         */
-        public void setId(final String id) {
-            getService().setId(id);
         }
 
         /**
@@ -5603,9 +5599,7 @@ public class ClusterBrowser extends Browser {
             }
             /* apply button */
             addApplyButton(buttonPanel);
-            applyButton.setEnabled(
-                checkResourceFields(null, params)
-            );
+            applyButton.setEnabled(checkResourceFields(null, params));
             /* expert mode */
             buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
 
@@ -5782,7 +5776,7 @@ public class ClusterBrowser extends Browser {
             }
             if (getService().isNew()) {
                 final String id = idField.getStringValue();
-                getService().setId(id);
+                getService().setIdAndCrmId(id);
                 typeRadioGroup.setEnabled(false);
             }
             setHeartbeatIdLabel();
