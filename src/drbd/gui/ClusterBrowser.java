@@ -242,11 +242,6 @@ public class ClusterBrowser extends Browser {
     private static final Map<String, String> HB_CLASS_MENU =
                                                 new HashMap<String, String>();
 
-    /** Whether the hb status is run for the first time. (For the progress
-     * indicator. */
-    private boolean clStatusFirstTime;
-
-
     /** Width of the label in the info panel. */
     private static final int SERVICE_LABEL_WIDTH =
                     Tools.getDefaultInt("ClusterBrowser.ServiceLabelWidth");
@@ -804,7 +799,7 @@ public class ClusterBrowser extends Browser {
         final String hostName = host.getName();
         /* now what we do if the status finished for the first time. */
         Tools.startProgressIndicator(hostName, ": updating drbd status...");
-        Thread thread = new Thread(new Runnable() {
+        final Thread thread = new Thread(new Runnable() {
             public void run() {
                 try {
                     firstTime.await();
@@ -857,6 +852,7 @@ public class ClusterBrowser extends Browser {
 
                    new NewOutputCallback() {
                        public void output(final String output) {
+                           firstTime.countDown();
                            if (output.indexOf(
                                     "No response from the DRBD driver") >= 0) {
                                host.setDrbdStatus(false);
@@ -943,19 +939,18 @@ public class ClusterBrowser extends Browser {
     /**
      * Starts hb status progress indicator.
      */
-    public final void startClStatusProgressIndicator(final String hostName) {
-        // TODO; clStatusFirstTime closure?
+    public final void startClStatusProgressIndicator(final String clusterName) {
         Tools.startProgressIndicator(
-                            hostName,
+                            clusterName,
                             Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
     /**
      * Stops hb status progress indicator.
      */
-    public final void stopClStatusProgressIndicator(final String hostName) {
+    public final void stopClStatusProgressIndicator(final String clusterName) {
         Tools.stopProgressIndicator(
-                            hostName,
+                            clusterName,
                             Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
@@ -963,7 +958,31 @@ public class ClusterBrowser extends Browser {
      * Starts hb status.
      */
     public final void startClStatus() {
-        clStatusFirstTime = true;
+        final CountDownLatch firstTime = new CountDownLatch(1);
+        final String clusterName = getCluster().getName();
+        startClStatusProgressIndicator(clusterName);
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    firstTime.await();
+                } catch (InterruptedException ignored) {
+                    /* ignored */
+                }
+                if (clStatusFailed()) {
+                     Tools.progressIndicatorFailed(clusterName,
+                                                   "Heartbeat status failed");
+                } else {
+                    selectServices();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                           heartbeatGraph.scale();
+                       }
+                    });
+                }
+                stopClStatusProgressIndicator(clusterName);
+            }
+        });
+        thread.start();
         while (true) {
             final Host host = getDCHost();
             if (host == null) {
@@ -975,43 +994,26 @@ public class ClusterBrowser extends Browser {
                 continue;
             }
             final String hostName = host.getName();
-            if (clStatusFirstTime) {
-                startClStatusProgressIndicator(hostName);
-            }
             clStatusCanceled = false;
             host.execClStatusCommand(
                  new ExecCallback() {
                      public void done(final String ans) {
-                         if (clStatusFirstTime) {
-                             clStatusFirstTime = false;
-                             selectServices();
-                             SwingUtilities.invokeLater(new Runnable() {
-                                 public void run() {
-                                    heartbeatGraph.scale();
-                                }
-                             });
-                             stopClStatusProgressIndicator(hostName);
-                         }
+                         host.setClStatus(true);
+                         firstTime.countDown();
                      }
 
                      public void doneError(final String ans,
                                            final int exitCode) {
-                         Tools.progressIndicatorFailed(hostName,
-                                    "Heartbeat status failed");
-                         if (clStatusFirstTime) {
+                         if (firstTime.getCount() == 1) {
                              Tools.debug(this, "hb status failed: "
-                                               + host.getName()
-                                               + ", ec: "
-                                               + exitCode, 2);
+                                           + host.getName()
+                                           + ", ec: "
+                                           + exitCode, 2);
                          }
                          clStatusLock();
-                         final boolean prevClStatusFailed = clStatusFailed();
                          host.setClStatus(false);
                          clusterStatus.setDC(null);
                          clStatusUnlock();
-                         //if (prevClStatusFailed != clStatusFailed()) {
-                         //    heartbeatGraph.getServicesInfo().getInfoPanel();
-                         //}
                          if (exitCode == 255) {
                              /* looks like connection was lost */
                              heartbeatGraph.repaint();
@@ -1027,19 +1029,9 @@ public class ClusterBrowser extends Browser {
                                                         new StringBuffer(300);
                      public void output(final String output) {
                          clStatusLock();
-                         final boolean prevClStatusFailed = clStatusFailed();
                          if (clStatusCanceled) {
                              clStatusUnlock();
-                             if (clStatusFirstTime) {
-                                 clStatusFirstTime = false;
-                                 selectServices();
-                                 SwingUtilities.invokeLater(new Runnable() {
-                                     public void run() {
-                                         heartbeatGraph.scale();
-                                     }
-                                 });
-                                 stopClStatusProgressIndicator(hostName);
-                             }
+                             firstTime.countDown();
                              return;
                          }
                          if (output == null) {
@@ -1087,22 +1079,12 @@ public class ClusterBrowser extends Browser {
                                 }
                              }
                          }
-                         if (clStatusFirstTime) {
-                             clStatusFirstTime = false;
-                             selectServices();
-                             SwingUtilities.invokeLater(new Runnable() {
-                                 public void run() {
-                                     heartbeatGraph.scale();
-                                 }
-                             });
-                             stopClStatusProgressIndicator(hostName);
-                         }
                          clStatusUnlock();
+                         firstTime.countDown();
                      }
                  });
             host.waitOnClStatus();
             if (clStatusCanceled) {
-                clStatusFirstTime = true;
                 break;
             }
             final boolean hbSt = clStatusFailed();
