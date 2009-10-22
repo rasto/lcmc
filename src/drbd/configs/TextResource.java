@@ -131,7 +131,7 @@ public class TextResource extends
          "Loading..."},
 
         {"Tools.Saving",
-         "Saving..."},
+         "Saving \"@FILENAME@\"..."},
 
         {"Tools.Warning.Title",
          "Warning: "},

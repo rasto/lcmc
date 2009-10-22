@@ -778,7 +778,9 @@ public final class Tools {
      */
     public static void save(final String filename) {
         debug("save");
-        startProgressIndicator(Tools.getString("Tools.Saving"));
+        final String text =
+            Tools.getString("Tools.Saving").replaceAll("@FILENAME@", filename);
+        startProgressIndicator(text);
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
             drbdGuiXML.saveXML(fileOut);
@@ -801,7 +803,7 @@ public final class Tools {
                     }
                 }
             }
-            stopProgressIndicator(Tools.getString("Tools.Saving"));
+            stopProgressIndicator(text);
         }
 
     }
