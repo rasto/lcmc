@@ -3810,6 +3810,10 @@ public class ClusterBrowser extends Browser {
                         Tools.getString("ClusterBrowser.Hb.AddGroupService")) {
                 private static final long serialVersionUID = 1L;
 
+                public boolean enablePredicate() {
+                    return !clStatusFailed();
+                }
+
                 public void update() {
                     super.update();
 
@@ -6388,8 +6392,8 @@ public class ClusterBrowser extends Browser {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    // TODO: if it was migrated
-                    return !getService().isRemoved();
+                    return !clStatusFailed()
+                           && !getService().isRemoved();
                 }
 
                 public void action() {
@@ -6415,7 +6419,8 @@ public class ClusterBrowser extends Browser {
                         private static final long serialVersionUID = 1L;
 
                         public boolean enablePredicate() {
-                            return !getService().isRemoved();
+                            return !clStatusFailed()
+                                   && !getService().isRemoved();
                         }
 
                         public void action() {
@@ -6441,6 +6446,11 @@ public class ClusterBrowser extends Browser {
                                     Tools.getString(
                                         "ClusterBrowser.Hb.AddDependency")) {
                     private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return !clStatusFailed()
+                               && !getService().isRemoved();
+                    }
 
                     public void update() {
                         super.update();
@@ -6603,6 +6613,11 @@ public class ClusterBrowser extends Browser {
                                         "ClusterBrowser.Hb.AddStartBefore")) {
                     private static final long serialVersionUID = 1L;
 
+                    public boolean enablePredicate() {
+                        return !clStatusFailed()
+                               && !getService().isRemoved();
+                    }
+
                     public void update() {
                         super.update();
                         removeAll();
@@ -6658,7 +6673,8 @@ public class ClusterBrowser extends Browser {
 
                         public boolean enablePredicate() {
                             // TODO: don't if it is up
-                            return getService().isAvailable();
+                            return !clStatusFailed()
+                                   && getService().isAvailable();
                         }
 
                         public void action() {
@@ -6683,7 +6699,8 @@ public class ClusterBrowser extends Browser {
 
                         public boolean enablePredicate() {
                             // TODO: don't if it is down
-                            return getService().isAvailable();
+                            return !clStatusFailed()
+                                   && getService().isAvailable();
                         }
 
                         public void action() {
@@ -6709,7 +6726,9 @@ public class ClusterBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return getService().isAvailable() && !isStarted();
+                        return !clStatusFailed()
+                               && getService().isAvailable()
+                               && isStarted();
                     }
 
                     public void action() {
@@ -6734,7 +6753,9 @@ public class ClusterBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return getService().isAvailable() && !isStopped();
+                        return !clStatusFailed()
+                               && getService().isAvailable()
+                               && !isStopped();
                     }
 
                     public void action() {
@@ -6766,7 +6787,8 @@ public class ClusterBrowser extends Browser {
                     }
 
                     public boolean enablePredicate() {
-                        return getService().isAvailable()
+                        return !clStatusFailed()
+                               && getService().isAvailable()
                                && isOneFailedCount();
                     }
 
@@ -6800,7 +6822,8 @@ public class ClusterBrowser extends Browser {
                         return !isManaged();
                     }
                     public boolean enablePredicate() {
-                        return getService().isAvailable();
+                        return !clStatusFailed()
+                               && getService().isAvailable();
                     }
 
                     public void action() {
@@ -6886,7 +6909,8 @@ public class ClusterBrowser extends Browser {
                             }
                             final String runningOnNode =
                                         runningOnNodes.get(0).toLowerCase();
-                            return getService().isAvailable()
+                            return !clStatusFailed()
+                                   && !getService().isAvailable()
                                    && !hostName.toLowerCase().equals(
                                              runningOnNode)
                                    && isActiveNode(hostName);
@@ -6916,7 +6940,8 @@ public class ClusterBrowser extends Browser {
 
                     public boolean enablePredicate() {
                         // TODO: if it was migrated
-                        return getService().isAvailable()
+                        return !clStatusFailed()
+                               && getService().isAvailable()
                                && getMigratedTo() != null;
                     }
 
@@ -8317,7 +8342,8 @@ public class ClusterBrowser extends Browser {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !getExistingServiceList().isEmpty();
+                    return !clStatusFailed()
+                           && !getExistingServiceList().isEmpty();
                 }
 
                 public void action() {
@@ -8356,7 +8382,7 @@ public class ClusterBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return true;
+                        return !clStatusFailed();
                     }
 
                     public void action() {
@@ -8381,6 +8407,10 @@ public class ClusterBrowser extends Browser {
             final MyMenu addServiceMenuItem = new MyMenu(
                             Tools.getString("ClusterBrowser.Hb.AddService")) {
                 private static final long serialVersionUID = 1L;
+
+                public boolean enablePredicate() {
+                    return !clStatusFailed();
+                }
 
                 public void update() {
                     super.update();
@@ -9467,7 +9497,7 @@ public class ClusterBrowser extends Browser {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return true;
+                    return !clStatusFailed();
                 }
 
                 public void action() {
@@ -9493,7 +9523,7 @@ public class ClusterBrowser extends Browser {
                 }
 
                 public boolean enablePredicate() {
-                    return true;
+                    return !clStatusFailed();
                 }
 
                 public void action() {
@@ -9533,7 +9563,7 @@ public class ClusterBrowser extends Browser {
                 }
 
                 public boolean enablePredicate() {
-                    return true;
+                    return !clStatusFailed();
                 }
 
                 public void action() {
