@@ -238,10 +238,11 @@ public class TextResource extends
          "Create SSH Connection"},
 
         {"Dialog.HostSSH.Description",
-         "Trying to create a connection to the host. You can either enter "
+         "Trying to connect to host via ssh. You can either enter "
          + "a RSA or DSA key or enter a password in the pop up dialog. "
-         + "You can also set up passwordless authentication to omit this "
-         + "step."},
+         + "You can switch between passphrase and password "
+         + "authentication by pressing enter without entering "
+         + "anything."},
 
         {"Dialog.HostSSH.Connecting",
          "Connecting..."},

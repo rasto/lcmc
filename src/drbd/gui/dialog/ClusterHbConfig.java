@@ -183,7 +183,8 @@ public class ClusterHbConfig extends DialogCluster {
                                 if (configOk) {
                                     hideRetryButton();
                                     nextButtonSetEnabled(true);
-                                    if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                                    if (!Tools.getConfigData()
+                                              .getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
                                         pressNextButton();
                                     }
@@ -235,7 +236,8 @@ public class ClusterHbConfig extends DialogCluster {
                     enableComponents();
                     if (configOk) {
                         nextButtonSetEnabled(true);
-                        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+                        if (!Tools.getConfigData().getAutoClusters()
+                                                  .isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
                         }

@@ -212,10 +212,10 @@ public class ClusterBrowser extends Browser {
                       Tools.getDefault("HeartbeatGraph.ServiceUnmanagedIcon"));
     /** Stop service icon. */
     private static final ImageIcon STOP_ICON  = SERVICE_NOT_RUNNING_ICON;
-    /** Unmanaged subtext. */ 
+    /** Unmanaged subtext. */
     private static final Subtext UNMANAGED_SUBTEXT =
                                          new Subtext("(unmanaged)", Color.RED);
-    /** Migrated subtext. */ 
+    /** Migrated subtext. */
     private static final Subtext MIGRATED_SUBTEXT =
                                          new Subtext("(migrated)", Color.RED);
 
@@ -7611,41 +7611,47 @@ public class ClusterBrowser extends Browser {
             return "text/html";
         }
         /**
-         * Returns info for the Heartbeat menu.
+         * Returns editable info panel for global crm config.
          */
-        public String getInfo() {
-            final StringBuffer s = new StringBuffer(30);
-            s.append("<h2>");
-            s.append(getName());
-            if (crmXML == null) {
-                s.append("</h2><br>info not available");
-                return s.toString();
-            }
-
-            final Host[] hosts = getClusterHosts();
-            int i = 0;
-            final StringBuffer hbVersion = new StringBuffer();
-            boolean differentHbVersions = false;
-            for (Host host : hosts) {
-                if (i == 0) {
-                    hbVersion.append(host.getHeartbeatVersion());
-                } else if (!hbVersion.toString().equals(
-                                                host.getHeartbeatVersion())) {
-                    differentHbVersions = true;
-                    hbVersion.append(", ");
-                    hbVersion.append(host.getHeartbeatVersion());
-                }
-
-                i++;
-            }
-            s.append(" (" + hbVersion.toString() + ")</h2><br>");
-            if (differentHbVersions) {
-                s.append(Tools.getString(
-                                "ClusterBrowser.DifferentHbVersionsWarning"));
-                s.append("<br>");
-            }
-            return s.toString();
+        public JComponent getInfoPanel() {
+            return heartbeatGraph.getServicesInfo().getInfoPanel();
         }
+        ///**
+        // * Returns info for the Heartbeat menu.
+        // */
+        //public String getInfo() {
+        //    final StringBuffer s = new StringBuffer(30);
+        //    s.append("<h2>");
+        //    s.append(getName());
+        //    if (crmXML == null) {
+        //        s.append("</h2><br>info not available");
+        //        return s.toString();
+        //    }
+
+        //    final Host[] hosts = getClusterHosts();
+        //    int i = 0;
+        //    final StringBuffer hbVersion = new StringBuffer();
+        //    boolean differentHbVersions = false;
+        //    for (Host host : hosts) {
+        //        if (i == 0) {
+        //            hbVersion.append(host.getHeartbeatVersion());
+        //        } else if (!hbVersion.toString().equals(
+        //                                        host.getHeartbeatVersion())) {
+        //            differentHbVersions = true;
+        //            hbVersion.append(", ");
+        //            hbVersion.append(host.getHeartbeatVersion());
+        //        }
+
+        //        i++;
+        //    }
+        //    s.append(" (" + hbVersion.toString() + ")</h2><br>");
+        //    if (differentHbVersions) {
+        //        s.append(Tools.getString(
+        //                        "ClusterBrowser.DifferentHbVersionsWarning"));
+        //        s.append("<br>");
+        //    }
+        //    return s.toString();
+        //}
     }
 
     /**
@@ -8112,7 +8118,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
-         * Returns editable info panel for global heartbeat config.
+         * Returns editable info panel for global crm config.
          */
         public JComponent getInfoPanel() {
             /* if don't have hb status we don't have all the info we need here.
@@ -9644,8 +9650,7 @@ public class ClusterBrowser extends Browser {
          */
         public final void addColocation(final ServiceInfo serviceInfoRsc,
                                         final ServiceInfo serviceInfoWithRsc) {
-            final String colId =
-            clusterStatus.getColocationId(
+            final String colId = clusterStatus.getColocationId(
                              serviceInfoRsc.getService().getHeartbeatId(),
                              serviceInfoWithRsc.getService().getHeartbeatId());
             if (colId == null) {

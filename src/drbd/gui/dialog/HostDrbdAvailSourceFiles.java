@@ -101,17 +101,17 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
                         }
                     }
                     drbdTarballCombo.clear();
-                    //SwingUtilities.invokeLater(new Runnable() {
-                    //    public void run() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
                             drbdTarballCombo.reloadComboBox(
                                    items.get(0).toString(),
                                    items.toArray(new ComboInfo[items.size()]));
-                    //    }
-                    //});
-                    final ComboInfo selectedItem =
-                           (ComboInfo) drbdTarballCombo.getValue();
-                    drbdTarballCombo.setEnabled(true);
-                    allDone(selectedItem);
+                            final ComboInfo selectedItem =
+                                   (ComboInfo) drbdTarballCombo.getValue();
+                            drbdTarballCombo.setEnabled(true);
+                            allDone(selectedItem);
+                        }
+                    });
                 }
 
                 public void doneError(final String ans,

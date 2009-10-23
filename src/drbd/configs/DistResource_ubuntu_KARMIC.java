@@ -24,7 +24,7 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for ubuntu karmic
+ * Here are commands for ubuntu karmic.
  */
 public class DistResource_ubuntu_KARMIC extends
             java.util.ListResourceBundle {

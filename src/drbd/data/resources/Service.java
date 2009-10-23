@@ -134,7 +134,7 @@ public class Service extends Resource {
         }
         setValue("id", id);
     }
-    
+
     /**
      * Sets the id.
      */

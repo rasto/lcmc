@@ -228,8 +228,11 @@ public class ClusterStatus {
      */
     public final String getColocationId(final String rsc1,
                                         final String rsc2) {
-        final String ret = (String) cibQueryMap.getColocationId().get(rsc1,
-                                                                      rsc2);
+        final MultiKeyMap colMap = cibQueryMap.getColocationId();
+        if (colMap == null) {
+            return null;
+        }
+        final String ret = (String) colMap.get(rsc1, rsc2);
         if (ret == null) {
             return (String) cibQueryMap.getColocationId().get(rsc2, rsc1);
         }

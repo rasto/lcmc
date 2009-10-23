@@ -117,7 +117,7 @@ public class HostCheckInstallation extends DialogHost {
     /** Label of heartbeat that can be with or without pacemaker. */
     private final JLabel hbPmJLabel = new JLabel("Pacemaker/HB");
     /** Label of pacemaker that can be with corosync or openais. */
-    private final JLabel pmJLabel = new JLabel("Pacemaker/Cor");
+    private final JLabel pmJLabel = new JLabel("Pacemaker/Coro");
 
     /**
      * Prepares a new <code>HostCheckInstallation</code> object.
@@ -159,7 +159,7 @@ public class HostCheckInstallation extends DialogHost {
                     getHost().setDrbdInstallMethod(im.getIndex());
                     final String button = e.getActionCommand();
                     if (!drbdOk || button.equals(Tools.getString(
-                     "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"))) {
+                        "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"))) {
                         if (im.isLinbitMethod()) {
                             nextDialogObject =
                                 new HostDrbdLinbitAvailPackages(thisClass,
@@ -387,7 +387,7 @@ public class HostCheckInstallation extends DialogHost {
                     pmIcon.setIcon(NOT_INSTALLED_ICON);
                     pmLabel.setText(": " + Tools.getString(
                             "Dialog.HostCheckInstallation.PmNotInstalled"));
-                    pmJLabel.setText("Pacemaker/Cor");
+                    pmJLabel.setText("Pacemaker/Coro");
                 }
             });
         } else {
@@ -396,7 +396,7 @@ public class HostCheckInstallation extends DialogHost {
                 public void run() {
                     pmIcon.setIcon(INSTALLED_ICON);
                     if (corosyncVersion != null) {
-                        pmJLabel.setText("Pacemaker/Cor");
+                        pmJLabel.setText("Pacemaker/Coro");
                     } else if (aisVersion != null) {
                         pmJLabel.setText("Pacemaker/AIS");
                     }

@@ -93,7 +93,6 @@ public class ConfigData implements Serializable {
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     /** Name of the group pacemaker object. */
     public static final String PM_GROUP_NAME = "Group";
-    
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts

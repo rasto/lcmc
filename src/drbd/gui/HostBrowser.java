@@ -148,22 +148,22 @@ public class HostBrowser extends Browser {
     /** Color of the status backgrounds. */
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Standby subtext. */ 
+    /** Standby subtext. */
     private static final Subtext STANDBY_SUBTEXT =
                                          new Subtext("STANDBY", Color.RED);
-    /** Offline subtext. */ 
+    /** Offline subtext. */
     private static final Subtext OFFLINE_SUBTEXT =
                                          new Subtext("offline", Color.BLUE);
-    /** Online subtext. */ 
+    /** Online subtext. */
     private static final Subtext ONLINE_SUBTEXT =
                                           new Subtext("online", Color.BLUE);
-    /** Meta-disk subtext. */ 
+    /** Meta-disk subtext. */
     private static final Subtext METADISK_SUBTEXT =
                                           new Subtext("meta-disk", Color.BLUE);
-    /** Swap subtext. */ 
+    /** Swap subtext. */
     private static final Subtext SWAP_SUBTEXT =
                                           new Subtext("swap", Color.BLUE);
-    /** Mounted subtext. */ 
+    /** Mounted subtext. */
     private static final Subtext MOUNTED_SUBTEXT =
                                           new Subtext("mounted", Color.BLUE);
     /** String length after the cut. */

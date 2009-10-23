@@ -19,7 +19,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.gui;
 
 import drbd.utilities.Tools;
@@ -49,7 +48,6 @@ import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.GradientPaint;
 import java.awt.BasicStroke;
 
@@ -63,7 +61,6 @@ import java.util.ArrayList;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
@@ -111,8 +108,6 @@ public class HeartbeatGraph extends ResourceGraph {
     private static final int HOST_Y_POS = 40;
     /** Vertical step in pixels by which the hosts are drawn in the graph. */
     private static final int HOST_STEP_X = 230;
-    /** Minimum horizontal position. */
-    private static final int MIN_X_POS = 40;
     /** Minimum vertical position. */
     private static final int MIN_Y_POS = 20;
     /** Maximum horizontal position. */
@@ -300,9 +295,12 @@ public class HeartbeatGraph extends ResourceGraph {
         return "hb=" + i.getId();
     }
 
+    /**
+     * Exchanges object in vertex, e.g., wenn ra changes to/from m/s resource.
+     */
     public final void exchangeObjectInTheVertex(final ServiceInfo newSI,
                                                 final ServiceInfo oldSI) {
-        Vertex v = getVertex(oldSI);
+        final Vertex v = getVertex(oldSI);
         removeVertex(oldSI);
         putInfoToVertex(newSI, v);
         putVertexToInfo(v, (Info) newSI);
@@ -540,13 +538,6 @@ public class HeartbeatGraph extends ResourceGraph {
     }
 
     /**
-     * Repaints the graph.
-     */
-    public final void repaint() {
-        getVisualizationViewer().repaint();
-    }
-
-    /**
      * Picks info.
      */
     public final void pickInfo(final Info i) {
@@ -744,7 +735,7 @@ public class HeartbeatGraph extends ResourceGraph {
                 s.append(" not on the same host");
             } else {
                 s.append(" on the same host");
-            } 
+            }
         } else {
             s.append(" not necessarily on the same host");
         }
@@ -758,7 +749,6 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     protected final Color getVertexFillColor(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
-            final HostInfo hi = vertexToHostMap.get(v);
             return vertexToHostMap.get(v).getHost().getPmColors()[0];
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
@@ -803,7 +793,6 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo s2 = (ServiceInfo) getInfo((Vertex) p.getFirst());
         String ret;
         if (edgeIsOrder && edgeIsColocation) {
-            // TODO: no colocation & order
             if (edgeToHbconnectionMap.get((Edge) e).isColScoreNegative()) {
                 ret = Tools.getString("HeartbeatGraph.NoColOrd");
             } else {
@@ -939,7 +928,7 @@ public class HeartbeatGraph extends ResourceGraph {
                     && !getClusterBrowser().clStatusFailed()) {
 
                     si.setUpdated(false);
-                    getVertexLocations().setLocation(v, null); //TODO: asdf
+                    getVertexLocations().setLocation(v, null);
                     getGraph().removeVertex(v);
                     removeInfo(v);
                     removeVertex(si);
@@ -1098,7 +1087,8 @@ public class HeartbeatGraph extends ResourceGraph {
             Thread.currentThread().interrupt();
         }
         final ServiceInfo siRsc = hbConnectionInfo.getLastServiceInfoRsc();
-        final ServiceInfo siWithRsc = hbConnectionInfo.getLastServiceInfoWithRsc();
+        final ServiceInfo siWithRsc =
+                                hbConnectionInfo.getLastServiceInfoWithRsc();
         if (edgeIsColocationList.contains(edge)) {
             edgeIsOrderList.remove(edge);
             edgeIsColocationList.remove(edge);
@@ -1263,12 +1253,6 @@ public class HeartbeatGraph extends ResourceGraph {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             return hi.getRightCornerTextForGraph();
-            //if (hi.getHost().isClStatus()) {
-            //    return "online";
-            //} else if (hi.getHost().isConnected()) {
-            //    return "offline";
-            //}
-            //return null;
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         if (si != null) {
@@ -1295,7 +1279,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * Returns how much of the disk is used. Probably useful only for disks.
      * -1 for not used or not applicable.
      */
-    protected int getUsed(final Vertex v) {
+    protected final int getUsed(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
             return ((HostInfo) getInfo(v)).getUsed();
         }
@@ -1306,7 +1290,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * This method draws how much of the vertex is used for something.
      * It draws more colors for verteces that have more background colors.
      */
-    protected void drawInside(final Vertex v,
+    protected final void drawInside(final Vertex v,
                               final Graphics2D g2d,
                               final double x,
                               final double y,
@@ -1328,22 +1312,23 @@ public class HeartbeatGraph extends ResourceGraph {
             final int number = colors.size();
             if (number > 1) {
                 for (int i = 1; i < number; i++) {
-                    Paint p = new GradientPaint((float)x + width / number,
-                                             (float)y,
-                                             getVertexFillSecondaryColor(v),
-                                             (float)x + width / number,
-                                             (float)y + height,
-                                             colors.get(i),
-                                             false);
+                    final Paint p = new GradientPaint(
+                                                (float) x + width / number,
+                                                (float) y,
+                                                getVertexFillSecondaryColor(v),
+                                                (float) x + width / number,
+                                                (float) y + height,
+                                                colors.get(i),
+                                                false);
                     g2d.setPaint(p);
-                    RoundRectangle2D s =
+                    final RoundRectangle2D s =
                        new RoundRectangle2D.Double(
-                                        x + (width / number) * i - 5,
-                                        y,
-                                        width / number + (i < number - 1 ? 20 : 5),
-                                        height,
-                                        20,
-                                        20);
+                                    x + (width / number) * i - 5,
+                                    y,
+                                    width / number + (i < number - 1 ? 20 : 5),
+                                    height,
+                                    20,
+                                    20);
                     g2d.fill(s);
                 }
             }
@@ -1351,7 +1336,7 @@ public class HeartbeatGraph extends ResourceGraph {
             if (used > 0) {
                 /** Show how much is used. */
                 final double freeWidth = width * (100 - used) / 100;
-                RoundRectangle2D freeShape =
+                final RoundRectangle2D freeShape =
                    new RoundRectangle2D.Double(x + width - freeWidth,
                                                y,
                                                freeWidth,

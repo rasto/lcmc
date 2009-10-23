@@ -24,7 +24,7 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for ubuntu intrepid
+ * Here are commands for ubuntu intrepid.
  */
 public class DistResource_ubuntu_INTREPID extends
             java.util.ListResourceBundle {

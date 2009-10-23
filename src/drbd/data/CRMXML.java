@@ -1543,7 +1543,7 @@ public class CRMXML extends XML {
             }
         }
     }
-   
+
     /**
      * Parses node, to get info like if it is in stand by.
      */

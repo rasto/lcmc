@@ -80,9 +80,9 @@ public class SSH {
     private String lastRSAKey = null;
     /** Last successful dsa key. */
     private String lastDSAKey = null;
-    /** Connection mutex */
+    /** Connection mutex. */
     private final Mutex mConnectionLock = new Mutex();
-    /** Connection thread mutex */
+    /** Connection thread mutex. */
     private final Mutex mConnectionThreadLock = new Mutex();
 
     /**

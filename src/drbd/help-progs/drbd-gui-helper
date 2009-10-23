@@ -1037,8 +1037,9 @@ if (/etc/init.d/$script status 2>&1|grep 'Usage:' >/dev/null); then \
 	done; \
 	exit 3; \
 else \
-	/etc/init.d/$script status>/dev/null; \
-	exit \$?
+	out=`/etc/init.d/$script status 2>&1`; \
+	ret=\$?; \
+	if [ -z \$out ]; then exit 111; else exit \$ret; fi; \
 fi
 STATUS
 }

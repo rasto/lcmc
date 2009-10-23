@@ -269,9 +269,9 @@ public class AppDefaults extends
         {"HeartbeatGraph.ServiceIcon",  "Icons/tango/32x32/service1_32x32.png"},
         {"HeartbeatGraph.StartIcon",     "Icons/tango/32x32/ok_32x32.png"},
         //{"HeartbeatGraph.StopIcon",     "Icons/tango/32x32/cancel_32x32.png"},
-        {"HeartbeatGraph.MigrateIcon", 
+        {"HeartbeatGraph.MigrateIcon",
                                 "Icons/tango/32x32/service_migrated_32x32.png"},
-        {"HeartbeatGraph.UnmigrateIcon", 
+        {"HeartbeatGraph.UnmigrateIcon",
                               "Icons/tango/32x32/service_unmigrate_32x32.png"},
 
         {"ClusterViewPanel.HostIcon",    "Icons/tango/32x32/host_32x32.png"},

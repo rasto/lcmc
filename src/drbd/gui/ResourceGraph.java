@@ -19,7 +19,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.gui;
 
 import drbd.utilities.Tools;
@@ -81,7 +80,6 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import java.awt.event.MouseEvent;
 import java.awt.Paint;
-import java.awt.GradientPaint;
 import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -104,7 +102,8 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
 public abstract class ResourceGraph {
     /** Cluster browser object. */
     private final ClusterBrowser clusterBrowser;
-        final PluggableRenderer pr = new MyPluggableRenderer();
+    /** Pluggable renderer. */
+    private final PluggableRenderer pr = new MyPluggableRenderer();
     /** Vertex to resource info object map. */
     private final Map<Vertex, Info>vertexToInfoMap =
                                         new LinkedHashMap<Vertex, Info>();
@@ -293,7 +292,7 @@ public abstract class ResourceGraph {
     /**
      * Repaints the graph.
      */
-    public void repaint() {
+    public final void repaint() {
         visualizationViewer.repaint();
     }
 
@@ -443,7 +442,7 @@ public abstract class ResourceGraph {
 
     /**
      * Scales the graph, so that all vertices can be seen. The graph can
-     * get smaller but not bigger. 
+     * get smaller but not bigger.
      */
     public final void scale() { // TODO: synchronize differently
         //TODO: disabling it till it works properly
@@ -718,7 +717,6 @@ public abstract class ResourceGraph {
      * Handles right click on the background.
      */
     protected JPopupMenu handlePopupBackground(final Point2D pos) {
-        /* should be overridden to do something. */
         return null;
     }
 
@@ -949,12 +947,12 @@ public abstract class ResourceGraph {
         return Color.WHITE;
     }
 
-        /**
-         * Returns whether the vertex is picked.
-         */
-        public final boolean isPicked(final Vertex v) {
-            return pr.isPicked(v);
-        }
+    /**
+     * Returns whether the vertex is picked.
+     */
+    public final boolean isPicked(final Vertex v) {
+        return pr.isPicked(v);
+    }
 
     /**
      * This class provides methods for different paint colors for different
@@ -1094,7 +1092,7 @@ public abstract class ResourceGraph {
     /**
      * This method draws in the host vertex.
      */
-    protected void drawInsideVertex(final Graphics2D g2d,
+    protected final void drawInsideVertex(final Graphics2D g2d,
                                     final Vertex v,
                                     final Color[] colors,
                                     final double x,
@@ -1104,20 +1102,21 @@ public abstract class ResourceGraph {
         final int number = colors.length;
         if (number > 1) {
             for (int i = 1; i < number; i++) {
-                Paint p = new GradientPaint((float)x + width / number,
-                                         (float)y,
-                                         getVertexFillSecondaryColor(v),
-                                         (float)x + width / number,
-                                         (float)y + height,
-                                         colors[i],
-                                         false);
+                final Paint p = new GradientPaint(
+                                            (float) x + width / number,
+                                            (float) y,
+                                            getVertexFillSecondaryColor(v),
+                                            (float) x + width / number,
+                                            (float) y + height,
+                                            colors[i],
+                                            false);
                 g2d.setPaint(p);
-                Rectangle2D s =
-                   new Rectangle2D.Double(
-                                x + width / 2 + (width / number / 2) * i,
-                                y,
-                                width / number / 2,
-                                height - 2);
+                final Rectangle2D s =
+                       new Rectangle2D.Double(
+                                    x + width / 2 + (width / number / 2) * i,
+                                    y,
+                                    width / number / 2,
+                                    height - 2);
                 g2d.fill(s);
             }
         }
@@ -1139,9 +1138,9 @@ public abstract class ResourceGraph {
          * Paints the shape for vertex and all icons and texts inside. It
          * resizes and repositions the vertex if neccessary.
          */
-        public void paintShapeForVertex(final Graphics2D g2d,
-                                        final Vertex v,
-                                        final Shape shape) {
+        public final void paintShapeForVertex(final Graphics2D g2d,
+                                              final Vertex v,
+                                              final Shape shape) {
             int shapeWidth = getDefaultVertexWidth(v);
             int shapeHeight = getDefaultVertexHeight(v);
             /* main text */
@@ -1205,8 +1204,10 @@ public abstract class ResourceGraph {
             }
             final int oldShapeWidth = getVertexWidth(v);
             final int oldShapeHeight = getVertexHeight(v);
-            boolean widthChanged = Math.abs(oldShapeWidth - shapeWidth) > 5;
-            boolean heightChanged = Math.abs(oldShapeHeight - shapeHeight) > 1;
+            final boolean widthChanged =
+                                    Math.abs(oldShapeWidth - shapeWidth) > 5;
+            final boolean heightChanged =
+                                    Math.abs(oldShapeHeight - shapeHeight) > 1;
             if (widthChanged || heightChanged) {
                 somethingChanged();
                 /* move it, so that left side has the same position, if it is
@@ -1293,11 +1294,12 @@ public abstract class ResourceGraph {
                     }
                     final Color color = subtext.getColor();
                     if (color != null) {
-                        Paint p = new GradientPaint((float)x + shapeWidth / 2,
-                                                 (float)y,
+                        final Paint p =
+                               new GradientPaint((float) x + shapeWidth / 2,
+                                                 (float) y,
                                                  getVertexFillSecondaryColor(v),
-                                                 (float)x + shapeWidth / 2,
-                                                 (float)y + shapeHeight,
+                                                 (float) x + shapeWidth / 2,
+                                                 (float) y + shapeHeight,
                                                  color,
                                                  false);
                         g2d.setPaint(p);
@@ -1441,7 +1443,7 @@ public abstract class ResourceGraph {
     /**
      * Resets something changed flag.
      */
-    private final void somethingChangedReset() {
+    private void somethingChangedReset() {
         changed = false;
     }
     /**

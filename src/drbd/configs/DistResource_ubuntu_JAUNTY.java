@@ -24,7 +24,7 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for ubuntu jaunty
+ * Here are commands for ubuntu jaunty.
  */
 public class DistResource_ubuntu_JAUNTY extends
             java.util.ListResourceBundle {

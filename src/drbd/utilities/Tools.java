@@ -1674,7 +1674,7 @@ public final class Tools {
      */
     public static void openBrowswer(final String url) {
         try {
-            java.awt.Desktop.getDesktop().browse(new URI(url)); 
+            java.awt.Desktop.getDesktop().browse(new URI(url));
         } catch (java.io.IOException e) {
             Tools.appError("wrong uri", e);
         } catch (java.net.URISyntaxException e) {

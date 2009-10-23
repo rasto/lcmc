@@ -78,7 +78,7 @@ public class DrbdGraph extends ResourceGraph {
                                  new LinkedHashMap<BlockDevice, Vertex>();
     /** Map from host to the list of block devices. */
     private final Map<HostDrbdInfo, List<Vertex>>hostBDVerticesMap =
-                                 new LinkedHashMap<HostDrbdInfo, List<Vertex>>();
+                               new LinkedHashMap<HostDrbdInfo, List<Vertex>>();
     /** Map from graph edge to the drbd resource info object. */
     private final Map<Edge, DrbdResourceInfo>edgeToDrbdResourceMap =
                                  new LinkedHashMap<Edge, DrbdResourceInfo>();
@@ -107,8 +107,6 @@ public class DrbdGraph extends ResourceGraph {
     private static final int HOST_Y_POS = 40;
     /** Vertical step in pixels by which the hosts are drawn in the graph. */
     private static final int HOST_STEP_X = 280;
-    ///** Maximum vertical position. */
-    //private static final int MAX_Y_POS = 2600;
     /** Block device vertex size. */
     private static final int VERTEX_SIZE_BD = 200;
     /** Host vertex size. */
@@ -199,62 +197,60 @@ public class DrbdGraph extends ResourceGraph {
         final Host host = hostDrbdInfo.getHost();
         final Point2D hostPos = getVertexLocations().getLocation(v);
         final double hostXPos = hostPos.getX() - getDefaultVertexWidth(v) / 2;
-        //if (host.blockDevicesHaveChanged()) {
-            int devYPos = HOST_Y_POS + BD_STEP_Y;
-            List<Vertex> vertexList = hostBDVerticesMap.get(hostDrbdInfo);
-            List<Vertex> oldVertexList = null;
-            if (vertexList == null) {
-                vertexList = new ArrayList<Vertex>();
-                hostBDVerticesMap.put(hostDrbdInfo, vertexList);
-            } else {
-                oldVertexList = new ArrayList<Vertex>(vertexList);
-            }
-            final List<BlockDevInfo> blockDevInfos =
-                                        host.getBrowser().getBlockDevInfos();
-            if (oldVertexList != null) {
-                for (final Vertex vertex : oldVertexList) {
-                    final BlockDevInfo bdi = (BlockDevInfo) getInfo(vertex);
-                    if (!blockDevInfos.contains(bdi)) {
-                        /* removing */
-                        final Vertex bdv = bdiToVertexMap.get(bdi);
-                        getGraph().removeVertex(bdv);
-                        removeInfo(bdv);
-                        removeVertex(bdi);
-                        getVertexToMenus().remove(bdv);
-                        bdiToVertexMap.remove(bdi);
-                        blockDeviceToVertexMap.remove(bdi.getBlockDevice());
-                        vertexToHostMap.remove(bdv);
-                        vertexList.remove(bdv);
-                        somethingChanged();
-                    }
-                }
-            }
-            for (final BlockDevInfo bdi : blockDevInfos) {
-                if (!blockDeviceToVertexMap.containsKey(bdi.getBlockDevice())) {
-                    final SparseVertex bdsv = new SparseVertex();
-                    final Vertex bdv = getGraph().addVertex(bdsv);
+        int devYPos = HOST_Y_POS + BD_STEP_Y;
+        List<Vertex> vertexList = hostBDVerticesMap.get(hostDrbdInfo);
+        List<Vertex> oldVertexList = null;
+        if (vertexList == null) {
+            vertexList = new ArrayList<Vertex>();
+            hostBDVerticesMap.put(hostDrbdInfo, vertexList);
+        } else {
+            oldVertexList = new ArrayList<Vertex>(vertexList);
+        }
+        final List<BlockDevInfo> blockDevInfos =
+                                    host.getBrowser().getBlockDevInfos();
+        if (oldVertexList != null) {
+            for (final Vertex vertex : oldVertexList) {
+                final BlockDevInfo bdi = (BlockDevInfo) getInfo(vertex);
+                if (!blockDevInfos.contains(bdi)) {
+                    /* removing */
+                    final Vertex bdv = bdiToVertexMap.get(bdi);
+                    getGraph().removeVertex(bdv);
+                    removeInfo(bdv);
+                    removeVertex(bdi);
+                    getVertexToMenus().remove(bdv);
+                    bdiToVertexMap.remove(bdi);
+                    blockDeviceToVertexMap.remove(bdi.getBlockDevice());
+                    vertexToHostMap.remove(bdv);
+                    vertexList.remove(bdv);
                     somethingChanged();
-                    bdiToVertexMap.put(bdi, bdv);
-                    blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
-                    putVertexToInfo(bdv, (Info) bdi);
-                    putInfoToVertex(bdi, bdv);
-                    vertexToHostMap.put(bdv, hostDrbdInfo);
-                    vertexList.add(bdv);
-                    // TODO: get saved position is disabled at the moment,
-                    // because it does more harm than good at the moment.
                 }
-                final Vertex bdv = blockDeviceToVertexMap.get(
-                                                        bdi.getBlockDevice());
-                Point2D pos = null; // getSavedPosition(bdi);
-                if (pos == null) {
-                    pos = new Point2D.Double(
-                        hostXPos + BD_X_OFFSET + getDefaultVertexWidth(bdv) / 2,
-                        devYPos);
-                }
-                getVertexLocations().setLocation(bdv, pos);
-                devYPos += BD_STEP_Y;
             }
-        //}
+        }
+        for (final BlockDevInfo bdi : blockDevInfos) {
+            if (!blockDeviceToVertexMap.containsKey(bdi.getBlockDevice())) {
+                final SparseVertex bdsv = new SparseVertex();
+                final Vertex bdv = getGraph().addVertex(bdsv);
+                somethingChanged();
+                bdiToVertexMap.put(bdi, bdv);
+                blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
+                putVertexToInfo(bdv, (Info) bdi);
+                putInfoToVertex(bdi, bdv);
+                vertexToHostMap.put(bdv, hostDrbdInfo);
+                vertexList.add(bdv);
+                // TODO: get saved position is disabled at the moment,
+                // because it does more harm than good at the moment.
+            }
+            final Vertex bdv = blockDeviceToVertexMap.get(
+                                                    bdi.getBlockDevice());
+            Point2D pos = null; // getSavedPosition(bdi);
+            if (pos == null) {
+                pos = new Point2D.Double(
+                    hostXPos + BD_X_OFFSET + getDefaultVertexWidth(bdv) / 2,
+                    devYPos);
+            }
+            getVertexLocations().setLocation(bdv, pos);
+            devYPos += BD_STEP_Y;
+        }
     }
 
     /**
@@ -315,7 +311,6 @@ public class DrbdGraph extends ResourceGraph {
                     l.delete(0, l.length() - EDGE_STRING_LENGTH);
                     l.insert(0, "...");
                 }
-                //l = "..." + l.substring(l.length() - 7, l.length());
                 if (dri.isSyncing()) {
                     String syncedProgress = dri.getSyncedProgress();
                     if (syncedProgress == null) {
@@ -366,22 +361,6 @@ public class DrbdGraph extends ResourceGraph {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null) {
-                //if (bdi.getBlockDevice().isDrbdMetaDisk()) {
-                //    return "meta-disk";
-                //} else if (bdi.getBlockDevice().isSwap()) {
-                //    return "swap";
-                //} else if (bdi.getBlockDevice().getMountedOn() != null) {
-                //    return "mounted";
-                //} else if (bdi.getBlockDevice().isDrbd()) {
-                //    String s = bdi.getBlockDevice().getName();
-                //    if (s.length() > MAX_RIGHT_CORNER_STRING_LENGTH) {
-                //        s = "..." + s.substring(
-                //                      s.length()
-                //                      - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
-                //                      s.length());
-                //    }
-                //    return s;
-                //}
                 return bdi.getRightCornerTextForDrbdGraph();
 
             }
@@ -444,13 +423,6 @@ public class DrbdGraph extends ResourceGraph {
     protected final Shape getVertexShape(final Vertex v,
                                          final VertexShapeFactory factory) {
         return factory.getRectangle(v);
-    }
-
-    /**
-     * Repaints the graph.
-     */
-    public final void repaint() {
-        getVisualizationViewer().repaint();
     }
 
     /**
@@ -574,10 +546,6 @@ public class DrbdGraph extends ResourceGraph {
         final Vertex v = bdiToVertexMap.get(bdi);
         pickVertex(v);
         bdi.selectMyself();
-        //final HostDrbdInfo hi = vertexToHostMap.get(v);
-        //if (hi != null) {
-        //    Tools.getGUIData().setTerminalPanel(hi.getHost().getTerminalPanel());
-        //}
     }
 
     /**
@@ -914,7 +882,7 @@ public class DrbdGraph extends ResourceGraph {
      * Returns how much of the disk is used.
      * -1 for not used or not applicable.
      */
-    protected int getUsed(final Vertex v) {
+    protected final int getUsed(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             return bdi.getUsed();
@@ -926,11 +894,11 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * This method draws how much of the vertex is used for something.
      */
-    protected void drawInside(final Vertex v,
-                              final Graphics2D g2d,
-                              final double x,
-                              final double y,
-                              final Shape shape) {
+    protected final void drawInside(final Vertex v,
+                                    final Graphics2D g2d,
+                                    final double x,
+                                    final double y,
+                                    final Shape shape) {
         final double used = getUsed(v);
         final float height = (float) shape.getBounds().getHeight();
         final float width = (float) shape.getBounds().getWidth();

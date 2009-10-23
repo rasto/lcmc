@@ -24,7 +24,7 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for openfiler NSA 2
+ * Here are commands for openfiler NSA 2.
  */
 public class DistResource_openfiler_2 extends
             java.util.ListResourceBundle {

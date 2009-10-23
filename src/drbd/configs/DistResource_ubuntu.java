@@ -53,7 +53,7 @@ public class DistResource_ubuntu extends
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: HB 2.99.X"},
+         "the ubuntu way: 1.0.x / 2.99.x"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -61,12 +61,12 @@ public class DistResource_ubuntu extends
 
         /* pacemaker corosync install method 1 */
         {"PmInst.install.text.1",
-         "the ubuntu way: HB 2.99.X"},
+         "the ubuntu way: 1.0.x / 1.0.x"},
 
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' pacemaker-openais "
-         + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
+         + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync)"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
@@ -94,11 +94,12 @@ public class DistResource_ubuntu extends
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the ubuntu way: possibly too old"},
+         "the ubuntu way: 8.3.x"},
 
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "
-         + "'DPkg::Options::force=--force-confnew' drbd8-utils"},
+         + "'DPkg::Options::force=--force-confnew'"
+         + " linux-headers-`uname -r` drbd8-utils"},
 
         {"HbCheck.version",
          "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
