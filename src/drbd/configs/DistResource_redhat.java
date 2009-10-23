@@ -71,10 +71,10 @@ public class DistResource_redhat extends
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the centos way: possibly too old"},
+         "the centos way: 8.3.x"},
 
         {"DrbdInst.install.3",
-         "/usr/bin/yum -y install kmod-drbd82 drbd82"},
+         "/usr/bin/yum -y install kmod-drbd83 drbd83"},
 
         {"HbCheck.version",
          "/usr/local/bin/drbd-gui-helper get-cluster-versions;"

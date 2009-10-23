@@ -48,11 +48,12 @@ public class DistResource_redhat_5 extends
 
         /* Corosync/Openais/Pacemaker Opensuse */
         {"PmInst.install.text.1",
-         "http://download.opensuse.org" },
+         "http://download.opensuse.org 1.0.x/0.80.x" },
 
         {"PmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
-         + "yum -y install pacemaker resource-agents "
+         + "yum -y --disablerepo=base install openais"
+         + " && yum -y install pacemaker resource-agents "
          + " && (/sbin/chkconfig --add corosync"
          + " || /sbin/chkconfig --add openais)"
          + " && if [ -e /etc/ais/openais.conf ];then"
