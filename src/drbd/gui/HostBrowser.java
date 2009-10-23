@@ -418,6 +418,62 @@ public class HostBrowser extends Browser {
     }
 
     /**
+     * Adds expert submenu to the host menus in drbd and pacemaker view.
+     */
+    private void addExpertMenu(final MyMenu submenu) {
+        if (submenu.getItemCount() > 0) {
+            return;
+        }
+        /* panic */
+        final MyMenuItem panicMenuItem = new MyMenuItem(
+                    Tools.getString("HostBrowser.MakeKernelPanic")
+                    + host.getName(),
+                    null) {
+            private static final long serialVersionUID = 1L;
+
+            public boolean enablePredicate() {
+                return host.isConnected();
+            }
+
+            public void action() {
+                // TODO are you sure dialog.
+                final String hostName = host.getName();
+                final String command = "MakeKernelPanic";
+                Tools.startProgressIndicator(hostName,
+                                             host.getDistString(command));
+                host.execCommand(command, null, null, true);
+                Tools.stopProgressIndicator(hostName,
+                                            host.getDistString(command));
+            }
+        };
+        submenu.add(panicMenuItem);
+
+        /* reboot */
+        final MyMenuItem rebootMenuItem = new MyMenuItem(
+                    Tools.getString("HostBrowser.MakeKernelReboot")
+                    + host.getName(),
+                    null) {
+            private static final long serialVersionUID = 1L;
+
+            public boolean enablePredicate() {
+                return host.isConnected();
+            }
+
+            public void action() {
+                // TODO are you sure dialog.
+                final String hostName = host.getName();
+                final String command = "MakeKernelReboot";
+                Tools.startProgressIndicator(hostName,
+                                             host.getDistString(command));
+                host.execCommand(command, null, null, true);
+                Tools.stopProgressIndicator(hostName,
+                                            host.getDistString(command));
+            }
+        };
+        submenu.add(rebootMenuItem);
+    }
+
+    /**
      * This class holds info data for a filesystem.
      */
     class FilesystemInfo extends Info {
@@ -776,6 +832,22 @@ public class HostBrowser extends Browser {
                 };
             registerMenuItem(removeHostItem);
             items.add(removeHostItem);
+
+            /* expert options */
+            final MyMenu hostExpertSubmenu = new MyMenu(
+                            Tools.getString("HostBrowser.ExpertSubmenu")) {
+                private static final long serialVersionUID = 1L;
+                public boolean enablePredicate() {
+                    return host.isConnected();
+                }
+
+                public void update() {
+                    super.update();
+                    addExpertMenu(this);
+                }
+            };
+            items.add(hostExpertSubmenu);
+            registerMenuItem(hostExpertSubmenu);
 
             return items;
         }
@@ -1314,6 +1386,22 @@ public class HostBrowser extends Browser {
                 };
             registerMenuItem(removeHostItem);
             items.add(removeHostItem);
+
+            /* expert options */
+            final MyMenu hostExpertSubmenu = new MyMenu(
+                            Tools.getString("HostBrowser.ExpertSubmenu")) {
+                private static final long serialVersionUID = 1L;
+                public boolean enablePredicate() {
+                    return host.isConnected();
+                }
+
+                public void update() {
+                    super.update();
+                    addExpertMenu(this);
+                }
+            };
+            items.add(hostExpertSubmenu);
+            registerMenuItem(hostExpertSubmenu);
 
             return items;
         }

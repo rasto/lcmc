@@ -1544,6 +1544,15 @@ public class TextResource extends
         {"HostBrowser.Drbd.NoInfoAvailable",
          "no info available"},
 
+        {"HostBrowser.ExpertSubmenu",
+         "Expert Options"},
+
+        {"HostBrowser.MakeKernelPanic",
+         "make kernel panic on "},
+
+        {"HostBrowser.MakeKernelReboot",
+         "make instant reboot on "},
+
         {"CRMXML.RequiredOptions",
          "Required Options"},
 

@@ -298,5 +298,8 @@ public class DistResource extends
         {"DrbdInst.install.method.1",       "linbit"},
 
         {"Pacemaker.Service.Ver", "0"},
+
+        {"MakeKernelPanic", "echo c > /proc/sysrq-trigger"},
+        {"MakeKernelReboot", "echo b > /proc/sysrq-trigger"},
     };
 }
