@@ -53,7 +53,7 @@ public class DistResource_redhat_5 extends
         {"PmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
          + "yum -y install OpenIPMI-libs lm_sensors "
-         + "&& yum -y --disablerepo=base install openais pacemaker resource-agents"
+         + "&& yum -y --exclude openais-0.80.6 install openais pacemaker resource-agents"
          + " && (/sbin/chkconfig --add corosync"
          + " || /sbin/chkconfig --add openais)"
          + " && if [ -e /etc/ais/openais.conf ];then"
