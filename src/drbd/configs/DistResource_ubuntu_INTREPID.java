@@ -24,9 +24,9 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for ubuntu jaunty
+ * Here are commands for ubuntu intrepid
  */
-public class DistResource_ubuntu_JAUNTY extends
+public class DistResource_ubuntu_INTREPID extends
             java.util.ListResourceBundle {
 
     /** Get contents. */
@@ -36,12 +36,12 @@ public class DistResource_ubuntu_JAUNTY extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "ubuntu-JAUNTY"},
-        {"distributiondir",    "ubuntu-jaunty-server"},
+        {"Support",            "ubuntu-INTREPID"},
+        {"distributiondir",    "ubuntu-inrepid-server"},
 
         /* pacemaker/hb install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: HB 2.1.4 (not recommended)"},
+         "the ubuntu way: HB 2.1.3 (not recommended)"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"

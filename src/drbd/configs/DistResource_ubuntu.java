@@ -38,7 +38,9 @@ public class DistResource_ubuntu extends
     private static Object[][] contents = {
         {"Support",                       "ubuntu"},
         {"version:7.04",                  ""},
+        //{"version:5.0/9.10",              "KARMIC"},
         {"version:5.0/9.04",              "JAUNTY"},
+        {"version:5.0/8.10",              "INTREPID"},
         {"version:lenny/sid/8.04",        "HARDY"},
         {"version:testing/unstable/6.06", "DAPPER"},
         {"arch:x86_64",        "amd64"}, // convert arch to arch in the drbd download file
@@ -49,13 +51,24 @@ public class DistResource_ubuntu extends
          "dpkg -i --force-confold"
          + " /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        /* pacemaker install method 1 */
+        /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: possibly too old"},
+         "the ubuntu way: HB 2.99.X"},
 
         {"HbPmInst.install.1",
-         "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+         "apt-get update && /usr/bin/apt-get -y install -o"
+         + " 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
 
+        /* pacemaker corosync install method 1 */
+        {"PmInst.install.text.1",
+         "the ubuntu way: HB 2.99.X"},
+
+        {"PmInst.install.1",
+         "apt-get update && /usr/bin/apt-get -y install -o"
+         + " 'DPkg::Options::force=--force-confnew' pacemaker-openais "
+         + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -63,7 +76,6 @@ public class DistResource_ubuntu extends
 
         {"DrbdInst.install.method.2",
          "source"},
-
 
         {"DrbdInst.install.2",
          "/bin/mkdir -p /tmp/drbdinst && "

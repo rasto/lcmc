@@ -24,9 +24,9 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for ubuntu jaunty
+ * Here are commands for ubuntu karmic
  */
-public class DistResource_ubuntu_JAUNTY extends
+public class DistResource_ubuntu_KARMIC extends
             java.util.ListResourceBundle {
 
     /** Get contents. */
@@ -36,19 +36,7 @@ public class DistResource_ubuntu_JAUNTY extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "ubuntu-JAUNTY"},
-        {"distributiondir",    "ubuntu-jaunty-server"},
-
-        /* pacemaker/hb install method 1 */
-        {"HbPmInst.install.text.1",
-         "the ubuntu way: HB 2.1.4 (not recommended)"},
-
-        {"HbPmInst.install.1",
-         "apt-get update && /usr/bin/apt-get -y install -o"
-         + " 'DPkg::Options::force=--force-confnew' heartbeat-2"},
-
-        /* pacemaker/ais disabled */
-        {"HbPmInst.install.text.1",
-         ""},
+        {"Support",            "ubuntu-KARMIC"},
+        {"distributiondir",    "ubuntu-karmic-server"},
     };
 }
