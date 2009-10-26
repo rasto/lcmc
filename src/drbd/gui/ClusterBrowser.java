@@ -1447,7 +1447,7 @@ public class ClusterBrowser extends Browser {
             }
             final String newId = id + Integer.toString(i);
             heartbeatIdList.add(newId);
-            si.getService().setHeartbeatId(newId);
+            si.getService().setId(newId);
             heartbeatIdToServiceInfo.put(newId, si);
         } else {
             if (!heartbeatIdList.contains(id)) {
@@ -1488,9 +1488,12 @@ public class ClusterBrowser extends Browser {
         Map<String, ServiceInfo> idToInfoHash =
                                 nameToServiceInfoHash.get(service.getName());
         String csPmId = null;
-        if (serviceInfo.getContainedService() != null) {
+        final ServiceInfo cs = serviceInfo.getContainedService();
+        if (cs != null) {
             csPmId =
-               serviceInfo.getContainedService().getService().getHeartbeatId();
+               cs.getService().getName()
+               + "_"
+               + cs.getService().getId();
         }
         if (idToInfoHash == null) {
             idToInfoHash = new HashMap<String, ServiceInfo>();
@@ -1498,7 +1501,7 @@ public class ClusterBrowser extends Browser {
                 if (csPmId == null) {
                     service.setId("1");
                 } else {
-                    service.setId(csPmId);
+                    service.setIdAndCrmId(csPmId);
                 }
             }
         } else {
@@ -1534,9 +1537,9 @@ public class ClusterBrowser extends Browser {
                     service.setId(Integer.toString(index + 1));
                 } else {
                     if (index == 0) {
-                        service.setId(csPmId);
+                        service.setIdAndCrmId(csPmId);
                     } else {
-                        service.setId(csPmId
+                        service.setIdAndCrmId(csPmId
                                       + "_"
                                       + Integer.toString(index + 1));
                     }
@@ -1840,6 +1843,9 @@ public class ClusterBrowser extends Browser {
             /* protocol... */
             final String[] params = drbdXML.getSectionParams("resource");
             for (String param : params) {
+                if ("device".equals(param)) {
+                    continue;
+                }
                 config.append('\t');
                 config.append(param);
                 config.append('\t');
@@ -2483,9 +2489,9 @@ public class ClusterBrowser extends Browser {
             di.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(di);
             fi.setDrbddiskInfo(di);
-            di.getInfoPanel();
+            heartbeatGraph.addColocation(di, fi);
+            di.waitForInfoPanel();
             di.paramComboBoxGet("1", null).setValueAndWait(getName());
-            //heartbeatGraph.addColocation(di, fi);
             di.apply();
         }
 
@@ -4262,7 +4268,9 @@ public class ClusterBrowser extends Browser {
                 final String id = idField.getStringValue();
                 final String heartbeatId = getService().getHeartbeatId();
                 if (PM_GROUP_NAME.equals(getName())) {
-                    if (heartbeatId.equals(Service.GRP_ID_PREFIX + id)
+                    if (heartbeatId == null) {
+                        ret = true;
+                    } else if (heartbeatId.equals(Service.GRP_ID_PREFIX + id)
                         || heartbeatId.equals(id)) {
                         ret = checkHostScoreFieldsChanged() || checkOperationFieldsChanged();
                     } else {
@@ -4432,8 +4440,8 @@ public class ClusterBrowser extends Browser {
             final String provider = resourceAgent.getProvider();
             if (!HB_HEARTBEAT_PROVIDER.equals(provider)
                 && !"".equals(provider)) {
+                s.append(provider);
                 s.append(':');
-                s.append(resourceAgent.getProvider());
             }
             s.append(getName());
             String string = getService().getId();
@@ -5387,31 +5395,36 @@ public class ClusterBrowser extends Browser {
             if (cloneInfo == null) {
                 heartbeatGraph.pickInfo(this);
             } else {
-                cloneInfo.applyButton = applyButton;
                 heartbeatGraph.pickInfo(cloneInfo);
             }
             if (infoPanel != null) {
                 return infoPanel;
             }
             /* init save button */
+            final boolean abExisted = applyButton != null;
             initApplyButton();
+            if (cloneInfo != null) {
+                cloneInfo.applyButton = applyButton;
+            }
             /* add item listeners to the apply button. */
-            applyButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
-                                public void run() {
-                                    clStatusLock();
-                                    apply();
-                                    clStatusUnlock();
+            if (!abExisted) {
+                applyButton.addActionListener(
+                    new ActionListener() {
+                        public void actionPerformed(final ActionEvent e) {
+                            final Thread thread = new Thread(
+                                new Runnable() {
+                                    public void run() {
+                                        clStatusLock();
+                                        apply();
+                                        clStatusUnlock();
+                                    }
                                 }
-                            }
-                        );
-                        thread.start();
+                            );
+                            thread.start();
+                        }
                     }
-                }
-            );
+                );
+            }
             /* main, button and options panels */
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -6728,7 +6741,7 @@ public class ClusterBrowser extends Browser {
                     public boolean enablePredicate() {
                         return !clStatusFailed()
                                && getService().isAvailable()
-                               && isStarted();
+                               && !isStarted();
                     }
 
                     public void action() {
@@ -6910,7 +6923,7 @@ public class ClusterBrowser extends Browser {
                             final String runningOnNode =
                                         runningOnNodes.get(0).toLowerCase();
                             return !clStatusFailed()
-                                   && !getService().isAvailable()
+                                   && getService().isAvailable()
                                    && !hostName.toLowerCase().equals(
                                              runningOnNode)
                                    && isActiveNode(hostName);

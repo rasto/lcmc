@@ -490,11 +490,12 @@ public abstract class WizardDialog extends ConfigDialog {
      */
     public final void pressNextButton() {
         final MyButton nb = (MyButton) buttonClass(nextButton());
-
-        if (nb != null && nb.isVisible() && nb.isEnabled()) {
+        if (nb != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    nb.pressButton();
+                    if (nb.isVisible() && nb.isEnabled()) {
+                        nb.pressButton();
+                    }
                 }
             });
         }

@@ -908,7 +908,11 @@ public class HostBrowser extends Browser {
             if (c == null) {
                 return false;
             }
-            return c.getBrowser().isStandby(host);
+            final ClusterBrowser b = c.getBrowser();
+            if (b == null) {
+                return false;
+            }
+            return b.isStandby(host);
         }
 
         /**

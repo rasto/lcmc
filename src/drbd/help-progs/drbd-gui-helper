@@ -209,7 +209,7 @@ sub get_used {
 	my $lvm_devs = shift;
 	my $drbd_devs = shift;
 	my %dev_to_used;
-	for (`/bin/df -P`) {
+	for (`/bin/df -Pl`) {
 		if (m!(\S+)\s+\d+\s+\d+\s+\d+\s+(\d+)%\s+!) {
 			my ($dev, $used) = ($1, $2);
 			if ($$drbd_devs{$dev}) {

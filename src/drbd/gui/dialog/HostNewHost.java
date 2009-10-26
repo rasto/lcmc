@@ -209,6 +209,7 @@ public class HostNewHost extends DialogHost {
                                 Tools.getConfigData().getAutoHosts().get(0));
                 }
             });
+            Tools.sleep(3000);
             pressNextButton();
         }
     }
