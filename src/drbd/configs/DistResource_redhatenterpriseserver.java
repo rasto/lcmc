@@ -46,7 +46,7 @@ public class DistResource_redhatenterpriseserver extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
 
         {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
-        {"HbPmInst.install.text.1", "the redhat way: possibly too old"},
+        {"HbPmInst.install.text.1", "the redhat way: HB 2.1.4 (obsolete)"},
         {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
 
         /* Drbd install method 2 */

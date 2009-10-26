@@ -48,7 +48,7 @@ public class DistResource_fedora extends
          "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
         {"HbPmInst.install.text.2",
-         "the fedora way: possibly too old" },
+         "the fedora way: HB 2.1.x (obsolete)" },
 
         {"HbPmInst.install.2",
          "/usr/bin/yum -y install heartbeat"},

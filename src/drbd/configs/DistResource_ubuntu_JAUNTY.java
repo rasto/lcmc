@@ -41,14 +41,14 @@ public class DistResource_ubuntu_JAUNTY extends
 
         /* pacemaker/hb install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: HB 2.1.4 (not recommended)"},
+         "the ubuntu way: HB 2.1.4 (obsolete)"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         /* pacemaker/ais disabled */
-        {"HbPmInst.install.text.1",
+        {"PmInst.install.text.1",
          ""},
     };
 }

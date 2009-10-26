@@ -48,7 +48,7 @@ public class DistResource_debian_LENNY extends
 
         /* openais/pacemaker madkiss */
         {"PmInst.install.text.1",
-         "LINBIT/MADKISS repository (testing)"},
+         "LINBIT/MADKISS repo: 1.0.x/1.0.x (testing)"},
 
         {"PmInst.install.1",
          "echo 'deb http://people.debian.org/~madkiss/ha-corosync lenny main'"
@@ -63,7 +63,7 @@ public class DistResource_debian_LENNY extends
 
         /* heartbeat/pacemaker madkiss */
         {"HbPmInst.install.text.1",
-         "LINBIT/MADKISS repository (testing: pacemaker-heartbeat)"},
+         "LINBIT/MADKISS repo: 1.0.x/3.0.x (not working yet)"},
 
         {"HbPmInst.install.1",
          "echo 'deb http://people.debian.org/~madkiss/ha-corosync lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
@@ -76,7 +76,7 @@ public class DistResource_debian_LENNY extends
 
         /* heartbeat apt-get install */
         {"HbPmInst.install.text.2",
-         "lenny repository (not recommended)"},
+         "the debian way: HB 2.1.3 (obsolete)"},
 
         {"HbPmInst.install.2",
          "apt-get update && "

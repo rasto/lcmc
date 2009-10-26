@@ -40,7 +40,7 @@ public class DistResource_ubuntu extends
         {"version:7.04",                  ""},
         //{"version:5.0/9.10",              "KARMIC"},
         {"version:5.0/9.04",              "JAUNTY"},
-        {"version:5.0/8.10",              "INTREPID"},
+        {"version:lenny/sid/8.10",        "INTREPID"},
         {"version:lenny/sid/8.04",        "HARDY"},
         {"version:testing/unstable/6.06", "DAPPER"},
         {"arch:x86_64",        "amd64"}, // convert arch to arch in the drbd download file

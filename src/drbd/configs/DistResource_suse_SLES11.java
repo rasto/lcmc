@@ -49,7 +49,7 @@ public class DistResource_suse_SLES11 extends
 
         /* Corosync/Openais/Pacemaker opensuse */
         {"PmInst.install.text.1",
-         "http://download.opensuse.org: zypper" },
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
         {"PmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
@@ -64,7 +64,7 @@ public class DistResource_suse_SLES11 extends
 
         /* Heartbeat/Pacemaker opensuse */
         {"HbPmInst.install.text.1",
-         "http://download.opensuse.org: zypper" },
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
 
         {"HbPmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"

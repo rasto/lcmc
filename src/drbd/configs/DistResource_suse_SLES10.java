@@ -45,7 +45,7 @@ public class DistResource_suse_SLES10 extends
 
         /* Corosync/Openais/Pacemaker Opensuse*/
         {"PmInst.install.text.1",
-         "http://download.opensuse.org: rug" },
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
         {"PmInst.install.1",
          "rug service-delete ha-clustering; "
@@ -63,7 +63,8 @@ public class DistResource_suse_SLES10 extends
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
 
         /* Heartbeat/Pacemaker Opensuse*/
-        {"HbPmInst.install.text.1", "http://download.opensuse.org: rug" },
+        {"HbPmInst.install.text.1",
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
         {"HbPmInst.install.1",
          "rug service-delete ha-clustering; "
          + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>' 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
@@ -72,7 +73,7 @@ public class DistResource_suse_SLES10 extends
          + " && /sbin/chkconfig --add heartbeat"},
 
         /* Heartbeat */
-        {"HbPmInst.install.text.2", "the suse way: possibly too old" },
+        {"HbPmInst.install.text.2", "the suse way: 2.1.x (obsolete)"},
         {"HbPmInst.install.2",
          "/usr/bin/zypper -n --no-gpg-checks install heartbeat &&"
          + "/sbin/chkconfig --add heartbeat"},
@@ -96,12 +97,5 @@ public class DistResource_suse_SLES10 extends
          + "make && make install && "
          //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
-
-        /* Drbd install method 3 */
-        {"DrbdInst.install.text.3",
-         "the suse way: possibly too old"},
-
-        {"DrbdInst.install.3",
-         "/usr/bin/zypper -n --no-gpg-checks install drbd drbd-kmp-default"},
     };
 }

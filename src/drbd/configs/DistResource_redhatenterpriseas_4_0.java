@@ -83,7 +83,7 @@ public class DistResource_redhatenterpriseas_4_0 extends
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
 
         {"HbPmInst.install.text.1",
-         "http://download.opensuse.org: wget & rpm -U" },
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
 
         {"HbPmInst.install.1",
          "rm -rf /tmp/drbd-mc-hbinst/; "

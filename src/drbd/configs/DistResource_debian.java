@@ -50,7 +50,7 @@ public class DistResource_debian extends
 
         {"DrbdInst.install", "echo | dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        {"HbPmInst.install.text.1", "the debian way"},
+        {"HbPmInst.install.text.1", "the debian way: HB 2.1.x (obsolete)"},
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
@@ -76,7 +76,7 @@ public class DistResource_debian extends
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the debian way: possibly too old"},
+         "the debian way: 8.0.x (obsolete)"},
 
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "

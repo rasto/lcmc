@@ -53,32 +53,34 @@ public class DistResource_debian_ETCH extends
          + "\\.(?:rpm|deb))\"! or goto LINE'"
         },
 
-        /* Heartbeat/Pacemaker Opensuse */
-        {"HbPmInst.install.text.1", "http://download.opensuse.org repository"},
-        {"HbPmInst.install.1",
-         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
-         + " && apt-get update"
-         + " && apt-get -y -q --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"
-         + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
+        ///* Heartbeat/Pacemaker Opensuse */
+        // TODO: does not exist at the moment
+        //{"HbPmInst.install.text.1", "ha-clustering repo: 1.0.x/0.80.x"},
+        //{"HbPmInst.install.1",
+        // "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+        // + " && apt-get update"
+        // + " && apt-get -y -q --allow-unauthenticated install"
+        // + " -o 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"
+        // + " && /usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
-        {"HbPmInst.install.text.2", "the debian way"},
-        {"HbPmInst.install.2",
+        {"HbPmInst.install.text.1", "the debian way: HB 2.0.x (obsolete)"},
+        {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
-        /* Corosync/Heartbeat/Pacemaker Opensuse */
-        {"PmInst.install.text.1", "http://download.opensuse.org repository"},
-        {"PmInst.install.1",
-         "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
-         + " && apt-get update"
-         + " && apt-get -y -q --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' pacemaker"
-         + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
-         + " && /usr/sbin/update-rc.d -f heartbeat remove"
-         + " && if [ -e /etc/ais/openais.conf ];then"
-         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi);"
-         + " && if [ -e /etc/corosync/corosync.conf ]; then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"},
+        ///* Corosync/Heartbeat/Pacemaker Opensuse */
+        //does not exist at the moment
+        //{"PmInst.install.text.1", "ha-clustering repo: 1.0.x/2.99.x"},
+        //{"PmInst.install.1",
+        // "echo 'deb http://download.opensuse.org/repositories/server:/ha-clustering/Debian_Etch/ ./' > /etc/apt/sources.list.d/ha-clustering.list "
+        // + " && apt-get update"
+        // + " && apt-get -y -q --allow-unauthenticated install"
+        // + " -o 'DPkg::Options::force=--force-confnew' pacemaker"
+        // + " && (grep 'START=no' /etc/default/openais && echo 'START=yes'>>/etc/default/openais)"
+        // + " && /usr/sbin/update-rc.d -f heartbeat remove"
+        // + " && if [ -e /etc/ais/openais.conf ];then"
+        // + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi);"
+        // + " && if [ -e /etc/corosync/corosync.conf ]; then"
+        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",

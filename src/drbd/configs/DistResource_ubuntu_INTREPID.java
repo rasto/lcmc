@@ -41,14 +41,18 @@ public class DistResource_ubuntu_INTREPID extends
 
         /* pacemaker/hb install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: HB 2.1.3 (not recommended)"},
+         "the ubuntu way: HB 2.1.3 (obsolete)"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
         /* pacemaker/ais disabled */
-        {"HbPmInst.install.text.1",
+        {"PmInst.install.text.1",
          ""},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "the ubuntu way: 8.2.x"},
     };
 }

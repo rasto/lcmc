@@ -46,24 +46,28 @@ public class DistResource_fedora_11 extends
 
         /* Corosync/Openais/Pacemaker */
         {"PmInst.install.text.1",
-         "http://download.opensuse.org" },
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
         {"PmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_11/server:ha-clustering.repo && "
          + "(/usr/sbin/groupadd haclient 2>/dev/null && "
          + "/usr/sbin/useradd -g haclient hacluster 2>/dev/null;"
-         + "yum -y install pacemaker"
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9* install pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
          + " if [ -e /etc/corosync/corosync.conf ]; then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"},
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 openais on"
+         + " && /sbin/chkconfig --level 016 openais off)"},
+
         {"HbPmInst.install.text.1",
-         "http://download.opensuse.org" },
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
 
         {"HbPmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_11/server:ha-clustering.repo && "
-         + "yum -y install heartbeat pacemaker && "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9* install heartbeat pacemaker && "
          + "/sbin/chkconfig --add heartbeat"},
 
         /* Drbd install method 2 */
@@ -79,19 +83,15 @@ public class DistResource_fedora_11 extends
          + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
          //TODO: fedora11 has the it?
          /* it installs eather kernel-devel- or kernel-PAE-devel-, etc. */
-         /* the fedora 10 does not keep old devel packages so for old kernels
-          * the kernel-devel pacakge will be downloaded from rpmfind.net.
-          */
          + "/usr/bin/yum -y install kernel`uname -r|"
          + " grep -o '\\.PAEdebug\\|\\.PAE'"
          + "|tr . -`-devel-`uname -r|sed 's/\\.\\(PAEdebug\\|PAE\\)$//'` "
          + "|tee -a /dev/tty|grep 'No package'>/dev/null;"
          + "(if [ \"$?\" == 0 ]; then "
-         + "wget --directory-prefix=/tmp/drbdinst/"
-         + " ftp://fr.rpmfind.net/linux/fedora/updates/11/@ARCH@/kernel-devel-`uname -r`.rpm && "
-         + "cd /tmp/drbdinst && "
-         + "/bin/rpm -Uvh kernel-devel-`uname -r`.rpm; fi) && "
-         + "/usr/bin/yum -y install flex gcc && "
+         + "echo \"you need to find and install kernel-devel-`uname -r`.rpm "
+         + "package, or upgrade the kernel, sorry\";"
+         + "exit 1; fi)"
+         + "&& /usr/bin/yum -y install flex gcc && "
          + "cd /tmp/drbdinst && "
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "

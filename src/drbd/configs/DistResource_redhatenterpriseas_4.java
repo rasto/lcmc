@@ -75,7 +75,7 @@ public class DistResource_redhatenterpriseas_4 extends
 
         /* Corosync/Openais/Pacemaker Opensuse */
         {"PmInst.install.text.1",
-         "http://download.opensuse.org: wget & rpm -U" },
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
         {"PmInst.install.1",
          "rm -rf /tmp/drbd-mc-hbinst/; "
@@ -95,7 +95,7 @@ public class DistResource_redhatenterpriseas_4 extends
 
         /* Heartbeat/Pacemaker Opensuse */
         {"HbPmInst.install.text.1",
-         "http://download.opensuse.org: wget & rpm -U" },
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
 
         {"HbPmInst.install.1",
          "rm -rf /tmp/drbd-mc-hbinst/; "

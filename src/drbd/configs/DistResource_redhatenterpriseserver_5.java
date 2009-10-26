@@ -43,7 +43,7 @@ public class DistResource_redhatenterpriseserver_5 extends
         /* support */
         {"Support", "redhatenterpriseserver-5"},
         {"HbPmInst.install.text.1",
-         "http://download.opensuse.org" },
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
 
         /* Heartbeat/Pacemaker opensuse */
         {"HbPmInst.install.1",
@@ -63,7 +63,7 @@ public class DistResource_redhatenterpriseserver_5 extends
 
         /* Corosync/Openais/Pacemaker opensuse */
         {"PmInst.install.text.1",
-         "http://download.opensuse.org" },
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
         {"PmInst.install.1.i686",
          "wget -N -nd -P /etc/yum.repos.d/"
@@ -93,11 +93,6 @@ public class DistResource_redhatenterpriseserver_5 extends
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
          + " if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
-
-        /* old Heartbeat */
-        {"HbPmInst.install.text.2", "the redhat way: possibly too old"},
-
-        {"HbPmInst.install.2", "/usr/bin/yum -y install heartbeat"},
 
         /* Workaround, where aisexec hangs the gui if called directly. */
         {"Openais.startOpenais.i686",
