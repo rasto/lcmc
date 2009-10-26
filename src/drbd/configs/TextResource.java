@@ -156,7 +156,7 @@ public class TextResource extends
         {"ClusterViewPanel.ClusterWizard",
          "Cluster Wizard"},
 
-        /* Progres bar */
+        /* Progress bar */
         {"ProgressBar.Cancel",
          "Cancel"},
 
@@ -333,17 +333,20 @@ public class TextResource extends
          "Installation Check"},
 
         {"Dialog.HostCheckInstallation.Description",
-         "Checking if DRBD, Heartbeat/Pacemaker and other important "
+         "Checking if DRBD, Pacemaker and other important "
          + "components are already installed. If not, you can press "
          + "one of the 'Install' buttons to install them. You can check "
          + "for DRBD upgrade as well if installed DRBD was detected. "
          + "Installing or upgrading of DRBD via binary packages is "
          + "possible only if you have support contract with LINBIT.<br>"
-         + "You can also choose a heartbeat installation method. "
+         + "You can also choose a <b>Pacemaker</b> installation method. "
          + "The newest packages for many different distributions are in "
-         + "Opensuse repositories, yes even your distribution is not "
-         + "an Opensuse. You can also install the Heartbeat/Pacemaker "
-         + "that comes with your distribution, if you choose so."},
+         + "Opensuse repositories, yes even if your distribution is not "
+         + "an Opensuse. On <b>Debians</b> there is currently no possibility "
+         + "to install working Pacemaker with Heartbeat and somewhat with "
+         + "Openais from binary packages, "
+         + "you may have to install it from source but make sure that you use "
+         + "the recommended combination of versions for all components."},
 
         {"Dialog.HostCheckInstallation.Drbd.NotInstalled",
          "DRBD is not installed. Click 'Install' button to install a new "
@@ -354,7 +357,7 @@ public class TextResource extends
 
         {"Dialog.HostCheckInstallation.Heartbeat.NotInstalled",
          "Heartbeat is not installed or is installed improperly. "
-         + "Press 'Next' button in order to install the heartbeat packages."},
+         + "Press 'Next' button in order to install the Heartbeat packages."},
 
         {"Dialog.HostCheckInstallation.Heartbeat.CheckError",
          "Check failed."},
@@ -516,7 +519,7 @@ public class TextResource extends
          "Heartbeat Install"},
 
         {"Dialog.HostHbInst.Description",
-         "Heartbeat and pacemaker packages are being installed."},
+         "Heartbeat and Pacemaker packages are being installed."},
 
         {"Dialog.HostHbInst.Executing",
          "Installing..."},
@@ -609,7 +612,7 @@ public class TextResource extends
 
         {"Dialog.ClusterHosts.Description",
          "Select two or more hosts that are part of the "
-         + "DRBD/Heartbeat cluster."},
+         + "DRBD/Pacemaker cluster."},
 
         {"Dialog.ClusterConnect.Title",
          "Cluster Connect"},
@@ -626,8 +629,8 @@ public class TextResource extends
          + "theoretically you may be able seamlessly switch between them at "
          + "any time. "
          + "Heartbeat is more widely used and thus better "
-         + "tested at the moment, but probably will be completely displaced "
-         + "by Corosync in the future."},
+         + "tested at the moment, but is unmaintained and is being completely "
+         + "displaced by Corosync."},
 
         {"Dialog.ClusterAisConfig.Title",
          "Corosync/OpenAIS Config File"},
@@ -663,7 +666,7 @@ public class TextResource extends
          ""},
 
         {"Dialog.ClusterAisConfig.UseMgmtdCheckBox.ToolTip",
-         "use mgmtd, if you want to use pacemaker-gui"},
+         "use mgmtd, if you want to use Pacemaker-GUI"},
 
         {"Dialog.ClusterAisConfig.UseMgmtdCheckBox",
          ""},
@@ -727,7 +730,7 @@ public class TextResource extends
          ""},
 
         {"Dialog.ClusterHbConfig.UseMgmtdCheckBox.ToolTip",
-         "use mgmtd, if you want to use pacemaker-gui"},
+         "use mgmtd, if you want to use Pacemaker-GUI"},
 
         {"Dialog.ClusterHbConfig.UseMgmtdCheckBox",
          ""},
@@ -873,7 +876,7 @@ public class TextResource extends
 
         {"Dialog.ClusterFinish.Description",
          "Configuration of the cluster is now complete. You can now "
-         + "configure DRBD and Heartbeat services from the menu in "
+         + "configure DRBD and Pacemaker services from the menu in "
          + "the cluster view."},
 
         {"Dialog.ClusterFinish.Save",
@@ -903,7 +906,7 @@ public class TextResource extends
          + "DRBD net interface that will be used for DRBD communication "
          + "and a port. The port must not be used by anything else and must "
          + "not be used by another DRBD block device. The net interface "
-         + "should be different than the one that is used by Heartbeat. "
+         + "should be different than the one that is used by Pacemaker. "
          + "Choose where DRBD meta data should be written. You can choose "
          + "internal to make it simple or learn external DRBD meta disk to "
          + "make it faster."},
@@ -1020,19 +1023,19 @@ public class TextResource extends
          "Load Marked Clusters"},
 
         {"EmptyBrowser.StartMarkedClusters.ToolTip",
-         "Load marked clusters in the gui."},
+         "Load marked clusters in the GUI."},
 
         {"EmptyBrowser.StopMarkedClusters",
          "Unload Marked Clusters"},
 
         {"EmptyBrowser.StopMarkedClusters.ToolTip",
-         "Unload marked clusters in the gui."},
+         "Unload marked clusters in the GUI."},
 
         {"EmptyBrowser.RemoveMarkedClusters",
          "Remove Marked Clusters"},
 
         {"EmptyBrowser.RemoveMarkedClusters.ToolTip",
-         "Remove marked clusters from the gui."},
+         "Remove marked clusters from the GUI."},
 
         {"EmptyBrowser.StartClusterButton",
          "Load"},
@@ -1121,7 +1124,7 @@ public class TextResource extends
          + " Your Heartbeat @VERSION@(!) is too old for Linbit:DRBD resource"
          + " agent to work properly."
          + " You should upgrade to the Pacemaker or use the <b>drbddisk</b>"
-         + " resouce agent.<br>"
+         + " resource agent.<br>"
          + "<b>Are you sure?!<b>"},
 
         {"ClusterBrowser.confirmLinbitDrbd.Yes",
@@ -1249,13 +1252,13 @@ public class TextResource extends
          "Start"},
 
         {"ClusterBrowser.Hb.StartResource.ToolTip",
-         "Start heartbeat resource"},
+         "Start resource"},
 
         {"ClusterBrowser.Hb.StopResource",
          "Stop"},
 
         {"ClusterBrowser.Hb.StopResource.ToolTip",
-         "Stop heartbeat resource"},
+         "Stop resource"},
 
         {"ClusterBrowser.Hb.MigrateResource",
          "Migrate To"},
@@ -1348,10 +1351,10 @@ public class TextResource extends
          "migrating..."},
 
         {"ClusterBrowser.HbUpdateResources",
-         "updating heartbeat resources..."},
+         "updating cluster resources..."},
 
         {"ClusterBrowser.HbUpdateStatus",
-         "updating heartbeat status..."},
+         "updating cluster status..."},
 
         {"ClusterBrowser.Drbd.RemoveEdge",
          "Remove DRBD Resource"},
@@ -1402,7 +1405,7 @@ public class TextResource extends
          "Filesystem + Linbit:DRBD"},
 
         {"ClusterBrowser.DrbddiskMenuName",
-         "Filesystem + drbddisk (old)"},
+         "Filesystem + drbddisk (obsolete)"},
 
         {"HostBrowser.HostWizard",
          "Host Wizard"},
@@ -1563,7 +1566,7 @@ public class TextResource extends
          "Advanced Options"},
 
         {"CRMXML.GetOCFParameters",
-         "Getting Heartbeat OCF parameters..."},
+         "Getting OCF parameters..."},
 
         {"CRMXML.TargetRole.ShortDesc",
          "Target Role"},
@@ -1575,7 +1578,7 @@ public class TextResource extends
          "Is Managed By HB"},
 
         {"CRMXML.IsManaged.LongDesc",
-         "Select whether the service should be managed by Heartbeat or not."},
+         "Select whether the service should be managed by CRM or not."},
 
         {"CRMXML.ColocationSectionParams",
          "Colocation Parameters"},
@@ -1659,7 +1662,7 @@ public class TextResource extends
          "getting metadata"},
 
         {"Heartbeat.ExecutingCommand",
-         "Executing Heartbeat command..."},
+         "Executing CRM command..."},
 
         {"DrbdNetInterface",
          "DRBD net interface"},
@@ -1725,7 +1728,7 @@ public class TextResource extends
 + "be fine.</p>"
 
 + "<p><i>And of course this is a beta software, so do not forget to double check\n"
-+ "everything the gui is doing and if you find a bug file a bug report.</i></p>"
++ "everything the GUI is doing and if you find a bug file a bug report.</i></p>"
 
 + "<p>You can start even if you have nothing installed on the cluster hosts, just a Linux distribution of\n"
 + "course. There is a possibility to install all required components from\n"
