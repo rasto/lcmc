@@ -53,7 +53,8 @@ public class DistResource_fedora_11 extends
          + " http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_11/server:ha-clustering.repo && "
          + "(/usr/sbin/groupadd haclient 2>/dev/null && "
          + "/usr/sbin/useradd -g haclient hacluster 2>/dev/null;"
-         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9* install pacemaker"
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
          + " if [ -e /etc/corosync/corosync.conf ]; then"
@@ -67,7 +68,8 @@ public class DistResource_fedora_11 extends
 
         {"HbPmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_11/server:ha-clustering.repo && "
-         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9* install heartbeat pacemaker && "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9* "
+         + "-x heartbeat-2.1* install heartbeat pacemaker && "
          + "/sbin/chkconfig --add heartbeat"},
 
         /* Drbd install method 2 */
