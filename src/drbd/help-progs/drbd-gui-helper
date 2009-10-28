@@ -79,8 +79,8 @@ if ($option eq "all") {
 	get_gui_info();
 } elsif ($option eq "get-mount-point-info") {
 	get_mount_points_info();
-} elsif ($option eq "get-drbd-info") {
-	get_drbd_info();
+#} elsif ($option eq "get-drbd-info") {
+#	get_drbd_info();
 } elsif ($option eq "get-drbd-events") {
 	get_drbd_events();
 } elsif ($option eq "get-old-style-resources") {
@@ -471,56 +471,56 @@ sub get_drbd_events {
 	}
 }
 
-sub get_drbd_info {
-	my ($version, $api) = `echo|drbdadm help` =~ /Version:\s+(\S+)\s+\(api:(\d+)\)/;
-	if ($version && $api) {
-		print "<drbd-status version=\"$version\" api=\"$api\">\n";
-	} else {
-		print "<drbd-status>unknown</drbd-status>\n";
-		return;
-	}
-	print "	<resources>\n";
-	# since 8.3 drbdadm status can be used
-	my @resources = split /\s+/, `drbdadm sh-resources`; 
-	chomp (my @cstates = `drbdadm cstate all`);
-	chomp (my @roles  = `drbdadm state all || drbdadm role all`);
-	chomp (my @dstates = `drbdadm dstate all`);
-	my @sync_progress;
-	for (my $i = 0; $i<@resources; $i++) {
-		my $res = $resources[$i];
-		my $cs = $cstates[$i];
-		my ($ro1, $ro2) = split /\//, $roles[$i];
-		my ($ds1, $ds2) = split /\//, $dstates[$i];
-
-		print "		<resource res=\"$res\"";
-		print " cs=\"$cs\"";
-		print " ro1=\"$ro1\"";
-		print " ro2=\"$ro2\"";
-		print " ds1=\"$ds1\"";
-		print " ds2=\"$ds2\"";
-
-		if (defined $sync_progress[$i]) {
-			print " synced=\"$sync_progress[$i]\"";
-		} elsif ($cs =~ /^Sync/) {
-			if (open my $proc, "/proc/drbd") {
-				my $index = -1;
-				while (<$proc>) {
-					if (/^\s*(\d+):/) {
-						$index++;
-					} elsif (m!\s+sync'ed:\s+(\d+\.\d+)\%!) {
-						$sync_progress[$index] = $1;
-						if ($i == $index) {
-							print " synced=\"$sync_progress[$i]\"";
-						}
-					}
-				}
-			}
-		}
-		print " />\n";
-	}
-	print "	</resources>\n";
-	print "</drbd-status>\n";
-}
+#sub get_drbd_info {
+#	my ($version, $api) = `echo|drbdadm help` =~ /Version:\s+(\S+)\s+\(api:(\d+)\)/;
+#	if ($version && $api) {
+#		print "<drbd-status version=\"$version\" api=\"$api\">\n";
+#	} else {
+#		print "<drbd-status>unknown</drbd-status>\n";
+#		return;
+#	}
+#	print "	<resources>\n";
+#	# since 8.3 drbdadm status can be used
+#	my @resources = split /\s+/, `drbdadm sh-resources`; 
+#	chomp (my @cstates = `drbdadm cstate all`);
+#	chomp (my @roles  = `drbdadm state all || drbdadm role all`);
+#	chomp (my @dstates = `drbdadm dstate all`);
+#	my @sync_progress;
+#	for (my $i = 0; $i<@resources; $i++) {
+#		my $res = $resources[$i];
+#		my $cs = $cstates[$i];
+#		my ($ro1, $ro2) = split /\//, $roles[$i];
+#		my ($ds1, $ds2) = split /\//, $dstates[$i];
+#
+#		print "		<resource res=\"$res\"";
+#		print " cs=\"$cs\"";
+#		print " ro1=\"$ro1\"";
+#		print " ro2=\"$ro2\"";
+#		print " ds1=\"$ds1\"";
+#		print " ds2=\"$ds2\"";
+#
+#		if (defined $sync_progress[$i]) {
+#			print " synced=\"$sync_progress[$i]\"";
+#		} elsif ($cs =~ /^Sync/) {
+#			if (open my $proc, "/proc/drbd") {
+#				my $index = -1;
+#				while (<$proc>) {
+#					if (/^\s*(\d+):/) {
+#						$index++;
+#					} elsif (m!\s+sync'ed:\s+(\d+\.\d+)\%!) {
+#						$sync_progress[$index] = $1;
+#						if ($i == $index) {
+#							print " synced=\"$sync_progress[$i]\"";
+#						}
+#					}
+#				}
+#			}
+#		}
+#		print " />\n";
+#	}
+#	print "	</resources>\n";
+#	print "</drbd-status>\n";
+#}
 
 sub is_smaller_v {
 	my $v 	   = shift;
@@ -1062,6 +1062,9 @@ sub get_cluster_versions {
 	if ($pm_version) {
 		$pm_version =~ s/\s+.*//;
 		chomp $pm_version;
+		if ($pm_version =~ /^2\.1\./) {
+			$pm_version = "";
+		}
 	}
 
 	# there is no reliable way to find the installed corosync and openais

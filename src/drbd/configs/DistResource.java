@@ -239,7 +239,7 @@ public class DistResource extends
         /* drbd commands */
         {"Drbd.getParameters", "/usr/local/bin/drbd-gui-helper get-drbd-xml"},
         {"Drbd.getConfig",     "echo|/sbin/drbdadm dump-xml"},
-        {"Drbd.getStatus",     "/usr/local/bin/drbd-gui-helper get-drbd-info"},
+        //{"Drbd.getStatus",     "/usr/local/bin/drbd-gui-helper get-drbd-info"},
 
         {"DRBD.attach",        "echo|/sbin/drbdadm attach @RESOURCE@"},
         {"DRBD.detach",        "echo|/sbin/drbdadm detach @RESOURCE@"},

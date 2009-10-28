@@ -399,7 +399,10 @@ public class ClusterBrowser extends Browser {
         // TODO: need two monitors for role='Slave' and 'Master' in
         // master/slave resources
         final String hbV = getDCHost().getHeartbeatVersion();
-        if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        final String pmV = getDCHost().getPacemakerVersion();
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             HB_OPERATION_PARAMS.put(HB_OP_MONITOR,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
@@ -1559,7 +1562,10 @@ public class ClusterBrowser extends Browser {
     private boolean linbitDrbdConfirmDialog() {
         // TODO: warn about drbd < 8.3.3 as well
         final String hbV = getDCHost().getHeartbeatVersion();
-        if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        final String pmV = getDCHost().getPacemakerVersion();
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             String desc = Tools.getString(
                         "ClusterBrowser.confirmLinbitDrbd.Description");
 
@@ -4471,8 +4477,11 @@ public class ClusterBrowser extends Browser {
         */
         public boolean isStarted() {
             final String hbV = getDCHost().getHeartbeatVersion();
+            final String pmV = getDCHost().getPacemakerVersion();
             String targetRoleString = "target-role";
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 targetRoleString = "target_role";
             }
             String targetRole =
@@ -4492,8 +4501,11 @@ public class ClusterBrowser extends Browser {
         */
         public boolean isStopped() {
             final String hbV = getDCHost().getHeartbeatVersion();
+            final String pmV = getDCHost().getPacemakerVersion();
             String targetRoleString = "target-role";
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 targetRoleString = "target_role";
             }
             String targetRole =
@@ -4514,8 +4526,11 @@ public class ClusterBrowser extends Browser {
          */
         public boolean isManaged() {
             final String hbV = getDCHost().getHeartbeatVersion();
+            final String pmV = getDCHost().getPacemakerVersion();
             String isManagedString = "is-managed";
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 isManagedString = "is_managed";
             }
             String isManaged =
@@ -5827,7 +5842,6 @@ public class ClusterBrowser extends Browser {
             final Host dcHost = getDCHost();
             if (getService().isNew()) {
                 /* TODO: there are more attributes. */
-                final String hbV = dcHost.getHeartbeatVersion();
                 if (cloneInfo != null) {
                     for (String param : cloneParams) {
                         String value = cloneInfo.getComboBoxValue(param);
@@ -7451,7 +7465,10 @@ public class ClusterBrowser extends Browser {
          */
         public final boolean isStarted() {
             final String hbV = getDCHost().getHeartbeatVersion();
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            final String pmV = getDCHost().getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 return super.isStarted();
             } else {
                 final ServiceInfo cs = containedService;
@@ -7467,7 +7484,10 @@ public class ClusterBrowser extends Browser {
          */
         public final boolean isStopped() {
             final String hbV = getDCHost().getHeartbeatVersion();
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            final String pmV = getDCHost().getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 return super.isStopped();
             } else {
                 final ServiceInfo cs = containedService;
@@ -7483,7 +7503,10 @@ public class ClusterBrowser extends Browser {
          */
         public final boolean isManaged() {
             final String hbV = getDCHost().getHeartbeatVersion();
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            final String pmV = getDCHost().getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 return super.isManaged();
             } else {
                 final ServiceInfo cs = containedService;
@@ -7501,7 +7524,10 @@ public class ClusterBrowser extends Browser {
             final ServiceInfo cs = containedService;
             if (cs != null) {
                 final String hbV = getDCHost().getHeartbeatVersion();
-                if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                final String pmV = getDCHost().getPacemakerVersion();
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                     for (int i = 0; i < getClusterHosts().length; i++) {
                         CRM.cleanupResource(getDCHost(),
                                             cs.getService().getHeartbeatId()
@@ -7519,7 +7545,10 @@ public class ClusterBrowser extends Browser {
          */
         public final void startResource() {
             final String hbV = getDCHost().getHeartbeatVersion();
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            final String pmV = getDCHost().getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 super.startResource();
             } else {
                 final ServiceInfo cs = containedService;
@@ -7534,7 +7563,10 @@ public class ClusterBrowser extends Browser {
          */
         public final void stopResource() {
             final String hbV = getDCHost().getHeartbeatVersion();
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            final String pmV = getDCHost().getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 super.stopResource();
             } else {
                 final ServiceInfo cs = containedService;
@@ -7569,7 +7601,10 @@ public class ClusterBrowser extends Browser {
          */
         public void setManaged(final boolean isManaged) {
             final String hbV = getDCHost().getHeartbeatVersion();
-            if (Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            final String pmV = getDCHost().getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 super.setManaged(isManaged);
             } else {
                 final ServiceInfo cs = containedService;

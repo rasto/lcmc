@@ -474,6 +474,88 @@ public class HostBrowser extends Browser {
     }
 
     /**
+     * Returns tooltip for host.
+     */
+    public String getHostToolTip(final Host host) {
+        final StringBuffer tt = new StringBuffer(80);
+        tt.append("<b>" + host.getName() + "</b>");
+        if (host.getCluster().getBrowser().isRealDcHost(host)) {
+            tt.append(" (designated co-ordinator)");
+        }
+        if (!host.isConnected()) {
+            tt.append('\n');
+            tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
+        } else if (!host.isDrbdStatus() && !host.isClStatus()) {
+            tt.append('\n');
+            tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
+        }
+        final String pmV = host.getPacemakerVersion();
+        final String hbV = host.getHeartbeatVersion();
+        String hbRunning;
+        if (host.isHeartbeatRunning()) {
+            hbRunning = "running";
+            if (!host.isHeartbeatRc()) {
+                hbRunning += "/no rc.d";
+            }
+        } else {
+            hbRunning = "not running";
+        }
+        if (host.isHeartbeatRc()) {
+            hbRunning += "/rc.d";
+        }
+        if (pmV == null) {
+            if (hbV != null) {
+                tt.append('\n');
+                tt.append("Heartbeat " + hbV + " (" + hbRunning + ")");
+            }
+        } else {
+            String pmRunning; 
+            if (host.isClStatus()) {
+                pmRunning = "running";
+            } else {
+                pmRunning = "not running";
+            }
+            tt.append('\n');
+            tt.append("Pacemaker " + pmV + " (" + pmRunning + ")");
+            String corOrAis = null;
+            final String corV = host.getCorosyncVersion();
+            final String aisV = host.getOpenaisVersion();
+            if (corV != null) {
+                corOrAis = "Corosync " + corV;
+            } else if (aisV != null) {
+                corOrAis = "Openais " + aisV;
+            }
+
+            if (hbV != null && host.isHeartbeatRunning()) {
+                tt.append('\n');
+                tt.append("Heartbeat " + hbV + " (" + hbRunning + ")");
+            }
+            if (corOrAis != null) {
+                String csAisRunning;
+                if (host.isCsAisRunning()) {
+                    csAisRunning = "running";
+                    if (!host.isCsAisRc()) {
+                        csAisRunning += "/no rc.d";
+                    }
+                } else {
+                    csAisRunning = "not running";
+                }
+                if (host.isCsAisRc()) {
+                    csAisRunning += "/rc.d";
+                }
+                corOrAis += " (" + csAisRunning + ")";
+                tt.append('\n');
+                tt.append(corOrAis);
+            }
+            if (hbV != null && !host.isHeartbeatRunning()) {
+                tt.append('\n');
+                tt.append("Heartbeat " + hbV + " (" + hbRunning + ")");
+            }
+        }
+        return tt.toString();
+    }
+
+    /**
      * This class holds info data for a filesystem.
      */
     class FilesystemInfo extends Info {
@@ -571,19 +653,7 @@ public class HostBrowser extends Browser {
          * Returns tooltip for the host.
          */
         public final String getToolTipForGraph() {
-            final StringBuffer tt = new StringBuffer(80);
-            tt.append("<b>" + host.getName() + "</b>");
-            if (host.getCluster().getBrowser().isRealDcHost(host)) {
-                tt.append(" (designated co-ordinator)");
-            }
-            if (!host.isConnected()) {
-                tt.append('\n');
-                tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
-            } else if (!host.isDrbdStatus() && !host.isClStatus()) {
-                tt.append('\n');
-                tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
-            }
-            return tt.toString();
+            return getHostToolTip(host);
         }
 
         /**
@@ -977,19 +1047,7 @@ public class HostBrowser extends Browser {
          * Returns tooltip for the host.
          */
         public final String getToolTipForGraph() {
-            final StringBuffer tt = new StringBuffer(80);
-            tt.append("<b>" + host.getName() + "</b>");
-            if (host.getCluster().getBrowser().isRealDcHost(host)) {
-                tt.append(" (designated co-ordinator)");
-            }
-            if (!host.isConnected()) {
-                tt.append('\n');
-                tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
-            } else if (!host.isDrbdStatus() && !host.isClStatus()) {
-                tt.append('\n');
-                tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
-            }
-            return tt.toString();
+            return getHostToolTip(host);
         }
 
         /**

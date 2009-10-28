@@ -194,6 +194,7 @@ public class CRMXML extends XML {
         this.host = host;
         String command = null;
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         final String[] booleanValues = getGlobalCheckBoxChoices();
         final String[] integerValues = getIntegerValues();
         final String hbBooleanTrue = booleanValues[0];
@@ -201,7 +202,9 @@ public class CRMXML extends XML {
         hbClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
                                     "",
                                     "clone");
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             setMetaAttributes(hbClone, "target_role", "is_managed");
         }
         /* clone-max */
@@ -247,12 +250,14 @@ public class CRMXML extends XML {
         hbClone.setParamDefault("interleave", hbBooleanFalse);
         hbClone.setParamPossibleChoices("interleave", booleanValues);
 
-        if (Tools.compareVersions(hbV, "2.1.3") <= 0) {
+        if (pmV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
                                           (ConvertCmdCallback) null);
         }
 
-        if (command == null && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (command == null
+            && pmV == null
+            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
                                           (ConvertCmdCallback) null);
         }
@@ -402,7 +407,7 @@ public class CRMXML extends XML {
         globalRequiredParams.add("default-resource-failure-stickiness");
 
 
-        if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
+        if (pmV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
             final String[] params = {
                 "stonith-action",
                 "is-managed-default",
@@ -538,7 +543,8 @@ public class CRMXML extends XML {
      */
     public final String[] getGlobalCheckBoxChoices() {
         final String hbV = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
+        final String pmV = host.getPacemakerVersion();
+        if (pmV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
             return new String[]{
                 Tools.getString("Heartbeat.2.1.3.Boolean.True"),
                 Tools.getString("Heartbeat.2.1.3.Boolean.False")};
@@ -580,7 +586,8 @@ public class CRMXML extends XML {
             }
         }
         final String hbV = host.getHeartbeatVersion();
-        if (Tools.compareVersions(hbV, "2.1.3") >= 0) {
+        final String pmV = host.getPacemakerVersion();
+        if (pmV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
             return new String[]{
                 Tools.getString("Heartbeat.2.1.3.Boolean.True"),
                 Tools.getString("Heartbeat.2.1.3.Boolean.False")};
@@ -975,7 +982,10 @@ public class CRMXML extends XML {
     private void parseParameters(final ResourceAgent ra,
                                  final Node parametersNode) {
         final String hbV = host.getHeartbeatVersion();
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        final String pmV = host.getPacemakerVersion();
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             setMetaAttributes(ra, "target_role", "is_managed");
         } else {
             setMetaAttributes(ra, "target-role", "is-managed");
@@ -1279,6 +1289,7 @@ public class CRMXML extends XML {
                                         new HashMap<String, String>();
         parametersNvpairsIdsMap.put(hbId, nvpairIds);
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         /* <instance_attributes> */
         final Node instanceAttrNode =
                                    getChildNode(resourceNode,
@@ -1288,7 +1299,9 @@ public class CRMXML extends XML {
             final String iAId = getAttribute(instanceAttrNode, "id");
             resourceInstanceAttrIdMap.put(hbId, iAId);
             NodeList nvpairsRes;
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
                 final Node attrNode = getChildNode(instanceAttrNode,
                                                    "attributes");
@@ -1558,7 +1571,10 @@ public class CRMXML extends XML {
             final String iAId = getAttribute(instanceAttrNode, "id");
             NodeList nvpairsRes;
             final String hbV = host.getHeartbeatVersion();
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            final String pmV = host.getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
                 final Node attrNode = getChildNode(instanceAttrNode,
                                                    "attributes");
@@ -1615,7 +1631,10 @@ public class CRMXML extends XML {
         }
         NodeList nvpairs;
         final String hbV = host.getHeartbeatVersion();
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        final String pmV = host.getPacemakerVersion();
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <attributtes> only til 2.1.4 */
             final Node attrNode = getChildNode(cpsNode,
                                                "attributes");

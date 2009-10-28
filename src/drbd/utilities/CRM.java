@@ -98,9 +98,12 @@ public final class CRM {
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         if (cloneId != null) {
             if (master) {
-                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
                     xml.append("<master_slave id=\"");
                 } else {
                     xml.append("<master id=\"");
@@ -130,7 +133,9 @@ public final class CRM {
             xml.append("<instance_attributes id=\"");
             xml.append(instanceAttrId);
             xml.append("\">");
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* 2.1.4 */
                 xml.append("<attributes>");
             }
@@ -155,7 +160,9 @@ public final class CRM {
                 xml.append(value);
                 xml.append("\"/>");
             }
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* 2.1.4 */
                 xml.append("</attributes>");
             }
@@ -163,7 +170,9 @@ public final class CRM {
         }
         /* operations */
         if (!pacemakerOps.isEmpty()) {
-            if (hbV == null || Tools.compareVersions(hbV, "2.99.0") >= 0) {
+            if (pmV != null
+                || hbV == null
+                || Tools.compareVersions(hbV, "2.99.0") >= 0) {
                 /* 2.1.4 does not have the id. */
                 if (operationsId == null) {
                     operationsId = heartbeatId + "-operations";
@@ -201,7 +210,9 @@ public final class CRM {
         }
         if (cloneId != null) {
             if (master) {
-                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
                     xml.append("</master_slave>");
                 } else {
                     xml.append("</master>");
@@ -326,9 +337,12 @@ public final class CRM {
             xml.append("\">");
         }
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         if (cloneId != null) {
             if (master) {
-                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
                     xml.append("<master_slave id=\"");
                 } else {
                     xml.append("<master id=\"");
@@ -346,7 +360,9 @@ public final class CRM {
         }
         if (cloneId != null) {
             if (master) {
-                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
                     xml.append("</master_slave>");
                 } else {
                     xml.append("</master>");
@@ -390,8 +406,11 @@ public final class CRM {
     public static void startResource(final Host host,
                                      final String heartbeatId) {
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         String cmd = "CRM.startResource";
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             cmd = "CRM.2.1.4.startResource";
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
@@ -408,8 +427,11 @@ public final class CRM {
                                            final Map<String, String> attrs) {
         final StringBuffer xml = new StringBuffer(360);
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         String idPostfix = "-meta_attributes";
-        if (hbV != null && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             idPostfix = "-meta-options";
         }
         xml.append("<meta_attributes id=\"");
@@ -417,7 +439,9 @@ public final class CRM {
         xml.append(idPostfix);
         xml.append("\">");
 
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* 2.1.4 */
             xml.append("<attributes>");
         }
@@ -434,7 +458,9 @@ public final class CRM {
             xml.append("\"/>");
         }
 
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* 2.1.4 */
             xml.append("</attributes>");
         }
@@ -455,8 +481,11 @@ public final class CRM {
             string = ".isManagedOff";
         }
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         String cmd = "CRM" + string;
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             cmd = "CRM.2.1.4" + string;
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
@@ -472,8 +501,11 @@ public final class CRM {
     public static void stopResource(final Host host,
                                     final String heartbeatId) {
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         String cmd = "CRM.stopResource";
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             cmd = "CRM.2.1.4.stopResource";
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
@@ -520,7 +552,10 @@ public final class CRM {
         xml.append("'<crm_config>");
         xml.append("<cluster_property_set id=\"cib-bootstrap-options\">");
         final String hbV = host.getHeartbeatVersion();
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        final String pmV = host.getPacemakerVersion();
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* 2.1.4 */
             xml.append("<attributes>");
         }
@@ -534,7 +569,9 @@ public final class CRM {
             xml.append(args.get(arg));
             xml.append("\"/>");
         }
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* 2.1.4 */
             xml.append("</attributes>");
         }
@@ -554,9 +591,12 @@ public final class CRM {
                                         final String rsc2,
                                         final String score) {
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         String rscString = "rsc";
         String withRscString = "with-rsc";
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <= 2.1.4 */
             rscString = "from";
             withRscString = "to";
@@ -601,6 +641,7 @@ public final class CRM {
             colocationId = colId;
         }
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         if (attrs == null) {
             attrs = new LinkedHashMap<String, String>();
         }
@@ -610,7 +651,9 @@ public final class CRM {
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
         final Map<String, String> convertHash = new HashMap<String, String>();
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <= 2.1.4 */
             convertHash.put("rsc", "from");
             convertHash.put("with-rsc", "to");
@@ -645,9 +688,12 @@ public final class CRM {
                                    final String score,
                                    final String symmetrical) {
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         String firstString = "first";
         String thenString = "then";
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <= 2.1.4 */
             firstString = "from";
             thenString = "to";
@@ -692,12 +738,15 @@ public final class CRM {
             orderId = ordId;
         }
         final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         if (attrs == null) {
             attrs = new LinkedHashMap<String, String>();
         }
         String firstString = "first";
         String thenString = "then";
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <= 2.1.4 */
             firstString = "from";
             thenString = "to";
@@ -708,7 +757,9 @@ public final class CRM {
         attrs.put("first", parentHbId);
         attrs.put("then", heartbeatId);
         final Map<String, String> convertHash = new HashMap<String, String>();
-        if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <= 2.1.4 */
             final String type = "before"; //TODO: can be after
             attrs.put("type", type);
