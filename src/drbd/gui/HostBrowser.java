@@ -489,6 +489,36 @@ public class HostBrowser extends Browser {
             tt.append('\n');
             tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
         }
+        /* DRBD */
+        final String drbdV = host.getDrbdVersion();
+        final String drbdModuleV = host.getDrbdModuleVersion();
+        String drbdS = null;
+        if (drbdV == null || "".equals(drbdV)) {
+            drbdS = "not installed";
+        } else {
+            drbdS = drbdV;
+        }
+
+        String drbdModuleS = null;
+        if (drbdModuleV == null || "".equals(drbdModuleV)) {
+            drbdModuleS = "not installed";
+        } else {
+            drbdModuleS = drbdModuleV;
+        }
+        tt.append('\n');
+        tt.append("DRBD ");
+        tt.append(drbdS);
+        if (!drbdS.equals(drbdModuleS)) {
+            tt.append('\n');
+            tt.append("DRBD module ");
+            tt.append(drbdModuleS);
+        }
+        if (!host.isDrbdLoaded()) {
+            tt.append(" (not loaded)");
+        } else {
+            tt.append(" (running)");
+        }
+        /* Pacemaker */
         final String pmV = host.getPacemakerVersion();
         final String hbV = host.getHeartbeatVersion();
         String hbRunning;

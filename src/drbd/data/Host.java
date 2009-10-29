@@ -110,7 +110,10 @@ public class Host implements Serializable {
     private String drbdModulePackageToInstall = null;
     /** Cluster data object. */
     private Cluster cluster = null;
-
+    /** Drbd version of drbdadm tool. */
+    private String drbdVersion = null;
+    /** Drbd version of drbd module. */
+    private String drbdModuleVersion = null;
     /** Installed drbd version. TODO */
     private final String installedDrbdVersion = null;
     /** Map of network interfaces of this host. */
@@ -625,6 +628,20 @@ public class Host implements Serializable {
         return false;
     }
 
+    /**
+     * Returns installed drbd version.
+     */
+    public final String getDrbdVersion() {
+        return drbdVersion;
+    }
+
+    /**
+     * Returns installed drbd module version.
+     */
+    public final String getDrbdModuleVersion() {
+        return drbdModuleVersion;
+    }
+     
 
     /**
      * Sets drbdVersionToInstall. This version is one that is to be installed.
@@ -1891,6 +1908,18 @@ public class Host implements Serializable {
                 hostname = null;
             }
             setName(hostname);
+        } else if ("drbd".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                drbdVersion = tokens[1].trim();
+            } else {
+                drbdVersion = null;
+            }
+        } else if ("drbd-mod".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                drbdModuleVersion = tokens[1].trim();
+            } else {
+                drbdModuleVersion = null;
+            }
         }
     }
 

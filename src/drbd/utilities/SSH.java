@@ -305,6 +305,7 @@ public class SSH {
      * After this method is called a reconnect will work as expected.
      */
     public final void forceReconnect() {
+        Tools.printStackTrace("force reconnect");
         try {
             mConnectionLock.acquire();
         } catch (InterruptedException e) {

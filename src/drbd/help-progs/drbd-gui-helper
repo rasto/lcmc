@@ -462,65 +462,13 @@ sub get_drbd_events {
 	my $kidpid;
 	my $pid = $$;
 	die "can't fork: $!" unless defined($kidpid = fork());
-	# TODO: 
 	if ($kidpid) {
 		exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
 	} else {
-		sleep 20;
+		sleep 20; # cannot be bigger than ssh timeout
 		kill("TERM", $pid);
 	}
 }
-
-#sub get_drbd_info {
-#	my ($version, $api) = `echo|drbdadm help` =~ /Version:\s+(\S+)\s+\(api:(\d+)\)/;
-#	if ($version && $api) {
-#		print "<drbd-status version=\"$version\" api=\"$api\">\n";
-#	} else {
-#		print "<drbd-status>unknown</drbd-status>\n";
-#		return;
-#	}
-#	print "	<resources>\n";
-#	# since 8.3 drbdadm status can be used
-#	my @resources = split /\s+/, `drbdadm sh-resources`; 
-#	chomp (my @cstates = `drbdadm cstate all`);
-#	chomp (my @roles  = `drbdadm state all || drbdadm role all`);
-#	chomp (my @dstates = `drbdadm dstate all`);
-#	my @sync_progress;
-#	for (my $i = 0; $i<@resources; $i++) {
-#		my $res = $resources[$i];
-#		my $cs = $cstates[$i];
-#		my ($ro1, $ro2) = split /\//, $roles[$i];
-#		my ($ds1, $ds2) = split /\//, $dstates[$i];
-#
-#		print "		<resource res=\"$res\"";
-#		print " cs=\"$cs\"";
-#		print " ro1=\"$ro1\"";
-#		print " ro2=\"$ro2\"";
-#		print " ds1=\"$ds1\"";
-#		print " ds2=\"$ds2\"";
-#
-#		if (defined $sync_progress[$i]) {
-#			print " synced=\"$sync_progress[$i]\"";
-#		} elsif ($cs =~ /^Sync/) {
-#			if (open my $proc, "/proc/drbd") {
-#				my $index = -1;
-#				while (<$proc>) {
-#					if (/^\s*(\d+):/) {
-#						$index++;
-#					} elsif (m!\s+sync'ed:\s+(\d+\.\d+)\%!) {
-#						$sync_progress[$index] = $1;
-#						if ($i == $index) {
-#							print " synced=\"$sync_progress[$i]\"";
-#						}
-#					}
-#				}
-#			}
-#		}
-#		print " />\n";
-#	}
-#	print "	</resources>\n";
-#	print "</drbd-status>\n";
-#}
 
 sub is_smaller_v {
 	my $v 	   = shift;
@@ -1130,6 +1078,13 @@ sub get_cluster_versions {
 	}
 	chomp $hb_running;
 	chomp $cs_ais_running;
+	# drbd version
+	my ($drbd_version) =
+			`echo|drbdadm help 2>/dev/null`=~ /Version:\s+(\S+)/;
+	$drbd_version = "" if !$drbd_version;
+	my $drbd_mod_version = `(modinfo -F version drbd 2>/dev/null|grep . || modinfo -F description drbd 2>/dev/null|sed 's/.* v//')` || "";
+	chomp $drbd_mod_version;
+
 	return "hb:$hb_version\n"
 	       ."pm:$pm_version\n"
 	       ."cs:$cs_version\n"
@@ -1140,5 +1095,7 @@ sub get_cluster_versions {
 	       ."cs-ais-running:$cs_ais_running\n"
 	       ."hb-conf:$hb_conf\n"
 	       ."cs-ais-conf:$cs_ais_conf\n"
+	       ."drbd:$drbd_version\n"
+	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
 }

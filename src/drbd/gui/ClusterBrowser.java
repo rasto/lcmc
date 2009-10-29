@@ -357,7 +357,6 @@ public class ClusterBrowser extends Browser {
                                                              HB_PAR_ROLE,
                                                              HB_PAR_PREREQ,
                                                              HB_PAR_ON_FAIL};
-
     /**
      * Prepares a new <code>CusterBrowser</code> object.
      */

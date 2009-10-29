@@ -366,7 +366,8 @@ public class HostCheckInstallation extends DialogHost {
             getHost().setHeartbeatVersion(hbVersion);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (getHost().getHeartbeatVersion().equals(
+                    if (getHost().getPacemakerVersion() == null
+                        || getHost().getHeartbeatVersion().equals(
                                             getHost().getPacemakerVersion())) {
                         hbPmJLabel.setText("Heartbeat");
                         hbPmLabel.setText(": " + hbVersionText);
