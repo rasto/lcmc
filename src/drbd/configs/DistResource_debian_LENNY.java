@@ -61,26 +61,5 @@ public class DistResource_debian_LENNY extends
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
-        /* heartbeat/pacemaker madkiss */
-        {"HbPmInst.install.text.1",
-         "LINBIT/MADKISS repo: 1.0.x/3.0.x (not working yet)"},
-
-        {"HbPmInst.install.1",
-         "echo 'deb http://people.debian.org/~madkiss/ha-corosync lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
-         + " && apt-get update"
-         + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
-         //+ " && chmod g+w /var/run/heartbeat/crm" // TODO: remove workarounds
-         //                                         // when not needed
-         //+ " && ln -s /var/run/heartbeat/crm/ /var/run/crm"},
-
-        /* heartbeat apt-get install */
-        {"HbPmInst.install.text.2",
-         "the debian way: HB 2.1.3 (obsolete)"},
-
-        {"HbPmInst.install.2",
-         "apt-get update && "
-         + "/usr/bin/apt-get -y -q install -o"
-         + " 'DPkg::Options::force=--force-confnew' heartbeat-2"},
     };
 }

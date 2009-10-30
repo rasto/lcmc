@@ -1026,7 +1026,7 @@ public class ClusterBrowser extends Browser {
                              heartbeatGraph.repaint();
                              host.getSSH().forceReconnect();
                          }
-                         done(ans);
+                         firstTime.countDown();
                      }
                  },
 
@@ -1044,6 +1044,7 @@ public class ClusterBrowser extends Browser {
                          if (output == null) {
                              host.setClStatus(false);
                          } else {
+                             // TODO: if we get ERROR:... show it somewhere
                              clusterStatusOutput.append(output);
                              if (clusterStatusOutput.length() > 12) {
                                  //host.setClStatus(true);

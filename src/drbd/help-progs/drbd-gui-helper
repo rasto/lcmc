@@ -90,7 +90,11 @@ if ($option eq "all") {
 } elsif ($option eq "get-drbd-xml") {
 	get_drbd_xml();
 } elsif ($option eq "get-cluster-events") {
-	get_cluster_events();
+	my $ret = get_cluster_events();
+	if ($ret) {
+		print $ret;
+		exit 1;
+	}
 } elsif ($option eq "get-cluster-metadata") {
 	get_cluster_metadata();
 } elsif ($option eq "get-cluster-versions") {
@@ -539,6 +543,8 @@ sub get_cluster_events {
 			$rw_socket_name = "/var/run/crm/cib_rw";
 		} elsif (-S "/var/run/heartbeat/crm/cib_rw") {
 			$rw_socket_name = "/var/run/heartbeat/crm/cib_rw";
+		} elsif (-S "/usr/var/run/crm/cib_rw") {
+			$rw_socket_name = "/usr/var/run/crm/cib_rw";
 		} else {
 			print "---start---\n";
 			print "ERROR: could not find cib_rw socket.\n";
@@ -550,6 +556,8 @@ sub get_cluster_events {
 			$cb_socket_name = "/var/run/crm/cib_callback";
 		} elsif (-S "/var/run/heartbeat/crm/cib_callback") {
 			$cb_socket_name = "/var/run/heartbeat/crm/cib_callback";
+		} elsif (-S "/usr/var/run/crm/cib_callback") {
+			$cb_socket_name = "/usr/var/run/crm/cib_callback";
 		} else {
 			print "---start---\n";
 			print "ERROR: could not find cib_callback socket.\n";
@@ -652,15 +660,15 @@ sub get_resource_status {
 			$in_rsc_list += /^============/;
 		} else {
 			next if /^\t*$/;
-			if (/^\S/) {
+			if (/^.\S/) {
 				$set = "";
 			}
-			if (m!^(Master/Slave|Clone) Set: (.*)!) {
+			if (m!^\s*(Master/Slave|Clone) Set: (.*)!) {
 				$set = $2;
 				$clone_or_ms{$set} = $1;
 				push @sets, $set;
 				next;
-			} elsif (/^Resource Group: (.*)/) {
+			} elsif (/^\s*Resource Group: (.*)/) {
 				next;
 			} elsif (/\s+Masters:\s+\[\s+(.*)\s+\]/) {
 				push @{$masters{$set}}, split /\s+/, $1;

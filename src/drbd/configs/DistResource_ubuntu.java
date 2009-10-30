@@ -123,5 +123,71 @@ public class DistResource_ubuntu extends
 
         {"Openais.deleteFromRc",
          "/usr/sbin/update-rc.d openais remove"},
+
+        /* openais/pacemaker from source */
+        {"PmInst.install.text.2",
+         "from source: latest/whitetank"},
+
+        {"PmInst.install.2",
+         "export PREFIX=/usr;"
+         + "export LCRSODIR=$PREFIX/libexec/lcrso;"
+         + "export CLUSTER_USER=hacluster;"
+         + "export CLUSTER_GROUP=haclient;"
+         + "apt-get update"
+         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew'"
+         + " automake libtool make pkg-config libglib2.0-dev libxml2-dev"
+         + " libbz2-dev uuid-dev libsnmp-dev subversion libxslt1-dev"
+         + " libltdl3-dev libperl-dev"
+         + " && /bin/mkdir -p /tmp/pminst "
+         /* cluster glue */
+         + " && /usr/bin/wget -O /tmp/pminst/cluster-glue.tar.bz2"
+         + " http://hg.linux-ha.org/glue/archive/tip.tar.bz2"
+         + " && cd /tmp/pminst"
+         + " && /bin/tar xfjp cluster-glue.tar.bz2"
+         + " && cd Reusable-Cluster-Components-*"
+         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " --with-daemon-user=${CLUSTER_USER}"
+         + " --with-daemon-group=${CLUSTER_GROUP}"
+         + " && make && make install"
+         /* resource agents */
+         + " && /usr/bin/wget -O /tmp/pminst/resource-agents.tar.bz2"
+         + " http://hg.linux-ha.org/agents/archive/tip.tar.bz2"
+         + " && cd /tmp/pminst"
+         + " && /bin/tar xfjp resource-agents.tar.bz2"
+         + " && cd Cluster-Resource-Agents-*"
+         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && make && make install"
+         /* openais */
+         + " && cd /tmp/pminst"
+         + " && svn co"
+         + " http://svn.fedorahosted.org/svn/openais/branches/whitetank"
+         + " && cd /tmp/pminst/whitetank/"
+         + " && make PREFIX=$PREFIX LCRSODIR=$LCRSODIR"
+         + " && make install PREFIX=$PREFIX LCRSODIR=$LCRSODIR STATICLIBS=NO"
+         + " && cp init/generic /etc/init.d/openais"
+         + " && chmod a+x /etc/init.d/openais"
+         + " && (addgroup --system --group ais;"
+         + " adduser --system --no-create-home --ingroup ais"
+         + " --disabled-login --shel /bin/false --disabled-password ais;"
+         + " addgroup --system --group haclient;"
+         + " adduser --system --no-create-home --ingroup haclient"
+         + " --disabled-login --shel /bin/false --disabled-password hacluster;"
+         + " true)"
+         /* pacemaker */
+         + " && /usr/bin/wget -O /tmp/pminst/pacemaker.tar.bz2"
+         + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
+         + " && cd /tmp/pminst"
+         + " && /bin/tar xfjp pacemaker.tar.bz2"
+         + " && cd Pacemaker-1-*"
+         + " && ./autogen.sh"
+         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " --disable-fatal-warnings"
+         + " && make && make install"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+
     };
 }

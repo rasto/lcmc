@@ -326,18 +326,20 @@ public class HostCheckInstallation extends DialogHost {
         if (hbVersion == null
             && (getHost().getPacemakerVersion() == null
                 || (corosyncVersion == null && aisVersion == null))) {
-            if (hbPmInstMethodCB.getValue() != null) {
+            final InstallMethods hbim =
+                                       (InstallMethods) hbPmInstMethodCB.getValue();
+            if (hbim != null) {
                 hbPmButton.setEnabled(true);
                 hbPmInstMethodCB.setEnabled(true);
-                final String toolTip = getHbPmInstToolTip("1");
+                final String toolTip = getHbPmInstToolTip(hbim.getIndex());
                 hbPmInstMethodCB.setToolTipText(toolTip);
                 hbPmButton.setToolTipText(toolTip);
             }
-            if (pmInstMethodCB.getValue() != null) {
+            final InstallMethods pmim = (InstallMethods) pmInstMethodCB.getValue();
+            if (pmim != null) {
                 pmButton.setEnabled(true);
                 pmInstMethodCB.setEnabled(true);
-                final String aisToolTip =
-                               getPmInstToolTip("1");
+                final String aisToolTip = getPmInstToolTip(pmim.getIndex());
                 pmInstMethodCB.setToolTipText(aisToolTip);
                 pmButton.setToolTipText(aisToolTip);
             }
@@ -596,7 +598,11 @@ public class HostCheckInstallation extends DialogHost {
             final String text =
                     getHost().getDistString("PmInst.install.text." + index);
             if (text == null || text.equals("")) {
-                break;
+                if (i > 9) {
+                    break;
+                }
+                i++;
+                continue;
             }
             final InstallMethods pmInstallMethod = new InstallMethods(
               Tools.getString("Dialog.HostCheckInstallation.PmInstallMethod")
