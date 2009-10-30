@@ -467,6 +467,7 @@ sub get_drbd_events {
 	my $pid = $$;
 	die "can't fork: $!" unless defined($kidpid = fork());
 	if ($kidpid) {
+		print "empty\n";
 		exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
 	} else {
 		sleep 20; # cannot be bigger than ssh timeout
