@@ -28,8 +28,9 @@ import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-
 import javax.swing.BoxLayout;
+import javax.swing.SwingUtilities;
+
 import java.awt.Component;
 import java.util.Random;
 import java.util.ArrayList;
@@ -118,6 +119,13 @@ public class DrbdConfigResource extends DrbdConfig {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
+        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    pressNextButton();
+                }
+            });
+        }
     }
 
     /**

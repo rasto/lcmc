@@ -179,6 +179,13 @@ public class DrbdConfigCreateFS extends DrbdConfig {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
         enableComponents();
+        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    makeFsButton.pressButton();
+                }
+            });
+        }
     }
 
     /**
@@ -233,7 +240,11 @@ public class DrbdConfigCreateFS extends DrbdConfig {
         }
         final JLabel hostLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfigCreateFS.ChooseHost"));
-        hostCB = new GuiComboBox(NO_HOST_STRING,
+        String defaultHost = NO_HOST_STRING;
+        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            defaultHost = hostNames[1];
+        }
+        hostCB = new GuiComboBox(defaultHost,
                                  hostNames,
                                  GuiComboBox.Type.COMBOBOX,
                                  null,
@@ -260,7 +271,10 @@ public class DrbdConfigCreateFS extends DrbdConfig {
         /* Filesystem */
         final JLabel filesystemLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfigCreateFS.Filesystem"));
-        final String defaultValue = NO_FILESYSTEM_STRING;
+        String defaultValue = NO_FILESYSTEM_STRING;
+        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            defaultValue = "ext3";
+        }
         final StringInfo[] filesystems =
                     getDrbdResourceInfo().getCommonFileSystems2(defaultValue);
 

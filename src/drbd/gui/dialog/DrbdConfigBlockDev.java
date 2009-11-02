@@ -32,6 +32,7 @@ import drbd.Exceptions;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import javax.swing.BoxLayout;
 import java.awt.Component;
@@ -139,6 +140,13 @@ public class DrbdConfigBlockDev extends DrbdConfig {
         final String[] params = blockDevInfo.getParametersFromXML();
         ((MyButton) buttonClass(nextButton())).setEnabled(
                     blockDevInfo.checkResourceFieldsCorrect(null, params));
+        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    pressNextButton();
+                }
+            });
+        }
     }
 
     /**

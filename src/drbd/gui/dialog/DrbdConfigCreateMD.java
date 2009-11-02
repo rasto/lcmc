@@ -163,6 +163,10 @@ public class DrbdConfigCreateMD extends DrbdConfig {
                 public void run() {
                     makeMDButton.setEnabled(false);
                     buttonClass(nextButton()).setEnabled(true);
+                    if (Tools.getConfigData().getAutoOptionGlobal(
+                                                        "autodrbd") != null) {
+                        pressNextButton();
+                    }
                 }
             });
             answerPaneSetText(Tools.join("\n", answer));
@@ -208,6 +212,13 @@ public class DrbdConfigCreateMD extends DrbdConfig {
             enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         }
         enableComponents();
+        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    makeMDButton.pressButton();
+                }
+            });
+        }
     }
 
     /**
@@ -248,7 +259,11 @@ public class DrbdConfigCreateMD extends DrbdConfig {
             makeMDButton.setEnabled(false);
             makeMDButton.setText(
                 Tools.getString("Dialog.DrbdConfigCreateMD.OverwriteMDButton"));
-            final String metadataDefault = useExistingMetadata;
+            String metadataDefault = useExistingMetadata;
+            if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+                metadataDefault = createNewMetadata;
+                makeMDButton.setEnabled(true);
+            }
             metadataCB = new GuiComboBox(metadataDefault,
                                          choices,
                                          GuiComboBox.Type.COMBOBOX,
