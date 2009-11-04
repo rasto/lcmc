@@ -661,7 +661,7 @@ sub get_resource_status {
 			$in_rsc_list += /^============/;
 		} else {
 			next if /^\t*$/;
-			if (/^.\S/) {
+			if (/^.\S/ && $_ !~ /^\t/) {
 				$set = "";
 			}
 			if (m!^\s*(Master/Slave|Clone) Set: (.*)!) {
@@ -973,10 +973,11 @@ sub get_drbd_xml {
 # directories.
 sub is_script_rc {
 	my $script = shift;
-	return "(/usr/sbin/update-rc.d -n $script defaults 1"
-	      ." || /sbin/chkconfig --list $script 2>/dev/null"
-	      ."|grep ':on') 2>/dev/null"
-	      ."|sed s/.*/on/|uniq";
+	return 
+	  "(/usr/sbin/update-rc.d -n $script defaults 1|grep 'already exist'"
+         ." || /sbin/chkconfig --list $script 2>/dev/null"
+         ."|grep ':on') 2>/dev/null"
+         ."|sed s/.*/on/|uniq";
 }
 
 #
@@ -1031,9 +1032,12 @@ sub get_cluster_versions {
 	my $cs_version = "";
 	my $cs_script = "corosync";
 	if (-e $cs_prog) {
-		$cs_version =
-		`grep -m 1 -a -o '/BUILD/corosync-[^/]*' /usr/sbin/corosync|sed s/.*-// 2>/dev/null` || "";
-		chomp $cs_version;
+		($cs_version) = `$cs_prog -v` =~ /'(\d+\.\d+\.\d+)'/;
+		if (!$cs_version) {	
+			$cs_version =
+			`grep -m 1 -a -o '/BUILD/corosync-[^/]*' /usr/sbin/corosync|sed s/.*-// 2>/dev/null` || "";
+			chomp $cs_version;
+		}
 		if (!$cs_version) {
 			$cs_version = "ok";
 		}
