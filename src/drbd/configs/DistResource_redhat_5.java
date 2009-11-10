@@ -46,11 +46,29 @@ public class DistResource_redhat_5 extends
         /* support */
         {"Support", "redhat-5"},
 
-        /* Corosync/Openais/Pacemaker Opensuse */
+        /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+         "clusterlabs repo: 1.0.x/1.1.x" },
 
         {"PmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/epel-5/clusterlabs.repo && "
+         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
+         + "/epel-release-5-3.noarch.rpm && "
+         + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"},
+
+        /* Corosync/Openais/Pacemaker Opensuse */
+        {"PmInst.install.text.2",
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+
+        {"PmInst.install.2",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
          + "yum -y install OpenIPMI-libs lm_sensors "
          + "&& yum -y -x openais-0.80.6 install openais pacemaker resource-agents"

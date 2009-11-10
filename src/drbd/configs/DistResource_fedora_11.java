@@ -44,11 +44,27 @@ public class DistResource_fedora_11 extends
         {"DrbdInst.install",
          "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        /* Corosync/Openais/Pacemaker */
+        /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+         "clusterlabs repo: 1.0.x/1.1.x" },
 
         {"PmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/fedora-11/clusterlabs.repo && "
+         + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"},
+
+        /* Corosync/Openais/Pacemaker opensuse*/
+        {"PmInst.install.text.2",
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+
+        {"PmInst.install.2",
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_11/server:ha-clustering.repo && "
          + "(/usr/sbin/groupadd haclient 2>/dev/null && "
@@ -59,14 +75,28 @@ public class DistResource_fedora_11 extends
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
          + " if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi)"
-         + " && (/sbin/chkconfig --del heartbeat;"
+         + " && /sbin/chkconfig --del heartbeat;"
          + " /sbin/chkconfig --level 2345 openais on"
-         + " && /sbin/chkconfig --level 016 openais off)"},
+         + " && /sbin/chkconfig --level 016 openais off"},
 
+        /* Heartbeat/Pacemaker clusterlabs*/
         {"HbPmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+         "clusterlabs repo: 1.0.x/3.0.x" },
 
         {"HbPmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/fedora-11/clusterlabs.repo && "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker heartbeat"
+         + " && /sbin/chkconfig --del corosync;"
+         + " /sbin/chkconfig --level 2345 heartbeat on"
+         + " && /sbin/chkconfig --level 016 heartbeat off"},
+
+
+        {"HbPmInst.install.text.2",
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+
+        {"HbPmInst.install.2",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/Fedora_11/server:ha-clustering.repo && "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9* "
          + "-x heartbeat-2.1* install heartbeat pacemaker && "

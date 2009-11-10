@@ -124,9 +124,9 @@ public class DistResource_ubuntu extends
         {"Openais.deleteFromRc",
          "/usr/sbin/update-rc.d openais remove"},
 
-        /* openais/pacemaker from source */
+        /* corosync/pacemaker from source */
         {"PmInst.install.text.2",
-         "from source: latest/whitetank"},
+         "from source: latest/1.1.x"},
 
         {"PmInst.install.2",
          "export PREFIX=/usr;"
@@ -138,56 +138,64 @@ public class DistResource_ubuntu extends
          + " -o 'DPkg::Options::force=--force-confnew'"
          + " automake libtool make pkg-config libglib2.0-dev libxml2-dev"
          + " libbz2-dev uuid-dev libsnmp-dev subversion libxslt1-dev"
-         + " libltdl3-dev libperl-dev"
+         + " libltdl3-dev libperl-dev libnss3-dev groff"
          + " && /bin/mkdir -p /tmp/pminst "
          /* cluster glue */
-         + " && /usr/bin/wget -O /tmp/pminst/cluster-glue.tar.bz2"
+         + " && /usr/bin/wget -N -O /tmp/pminst/cluster-glue.tar.bz2"
          + " http://hg.linux-ha.org/glue/archive/tip.tar.bz2"
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp cluster-glue.tar.bz2"
-         + " && cd Reusable-Cluster-Components-*"
+         + " && cd `ls -dr Reusable-Cluster-Components-*`"
          + " && ./autogen.sh && ./configure --prefix=$PREFIX"
          + " --with-daemon-user=${CLUSTER_USER}"
          + " --with-daemon-group=${CLUSTER_GROUP}"
+         + " --disable-fatal-warnings"
+         + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          /* resource agents */
-         + " && /usr/bin/wget -O /tmp/pminst/resource-agents.tar.bz2"
+         + " && /usr/bin/wget -N -O /tmp/pminst/resource-agents.tar.bz2"
          + " http://hg.linux-ha.org/agents/archive/tip.tar.bz2"
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp resource-agents.tar.bz2"
-         + " && cd Cluster-Resource-Agents-*"
+         + " && cd `ls -dr Cluster-Resource-Agents-*`"
          + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
-         /* openais */
+         /* corosync */
          + " && cd /tmp/pminst"
          + " && svn co"
-         + " http://svn.fedorahosted.org/svn/openais/branches/whitetank"
-         + " && cd /tmp/pminst/whitetank/"
-         + " && make PREFIX=$PREFIX LCRSODIR=$LCRSODIR"
-         + " && make install PREFIX=$PREFIX LCRSODIR=$LCRSODIR STATICLIBS=NO"
-         + " && cp init/generic /etc/init.d/openais"
-         + " && chmod a+x /etc/init.d/openais"
+         + " http://svn.fedorahosted.org/svn/corosync/branches/flatiron"
+         + " && cd /tmp/pminst/flatiron"
+         + " && ./autogen.sh"
+         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " --sysconfdir=/etc --localstatedir=/var"
+         + " && make"
+         + " && make install"
          + " && (addgroup --system --group ais;"
          + " adduser --system --no-create-home --ingroup ais"
-         + " --disabled-login --shel /bin/false --disabled-password ais;"
+         + " --disabled-login --shell /bin/false --disabled-password ais;"
          + " addgroup --system --group haclient;"
          + " adduser --system --no-create-home --ingroup haclient"
-         + " --disabled-login --shel /bin/false --disabled-password hacluster;"
+         + " --disabled-login --shell /bin/false --disabled-password hacluster;"
          + " true)"
          /* pacemaker */
-         + " && /usr/bin/wget -O /tmp/pminst/pacemaker.tar.bz2"
+         + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
          + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp pacemaker.tar.bz2"
-         + " && cd Pacemaker-1-*"
+         + " && cd `ls -dr Pacemaker-1-*`"
          + " && ./autogen.sh"
          + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " --sysconfdir=/etc --localstatedir=/var"
          + " --disable-fatal-warnings"
          + " && make && make install"
-         + " && if [ -e /etc/ais/openais.conf ];then"
-         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"},
+
+         {"PmInst.install.files.2",
+          "init-corosync-debian:/etc/init.d/corosync:755"
+          + ":init-default-corosync-debian:/etc/default/corosync:644"},
 
     };
 }

@@ -46,20 +46,20 @@ public class DistResource_debian_LENNY extends
         // TODO: use flags for this
         {"Support", "debian-LENNY"},
 
-        /* openais/pacemaker madkiss */
+        /* corosync/pacemaker madkiss */
         {"PmInst.install.text.1",
          "LINBIT/MADKISS repo: 1.0.x/1.0.x (testing)"},
 
         {"PmInst.install.1",
-         "echo 'deb http://people.debian.org/~madkiss/ha-corosync lenny main'"
+         "echo 'deb http://people.debian.org/~madkiss/ha lenny main'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' pacemaker-openais"
-         + " && if [ -e /etc/ais/openais.conf ];then"
-         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker corosync"
+         + " && sed -i 's/\\(START=\\)no/\\1yes/' /etc/default/corosync"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"},
 
     };
 }

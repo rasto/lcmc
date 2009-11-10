@@ -47,10 +47,22 @@ public class DistResource_suse_OPENSUSE11_1 extends
          + " /etc/modprobe.d/unsupported-modules;"
          + "modprobe drbd"},
 
-        /* Corosync/Openais/Pacemaker Opensuse */
+        /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+         "clusterlabs repo: 1.0.x/1.0.x" },
         {"PmInst.install.1",
+         "wget -N -nd -P /etc/zypp/repos.d/"
+         + " http://www.clusterlabs.org/rpm/opensuse-11.1/clusterlabs.repo && "
+         + "zypper -n --no-gpg-check install pacemaker corosync"
+         + " && /sbin/chkconfig --add corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"},
+
+        /* Corosync/Openais/Pacemaker Opensuse */
+        {"PmInst.install.text.2",
+         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+        {"PmInst.install.2",
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/openSUSE_11.1/server:ha-clustering.repo && "
          + "zypper -n --no-gpg-check install pacemaker"
@@ -59,20 +71,30 @@ public class DistResource_suse_OPENSUSE11_1 extends
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"},
 
         /* Openais/Pacemaker native */
-        {"PmInst.install.text.2", "opensuse way: 1.0.x/0.80.x" },
-        {"PmInst.install.2",
+        {"PmInst.install.text.3", "opensuse way: 1.0.x/0.80.x" },
+        {"PmInst.install.3",
          "zypper -n install heartbeat-resources pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
          + " && chkconfig --add openais"},
 
-        /* Heartbeat/Pacemaker Opensuse */
+        /* Heartbeat/Pacemaker Clusterlabs */
         {"HbPmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+         "clusterlabs repo: 1.0.x/3.0.x" },
         {"HbPmInst.install.1",
+         "wget -N -nd -P /etc/zypp/repos.d/"
+         + " http://www.clusterlabs.org/rpm/opensuse-11.1/clusterlabs.repo && "
+         + "zypper -n --no-gpg-check install heartbeat pacemaker"
+         + " && chkconfig --add heartbeat"},
+
+        /* Heartbeat/Pacemaker Opensuse */
+        {"HbPmInst.install.text.2",
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+        {"HbPmInst.install.2",
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/openSUSE_11.1/server:ha-clustering.repo && "
          + "zypper -n --no-gpg-check install heartbeat pacemaker"

@@ -61,11 +61,29 @@ public class DistResource_redhatenterpriseserver_5 extends
          + "chmod g+w /var/run/heartbeat/ccm/ &&"
          + "/sbin/chkconfig --add heartbeat"},
 
-        /* Corosync/Openais/Pacemaker opensuse */
+        /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
+         "clusterlabs repo: 1.0.x/1.1.x" },
+
+        {"PmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/epel-5/clusterlabs.repo && "
+         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
+         + "/epel-release-5-3.noarch.rpm && "
+         + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"},
+
+        /* Corosync/Openais/Pacemaker opensuse */
+        {"PmInst.install.text.2",
          "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
-        {"PmInst.install.1.i686",
+        {"PmInst.install.2.i686",
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
          + "yum -y install resource-agents.`uname -m"
@@ -80,7 +98,7 @@ public class DistResource_redhatenterpriseserver_5 extends
          + " if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
 
-        {"PmInst.install.1",
+        {"PmInst.install.2",
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
          + "yum -y install resource-agents.`uname -m"

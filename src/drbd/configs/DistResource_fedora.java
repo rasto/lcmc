@@ -47,10 +47,10 @@ public class DistResource_fedora extends
         {"DrbdInst.install",
          "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
 
-        {"HbPmInst.install.text.2",
+        {"HbPmInst.install.text.3",
          "the fedora way: HB 2.1.x (obsolete)" },
 
-        {"HbPmInst.install.2",
+        {"HbPmInst.install.3",
          "/usr/bin/yum -y install heartbeat"},
         /* at least fedora 10 and fedora11 in version 2.1.3 and 2.14 has different
            ocf path. */
@@ -69,6 +69,73 @@ public class DistResource_fedora extends
          + "echo 'master:';"
          + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
+
+        /* corosync/pacemaker from source */
+        {"PmInst.install.text.9",
+         "from source: latest/1.1.x"},
+
+        {"PmInst.install.9",
+         "export PREFIX=/usr;"
+         + "export LCRSODIR=$PREFIX/libexec/lcrso;"
+         + "export CLUSTER_USER=hacluster;"
+         + "export CLUSTER_GROUP=haclient;"
+         + "/usr/bin/yum -y install autoconf automake libtool glib2-devel"
+         + " libxml2-devel bzip2-devel libtool-ltdl-devel e2fsprogs-devel"
+         + " net-snmp-devel subversion libxslt-devel"
+         + " && /bin/mkdir -p /tmp/pminst "
+         /* cluster glue */
+         + " && /usr/bin/wget -N -O /tmp/pminst/cluster-glue.tar.bz2"
+         + " http://hg.linux-ha.org/glue/archive/tip.tar.bz2"
+         + " && cd /tmp/pminst"
+         + " && /bin/tar xfjp cluster-glue.tar.bz2"
+         + " && cd `ls -dr Reusable-Cluster-Components-*`"
+         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " --with-daemon-user=${CLUSTER_USER}"
+         + " --with-daemon-group=${CLUSTER_GROUP}"
+         + " --disable-fatal-warnings"
+         + " --sysconfdir=/etc --localstatedir=/var"
+         + " && make && make install"
+         /* resource agents */
+         + " && /usr/bin/wget -N -O /tmp/pminst/resource-agents.tar.bz2"
+         + " http://hg.linux-ha.org/agents/archive/tip.tar.bz2"
+         + " && cd /tmp/pminst"
+         + " && /bin/tar xfjp resource-agents.tar.bz2"
+         + " && cd `ls -dr Cluster-Resource-Agents-*`"
+         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " --sysconfdir=/etc --localstatedir=/var"
+         + " && make && make install"
+         /* corosync */
+         + " && cd /tmp/pminst"
+         + " && svn co"
+         + " http://svn.fedorahosted.org/svn/corosync/branches/flatiron"
+         + " && cd /tmp/pminst/flatiron"
+         + " && ./autogen.sh"
+         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " --sysconfdir=/etc --localstatedir=/var"
+         + " && make"
+         + " && make install"
+         + " && cp init/redhat /etc/init.d/corosync"
+         + " && chmod a+x /etc/init.d/corosync"
+         + " && (groupadd ais;"
+         + " useradd -g ais --shell /bin/false ais;"
+         + " groupadd haclient;"
+         + " useradd -g haclient --shell /bin/false hacluster;"
+         + " true)"
+         /* pacemaker */
+         + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
+         + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
+         + " && cd /tmp/pminst"
+         + " && /bin/tar xfjp pacemaker.tar.bz2"
+         + " && cd `ls -dr Pacemaker-1-*`"
+         + " && echo 'docdir = ${datadir}/doc/${PACKAGE}'>>doc/Makefile.am"
+         + " && echo 'docdir = ${datadir}/doc/${PACKAGE}'>>Makefile.am"
+         + " && ./autogen.sh"
+         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " --sysconfdir=/etc --localstatedir=/var"
+         + " --disable-fatal-warnings"
+         + " && make && make install"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         {"HbCheck.version",
          "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
