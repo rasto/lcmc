@@ -361,7 +361,7 @@ sub get_disk_info {
 		    	# 104 cciss0
 			if ($_ !~ /\d$/) { # whole disk
 				push @disks, $name;
-				next;
+				$device = "/dev/$name";
 			} elsif ($blocks == 1) { # extended partition
 				next;
 			} else {
@@ -704,13 +704,16 @@ sub get_resource_status {
 
 			} else {
 				my $running_on = "";
-				if ($running eq "Started") {
-					$running_on = shift @rest;
+				if (defined $running) {
+					if ($running eq "Started") {
+						$running_on = shift @rest;
+					}
+					$info.= "  <resource id=\"$rsc\""
+						." running=\"$running\""
+						." running_on=\"$running_on\""
+						." managed=\"$managed\" />\n";
+
 				}
-				$info.= "  <resource id=\"$rsc\""
-					." running=\"$running\""
-					." running_on=\"$running_on\""
-					." managed=\"$managed\" />\n";
 			}
 		}
 	}
