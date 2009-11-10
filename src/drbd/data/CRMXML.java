@@ -31,6 +31,7 @@ import org.w3c.dom.Node;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -1391,6 +1392,48 @@ public class CRMXML extends XML {
     }
 
     /**
+     * Parses the "group" node.
+     */
+    private void parseGroup(
+                final Node groupNode,
+                final List<String> resList,
+                final Map<String, List<String>> groupsToResourcesMap,
+                final Map<String, Map<String, String>> parametersMap,
+                final Map<String, ResourceAgent> resourceTypeMap,                     
+                final Map<String, Map<String, String>> parametersNvpairsIdsMap,             
+                final Map<String, String> resourceInstanceAttrIdMap,           
+                final MultiKeyMap operationsMap,
+                final Map<String, String> operationsIdMap,
+                final Map<String, Map<String, String>> resOpIdsMap) {
+        final NodeList primitives = groupNode.getChildNodes();
+        final String groupId = getAttribute(groupNode, "id");
+        if (resList != null) {
+            resList.add(groupId);
+        }
+        parametersMap.put(groupId, new HashMap<String, String>());
+        List<String> groupResList = groupsToResourcesMap.get(groupId);
+        if (groupResList == null) {
+            groupResList = new ArrayList<String>();
+            groupsToResourcesMap.put(groupId, groupResList);
+        }
+
+        for (int j = 0; j < primitives.getLength(); j++) {
+            final Node primitiveNode = primitives.item(j);
+            if (primitiveNode.getNodeName().equals("primitive")) {
+                parsePrimitive(primitiveNode,
+                               groupResList,
+                               resourceTypeMap,
+                               parametersMap,
+                               parametersNvpairsIdsMap,
+                               resourceInstanceAttrIdMap,
+                               operationsMap,
+                               operationsIdMap,
+                               resOpIdsMap);
+            }
+        }
+    }
+
+    /**
      * Parses the "primitive" node.
      */
     private void parsePrimitive(
@@ -1601,12 +1644,14 @@ public class CRMXML extends XML {
         final Document document = getXMLDocument(query);
         final CibQuery cibQueryData = new CibQuery();
         if (document == null) {
+            Tools.appWarning("cib error");
             return cibQueryData;
         }
 
         /* get root <cib> */
         final Node cibNode = getChildNode(document, "cib");
         if (cibNode == null) {
+            Tools.appWarning("there is no cib node");
             return cibQueryData;
         }
         /* Designated Co-ordinator */
@@ -1616,17 +1661,20 @@ public class CRMXML extends XML {
         /* <configuration> */
         final Node confNode = getChildNode(cibNode, "configuration");
         if (confNode == null) {
+            Tools.appWarning("there is no configuration node");
             return cibQueryData;
         }
 
         /* <crm_config> */
         final Node crmConfNode = getChildNode(confNode, "crm_config");
         if (crmConfNode == null) {
+            Tools.appWarning("there is no crm_config node");
             return cibQueryData;
         }
         /*      <cluster_property_set> */
         final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
         if (cpsNode == null) {
+            Tools.appWarning("there is no cluster_property_set node");
             return cibQueryData;
         }
         NodeList nvpairs;
@@ -1682,6 +1730,7 @@ public class CRMXML extends XML {
         /* <resources> */
         final Node resourcesNode = getChildNode(confNode, "resources");
         if (resourcesNode == null) {
+            Tools.appWarning("there is no resources node");
             return cibQueryData;
         }
         /*      <primitive> */
@@ -1699,8 +1748,10 @@ public class CRMXML extends XML {
                                                 new HashMap<String, String>();
         final Map<String, Map<String, String>> resOpIdsMap =
                                     new HashMap<String, Map<String, String>>();
+        /* must be linked, so that clone from group is before the group itself.
+         */
         final Map<String, List<String>> groupsToResourcesMap =
-                                           new HashMap<String, List<String>>();
+                                     new LinkedHashMap<String, List<String>>();
         final Map<String, String> cloneToResourceMap =
                                                  new HashMap<String, String>();
         final List<String> masterList = new ArrayList<String>();
@@ -1724,29 +1775,39 @@ public class CRMXML extends XML {
                                operationsIdMap,
                                resOpIdsMap);
             } else if ("group".equals(nodeName)) {
-                final NodeList primitives = primitiveGroupNode.getChildNodes();
-                final String groupId = getAttribute(primitiveGroupNode, "id");
-                parametersMap.put(groupId, new HashMap<String, String>());
-                List<String> resList = groupsToResourcesMap.get(groupId);
-                if (resList == null) {
-                    resList = new ArrayList<String>();
-                    groupsToResourcesMap.put(groupId, resList);
-                }
+                parseGroup(primitiveGroupNode,
+                           null,
+                           groupsToResourcesMap, 
+                           parametersMap,
+                           resourceTypeMap,                     
+                           parametersNvpairsIdsMap,             
+                           resourceInstanceAttrIdMap,           
+                           operationsMap,
+                           operationsIdMap,
+                           resOpIdsMap);
+                //final NodeList primitives = primitiveGroupNode.getChildNodes();
+                //final String groupId = getAttribute(primitiveGroupNode, "id");
+                //parametersMap.put(groupId, new HashMap<String, String>());
+                //List<String> resList = groupsToResourcesMap.get(groupId);
+                //if (resList == null) {
+                //    resList = new ArrayList<String>();
+                //    groupsToResourcesMap.put(groupId, resList);
+                //}
 
-                for (int j = 0; j < primitives.getLength(); j++) {
-                    final Node primitiveNode = primitives.item(j);
-                    if (primitiveNode.getNodeName().equals("primitive")) {
-                        parsePrimitive(primitiveNode,
-                                       resList,
-                                       resourceTypeMap,
-                                       parametersMap,
-                                       parametersNvpairsIdsMap,
-                                       resourceInstanceAttrIdMap,
-                                       operationsMap,
-                                       operationsIdMap,
-                                       resOpIdsMap);
-                    }
-                }
+                //for (int j = 0; j < primitives.getLength(); j++) {
+                //    final Node primitiveNode = primitives.item(j);
+                //    if (primitiveNode.getNodeName().equals("primitive")) {
+                //        parsePrimitive(primitiveNode,
+                //                       resList,
+                //                       resourceTypeMap,
+                //                       parametersMap,
+                //                       parametersNvpairsIdsMap,
+                //                       resourceInstanceAttrIdMap,
+                //                       operationsMap,
+                //                       operationsIdMap,
+                //                       resOpIdsMap);
+                //    }
+                //}
             } else if ("master".equals(nodeName)
                        || "master_slave".equals(nodeName)
                        || "clone".equals(nodeName)) {
@@ -1778,6 +1839,17 @@ public class CRMXML extends XML {
                                        operationsMap,
                                        operationsIdMap,
                                        resOpIdsMap);
+                    } else if (primitiveNode.getNodeName().equals("group")) {
+                        parseGroup(primitiveNode,
+                                   resList,
+                                   groupsToResourcesMap, 
+                                   parametersMap,
+                                   resourceTypeMap,                     
+                                   parametersNvpairsIdsMap,             
+                                   resourceInstanceAttrIdMap,           
+                                   operationsMap,
+                                   operationsIdMap,
+                                   resOpIdsMap);
                     }
                 }
                 if (!resList.isEmpty()) {

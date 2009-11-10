@@ -75,6 +75,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 
 /**
@@ -122,6 +123,9 @@ public final class Tools {
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(
                                                           DIALOG_PANEL_WIDTH,
                                                           DIALOG_PANEL_HEIGHT);
+    private static final List<JPanel> expertPanels = new ArrayList<JPanel>();
+    /** Expert panel mutex. */
+    private static final Mutex mExpertPanels = new Mutex();
 
     /**
      * Private constructor.
@@ -674,21 +678,18 @@ public final class Tools {
      * Loads the save file and returns its content as string. Return null, if
      * nothing was loaded.
      */
-    public static String loadSaveFile(final String filename,
+    public static String loadFile(final String filename,
                                       final boolean showError) {
         BufferedReader in = null;
-        final StringBuffer xml = new StringBuffer("");
+        final StringBuffer content = new StringBuffer("");
         //Tools.startProgressIndicator(Tools.getString("Tools.Loading"));
         try {
             in = new BufferedReader(new FileReader(filename));
             String line = "";
             while ((line = in.readLine()) != null) {
-                xml.append(line);
+                content.append(line);
             }
         } catch (Exception ex) {
-            //Tools.stopProgressIndicator(Tools.getString("Tools.Loading"));
-            //Tools.progressIndicatorFailed(Tools.getString("Tools.Loading")
-            //                              + " failed");
             if (showError) {
                 infoDialog("Load Error",
                            "The file " + filename + " failed to load",
@@ -696,7 +697,6 @@ public final class Tools {
             }
             return null;
         }
-        //Tools.stopProgressIndicator(Tools.getString("Tools.Loading"));
         if (in != null)  {
             try {
                 in.close();
@@ -704,7 +704,7 @@ public final class Tools {
                 Tools.appError("Could not close: " + filename, ex);
             }
         }
-        return xml.toString();
+        return content.toString();
     }
 
     /**
@@ -712,7 +712,7 @@ public final class Tools {
      */
     public static void loadConfigData(final String filename) {
         debug("load", 0);
-        final String xml = loadSaveFile(filename, true);
+        final String xml = loadFile(filename, true);
         if (xml == null) {
             return;
         }
@@ -1322,6 +1322,36 @@ public final class Tools {
     }
 
     /**
+     * Register expert panel.
+     */
+    public static void registerExpertPanel(final JPanel extraOptionsPanel) {
+        try {
+            mExpertPanels.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        System.out.println("register expert panel: " + expertPanels.size());
+        if (!expertPanels.contains(extraOptionsPanel)) {
+            expertPanels.add(extraOptionsPanel);
+        }
+        mExpertPanels.release();
+    }
+
+    /**
+     * Unregister expert panel.
+     */
+    public static void unregisterExpertPanel(final JPanel extraOptionsPanel) {
+        try {
+            mExpertPanels.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        expertPanels.remove(extraOptionsPanel);
+        System.out.println("unregister expert panel: " + expertPanels.size());
+        mExpertPanels.release();
+    }
+
+    /**
      * Returns expert mode check box. That hides extraOptionsPanel if expert
      * mode was deactivated.
      *
@@ -1330,7 +1360,7 @@ public final class Tools {
      *
      * @return expert mode checkbox
      */
-    public static JCheckBox expertModeButton(final JPanel extraOptionsPanel) {
+    public static JCheckBox expertModeButton() {
         final JCheckBox expertCB = new JCheckBox(Tools.getString(
                                                     "Browser.ExpertMode"));
         expertCB.setBackground(Tools.getDefaultColor(
@@ -1341,12 +1371,23 @@ public final class Tools {
                 final boolean selected =
                                     e.getStateChange() == ItemEvent.SELECTED;
                 if (selected != Tools.getConfigData().getExpertMode()) {
-                    Tools.getConfigData().setExpertMode(selected);
-                    //selectMyself();
-                    extraOptionsPanel.setVisible(selected);
-                    extraOptionsPanel.invalidate();
-                    extraOptionsPanel.validate();
-                    extraOptionsPanel.repaint();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            try {
+                                mExpertPanels.acquire();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            }
+                            for (final JPanel panel : expertPanels) {
+                                Tools.getConfigData().setExpertMode(selected);
+                                panel.setVisible(selected);
+                                panel.invalidate();
+                                panel.validate();
+                                panel.repaint();
+                            }
+                            mExpertPanels.release();
+                        }
+                    });
                 }
             }
         });
@@ -1593,6 +1634,7 @@ public final class Tools {
         final String[] args = line.split(",");
         String host = null;
         String cluster = null;
+        boolean global = false;
         for (final String arg : args) {
             final String[] pair = arg.split(":");
             if (pair == null || pair.length != 2) {
@@ -1611,11 +1653,18 @@ public final class Tools {
                 cluster = value;
                 Tools.getConfigData().addAutoCluster(cluster);
                 continue;
+            } else if ("global".equals(option)) {
+                host = null;
+                cluster = null;
+                global = true;
+                continue;
             }
             if (host != null) {
                 Tools.getConfigData().addAutoOption(host, option, value);
             } else if (cluster != null) {
                 Tools.getConfigData().addAutoOption(cluster, option, value);
+            } else if (global) {
+                Tools.getConfigData().addAutoOption("global", option, value);
             } else {
                 appWarning("cannot parse: " + line);
                 return;

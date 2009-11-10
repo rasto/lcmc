@@ -397,16 +397,19 @@ public class HostCheckInstallation extends DialogHost {
             pmOk = true;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    String coroAisVersion = "no";
                     pmIcon.setIcon(INSTALLED_ICON);
                     if (corosyncVersion != null) {
                         pmJLabel.setText("Pacemaker/Coro");
+                        coroAisVersion = corosyncVersion;
                     } else if (aisVersion != null) {
                         pmJLabel.setText("Pacemaker/AIS");
+                        coroAisVersion = aisVersion;
                     }
                     pmJLabel.repaint();
                     pmLabel.setText(": "
                                        + getHost().getPacemakerVersion() + "/"
-                                       + getHost().getOpenaisVersion());
+                                       + coroAisVersion);
                 }
             });
         }

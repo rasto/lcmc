@@ -440,4 +440,11 @@ public class ConfigData implements Serializable {
           }
           return (String) autoOptions.get(autoClusters.get(0), option);
       }
+
+      /**
+       * Returns a global option.
+       */
+      public final String getAutoOptionGlobal(final String option) {
+          return (String) autoOptions.get("global", option);
+      }
 }

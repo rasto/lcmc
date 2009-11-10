@@ -121,11 +121,17 @@ public class ClusterName extends DialogCluster {
         if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
             final String name = Tools.getConfigData().getAutoClusters().get(0);
             if (!".".equals(name)) {
-                Tools.sleep(1000);
-                nameField.setValue(name);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        nameField.setValue(name);
+                    }
+                });
             }
-            Tools.sleep(1000);
-            pressNextButton();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    pressNextButton();
+                }
+            });
         }
     }
 

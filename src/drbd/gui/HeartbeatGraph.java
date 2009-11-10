@@ -903,6 +903,7 @@ public class HeartbeatGraph extends ResourceGraph {
                     final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
                     edgeToHbconnectionMap.remove(e);
                     hbconnectionToEdgeMap.remove(hbci);
+                    hbci.removeMyself();
                 }
             }
         }

@@ -29,6 +29,7 @@ import drbd.data.CRMXML.ResStatus;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import org.apache.commons.collections.map.MultiKeyMap;
 
@@ -133,11 +134,10 @@ public class ClusterStatus {
     /**
      * Returns all groups as an string array.
      */
-    public final String[] getAllGroups() {
+    public final Set<String> getAllGroups() {
         final Map<String, List<String>> groupsToResources =
                                             cibQueryMap.getGroupsToResources();
-        return groupsToResources.keySet().toArray(
-                                        new String[groupsToResources.size()]);
+        return groupsToResources.keySet();
     }
 
     /**

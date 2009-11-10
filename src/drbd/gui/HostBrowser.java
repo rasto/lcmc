@@ -1660,14 +1660,16 @@ public class HostBrowser extends Browser {
      * This class holds info data for a block device.
      */
     public class BlockDevInfo extends EditableInfo {
-        /** drbd resource in which this block device is member. */
+        /** DRBD resource in which this block device is member. */
         private DrbdResourceInfo drbdResourceInfo;
-        /** map from paremeters to the fact if the last entered value was
+        /** Map from paremeters to the fact if the last entered value was
          * correct. */
         private final Map<String, Boolean> paramCorrectValueMap =
                                                 new HashMap<String, Boolean>();
-        /** cache for the info panel. */
+        /** Cache for the info panel. */
         private JComponent infoPanel = null;
+        /** Extra options panel. */
+        final JPanel extraOptionsPanel = new JPanel();
 
         /**
          * Prepares a new <code>BlockDevInfo</code> object.
@@ -1701,6 +1703,7 @@ public class HostBrowser extends Browser {
             getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
             super.removeMyself();
             infoPanel = null;
+            Tools.unregisterExpertPanel(extraOptionsPanel);
         }
 
         /**
@@ -2304,7 +2307,6 @@ public class HostBrowser extends Browser {
                                                  BoxLayout.Y_AXIS));
             optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            final JPanel extraOptionsPanel = new JPanel();
             extraOptionsPanel.setBackground(PANEL_BACKGROUND);
             extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                                       BoxLayout.Y_AXIS));
@@ -2336,7 +2338,7 @@ public class HostBrowser extends Browser {
                 );
 
                 /* expert mode */
-                buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
+                Tools.registerExpertPanel(extraOptionsPanel);
 
                 applyButton.addActionListener(
                     new ActionListener() {
@@ -2365,12 +2367,6 @@ public class HostBrowser extends Browser {
             riaPanel.add(super.getInfoPanel());
             mainPanel.add(riaPanel);
 
-            ///* drbd node */
-            //if (getBlockDevice().isDrbd()) {
-            //    /* expert mode */
-            //    mainPanel.add(Tools.expertModeButton(extraOptionsPanel));
-
-            //}
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
             final JPanel newPanel = new JPanel();

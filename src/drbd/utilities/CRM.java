@@ -329,13 +329,6 @@ public final class CRM {
                                       final boolean master) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
-        if (groupId != null) {
-            /* when removing the last resource in a group, remove the
-             * whole group. */
-            xml.append("<group id=\"");
-            xml.append(groupId);
-            xml.append("\">");
-        }
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         if (cloneId != null) {
@@ -353,10 +346,20 @@ public final class CRM {
             xml.append(cloneId);
             xml.append("\">");
         }
+        if (groupId != null) {
+            /* when removing the last resource in a group, remove the
+             * whole group. */
+            xml.append("<group id=\"");
+            xml.append(groupId);
+            xml.append("\">");
+        }
         if (heartbeatId != null) {
             xml.append("<primitive id=\"");
             xml.append(heartbeatId);
             xml.append("\"></primitive>");
+        }
+        if (groupId != null) {
+            xml.append("</group>");
         }
         if (cloneId != null) {
             if (master) {
@@ -370,9 +373,6 @@ public final class CRM {
             } else {
                 xml.append("</clone>");
             }
-        }
-        if (groupId != null) {
-            xml.append("</group>");
         }
         xml.append('\'');
         final String command = getCibCommand(

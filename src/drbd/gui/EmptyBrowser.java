@@ -100,7 +100,7 @@ public class EmptyBrowser extends Browser {
         super();
         /* Load the default file */
         final String saveFile = Tools.getConfigData().getSaveFile();
-        final String xml = Tools.loadSaveFile(saveFile, false);
+        final String xml = Tools.loadFile(saveFile, false);
         if (xml != null) {
             Tools.loadXML(xml);
         }

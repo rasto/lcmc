@@ -1430,34 +1430,42 @@ public class ClusterBrowser extends Browser {
      *          service info object
      */
     private void addToHeartbeatIdList(final ServiceInfo si) {
-        String id = si.getService().getHeartbeatId();
-        if (id == null) {
+        String id = si.getService().getId();
+        String pmId = si.getService().getHeartbeatId();
+        if (pmId == null) {
             if (PM_GROUP_NAME.equals(si.getName())) {
-                id = Service.GRP_ID_PREFIX;
+                pmId = Service.GRP_ID_PREFIX;
             } else if (PM_CLONE_SET_NAME.equals(si.getName())
                        || PM_MASTER_SLAVE_SET_NAME.equals(si.getName())) {
                 if (si.getService().isMaster()) {
-                    id = Service.MS_ID_PREFIX;
+                    pmId = Service.MS_ID_PREFIX;
                 } else {
-                    id = Service.CL_ID_PREFIX;
+                    pmId = Service.CL_ID_PREFIX;
                 }
             } else {
-                id = Service.RES_ID_PREFIX + si.getName() + "_";
+                pmId = Service.RES_ID_PREFIX + si.getName() + "_";
             }
-            int i = 1;
-            while (heartbeatIdList.contains(id + Integer.toString(i))) {
-                i++;
+            String newPmId;
+            if (id == null) {
+                /* first time, no pm id is set */ 
+                int i = 1;
+                while (heartbeatIdList.contains(pmId + Integer.toString(i))) {
+                    i++;
+                }
+                newPmId = pmId + Integer.toString(i);
+                si.getService().setId(Integer.toString(i));
+            } else {
+                newPmId = pmId + id;
+                si.getService().setHeartbeatId(newPmId);
             }
-            final String newId = id + Integer.toString(i);
-            heartbeatIdList.add(newId);
-            si.getService().setId(newId);
-            heartbeatIdToServiceInfo.put(newId, si);
+            heartbeatIdList.add(newPmId);
+            heartbeatIdToServiceInfo.put(newPmId, si);
         } else {
-            if (!heartbeatIdList.contains(id)) {
-                heartbeatIdList.add(id);
+            if (!heartbeatIdList.contains(pmId)) {
+                heartbeatIdList.add(pmId);
             }
-            if (heartbeatIdToServiceInfo.get(id) == null) {
-                heartbeatIdToServiceInfo.put(id, si);
+            if (heartbeatIdToServiceInfo.get(pmId) == null) {
+                heartbeatIdToServiceInfo.put(pmId, si);
             }
         }
     }
@@ -1683,6 +1691,8 @@ public class ClusterBrowser extends Browser {
         private boolean haveToCreateMD = false;
         /** Last created filesystem. */
         private String createdFs = null;
+        /** Extra options panel. */
+        final JPanel extraOptionsPanel = new JPanel();
 
         /**
          * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -2307,7 +2317,6 @@ public class ClusterBrowser extends Browser {
                                                  BoxLayout.Y_AXIS));
             optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            final JPanel extraOptionsPanel = new JPanel();
             extraOptionsPanel.setBackground(EXTRA_PANEL_BACKGROUND);
             extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                                       BoxLayout.Y_AXIS));
@@ -2365,7 +2374,7 @@ public class ClusterBrowser extends Browser {
             addApplyButton(buttonPanel);
             applyButton.setEnabled(checkResourceFields(null, params));
             /* expert mode */
-            buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
+            Tools.registerExpertPanel(extraOptionsPanel);
 
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
@@ -2437,6 +2446,7 @@ public class ClusterBrowser extends Browser {
             resetFilesystems();
             infoPanel = null;
             reload(drbdNode);
+            Tools.unregisterExpertPanel(extraOptionsPanel);
         }
 
         /**
@@ -2491,7 +2501,8 @@ public class ClusterBrowser extends Browser {
             final Point2D p = null;
             final DrbddiskInfo di =
                 (DrbddiskInfo) heartbeatGraph.getServicesInfo().addServicePanel(
-                                        crmXML.getHbDrbddisk(), p, true, null);
+                                        crmXML.getHbDrbddisk(), p, true, null,
+                                        null);
             di.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(di);
             fi.setDrbddiskInfo(di);
@@ -2512,7 +2523,7 @@ public class ClusterBrowser extends Browser {
             final Point2D p = null;
             final LinbitDrbdInfo ldi =
              (LinbitDrbdInfo) heartbeatGraph.getServicesInfo().addServicePanel(
-                                 crmXML.getHbLinbitDrbd(), p, true, null);
+                                 crmXML.getHbLinbitDrbd(), p, true, null, null);
             ldi.setGroupInfo(fi.getGroupInfo());
             addToHeartbeatIdList(ldi);
             fi.setLinbitDrbdInfo(ldi);
@@ -3626,9 +3637,12 @@ public class ClusterBrowser extends Browser {
             if (getService().isNew()) {
                 final String id = idField.getStringValue();
                 getService().setIdAndCrmId(id);
+                if (getTypeRadioGroup() != null) {
+                    getTypeRadioGroup().setEnabled(false);
+                }
             }
-            setHeartbeatIdLabel();
             addToHeartbeatIdList(this);
+            setHeartbeatIdLabel();
             addNameToServiceInfoHash(this);
 
             /*
@@ -3693,9 +3707,7 @@ public class ClusterBrowser extends Browser {
             newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
             newServiceInfo.setGroupInfo(this);
-
             addToHeartbeatIdList(newServiceInfo);
-
             final DefaultMutableTreeNode newServiceNode =
                                     new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
@@ -3907,12 +3919,18 @@ public class ClusterBrowser extends Browser {
         public void removeMyselfNoConfirm() {
             super.removeMyselfNoConfirm();
             if (!getService().isNew()) {
+                String cloneId = null;
+                boolean master = false;
+                if (getCloneInfo() != null) {
+                    cloneId = getCloneInfo().getService().getHeartbeatId();
+                    master = getCloneInfo().getService().isMaster();
+                }
                 CRM.removeResource(
                                 getDCHost(),
                                 null,
                                 getService().getHeartbeatId(),
-                                null, /* group id */
-                                false);
+                                cloneId, /* clone id */
+                                master);
             }
         }
 
@@ -4173,6 +4191,8 @@ public class ClusterBrowser extends Browser {
         private GuiComboBox typeRadioGroup;
         /** Is counted down, first time the info panel is initialized. */
         private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
+        /** Extra options panel. */
+        final JPanel extraOptionsPanel = new JPanel();
 
         /**
          * Prepares a new <code>ServiceInfo</code> object and creates
@@ -4927,12 +4947,12 @@ public class ClusterBrowser extends Browser {
             optionsPanel.add(panel);
         }
 
-        /**
-         * Sets value for id field.
-         */
-        protected void setIdField(final String id) {
-            idField.setValue(id);
-        }
+        ///**
+        // * Sets value for id field.
+        // */
+        //protected void setIdField(final String id) {
+        //    idField.setValue(id);
+        //}
 
         /**
          * Adds clone fields to the option pane.
@@ -5302,8 +5322,12 @@ public class ClusterBrowser extends Browser {
 
             if (clone) {
                 final CloneInfo oldCI = cloneInfo;
+                String title = PM_CLONE_SET_NAME;
+                if (masterSlave) {
+                    title = PM_MASTER_SLAVE_SET_NAME;
+                }
                 cloneInfo = new CloneInfo(crmXML.getHbClone(),
-                                          PM_MASTER_SLAVE_SET_NAME,
+                                          title,
                                           masterSlave);
                 if (oldCI == null) {
                     heartbeatGraph.exchangeObjectInTheVertex(cloneInfo, this);
@@ -5457,7 +5481,6 @@ public class ClusterBrowser extends Browser {
                                                  BoxLayout.Y_AXIS));
             optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            final JPanel extraOptionsPanel = new JPanel();
             extraOptionsPanel.setBackground(EXTRA_PANEL_BACKGROUND);
             extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                         BoxLayout.Y_AXIS));
@@ -5484,8 +5507,7 @@ public class ClusterBrowser extends Browser {
                     defaultValue = "Clone";
                 }
             }
-            if (!getResourceAgent().isClone() &&
-                !getResourceAgent().isGroup()) {
+            if (!getResourceAgent().isClone() && getGroupInfo() == null) {
                 final ServiceInfo thisClass = this;
                 typeRadioGroup = new GuiComboBox(defaultValue,
                                                  new String[]{"Primitive",
@@ -5633,7 +5655,7 @@ public class ClusterBrowser extends Browser {
             addApplyButton(buttonPanel);
             applyButton.setEnabled(checkResourceFields(null, params));
             /* expert mode */
-            buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
+            Tools.registerExpertPanel(extraOptionsPanel);
 
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
@@ -5809,10 +5831,12 @@ public class ClusterBrowser extends Browser {
             if (getService().isNew()) {
                 final String id = idField.getStringValue();
                 getService().setIdAndCrmId(id);
-                typeRadioGroup.setEnabled(false);
+                if (typeRadioGroup != null) {
+                    typeRadioGroup.setEnabled(false);
+                }
             }
-            setHeartbeatIdLabel();
             addToHeartbeatIdList(this);
+            setHeartbeatIdLabel();
             addNameToServiceInfoHash(this);
             addResourceBefore();
 
@@ -5837,6 +5861,12 @@ public class ClusterBrowser extends Browser {
                     groupInfo.apply();
                 }
                 groupId = groupInfo.getService().getHeartbeatId();
+                if (cloneId == null) {
+                    final CloneInfo gCloneInfo = groupInfo.getCloneInfo();
+                    if (gCloneInfo != null) {
+                        cloneId = gCloneInfo.getService().getHeartbeatId();
+                    }
+                }
             }
 
             final Host dcHost = getDCHost();
@@ -6283,7 +6313,7 @@ public class ClusterBrowser extends Browser {
             }
 
             if (getService().isNew()) {
-                heartbeatGraph.getServicesInfo().setAllResources();
+                heartbeatGraph.killRemovedVertices();
             } else {
                 final Host dcHost = getDCHost();
                 if (groupInfo == null) {
@@ -6304,7 +6334,8 @@ public class ClusterBrowser extends Browser {
                                            locScore);
                     }
                 }
-                if (!getResourceAgent().isGroup()) {
+                if (!getResourceAgent().isGroup()
+                    && !getResourceAgent().isClone()) {
                     String groupId = null; /* for pacemaker */
                     if (groupInfo != null) {
                         /* get group id only if there is only one resource in a
@@ -6345,6 +6376,7 @@ public class ClusterBrowser extends Browser {
             removeFromServiceInfoHash(this);
             infoPanel = null;
             getService().doneRemoving();
+            Tools.unregisterExpertPanel(extraOptionsPanel);
         }
 
         /**
@@ -7196,8 +7228,8 @@ public class ClusterBrowser extends Browser {
             final DefaultMutableTreeNode newServiceNode =
                                     new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
-            getNode().add(newServiceNode);
             reload(getNode());
+            getNode().add(newServiceNode);
             reload(newServiceNode);
         }
         /**
@@ -7734,6 +7766,8 @@ public class ClusterBrowser extends Browser {
     class ServicesInfo extends EditableInfo {
         /** Cache for the info panel. */
         private JComponent infoPanel = null;
+        /** Extra options panel */
+        final JPanel extraOptionsPanel = new JPanel();
 
         /**
          * Prepares a new <code>ServicesInfo</code> object.
@@ -7943,148 +7977,204 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Sets clone info object.
+         */
+        private CloneInfo setCreateCloneInfo(final String cloneId) {
+            CloneInfo newCi = null;
+            newCi = (CloneInfo) heartbeatIdToServiceInfo.get(cloneId);
+            if (newCi == null) {
+                final Point2D p = null;
+                newCi =
+                   (CloneInfo) heartbeatGraph.getServicesInfo().addServicePanel(
+                                                        crmXML.getHbClone(),
+                                                        p,
+                                                        true,
+                                                        cloneId,
+                                                        null);
+                newCi.getService().setNew(false);
+                addToHeartbeatIdList(newCi);
+                final Map<String, String> resourceNode =
+                                      clusterStatus.getParamValuePairs(
+                                          newCi.getService().getHeartbeatId());
+                newCi.setParameters(resourceNode);
+            } else {
+                final Map<String, String> resourceNode =
+                                      clusterStatus.getParamValuePairs(
+                                          newCi.getService().getHeartbeatId());
+                newCi.setParameters(resourceNode);
+                newCi.setUpdated(false);
+                heartbeatGraph.repaint();
+            }
+            heartbeatGraph.setVertexIsPresent(newCi);
+            return newCi;
+        }
+        /**
+         * Sets group info object.
+         */
+        private GroupInfo setCreateGroupInfo(final String group,
+                                             final CloneInfo newCi) {
+            GroupInfo newGi = null;
+            newGi = (GroupInfo) heartbeatIdToServiceInfo.get(group);
+            if (newGi == null) {
+                final Point2D p = null;
+                newGi =
+                  (GroupInfo) heartbeatGraph.getServicesInfo().addServicePanel(
+                                                crmXML.getHbGroup(),
+                                                p,
+                                                true,
+                                                group,
+                                                newCi);
+                newGi.getService().setNew(false);
+                final Map<String, String> resourceNode =
+                                      clusterStatus.getParamValuePairs(
+                                          newGi.getService().getHeartbeatId());
+                newGi.setParameters(resourceNode);
+                if (newCi != null) {
+                    newCi.addCloneServicePanel(newGi);
+                }
+            } else {
+                final Map<String, String> resourceNode =
+                                        clusterStatus.getParamValuePairs(
+                                          newGi.getService().getHeartbeatId());
+                newGi.setParameters(resourceNode);
+                newGi.setUpdated(false);
+                heartbeatGraph.repaint();
+            }
+            return newGi;
+        }
+        
+        /**
+         * Sets or create all resources.
+         */
+        private void setGroupResources(
+                               final Set<String> allGroupsAndClones,
+                               final String groupId,
+                               final GroupInfo newGi,
+                               final CloneInfo newCi,
+                               final List<ServiceInfo> groupServiceIsPresent) {
+            for (String hbId : clusterStatus.getGroupResources(groupId)) {
+                if (allGroupsAndClones.contains(hbId)) {
+                    if (newGi != null) {
+                        Tools.appWarning("group in group not implemented");
+                        continue;
+                    }
+                    /* clone group */
+                    final GroupInfo gi = setCreateGroupInfo(hbId, newCi);
+                    setGroupResources(allGroupsAndClones,
+                                      hbId,
+                                      gi,
+                                      null,
+                                      groupServiceIsPresent);
+                    continue;
+                }
+                final ResourceAgent newRA =
+                                     clusterStatus.getResourceType(hbId);
+                if (newRA == null) {
+                    /* This is bad. There is a service but we do not have
+                     * the heartbeat script of this service or the we look
+                     * in the wrong places.
+                     */
+                    Tools.appWarning(hbId + ": could not find hb script");
+                    continue;
+                }
+                /* continue of creating/updating of the
+                 * service in the gui.
+                 */
+                ServiceInfo newSi = heartbeatIdToServiceInfo.get(hbId);
+                final Map<String, String> resourceNode =
+                                   clusterStatus.getParamValuePairs(hbId);
+                if (newSi == null) {
+                    // TODO: get rid of the service name? (everywhere)
+                    final String serviceName = newRA.getName();
+                    if (newRA.isFilesystem()) {
+                        newSi = new FilesystemInfo(serviceName,
+                                                   newRA,
+                                                   hbId,
+                                                   resourceNode);
+                    } else if (newRA.isLinbitDrbd()) {
+                        newSi = new LinbitDrbdInfo(serviceName,
+                                                   newRA,
+                                                   hbId,
+                                                   resourceNode);
+                    } else if (newRA.isDrbddisk()) {
+                        newSi = new DrbddiskInfo(serviceName,
+                                                 newRA,
+                                                 hbId,
+                                                 resourceNode);
+                    } else if (newRA.isIPaddr()) {
+                        newSi = new IPaddrInfo(serviceName,
+                                               newRA,
+                                               hbId,
+                                               resourceNode);
+
+                    } else {
+                        newSi = new ServiceInfo(serviceName,
+                                                newRA,
+                                                hbId,
+                                                resourceNode);
+                    }
+                    newSi.getService().setHeartbeatId(hbId);
+                    addToHeartbeatIdList(newSi);
+                    final Point2D p = null;
+                    if (newGi != null) {
+                        newGi.addGroupServicePanel(newSi);
+                    } else if (newCi != null) {
+                        newCi.addCloneServicePanel(newSi);
+                    } else {
+                        heartbeatGraph.getServicesInfo().addServicePanel(
+                                                                    newSi,
+                                                                    p,
+                                                                    true,
+                                                                    false);
+                    }
+                } else {
+                    newSi.setParameters(resourceNode);
+                    newSi.setUpdated(false);
+                    heartbeatGraph.repaint();
+                }
+                newSi.getService().setNew(false);
+                //newSi.getTypeRadioGroup().setEnabled(false);
+                heartbeatGraph.setVertexIsPresent(newSi);
+                if (newGi != null || newCi != null) {
+                    groupServiceIsPresent.add(newSi);
+                }
+            }
+        }
+
+        /**
          * This functions goes through all services, constrains etc. in
          * clusterStatus and updates the internal structures and graph.
          */
         public void setAllResources() {
-            final String[] allGroups = clusterStatus.getAllGroups();
+            final Set<String> allGroupsAndClones =
+                                                 clusterStatus.getAllGroups();
             heartbeatGraph.clearVertexIsPresentList();
             List<ServiceInfo> groupServiceIsPresent =
-                                                new ArrayList<ServiceInfo>();
+                                                  new ArrayList<ServiceInfo>();
             groupServiceIsPresent.clear();
-            for (String group : allGroups) {
-                //TODO: need hb class here
-                for (String hbId : clusterStatus.getGroupResources(group)) {
-                    final ResourceAgent newRA =
-                                         clusterStatus.getResourceType(hbId);
-                    if (newRA == null) {
-                        /* This is bad. There is a service but we do not have
-                         * the heartbeat script of this service or the we look
-                         * in the wrong places.
-                         */
-                        Tools.appWarning(hbId + ": could not find hb script");
+            for (final String groupOrClone : allGroupsAndClones) {
+                CloneInfo newCi = null;
+                GroupInfo newGi = null;
+                if (clusterStatus.isClone(groupOrClone)) {
+                    /* clone */
+                    newCi = setCreateCloneInfo(groupOrClone);
+                } else if (!"none".equals(groupOrClone)) {
+                    /* group */
+                    final GroupInfo gi =
+                        (GroupInfo) heartbeatIdToServiceInfo.get(groupOrClone);
+                    if (gi != null && gi.getCloneInfo() != null) {
+                        /* cloned group is already done */
+                        groupServiceIsPresent.add(gi);
                         continue;
                     }
-                    GroupInfo newGi = null;
-                    CloneInfo newCi = null;
-                    if (!"none".equals(group)) {
-                        if (clusterStatus.isClone(group)) {
-                            /* clone */
-                            newCi = (CloneInfo) heartbeatIdToServiceInfo.get(
-                                                                        group);
-                            if (newCi == null) {
-                                final Point2D p = null;
-                                newCi = (CloneInfo) heartbeatGraph.getServicesInfo().addServicePanel(
-                                            crmXML.getHbClone(),
-                                            p,
-                                            true,
-                                            group);
-                                newCi.getService().setNew(false);
-                                addToHeartbeatIdList(newCi);
-                                final Map<String, String> resourceNode =
-                                      clusterStatus.getParamValuePairs(
-                                          newCi.getService().getHeartbeatId());
-                                newCi.setParameters(resourceNode);
-                            } else {
-                                final Map<String, String> resourceNode =
-                                      clusterStatus.getParamValuePairs(
-                                          newCi.getService().getHeartbeatId());
-                                newCi.setParameters(resourceNode);
-                                newCi.setUpdated(false);
-                                heartbeatGraph.repaint();
-                            }
-                            heartbeatGraph.setVertexIsPresent(newCi);
-                        } else {
-                            /* group */
-                            newGi = (GroupInfo) heartbeatIdToServiceInfo.get(group);
-                            if (newGi == null) {
-                                final Point2D p = null;
-                                newGi = (GroupInfo) heartbeatGraph.getServicesInfo().addServicePanel(
-                                            crmXML.getHbGroup(),
-                                            p,
-                                            true,
-                                            group);
-                                //newGi.getService().setHeartbeatId(group); // TODO: to late
-                                newGi.getService().setNew(false);
-                                addToHeartbeatIdList(newGi);
-                                final Map<String, String> resourceNode =
-                                      clusterStatus.getParamValuePairs(
-                                          newGi.getService().getHeartbeatId());
-                                newGi.setParameters(resourceNode);
-                            } else {
-                                final Map<String, String> resourceNode =
-                                        clusterStatus.getParamValuePairs(
-                                          newGi.getService().getHeartbeatId());
-                                newGi.setParameters(resourceNode);
-                                newGi.setUpdated(false);
-                                heartbeatGraph.repaint();
-                            }
-                            heartbeatGraph.setVertexIsPresent(newGi);
-                        }
-                    }
-                    /* continue of creating/updating of the
-                     * service in the gui.
-                     */
-                    ServiceInfo newSi = heartbeatIdToServiceInfo.get(hbId);
-                    final Map<String, String> resourceNode =
-                                    clusterStatus.getParamValuePairs(hbId);
-                    if (newSi == null) {
-                        // TODO: get rid of the service name? (everywhere)
-                        final String serviceName = newRA.getName();
-                        if (newRA.isFilesystem()) {
-                            newSi = new FilesystemInfo(serviceName,
-                                                       newRA,
-                                                       hbId,
-                                                       resourceNode);
-                        } else if (newRA.isLinbitDrbd()) {
-                            newSi = new LinbitDrbdInfo(serviceName,
-                                                       newRA,
-                                                       hbId,
-                                                       resourceNode);
-                        } else if (newRA.isDrbddisk()) {
-                            newSi = new DrbddiskInfo(serviceName,
-                                                     newRA,
-                                                     hbId,
-                                                     resourceNode);
-                        } else if (newRA.isIPaddr()) {
-                            newSi = new IPaddrInfo(serviceName,
-                                                   newRA,
-                                                   hbId,
-                                                   resourceNode);
-
-                        } else {
-                            newSi = new ServiceInfo(serviceName,
-                                                    newRA,
-                                                    hbId,
-                                                    resourceNode);
-                        }
-                        newSi.getService().setHeartbeatId(hbId);
-                        addToHeartbeatIdList(newSi);
-                        final Point2D p = null;
-
-                        if (newGi != null) {
-                            newGi.addGroupServicePanel(newSi);
-                        } else if (newCi != null) {
-                            newCi.addCloneServicePanel(newSi);
-                        } else {
-                            heartbeatGraph.getServicesInfo().addServicePanel(
-                                                                        newSi,
-                                                                        p,
-                                                                        true,
-                                                                        false);
-                        }
-                    } else {
-                        newSi.setParameters(resourceNode);
-                        newSi.setUpdated(false);
-                        heartbeatGraph.repaint();
-                    }
-                    newSi.getService().setNew(false);
-                    //newSi.getTypeRadioGroup().setEnabled(false);
-                    heartbeatGraph.setVertexIsPresent(newSi);
-                    if (newGi != null || newCi != null) {
-                        groupServiceIsPresent.add(newSi);
-                    }
+                    newGi = setCreateGroupInfo(groupOrClone, newCi);
+                    heartbeatGraph.setVertexIsPresent(newGi);
                 }
+                setGroupResources(allGroupsAndClones,
+                                  groupOrClone,
+                                  newGi,
+                                  newCi,
+                                  groupServiceIsPresent);
             }
             heartbeatGraph.clearColocationList();
             final Map<String, List<String>> colocationMap =
@@ -8221,7 +8311,6 @@ public class ClusterBrowser extends Browser {
                                                  BoxLayout.Y_AXIS));
             optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            final JPanel extraOptionsPanel = new JPanel();
             extraOptionsPanel.setBackground(EXTRA_PANEL_BACKGROUND);
             extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                                       BoxLayout.Y_AXIS));
@@ -8271,7 +8360,7 @@ public class ClusterBrowser extends Browser {
             addApplyButton(buttonPanel);
             applyButton.setEnabled(checkResourceFields(null, params));
             /* expert mode */
-            buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
+            Tools.registerExpertPanel(extraOptionsPanel);
 
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
@@ -8298,7 +8387,8 @@ public class ClusterBrowser extends Browser {
         public ServiceInfo addServicePanel(final ResourceAgent newRA,
                                            final Point2D pos,
                                            final boolean reloadNode,
-                                           final String heartbeatId) {
+                                           final String heartbeatId,
+                                           final CloneInfo newCi) {
             ServiceInfo newServiceInfo;
             final String name = newRA.getName();
             if (newRA.isFilesystem()) {
@@ -8324,10 +8414,12 @@ public class ClusterBrowser extends Browser {
                 newServiceInfo = new ServiceInfo(name, newRA);
             }
             if (heartbeatId != null) {
-                addToHeartbeatIdList(newServiceInfo);
                 newServiceInfo.getService().setHeartbeatId(heartbeatId);
+                addToHeartbeatIdList(newServiceInfo);
             }
-            addServicePanel(newServiceInfo, pos, reloadNode, true);
+            if (newCi == null) {
+                addServicePanel(newServiceInfo, pos, reloadNode, true);
+            }
             return newServiceInfo;
         }
 
@@ -8340,9 +8432,8 @@ public class ClusterBrowser extends Browser {
                                     final Point2D pos,
                                     final boolean reloadNode,
                                     final boolean interactive) {
-
             newServiceInfo.getService().setResourceClass(
-                    newServiceInfo.getResourceAgent().getResourceClass());
+                        newServiceInfo.getResourceAgent().getResourceClass());
             if (!heartbeatGraph.addResource(newServiceInfo, null, pos)) {
                 addNameToServiceInfoHash(newServiceInfo);
                 final DefaultMutableTreeNode newServiceNode =
@@ -8367,7 +8458,6 @@ public class ClusterBrowser extends Browser {
             }
             heartbeatGraph.reloadServiceMenus();
         }
-
 
         /**
          * Returns 'add service' list for graph popup menu.
@@ -8444,6 +8534,7 @@ public class ClusterBrowser extends Browser {
                         addServicePanel(crmXML.getHbGroup(),
                                         getPos(),
                                         true,
+                                        null,
                                         null);
                         heartbeatGraph.getVisualizationViewer().repaint();
                     }
@@ -8490,6 +8581,7 @@ public class ClusterBrowser extends Browser {
                                                                     fsService,
                                                                     getPos(),
                                                                     true,
+                                                                    null,
                                                                     null);
                                 fsi.setDrbddiskIsPreferred(false);
                                 heartbeatGraph.getVisualizationViewer().repaint();
@@ -8520,6 +8612,7 @@ public class ClusterBrowser extends Browser {
                                                                     fsService,
                                                                     getPos(),
                                                                     true,
+                                                                    null,
                                                                     null);
                                 fsi.setDrbddiskIsPreferred(true);
                                 heartbeatGraph.getVisualizationViewer().repaint();
@@ -8548,7 +8641,7 @@ public class ClusterBrowser extends Browser {
                                 });
                                 addServicePanel(ipService,
                                                 getPos(),
-                                                true, null);
+                                                true, null, null);
                                 heartbeatGraph.getVisualizationViewer().repaint();
                             }
                         };
@@ -8573,7 +8666,11 @@ public class ClusterBrowser extends Browser {
                                         && !linbitDrbdConfirmDialog()) {
                                         return;
                                     }
-                                    addServicePanel(ra, getPos(), true, null);
+                                    addServicePanel(ra,
+                                                    getPos(),
+                                                    true,
+                                                    null,
+                                                    null);
                                     heartbeatGraph.repaint();
                                 }
                             };
@@ -8638,6 +8735,15 @@ public class ClusterBrowser extends Browser {
                 new Unit("min", "m",  "Minute",      "Minutes"),
                 new Unit("h",   "h",  "Hour",        "Hours")
             };
+        }
+       
+        /**
+         * Removes this services info.
+         * TODO: is not called yet
+         */
+        public void removeMyself() {
+            super.removeMyself();
+            Tools.unregisterExpertPanel(extraOptionsPanel);
         }
     }
 
@@ -9229,6 +9335,8 @@ public class ClusterBrowser extends Browser {
         /** List of order ids. */
         private Map<String, HbOrderInfo> orderIds =
                                             new HashMap<String, HbOrderInfo>();
+        /** Expert options panel. */
+        final JPanel extraOptionsPanel = new JPanel();
 
         /**
          * Prepares a new <code>HbConnectionInfo</code> object.
@@ -9438,7 +9546,6 @@ public class ClusterBrowser extends Browser {
                                                  BoxLayout.Y_AXIS));
             optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            final JPanel extraOptionsPanel = new JPanel();
             extraOptionsPanel.setBackground(EXTRA_PANEL_BACKGROUND);
             extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                                       BoxLayout.Y_AXIS));
@@ -9505,7 +9612,7 @@ public class ClusterBrowser extends Browser {
             addApplyButton(buttonPanel);
             applyButton.setEnabled(checkResourceFields(null, null));
             /* expert mode */
-            buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
+            Tools.registerExpertPanel(extraOptionsPanel);
 
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
@@ -9762,6 +9869,13 @@ public class ClusterBrowser extends Browser {
             }
             return score < 0;
         }
+        /**
+         * Removes this connection. 
+         */
+        public void removeMyself() {
+            super.removeMyself();
+            Tools.unregisterExpertPanel(extraOptionsPanel);
+        }
     }
 
     /**
@@ -9774,6 +9888,8 @@ public class ClusterBrowser extends Browser {
         private BlockDevInfo selectedBD = null;
         /** Cache for the info panel. */
         private JComponent infoPanel = null;
+        /** Extra options panel. */
+        final JPanel extraOptionsPanel = new JPanel();
 
         /**
          * Prepares a new <code>DrbdInfo</code> object.
@@ -10053,7 +10169,6 @@ public class ClusterBrowser extends Browser {
                                                  BoxLayout.Y_AXIS));
             optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            final JPanel extraOptionsPanel = new JPanel();
             extraOptionsPanel.setBackground(EXTRA_PANEL_BACKGROUND);
             extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                                       BoxLayout.Y_AXIS));
@@ -10096,7 +10211,7 @@ public class ClusterBrowser extends Browser {
             addApplyButton(buttonPanel);
             applyButton.setEnabled(checkResourceFields(null, params));
             /* expert mode */
-            buttonPanel.add(Tools.expertModeButton(extraOptionsPanel));
+            Tools.registerExpertPanel(extraOptionsPanel);
 
             mainPanel.add(optionsPanel);
             mainPanel.add(extraOptionsPanel);
@@ -10302,6 +10417,15 @@ public class ClusterBrowser extends Browser {
             }
             drbdGraph.stopAnimation(bd1);
             drbdGraph.stopAnimation(bd2);
+        }
+
+        /**
+         * Removes this drbd info.
+         * TODO: is not called yet
+         */
+        public void removeMyself() {
+            super.removeMyself();
+            Tools.unregisterExpertPanel(extraOptionsPanel);
         }
     }
 

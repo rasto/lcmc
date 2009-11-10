@@ -98,6 +98,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         clusterButtonsPanel.setBorder(titledBorder);
 
         clusterButtonsPanel.add(clusterWizardButton);
+        clusterButtonsPanel.add(Tools.expertModeButton());
         buttonPanel.add(clusterButtonsPanel);
         /* upgrade field */
         buttonPanel.add(
