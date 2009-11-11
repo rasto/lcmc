@@ -302,7 +302,8 @@ sub get_raid {
 
 	# create hash with devices that are in the raid.
 	while (<MDSTAT>) {
-		if (/^(md\d+)\s+:\s+(.+)/) {
+		if (/^(md\d+)\s+:\s+(.+)/ # old way
+		    || /^(md_d\d+)\s+:\s+(.+)/) {
 			 my $dev = $1;
 			 my ($active, $type, @members) = split /\s+/, $2;
 			 print_debug("get_raid: $dev ($active, $type, @members)");
@@ -343,7 +344,6 @@ sub get_disk_info {
 	open PT, "/proc/partitions" or disk_info_error("cannot open /proc/partitions");
 	my @raids;
 	my @lvms;
-	my @disks;
 	my @partitions;
 	my @info;
 	my $device_mapper_major = get_device_mapper_major();
@@ -360,14 +360,13 @@ sub get_disk_info {
 		    || $major == 104) { # ide and scsi disks
 		    	# 104 cciss0
 			if ($_ !~ /\d$/) { # whole disk
-				push @disks, $name;
 				$device = "/dev/$name";
 			} elsif ($blocks == 1) { # extended partition
 				next;
 			} else {
 				$device = "/dev/$name";
 			}
-		} elsif ($major == 9) { # raid
+		} elsif ($major == 9 || $major == 254) { # raid
 			$device = "/dev/$name";
 		} elsif ($major == $device_mapper_major) {
 			if ($$major_minor_to_dev{"$major:$minor"}) {
@@ -380,11 +379,10 @@ sub get_disk_info {
 			}
 
 		} elsif ($name =~ /^drbd/) {
-			# disk_info_warning("skiping: $_");
 			next;
 		} else {
 			disk_info_warning("unknown partition: $_");
-			next;
+			$device = "/dev/$name";
 		}
 		my $readlink = readlink $device || $device;
 		my $info = "$device $readlink $blocks";
@@ -397,11 +395,11 @@ sub get_disk_info {
 	close PT;
 	
 	print join "", map { $_->[0] } 
-			   sort { 
-			    ($a->[1] =~ /(^\D+)/)[0] cmp ($b->[1]  =~ /(^\D+)/)[0] 
-			  			||
-			    (($a->[1] =~ /(\d+$)/)[0] || 0) <=> (($b->[1]  =~ /(\d+$)/)[0] || 0) 
-			   } map { [$_, /([^\/]+?) /] } @info;
+	  sort { 
+	   ($a->[1] =~ /(^\D+)/)[0] cmp ($b->[1]  =~ /(^\D+)/)[0] 
+				||
+	   (($a->[1] =~ /(\d+$)/)[0] || 0) <=> (($b->[1]  =~ /(\d+$)/)[0] || 0) 
+	  } map { [$_, /([^\/]+?) /] } @info;
 }
 
 # get_filesystems_info
