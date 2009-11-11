@@ -1748,7 +1748,7 @@ public class Host implements Serializable {
                                      new LinkedHashMap<String, BlockDevice>();
         final Map<String, NetInterface> newNetInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
-
+        final Pattern bdP = Pattern.compile("(\\D+)\\d+");
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
                 break;
@@ -1773,13 +1773,18 @@ public class Host implements Serializable {
                 newNetInterfaces.put(netInterface.getName(), netInterface);
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
-                if (blockDevices.containsKey(blockDevice.getName())) {
+                final String name = blockDevice.getName();
+                if (blockDevices.containsKey(name)) {
                     /* get the existing block device object,
                        forget the new one. */
-                    blockDevice = blockDevices.get(blockDevice.getName());
+                    blockDevice = blockDevices.get(name);
                     blockDevice.update(line);
                 }
-                newBlockDevices.put(blockDevice.getName(), blockDevice);
+                newBlockDevices.put(name, blockDevice);
+                final Matcher m = bdP.matcher(name);
+                if (m.matches()) {
+                    newBlockDevices.remove(m.group(1));
+                }
             } else if ("filesystems-info".equals(type)) {
                 addFileSystem(line);
             } else if ("mount-points-info".equals(type)) {
