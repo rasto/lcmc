@@ -67,7 +67,11 @@ public class DistResource_redhatenterpriseserver extends
           + " grep -o '5PAE\\|5xen\\|5debug'"
           + "|tr 5 -`-devel-`uname -r|sed 's/\\(PAE\\|xen\\|debug\\)$//'` && "
          + "/usr/bin/yum -y install glibc flex gcc && "
-         + "make && make install && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
          //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 

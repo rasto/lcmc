@@ -9798,8 +9798,6 @@ public class ClusterBrowser extends Browser {
          */
         public final void addOrder(final ServiceInfo serviceInfoParent,
                                    final ServiceInfo serviceInfoChild) {
-            Tools.printStackTrace("add order");
-            //waitForInfoPanel();
             final String ordId = clusterStatus.getOrderId(
                             serviceInfoParent.getService().getHeartbeatId(),
                             serviceInfoChild.getService().getHeartbeatId());
@@ -9818,7 +9816,6 @@ public class ClusterBrowser extends Browser {
                                                    serviceInfoParent,
                                                    serviceInfoChild);
             oi.applyButton = applyButton;
-            System.out.println("order ab: " + applyButton);
             orderIds.put(ordId, oi);
             oi.getService().setHeartbeatId(ordId);
             oi.setParameters();

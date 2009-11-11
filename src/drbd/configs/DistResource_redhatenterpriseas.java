@@ -75,7 +75,11 @@ public class DistResource_redhatenterpriseas extends
          + "cd drbd-@VERSION@ && "
          + "/usr/sbin/up2date -f kernel-devel && "
          + "/usr/sbin/up2date flex gcc && "
-         + "make && make install && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
          //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 

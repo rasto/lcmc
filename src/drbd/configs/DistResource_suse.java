@@ -83,7 +83,11 @@ public class DistResource_suse extends
          + "/usr/bin/zypper -n in kernel-source=`uname -r"
          + "|sed s/-[a-z].*//;` && "
          + "/usr/bin/zypper -n in flex gcc && "
-         + "make && make install && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
          //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 

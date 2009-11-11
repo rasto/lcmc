@@ -70,7 +70,11 @@ public class DistResource_debian extends
          + "cd drbd-@VERSION@ && "
          + "/usr/bin/apt-get update && "
          + "/usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
-         + "make && make install && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
          //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
 

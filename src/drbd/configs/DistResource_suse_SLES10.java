@@ -94,7 +94,11 @@ public class DistResource_suse_SLES10 extends
          + "cd drbd-@VERSION@ && "
          + "/usr/bin/zypper -n --no-gpg-checks in kernel-source && "
          + "/usr/bin/zypper -n --no-gpg-checks in flex gcc && "
-         + "make && make install && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
          //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };

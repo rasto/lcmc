@@ -88,7 +88,11 @@ public class DistResource_ubuntu extends
          + "/usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
          + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
            + "/lib/modules/`uname -r`/kernel/ubuntu/drbd/drbd.ko && "
-         + "make && make install && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
          //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
 

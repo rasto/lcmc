@@ -627,7 +627,6 @@ public final class CRM {
                                      final String heartbeatId,
                                      final String parentHbId,
                                      Map<String, String> attrs) {
-        Tools.printStackTrace("add colocation");
         String colocationId;
         String cibadminOpt;
         if (colId == null) {
