@@ -336,6 +336,7 @@ public final class Tools {
             }
             onHost.append(host.getName());
         }
+        Tools.printStackTrace();
         Tools.error(Tools.getString("Tools.sshError.command")
                     + " '" + command + "'" + onHost.toString() + "\n"
                     + Tools.getString("Tools.sshError.returned")

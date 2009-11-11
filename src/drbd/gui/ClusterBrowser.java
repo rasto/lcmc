@@ -1712,17 +1712,11 @@ public class ClusterBrowser extends Browser {
                                 final BlockDevInfo blockDevInfo2) {
             super(name);
             setResource(new DrbdResource(name, null)); // TODO: ?
-            //initApplyButton(); // TODO: twice?
             setResource(new DrbdResource(name, drbdDev)); // TODO: ?
             // TODO: drbdresource
             getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
             this.blockDevInfo1 = blockDevInfo1;
             this.blockDevInfo2 = blockDevInfo2;
-            //SwingUtilities.invokeLater(new Runnable() {
-            //    public void run() {
-            //        initApplyButton();
-            //    }
-            //});
         }
 
         /**
@@ -4189,8 +4183,6 @@ public class ClusterBrowser extends Browser {
         private JLabel heartbeatIdLabel = null;
         /** Radio buttons for clone/master/slave primitive resources. */
         private GuiComboBox typeRadioGroup;
-        /** Is counted down, first time the info panel is initialized. */
-        private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
         /** Extra options panel. */
         final JPanel extraOptionsPanel = new JPanel();
 
@@ -5418,16 +5410,6 @@ public class ClusterBrowser extends Browser {
             }
         }
         /**
-         * Waits till the info panel is done for the first time.
-         */
-        public final void waitForInfoPanel() {
-            try {
-                infoPanelLatch.await();
-            } catch (InterruptedException ignored) {
-                /* ignored */
-            }
-        }
-        /**
          * Returns info panel with comboboxes for service parameters.
          */
         public JComponent getInfoPanel() {
@@ -5668,7 +5650,7 @@ public class ClusterBrowser extends Browser {
             /* if id textfield was changed and this id is not used,
              * enable apply button */
             infoPanel = newPanel;
-            infoPanelLatch.countDown();
+            infoPanelDone();
             return infoPanel;
         }
 
@@ -5865,6 +5847,7 @@ public class ClusterBrowser extends Browser {
                     final CloneInfo gCloneInfo = groupInfo.getCloneInfo();
                     if (gCloneInfo != null) {
                         cloneId = gCloneInfo.getService().getHeartbeatId();
+                        master = gCloneInfo.getService().isMaster();
                     }
                 }
             }
@@ -8752,7 +8735,9 @@ public class ClusterBrowser extends Browser {
      * graph.
      */
     public final HbConnectionInfo getNewHbConnectionInfo() {
-        return new HbConnectionInfo();
+        final HbConnectionInfo hbci = new HbConnectionInfo();
+        //hbci.getInfoPanel();
+        return hbci;
     }
 
     /**
@@ -9343,7 +9328,6 @@ public class ClusterBrowser extends Browser {
          */
         public HbConnectionInfo() {
             super("HbConnectionInfo");
-            initApplyButton();
         }
 
         /**
@@ -9530,6 +9514,13 @@ public class ClusterBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
+            initApplyButton();
+            for (final String col : colocationIds.keySet()) {
+                colocationIds.get(col).applyButton = applyButton;
+            }
+            for (final String ord : orderIds.keySet()) {
+                orderIds.get(ord).applyButton = applyButton;
+            }
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -9632,6 +9623,7 @@ public class ClusterBrowser extends Browser {
                     Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")
                     ));
             infoPanel = newPanel;
+            infoPanelDone();
             return infoPanel;
         }
 
@@ -9806,6 +9798,8 @@ public class ClusterBrowser extends Browser {
          */
         public final void addOrder(final ServiceInfo serviceInfoParent,
                                    final ServiceInfo serviceInfoChild) {
+            Tools.printStackTrace("add order");
+            //waitForInfoPanel();
             final String ordId = clusterStatus.getOrderId(
                             serviceInfoParent.getService().getHeartbeatId(),
                             serviceInfoChild.getService().getHeartbeatId());
@@ -9823,9 +9817,10 @@ public class ClusterBrowser extends Browser {
             final HbOrderInfo oi = new HbOrderInfo(this,
                                                    serviceInfoParent,
                                                    serviceInfoChild);
+            oi.applyButton = applyButton;
+            System.out.println("order ab: " + applyButton);
             orderIds.put(ordId, oi);
             oi.getService().setHeartbeatId(ordId);
-            oi.applyButton = applyButton;
             oi.setParameters();
             constraints.add(oi);
         }
@@ -9835,6 +9830,7 @@ public class ClusterBrowser extends Browser {
          */
         public final void addColocation(final ServiceInfo serviceInfoRsc,
                                         final ServiceInfo serviceInfoWithRsc) {
+            //waitForInfoPanel();
             final String colId = clusterStatus.getColocationId(
                              serviceInfoRsc.getService().getHeartbeatId(),
                              serviceInfoWithRsc.getService().getHeartbeatId());
@@ -9852,9 +9848,9 @@ public class ClusterBrowser extends Browser {
                                                        this,
                                                        serviceInfoRsc,
                                                        serviceInfoWithRsc);
+            ci.applyButton = applyButton;
             colocationIds.put(colId, ci);
             ci.getService().setHeartbeatId(colId);
-            ci.applyButton = applyButton;
             ci.setParameters();
             constraints.add(ci);
         }

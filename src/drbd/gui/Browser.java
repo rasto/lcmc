@@ -58,10 +58,10 @@ import java.awt.event.ItemEvent;
 
 import java.util.List;
 import java.util.ArrayList;
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
@@ -751,6 +751,8 @@ public class Browser {
         private MyButton oldApplyButton = null;
         /** Apply button. */ // TODO: private
         protected MyButton applyButton;
+        /** Is counted down, first time the info panel is initialized. */
+        private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
         /** How much of the info is used. */
         public int getUsed() {
             return -1;
@@ -1081,6 +1083,8 @@ public class Browser {
                                                                   params);
                                     SwingUtilities.invokeLater(new Runnable() {
                                         public void run() {
+                                            System.out.println(getName() + " insertUpdate: "
+                                                + param);
                                             applyButton.setEnabled(check);
                                         }
                                     });
@@ -1463,6 +1467,24 @@ public class Browser {
         public void removeMyself() {
             super.removeMyself();
             paramComboBoxClear();
+        }
+
+        /**
+         * Waits till the info panel is done for the first time.
+         */
+        public final void waitForInfoPanel() {
+            try {
+                infoPanelLatch.await();
+            } catch (InterruptedException ignored) {
+                /* ignored */
+            }
+        }
+
+        /**
+         * Should be called after info panel is done.
+         */
+        public final void infoPanelDone() {
+            infoPanelLatch.countDown();
         }
     }
 

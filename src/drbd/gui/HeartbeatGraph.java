@@ -391,10 +391,15 @@ public class HeartbeatGraph extends ResourceGraph {
                 edge = null;
             }
         }
-
+        mEdgeLock.release();
         HbConnectionInfo hbci;
         if (edge == null) {
             hbci = getClusterBrowser().getNewHbConnectionInfo();
+            try {
+                mEdgeLock.acquire();
+            } catch (java.lang.InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             edge = (MyEdge) getGraph().addEdge(new MyEdge(vP, v));
             if (colRsc != null) {
                 edgeIsColocationList.add(edge);
@@ -403,6 +408,11 @@ public class HeartbeatGraph extends ResourceGraph {
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         } else {
+            try {
+                mEdgeLock.acquire();
+            } catch (java.lang.InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             hbci = edgeToHbconnectionMap.get(edge);
         }
         hbci.addOrder(parent, serviceInfo);
@@ -445,13 +455,24 @@ public class HeartbeatGraph extends ResourceGraph {
         if (edge == null) {
             edge = (MyEdge) v.findEdge(vRsc);
         }
+        mEdgeLock.release();
         HbConnectionInfo hbci;
         if (edge == null) {
             hbci = getClusterBrowser().getNewHbConnectionInfo();
+            try {
+                mEdgeLock.acquire();
+            } catch (java.lang.InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             edge = (MyEdge) getGraph().addEdge(new MyEdge(vRsc, v));
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         } else {
+            try {
+                mEdgeLock.acquire();
+            } catch (java.lang.InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             hbci = edgeToHbconnectionMap.get(edge);
         }
         hbci.addColocation(rsc, withRsc);
