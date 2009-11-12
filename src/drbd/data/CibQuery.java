@@ -97,8 +97,8 @@ public class CibQuery {
     /** "op" tag id map. */
     private Map<String, Map<String, String>> resOpIds =
                                     new HashMap<String, Map<String, String>>();
-    /** List of offline nodes. */
-    private Set<String> offlineNodes = new HashSet<String>();
+    /** If node is online. */
+    private Map<String, String> nodeOnline = new HashMap<String, String>();
     /** Group to resources map. */
     private Map<String, List<String>> groupsToResources =
                                            new HashMap<String, List<String>>();
@@ -479,17 +479,17 @@ public class CibQuery {
     }
 
     /**
-     * Sets offline nodes.
+     * Sets map with nodes and if they ore online.
      */
-    public final void setOfflineNodes(final Set<String> offlineNodes) {
-        this.offlineNodes = offlineNodes;
+    public final void setNodeOnline(final Map<String, String> nodeOnline) {
+        this.nodeOnline = nodeOnline;
     }
 
     /**
-     * Gets offline nodes.
+     * Gets map whith nodes and if they are online.
      */
-    public final Set<String> getOfflineNodes() {
-        return offlineNodes;
+    public final Map<String, String> getNodeOnline() {
+        return nodeOnline;
     }
 
     /**

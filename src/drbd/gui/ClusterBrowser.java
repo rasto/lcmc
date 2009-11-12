@@ -939,7 +939,12 @@ public class ClusterBrowser extends Browser {
     public final void setClStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
-            host.setClStatus(!clusterStatus.isOfflineNode(host.getName()));
+            final String online = clusterStatus.isOnlineNode(host.getName());
+            if ("yes".equals(online)) { 
+                host.setClStatus(true);
+            } else if ("no".equals(online)) { 
+                host.setClStatus(false);
+            }
         }
     }
 
@@ -1018,6 +1023,7 @@ public class ClusterBrowser extends Browser {
                                            + exitCode, 2);
                          }
                          clStatusLock();
+                         clusterStatus.setOnlineNode(host.getName(), "no");
                          host.setClStatus(false);
                          clusterStatus.setDC(null);
                          clStatusUnlock();
@@ -1042,6 +1048,7 @@ public class ClusterBrowser extends Browser {
                              return;
                          }
                          if (output == null) {
+                             clusterStatus.setOnlineNode(host.getName(), "no");
                              host.setClStatus(false);
                              firstTime.countDown();
                          } else {
@@ -1064,11 +1071,13 @@ public class ClusterBrowser extends Browser {
                                              if ("---start---\r\nerror\r\n\r\n---done---\r\n".equals(status)) {
                                                  final boolean oldStatus =
                                                               host.isClStatus();
+                                                 clusterStatus.setOnlineNode(host.getName(), "no");
                                                  host.setClStatus(false);
                                                  if (oldStatus) {
                                                     heartbeatGraph.repaint();
                                                  }
                                              } else {
+                                                 host.setClStatus(true);
                                                  clusterStatus.parseStatus(status);
                                                  // TODO; servicesInfo can be null
                                                  heartbeatGraph.getServicesInfo().setGlobalConfig();
@@ -4224,7 +4233,7 @@ public class ClusterBrowser extends Browser {
          * Returns true if the node is active.
          */
         public boolean isOfflineNode(final String node) {
-            return clusterStatus.isOfflineNode(node);
+            return "no".equals(clusterStatus.isOnlineNode(node));
         }
 
         /**
@@ -6913,7 +6922,8 @@ public class ClusterBrowser extends Browser {
          */
         protected void addMigrateMenuItems(final List<UpdatableItem> items) {
             /* migrate resource */
-            for (final String hostName : getHostNames()) {
+            for (final Host host : getClusterHosts()) {
+                final String hostName = host.getName();
                 final MyMenuItem migrateMenuItem =
                     new MyMenuItem(
                             Tools.getString(
@@ -6925,7 +6935,7 @@ public class ClusterBrowser extends Browser {
 
                             Tools.getString(
                                  "ClusterBrowser.Hb.MigrateResource")
-                                 + " " + hostName + " (inactive)",
+                                 + " " + hostName + " (offline)",
                             MIGRATE_ICON,
                             Tools.getString(
                                  "ClusterBrowser.Hb.MigrateResource.ToolTip")
@@ -6933,7 +6943,7 @@ public class ClusterBrowser extends Browser {
                         private static final long serialVersionUID = 1L;
 
                         public boolean predicate() {
-                            return !isOfflineNode(hostName);
+                            return host.isClStatus();
                         }
 
                         public boolean enablePredicate() {
@@ -6949,7 +6959,7 @@ public class ClusterBrowser extends Browser {
                                    && getService().isAvailable()
                                    && !hostName.toLowerCase().equals(
                                              runningOnNode)
-                                   && !isOfflineNode(hostName);
+                                   && host.isClStatus();
                         }
 
                         public void action() {
@@ -7914,13 +7924,6 @@ public class ClusterBrowser extends Browser {
                     if (cb != null) {
                         cb.setValue(value);
                     }
-                }
-            }
-            final Host[] hosts = cluster.getHostsArray();
-            for (Host host : hosts) {
-                if (clusterStatus.isOfflineNode(host.getName())) {
-                    //TODO: something's missing here
-                    //System.out.println("is active node: " + host.getName());
                 }
             }
             if (infoPanel == null) {

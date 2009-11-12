@@ -453,11 +453,21 @@ public class ClusterStatus {
     }
 
     /**
-     * Returns whether the node is offline.
+     * Returns String whether the node is online.
+     * "yes", "no" or null if it is unknown.
      */
-    public final boolean isOfflineNode(final String node) {
-        return cibQueryMap.getOfflineNodes().contains(node.toLowerCase());
+    public final String isOnlineNode(final String node) {
+        return cibQueryMap.getNodeOnline().get(node.toLowerCase());
     }
+
+    /**
+     * Sets whether the node is online.
+     * "yes", "no" or null if it is unknown.
+     */
+    public final void setOnlineNode(final String node, final String online) {
+        cibQueryMap.getNodeOnline().put(node.toLowerCase(), online);
+    }
+
 
     /**
      * Returns fail count of the service on the specified node.

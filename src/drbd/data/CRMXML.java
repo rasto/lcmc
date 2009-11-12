@@ -2014,7 +2014,7 @@ public class CRMXML extends XML {
         }
 
         /* <status> */
-        final Set<String> offlineNodes = new HashSet<String>();
+        final Map<String, String> nodeOnline = new HashMap<String, String>();
         final Node statusNode = getChildNode(cibNode, "status");
         if (statusNode != null) {
             /* <node_state ...> */
@@ -2035,10 +2035,12 @@ public class CRMXML extends XML {
                     //final String expected =
                     //                getAttribute(nodeStateNode, "expected");
                     /* TODO: check and use other stuff too. */
-                    if (!"active".equals(ha)
-                        || !"member".equals(join)
-                        || !"true".equals(inCCM)) {
-                        offlineNodes.add(uname);
+                    if ("active".equals(ha)
+                        && "member".equals(join)
+                        && "true".equals(inCCM)) {
+                        nodeOnline.put(uname, "yes");
+                    } else {
+                        nodeOnline.put(uname, "no");
                     }
                     final NodeList nodeStates = nodeStateNode.getChildNodes();
                     for (int j = 0; j < nodeStates.getLength(); j++) {
@@ -2081,7 +2083,7 @@ public class CRMXML extends XML {
         cibQueryData.setOperations(operationsMap);
         cibQueryData.setOperationsId(operationsIdMap);
         cibQueryData.setResOpIds(resOpIdsMap);
-        cibQueryData.setOfflineNodes(offlineNodes);
+        cibQueryData.setNodeOnline(nodeOnline);
         cibQueryData.setGroupsToResources(groupsToResourcesMap);
         cibQueryData.setCloneToResource(cloneToResourceMap);
         cibQueryData.setMasterList(masterList);
