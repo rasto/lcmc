@@ -453,10 +453,10 @@ public class ClusterStatus {
     }
 
     /**
-     * Returns whether the node is active.
+     * Returns whether the node is offline.
      */
-    public final boolean isActiveNode(final String node) {
-        return cibQueryMap.getActiveNodes().contains(node.toLowerCase());
+    public final boolean isOfflineNode(final String node) {
+        return cibQueryMap.getOfflineNodes().contains(node.toLowerCase());
     }
 
     /**

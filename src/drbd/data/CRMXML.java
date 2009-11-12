@@ -2014,7 +2014,7 @@ public class CRMXML extends XML {
         }
 
         /* <status> */
-        final Set<String> activeNodes = new HashSet<String>();
+        final Set<String> offlineNodes = new HashSet<String>();
         final Node statusNode = getChildNode(cibNode, "status");
         if (statusNode != null) {
             /* <node_state ...> */
@@ -2024,19 +2024,21 @@ public class CRMXML extends XML {
                 if ("node_state".equals(nodeStateNode.getNodeName())) {
                     final String uname = getAttribute(nodeStateNode, "uname");
                     final String ha = getAttribute(nodeStateNode, "ha");
+                    final String join = getAttribute(nodeStateNode, "join");
+                    final String inCCM = getAttribute(nodeStateNode, "in_ccm");
                     //final String id = getAttribute(nodeStateNode, "id");
                     //final String crmd = getAttribute(nodeStateNode, "crmd");
                     //final String shutdown =
                     //                 getAttribute(nodeStateNode, "shutdown");
                     //final String inCcm =
                     //                   getAttribute(nodeStateNode, "in_ccm");
-                    ///* active / dead */
-                    //final String join = getAttribute(nodeStateNode, "join");
                     //final String expected =
                     //                getAttribute(nodeStateNode, "expected");
                     /* TODO: check and use other stuff too. */
-                    if ("active".equals(ha)) {
-                        activeNodes.add(uname);
+                    if (!"active".equals(ha)
+                        || !"member".equals(join)
+                        || !"true".equals(inCCM)) {
+                        offlineNodes.add(uname);
                     }
                     final NodeList nodeStates = nodeStateNode.getChildNodes();
                     for (int j = 0; j < nodeStates.getLength(); j++) {
@@ -2079,7 +2081,7 @@ public class CRMXML extends XML {
         cibQueryData.setOperations(operationsMap);
         cibQueryData.setOperationsId(operationsIdMap);
         cibQueryData.setResOpIds(resOpIdsMap);
-        cibQueryData.setActiveNodes(activeNodes);
+        cibQueryData.setOfflineNodes(offlineNodes);
         cibQueryData.setGroupsToResources(groupsToResourcesMap);
         cibQueryData.setCloneToResource(cloneToResourceMap);
         cibQueryData.setMasterList(masterList);

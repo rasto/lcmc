@@ -97,8 +97,8 @@ public class CibQuery {
     /** "op" tag id map. */
     private Map<String, Map<String, String>> resOpIds =
                                     new HashMap<String, Map<String, String>>();
-    /** List of active nodes. */
-    private Set<String> activeNodes = new HashSet<String>();
+    /** List of offline nodes. */
+    private Set<String> offlineNodes = new HashSet<String>();
     /** Group to resources map. */
     private Map<String, List<String>> groupsToResources =
                                            new HashMap<String, List<String>>();
@@ -479,17 +479,17 @@ public class CibQuery {
     }
 
     /**
-     * Sets active nodes.
+     * Sets offline nodes.
      */
-    public final void setActiveNodes(final Set<String> activeNodes) {
-        this.activeNodes = activeNodes;
+    public final void setOfflineNodes(final Set<String> offlineNodes) {
+        this.offlineNodes = offlineNodes;
     }
 
     /**
-     * Gets active nodes.
+     * Gets offline nodes.
      */
-    public final Set<String> getActiveNodes() {
-        return activeNodes;
+    public final Set<String> getOfflineNodes() {
+        return offlineNodes;
     }
 
     /**

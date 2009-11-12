@@ -598,6 +598,7 @@ sub get_cluster_events {
 			sleep 25;
 			close $CB;
 			kill 1, $pid;
+			return "";
 		}  else {
 			my $cibevent = 0;
 			my $prev_byte = "";
@@ -634,6 +635,7 @@ sub get_cluster_events {
 				}
 			}
 		}
+		return "";
 	} else {
 		return "ERROR: cib connection error";
 	}

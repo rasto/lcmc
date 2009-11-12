@@ -939,7 +939,7 @@ public class ClusterBrowser extends Browser {
     public final void setClStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
-            host.setClStatus(clusterStatus.isActiveNode(host.getName()));
+            host.setClStatus(!clusterStatus.isOfflineNode(host.getName()));
         }
     }
 
@@ -1080,14 +1080,6 @@ public class ClusterBrowser extends Browser {
                                      }
                                  }
                                  setClStatus();
-                             } else {
-                                 final boolean oldStatus =
-                                              host.isClStatus();
-                                 host.setClStatus(false);
-                                 firstTime.countDown();
-                                 if (oldStatus) {
-                                    heartbeatGraph.repaint();
-                                 }
                              }
                          }
                          clStatusUnlock();
@@ -4231,8 +4223,8 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns true if the node is active.
          */
-        public boolean isActiveNode(final String node) {
-            return clusterStatus.isActiveNode(node);
+        public boolean isOfflineNode(final String node) {
+            return clusterStatus.isOfflineNode(node);
         }
 
         /**
@@ -6941,7 +6933,7 @@ public class ClusterBrowser extends Browser {
                         private static final long serialVersionUID = 1L;
 
                         public boolean predicate() {
-                            return isActiveNode(hostName);
+                            return !isOfflineNode(hostName);
                         }
 
                         public boolean enablePredicate() {
@@ -6957,7 +6949,7 @@ public class ClusterBrowser extends Browser {
                                    && getService().isAvailable()
                                    && !hostName.toLowerCase().equals(
                                              runningOnNode)
-                                   && isActiveNode(hostName);
+                                   && !isOfflineNode(hostName);
                         }
 
                         public void action() {
@@ -7926,7 +7918,7 @@ public class ClusterBrowser extends Browser {
             }
             final Host[] hosts = cluster.getHostsArray();
             for (Host host : hosts) {
-                if (!clusterStatus.isActiveNode(host.getName())) {
+                if (clusterStatus.isOfflineNode(host.getName())) {
                     //TODO: something's missing here
                     //System.out.println("is active node: " + host.getName());
                 }
