@@ -960,8 +960,15 @@ public class HostBrowser extends Browser {
             if (c == null) {
                 return null;
             }
-            return ((HeartbeatGraph) c.getBrowser()
-                    .getHeartbeatGraph()).getServicesInfo().getGraphicalView();
+            final ClusterBrowser b = c.getBrowser();
+            if (b == null) {
+                return null;
+            }
+            final HeartbeatGraph hg = (HeartbeatGraph) b.getHeartbeatGraph();
+            if (hg == null) {
+                return null;
+            }
+            return hg.getServicesInfo().getGraphicalView();
         }
 
         /**

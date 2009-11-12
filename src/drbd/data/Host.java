@@ -1518,6 +1518,7 @@ public class Host implements Serializable {
         if (!enableOnConnectList.contains(c)) {
             enableOnConnectList.add(c);
         }
+        c.setEnabled(isConnected());
     }
 
     /**

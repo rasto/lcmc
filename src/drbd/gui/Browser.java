@@ -1083,8 +1083,6 @@ public class Browser {
                                                                   params);
                                     SwingUtilities.invokeLater(new Runnable() {
                                         public void run() {
-                                            System.out.println(getName() + " insertUpdate: "
-                                                + param);
                                             applyButton.setEnabled(check);
                                         }
                                     });
