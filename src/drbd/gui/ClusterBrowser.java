@@ -1043,6 +1043,7 @@ public class ClusterBrowser extends Browser {
                          }
                          if (output == null) {
                              host.setClStatus(false);
+                             firstTime.countDown();
                          } else {
                              // TODO: if we get ERROR:... show it somewhere
                              clusterStatusOutput.append(output);
@@ -1075,20 +1076,21 @@ public class ClusterBrowser extends Browser {
                                                  repaintTree();
                                              }
                                          }
+                                         firstTime.countDown();
                                      }
                                  }
                                  setClStatus();
                              } else {
-                                final boolean oldStatus =
-                                             host.isClStatus();
-                                host.setClStatus(false);
-                                if (oldStatus) {
-                                   heartbeatGraph.repaint();
-                                }
+                                 final boolean oldStatus =
+                                              host.isClStatus();
+                                 host.setClStatus(false);
+                                 firstTime.countDown();
+                                 if (oldStatus) {
+                                    heartbeatGraph.repaint();
+                                 }
                              }
                          }
                          clStatusUnlock();
-                         firstTime.countDown();
                      }
                  });
             host.waitOnClStatus();
