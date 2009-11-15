@@ -70,7 +70,7 @@ public class DistResource_fedora_11 extends
          + "(/usr/sbin/groupadd haclient 2>/dev/null && "
          + "/usr/sbin/useradd -g haclient hacluster 2>/dev/null;"
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker"
+         + " -x heartbeat-2.1* install openais pacemaker resource-agents"
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
          + " if [ -e /etc/corosync/corosync.conf ]; then"

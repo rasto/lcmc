@@ -114,8 +114,7 @@ public class DistResource_debian extends
          "from source: latest/1.1.x"},
 
         {"PmInst.install.2",
-         "export PREFIX=/usr;"
-         + "export LCRSODIR=$PREFIX/libexec/lcrso;"
+         "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"
          + "export CLUSTER_GROUP=haclient;"
          + "apt-get update"
@@ -131,7 +130,7 @@ public class DistResource_debian extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp cluster-glue.tar.bz2"
          + " && cd `ls -dr Reusable-Cluster-Components-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure "
          + " --with-daemon-user=${CLUSTER_USER}"
          + " --with-daemon-group=${CLUSTER_GROUP}"
          + " --disable-fatal-warnings"
@@ -143,7 +142,7 @@ public class DistResource_debian extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp resource-agents.tar.bz2"
          + " && cd `ls -dr Cluster-Resource-Agents-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure "
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          /* corosync */
@@ -152,7 +151,7 @@ public class DistResource_debian extends
          + " http://svn.fedorahosted.org/svn/corosync/branches/flatiron"
          + " && cd /tmp/pminst/flatiron"
          + " && ./autogen.sh"
-         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " && ./configure --with-lcrso-dir=$LCRSODIR"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make"
          + " && make install"
@@ -163,6 +162,8 @@ public class DistResource_debian extends
          + " adduser --system --no-create-home --ingroup haclient"
          + " --disabled-login --shell /bin/false --disabled-password hacluster;"
          + " true)"
+         + " && /usr/sbin/update-rc.d corosync start 75 2 3 4 5 ."
+         + " stop 05 0 1 6 . "
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
          + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
@@ -170,8 +171,8 @@ public class DistResource_debian extends
          + " && /bin/tar xfjp pacemaker.tar.bz2"
          + " && cd `ls -dr Pacemaker-1-*`"
          + " && ./autogen.sh"
-         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
-         + " --disable-fatal-warnings"
+         + " && ./configure --with-lcrso-dir=$LCRSODIR"
+         + " --with-ais --disable-fatal-warnings"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
@@ -184,16 +185,13 @@ public class DistResource_debian extends
 
         /* heartbeat/pacemaker madkiss */
         {"HbPmInst.install.text.1",
-         "LINBIT/MADKISS repo: 1.0.x/3.0.x (testing)"},
+         "LINBIT/MADKISS repo: 1.0.x/3.0.x"},
 
         {"HbPmInst.install.1",
          "echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
          + " -o 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"},
-         //+ " && chmod g+w /var/run/heartbeat/crm" // TODO: remove workarounds
-         //                                         // when not needed
-         //+ " && ln -s /var/run/heartbeat/crm/ /var/run/crm"},
 
         /* heartbeat apt-get install */
         {"HbPmInst.install.text.2",
@@ -209,8 +207,7 @@ public class DistResource_debian extends
          "from source: latest/3.0.x"},
 
         {"HbPmInst.install.3",
-         "export PREFIX=/usr;"
-         + "export LCRSODIR=$PREFIX/libexec/lcrso;"
+         "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"
          + "export CLUSTER_GROUP=haclient;"
          + "apt-get update"
@@ -226,7 +223,7 @@ public class DistResource_debian extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp cluster-glue.tar.bz2"
          + " && cd `ls -dr Reusable-Cluster-Components-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure "
          + " --with-daemon-user=${CLUSTER_USER}"
          + " --with-daemon-group=${CLUSTER_GROUP}"
          + " --disable-fatal-warnings"
@@ -238,7 +235,7 @@ public class DistResource_debian extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp resource-agents.tar.bz2"
          + " && cd `ls -dr Cluster-Resource-Agents-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure "
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          /* Heartbeat */
@@ -247,7 +244,7 @@ public class DistResource_debian extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp heartbeat.tar.bz2"
          + " && cd `ls -dr Linux-HA-Dev-*`"
-         + " && ./bootstrap && ./configure --prefix=$PREFIX"
+         + " && ./bootstrap && ./configure"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          /* Pacemaker */
@@ -257,9 +254,9 @@ public class DistResource_debian extends
          + " && /bin/tar xfjp pacemaker.tar.bz2"
          + " && cd `ls -dr Pacemaker-1-*`"
          + " && ./autogen.sh"
-         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " && ./configure --with-lcrso-dir=$LCRSODIR"
          + " --disable-fatal-warnings"
-         + " --sysconfdir=/etc --localstatedir=/var"
+         + " --with-heartbeat --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"

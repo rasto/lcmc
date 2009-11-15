@@ -133,8 +133,7 @@ public class DistResource_ubuntu extends
          "from source: latest/1.1.x"},
 
         {"PmInst.install.2",
-         "export PREFIX=/usr;"
-         + "export LCRSODIR=$PREFIX/libexec/lcrso;"
+         "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"
          + "export CLUSTER_GROUP=haclient;"
          + "apt-get update"
@@ -150,7 +149,7 @@ public class DistResource_ubuntu extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp cluster-glue.tar.bz2"
          + " && cd `ls -dr Reusable-Cluster-Components-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure"
          + " --with-daemon-user=${CLUSTER_USER}"
          + " --with-daemon-group=${CLUSTER_GROUP}"
          + " --disable-fatal-warnings"
@@ -162,7 +161,7 @@ public class DistResource_ubuntu extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp resource-agents.tar.bz2"
          + " && cd `ls -dr Cluster-Resource-Agents-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          /* corosync */
@@ -171,7 +170,7 @@ public class DistResource_ubuntu extends
          + " http://svn.fedorahosted.org/svn/corosync/branches/flatiron"
          + " && cd /tmp/pminst/flatiron"
          + " && ./autogen.sh"
-         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " && ./configure --with-lcrso-dir=$LCRSODIR"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make"
          + " && make install"
@@ -182,6 +181,8 @@ public class DistResource_ubuntu extends
          + " adduser --system --no-create-home --ingroup haclient"
          + " --disabled-login --shell /bin/false --disabled-password hacluster;"
          + " true)"
+         + " && /usr/sbin/update-rc.d corosync start 75 2 3 4 5 ."
+         + " stop 05 0 1 6 . "
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
          + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
@@ -189,8 +190,8 @@ public class DistResource_ubuntu extends
          + " && /bin/tar xfjp pacemaker.tar.bz2"
          + " && cd `ls -dr Pacemaker-1-*`"
          + " && ./autogen.sh"
-         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
-         + " --sysconfdir=/etc --localstatedir=/var"
+         + " && ./configure --with-lcrso-dir=$LCRSODIR"
+         + " --with-ais --sysconfdir=/etc --localstatedir=/var"
          + " --disable-fatal-warnings"
          + " && make && make install"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"

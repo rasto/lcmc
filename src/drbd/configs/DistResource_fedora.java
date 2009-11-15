@@ -75,8 +75,7 @@ public class DistResource_fedora extends
          "from source: latest/1.1.x"},
 
         {"PmInst.install.9",
-         "export PREFIX=/usr;"
-         + "export LCRSODIR=$PREFIX/libexec/lcrso;"
+         "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"
          + "export CLUSTER_GROUP=haclient;"
          + "/usr/bin/yum -y install autoconf automake libtool glib2-devel"
@@ -89,7 +88,7 @@ public class DistResource_fedora extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp cluster-glue.tar.bz2"
          + " && cd `ls -dr Reusable-Cluster-Components-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure"
          + " --with-daemon-user=${CLUSTER_USER}"
          + " --with-daemon-group=${CLUSTER_GROUP}"
          + " --disable-fatal-warnings"
@@ -101,7 +100,7 @@ public class DistResource_fedora extends
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp resource-agents.tar.bz2"
          + " && cd `ls -dr Cluster-Resource-Agents-*`"
-         + " && ./autogen.sh && ./configure --prefix=$PREFIX"
+         + " && ./autogen.sh && ./configure"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
          /* corosync */
@@ -110,7 +109,7 @@ public class DistResource_fedora extends
          + " http://svn.fedorahosted.org/svn/corosync/branches/flatiron"
          + " && cd /tmp/pminst/flatiron"
          + " && ./autogen.sh"
-         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
+         + " && ./configure --with-lcrso-dir=$LCRSODIR"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make"
          + " && make install"
@@ -121,6 +120,9 @@ public class DistResource_fedora extends
          + " groupadd haclient;"
          + " useradd -g haclient --shell /bin/false hacluster;"
          + " true)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
          + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
@@ -130,8 +132,8 @@ public class DistResource_fedora extends
          + " && echo 'docdir = ${datadir}/doc/${PACKAGE}'>>doc/Makefile.am"
          + " && echo 'docdir = ${datadir}/doc/${PACKAGE}'>>Makefile.am"
          + " && ./autogen.sh"
-         + " && ./configure --prefix=$PREFIX --with-lcrso-dir=$LCRSODIR"
-         + " --sysconfdir=/etc --localstatedir=/var"
+         + " && ./configure --with-lcrso-dir=$LCRSODIR"
+         + " --with-ais --sysconfdir=/etc --localstatedir=/var"
          + " --disable-fatal-warnings"
          + " && make && make install"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"

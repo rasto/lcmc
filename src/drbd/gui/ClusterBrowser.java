@@ -982,7 +982,7 @@ public class ClusterBrowser extends Browser {
                 }
                 if (clStatusFailed()) {
                      Tools.progressIndicatorFailed(clusterName,
-                                                   "Heartbeat status failed");
+                                                   "Cluster status failed");
                 } else {
                     selectServices();
                     SwingUtilities.invokeLater(new Runnable() {

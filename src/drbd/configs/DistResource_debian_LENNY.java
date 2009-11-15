@@ -48,14 +48,14 @@ public class DistResource_debian_LENNY extends
 
         /* corosync/pacemaker madkiss */
         {"PmInst.install.text.1",
-         "LINBIT/MADKISS repo: 1.0.x/1.0.x (testing)"},
+         "LINBIT/MADKISS repo: 1.0.x/1.1.x"},
 
         {"PmInst.install.1",
          "echo 'deb http://people.debian.org/~madkiss/ha lenny main'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
-         + " -o 'DPkg::Options::force=--force-confnew' pacemaker corosync"
+         + " -o 'DPkg::Options::force=--force-confnew' psmisc pacemaker corosync"
          + " && sed -i 's/\\(START=\\)no/\\1yes/' /etc/default/corosync"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"

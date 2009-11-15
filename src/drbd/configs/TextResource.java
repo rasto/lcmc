@@ -341,12 +341,8 @@ public class TextResource extends
          + "possible only if you have support contract with LINBIT.<br>"
          + "You can also choose a <b>Pacemaker</b> installation method. "
          + "The newest packages for many different distributions are in "
-         + "Opensuse repositories, yes even if your distribution is not "
-         + "an Opensuse. On <b>Debians</b> there is currently no possibility "
-         + "to install working Pacemaker with Heartbeat and somewhat with "
-         + "Openais from binary packages, "
-         + "you may have to install it from source but make sure that you use "
-         + "the recommended combination of versions for all components."},
+         + "Clusterlabs and Opensuse repositories, yes even if your "
+         + "distribution is not an Opensuse."},
 
         {"Dialog.HostCheckInstallation.Drbd.NotInstalled",
          "DRBD is not installed. Click 'Install' button to install a new "

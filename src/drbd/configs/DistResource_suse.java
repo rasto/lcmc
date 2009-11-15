@@ -41,7 +41,7 @@ public class DistResource_suse extends
         //{"version:SUSE LINUX Enterprise Server 10 (i586)", "SLES10"}, // detected
         {"version:9*",     "SLES9"}, // detected
         {"version:SUSE Linux Enterprise Server 10*", "SLES10"}, // detected
-        {"version:openSUSE 11*",    "OPENSUSE11_1"}, // detected
+        {"version:openSUSE 11.1*",    "OPENSUSE11_1"}, // detected
         {"version:SUSE Linux Enterprise Server 11*", "SLES11"}, // detected
         {"version:sles9",  "SLES9"}, // chosen
         {"version:sles10", "SLES10"}, // chosen

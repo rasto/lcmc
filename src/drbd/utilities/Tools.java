@@ -1331,7 +1331,7 @@ public final class Tools {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("register expert panel: " + expertPanels.size());
+        //System.out.println("register expert panel: " + expertPanels.size());
         if (!expertPanels.contains(extraOptionsPanel)) {
             expertPanels.add(extraOptionsPanel);
         }
@@ -1348,7 +1348,7 @@ public final class Tools {
             Thread.currentThread().interrupt();
         }
         expertPanels.remove(extraOptionsPanel);
-        System.out.println("unregister expert panel: " + expertPanels.size());
+        //System.out.println("unregister expert panel: " + expertPanels.size());
         mExpertPanels.release();
     }
 
