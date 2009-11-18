@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 /**
  * This class provides cib commands. There are commands that use cibadmin and
  * crm_resource commands to manipulate the cib, crm, etc.
@@ -35,20 +36,36 @@ import java.util.List;
  *
  */
 public final class CRM {
+    /** Output of the ptest. */
+    private volatile static String ptestOutput = null;
+    /** Ptest lock. */
+    private final static Mutex mPtestLock = new Mutex();
     /**
      * No instantiation.
      */
-    private CRM() { }
+    private CRM() {
+        /* empty */
+    }
 
     /**
      * Returns cibadmin command.
      */
     public static String getCibCommand(final String command,
                                        final String objType,
-                                       final String xml) {
-        return "/usr/sbin/cibadmin --obj_type " + objType + " "
-                                   + command
-                                   + " -X " + xml;
+                                       final String xml,
+                                       final boolean testOnly) {
+        final StringBuffer cmd = new StringBuffer(200);
+        if (testOnly) {
+            cmd.append("export file=/var/lib/heartbeat/drbd-mc-test.xml;"
+                       + "if [ ! -e $file ]; then cibadmin -Ql > $file;fi;"
+                       + "CIB_file=$file ");
+        }
+        cmd.append("/usr/sbin/cibadmin --obj_type "
+                   + objType + " " + command + " -X " + xml);
+        //if (testOnly) {
+        //    cmd.append(";ptest -VVV -x $file 2>&1");
+        //}
+        return cmd.toString();
     }
 
     /**
@@ -56,13 +73,100 @@ public final class CRM {
      */
     private static void execCommand(final Host host,
                                     final String command,
-                                    final boolean outputVisible) {
-        Tools.execCommandProgressIndicator(
-                                host,
-                                command,
-                                null,
-                                outputVisible,
-                                Tools.getString("CIB.ExecutingCommand"));
+                                    final boolean outputVisible,
+                                    final boolean testOnly) {
+        try {
+            mPtestLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        ptestOutput = null;
+        mPtestLock.release();
+        if (testOnly) {
+            Tools.execCommand(host, command, null, false);
+            //final String output = Tools.execCommand(host, command, null, false);
+            ////System.out.println("ptest: " + output);
+            //final StringBuffer sb = new StringBuffer(300);
+            //sb.append("<html><b>");
+            //sb.append(Tools.getString("CRM.Ptest.ToolTip"));
+            //sb.append("</b><br>");
+            //for (final String line : output.split("\\n")) {
+            //    final String[] prefixes = new String[]{"native_color: ",
+            //                                           "LogActions: "};
+            //    for (final String prefix : prefixes) {
+            //        final int index = line.indexOf(prefix);
+            //        if (index > 0) {
+            //            sb.append(line.substring(index + prefix.length()));
+            //            sb.append("<br>");
+            //        }
+            //    }
+
+            //}
+            //sb.append("</html>");
+            //try {
+            //    mPtestLock.acquire();
+            //} catch (InterruptedException e) {
+            //    Thread.currentThread().interrupt();
+            //}
+            //if (ptestOutput == null) {
+            //    ptestOutput = sb.toString();
+            //}
+            //mPtestLock.release();
+        } else {
+            Tools.execCommandProgressIndicator(
+                                    host,
+                                    command,
+                                    null,
+                                    outputVisible,
+                                    Tools.getString("CIB.ExecutingCommand"));
+        }
+    }
+
+    public static String ptest(final Host host) {
+        try {
+            mPtestLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        if (ptestOutput != null) {
+            final String po = ptestOutput;
+            mPtestLock.release();
+            return po;
+        }
+        mPtestLock.release();
+        final String command =
+                    "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
+                    + "ptest -VVV -x $file 2>&1";
+        final String output = Tools.execCommand(host, command, null, false);
+        //System.out.println("ptest: " + output);
+        final StringBuffer sb = new StringBuffer(300);
+        sb.append("<html><b>");
+        sb.append(Tools.getString("CRM.Ptest.ToolTip"));
+        sb.append("</b><br>");
+        for (final String line : output.split("\\n")) {
+            final String[] prefixes = new String[]{"native_color: ",
+                                                   "LogActions: "};
+            for (final String prefix : prefixes) {
+                final int index = line.indexOf(prefix);
+                if (index > 0) {
+                    sb.append(line.substring(index + prefix.length()));
+                    sb.append("<br>");
+                }
+            }
+
+        }
+        sb.append("</html>");
+        try {
+            mPtestLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final String po = sb.toString();
+        if (ptestOutput == null) {
+            ptestOutput = po;
+        }
+        mPtestLock.release();
+        return po;
     }
 
     /**
@@ -82,7 +186,8 @@ public final class CRM {
                            String instanceAttrId,
                            final Map<String, String> nvpairIdsHash,
                            final Map<String, Map<String, String>> pacemakerOps,
-                           String operationsId) {
+                           String operationsId,
+                           final boolean testOnly) {
         if (instanceAttrId == null) {
             instanceAttrId = heartbeatId + "-instance_attributes";
         }
@@ -226,8 +331,10 @@ public final class CRM {
         execCommand(host,
                     getCibCommand(command,
                                   "resources",
-                                  xml.toString()),
-                    true);
+                                  xml.toString(),
+                                  testOnly),
+                    true,
+                    testOnly);
     }
 
     /**
@@ -250,14 +357,21 @@ public final class CRM {
                                 final String heartbeatId,
                                 final String[] parents,
                                 final List<Map<String, String>> colAttrsList,
-                                final List<Map<String, String>> ordAttrsList) {
+                                final List<Map<String, String>> ordAttrsList,
+                                final boolean testOnly) {
         for (int i = 0; i < parents.length; i++) {
             addColocation(host,
                           null,
                           heartbeatId,
                           parents[i],
-                          colAttrsList.get(i));
-            addOrder(host, null, parents[i], heartbeatId, ordAttrsList.get(i));
+                          colAttrsList.get(i),
+                          testOnly);
+            addOrder(host,
+                     null,
+                     parents[i],
+                     heartbeatId,
+                     ordAttrsList.get(i),
+                     testOnly);
         }
     }
 
@@ -268,7 +382,8 @@ public final class CRM {
                                    final String heartbeatId,
                                    final String onHost,
                                    final String score,
-                                   String locationId) {
+                                   String locationId,
+                                   final boolean testOnly) {
         String command = "-U";
         if (locationId == null) {
             locationId = "loc_" + heartbeatId + "_" + onHost;
@@ -290,8 +405,10 @@ public final class CRM {
         execCommand(host,
                     getCibCommand(command,
                                   "constraints",
-                                  xml.toString()),
-                    true);
+                                  xml.toString(),
+                                  testOnly),
+                    true,
+                    testOnly);
     }
 
     /**
@@ -300,7 +417,8 @@ public final class CRM {
     public static void removeLocation(final Host host,
                                       final String locationId,
                                       final String heartbeatId,
-                                      final String score) {
+                                      final String score,
+                                      final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_location id=\"");
         xml.append(locationId);
@@ -313,8 +431,9 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString());
-        execCommand(host, command, true);
+                                             xml.toString(),
+                                             testOnly);
+        execCommand(host, command, true, testOnly);
     }
 
 
@@ -326,7 +445,8 @@ public final class CRM {
                                       final String heartbeatId,
                                       final String groupId,
                                       final String cloneId,
-                                      final boolean master) {
+                                      final boolean master,
+                                      final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
         final String hbV = host.getHeartbeatVersion();
@@ -378,8 +498,9 @@ public final class CRM {
         final String command = getCibCommand(
                                       "-D",
                                       "resources",
-                                      xml.toString());
-        execCommand(host, command, true);
+                                      xml.toString(),
+                                      testOnly);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -387,7 +508,8 @@ public final class CRM {
      */
     public static void cleanupResource(final Host host,
                                        final String heartbeatId,
-                                       final Host[] clusterHosts) {
+                                       final Host[] clusterHosts,
+                                       final boolean testOnly) {
         /* make cleanup on all cluster hosts. */
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
@@ -396,7 +518,7 @@ public final class CRM {
             final String command =
                       host.getDistCommand("CRM.cleanupResource",
                                           replaceHash);
-            execCommand(host, command, true);
+            execCommand(host, command, true, testOnly);
         }
     }
 
@@ -404,7 +526,8 @@ public final class CRM {
      * Starts resource.
      */
     public static void startResource(final Host host,
-                                     final String heartbeatId) {
+                                     final String heartbeatId,
+                                     final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String cmd = "CRM.startResource";
@@ -416,7 +539,7 @@ public final class CRM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         final String command = host.getDistCommand(cmd, replaceHash);
-        execCommand(host, command, true);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -473,7 +596,8 @@ public final class CRM {
      */
     public static void setManaged(final Host host,
                                   final String heartbeatId,
-                                  final boolean isManaged) {
+                                  final boolean isManaged,
+                                  final boolean testOnly) {
         String string;
         if (isManaged) {
             string = ".isManagedOn";
@@ -492,14 +616,15 @@ public final class CRM {
         replaceHash.put("@ID@", heartbeatId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        execCommand(host, command, true);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
      * Stops resource.
      */
     public static void stopResource(final Host host,
-                                    final String heartbeatId) {
+                                    final String heartbeatId,
+                                    final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String cmd = "CRM.stopResource";
@@ -512,7 +637,7 @@ public final class CRM {
         replaceHash.put("@ID@", heartbeatId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        execCommand(host, command, true);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -520,34 +645,37 @@ public final class CRM {
      */
     public static void migrateResource(final Host host,
                                        final String heartbeatId,
-                                       final String onHost) {
+                                       final String onHost,
+                                       final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         replaceHash.put("@HOST@", onHost);
         final String command = host.getDistCommand("CRM.migrateResource",
                                                    replaceHash);
 
-        execCommand(host, command, true);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
      * Unmigrates resource that was previously migrated.
      */
     public static void unmigrateResource(final Host host,
-                                         final String heartbeatId) {
+                                         final String heartbeatId,
+                                         final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         final String command = host.getDistCommand(
                                              "CRM.unmigrateResource",
                                              replaceHash);
-        execCommand(host, command, true);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
      * Sets global heartbeat parameters.
      */
     public static void setGlobalParameters(final Host host,
-                                           final Map<String, String> args) {
+                                           final Map<String, String> args,
+                                           final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<crm_config>");
         xml.append("<cluster_property_set id=\"cib-bootstrap-options\">");
@@ -578,8 +706,9 @@ public final class CRM {
         xml.append("</cluster_property_set></crm_config>'");
         final String command = getCibCommand("-R",
                                              "crm_config",
-                                             xml.toString());
-        execCommand(host, command, true);
+                                             xml.toString(),
+                                             testOnly);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -589,7 +718,8 @@ public final class CRM {
                                         final String colocationId,
                                         final String rsc1,
                                         final String rsc2,
-                                        final String score) {
+                                        final String score,
+                                        final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String rscString = "rsc";
@@ -615,8 +745,9 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString());
-        execCommand(host, command, true);
+                                             xml.toString(),
+                                             testOnly);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -626,7 +757,8 @@ public final class CRM {
                                      final String colId,
                                      final String heartbeatId,
                                      final String parentHbId,
-                                     Map<String, String> attrs) {
+                                     Map<String, String> attrs,
+                                     final boolean testOnly) {
         String colocationId;
         String cibadminOpt;
         if (colId == null) {
@@ -674,8 +806,9 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
-                                             xml.toString());
-        execCommand(host, command, true);
+                                             xml.toString(),
+                                             testOnly);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -686,7 +819,8 @@ public final class CRM {
                                    final String rscFrom,
                                    final String rscTo,
                                    final String score,
-                                   final String symmetrical) {
+                                   final String symmetrical,
+                                   final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String firstString = "first";
@@ -716,8 +850,9 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString());
-        execCommand(host, command, true);
+                                             xml.toString(),
+                                             testOnly);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -727,7 +862,8 @@ public final class CRM {
                                 final String ordId,
                                 final String parentHbId,
                                 final String heartbeatId,
-                                Map<String, String> attrs) {
+                                Map<String, String> attrs,
+                                final boolean testOnly) {
         String orderId;
         String cibadminOpt;
         if (ordId == null) {
@@ -782,8 +918,9 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
-                                             xml.toString());
-        execCommand(host, command, true);
+                                             xml.toString(),
+                                             testOnly);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
@@ -807,22 +944,22 @@ public final class CRM {
     /**
      * Makes heartbeat stand by.
      */
-    public static void standByOn(final Host host) {
+    public static void standByOn(final Host host, final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@HOST@", host.getName());
         final String command = host.getDistCommand("CRM.standByOn",
                                                    replaceHash);
-        execCommand(host, command, true);
+        execCommand(host, command, true, testOnly);
     }
 
     /**
      * Undoes heartbeat stand by.
      */
-    public static void standByOff(final Host host) {
+    public static void standByOff(final Host host, final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@HOST@", host.getName());
         final String command = host.getDistCommand("CRM.standByOff",
                                                    replaceHash);
-        execCommand(host, command, true);
+        execCommand(host, command, true, testOnly);
     }
 }

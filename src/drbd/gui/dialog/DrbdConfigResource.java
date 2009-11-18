@@ -89,7 +89,7 @@ public class DrbdConfigResource extends DrbdConfig {
      * Applies the changes and returns next dialog (DrbdConfigBlockDev).
      */
     public WizardDialog nextDialog() {
-        getDrbdResourceInfo().apply();
+        getDrbdResourceInfo().apply(false);
         return new DrbdConfigBlockDev(
                                   this,
                                   getDrbdResourceInfo(),

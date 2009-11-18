@@ -29,9 +29,17 @@ import java.awt.RenderingHints;
 import javax.swing.JButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JToolTip;
+import javax.swing.SwingUtilities;
+import java.awt.geom.Point2D;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.event.ActionEvent;
+import java.awt.MouseInfo;
+import java.awt.Robot;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 
 /**
  * This class creates a button with any gradient colors.
@@ -43,6 +51,12 @@ public class MyButton extends JButton {
     private Color color1;
     /** Second color in the gradient. */
     private Color color2;
+    /** Robot to move a mouse a little if a tooltip has changed. */
+    private Robot robot = null;
+    /** Offset, workaround for flipped dual monitors. */
+    private int xOffset = 0;
+    /** Button tooltip. */
+    private JToolTip tip = null;
 
     /**
      * Prepares a new <code>MyButton</code> object.
@@ -90,10 +104,8 @@ public class MyButton extends JButton {
                     final ImageIcon icon,
                     final String toolTip) {
         this(text, icon);
-        setToolTipText(toolTip);
+        super.setToolTipText(toolTip);
     }
-
-
     /**
      * Prepares a new <code>MyButton</code> object.
      *
@@ -104,10 +116,57 @@ public class MyButton extends JButton {
      */
     public MyButton(final Color c1, final Color c2) {
         super();
+        try {
+            robot = new Robot(MouseInfo.getPointerInfo().getDevice());
+        } catch (java.awt.AWTException e) {
+        }
+        final GraphicsDevice[] devices =
+          GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+        if (devices.length == 2) {
+            /* workaround for dual monitors that are flipped. */
+            //TODO: not sure how is it with three monitors
+            final int x1 = devices[0].getDefaultConfiguration().getBounds().x;
+            final int x2 = devices[1].getDefaultConfiguration().getBounds().x;
+            System.out.println("x1: " + x1 + ", x2: " + x2);
+            if (x1 > x2) {
+                xOffset = -x1;
+            }
+        }
+
         this.color1 = c1;
         this.color2 = c2;
         setContentAreaFilled(false);  // *
     }
+
+    /**
+     * Creates tooltip.
+     */
+    public JToolTip createToolTip() {
+        tip = super.createToolTip();
+        return tip;
+    }
+
+    /**
+     * Sets tooltip and wiggles the mouse to refresh it.
+     */
+    public void setToolTipText(final String toolTip) {
+        super.setToolTipText(toolTip);
+        if (tip != null) {
+            if (tip.isShowing()) {
+                if (robot != null) {
+                    final Point2D p = MouseInfo.getPointerInfo().getLocation();
+                    System.out.println("mouse x: " + p.getX()
+                                        + ", y: " + p.getY()
+                                        + ", offset: " + xOffset);
+                    robot.mouseMove((int) p.getX() + xOffset,
+                                    (int) p.getY() - 2);
+                    robot.mouseMove((int) p.getX() + xOffset,
+                                    (int) p.getY());
+                }
+            }
+        }
+    }
+
 
     /**
      * Sets color 1 in the gradient.

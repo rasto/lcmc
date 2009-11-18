@@ -819,7 +819,7 @@ public class HostBrowser extends Browser {
          */
         public final List<UpdatableItem> createPopup() {
             final List<UpdatableItem>items = new ArrayList<UpdatableItem>();
-
+            final boolean testOnly = false;
             /* host wizard */
             final MyMenuItem hostWizardItem =
                 new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
@@ -860,9 +860,9 @@ public class HostBrowser extends Browser {
 
                     public void action() {
                         if (isStandby()) {
-                            CRM.standByOff(host);
+                            CRM.standByOff(host, testOnly);
                         } else {
-                            CRM.standByOn(host);
+                            CRM.standByOn(host, testOnly);
                         }
                     }
                 };
@@ -1703,12 +1703,12 @@ public class HostBrowser extends Browser {
          *
          * TODO: check this
          */
-        public final void removeMyself() {
+        public final void removeMyself(final boolean testOnly) {
             getBlockDevice().setValue(DRBD_NI_PARAM, null);
             getBlockDevice().setValue(DRBD_NI_PORT_PARAM, null);
             getBlockDevice().setValue(DRBD_MD_PARAM, null);
             getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
-            super.removeMyself();
+            super.removeMyself(testOnly);
             infoPanel = null;
             Tools.unregisterExpertPanel(extraOptionsPanel);
         }
@@ -2263,7 +2263,7 @@ public class HostBrowser extends Browser {
             return params;
         }
 
-        public final void apply() {
+        public final void apply(final boolean testOnly) {
             final String[] params = getParametersFromXML();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -2296,7 +2296,7 @@ public class HostBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
-            initApplyButton();
+            initApplyButton(null);
 
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -2352,7 +2352,7 @@ public class HostBrowser extends Browser {
                         public void actionPerformed(final ActionEvent e) {
                             Thread thread = new Thread(new Runnable() {
                                 public void run() {
-                                    apply();
+                                    apply(false);
                                     try {
                                         drbdResourceInfo.getDrbdInfo()
                                                         .createDrbdConfig();
@@ -2455,6 +2455,7 @@ public class HostBrowser extends Browser {
                 /* block devices are not available */
                 return null;
             }
+            final boolean testOnly = false;
             final MyMenu repMenuItem = new MyMenu(
                         Tools.getString("HostBrowser.Drbd.AddDrbdResource")) {
                 private static final long serialVersionUID = 1L;
@@ -2511,7 +2512,8 @@ public class HostBrowser extends Browser {
                                                                      null,
                                                                      thisClass,
                                                                      oBdi,
-                                                                     true);
+                                                                     true,
+                                                                     testOnly);
                                             }
                                         });
                                     }

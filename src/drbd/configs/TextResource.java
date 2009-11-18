@@ -1403,6 +1403,12 @@ public class TextResource extends
         {"ClusterBrowser.DrbddiskMenuName",
          "Filesystem + drbddisk (obsolete)"},
 
+        {"ClusterBrowser.StartingPtest",
+         "Starting What-if machine..."},
+
+        {"CRM.Ptest.ToolTip",
+         "What happens when you apply it:"},
+
         {"HostBrowser.HostWizard",
          "Host Wizard"},
 

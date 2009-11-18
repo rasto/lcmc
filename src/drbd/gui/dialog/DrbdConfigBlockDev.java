@@ -69,7 +69,7 @@ public class DrbdConfigBlockDev extends DrbdConfig {
      * Applies the changes to the blockDevInfo object.
      */
     protected void finishDialog() {
-        blockDevInfo.apply();
+        blockDevInfo.apply(false);
     }
 
     /**

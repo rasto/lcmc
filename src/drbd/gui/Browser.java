@@ -24,6 +24,7 @@ package drbd.gui;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
+import drbd.utilities.ButtonCallback;
 import drbd.data.resources.Resource;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Unit;
@@ -55,6 +56,8 @@ import java.awt.geom.Point2D;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -536,7 +539,7 @@ public class Browser {
          * Removes this object from the tree and highlights and selects parent
          * node.
          */
-        public void removeMyself() {
+        public void removeMyself(final boolean testOnly) {
             if (node != null) {
                 final DefaultMutableTreeNode parent =
                                     (DefaultMutableTreeNode) node.getParent();
@@ -771,7 +774,7 @@ public class Browser {
         /**
          * Inits apply button.
          */
-        public final void initApplyButton() {
+        public final void initApplyButton(final ButtonCallback buttonCallback) {
             if (applyButton != null) {
                 Tools.appWarning("wrong call to initApplyButton: " + getName());
             }
@@ -784,6 +787,34 @@ public class Browser {
                 applyButton = oldApplyButton;
             }
             applyButton.setEnabled(false);
+            if (buttonCallback != null) {
+                applyButton.addMouseListener(new MouseListener() {
+                    public void mouseClicked(final MouseEvent e) {
+                        /* do nothing */
+                    }
+
+                    public void mouseEntered(final MouseEvent e) {
+                        System.out.println("mouse entered");
+                        if (applyButton.isShowing()
+                            && applyButton.isEnabled()) {
+                            buttonCallback.mouseOver();
+                        }
+                    }
+
+                    public void mouseExited(final MouseEvent e) {
+                        System.out.println("mouse left");
+                        /* do nothing */
+                    }
+
+                    public void mousePressed(final MouseEvent e) {
+                        /* do nothing */
+                    }
+
+                    public void mouseReleased(final MouseEvent e) {
+                        /* do nothing */
+                    }
+                });
+            }
         }
 
         /**
@@ -1462,8 +1493,8 @@ public class Browser {
         /**
          * Removes this editable object and clealrs the parameter hashes.
          */
-        public void removeMyself() {
-            super.removeMyself();
+        public void removeMyself(final boolean testOnly) {
+            super.removeMyself(testOnly);
             paramComboBoxClear();
         }
 
