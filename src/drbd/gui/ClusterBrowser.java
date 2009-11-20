@@ -34,6 +34,7 @@ import drbd.Exceptions;
 import drbd.gui.dialog.ClusterLogs;
 import drbd.gui.dialog.ServiceLogs;
 import drbd.gui.dialog.ClusterDrbdLogs;
+import drbd.data.PtestData;
 
 import drbd.data.Host;
 import drbd.data.Cluster;
@@ -87,6 +88,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -1675,7 +1678,6 @@ public class ClusterBrowser extends Browser {
         }
         return cfs;
     }
-
 
     /**
      * this class holds info data, menus and configuration
@@ -3760,14 +3762,15 @@ public class ClusterBrowser extends Browser {
          * all the services are running. Null if they running on different
          * nodes or not at all.
          */
-        public final List<String> getRunningOnNodes() {
+        public final List<String> getRunningOnNodes(final boolean testOnly) {
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             final List<String> allNodes = new ArrayList<String>();
             if (resources != null) {
                 for (final String hbId : resources) {
                     final List<String> ns =
-                                        clusterStatus.getRunningOnNodes(hbId);
+                                     clusterStatus.getRunningOnNodes(hbId,
+                                                                     testOnly);
                     if (ns != null) {
                         for (final String n : ns) {
                             if (!allNodes.contains(n)) {
@@ -3783,8 +3786,11 @@ public class ClusterBrowser extends Browser {
         /**
          * Starts all resources in the group.
          */
-        public final void startResource(final boolean testOnly) {
-            setUpdated(true);
+        public final void startResource(final boolean testOnly,
+                                        final Host dcHost) {
+            if (!testOnly) {
+                setUpdated(true);
+            }
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             final Host dc = getDCHost();
@@ -3799,7 +3805,9 @@ public class ClusterBrowser extends Browser {
          * Stops all resources in the group.
          */
         public final void stopResource(final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             final Host dc = getDCHost();
@@ -3814,7 +3822,9 @@ public class ClusterBrowser extends Browser {
          * Cleans up all resources in the group.
          */
         public final void cleanupResource(final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             if (resources != null) {
@@ -3830,7 +3840,9 @@ public class ClusterBrowser extends Browser {
          */
         public final void setManaged(final boolean isManaged,
                                      final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             final Host dc = getDCHost();
@@ -3962,8 +3974,8 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns tool tip for the group vertex.
          */
-        public String getToolTipText() {
-            final List<String> hostNames = getRunningOnNodes();
+        public String getToolTipText(final boolean testOnly) {
+            final List<String> hostNames = getRunningOnNodes(testOnly);
             final StringBuffer sb = new StringBuffer(220);
             sb.append("<b>");
             sb.append(toString());
@@ -3984,7 +3996,7 @@ public class ClusterBrowser extends Browser {
                                     (DefaultMutableTreeNode) e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
                 sb.append("\n&nbsp;&nbsp;&nbsp;");
-                sb.append(child.getToolTipText());
+                sb.append(child.getToolTipText(testOnly));
             }
 
             return sb.toString();
@@ -3993,12 +4005,13 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether one of the services on one of the hosts failed.
          */
-         public final boolean isOneFailed() {
+         public final boolean isOneFailed(final boolean testOnly) {
                 final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
              if (resources != null) {
                  for (final String hbId : resources) {
-                     if (heartbeatIdToServiceInfo.get(hbId).isOneFailed()) {
+                     if (heartbeatIdToServiceInfo.get(hbId).isOneFailed(
+                                                                   testOnly)) {
                          return true;
                      }
                  }
@@ -4009,12 +4022,13 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether one of the services on one of the hosts failed.
          */
-         public final boolean isOneFailedCount() {
+         public final boolean isOneFailedCount(final boolean testOnly) {
                 final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
              if (resources != null) {
                  for (final String hbId : resources) {
-                     if (heartbeatIdToServiceInfo.get(hbId).isOneFailedCount()) {
+                     if (heartbeatIdToServiceInfo.get(hbId).isOneFailedCount(
+                                                                    testOnly)) {
                          return true;
                      }
                  }
@@ -4025,7 +4039,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether one of the services failed to start.
          */
-         public final boolean isFailed() {
+         public final boolean isFailed(final boolean testOnly) {
              final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
              if (resources != null) {
@@ -4034,7 +4048,7 @@ public class ClusterBrowser extends Browser {
                      if (si == null) {
                          continue;
                      }
-                     if (si.isFailed()) {
+                     if (si.isFailed(testOnly)) {
                          return true;
                      }
                  }
@@ -4045,7 +4059,7 @@ public class ClusterBrowser extends Browser {
          /**
           * Returns subtexts that appears in the service vertex.
           */
-         public final Subtext[] getSubtextsForGraph() {
+         public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
              final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
              final List<Subtext> texts = new ArrayList<Subtext>();
@@ -4054,7 +4068,7 @@ public class ClusterBrowser extends Browser {
                  for (final String hbId : resources) {
                      final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
                      if (si != null) {
-                         Subtext[] subtexts = si.getSubtextsForGraph();
+                         Subtext[] subtexts = si.getSubtextsForGraph(testOnly);
                          Subtext sSubtext = null;
                          if (subtexts == null || subtexts.length == 0) {
                              continue;
@@ -4069,7 +4083,7 @@ public class ClusterBrowser extends Browser {
                          }
                          if (si != null) {
                              String unmanaged = "";
-                             if (!si.isManaged()) {
+                             if (!si.isManaged(testOnly)) {
                                  unmanaged = " / unmanaged";
                              }
                              texts.add(new Subtext("   " + si.toString()
@@ -4094,7 +4108,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether all services are unmaneged.
          */
-        public final boolean isManaged() {
+        public final boolean isManaged(final boolean testOnly) {
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             if (resources == null) {
@@ -4106,7 +4120,7 @@ public class ClusterBrowser extends Browser {
                 for (final String hbId : resources) {
                     final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
                     if (si != null) {
-                        if (si.isManaged()) {
+                        if (si.isManaged(testOnly)) {
                             return true;
                         }
                     }
@@ -4118,14 +4132,14 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether all of the services are started.
          */
-        public final boolean isStarted() {
+        public final boolean isStarted(final boolean testOnly) {
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             if (resources != null) {
                 for (final String hbId : resources) {
                     final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
                     if (si != null) {
-                        if (!si.isStarted()) {
+                        if (!si.isStarted(testOnly)) {
                             return false;
                         }
                     }
@@ -4137,14 +4151,14 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether one of the services is stopped.
          */
-        public final boolean isStopped() {
+        public final boolean isStopped(final boolean testOnly) {
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             if (resources != null) {
                 for (final String hbId : resources) {
                     final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
                     if (si != null) {
-                        if (si.isStopped()) {
+                        if (si.isStopped(testOnly)) {
                             return true;
                         }
                     }
@@ -4156,14 +4170,14 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns true if all services in the group are running.
          */
-        public final boolean isRunning() {
+        public final boolean isRunning(final boolean testOnly) {
             final List<String> resources = clusterStatus.getGroupResources(
                                                 getService().getHeartbeatId());
             if (resources != null) {
                 for (final String hbId : resources) {
                     final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
                     if (si != null) {
-                        if (!si.isRunning()) {
+                        if (!si.isRunning(testOnly)) {
                             return false;
                         }
                     }
@@ -4503,15 +4517,16 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns node name of the host where this service is running.
          */
-        public List<String> getRunningOnNodes() {
+        public List<String> getRunningOnNodes(final boolean testOnly) {
             return clusterStatus.getRunningOnNodes(
-                                                getService().getHeartbeatId());
+                                                getService().getHeartbeatId(),
+                                                testOnly);
         }
 
        /**
         * Returns whether service is started.
         */
-        public boolean isStarted() {
+        public boolean isStarted(final boolean testOnly) {
             final String hbV = getDCHost().getHeartbeatVersion();
             final String pmV = getDCHost().getPacemakerVersion();
             String targetRoleString = "target-role";
@@ -4521,8 +4536,9 @@ public class ClusterBrowser extends Browser {
                 targetRoleString = "target_role";
             }
             String targetRole =
-                clusterStatus.getParameter(getService().getHeartbeatId(),
-                                             targetRoleString);
+                    clusterStatus.getParameter(getService().getHeartbeatId(),
+                                               targetRoleString,
+                                               testOnly);
             if (targetRole == null) {
                 targetRole = getParamDefault(targetRoleString);
             }
@@ -4535,7 +4551,7 @@ public class ClusterBrowser extends Browser {
        /**
         * Returns whether service is stopped.
         */
-        public boolean isStopped() {
+        public boolean isStopped(final boolean testOnly) {
             final String hbV = getDCHost().getHeartbeatVersion();
             final String pmV = getDCHost().getPacemakerVersion();
             String targetRoleString = "target-role";
@@ -4545,8 +4561,9 @@ public class ClusterBrowser extends Browser {
                 targetRoleString = "target_role";
             }
             String targetRole =
-                clusterStatus.getParameter(getService().getHeartbeatId(),
-                                           targetRoleString);
+                    clusterStatus.getParameter(getService().getHeartbeatId(),
+                                               targetRoleString,
+                                               testOnly);
             if (targetRole == null) {
                 targetRole = getParamDefault(targetRoleString);
             }
@@ -4560,7 +4577,7 @@ public class ClusterBrowser extends Browser {
          * Returns whether service is managed.
          * TODO: "default" value
          */
-        public boolean isManaged() {
+        public boolean isManaged(final boolean testOnly) {
             final String hbV = getDCHost().getHeartbeatVersion();
             final String pmV = getDCHost().getPacemakerVersion();
             String isManagedString = "is-managed";
@@ -4571,7 +4588,8 @@ public class ClusterBrowser extends Browser {
             }
             String isManaged =
                 clusterStatus.getParameter(getService().getHeartbeatId(),
-                                             isManagedString);
+                                           isManagedString,
+                                           testOnly);
             if (isManaged == null) {
                 isManaged = getParamDefault(isManagedString);
             }
@@ -4584,7 +4602,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the service where was migrated or null.
          */
-        public final Host getMigratedTo() {
+        public final Host getMigratedTo(final boolean testOnly) {
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 String score = clusterStatus.getScore(
@@ -4600,17 +4618,18 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the service is running.
          */
-        public boolean isRunning() {
-            final List<String> runningOnNodes = getRunningOnNodes();
+        public boolean isRunning(boolean testOnly) {
+            final List<String> runningOnNodes = getRunningOnNodes(testOnly);
             return runningOnNodes != null && !runningOnNodes.isEmpty();
         }
 
         /**
          * Returns fail count string that appears in the graph.
          */
-        private String getFailCountString(final String hostName) {
+        private String getFailCountString(final String hostName,
+                                          final boolean testOnly) {
             String fcString = "";
-            final String failCount = getFailCount(hostName);
+            final String failCount = getFailCount(hostName, testOnly);
             if (failCount != null) {
                 if ("INFINITY".equals(failCount)) {
                     fcString = " failed";
@@ -4625,29 +4644,33 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns fail count.
          */
-        protected String getFailCount(final String hostName) {
-             return clusterStatus.getFailCount(
-                                                hostName,
-                                                getService().getHeartbeatId());
+        protected String getFailCount(final String hostName,
+                                      final boolean testOnly) {
+             return clusterStatus.getFailCount(hostName,
+                                               getService().getHeartbeatId(),
+                                               testOnly);
         }
 
         /**
          * Returns whether the resource failed on the specified host.
          */
-        protected final boolean failedOnHost(final String hostName) {
-            final String failCount = getFailCount(hostName);
+        protected final boolean failedOnHost(final String hostName,
+                                             final boolean testOnly) {
+            final String failCount = getFailCount(hostName,
+                                                  testOnly);
             return failCount != null && "INFINITY".equals(failCount);
         }
 
         /**
          * Returns whether the resource has failed to start.
          */
-        public boolean isFailed() {
-            if (isRunning()) {
+        public boolean isFailed(final boolean testOnly) {
+            if (isRunning(testOnly)) {
                 return false;
             }
             for (final Host host : getClusterHosts()) {
-                if (host.isClStatus() && failedOnHost(host.getName())) {
+                if (host.isClStatus() && failedOnHost(host.getName(),
+                                                      testOnly)) {
                     return true;
                 }
             }
@@ -4657,9 +4680,9 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the resource has failed on one of the nodes.
          */
-        public boolean isOneFailed() {
+        public boolean isOneFailed(final boolean testOnly) {
             for (final Host host : getClusterHosts()) {
-                if (failedOnHost(host.getName())) {
+                if (failedOnHost(host.getName(), testOnly)) {
                     return true;
                 }
             }
@@ -4669,9 +4692,9 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the resource has fail-count on one of the nodes.
          */
-        public boolean isOneFailedCount() {
+        public boolean isOneFailedCount(final boolean testOnly) {
             for (final Host host : getClusterHosts()) {
-                if (getFailCount(host.getName()) != null) {
+                if (getFailCount(host.getName(), testOnly) != null) {
                     return true;
                 }
             }
@@ -4683,7 +4706,9 @@ public class ClusterBrowser extends Browser {
          */
         public void setManaged(final boolean isManaged,
                                final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             CRM.setManaged(getDCHost(),
                            getService().getHeartbeatId(),
                            isManaged,
@@ -4693,16 +4718,16 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns color for the host vertex.
          */
-        public List<Color> getHostColors() {
-            return cluster.getHostColors(getRunningOnNodes());
+        public List<Color> getHostColors(final boolean testOnly) {
+            return cluster.getHostColors(getRunningOnNodes(testOnly));
         }
 
         /**
          * Returns service icon in the menu. It can be started or stopped.
          * TODO: broken icon, not managed icon.
          */
-        public ImageIcon getMenuIcon() {
-            if (allHostsDown() || isStopped()) {
+        public ImageIcon getMenuIcon(final boolean testOnly) {
+            if (allHostsDown() || isStopped(testOnly)) {
                 return SERVICE_STOPPED_ICON;
             }
             return SERVICE_STARTED_ICON;
@@ -5449,46 +5474,17 @@ public class ClusterBrowser extends Browser {
             }
             /* init save button */
             final boolean abExisted = applyButton != null;
+            final ServiceInfo thisClass = this;
             final ButtonCallback buttonCallback = new ButtonCallback() {
-                volatile Thread thread = null;
-                private final Mutex threadLock = new Mutex();
+                public final void mouseOut() {
+                    heartbeatGraph.stopTestAnimation(thisClass);
+                }
 
-                public void mouseOver() {
-                    try {
-                        threadLock.acquire();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                    if (thread != null) {
-//                        applyButton.setToolTipText(CRM.getPtestOutput());
-                        threadLock.release();
-                        System.out.println("thread already running");
-                        return;
-                    }
-                    thread = new Thread(new Runnable() {
-                        public void run() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    applyButton.setToolTipText(Tools.getString(
-                                              "ClusterBrowser.StartingPtest"));
-                                }
-                            });
-                            apply(true);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    try {
-                                        threadLock.acquire();
-                                    } catch (InterruptedException e) {
-                                        Thread.currentThread().interrupt();
-                                    }
-                                    thread = null;
-                                    threadLock.release();
-                                }
-                            });
-                        }
-                    });
-                    threadLock.release();
-                    thread.start();
+                public final void mouseOver() {
+                    heartbeatGraph.startTestAnimation(thisClass);
+                    applyButton.setToolTipText(Tools.getString(
+                              "ClusterBrowser.StartingPtest"));
+                    apply(true);
                 }
             };
             initApplyButton(buttonCallback);
@@ -5558,7 +5554,6 @@ public class ClusterBrowser extends Browser {
                 }
             }
             if (!getResourceAgent().isClone() && getGroupInfo() == null) {
-                final ServiceInfo thisClass = this;
                 typeRadioGroup = new GuiComboBox(defaultValue,
                                                  new String[]{"Primitive",
                                                               "Clone",
@@ -5854,6 +5849,7 @@ public class ClusterBrowser extends Browser {
          */
         public void apply(final boolean testOnly) {
             /* TODO: make progress indicator per resource. */
+            System.out.println("apply: " + testOnly);
             if (!testOnly) {
                 setUpdated(true);
             }
@@ -6068,7 +6064,7 @@ public class ClusterBrowser extends Browser {
                         getOperations(heartbeatId),
                         clusterStatus.getOperationsId(heartbeatId),
                         testOnly);
-                if (isFailed()) {
+                if (isFailed(testOnly)) {
                     cleanupResource(testOnly);
                 }
             }
@@ -6081,16 +6077,18 @@ public class ClusterBrowser extends Browser {
                 }
             }
             if (testOnly) {
-                applyButton.setToolTipText(CRM.ptest(dcHost));
+                final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
+                applyButton.setToolTipText(ptestData.getToolTip());
+                clusterStatus.setPtestData(ptestData);
             } else {
                 storeComboBoxValues(params);
                 if (cloneInfo != null) {
                     cloneInfo.storeComboBoxValues(cloneParams);
                 }
-            }
 
-            reload(getNode());
-            heartbeatGraph.repaint();
+                reload(getNode());
+                heartbeatGraph.repaint();
+            }
         }
 
         /**
@@ -6098,8 +6096,10 @@ public class ClusterBrowser extends Browser {
          */
         public void removeOrder(final ServiceInfo parent,
                                 final boolean testOnly) {
-            parent.setUpdated(true);
-            setUpdated(true);
+            if (!testOnly) {
+                parent.setUpdated(true);
+                setUpdated(true);
+            }
             final String parentHbId = parent.getService().getHeartbeatId();
             final String orderId =
                     clusterStatus.getOrderId(parentHbId,
@@ -6125,8 +6125,10 @@ public class ClusterBrowser extends Browser {
          * Adds order constraint from this service to the parent.
          */
         public void addOrder(final ServiceInfo parent, final boolean testOnly) {
-            parent.setUpdated(true);
-            setUpdated(true);
+            if (!testOnly) {
+                parent.setUpdated(true);
+                setUpdated(true);
+            }
             final String parentHbId = parent.getService().getHeartbeatId();
             final Map<String, String> attrs =
                                           new LinkedHashMap<String, String>();
@@ -6149,8 +6151,10 @@ public class ClusterBrowser extends Browser {
          */
         public void removeColocation(final ServiceInfo parent,
                                      final boolean testOnly) {
-            parent.setUpdated(true);
-            setUpdated(true);
+            if (!testOnly) {
+                parent.setUpdated(true);
+                setUpdated(true);
+            }
             final String parentHbId = parent.getService().getHeartbeatId();
             final String colocationId =
                 clusterStatus.getColocationId(parentHbId,
@@ -6174,8 +6178,10 @@ public class ClusterBrowser extends Browser {
          */
         public void addColocation(final ServiceInfo parent,
                                   final boolean testOnly) {
-            parent.setUpdated(true);
-            setUpdated(true);
+            if (!testOnly) {
+                parent.setUpdated(true);
+                setUpdated(true);
+            }
             final String parentHbId = parent.getService().getHeartbeatId();
             final Map<String, String> attrs =
                                    new LinkedHashMap<String, String>();
@@ -6315,9 +6321,11 @@ public class ClusterBrowser extends Browser {
         /**
          * Starts resource in crm.
          */
-        public void startResource(final boolean testOnly) {
-            setUpdated(true);
-            CRM.startResource(getDCHost(),
+        public void startResource(final boolean testOnly, final Host dcHost) {
+            if (!testOnly) {
+                setUpdated(true);
+            }
+            CRM.startResource(dcHost,
                               getService().getHeartbeatId(),
                               testOnly);
         }
@@ -6326,7 +6334,9 @@ public class ClusterBrowser extends Browser {
          * Stops resource in crm.
          */
         public void stopResource(final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             CRM.stopResource(getDCHost(),
                              getService().getHeartbeatId(),
                              testOnly);
@@ -6337,7 +6347,9 @@ public class ClusterBrowser extends Browser {
          */
         public void migrateResource(final String onHost,
                                     final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             CRM.migrateResource(getDCHost(),
                                 getService().getHeartbeatId(),
                                 onHost,
@@ -6348,7 +6360,9 @@ public class ClusterBrowser extends Browser {
          * Removes constraints created by resource migrate command.
          */
         public void unmigrateResource(final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             CRM.unmigrateResource(getDCHost(),
                                   getService().getHeartbeatId(),
                                   testOnly);
@@ -6357,16 +6371,20 @@ public class ClusterBrowser extends Browser {
         /**
          * Moves resource up in the group.
          */
-        public void moveGroupResUp() {
-            setUpdated(true);
+        public void moveGroupResUp(final boolean testOnly) {
+            if (!testOnly) {
+                setUpdated(true);
+            }
             CRM.moveGroupResUp(getDCHost(), getService().getHeartbeatId());
         }
 
         /**
          * Moves resource down in the group.
          */
-        public void moveGroupResDown() {
-            setUpdated(true);
+        public void moveGroupResDown(final boolean testOnly) {
+            if (!testOnly) {
+                setUpdated(true);
+            }
             CRM.moveGroupResDown(getDCHost(), getService().getHeartbeatId());
         }
 
@@ -6374,10 +6392,12 @@ public class ClusterBrowser extends Browser {
          * Cleans up the resource.
          */
         public void cleanupResource(final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             List<Host> dirtyHosts = new ArrayList<Host>();
             for (final Host host : getClusterHosts()) {
-                if (getFailCount(host.getName()) != null) {
+                if (getFailCount(host.getName(), testOnly) != null) {
                     dirtyHosts.add(host);
                 }
             }
@@ -6392,7 +6412,9 @@ public class ClusterBrowser extends Browser {
          * Removes the service without confirmation dialog.
          */
         protected void removeMyselfNoConfirm(final boolean testOnly) {
-            setUpdated(true);
+            if (!testOnly) {
+                setUpdated(true);
+            }
             getService().setRemoved(true);
             if (cloneInfo != null) {
                 cloneInfo.removeMyselfNoConfirm(testOnly);
@@ -6838,7 +6860,7 @@ public class ClusterBrowser extends Browser {
                                     getPopup().setVisible(false);
                                 }
                             });
-                            moveGroupResUp();
+                            moveGroupResUp(testOnly);
                         }
                     };
                 items.add(moveUpMenuItem);
@@ -6864,13 +6886,13 @@ public class ClusterBrowser extends Browser {
                                     getPopup().setVisible(false);
                                 }
                             });
-                            moveGroupResDown();
+                            moveGroupResDown(testOnly);
                         }
                     };
                 items.add(moveDownMenuItem);
                 registerMenuItem(moveDownMenuItem);
             }
-
+            final ServiceInfo thisClass = this;
             /* start resource */
             final MyMenuItem startMenuItem =
                 new MyMenuItem(
@@ -6883,7 +6905,7 @@ public class ClusterBrowser extends Browser {
                     public boolean enablePredicate() {
                         return !clStatusFailed()
                                && getService().isAvailable()
-                               && !isStarted();
+                               && !isStarted(testOnly);
                     }
 
                     public void action() {
@@ -6892,9 +6914,29 @@ public class ClusterBrowser extends Browser {
                                 getPopup().setVisible(false);
                             }
                         });
-                        startResource(testOnly);
+                        startResource(testOnly, getDCHost());
                     }
                 };
+            final ButtonCallback buttonCallback =
+                        new ButtonCallback() {
+                            public void mouseOut() {
+                                heartbeatGraph.stopTestAnimation(thisClass);
+                                startMenuItem.setToolTipText(null);
+                            }
+                            public void mouseOver() {
+                                heartbeatGraph.startTestAnimation(thisClass);
+                                startMenuItem.setToolTipText(Tools.getString(
+                                              "ClusterBrowser.StartingPtest"));
+                                final Host dcHost = getDCHost();
+                                startResource(true, dcHost); /* testOnly */
+                                final PtestData ptestData =
+                                           new PtestData(CRM.getPtest(dcHost));
+                                startMenuItem.setToolTipText(
+                                                       ptestData.getToolTip());
+                                clusterStatus.setPtestData(ptestData);
+                            }
+                        };
+            addMouseOverListener(startMenuItem, buttonCallback);
             items.add((UpdatableItem) startMenuItem);
             registerMenuItem((UpdatableItem) startMenuItem);
 
@@ -6910,7 +6952,7 @@ public class ClusterBrowser extends Browser {
                     public boolean enablePredicate() {
                         return !clStatusFailed()
                                && getService().isAvailable()
-                               && !isStopped();
+                               && !isStopped(testOnly);
                     }
 
                     public void action() {
@@ -6938,13 +6980,13 @@ public class ClusterBrowser extends Browser {
 
                     public boolean predicate() {
                         return getService().isAvailable()
-                               && isOneFailed();
+                               && isOneFailed(testOnly);
                     }
 
                     public boolean enablePredicate() {
                         return !clStatusFailed()
                                && getService().isAvailable()
-                               && isOneFailedCount();
+                               && isOneFailedCount(testOnly);
                     }
 
                     public void action() {
@@ -6974,7 +7016,7 @@ public class ClusterBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
-                        return !isManaged();
+                        return !isManaged(testOnly);
                     }
                     public boolean enablePredicate() {
                         return !clStatusFailed()
@@ -7059,7 +7101,7 @@ public class ClusterBrowser extends Browser {
 
                         public boolean enablePredicate() {
                             final List<String> runningOnNodes =
-                                                           getRunningOnNodes();
+                                                   getRunningOnNodes(testOnly);
                             if (runningOnNodes == null
                                 || runningOnNodes.size() == 0) {
                                 return false;
@@ -7099,7 +7141,7 @@ public class ClusterBrowser extends Browser {
                         // TODO: if it was migrated
                         return !clStatusFailed()
                                && getService().isAvailable()
-                               && getMigratedTo() != null;
+                               && getMigratedTo(testOnly) != null;
                     }
 
                     public void action() {
@@ -7118,9 +7160,9 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns tool tip for the hearbeat service.
          */
-        public String getToolTipText() {
+        public String getToolTipText(final boolean testOnly) {
             String nodeString = null;
-            final List<String> nodes = getRunningOnNodes();
+            final List<String> nodes = getRunningOnNodes(testOnly);
             if (nodes != null && nodes.size() > 0) {
                 nodeString =
                      Tools.join(", ", nodes.toArray(new String[nodes.size()]));
@@ -7132,15 +7174,15 @@ public class ClusterBrowser extends Browser {
             final StringBuffer sb = new StringBuffer(200);
             sb.append("<b>");
             sb.append(toString());
-            if (isFailed()) {
+            if (isFailed(testOnly)) {
                 sb.append("</b> <b>Failed</b>");
-            } else if (isStopped() || nodeString == null) {
+            } else if (isStopped(testOnly) || nodeString == null) {
                 sb.append("</b> not running");
             } else {
                 sb.append("</b> running on: ");
                 sb.append(nodeString);
             }
-            if (!isManaged()) {
+            if (!isManaged(testOnly)) {
                 sb.append(" (unmanaged)");
             }
             return sb.toString();
@@ -7168,10 +7210,10 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns text that appears in the corner of the graph.
          */
-        protected Subtext getRightCornerTextForGraph() {
-            if (!isManaged()) {
+        protected Subtext getRightCornerTextForGraph(final boolean testOnly) {
+            if (!isManaged(testOnly)) {
                 return UNMANAGED_SUBTEXT;
-            } else if (getMigratedTo() != null) {
+            } else if (getMigratedTo(testOnly) != null) {
                 return MIGRATED_SUBTEXT;
             }
             return null;
@@ -7180,12 +7222,12 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns text with lines as array that appears in the cluster graph.
          */
-        protected Subtext[] getSubtextsForGraph() {
+        protected Subtext[] getSubtextsForGraph(final boolean testOnly) {
             Color color = null;
             final List<Subtext> texts = new ArrayList<Subtext>();
-            if (isFailed()) {
+            if (isFailed(testOnly)) {
                 texts.add(new Subtext("not running:", null));
-            } else if (isStopped()) {
+            } else if (isStopped(testOnly)) {
                 texts.add(new Subtext("stopped",
                                       Tools.getDefaultColor(
                                           "HeartbeatGraph.FillPaintStopped")));
@@ -7194,7 +7236,8 @@ public class ClusterBrowser extends Browser {
                 if (allHostsDown()) {
                     runningOnNodeString = "unknown";
                 } else {
-                    final List<String> runningOnNodes = getRunningOnNodes();
+                    final List<String> runningOnNodes =
+                                                   getRunningOnNodes(testOnly);
                     if (runningOnNodes != null && runningOnNodes.size() > 0) {
                         runningOnNodeString = runningOnNodes.get(0);
                         color = cluster.getHostColors(runningOnNodes).get(0);
@@ -7209,13 +7252,14 @@ public class ClusterBrowser extends Browser {
                                            "HeartbeatGraph.FillPaintStopped")));
                 }
             }
-            if (isOneFailedCount()) {
+            if (isOneFailedCount(testOnly)) {
                 for (final Host host : getClusterHosts()) {
                     if (host.isClStatus()
-                        && getFailCount(host.getName()) != null) {
+                        && getFailCount(host.getName(), testOnly) != null) {
                         texts.add(new Subtext("    " + host.getName()
                                               + getFailCountString(
-                                                            host.getName()),
+                                                            host.getName(),
+                                                            testOnly),
                                   null));
                     }
                 }
@@ -7261,15 +7305,16 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns text that appears above the icon in the graph.
          */
-        public String getIconTextForGraph() {
+        public String getIconTextForGraph(final boolean testOnly) {
             if (allHostsDown()) {
                 return Tools.getString("ClusterBrowser.Hb.NoInfoAvailable");
             }
-            if (isStarted()) {
-                if (isRunning()) {
-                    final Host migratedTo = getMigratedTo();
+            if (isStarted(testOnly)) {
+                if (isRunning(testOnly)) {
+                    final Host migratedTo = getMigratedTo(testOnly);
                     if (migratedTo != null) {
-                        final List<String> runningOnNodes = getRunningOnNodes();
+                        final List<String> runningOnNodes =
+                                                   getRunningOnNodes(testOnly);
                         if (runningOnNodes != null
                             && !runningOnNodes.contains(migratedTo.getName())) {
                             return Tools.getString(
@@ -7277,14 +7322,14 @@ public class ClusterBrowser extends Browser {
                         }
                     }
                     return null;
-                } else if (isFailed()) {
+                } else if (isFailed(testOnly)) {
                     return Tools.getString("ClusterBrowser.Hb.StartingFailed");
 
                 } else {
                     return Tools.getString("ClusterBrowser.Hb.Starting");
                 }
-            } else if (isStopped()) {
-                if (isRunning()) {
+            } else if (isStopped(testOnly)) {
+                if (isRunning(testOnly)) {
                     return Tools.getString("ClusterBrowser.Hb.Stopping");
                 } else {
                     return null;
@@ -7401,20 +7446,21 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether the resource has failed to start.
          */
-        public boolean isFailed() {
+        public boolean isFailed(final boolean testOnly) {
             final ServiceInfo ci = containedService;
             if (ci != null) {
-                return ci.isFailed();
+                return ci.isFailed(testOnly);
             }
             return false;
         }
         /**
          * Returns fail count.
          */
-        protected final String getFailCount(final String hostName) {
+        protected final String getFailCount(final String hostName,
+                                            final boolean testOnly) {
             final ServiceInfo ci = containedService;
             if (ci != null) {
-                return ci.getFailCount(hostName);
+                return ci.getFailCount(hostName, testOnly);
             }
             return "";
         }
@@ -7441,8 +7487,8 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns color for the host vertex.
          */
-        public List<Color> getHostColors() {
-             List<String> nodes = getRunningOnNodes();
+        public List<Color> getHostColors(final boolean testOnly) {
+             List<String> nodes = getRunningOnNodes(testOnly);
              final List<String> slaves = getSlaveOnNodes();
              int nodesCount = 0;
              if (nodes != null) {
@@ -7467,11 +7513,12 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns fail count string that appears in the graph.
          */
-        private String getFailCountString(final String hostName) {
+        private String getFailCountString(final String hostName,
+                                          final boolean testOnly) {
             String fcString = "";
             if (containedService != null) {
                 final String failCount =
-                                       containedService.getFailCount(hostName);
+                             containedService.getFailCount(hostName, testOnly);
                 if (failCount != null) {
                     if ("INFINITY".equals(failCount)) {
                         fcString = " failed";
@@ -7486,7 +7533,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns text with lines as array that appears in the cluster graph.
          */
-        protected final Subtext[] getSubtextsForGraph() {
+        protected final Subtext[] getSubtextsForGraph(final boolean testOnly) {
             final List<Subtext> texts = new ArrayList<Subtext>();
             final Set<String> notRunningOnNodes = new LinkedHashSet<String>();
             for (final Host h : getClusterHosts()) {
@@ -7496,7 +7543,7 @@ public class ClusterBrowser extends Browser {
             if (allHostsDown()) {
                 return texts.toArray(new Subtext[texts.size()]);
             }
-            List<String> runningOnNodes = getRunningOnNodes();
+            List<String> runningOnNodes = getRunningOnNodes(testOnly);
             if (runningOnNodes != null && runningOnNodes.size() > 0) {
                 if (containedService != null
                     && containedService.getResourceAgent().isLinbitDrbd()) {
@@ -7510,7 +7557,8 @@ public class ClusterBrowser extends Browser {
                                        cluster.getHostColors(runningOnNodes);
                 int i = 0;
                 for (final String n : runningOnNodes) {
-                    texts.add(new Subtext("    " + n + getFailCountString(n),
+                    texts.add(new Subtext("    " + n
+                                          + getFailCountString(n, testOnly),
                                           colors.get(i)));
                     notRunningOnNodes.remove(n);
                     i++;
@@ -7530,7 +7578,7 @@ public class ClusterBrowser extends Browser {
                     }
                     for (final String n : slaveOnNodes) {
                         texts.add(new Subtext("    " + n
-                                              + getFailCountString(n),
+                                              + getFailCountString(n, testOnly),
                                               colors.get(i)));
                         notRunningOnNodes.remove(n);
                         i++;
@@ -7540,18 +7588,18 @@ public class ClusterBrowser extends Browser {
             if (notRunningOnNodes.size() > 0) {
                 final Color nColor = Tools.getDefaultColor(
                                             "HeartbeatGraph.FillPaintStopped");
-                if (isStopped()) {
+                if (isStopped(testOnly)) {
                     texts.add(new Subtext("stopped", nColor));
                 } else {
                     texts.add(new Subtext("not running on:", nColor));
                     for (final String n : notRunningOnNodes) {
                         Color color = nColor;
-                        if (failedOnHost(n)) {
+                        if (failedOnHost(n, testOnly)) {
                             color = null;
                         }
                         texts.add(new Subtext("    "
                                               + n
-                                              + getFailCountString(n),
+                                              + getFailCountString(n, testOnly),
                                               color));
                     }
                 }
@@ -7593,17 +7641,17 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether service is started.
          */
-        public final boolean isStarted() {
+        public final boolean isStarted(final boolean testOnly) {
             final String hbV = getDCHost().getHeartbeatVersion();
             final String pmV = getDCHost().getPacemakerVersion();
             if (pmV == null
                 && hbV != null
                 && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                return super.isStarted();
+                return super.isStarted(testOnly);
             } else {
                 final ServiceInfo cs = containedService;
                 if (cs != null) {
-                    return cs.isStarted();
+                    return cs.isStarted(testOnly);
                 }
                 return false;
             }
@@ -7612,17 +7660,17 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether service is started.
          */
-        public final boolean isStopped() {
+        public final boolean isStopped(final boolean testOnly) {
             final String hbV = getDCHost().getHeartbeatVersion();
             final String pmV = getDCHost().getPacemakerVersion();
             if (pmV == null
                 && hbV != null
                 && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                return super.isStopped();
+                return super.isStopped(testOnly);
             } else {
                 final ServiceInfo cs = containedService;
                 if (cs != null) {
-                    return cs.isStopped();
+                    return cs.isStopped(testOnly);
                 }
                 return false;
             }
@@ -7631,17 +7679,17 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns whether service is managed.
          */
-        public final boolean isManaged() {
+        public final boolean isManaged(final boolean testOnly) {
             final String hbV = getDCHost().getHeartbeatVersion();
             final String pmV = getDCHost().getPacemakerVersion();
             if (pmV == null
                 && hbV != null
                 && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                return super.isManaged();
+                return super.isManaged(testOnly);
             } else {
                 final ServiceInfo cs = containedService;
                 if (cs != null) {
-                    return cs.isManaged();
+                    return cs.isManaged(testOnly);
                 }
                 return false;
             }
@@ -7674,17 +7722,18 @@ public class ClusterBrowser extends Browser {
         /**
          * Starts resource in crm.
          */
-        public final void startResource(final boolean testOnly) {
-            final String hbV = getDCHost().getHeartbeatVersion();
-            final String pmV = getDCHost().getPacemakerVersion();
+        public final void startResource(final boolean testOnly,
+                                        final Host dcHost) {
+            final String hbV = dcHost.getHeartbeatVersion();
+            final String pmV = dcHost.getPacemakerVersion();
             if (pmV == null
                 && hbV != null
                 && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                super.startResource(testOnly);
+                super.startResource(testOnly, dcHost);
             } else {
                 final ServiceInfo cs = containedService;
                 if (cs != null) {
-                    cs.startResource(testOnly);
+                    cs.startResource(testOnly, dcHost);
                 }
             }
         }
@@ -8103,8 +8152,10 @@ public class ClusterBrowser extends Browser {
                                       clusterStatus.getParamValuePairs(
                                           newCi.getService().getHeartbeatId());
                 newCi.setParameters(resourceNode);
-                newCi.setUpdated(false);
-                heartbeatGraph.repaint();
+                if (!testOnly) {
+                    newCi.setUpdated(false);
+                    heartbeatGraph.repaint();
+                }
             }
             heartbeatGraph.setVertexIsPresent(newCi);
             return newCi;
@@ -8140,8 +8191,10 @@ public class ClusterBrowser extends Browser {
                                         clusterStatus.getParamValuePairs(
                                           newGi.getService().getHeartbeatId());
                 newGi.setParameters(resourceNode);
-                newGi.setUpdated(false);
-                heartbeatGraph.repaint();
+                if (!testOnly) {
+                    newGi.setUpdated(false);
+                    heartbeatGraph.repaint();
+                }
             }
             return newGi;
         }
@@ -8237,8 +8290,10 @@ public class ClusterBrowser extends Browser {
                     }
                 } else {
                     newSi.setParameters(resourceNode);
-                    newSi.setUpdated(false);
-                    heartbeatGraph.repaint();
+                    if (!testOnly) {
+                        newSi.setUpdated(false);
+                        heartbeatGraph.repaint();
+                    }
                 }
                 newSi.getService().setNew(false);
                 //newSi.getTypeRadioGroup().setEnabled(false);
@@ -9387,7 +9442,7 @@ public class ClusterBrowser extends Browser {
                 if (!value.equals(getResource().getValue(param))) {
                     changed = true;
                 }
-                    attrs.put(param, value);
+                attrs.put(param, value);
             }
             if (changed) {
                 CRM.addColocation(

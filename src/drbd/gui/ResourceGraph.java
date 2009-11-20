@@ -139,6 +139,12 @@ public abstract class ResourceGraph {
     private final List<Info> animationList = new ArrayList<Info>();
     /** This mutex is for protecting the animation list. */
     private final Mutex mAnimationListLock = new Mutex();
+    /** List with resources that should be animated for test view. */
+    private final List<Info> testAnimationList = new ArrayList<Info>();
+    /** This mutex is for protecting the test animation list. */
+    private final Mutex mTestAnimationListLock = new Mutex();
+    /** Animation thread */
+    private volatile Thread animationThread = null;
     /** Map from vertex to its width. */
     private final Map<Vertex, Integer>vertexWidth =
                                                new HashMap<Vertex, Integer>();
@@ -147,6 +153,11 @@ public abstract class ResourceGraph {
                                                new HashMap<Vertex, Integer>();
     /** Whether something in the graph changed that requires vv to restart. */
     private volatile boolean changed = false;
+
+    /** Whether only test or real thing should show. */
+    private volatile boolean testOnlyFlag = false;
+    /** Test animation thread */
+    private volatile Thread testAnimationThread = null;
 
     /**
      * Prepares a new <code>ResourceGraph</code> object.
@@ -167,34 +178,37 @@ public abstract class ResourceGraph {
         }
         if (animationList.isEmpty()) {
             /* start animation thread */
-            final Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    while (true) {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException ex) {
-                            Thread.currentThread().interrupt();
-                        }
+            if (animationThread == null) {
+                animationThread = new Thread(new Runnable() {
+                    public void run() {
+                        while (true) {
+                            try {
+                                Thread.sleep(50);
+                            } catch (InterruptedException ex) {
+                                Thread.currentThread().interrupt();
+                            }
 
-                        try {
-                            mAnimationListLock.acquire();
-                        } catch (java.lang.InterruptedException ie) {
-                            Thread.currentThread().interrupt();
-                        }
-                        if (animationList.isEmpty()) {
+                            try {
+                                mAnimationListLock.acquire();
+                            } catch (java.lang.InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                            }
+                            if (animationList.isEmpty()) {
+                                mAnimationListLock.release();
+                                repaint();
+                                animationThread = null;
+                                break;
+                            }
+                            for (final Info info : animationList) {
+                                info.incAnimationIndex();
+                            }
                             mAnimationListLock.release();
                             repaint();
-                            break;
                         }
-                        for (final Info info : animationList) {
-                            info.incAnimationIndex();
-                        }
-                        mAnimationListLock.release();
-                        repaint();
                     }
-                }
-            });
-            thread.start();
+                });
+                animationThread.start();
+            }
         }
         animationList.add(info);
         mAnimationListLock.release();
@@ -212,6 +226,72 @@ public abstract class ResourceGraph {
         animationList.remove(info);
         mAnimationListLock.release();
     }
+
+    /**
+     * Starts the animation if vertex is being tested.
+     */
+    public final void startTestAnimation(final Info info) {
+        try {
+            mTestAnimationListLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        if (testAnimationList.isEmpty()) {
+            if (testAnimationThread == null) {
+                /* start test animation thread */
+                testOnlyFlag = false;
+                testAnimationThread = new Thread(new Runnable() {
+                    public void run() {
+                        while (true) {
+                            try {
+                                if (testOnlyFlag) {
+                                    Thread.sleep(800);
+                                } else {
+                                    Thread.sleep(200);
+                                }
+                            } catch (InterruptedException ex) {
+                                Thread.currentThread().interrupt();
+                            }
+
+                            try {
+                                mTestAnimationListLock.acquire();
+                            } catch (java.lang.InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                            }
+                            if (testAnimationList.isEmpty()) {
+                                mTestAnimationListLock.release();
+                                repaint();
+                                testAnimationThread = null;
+                                break;
+                            }
+                            testOnlyFlag = !testOnlyFlag;
+                            mTestAnimationListLock.release();
+                            repaint();
+                        }
+                    }
+                });
+                testAnimationThread.start();
+            }
+        }
+        testAnimationList.add(info);
+        mTestAnimationListLock.release();
+    }
+
+    /**
+     * Stops the test animation.
+     */
+    public final void stopTestAnimation(final Info info) {
+        try {
+            mTestAnimationListLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        testAnimationList.remove(info);
+        testOnlyFlag = false;
+        mTestAnimationListLock.release();
+        repaint();
+    }
+
 
 
     /**
@@ -531,7 +611,8 @@ public abstract class ResourceGraph {
     /**
      * Returns label for vertex v.
      */
-    protected abstract String getMainText(final ArchetypeVertex v);
+    protected abstract String getMainText(final ArchetypeVertex v,
+                                          final boolean testOnly);
 
     /**
      * Returns label for edge e.
@@ -1087,7 +1168,8 @@ public abstract class ResourceGraph {
      * Returns an icon for vertex.
      */
     protected abstract List<ImageIcon> getIconsForVertex(
-                                                      final ArchetypeVertex v);
+                                                      final ArchetypeVertex v,
+                                                      final boolean testOnly);
 
     /**
      * This method draws in the host vertex.
@@ -1144,7 +1226,7 @@ public abstract class ResourceGraph {
             int shapeWidth = getDefaultVertexWidth(v);
             int shapeHeight = getDefaultVertexHeight(v);
             /* main text */
-            final String mainText = getMainText(v);
+            final String mainText = getMainText(v, isTestOnly());
             TextLayout mainTextLayout = null;
             if (mainText != null && !mainText.equals("")) {
                 mainTextLayout = getVertexTextLayout(g2d, mainText, 1);
@@ -1156,7 +1238,7 @@ public abstract class ResourceGraph {
             }
 
             /* icon text */
-            final String iconText = getIconText(v);
+            final String iconText = getIconText(v, isTestOnly());
             int iconTextWidth = 0;
             TextLayout iconTextLayout = null;
             if (iconText != null && !iconText.equals("")) {
@@ -1166,7 +1248,7 @@ public abstract class ResourceGraph {
             }
 
             /* right corner text */
-            final Subtext rightCornerText = getRightCornerText(v);
+            final Subtext rightCornerText = getRightCornerText(v, isTestOnly());
             TextLayout rightCornerTextLayout = null;
             if (rightCornerText != null && !rightCornerText.equals("")) {
                 rightCornerTextLayout = getVertexTextLayout(
@@ -1182,14 +1264,16 @@ public abstract class ResourceGraph {
             }
 
             /* subtext */
-            final Subtext[] subtexts = getSubtexts(v);
+            final Subtext[] subtexts = getSubtexts(v, isTestOnly());
             TextLayout[] subtextLayouts = null;
             if (subtexts != null) {
                 subtextLayouts = new TextLayout[subtexts.length];
                 int i = 0;
                 for (final Subtext subtext : subtexts) {
                     subtextLayouts[i] =
-                           getVertexTextLayout(g2d, subtext.getSubtext(), 0.8);
+                           getVertexTextLayout(g2d,
+                                               subtext.getSubtext(),
+                                               0.8);
                     final int subtextWidth =
                                 (int) subtextLayouts[i].getBounds().getWidth();
                     if (subtextWidth + 10 > shapeWidth) {
@@ -1242,7 +1326,7 @@ public abstract class ResourceGraph {
             drawInside(v, g2d, x, y, shape);
 
             /* icon */
-            final List<ImageIcon> icons = getIconsForVertex(v);
+            final List<ImageIcon> icons = getIconsForVertex(v, isTestOnly());
             if (icons != null) {
                 for (final ImageIcon icon : icons) {
                     icon.setDescription("sdf");
@@ -1346,17 +1430,20 @@ public abstract class ResourceGraph {
     /**
      * Small text that appears above the icon.
      */
-    protected abstract String getIconText(final Vertex v);
+    protected abstract String getIconText(final Vertex v,
+                                          final boolean testOnly);
 
     /**
      * Small text that appears in the right corner.
      */
-    protected abstract Subtext getRightCornerText(final Vertex v);
+    protected abstract Subtext getRightCornerText(final Vertex v,
+                                                  final boolean testOnly);
 
     /**
      * Small text that appears down.
      */
-    protected abstract Subtext[] getSubtexts(final Vertex v);
+    protected abstract Subtext[] getSubtexts(final Vertex v,
+                                             final boolean testOnly);
 
     /**
      * Returns positions of the vertices (by value).
@@ -1451,5 +1538,11 @@ public abstract class ResourceGraph {
      */
     protected final void somethingChanged() {
         changed = true;
+    }
+    /**
+     * Returns if it is testOnly.
+     */
+    protected final boolean isTestOnly() {
+        return testOnlyFlag;
     }
 }

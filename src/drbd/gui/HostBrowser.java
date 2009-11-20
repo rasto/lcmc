@@ -983,7 +983,7 @@ public class HostBrowser extends Browser {
          * Returns subtexts that appears in the host vertex in the cluster
          * graph.
          */
-        public final Subtext[] getSubtextsForGraph() {
+        public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
             final List<Subtext> texts = new ArrayList<Subtext>();
             if (getHost().isConnected()) {
                 if (!getHost().isClStatus()) {
@@ -1000,7 +1000,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears above the icon in the graph.
          */
-        public String getIconTextForGraph() {
+        public String getIconTextForGraph(final boolean testOnly) {
             if (!getHost().isConnected()) {
                 return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
             }
@@ -1025,7 +1025,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears in the corner of the graph.
          */
-        protected Subtext getRightCornerTextForGraph() {
+        protected Subtext getRightCornerTextForGraph(final boolean testOnly) {
             if (getHost().isClStatus()) {
                 if (isStandby()) {
                     return STANDBY_SUBTEXT;
@@ -1543,7 +1543,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns subtexts that appears in the host vertex in the drbd graph.
          */
-        public final Subtext[] getSubtextsForDrbdGraph() {
+        public final Subtext[] getSubtextsForDrbdGraph(final boolean testOnly) {
             final List<Subtext> texts = new ArrayList<Subtext>();
             if (getHost().isConnected()) {
                 if (!getHost().isDrbdLoaded()) {
@@ -1560,7 +1560,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears above the icon in the drbd graph.
          */
-        public String getIconTextForDrbdGraph() {
+        public String getIconTextForDrbdGraph(final boolean testOnly) {
             if (!getHost().isConnected()) {
                 return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
             }
@@ -1570,7 +1570,8 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears in the corner of the drbd graph.
          */
-        protected Subtext getRightCornerTextForDrbdGraph() {
+        protected Subtext getRightCornerTextForDrbdGraph(
+                                                     final boolean testOnly) {
             return null;
         }
     }
@@ -2834,7 +2835,7 @@ public class HostBrowser extends Browser {
          /**
           * Returns text that appears above the icon.
           */
-        public String getIconTextForGraph() {
+        public String getIconTextForGraph(final boolean testOnly) {
             if (!getHost().isConnected()) {
                 return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
             }
@@ -2847,7 +2848,8 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears in the corner of the drbd graph.
          */
-        protected Subtext getRightCornerTextForDrbdGraph() {
+        protected Subtext getRightCornerTextForDrbdGraph(
+                                                      final boolean testOnly) {
              if (getBlockDevice().isDrbdMetaDisk()) {
                  return METADISK_SUBTEXT;
              } else if (getBlockDevice().isSwap()) {

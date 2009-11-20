@@ -71,6 +71,7 @@ import javax.swing.event.DocumentEvent;
 
 import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class holds host and cluster resource data in a tree. It shows
@@ -772,6 +773,72 @@ public class Browser {
         }
 
         /**
+         * Adds mouse over listener.
+         */
+        protected final void addMouseOverListener(final Component c,
+                                                  final ButtonCallback bc) {
+            c.addMouseListener(new MouseListener() {
+                volatile Thread thread = null;
+                private final Mutex threadLock = new Mutex();
+
+                public void mouseClicked(final MouseEvent e) {
+                    /* do nothing */
+                }
+
+                public void mouseEntered(final MouseEvent e) {
+                    System.out.println("mouse entered");
+                    if (c.isShowing()
+                        && c.isEnabled()) {
+                        try {
+                            threadLock.acquire();
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                        if (thread != null) {
+                            threadLock.release();
+                            System.out.println("thread already running");
+                            return;
+                        }
+                        thread = new Thread(new Runnable() {
+                            public void run() {
+                                bc.mouseOver();
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        try {
+                                            threadLock.acquire();
+                                        } catch (InterruptedException e) {
+                                            Thread.currentThread().interrupt();
+                                        }
+                                        thread = null;
+                                        threadLock.release();
+                                    }
+                                });
+                            }
+                        });
+                        threadLock.release();
+                        thread.start();
+                    }
+                }
+
+                public void mouseExited(final MouseEvent e) {
+                    System.out.println("mouse left");
+                    if (c.isShowing()
+                        && c.isEnabled()) {
+                        bc.mouseOut();
+                    }
+                }
+
+                public void mousePressed(final MouseEvent e) {
+                    /* do nothing */
+                }
+
+                public void mouseReleased(final MouseEvent e) {
+                    /* do nothing */
+                }
+            });
+        }
+
+        /**
          * Inits apply button.
          */
         public final void initApplyButton(final ButtonCallback buttonCallback) {
@@ -788,32 +855,7 @@ public class Browser {
             }
             applyButton.setEnabled(false);
             if (buttonCallback != null) {
-                applyButton.addMouseListener(new MouseListener() {
-                    public void mouseClicked(final MouseEvent e) {
-                        /* do nothing */
-                    }
-
-                    public void mouseEntered(final MouseEvent e) {
-                        System.out.println("mouse entered");
-                        if (applyButton.isShowing()
-                            && applyButton.isEnabled()) {
-                            buttonCallback.mouseOver();
-                        }
-                    }
-
-                    public void mouseExited(final MouseEvent e) {
-                        System.out.println("mouse left");
-                        /* do nothing */
-                    }
-
-                    public void mousePressed(final MouseEvent e) {
-                        /* do nothing */
-                    }
-
-                    public void mouseReleased(final MouseEvent e) {
-                        /* do nothing */
-                    }
-                });
+                addMouseOverListener(applyButton, buttonCallback);
             }
         }
 

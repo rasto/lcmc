@@ -1404,7 +1404,8 @@ public class TextResource extends
          "Filesystem + drbddisk (obsolete)"},
 
         {"ClusterBrowser.StartingPtest",
-         "Starting What-if machine..."},
+         "<html><b>What happens when you apply it:</b><br>"
+         + "Starting What-if machine...</html>"},
 
         {"CRM.Ptest.ToolTip",
          "What happens when you apply it:"},

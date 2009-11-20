@@ -53,8 +53,6 @@ public class MyButton extends JButton {
     private Color color2;
     /** Robot to move a mouse a little if a tooltip has changed. */
     private Robot robot = null;
-    /** Offset, workaround for flipped dual monitors. */
-    private int xOffset = 0;
     /** Button tooltip. */
     private JToolTip tip = null;
 
@@ -119,18 +117,7 @@ public class MyButton extends JButton {
         try {
             robot = new Robot(MouseInfo.getPointerInfo().getDevice());
         } catch (java.awt.AWTException e) {
-        }
-        final GraphicsDevice[] devices =
-          GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-        if (devices.length == 2) {
-            /* workaround for dual monitors that are flipped. */
-            //TODO: not sure how is it with three monitors
-            final int x1 = devices[0].getDefaultConfiguration().getBounds().x;
-            final int x2 = devices[1].getDefaultConfiguration().getBounds().x;
-            System.out.println("x1: " + x1 + ", x2: " + x2);
-            if (x1 > x2) {
-                xOffset = -x1;
-            }
+            Tools.appError("Robot error");
         }
 
         this.color1 = c1;
@@ -154,6 +141,21 @@ public class MyButton extends JButton {
         if (tip != null) {
             if (tip.isShowing()) {
                 if (robot != null) {
+                final GraphicsDevice[] devices =
+                            GraphicsEnvironment.getLocalGraphicsEnvironment()
+                                               .getScreenDevices();
+                    int xOffset = 0;
+                    if (devices.length == 2) {
+                        /* workaround for dual monitors that are flipped. */
+                        //TODO: not sure how is it with three monitors
+                        final int x1 =
+                            devices[0].getDefaultConfiguration().getBounds().x;
+                        final int x2 =
+                            devices[1].getDefaultConfiguration().getBounds().x;
+                        if (x1 > x2) {
+                            xOffset = -x1;
+                        }
+                    }
                     final Point2D p = MouseInfo.getPointerInfo().getLocation();
                     System.out.println("mouse x: " + p.getX()
                                         + ", y: " + p.getY()

@@ -43,10 +43,14 @@ import org.apache.commons.collections.map.MultiKeyMap;
 public class ClusterStatus {
     /** Data from cib query. */
     private volatile CibQuery cibQueryMap = new CibQuery();
+    /** Data from shadow cib */
+    private volatile CibQuery shadowCibQueryMap = new CibQuery();
     /** CRMXML object. */
     private final CRMXML crmXML;
     /** On which node the resource is running or is a slave. */
-    private volatile Map<String, ResStatus> resStatusMap = null;
+    private volatile Map<String, ResStatus> resStateMap = null;
+    /** Results from ptest. */
+    private volatile PtestData ptestData = null;
 
     /**
      * Prepares a new <code>ClusterStatus</code> object.
@@ -93,9 +97,15 @@ public class ClusterStatus {
     /**
      * Returns value of parameter.
      */
-    public final String getParameter(final String hbId, final String param) {
-        final Map<String, String> params =
-                                        cibQueryMap.getParameters().get(hbId);
+    public final String getParameter(final String hbId,
+                                     final String param,
+                                     final boolean testOnly) {
+        final Map<String, String> params;
+        if (testOnly) {
+            params = shadowCibQueryMap.getParameters().get(hbId);
+        } else {
+            params = cibQueryMap.getParameters().get(hbId);
+        }
         if (params != null) {
             return params.get(param);
         }
@@ -427,11 +437,19 @@ public class ClusterStatus {
     /**
      * Returns on which nodes the resource is running.
      */
-    public final List<String> getRunningOnNodes(final String hbId) {
-        if (resStatusMap == null) {
+    public final List<String> getRunningOnNodes(final String hbId,
+                                                final boolean testOnly) {
+        final PtestData pd = ptestData;
+        if (testOnly && pd != null) {
+            final List<String> ron = pd.getRunningOnNodes(hbId);
+            if (ron != null) {
+                return ron;
+            }
+        }
+        if (resStateMap == null) {
             return null;
         }
-        final ResStatus resStatus = resStatusMap.get(hbId);
+        final ResStatus resStatus = resStateMap.get(hbId);
         if (resStatus == null) {
             return null;
         }
@@ -442,10 +460,10 @@ public class ClusterStatus {
      * Returns on which nodes the resource is slave.
      */
     public final List<String> getSlaveOnNodes(final String hbId) {
-        if (resStatusMap == null) {
+        if (resStateMap == null) {
             return null;
         }
-        final ResStatus resStatus = resStatusMap.get(hbId);
+        final ResStatus resStatus = resStateMap.get(hbId);
         if (resStatus == null) {
             return null;
         }
@@ -472,7 +490,9 @@ public class ClusterStatus {
     /**
      * Returns fail count of the service on the specified node.
      */
-     public final String getFailCount(final String node, final String res) {
+     public final String getFailCount(final String node,
+                                      final String res,
+                                      final boolean testOnly) {
          return cibQueryMap.getFailCount(node, res);
      }
 
@@ -569,7 +589,7 @@ public class ClusterStatus {
      * Parses output from crm_mon.
      */
     private void parseResStatus(final String resStatus) {
-        resStatusMap = crmXML.parseResStatus(resStatus);
+        resStateMap = crmXML.parseResStatus(resStatus);
     }
 
     /**
@@ -577,5 +597,15 @@ public class ClusterStatus {
      */
     private void parseCibQuery(final String query) {
         cibQueryMap = crmXML.parseCibQuery(query);
+    }
+
+    /**
+     * Sets data from ptest.
+     */
+    public final void setPtestData(final PtestData ptestData) {
+        this.ptestData = ptestData;
+        if (ptestData != null) {
+            shadowCibQueryMap = crmXML.parseCibQuery(ptestData.getShadowCib());
+        }
     }
 }

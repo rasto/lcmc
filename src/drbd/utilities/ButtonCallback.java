@@ -31,4 +31,8 @@ public interface ButtonCallback {
      * On mouse over.
      */
     void mouseOver();
+    /**
+     * On mouse out.
+     */
+    void mouseOut();
 }

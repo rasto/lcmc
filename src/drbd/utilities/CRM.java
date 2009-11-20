@@ -40,6 +40,8 @@ public final class CRM {
     private volatile static String ptestOutput = null;
     /** Ptest lock. */
     private final static Mutex mPtestLock = new Mutex();
+    /** Delimiter that delimits the ptest and test cib part. */
+    public final static String PTEST_END_DELIM = "--- PTEST END ---";
     /**
      * No instantiation.
      */
@@ -52,19 +54,14 @@ public final class CRM {
      */
     public static String getCibCommand(final String command,
                                        final String objType,
-                                       final String xml,
-                                       final boolean testOnly) {
-        final StringBuffer cmd = new StringBuffer(200);
-        if (testOnly) {
-            cmd.append("export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                       + "if [ ! -e $file ]; then cibadmin -Ql > $file;fi;"
-                       + "CIB_file=$file ");
-        }
-        cmd.append("/usr/sbin/cibadmin --obj_type "
-                   + objType + " " + command + " -X " + xml);
-        //if (testOnly) {
-        //    cmd.append(";ptest -VVV -x $file 2>&1");
-        //}
+                                       final String xml) {
+        final StringBuffer cmd = new StringBuffer(300);
+        cmd.append("/usr/sbin/cibadmin --obj_type ");
+        cmd.append(objType);
+        cmd.append(' ');
+        cmd.append(command);
+        cmd.append(" -X ");
+        cmd.append(xml);
         return cmd.toString();
     }
 
@@ -83,35 +80,11 @@ public final class CRM {
         ptestOutput = null;
         mPtestLock.release();
         if (testOnly) {
-            Tools.execCommand(host, command, null, false);
-            //final String output = Tools.execCommand(host, command, null, false);
-            ////System.out.println("ptest: " + output);
-            //final StringBuffer sb = new StringBuffer(300);
-            //sb.append("<html><b>");
-            //sb.append(Tools.getString("CRM.Ptest.ToolTip"));
-            //sb.append("</b><br>");
-            //for (final String line : output.split("\\n")) {
-            //    final String[] prefixes = new String[]{"native_color: ",
-            //                                           "LogActions: "};
-            //    for (final String prefix : prefixes) {
-            //        final int index = line.indexOf(prefix);
-            //        if (index > 0) {
-            //            sb.append(line.substring(index + prefix.length()));
-            //            sb.append("<br>");
-            //        }
-            //    }
-
-            //}
-            //sb.append("</html>");
-            //try {
-            //    mPtestLock.acquire();
-            //} catch (InterruptedException e) {
-            //    Thread.currentThread().interrupt();
-            //}
-            //if (ptestOutput == null) {
-            //    ptestOutput = sb.toString();
-            //}
-            //mPtestLock.release();
+            final String testCmd =
+                          "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
+                          + "if [ ! -e $file ]; then cibadmin -Ql > $file;fi;"
+                          + "CIB_file=$file ";
+            Tools.execCommand(host, testCmd + command, null, false);
         } else {
             Tools.execCommandProgressIndicator(
                                     host,
@@ -122,7 +95,7 @@ public final class CRM {
         }
     }
 
-    public static String ptest(final Host host) {
+    public static String getPtest(final Host host) {
         try {
             mPtestLock.acquire();
         } catch (InterruptedException e) {
@@ -136,32 +109,17 @@ public final class CRM {
         mPtestLock.release();
         final String command =
                     "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                    + "ptest -VVV -x $file 2>&1";
+                    + "ptest -VVV -x $file 2>&1;echo '"
+                    + PTEST_END_DELIM
+                    + "';cat $file;"
+                    + "rm $file";
         final String output = Tools.execCommand(host, command, null, false);
-        //System.out.println("ptest: " + output);
-        final StringBuffer sb = new StringBuffer(300);
-        sb.append("<html><b>");
-        sb.append(Tools.getString("CRM.Ptest.ToolTip"));
-        sb.append("</b><br>");
-        for (final String line : output.split("\\n")) {
-            final String[] prefixes = new String[]{"native_color: ",
-                                                   "LogActions: "};
-            for (final String prefix : prefixes) {
-                final int index = line.indexOf(prefix);
-                if (index > 0) {
-                    sb.append(line.substring(index + prefix.length()));
-                    sb.append("<br>");
-                }
-            }
-
-        }
-        sb.append("</html>");
         try {
             mPtestLock.acquire();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        final String po = sb.toString();
+        final String po = output;
         if (ptestOutput == null) {
             ptestOutput = po;
         }
@@ -331,8 +289,7 @@ public final class CRM {
         execCommand(host,
                     getCibCommand(command,
                                   "resources",
-                                  xml.toString(),
-                                  testOnly),
+                                  xml.toString()),
                     true,
                     testOnly);
     }
@@ -405,8 +362,7 @@ public final class CRM {
         execCommand(host,
                     getCibCommand(command,
                                   "constraints",
-                                  xml.toString(),
-                                  testOnly),
+                                  xml.toString()),
                     true,
                     testOnly);
     }
@@ -431,8 +387,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString(),
-                                             testOnly);
+                                             xml.toString());
         execCommand(host, command, true, testOnly);
     }
 
@@ -498,8 +453,7 @@ public final class CRM {
         final String command = getCibCommand(
                                       "-D",
                                       "resources",
-                                      xml.toString(),
-                                      testOnly);
+                                      xml.toString());
         execCommand(host, command, true, testOnly);
     }
 
@@ -538,6 +492,7 @@ public final class CRM {
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
+        final StringBuffer testcmd = new StringBuffer(300);
         final String command = host.getDistCommand(cmd, replaceHash);
         execCommand(host, command, true, testOnly);
     }
@@ -706,8 +661,7 @@ public final class CRM {
         xml.append("</cluster_property_set></crm_config>'");
         final String command = getCibCommand("-R",
                                              "crm_config",
-                                             xml.toString(),
-                                             testOnly);
+                                             xml.toString());
         execCommand(host, command, true, testOnly);
     }
 
@@ -745,8 +699,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString(),
-                                             testOnly);
+                                             xml.toString());
         execCommand(host, command, true, testOnly);
     }
 
@@ -806,8 +759,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
-                                             xml.toString(),
-                                             testOnly);
+                                             xml.toString());
         execCommand(host, command, true, testOnly);
     }
 
@@ -850,8 +802,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
-                                             xml.toString(),
-                                             testOnly);
+                                             xml.toString());
         execCommand(host, command, true, testOnly);
     }
 
@@ -918,8 +869,7 @@ public final class CRM {
         xml.append("\"/>'");
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
-                                             xml.toString(),
-                                             testOnly);
+                                             xml.toString());
         execCommand(host, command, true, testOnly);
     }
 

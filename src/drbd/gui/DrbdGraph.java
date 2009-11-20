@@ -266,7 +266,8 @@ public class DrbdGraph extends ResourceGraph {
      * Returns an icon for vertex, depending on if it is host or block device,
      * if it is started or stopped and so on.
      */
-    protected final List<ImageIcon> getIconsForVertex(final ArchetypeVertex v) {
+    protected final List<ImageIcon> getIconsForVertex(final ArchetypeVertex v,
+                                                      final boolean testOnly) {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         if (isVertexBlockDevice((Vertex) v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo((Vertex) v);
@@ -342,14 +343,14 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Small text that appears above the icon.
      */
-    protected final String getIconText(final Vertex v) {
+    protected final String getIconText(final Vertex v, final boolean testOnly) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null) {
-                return bdi.getIconTextForGraph();
+                return bdi.getIconTextForGraph(testOnly);
             }
         } else {
-            vertexToHostMap.get(v).getIconTextForDrbdGraph();
+            vertexToHostMap.get(v).getIconTextForDrbdGraph(testOnly);
         }
         return null;
     }
@@ -357,15 +358,17 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Small text that appears in the right corner.
      */
-    protected final Subtext getRightCornerText(final Vertex v) {
+    protected final Subtext getRightCornerText(final Vertex v,
+                                               final boolean testOnly) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null) {
-                return bdi.getRightCornerTextForDrbdGraph();
+                return bdi.getRightCornerTextForDrbdGraph(testOnly);
 
             }
         } else {
-            return vertexToHostMap.get(v).getRightCornerTextForDrbdGraph();
+            return vertexToHostMap.get(v).getRightCornerTextForDrbdGraph(
+                                                                      testOnly);
         }
         return null;
     }
@@ -373,7 +376,8 @@ public class DrbdGraph extends ResourceGraph {
     /**
      * Small text that appears down.
      */
-    protected final Subtext[] getSubtexts(final Vertex v) {
+    protected final Subtext[] getSubtexts(final Vertex v,
+                                          final boolean testOnly) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null && bdi.getBlockDevice().isDrbd()
@@ -386,7 +390,7 @@ public class DrbdGraph extends ResourceGraph {
                                 null)};
             }
         } else {
-            return vertexToHostMap.get(v).getSubtextsForDrbdGraph();
+            return vertexToHostMap.get(v).getSubtextsForDrbdGraph(testOnly);
         }
         return null;
     }
@@ -395,7 +399,8 @@ public class DrbdGraph extends ResourceGraph {
      * Returns label for block device vertex. If it is longer than 23
      * characters, it is shortened.
      */
-    protected final String getMainText(final ArchetypeVertex v) {
+    protected final String getMainText(final ArchetypeVertex v,
+                                       final boolean testOnly) {
         if (isVertexBlockDevice((Vertex) v)) {
             String l;
             if (isVertexDrbd((Vertex) v)) {
