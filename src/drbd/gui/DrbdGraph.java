@@ -782,7 +782,7 @@ public class DrbdGraph extends ResourceGraph {
      */
     public final String getVertexToolTip(final Vertex v) {
         final Info i = getInfo(v);
-        return i.getToolTipForGraph();
+        return i.getToolTipForGraph(isTestOnly());
     }
 
     /**
@@ -790,7 +790,7 @@ public class DrbdGraph extends ResourceGraph {
      */
     public final String getEdgeToolTip(final Edge edge) {
         final DrbdResourceInfo dri = edgeToDrbdResourceMap.get(edge);
-        return dri.getToolTipForGraph();
+        return dri.getToolTipForGraph(isTestOnly());
     }
 
     /**

@@ -55,6 +55,9 @@ public class MyButton extends JButton {
     private Robot robot = null;
     /** Button tooltip. */
     private JToolTip tip = null;
+    /** Screen device. */
+    private static final GraphicsDevice SCREEN_DEVICE =
+     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
     /**
      * Prepares a new <code>MyButton</code> object.
@@ -115,7 +118,7 @@ public class MyButton extends JButton {
     public MyButton(final Color c1, final Color c2) {
         super();
         try {
-            robot = new Robot(MouseInfo.getPointerInfo().getDevice());
+            robot = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
@@ -136,12 +139,12 @@ public class MyButton extends JButton {
     /**
      * Sets tooltip and wiggles the mouse to refresh it.
      */
-    public void setToolTipText(final String toolTip) {
-        super.setToolTipText(toolTip);
+    public void setToolTipText(final String toolTipText) {
+        super.setToolTipText(toolTipText);
         if (tip != null) {
             if (tip.isShowing()) {
                 if (robot != null) {
-                final GraphicsDevice[] devices =
+                    final GraphicsDevice[] devices =
                             GraphicsEnvironment.getLocalGraphicsEnvironment()
                                                .getScreenDevices();
                     int xOffset = 0;
@@ -157,9 +160,6 @@ public class MyButton extends JButton {
                         }
                     }
                     final Point2D p = MouseInfo.getPointerInfo().getLocation();
-                    System.out.println("mouse x: " + p.getX()
-                                        + ", y: " + p.getY()
-                                        + ", offset: " + xOffset);
                     robot.mouseMove((int) p.getX() + xOffset,
                                     (int) p.getY() - 2);
                     robot.mouseMove((int) p.getX() + xOffset,

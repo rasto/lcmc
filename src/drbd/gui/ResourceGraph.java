@@ -242,30 +242,28 @@ public abstract class ResourceGraph {
                 testOnlyFlag = false;
                 testAnimationThread = new Thread(new Runnable() {
                     public void run() {
-                        while (true) {
-                            try {
-                                if (testOnlyFlag) {
-                                    Thread.sleep(800);
-                                } else {
-                                    Thread.sleep(200);
+                        FOREVER: while (true) {
+                            int sleep = 200;
+                            if (testOnlyFlag) {
+                                sleep = 800;
+                            }
+                            final int interval = 50;
+                            for (int s = 0; s < sleep; s+=interval) {
+                                try {
+                                    mTestAnimationListLock.acquire();
+                                } catch (java.lang.InterruptedException ie) {
+                                    Thread.currentThread().interrupt();
                                 }
-                            } catch (InterruptedException ex) {
-                                Thread.currentThread().interrupt();
-                            }
-
-                            try {
-                                mTestAnimationListLock.acquire();
-                            } catch (java.lang.InterruptedException ie) {
-                                Thread.currentThread().interrupt();
-                            }
-                            if (testAnimationList.isEmpty()) {
+                                if (testAnimationList.isEmpty()) {
+                                    mTestAnimationListLock.release();
+                                    repaint();
+                                    testAnimationThread = null;
+                                    break FOREVER;
+                                }
                                 mTestAnimationListLock.release();
-                                repaint();
-                                testAnimationThread = null;
-                                break;
+                                Tools.sleep(interval);
                             }
                             testOnlyFlag = !testOnlyFlag;
-                            mTestAnimationListLock.release();
                             repaint();
                         }
                     }
@@ -274,6 +272,7 @@ public abstract class ResourceGraph {
             }
         }
         testAnimationList.add(info);
+        System.out.println("start anim list: " + testAnimationList.size());
         mTestAnimationListLock.release();
     }
 
@@ -287,6 +286,8 @@ public abstract class ResourceGraph {
             Thread.currentThread().interrupt();
         }
         testAnimationList.remove(info);
+        System.out.println("stop anim list: " + testAnimationList.size());
+        System.out.println();
         testOnlyFlag = false;
         mTestAnimationListLock.release();
         repaint();
@@ -1539,10 +1540,25 @@ public abstract class ResourceGraph {
     protected final void somethingChanged() {
         changed = true;
     }
+
     /**
      * Returns if it is testOnly.
      */
     protected final boolean isTestOnly() {
         return testOnlyFlag;
+    }
+
+    /**
+     * Returns if it test animation is running.
+     */
+    protected final boolean isTestOnlyAnimation() {
+        try {
+            mTestAnimationListLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final boolean empty = testAnimationList.isEmpty();
+        mTestAnimationListLock.release();
+        return !empty;
     }
 }

@@ -30,6 +30,11 @@ import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
 
+import java.awt.MouseInfo;
+import java.awt.Robot;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 /**
  * A menu item that can have an alternate text depending on the predicate()
  * method and be enabled/disabled depending on the enablePredicate() method.
@@ -54,6 +59,11 @@ implements ActionListener, UpdatableItem {
     private JToolTip toolTip;
     /** Pos of the click that can be used in the overriden action method. */
     private Point2D pos;
+    /** Robot to move a mouse a little if a tooltip has changed. */
+    private Robot robot = null;
+    /** Screen device. */
+    private static final GraphicsDevice SCREEN_DEVICE =
+     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
     /**
      * Prepares a new <code>MyMenuItem</code> object.
@@ -67,6 +77,11 @@ implements ActionListener, UpdatableItem {
         toolTip = createToolTip();
         setNormalFont();
         addActionListener(this);
+        try {
+            robot = new Robot(SCREEN_DEVICE);
+        } catch (java.awt.AWTException e) {
+            Tools.appError("Robot error");
+        }
     }
 
     /**
@@ -86,6 +101,11 @@ implements ActionListener, UpdatableItem {
         toolTip = createToolTip();
         setNormalFont();
         addActionListener(this);
+        try {
+            robot = new Robot(SCREEN_DEVICE);
+        } catch (java.awt.AWTException e) {
+            Tools.appError("Robot error");
+        }
     }
 
 
@@ -109,6 +129,11 @@ implements ActionListener, UpdatableItem {
         this.icon1 = icon;
         this.shortDesc1 = shortDesc;
         addActionListener(this);
+        try {
+            robot = new Robot(SCREEN_DEVICE);
+        } catch (java.awt.AWTException e) {
+            Tools.appError("Robot error");
+        }
     }
 
     /**
@@ -209,7 +234,7 @@ implements ActionListener, UpdatableItem {
             if (icon1 != null) {
                 setIcon(icon1);
             }
-            if (shortDesc1 != null) {
+            if (shortDesc1 != null && !shortDesc1.equals(text1)) {
                 toolTip.setTipText(shortDesc1);
             }
         } else {
@@ -217,7 +242,7 @@ implements ActionListener, UpdatableItem {
             if (icon2 != null) {
                 setIcon(icon2);
             }
-            if (shortDesc2 != null) {
+            if (shortDesc2 != null && !shortDesc1.equals(text2)) {
                 toolTip.setTipText(shortDesc2);
             }
         }
@@ -246,4 +271,46 @@ implements ActionListener, UpdatableItem {
     public final String toString() {
         return getText();
     }
+
+    /**
+     * Creates tooltip.
+     */
+    public JToolTip createToolTip() {
+        toolTip = super.createToolTip();
+        return toolTip;
+    }
+
+    /**
+     * Sets tooltip and wiggles the mouse to refresh it.
+     */
+    public void setToolTipText(final String toolTipText) {
+        super.setToolTipText(toolTipText);
+        if (toolTip != null) {
+            if (toolTip.isShowing()) {
+                if (robot != null) {
+                    final GraphicsDevice[] devices =
+                            GraphicsEnvironment.getLocalGraphicsEnvironment()
+                                               .getScreenDevices();
+                    int xOffset = 0;
+                    if (devices.length >= 2) {
+                        /* workaround for dual monitors that are flipped. */
+                        //TODO: not sure how is it with three monitors
+                        final int x1 =
+                            devices[0].getDefaultConfiguration().getBounds().x;
+                        final int x2 =
+                            devices[1].getDefaultConfiguration().getBounds().x;
+                        if (x1 > x2) {
+                            xOffset = -x1;
+                        }
+                    }
+                    final Point2D p = MouseInfo.getPointerInfo().getLocation();
+                    robot.mouseMove((int) p.getX() + xOffset,
+                                    (int) p.getY() - 2);
+                    robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
+                }
+            }
+        }
+    }
+
+
 }

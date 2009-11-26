@@ -383,9 +383,15 @@ public class ClusterStatus {
     /**
      * Returns score for resource and host.
      */
-    public final String getScore(final String hbId, final String onHost) {
-        final Map<String, String> hostToScoreMap =
-                                           cibQueryMap.getLocation().get(hbId);
+    public final String getScore(final String hbId,
+                                 final String onHost,
+                                 final boolean testOnly) {
+        Map<String, String> hostToScoreMap;
+        if (testOnly) {
+            hostToScoreMap = shadowCibQueryMap.getLocation().get(hbId);
+        } else {
+            hostToScoreMap = cibQueryMap.getLocation().get(hbId);
+        }
         if (hostToScoreMap != null) {
             return hostToScoreMap.get(onHost);
         }
@@ -459,7 +465,15 @@ public class ClusterStatus {
     /**
      * Returns on which nodes the resource is slave.
      */
-    public final List<String> getSlaveOnNodes(final String hbId) {
+    public final List<String> getSlaveOnNodes(final String hbId,
+                                              final boolean testOnly) {
+        final PtestData pd = ptestData;
+        if (testOnly && pd != null) {
+            final List<String> son = pd.getSlaveOnNodes(hbId);
+            if (son != null) {
+                return son;
+            }
+        }
         if (resStateMap == null) {
             return null;
         }

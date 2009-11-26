@@ -95,6 +95,9 @@ public final class CRM {
         }
     }
 
+    /**
+     * Executes the ptest command and returns results.
+     */
     public static String getPtest(final Host host) {
         try {
             mPtestLock.acquire();
@@ -108,11 +111,11 @@ public final class CRM {
         }
         mPtestLock.release();
         final String command =
-                    "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                    + "ptest -VVV -x $file 2>&1;echo '"
-                    + PTEST_END_DELIM
-                    + "';cat $file;"
-                    + "rm $file";
+                            "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
+                            + "ptest -VVV -x $file 2>&1;echo '"
+                            + PTEST_END_DELIM
+                            + "';cat $file;"
+                            + "rm $file";
         final String output = Tools.execCommand(host, command, null, false);
         try {
             mPtestLock.acquire();

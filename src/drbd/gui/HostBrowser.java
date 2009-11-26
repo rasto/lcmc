@@ -605,7 +605,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns file system icon for the menu.
          */
-        public ImageIcon getMenuIcon() {
+        public ImageIcon getMenuIcon(final boolean testOnly) {
             return FS_ICON;
         }
 
@@ -661,7 +661,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns a host icon for the menu.
          */
-        public final ImageIcon getMenuIcon() {
+        public final ImageIcon getMenuIcon(final boolean testOnly) {
             return HOST_ICON;
         }
 
@@ -682,7 +682,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns tooltip for the host.
          */
-        public final String getToolTipForGraph() {
+        public final String getToolTipForGraph(final boolean testOnly) {
             return getHostToolTip(host);
         }
 
@@ -1054,7 +1054,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns a host icon for the menu.
          */
-        public final ImageIcon getMenuIcon() {
+        public final ImageIcon getMenuIcon(final boolean testOnly) {
             return HOST_ICON;
         }
 
@@ -1083,7 +1083,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns tooltip for the host.
          */
-        public final String getToolTipForGraph() {
+        public final String getToolTipForGraph(final boolean testOnly) {
             return getHostToolTip(host);
         }
 
@@ -1629,7 +1629,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns icon of the net interface for the menu.
          */
-        public ImageIcon getMenuIcon() {
+        public ImageIcon getMenuIcon(final boolean testOnly) {
             return NET_I_ICON;
         }
 
@@ -1732,7 +1732,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns block device icon for the menu.
          */
-        public final ImageIcon getMenuIcon() {
+        public final ImageIcon getMenuIcon(final boolean testOnly) {
             return BD_ICON;
         }
 
@@ -1778,7 +1778,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns tool tip for this block device.
          */
-        public final String getToolTipForGraph() {
+        public final String getToolTipForGraph(final boolean testOnly) {
             final StringBuffer tt = new StringBuffer(60);
 
             if (getBlockDevice().isDrbd()) {

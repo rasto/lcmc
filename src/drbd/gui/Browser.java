@@ -279,7 +279,7 @@ public class Browser {
         /**
          * Returns the tool tip for this object.
          */
-        public String getToolTipText() {
+        public String getToolTipText(final boolean testOnly) {
             return "no tooltip";
         }
 
@@ -389,7 +389,7 @@ public class Browser {
         /**
          * Returns the icon.
          */
-        public ImageIcon getMenuIcon() {
+        public ImageIcon getMenuIcon(final boolean testOnly) {
             return null;
         }
 
@@ -604,8 +604,8 @@ public class Browser {
         /**
          * Returns tooltip for the object in the graph.
          */
-        public String getToolTipForGraph() {
-            return getToolTipText();
+        public String getToolTipForGraph(final boolean testOnly) {
+            return getToolTipText(testOnly);
         }
 
         /**
@@ -786,7 +786,6 @@ public class Browser {
                 }
 
                 public void mouseEntered(final MouseEvent e) {
-                    System.out.println("mouse entered");
                     if (c.isShowing()
                         && c.isEnabled()) {
                         try {
@@ -796,7 +795,6 @@ public class Browser {
                         }
                         if (thread != null) {
                             threadLock.release();
-                            System.out.println("thread already running");
                             return;
                         }
                         thread = new Thread(new Runnable() {
@@ -821,7 +819,6 @@ public class Browser {
                 }
 
                 public void mouseExited(final MouseEvent e) {
-                    System.out.println("mouse left");
                     if (c.isShowing()
                         && c.isEnabled()) {
                         bc.mouseOut();
@@ -829,6 +826,7 @@ public class Browser {
                 }
 
                 public void mousePressed(final MouseEvent e) {
+                    mouseExited(e);
                     /* do nothing */
                 }
 
@@ -1585,7 +1583,7 @@ public class Browser {
         /**
          * Returns the icon.
          */
-        public ImageIcon getMenuIcon() {
+        public ImageIcon getMenuIcon(final boolean testOnly) {
             return CATEGORY_ICON;
         }
     }
@@ -1674,7 +1672,7 @@ public class Browser {
             final Info i =
                     (Info) ((DefaultMutableTreeNode) value).getUserObject();
             if (leaf) {
-                final ImageIcon icon = i.getMenuIcon();
+                final ImageIcon icon = i.getMenuIcon(false);
                 if (icon != null) {
                     setIcon(icon);
                 }

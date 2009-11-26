@@ -30,6 +30,7 @@ import drbd.gui.ClusterBrowser.GroupInfo;
 import drbd.gui.ClusterBrowser.HbConnectionInfo;
 import drbd.gui.HostBrowser.HostInfo;
 import drbd.data.Subtext;
+import drbd.data.Host;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -315,7 +316,6 @@ public class HeartbeatGraph extends ResourceGraph {
     public final boolean addResource(final ServiceInfo serviceInfo,
                                      final ServiceInfo parent,
                                      final Point2D pos) {
-
         //vv.stop();
         boolean vertexExists = true;
         Vertex v = getVertex(serviceInfo);
@@ -596,7 +596,6 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     private void reloadAddExistingServicePopup(final JMenu addServiceMenuItem,
                                                final Vertex v) {
-
         if (addServiceMenuItem == null) {
             return;
         }
@@ -698,10 +697,10 @@ public class HeartbeatGraph extends ResourceGraph {
     public final String getVertexToolTip(final Vertex v) {
 
         if (vertexToHostMap.containsKey(v)) {
-            return vertexToHostMap.get(v).getToolTipForGraph();
+            return vertexToHostMap.get(v).getToolTipForGraph(isTestOnly());
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
-        return si.getToolTipText();
+        return si.getToolTipText(isTestOnly());
     }
 
     /**
@@ -1094,6 +1093,7 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void removeConnection(
                                     final HbConnectionInfo hbConnectionInfo,
+                                    final Host dcHost,
                                     final boolean testOnly) {
         try {
             mEdgeLock.acquire();
@@ -1105,7 +1105,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
         if (edgeIsOrderList.contains(edge)) {
             mEdgeLock.release();
-            siC.removeOrder(siP, testOnly);
+            siC.removeOrder(siP, dcHost, testOnly);
         } else {
             mEdgeLock.release();
         }
@@ -1121,7 +1121,7 @@ public class HeartbeatGraph extends ResourceGraph {
             edgeIsOrderList.remove(edge);
             edgeIsColocationList.remove(edge);
             mEdgeLock.release();
-            siRsc.removeColocation(siWithRsc, testOnly);
+            siRsc.removeColocation(siWithRsc, dcHost, testOnly);
         } else {
             edgeIsOrderList.remove(edge);
             edgeIsColocationList.remove(edge);
@@ -1133,6 +1133,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * Removes order.
      */
     public final void removeOrder(final HbConnectionInfo hbConnectionInfo,
+                                  final Host dcHost,
                                   final boolean testOnly) {
         try {
             mEdgeLock.acquire();
@@ -1145,7 +1146,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (edgeIsOrderList.contains(edge)) {
             edgeIsOrderList.remove(edge);
             mEdgeLock.release();
-            siC.removeOrder(siP, testOnly);
+            siC.removeOrder(siP, dcHost, testOnly);
         } else {
             mEdgeLock.release();
         }
@@ -1155,6 +1156,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * Adds order.
      */
     public final void addOrder(final HbConnectionInfo hbConnectionInfo,
+                               final Host dcHost,
                                final boolean testOnly) {
         try {
             mEdgeLock.acquire();
@@ -1164,7 +1166,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siP = hbConnectionInfo.getLastServiceInfoParent();
         final ServiceInfo siC = hbConnectionInfo.getLastServiceInfoChild();
         mEdgeLock.release();
-        siC.addOrder(siP, testOnly);
+        siC.addOrder(siP, dcHost, testOnly);
     }
 
     /**
@@ -1172,6 +1174,7 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void removeColocation(
                                     final HbConnectionInfo hbConnectionInfo,
+                                    final Host dcHost,
                                     final boolean testOnly) {
         try {
             mEdgeLock.acquire();
@@ -1185,7 +1188,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (edgeIsColocationList.contains(edge)) {
             edgeIsColocationList.remove(edge);
             mEdgeLock.release();
-            siRsc.removeColocation(siWithRsc, testOnly);
+            siRsc.removeColocation(siWithRsc, dcHost, testOnly);
         } else {
             mEdgeLock.release();
         }
@@ -1195,6 +1198,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * Adds colocation.
      */
     public final void addColocation(final HbConnectionInfo hbConnectionInfo,
+                                    final Host dcHost,
                                     final boolean testOnly) {
         try {
             mEdgeLock.acquire();
@@ -1205,7 +1209,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siWithRsc =
                                   hbConnectionInfo.getLastServiceInfoWithRsc();
         mEdgeLock.release();
-        siRsc.addColocation(siWithRsc, testOnly);
+        siRsc.addColocation(siWithRsc, dcHost, testOnly);
     }
 
     /**
@@ -1226,8 +1230,7 @@ public class HeartbeatGraph extends ResourceGraph {
     /**
      * Returns whether this hb connection is colocation.
      */
-    public final boolean isColocation(
-                                    final HbConnectionInfo hbConnectionInfo) {
+    public final boolean isColocation(final HbConnectionInfo hbConnectionInfo) {
         try {
             mEdgeLock.acquire();
         } catch (java.lang.InterruptedException ie) {
@@ -1268,6 +1271,9 @@ public class HeartbeatGraph extends ResourceGraph {
      * Small text that appears above the icon.
      */
     protected final String getIconText(final Vertex v, final boolean testOnly) {
+        if (isTestOnlyAnimation()) {
+            return "ptest...";
+        }
         if (vertexToHostMap.containsKey(v)) {
             return vertexToHostMap.get(v).getIconTextForGraph(testOnly);
         }

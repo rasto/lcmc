@@ -45,7 +45,7 @@ public class DrbdMC extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /** Initial delay for showing any tool tip in milliseconds. */
-    private static final int TOOLTIP_INITIAL_DELAY = 500;
+    private static final int TOOLTIP_INITIAL_DELAY = 200;
     /** Dismiss delay for showing any tool tip in milliseconds. */
     private static final int TOOLTIP_DISMISS_DELAY = 100000;
     /**
