@@ -646,107 +646,97 @@ sub get_cluster_events {
 # if a resource is running, not running and/or unmanaged
 # unmanaged etc.
 sub get_resource_status {
-	my $in_rsc_list = 0;
-	my $info = "";
-	my %clone_or_ms;
-	my $set;
-	my %masters;
-	my %slaves;
-	my %started;
-	my %stopped;
-	my @sets;
-	# 2.1.3 does not have -f option
-	for (`crm_mon -1 -f 2>/dev/null || crm_mon -1 2>/dev/null`) {
-		if ($in_rsc_list < 2) {
-			$in_rsc_list += /^============/;
-		} else {
-			next if /^\t*$/;
-			if (/^.\S/ && $_ !~ /^\t/) {
-				$set = "";
+	my %role;
+	my %running;
+	my %unmanaged;
+	my %resources;
+	for my $line (`ptest -VVV -L 2>&1`) {
+		my $what;
+		my $on;
+		my $res;
+		if ($line =~
+		    /Leave\s+resource\s+(\S+)\s+\((.*?)(?<! unmanaged)\)/) {
+		  	# managed: Started, Master, Slave, Stopped
+			$res = $1;
+			my $state = $2;
+			if ($res =~/(.*):\d+$/) {
+				$res = $1;
 			}
-			if (m!^\s*(Master/Slave|Clone) Set: (.*)!) {
-				$set = $2;
-				$clone_or_ms{$set} = $1;
-				push @sets, $set;
-				next;
-			} elsif (/^\s*Resource Group: (.*)/) {
-				next;
-			} elsif (/\s+Masters:\s+\[\s+(.*)\s+\]/) {
-				push @{$masters{$set}}, split /\s+/, $1;
-				next;
-			} elsif (/\s+Slaves:\s+\[\s+(.*)\s+\]/) {
-				push @{$slaves{$set}}, split /\s+/, $1;
-				next;
-			} elsif (/\s+Started:\s+\[\s+(.*)\s+\]/) {
-				push @{$started{$set}}, split /\s+/, $1;
-				next;
-			} elsif (/\s+Stopped:\s+\[\s+(.*)\s+\]/) {
-				push @{$stopped{$set}}, split /\s+/, $1;
-				next;
-			}
-			my ($rsc, $type, $running, @rest) = split;
-			my $managed;
-			if (@rest > 0 and $rest[0] eq "(unmanaged)") {
-				$managed = "unmanaged";
+			if ($state =~ /^(Stopped)/) {
 			} else {
-				$managed = "managed";
+				($what, $on) = map {lc} split /\s+/, $state;
 			}
-			if ($set) {
-				if ($running eq "Started") {
-					push @{$started{$set}}, shift @rest;
-				} elsif ($running eq "Master") {
-					push @{$masters{$set}}, shift @rest;
-				} elsif ($running eq "Slave") {
-					push @{$slaves{$set}}, shift @rest;
-				} elsif ($running eq "Stopped") {
-					push @{$stopped{$set}}, $rsc;
-				}
-
+		} elsif ($line
+			 =~ /Stop\s+resource\s+(\S+)\s+\((.*)\)/) {
+			# Stop, is still slave or started 
+			$res = $1;
+			$on = $2;
+			if ($res =~/(.*):\d+$/) {
+				$res = $1;
+				$what = "slave";
 			} else {
-				my $running_on = "";
-				if (defined $running) {
-					if ($running eq "Started") {
-						$running_on = shift @rest;
-					}
-					$info.= "  <resource id=\"$rsc\""
-						." running=\"$running\""
-						." running_on=\"$running_on\""
-						." managed=\"$managed\" />\n";
-
-				}
+				$what = "started";
+			}
+		} elsif ($line =~
+			 /Demote\s+(\S+)\s+\(Master -> \S+\s+(.*)\)/) {
+			# Demote master -> *, still master
+			$res = $1;
+			$on = $2;
+			if ($res =~/(.*):\d+$/) {
+				$res = $1;
+				$what = "master";
+			}
+		} elsif ($line =~
+			 /Promote\s+(\S+)\s+\((\S+) -> \S+\s+(.*)\)/) {
+			# Promote from something, still that something
+			$res = $1;
+			$what = lc $2;
+			$on = $3;
+			if ($res =~/(.*):\d+$/) {
+				$res = $1;
+			}
+		} elsif ($line =~
+			 /native_print:\s+(\S+).*:\s+(.*)\s+\(unmanaged\)$/) {
+		  	# unmanaged
+			$res = $1;
+			my $state = $2;
+			if ($res =~/(.*):\d+$/) {
+				$res = $1;
+			}
+			if ($state =~ /^(Stopped)/) {
+			} else {
+				($what, $on) = map {lc} split /\s+/, $state;
+			}
+			$unmanaged{$res}++;
+		}
+		if ($res) {
+			$resources{$res}++;
+			if ($what && $on) {
+				$role{$res}{$on} = $what if !$role{$res}{$on};
 			}
 		}
 	}
-	for my $set (@sets) {
-		$info.= "  <set id=\"$set\">\n";
-		if ($masters{$set}) {
-			for (@{$masters{$set}}) {
-				$info.= "    <master>$_</master>\n";
-			}
+	my $info = "";
+	for my $res (keys %resources) {
+		my $running = "running";
+		if (keys %{$role{$res}} == 0) {
+			$running = "stopped";
 		}
-		if ($slaves{$set}) {
-			for (@{$slaves{$set}}) {
-				$info.= "    <slave>$_</slave>\n";
-			}
+		my $managed = "managed";
+		if ($unmanaged{$res}) {
+			$managed = "unmanaged";
 		}
-		if ($started{$set}) {
-			for (@{$started{$set}}) {
-				if ($clone_or_ms{$set} eq "Master/Slave") {
-					$info.= "    <slave>$_</slave>\n";
-				} else {
-					$info.= "    <started>$_</started>\n";
-				}
-			}
+		$info.= "  <resource id=\"$res\""
+			." running=\"$running\""
+			." managed=\"$managed\">\n";
+		for my $on (keys %{$role{$res}}) {
+			my $tag = $role{$res}{$on};
+			$info.="   <$tag>$on</$tag>\n";
 		}
-		if ($stopped{$set}) {
-			for (@{$stopped{$set}}) {
-				$info.= "    <stopped>$_</stopped>\n";
-			}
-		}
-		$info.= "  </set>\n";
+		$info.= "  </resource>\n";
 	}
 	if ($info) {
-		return "<resource_status>\n$info\n</resource_status>\n";
+		return "<resource_status>\n$info</resource_status>\n";
 	}
 	return "";
 }
