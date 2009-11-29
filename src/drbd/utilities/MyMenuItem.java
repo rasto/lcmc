@@ -277,6 +277,7 @@ implements ActionListener, UpdatableItem {
      */
     public JToolTip createToolTip() {
         toolTip = super.createToolTip();
+        toolTip.setBackground(Color.YELLOW);
         return toolTip;
     }
 
@@ -311,6 +312,8 @@ implements ActionListener, UpdatableItem {
             }
         }
     }
-
-
+    
+    public final JToolTip getToolTip() {
+        return toolTip;
+    }
 }

@@ -456,7 +456,8 @@ sub get_version_info {
 	 .'| sed "s/distro/openfiler/";'
 	 .'lsb_release -i -r 2>/dev/null '
 	 .'| sed "s/CentOS/redhat/"|sed "s/SUSE LINUX/suse/" '
-	 .'| perl -lne "print lc((split /:\s*/)[1])"';
+	 .'| perl -lne "print lc((split /:\s*/)[1])";'
+	 .'cut -d ":" /etc/system-release-cpe -f 4,5 |sed "s/:/\n/"';
 	 print `$cmd`;
 }
 
@@ -650,7 +651,7 @@ sub get_resource_status {
 	my %running;
 	my %unmanaged;
 	my %resources;
-	for my $line (`ptest -VVV -L 2>&1`) {
+	for my $line (`ptest -VVVV -L 2>&1`) {
 		my $what;
 		my $on;
 		my $res;

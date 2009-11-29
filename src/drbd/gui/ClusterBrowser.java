@@ -79,6 +79,7 @@ import javax.swing.JMenuBar;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JRadioButton;
+import javax.swing.JList;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
@@ -3941,7 +3942,9 @@ public class ClusterBrowser extends Browser {
                     desc,
                     Tools.getString("ClusterBrowser.confirmRemoveGroup.Yes"),
                     Tools.getString("ClusterBrowser.confirmRemoveGroup.No"))) {
-                getService().setRemoved(true);
+                if (!testOnly) {
+                    getService().setRemoved(true);
+                }
                 removeMyselfNoConfirm(getDCHost(), testOnly);
             }
             getService().doneRemoving();
@@ -5497,6 +5500,10 @@ public class ClusterBrowser extends Browser {
                 }
 
                 public final void mouseOver() {
+                    clusterStatus.setPtestData(null);
+                    final CountDownLatch startTestLatch = new CountDownLatch(1);
+                    heartbeatGraph.startTestAnimation(thisClass,
+                                                      startTestLatch);
                     applyButton.setToolTipText(Tools.getString(
                               "ClusterBrowser.StartingPtest"));
                     final Host dcHost = getDCHost();
@@ -5507,11 +5514,12 @@ public class ClusterBrowser extends Browser {
                     }
                     apply(dcHost, true);
                     final PtestData ptestData = new PtestData(
-                                                         CRM.getPtest(dcHost));
+                                                        CRM.getPtest(dcHost)
+                                                        );
                     applyButton.setToolTipText(ptestData.getToolTip());
                     clusterStatus.setPtestData(ptestData);
                     mPtestLock.release();
-                    heartbeatGraph.startTestAnimation(thisClass);
+                    startTestLatch.countDown();
                 }
             };
             initApplyButton(buttonCallback);
@@ -6282,7 +6290,7 @@ public class ClusterBrowser extends Browser {
 
             serviceInfo.getService().setResourceClass(
                         serviceInfo.getResourceAgent().getResourceClass());
-            if (heartbeatGraph.addResource(serviceInfo, this, pos)) {
+            if (heartbeatGraph.addResource(serviceInfo, this, pos, testOnly)) {
                 /* edge added */
                 final String parentId = getService().getHeartbeatId();
                 final String heartbeatId =
@@ -6443,8 +6451,8 @@ public class ClusterBrowser extends Browser {
                                              final boolean testOnly) {
             if (!testOnly) {
                 setUpdated(true);
+                getService().setRemoved(true);
             }
-            getService().setRemoved(true);
             if (cloneInfo != null) {
                 cloneInfo.removeMyselfNoConfirm(dcHost, testOnly);
             }
@@ -6491,7 +6499,9 @@ public class ClusterBrowser extends Browser {
                         }
                         if (clusterStatus.getGroupResources(
                                                           group).size() == 1) {
-                            groupInfo.getService().setRemoved(true);
+                            if (!testOnly) {
+                                groupInfo.getService().setRemoved(true);
+                            }
                             groupInfo.removeMyselfNoConfirmFromChild(dcHost,
                                                                      testOnly);
                             groupId = group;
@@ -6512,10 +6522,12 @@ public class ClusterBrowser extends Browser {
                                        testOnly);
                 }
             }
-            removeFromServiceInfoHash(this);
-            infoPanel = null;
-            getService().doneRemoving();
-            Tools.unregisterExpertPanel(extraOptionsPanel);
+            if (!testOnly) {
+                removeFromServiceInfoHash(this);
+                infoPanel = null;
+                getService().doneRemoving();
+                Tools.unregisterExpertPanel(extraOptionsPanel);
+            }
         }
 
         /**
@@ -6585,9 +6597,9 @@ public class ClusterBrowser extends Browser {
             final boolean testOnly = false;
             /* remove service */
             final MyMenuItem removeMenuItem = new MyMenuItem(
-                        Tools.getString(
-                                "ClusterBrowser.Hb.RemoveService"),
-                        REMOVE_ICON) {
+                        Tools.getString("ClusterBrowser.Hb.RemoveService"),
+                        REMOVE_ICON,
+                        Tools.getString("ClusterBrowser.StartingPtest")) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -6605,6 +6617,14 @@ public class ClusterBrowser extends Browser {
                     heartbeatGraph.getVisualizationViewer().repaint();
                 }
             };
+            final ServiceInfo thisClass = this;
+            final MenuItemCallback removeItemCallback =
+                         new MenuItemCallback(thisClass, removeMenuItem) {
+                public void action(final Host dcHost) {
+                    removeMyselfNoConfirm(dcHost, true); /* test only */
+                }
+            };
+            addMouseOverListener(removeMenuItem, removeItemCallback);
             items.add((UpdatableItem) removeMenuItem);
             registerMenuItem((UpdatableItem) removeMenuItem);
 
@@ -6811,7 +6831,6 @@ public class ClusterBrowser extends Browser {
                 registerMenuItem((UpdatableItem) addServiceMenuItem);
 
                 /* add existing service dependency*/
-                final ServiceInfo thisClass = this;
                 final MyMenu existingServiceMenuItem =
                                 new MyMenu(
                                     Tools.getString(
@@ -6828,6 +6847,9 @@ public class ClusterBrowser extends Browser {
                         removeAll();
 
                         DefaultListModel m = new DefaultListModel();
+                        final Map<MyMenuItem, ButtonCallback> callbackHash =
+                                     new HashMap<MyMenuItem, ButtonCallback>();
+                        final JList list = new JList(m);
                         for (final ServiceInfo asi
                                         : getExistingServiceList(thisClass)) {
                             if (asi.getGroupInfo() != null
@@ -6863,8 +6885,22 @@ public class ClusterBrowser extends Browser {
                                 }
                             };
                             m.addElement(mmi);
+
+                            final MenuItemCallback mmiCallback =
+                               new MenuItemCallback(thisClass, list) {
+                                public void action(final Host dcHost) {
+                                    addServicePanel(asi,
+                                                    null,
+                                                    true,
+                                                    true); /* test only */
+                                }
+                            };
+                            callbackHash.put(mmi, mmiCallback);
                         }
-                        add(Tools.getScrollingMenu(this, m));
+                        add(Tools.getScrollingMenuTest(this,
+                                                       m,
+                                                       callbackHash,
+                                                       list));
                     }
                 };
                 items.add((UpdatableItem) existingServiceMenuItem);
@@ -6921,14 +6957,12 @@ public class ClusterBrowser extends Browser {
                 items.add(moveDownMenuItem);
                 registerMenuItem(moveDownMenuItem);
             }
-            final ServiceInfo thisClass = this;
             /* start resource */
             final MyMenuItem startMenuItem =
                 new MyMenuItem(
                       Tools.getString("ClusterBrowser.Hb.StartResource"),
                       START_ICON,
-                      Tools.getString("ClusterBrowser.Hb.StartResource.ToolTip")
-                     ) {
+                      Tools.getString("ClusterBrowser.StartingPtest")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -6961,8 +6995,7 @@ public class ClusterBrowser extends Browser {
                 new MyMenuItem(
                        Tools.getString("ClusterBrowser.Hb.StopResource"),
                        STOP_ICON,
-                       Tools.getString("ClusterBrowser.Hb.StopResource.ToolTip")
-                      ) {
+                       Tools.getString("ClusterBrowser.StartingPtest")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -6995,10 +7028,11 @@ public class ClusterBrowser extends Browser {
                 new MyMenuItem(
                    Tools.getString("ClusterBrowser.Hb.CleanUpFailedResource"),
                    SERVICE_RUNNING_ICON,
-                   Tools.getString("ClusterBrowser.Hb.CleanUpFailedResource"),
+                   Tools.getString("ClusterBrowser.StartingPtest"),
+
                    Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
                    SERVICE_RUNNING_ICON,
-                   Tools.getString("ClusterBrowser.Hb.CleanUpResource")) {
+                   Tools.getString("ClusterBrowser.StartingPtest")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
@@ -7030,12 +7064,11 @@ public class ClusterBrowser extends Browser {
                 new MyMenuItem(
                       Tools.getString("ClusterBrowser.Hb.ManageResource"),
                       START_ICON,
-                      Tools.getString("ClusterBrowser.Hb.ManageResource.ToolTip"),
+                      Tools.getString("ClusterBrowser.StartingPtest"),
 
                       Tools.getString("ClusterBrowser.Hb.UnmanageResource"),
                       UNMANAGE_ICON,
-                      Tools.getString("ClusterBrowser.Hb.UnmanageResource.ToolTip")
-                     ) {
+                      Tools.getString("ClusterBrowser.StartingPtest")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
@@ -7115,16 +7148,13 @@ public class ClusterBrowser extends Browser {
                                  "ClusterBrowser.Hb.MigrateResource")
                                  + " " + hostName,
                             MIGRATE_ICON,
-                            Tools.getString(
-                                 "ClusterBrowser.Hb.MigrateResource.ToolTip"),
+                            Tools.getString("ClusterBrowser.StartingPtest"),
 
                             Tools.getString(
                                  "ClusterBrowser.Hb.MigrateResource")
                                  + " " + hostName + " (offline)",
                             MIGRATE_ICON,
-                            Tools.getString(
-                                 "ClusterBrowser.Hb.MigrateResource.ToolTip")
-                           ) {
+                            Tools.getString("ClusterBrowser.StartingPtest")) {
                         private static final long serialVersionUID = 1L;
 
                         public boolean predicate() {
@@ -7169,10 +7199,10 @@ public class ClusterBrowser extends Browser {
 
             /* unmigrate resource */
             final MyMenuItem unmigrateMenuItem =
-                new MyMenuItem(Tools.getString(
-                                    "ClusterBrowser.Hb.UnmigrateResource"),
-                                    UNMIGRATE_ICON,
-                                    null) {
+                new MyMenuItem(
+                        Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
+                        UNMIGRATE_ICON,
+                        Tools.getString("ClusterBrowser.StartingPtest")) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -7390,24 +7420,24 @@ public class ClusterBrowser extends Browser {
          */
         protected class MenuItemCallback implements ButtonCallback {
             final ServiceInfo serviceInfo;
-            final MyMenuItem myMenuItem;
+            final JComponent myMenuItem;
 
             public MenuItemCallback(final ServiceInfo serviceInfo,
-                                    final MyMenuItem myMenuItem) {
+                                    final JComponent myMenuItem) {
                 this.serviceInfo = serviceInfo;
                 this.myMenuItem = myMenuItem;
                 
             }
 
-            public void mouseOut() {
+            public final void mouseOut() {
                 heartbeatGraph.stopTestAnimation(serviceInfo);
-                System.out.println("mouse out mi: " + myMenuItem);
                 myMenuItem.setToolTipText(null);
             }
 
-            public void mouseOver() {
-                System.out.println("mouse over mi: " + myMenuItem);
-                heartbeatGraph.startTestAnimation(serviceInfo);
+            public final void mouseOver() {
+                clusterStatus.setPtestData(null);
+                final CountDownLatch startTestLatch = new CountDownLatch(1);
+                heartbeatGraph.startTestAnimation(serviceInfo, startTestLatch);
                 myMenuItem.setToolTipText(
                               Tools.getString("ClusterBrowser.StartingPtest"));
                 final Host dcHost = getDCHost();
@@ -7421,6 +7451,7 @@ public class ClusterBrowser extends Browser {
                 myMenuItem.setToolTipText(ptestData.getToolTip());
                 clusterStatus.setPtestData(ptestData);
                 mPtestLock.release();
+                startTestLatch.countDown();
             }
 
             protected void action(final Host dcHost) {
@@ -7570,20 +7601,13 @@ public class ClusterBrowser extends Browser {
          * Returns node name of the host where this service is slave.
          */
         public List<String> getSlaveOnNodes(final boolean testOnly) {
-            if (testOnly) {
-                final ServiceInfo cs = containedService;
-                if (cs != null) {
-                    final List<String> son = clusterStatus.getSlaveOnNodes(
-                                             cs.getService().getHeartbeatId(),
-                                             testOnly);
-                    if (son != null) {
-                        return son;
-                    }
-                }
+            final ServiceInfo cs = containedService;
+            if (cs != null) {
+                return clusterStatus.getSlaveOnNodes(
+                                              cs.getService().getHeartbeatId(),
+                                              testOnly);
             }
-            return clusterStatus.getSlaveOnNodes(
-                                                getService().getHeartbeatId(),
-                                                testOnly);
+            return null;
         }
 
 
@@ -7592,20 +7616,19 @@ public class ClusterBrowser extends Browser {
          */
         public List<String> getRunningOnNodes(final boolean testOnly) {
 
-            if (testOnly) {
-                final ServiceInfo cs = containedService;
-                if (cs != null) {
-                    final List<String> ron = clusterStatus.getRunningOnNodes(
-                                             cs.getService().getHeartbeatId(),
-                                             testOnly);
-                    if (ron != null) {
-                        return ron;
-                    }
+            final ServiceInfo cs = containedService;
+            if (cs != null) {
+                if (getService().isMaster()) {
+                    return clusterStatus.getMasterOnNodes(
+                                            cs.getService().getHeartbeatId(),
+                                            testOnly);
+                } else {
+                    return clusterStatus.getRunningOnNodes(
+                                            cs.getService().getHeartbeatId(),
+                                            testOnly);
                 }
             }
-            return clusterStatus.getRunningOnNodes(
-                                                getService().getHeartbeatId(),
-                                                testOnly);
+            return null;
         }
 
         /**
@@ -8737,7 +8760,10 @@ public class ClusterBrowser extends Browser {
                                     final boolean testOnly) {
             newServiceInfo.getService().setResourceClass(
                         newServiceInfo.getResourceAgent().getResourceClass());
-            if (!heartbeatGraph.addResource(newServiceInfo, null, pos)) {
+            if (!heartbeatGraph.addResource(newServiceInfo,
+                                            null,
+                                            pos,
+                                            testOnly)) {
                 addNameToServiceInfoHash(newServiceInfo);
                 final DefaultMutableTreeNode newServiceNode =
                                     new DefaultMutableTreeNode(newServiceInfo);

@@ -115,7 +115,7 @@ public final class CRM {
                             + "ptest -VVV -x $file 2>&1;echo '"
                             + PTEST_END_DELIM
                             + "';cat $file;"
-                            + "rm $file";
+                            + "mv $file{,.last}";
         final String output = Tools.execCommand(host, command, null, false);
         try {
             mPtestLock.acquire();

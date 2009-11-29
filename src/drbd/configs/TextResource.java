@@ -1247,20 +1247,11 @@ public class TextResource extends
         {"ClusterBrowser.Hb.StartResource",
          "Start"},
 
-        {"ClusterBrowser.Hb.StartResource.ToolTip",
-         "Start resource"},
-
         {"ClusterBrowser.Hb.StopResource",
          "Stop"},
 
-        {"ClusterBrowser.Hb.StopResource.ToolTip",
-         "Stop resource"},
-
         {"ClusterBrowser.Hb.MigrateResource",
          "Migrate To"},
-
-        {"ClusterBrowser.Hb.MigrateResource.ToolTip",
-         "Migrate resource to other node"},
 
         {"ClusterBrowser.Hb.UnmigrateResource",
          "Unmigrate"},
@@ -1322,14 +1313,8 @@ public class TextResource extends
         {"ClusterBrowser.Hb.ManageResource",
          "Manage by CRM"},
 
-        {"ClusterBrowser.Hb.ManageResource.ToolTip",
-         "Manage by CRM"},
-
         {"ClusterBrowser.Hb.UnmanageResource",
          "Do not manage by CRM"},
-
-        {"ClusterBrowser.Hb.UnmanageResource.ToolTip",
-         "Do not Manage by CRM"},
 
         {"ClusterBrowser.Hb.NoInfoAvailable",
          "no info available"},

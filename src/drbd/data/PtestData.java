@@ -1,0 +1,236 @@
+/*
+ * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
+ * by Rasto Levrinc.
+ *
+ * Copyright (C) 2009, Rastislav Levrinc
+ * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+ *
+ * DRBD Management Console is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * DRBD Management Console is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with drbd; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+package drbd.data;
+
+import drbd.utilities.Tools;
+import drbd.utilities.CRM;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * This class holds data that were retrieved from ptest command.
+ *
+ * @author Rasto Levrinc
+ * @version $Id$
+ *
+ */
+public class PtestData {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
+    /** Pattern for: LogActions: Start res_IPaddr2_1     (hardy-a) */
+    private static final Pattern PTEST_ACTIONS_PATTERN =
+          Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)"
+                          + "\\s+\\(([^)]*)(?<! unmanaged)\\).*");
+    /** Pattern that gets cloned resource id. */
+    private static final Pattern PTEST_CLONE_PATTERN =
+                                            Pattern.compile("(.*):\\d+");
+    /** Tool tip. */
+    private final String toolTip;
+    /** Shadow cib */
+    private final String shadowCib;
+    /** Running on nodes. */
+    private final Map<String, List<String>> runningOnNodes =
+                                         new HashMap<String, List<String>>();
+    /** Slave on nodes. */
+    private final Map<String, List<String>> slaveOnNodes =
+                                         new HashMap<String, List<String>>();
+    /** Master on nodes. */
+    private final Map<String, List<String>> masterOnNodes =
+                                         new HashMap<String, List<String>>();
+
+    /**
+     * Prepares a new <code>AisCastAddress</code> object.
+     */
+    public PtestData(final String raw) {
+        if (raw == null) {
+            this.toolTip = null;
+            this.shadowCib = null;
+            return;
+        }
+        final StringBuffer sb = new StringBuffer(300);
+        sb.append("<html><b>");
+        sb.append(Tools.getString("CRM.Ptest.ToolTip"));
+        sb.append("</b><br>");
+        String[] queries = raw.split(CRM.PTEST_END_DELIM);
+        if (queries.length != 2) {
+            this.shadowCib = null;
+            this.toolTip = null;
+            return;
+        }
+        for (final String line : queries[0].split("\\r?\\n")) {
+            final Matcher m = PTEST_ACTIONS_PATTERN.matcher(line);
+            if (m.matches()) {
+                final String action = m.group(1);
+                String res = m.group(2);
+                /* Clone */
+                boolean clone = false;
+                final Matcher cm = PTEST_CLONE_PATTERN.matcher(res);
+                if (cm.matches()) {
+                    res = cm.group(1);
+                    clone = true;
+                }
+
+                final String state = m.group(3);
+                List<String> nodes = runningOnNodes.get(res);
+                if (nodes == null) {
+                    nodes = new ArrayList<String>();
+                }
+                List<String> slaveNodes = null;
+                if (clone) {
+                    slaveNodes = slaveOnNodes.get(res);
+                    if (slaveNodes == null) {
+                        slaveNodes = new ArrayList<String>();
+                    }
+                }
+                List<String> masterNodes = null;
+                if (clone) {
+                    masterNodes = masterOnNodes.get(res);
+                    if (masterNodes == null) {
+                        masterNodes = new ArrayList<String>();
+                    }
+                }
+                if ("Start".equals(action)) {
+                    nodes.add(state);
+                    if (clone) {
+                        slaveNodes.add(state);
+                    }
+                } else if ("Leave".equals(action)) {
+                    if (state.indexOf(" ") >= 0) {
+                        final String[] parts = state.split(" ");
+                        if (parts.length == 2) {
+                            final String what = parts[0];
+                            final String node = parts[1];
+                            if ("Started".equals(what)) {
+                                nodes.add(node);
+                            } else if ("Slave".equals(what)) {
+                                nodes.add(node);
+                                if (clone) {
+                                    slaveNodes.add(node);
+                                }
+                            } else if ("Master".equals(what)) {
+                                nodes.add(node);
+                                if (clone) {
+                                    masterNodes.add(node);
+                                }
+                            }
+                        }
+                    }
+                } else if ("Stop".equals(action)) {
+                        nodes.remove(state);
+                        if (clone) {
+                            slaveNodes.remove(state);
+                            masterNodes.remove(state);
+                        }
+                } else if ("Move".equals(action)) {
+                    if (state.indexOf(" -> ") >= 0) {
+                        final String[] parts = state.split(" -> ");
+                        nodes.remove(parts[0]);
+                        nodes.add(parts[parts.length - 1]);
+                    }
+                } else if ("Promote".equals(action)) {
+                    if (state.indexOf(" -> Master ") >= 0) {
+                        final String[] parts = state.split(" -> Master ");
+                        if (parts.length > 0) {
+                            nodes.add(parts[parts.length - 1]);
+                            if (clone) {
+                                slaveNodes.remove(parts[parts.length - 1]);
+                                masterNodes.add(parts[parts.length - 1]);
+                            }
+                        }
+                    }
+                } else if ("Demote".equals(action)) {
+                    if (state.indexOf(" -> Slave ") >= 0) {
+                        final String[] parts = state.split(" -> Slave ");
+                        if (parts.length > 0) {
+                            if (clone) {
+                                masterNodes.remove(parts[parts.length - 1]);
+                                slaveNodes.add(parts[parts.length - 1]);
+                            }
+                        }
+                    }
+                } else {
+                    continue;
+                }
+                runningOnNodes.put(res, nodes);
+                if (clone) {
+                    slaveOnNodes.put(res, slaveNodes);
+                    masterOnNodes.put(res, masterNodes);
+                }
+                if ("Leave".equals(action)) {
+                    /* don't show it in tooltip */
+                    continue;
+                }
+            }
+            final String[] prefixes = new String[]{"LogActions: "};
+            for (final String prefix : prefixes) {
+                final int index = line.indexOf(prefix);
+                if (index >= 0) {
+                    sb.append(line.substring(index + prefix.length()));
+                    sb.append("<br>");
+                }
+            }
+        }
+        sb.append("</html>");
+        this.toolTip = sb.toString();
+        this.shadowCib = queries[1];
+    }
+
+    /**
+     * Returns tooltip.
+     */
+    public final String getToolTip() {
+        return toolTip;
+    }
+
+    /**
+     * Returns shadow cib.
+     */
+    public final String getShadowCib() {
+        return shadowCib;
+    }
+
+    /**
+     * Returns on which nodes is service running.
+     */
+    public final List<String> getRunningOnNodes(final String pmId) {
+        return runningOnNodes.get(pmId);
+    }
+
+    /**
+     * Returns on which nodes is service master.
+     */
+    public final List<String> getMasterOnNodes(final String pmId) {
+        return masterOnNodes.get(pmId);
+    }
+
+    /**
+     * Returns on which nodes is service slave.
+     */
+    public final List<String> getSlaveOnNodes(final String pmId) {
+        return slaveOnNodes.get(pmId);
+    }
+}

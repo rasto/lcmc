@@ -738,6 +738,10 @@ public class Host implements Serializable {
         String lsbVersion = null;
         String lsbDist = null;
         switch (info.length) {
+            case 9:
+                lsbVersion = info[8]; // TODO: not used
+            case 8:
+                lsbDist = info[7];
             case 7:
                 lsbVersion = info[6]; // TODO: not used
             case 6:

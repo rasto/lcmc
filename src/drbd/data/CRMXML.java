@@ -1471,6 +1471,8 @@ public class CRMXML extends XML {
     class ResStatus {
         /** On which nodes the resource runs, or is master. */
         private final List<String> runningOnNodes;
+        /** On which nodes the resource is master if it is m/s resource. */
+        private final List<String> masterOnNodes;
         /** On which nodes the resource is slave if it is m/s resource. */
         private final List<String> slaveOnNodes;
 
@@ -1478,8 +1480,10 @@ public class CRMXML extends XML {
          * Creates a new ResStatus object.
          */
         public ResStatus(final List<String> runningOnNodes,
+                         final List<String> masterOnNodes,
                          final List<String> slaveOnNodes) {
             this.runningOnNodes = runningOnNodes;
+            this.masterOnNodes = masterOnNodes;
             this.slaveOnNodes = slaveOnNodes;
         }
 
@@ -1488,6 +1492,13 @@ public class CRMXML extends XML {
          */
         public final List<String> getRunningOnNodes() {
             return runningOnNodes;
+        }
+
+        /**
+         * Gets on which nodes the resource is master if it is m/s resource.
+         */
+        public final List<String> getMasterOnNodes() {
+            return masterOnNodes;
         }
 
         /**
@@ -1520,27 +1531,29 @@ public class CRMXML extends XML {
             final Node resourceNode = resources.item(i);
             if (resourceNode.getNodeName().equals("resource")) {
                 final String id = getAttribute(resourceNode, "id");
-                final String runningOn =
-                                      getAttribute(resourceNode, "running_on");
-                if (runningOn != null && !"".equals(runningOn)) {
-                    final List<String> rList = new ArrayList<String>();
-                    rList.add(runningOn);
-                    resStatusMap.put(id, new ResStatus(rList, null));
-                }
-            } else if (resourceNode.getNodeName().equals("set")) {
-                final String id = getAttribute(resourceNode, "id");
+                //if (runningOn != null && !"".equals(runningOn)) {
+                //    final List<String> rList = new ArrayList<String>();
+                //    rList.add(runningOn);
+                //    resStatusMap.put(id, new ResStatus(rList, null));
+                //}
                 final NodeList statusList = resourceNode.getChildNodes();
                 List<String> runningOnList = null;
+                List<String> masterOnList = null;
                 List<String> slaveOnList = null;
                 for (int j = 0; j < statusList.getLength(); j++) {
                     final Node setNode = statusList.item(j);
-                    if (setNode.getNodeName().equals("master")
-                        || setNode.getNodeName().equals("started")) {
+                    if (setNode.getNodeName().equals("started")) {
                         final String node = getText(setNode);
                         if (runningOnList == null) {
                             runningOnList = new ArrayList<String>();
                         }
                         runningOnList.add(node);
+                    } else if (setNode.getNodeName().equals("master")) {
+                        final String node = getText(setNode);
+                        if (masterOnList == null) {
+                            masterOnList = new ArrayList<String>();
+                        }
+                        masterOnList.add(node);
                     } else if (setNode.getNodeName().equals("slave")) {
                         final String node = getText(setNode);
                         if (slaveOnList == null) {
@@ -1549,8 +1562,9 @@ public class CRMXML extends XML {
                         slaveOnList.add(node);
                     }
                 }
-                resStatusMap.put(id,
-                                 new ResStatus(runningOnList, slaveOnList));
+                resStatusMap.put(id, new ResStatus(runningOnList,
+                                                   masterOnList,
+                                                   slaveOnList));
             }
         }
         return resStatusMap;

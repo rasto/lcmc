@@ -75,6 +75,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.awt.Dimension;
 
 import javax.swing.JPanel;
@@ -145,6 +146,8 @@ public abstract class ResourceGraph {
     private final Mutex mTestAnimationListLock = new Mutex();
     /** Animation thread */
     private volatile Thread animationThread = null;
+    /** This mutex is for protecting the animation thread. */
+    private final Mutex mAnimationThreadLock = new Mutex();
     /** Map from vertex to its width. */
     private final Map<Vertex, Integer>vertexWidth =
                                                new HashMap<Vertex, Integer>();
@@ -156,8 +159,12 @@ public abstract class ResourceGraph {
 
     /** Whether only test or real thing should show. */
     private volatile boolean testOnlyFlag = false;
+    /** This mutex is for protecting the testOnlyFlag. */
+    private final Mutex mTestOnlyFlag = new Mutex();
     /** Test animation thread */
     private volatile Thread testAnimationThread = null;
+    /** This mutex is for protecting the test animation thread. */
+    private final Mutex mTestAnimationThreadLock = new Mutex();
 
     /**
      * Prepares a new <code>ResourceGraph</code> object.
@@ -178,6 +185,11 @@ public abstract class ResourceGraph {
         }
         if (animationList.isEmpty()) {
             /* start animation thread */
+            try {
+                mAnimationThreadLock.acquire();
+            } catch (java.lang.InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             if (animationThread == null) {
                 animationThread = new Thread(new Runnable() {
                     public void run() {
@@ -196,7 +208,13 @@ public abstract class ResourceGraph {
                             if (animationList.isEmpty()) {
                                 mAnimationListLock.release();
                                 repaint();
+                                try {
+                                    mAnimationThreadLock.acquire();
+                                } catch (java.lang.InterruptedException ie) {
+                                    Thread.currentThread().interrupt();
+                                }
                                 animationThread = null;
+                                mAnimationThreadLock.release();
                                 break;
                             }
                             for (final Info info : animationList) {
@@ -209,6 +227,7 @@ public abstract class ResourceGraph {
                 });
                 animationThread.start();
             }
+            mAnimationThreadLock.release();
         }
         animationList.add(info);
         mAnimationListLock.release();
@@ -217,7 +236,7 @@ public abstract class ResourceGraph {
     /**
      * Stops the animation.
      */
-    public final void stopAnimation(final Info info) {
+    public final synchronized void stopAnimation(final Info info) {
         try {
             mAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
@@ -230,25 +249,62 @@ public abstract class ResourceGraph {
     /**
      * Starts the animation if vertex is being tested.
      */
-    public final void startTestAnimation(final Info info) {
+    public final void startTestAnimation(final Info info,
+                                         final CountDownLatch startTestLatch) {
         try {
             mTestAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
+        try {
+            mTestOnlyFlag.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        testOnlyFlag = false;
+        mTestOnlyFlag.release();
         if (testAnimationList.isEmpty()) {
+            try {
+                mTestAnimationThreadLock.acquire();
+            } catch (java.lang.InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             if (testAnimationThread == null) {
                 /* start test animation thread */
-                testOnlyFlag = false;
                 testAnimationThread = new Thread(new Runnable() {
                     public void run() {
                         FOREVER: while (true) {
-                            int sleep = 200;
+                            try {
+                                startTestLatch.await();
+                            } catch (InterruptedException ignored) {
+                                /* ignored */
+                            }
+                            try {
+                                mTestOnlyFlag.acquire();
+                            } catch (java.lang.InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                            }
+                            testOnlyFlag = !testOnlyFlag;
+                            final boolean testOnlyFlagLast = testOnlyFlag;
+                            mTestOnlyFlag.release();
+                            repaint();
+                            int sleep = 300;
                             if (testOnlyFlag) {
-                                sleep = 800;
+                                sleep = 1200;
                             }
                             final int interval = 50;
                             for (int s = 0; s < sleep; s+=interval) {
+                                try {
+                                    mTestOnlyFlag.acquire();
+                                } catch (java.lang.InterruptedException ie) {
+                                    Thread.currentThread().interrupt();
+                                }
+                                if (testOnlyFlag != testOnlyFlagLast) {
+                                    mTestOnlyFlag.release();
+                                    repaint();
+                                } else {
+                                    mTestOnlyFlag.release();
+                                }
                                 try {
                                     mTestAnimationListLock.acquire();
                                 } catch (java.lang.InterruptedException ie) {
@@ -256,23 +312,34 @@ public abstract class ResourceGraph {
                                 }
                                 if (testAnimationList.isEmpty()) {
                                     mTestAnimationListLock.release();
+                                    try {
+                                        mTestOnlyFlag.acquire();
+                                    } catch (java.lang.InterruptedException i) {
+                                        Thread.currentThread().interrupt();
+                                    }
+                                    testOnlyFlag = false;
+                                    mTestOnlyFlag.release();
                                     repaint();
+                                    try {
+                                        mTestAnimationThreadLock.acquire();
+                                    } catch (java.lang.InterruptedException i) {
+                                        Thread.currentThread().interrupt();
+                                    }
                                     testAnimationThread = null;
+                                    mTestAnimationThreadLock.release();
                                     break FOREVER;
                                 }
                                 mTestAnimationListLock.release();
                                 Tools.sleep(interval);
                             }
-                            testOnlyFlag = !testOnlyFlag;
-                            repaint();
                         }
                     }
                 });
                 testAnimationThread.start();
             }
+            mTestAnimationThreadLock.release();
         }
         testAnimationList.add(info);
-        System.out.println("start anim list: " + testAnimationList.size());
         mTestAnimationListLock.release();
     }
 
@@ -286,9 +353,6 @@ public abstract class ResourceGraph {
             Thread.currentThread().interrupt();
         }
         testAnimationList.remove(info);
-        System.out.println("stop anim list: " + testAnimationList.size());
-        System.out.println();
-        testOnlyFlag = false;
         mTestAnimationListLock.release();
         repaint();
     }
@@ -1289,6 +1353,14 @@ public abstract class ResourceGraph {
             }
             final int oldShapeWidth = getVertexWidth(v);
             final int oldShapeHeight = getVertexHeight(v);
+            if (isTestOnlyAnimation()) {
+                if (oldShapeWidth > shapeWidth) {
+                    shapeWidth = oldShapeWidth;
+                }
+                if (oldShapeHeight > shapeHeight) {
+                    shapeHeight = oldShapeHeight;
+                }
+            }
             final boolean widthChanged =
                                     Math.abs(oldShapeWidth - shapeWidth) > 5;
             final boolean heightChanged =
@@ -1545,7 +1617,14 @@ public abstract class ResourceGraph {
      * Returns if it is testOnly.
      */
     protected final boolean isTestOnly() {
-        return testOnlyFlag;
+        try {
+            mTestOnlyFlag.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final boolean tof = testOnlyFlag;
+        mTestOnlyFlag.release();
+        return tof;
     }
 
     /**

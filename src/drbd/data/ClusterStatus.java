@@ -485,6 +485,28 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns on which nodes the resource is master.
+     */
+    public final List<String> getMasterOnNodes(final String hbId,
+                                              final boolean testOnly) {
+        final PtestData pd = ptestData;
+        if (testOnly && pd != null) {
+            final List<String> son = pd.getMasterOnNodes(hbId);
+            if (son != null) {
+                return son;
+            }
+        }
+        if (resStateMap == null) {
+            return null;
+        }
+        final ResStatus resStatus = resStateMap.get(hbId);
+        if (resStatus == null) {
+            return null;
+        }
+        return resStatus.getMasterOnNodes();
+    }
+
+    /**
      * Returns String whether the node is online.
      * "yes", "no" or null if it is unknown.
      */
@@ -620,6 +642,8 @@ public class ClusterStatus {
         this.ptestData = ptestData;
         if (ptestData != null) {
             shadowCibQueryMap = crmXML.parseCibQuery(ptestData.getShadowCib());
+        } else {
+            shadowCibQueryMap = new CibQuery();
         }
     }
 }

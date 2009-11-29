@@ -315,7 +315,8 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final boolean addResource(final ServiceInfo serviceInfo,
                                      final ServiceInfo parent,
-                                     final Point2D pos) {
+                                     final Point2D pos,
+                                     final boolean testOnly) {
         //vv.stop();
         boolean vertexExists = true;
         Vertex v = getVertex(serviceInfo);
@@ -344,7 +345,7 @@ public class HeartbeatGraph extends ResourceGraph {
             vertexExists = false;
         }
 
-        if (parent != null) {
+        if (parent != null && !testOnly) {
             addColocation(parent, serviceInfo);
             addOrder(parent, serviceInfo);
         }
@@ -1144,7 +1145,9 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siC = hbConnectionInfo.getLastServiceInfoChild();
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
         if (edgeIsOrderList.contains(edge)) {
-            edgeIsOrderList.remove(edge);
+            if (!testOnly) {
+                edgeIsOrderList.remove(edge);
+            }
             mEdgeLock.release();
             siC.removeOrder(siP, dcHost, testOnly);
         } else {
@@ -1186,7 +1189,9 @@ public class HeartbeatGraph extends ResourceGraph {
                                   hbConnectionInfo.getLastServiceInfoWithRsc();
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
         if (edgeIsColocationList.contains(edge)) {
-            edgeIsColocationList.remove(edge);
+            if (!testOnly) {
+                edgeIsColocationList.remove(edge);
+            }
             mEdgeLock.release();
             siRsc.removeColocation(siWithRsc, dcHost, testOnly);
         } else {

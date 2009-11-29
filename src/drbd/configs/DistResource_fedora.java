@@ -40,6 +40,7 @@ public class DistResource_fedora extends
         {"distribution", "redhat"},
         {"version:Fedora release 10*", "10"},
         {"version:Fedora release 11*", "11"},
+        {"version:Fedora release 12*", "12"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},

@@ -133,6 +133,7 @@ public class MyButton extends JButton {
      */
     public JToolTip createToolTip() {
         tip = super.createToolTip();
+        tip.setBackground(Color.YELLOW);
         return tip;
     }
 

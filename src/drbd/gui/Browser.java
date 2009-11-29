@@ -778,54 +778,34 @@ public class Browser {
         protected final void addMouseOverListener(final Component c,
                                                   final ButtonCallback bc) {
             c.addMouseListener(new MouseListener() {
-                volatile Thread thread = null;
-                private final Mutex threadLock = new Mutex();
-
                 public void mouseClicked(final MouseEvent e) {
                     /* do nothing */
                 }
 
-                public void mouseEntered(final MouseEvent e) {
+                public synchronized void mouseEntered(final MouseEvent e) {
                     if (c.isShowing()
                         && c.isEnabled()) {
-                        try {
-                            threadLock.acquire();
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
-                        }
-                        if (thread != null) {
-                            threadLock.release();
-                            return;
-                        }
-                        thread = new Thread(new Runnable() {
+                        final Thread thread = new Thread(new Runnable() {
                             public void run() {
+                                System.out.println("mouse over: " + c);
                                 bc.mouseOver();
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        try {
-                                            threadLock.acquire();
-                                        } catch (InterruptedException e) {
-                                            Thread.currentThread().interrupt();
-                                        }
-                                        thread = null;
-                                        threadLock.release();
-                                    }
-                                });
                             }
                         });
-                        threadLock.release();
                         thread.start();
                     }
                 }
 
-                public void mouseExited(final MouseEvent e) {
-                    if (c.isShowing()
-                        && c.isEnabled()) {
-                        bc.mouseOut();
-                    }
+                public synchronized void mouseExited(final MouseEvent e) {
+                    final Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            System.out.println("mouse out: " + c);
+                            bc.mouseOut();
+                        }
+                    });
+                    t.start();
                 }
 
-                public void mousePressed(final MouseEvent e) {
+                public synchronized void mousePressed(final MouseEvent e) {
                     mouseExited(e);
                     /* do nothing */
                 }
