@@ -656,16 +656,21 @@ sub get_resource_status {
 		my $on;
 		my $res;
 		if ($line =~
-		    /Leave\s+resource\s+(\S+)\s+\((.*?)(?<! unmanaged)\)/) {
+		    /Leave\s+resource\s+(\S+)\s+\((.*?)\)/) {
 		  	# managed: Started, Master, Slave, Stopped
 			$res = $1;
 			my $state = $2;
 			if ($res =~/(.*):\d+$/) {
 				$res = $1;
 			}
-			if ($state =~ /^(Stopped)/) {
+			if ($state =~ /\s+unmanaged$/) {
+				$unmanaged{$res}++;
 			} else {
-				($what, $on) = map {lc} split /\s+/, $state;
+				if ($state =~ /^(Stopped)/) {
+				} else {
+					($what, $on) =
+						  map {lc} split /\s+/, $state;
+				}
 			}
 		} elsif ($line
 			 =~ /Stop\s+resource\s+(\S+)\s+\((.*)\)/) {
@@ -1106,3 +1111,4 @@ sub get_cluster_versions {
 	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
 }
+

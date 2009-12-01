@@ -441,6 +441,26 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns on which nodes the resource is managed.
+     */
+    public final boolean isManaged(final String hbId,
+                                        final boolean testOnly) {
+        final PtestData pd = ptestData;
+        if (testOnly && pd != null) {
+            return pd.isManaged(hbId);
+        }
+        if (resStateMap == null) {
+            return true;
+        }
+        final ResStatus resStatus = resStateMap.get(hbId);
+        if (resStatus == null) {
+            return true;
+        }
+        return resStatus.isManaged();
+    }
+
+
+    /**
      * Returns on which nodes the resource is running.
      */
     public final List<String> getRunningOnNodes(final String hbId,

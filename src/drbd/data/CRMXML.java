@@ -1475,16 +1475,20 @@ public class CRMXML extends XML {
         private final List<String> masterOnNodes;
         /** On which nodes the resource is slave if it is m/s resource. */
         private final List<String> slaveOnNodes;
+        /** Is managed by CRM. */
+        private boolean managed = true;
 
         /**
          * Creates a new ResStatus object.
          */
         public ResStatus(final List<String> runningOnNodes,
                          final List<String> masterOnNodes,
-                         final List<String> slaveOnNodes) {
+                         final List<String> slaveOnNodes,
+                         final boolean managed) {
             this.runningOnNodes = runningOnNodes;
             this.masterOnNodes = masterOnNodes;
             this.slaveOnNodes = slaveOnNodes;
+            this.managed = managed;
         }
 
         /**
@@ -1506,6 +1510,13 @@ public class CRMXML extends XML {
          */
         public final List<String> getSlaveOnNodes() {
             return slaveOnNodes;
+        }
+
+        /**
+         * Returns whether the resoruce is managed.
+         */
+        public final boolean isManaged() {
+            return managed;
         }
     }
 
@@ -1531,6 +1542,7 @@ public class CRMXML extends XML {
             final Node resourceNode = resources.item(i);
             if (resourceNode.getNodeName().equals("resource")) {
                 final String id = getAttribute(resourceNode, "id");
+                final String isManaged = getAttribute(resourceNode, "managed");
                 //if (runningOn != null && !"".equals(runningOn)) {
                 //    final List<String> rList = new ArrayList<String>();
                 //    rList.add(runningOn);
@@ -1540,6 +1552,11 @@ public class CRMXML extends XML {
                 List<String> runningOnList = null;
                 List<String> masterOnList = null;
                 List<String> slaveOnList = null;
+                boolean managed = false;
+                if ("managed".equals(isManaged)) {
+                    managed = true;
+                }
+                System.out.println("id: " + id + ", managed: " + managed);
                 for (int j = 0; j < statusList.getLength(); j++) {
                     final Node setNode = statusList.item(j);
                     if (setNode.getNodeName().equals("started")) {
@@ -1564,7 +1581,8 @@ public class CRMXML extends XML {
                 }
                 resStatusMap.put(id, new ResStatus(runningOnList,
                                                    masterOnList,
-                                                   slaveOnList));
+                                                   slaveOnList,
+                                                   managed));
             }
         }
         return resStatusMap;

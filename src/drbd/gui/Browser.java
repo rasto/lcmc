@@ -737,7 +737,6 @@ public class Browser {
                         && c.isEnabled()) {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
-                                System.out.println("mouse over: " + c);
                                 bc.mouseOver();
                             }
                         });
@@ -748,7 +747,6 @@ public class Browser {
                 public synchronized void mouseExited(final MouseEvent e) {
                     final Thread t = new Thread(new Runnable() {
                         public void run() {
-                            System.out.println("mouse out: " + c);
                             bc.mouseOut();
                         }
                     });

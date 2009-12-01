@@ -44,7 +44,7 @@ public class PtestData {
     /** Pattern for: LogActions: Start res_IPaddr2_1     (hardy-a) */
     private static final Pattern PTEST_ACTIONS_PATTERN =
           Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)"
-                          + "\\s+\\(([^)]*)(?<! unmanaged)\\).*");
+                          + "\\s+\\(([^)]*)\\).*");
     private static final Pattern PTEST_ERROR_PATTERN = Pattern.compile(
                            ".*ERROR: print_elem:\\s+\\[Action.*?: Pending "
                            + "\\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
@@ -65,6 +65,9 @@ public class PtestData {
     /** Master on nodes. */
     private final Map<String, List<String>> masterOnNodes =
                                          new HashMap<String, List<String>>();
+    /** Which resources are managed. */
+    private final Map<String, Boolean> managedHash =
+                                               new HashMap<String, Boolean>();
 
     /**
      * Prepares a new <code>AisCastAddress</code> object.
@@ -131,6 +134,10 @@ public class PtestData {
                         if (parts.length == 2) {
                             final String what = parts[0];
                             final String node = parts[1];
+                            if ("unmanaged".equals(node)) {
+                                managedHash.put(res, false);
+                                continue;
+                            }
                             if ("Started".equals(what)) {
                                 nodes.add(node);
                             } else if ("Slave".equals(what)) {
@@ -294,5 +301,16 @@ public class PtestData {
      */
     public final List<String> getSlaveOnNodes(final String pmId) {
         return slaveOnNodes.get(pmId);
+    }
+
+    /**
+     * Returns if service is managed.
+     */
+    public final boolean isManaged(final String pmId) {
+        final Boolean m = managedHash.get(pmId);
+        if (m == null) {
+            return true;
+        }
+        return m;
     }
 }

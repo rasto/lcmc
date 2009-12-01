@@ -4644,26 +4644,28 @@ public class ClusterBrowser extends Browser {
          * TODO: "default" value
          */
         public boolean isManaged(final boolean testOnly) {
-            final Host dcHost = getDCHost();
-            final String hbV = dcHost.getHeartbeatVersion();
-            final String pmV = dcHost.getPacemakerVersion();
-            String isManagedString = "is-managed";
-            if (pmV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                isManagedString = "is_managed";
-            }
-            String isManaged =
-                clusterStatus.getParameter(getService().getHeartbeatId(),
-                                           isManagedString,
+            return clusterStatus.isManaged(getService().getHeartbeatId(),
                                            testOnly);
-            if (isManaged == null) {
-                isManaged = getParamDefault(isManagedString);
-            }
-            if ("true".equals(isManaged)) {
-                return true;
-            }
-            return false;
+            //final Host dcHost = getDCHost();
+            //final String hbV = dcHost.getHeartbeatVersion();
+            //final String pmV = dcHost.getPacemakerVersion();
+            //String isManagedString = "is-managed";
+            //if (pmV == null
+            //    && hbV != null
+            //    && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            //    isManagedString = "is_managed";
+            //}
+            //String isManaged =
+            //    clusterStatus.getParameter(getService().getHeartbeatId(),
+            //                               isManagedString,
+            //                               testOnly);
+            //if (isManaged == null) {
+            //    isManaged = getParamDefault(isManagedString);
+            //}
+            //if ("true".equals(isManaged)) {
+            //    return true;
+            //}
+            //return false;
         }
 
         /**
