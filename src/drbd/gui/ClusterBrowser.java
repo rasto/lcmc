@@ -56,6 +56,7 @@ import drbd.data.ResourceAgent;
 import drbd.data.Subtext;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.MyList;
 import drbd.utilities.ButtonCallback;
 
 import drbd.gui.HostBrowser.BlockDevInfo;
@@ -80,6 +81,7 @@ import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JRadioButton;
 import javax.swing.JList;
+import javax.swing.JToolTip;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
@@ -3903,7 +3905,10 @@ public class ClusterBrowser extends Browser {
                             };
                             m.addElement(mmi);
                         }
-                        classItem.add(Tools.getScrollingMenu(classItem, m));
+                        classItem.add(Tools.getScrollingMenu(classItem,
+                                                             m,
+                                                             new JList(m),
+                                                             null));
                         add(classItem);
                     }
                 }
@@ -5495,23 +5500,32 @@ public class ClusterBrowser extends Browser {
             final boolean abExisted = applyButton != null;
             final ServiceInfo thisClass = this;
             final ButtonCallback buttonCallback = new ButtonCallback() {
+                private volatile boolean mouseStillOver = false;
                 public final void mouseOut() {
-                    heartbeatGraph.stopTestAnimation(thisClass);
+                    mouseStillOver = false;
+                    heartbeatGraph.stopTestAnimation(applyButton);
+                    applyButton.setToolTipText(null);
                 }
 
                 public final void mouseOver() {
-                    clusterStatus.setPtestData(null);
+                    mouseStillOver = true;
+                    applyButton.setToolTipText(
+                             Tools.getString("ClusterBrowser.StartingPtest"));
+                    Tools.sleep(250);
+                    if (!mouseStillOver) {
+                        return;
+                    }
+                    mouseStillOver = false;
                     final CountDownLatch startTestLatch = new CountDownLatch(1);
-                    heartbeatGraph.startTestAnimation(thisClass,
+                    heartbeatGraph.startTestAnimation(applyButton,
                                                       startTestLatch);
-                    applyButton.setToolTipText(Tools.getString(
-                              "ClusterBrowser.StartingPtest"));
                     final Host dcHost = getDCHost();
                     try {
                         mPtestLock.acquire();
                     } catch (final InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
+                    clusterStatus.setPtestData(null);
                     apply(dcHost, true);
                     final PtestData ptestData = new PtestData(
                                                         CRM.getPtest(dcHost)
@@ -6289,7 +6303,7 @@ public class ClusterBrowser extends Browser {
                                     final boolean testOnly) {
 
             serviceInfo.getService().setResourceClass(
-                        serviceInfo.getResourceAgent().getResourceClass());
+                            serviceInfo.getResourceAgent().getResourceClass());
             if (heartbeatGraph.addResource(serviceInfo, this, pos, testOnly)) {
                 /* edge added */
                 final String parentId = getService().getHeartbeatId();
@@ -6822,7 +6836,10 @@ public class ClusterBrowser extends Browser {
                                 mmi.setPos(pos);
                                 m.addElement(mmi);
                             }
-                            classItem.add(Tools.getScrollingMenu(classItem, m));
+                            classItem.add(Tools.getScrollingMenu(classItem,
+                                                                 m,
+                                                                 new JList(m),
+                                                                 null));
                             add(classItem);
                         }
                     }
@@ -6849,7 +6866,7 @@ public class ClusterBrowser extends Browser {
                         DefaultListModel m = new DefaultListModel();
                         final Map<MyMenuItem, ButtonCallback> callbackHash =
                                      new HashMap<MyMenuItem, ButtonCallback>();
-                        final JList list = new JList(m);
+                        final MyList list = new MyList(m);
                         for (final ServiceInfo asi
                                         : getExistingServiceList(thisClass)) {
                             if (asi.getGroupInfo() != null
@@ -6874,7 +6891,8 @@ public class ClusterBrowser extends Browser {
                                                                 null,
                                                                 true,
                                                                 testOnly);
-                                                SwingUtilities.invokeLater(new Runnable() {
+                                                SwingUtilities.invokeLater(
+                                                new Runnable() {
                                                     public void run() {
                                                         repaint();
                                                     }
@@ -6897,10 +6915,10 @@ public class ClusterBrowser extends Browser {
                             };
                             callbackHash.put(mmi, mmiCallback);
                         }
-                        add(Tools.getScrollingMenuTest(this,
-                                                       m,
-                                                       callbackHash,
-                                                       list));
+                        add(Tools.getScrollingMenu(this,
+                                                   m, 
+                                                   list,
+                                                   callbackHash));
                     }
                 };
                 items.add((UpdatableItem) existingServiceMenuItem);
@@ -7055,6 +7073,7 @@ public class ClusterBrowser extends Browser {
                         cleanupResource(getDCHost(), testOnly);
                     }
                 };
+            /* cleanup ignores CIB_file */
             items.add((UpdatableItem) cleanupMenuItem);
             registerMenuItem((UpdatableItem) cleanupMenuItem);
 
@@ -7419,8 +7438,9 @@ public class ClusterBrowser extends Browser {
          * Callback to service menu items, that show ptest results in tooltips.
          */
         protected class MenuItemCallback implements ButtonCallback {
-            final ServiceInfo serviceInfo;
-            final JComponent myMenuItem;
+            private final ServiceInfo serviceInfo;
+            private final JComponent myMenuItem;
+            private volatile boolean mouseStillOver = false;
 
             public MenuItemCallback(final ServiceInfo serviceInfo,
                                     final JComponent myMenuItem) {
@@ -7430,22 +7450,29 @@ public class ClusterBrowser extends Browser {
             }
 
             public final void mouseOut() {
-                heartbeatGraph.stopTestAnimation(serviceInfo);
+                mouseStillOver = false;
+                heartbeatGraph.stopTestAnimation(myMenuItem);
                 myMenuItem.setToolTipText(null);
             }
 
             public final void mouseOver() {
-                clusterStatus.setPtestData(null);
-                final CountDownLatch startTestLatch = new CountDownLatch(1);
-                heartbeatGraph.startTestAnimation(serviceInfo, startTestLatch);
+                mouseStillOver = true;
                 myMenuItem.setToolTipText(
                               Tools.getString("ClusterBrowser.StartingPtest"));
+                Tools.sleep(250);
+                if (!mouseStillOver) {
+                    return;
+                }
+                mouseStillOver = false;
+                final CountDownLatch startTestLatch = new CountDownLatch(1);
+                heartbeatGraph.startTestAnimation(myMenuItem, startTestLatch);
                 final Host dcHost = getDCHost();
                 try {
                     mPtestLock.acquire();
                 } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
+                clusterStatus.setPtestData(null);
                 action(dcHost);
                 final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                 myMenuItem.setToolTipText(ptestData.getToolTip());
@@ -9014,7 +9041,10 @@ public class ClusterBrowser extends Browser {
                             mmi.setPos(pos);
                             m.addElement(mmi);
                         }
-                        classItem.add(Tools.getScrollingMenu(classItem, m));
+                        classItem.add(Tools.getScrollingMenu(classItem,
+                                                             m,
+                                                             new JList(m),
+                                                             null));
                         add(classItem);
                     }
                 }

@@ -101,7 +101,7 @@ public class ClusterStatus {
                                      final String param,
                                      final boolean testOnly) {
         final Map<String, String> params;
-        if (testOnly) {
+        if (testOnly && ptestData != null) {
             params = shadowCibQueryMap.getParameters().get(hbId);
         } else {
             params = cibQueryMap.getParameters().get(hbId);
@@ -387,7 +387,7 @@ public class ClusterStatus {
                                  final String onHost,
                                  final boolean testOnly) {
         Map<String, String> hostToScoreMap;
-        if (testOnly) {
+        if (testOnly && ptestData != null) {
             hostToScoreMap = shadowCibQueryMap.getLocation().get(hbId);
         } else {
             hostToScoreMap = cibQueryMap.getLocation().get(hbId);

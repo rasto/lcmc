@@ -45,9 +45,13 @@ public class PtestData {
     private static final Pattern PTEST_ACTIONS_PATTERN =
           Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)"
                           + "\\s+\\(([^)]*)(?<! unmanaged)\\).*");
+    private static final Pattern PTEST_ERROR_PATTERN = Pattern.compile(
+                           ".*ERROR: print_elem:\\s+\\[Action.*?: Pending "
+                           + "\\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
+           //".*native_color:\\s+Resource\\s+(\\S+)\\s+cannot run anywhere.*");
     /** Pattern that gets cloned resource id. */
     private static final Pattern PTEST_CLONE_PATTERN =
-                                            Pattern.compile("(.*):\\d+");
+                                                 Pattern.compile("(.*):\\d+");
     /** Tool tip. */
     private final String toolTip;
     /** Shadow cib */
@@ -81,8 +85,10 @@ public class PtestData {
             this.toolTip = null;
             return;
         }
+        boolean isToolTip = false;
         for (final String line : queries[0].split("\\r?\\n")) {
             final Matcher m = PTEST_ACTIONS_PATTERN.matcher(line);
+            final Matcher mError = PTEST_ERROR_PATTERN.matcher(line);
             if (m.matches()) {
                 final String action = m.group(1);
                 String res = m.group(2);
@@ -95,6 +101,7 @@ public class PtestData {
                 }
 
                 final String state = m.group(3);
+
                 List<String> nodes = runningOnNodes.get(res);
                 if (nodes == null) {
                     nodes = new ArrayList<String>();
@@ -140,11 +147,12 @@ public class PtestData {
                         }
                     }
                 } else if ("Stop".equals(action)) {
-                        nodes.remove(state);
-                        if (clone) {
-                            slaveNodes.remove(state);
-                            masterNodes.remove(state);
-                        }
+                    /* is handled by next regexp, if stop fails */
+                    nodes.remove(state);
+                    if (clone) {
+                        slaveNodes.remove(state);
+                        masterNodes.remove(state);
+                    }
                 } else if ("Move".equals(action)) {
                     if (state.indexOf(" -> ") >= 0) {
                         final String[] parts = state.split(" -> ");
@@ -184,15 +192,62 @@ public class PtestData {
                     /* don't show it in tooltip */
                     continue;
                 }
+            } else if (mError.matches()) {
+                String res = mError.group(1);
+                String action = mError.group(2);
+                String node = mError.group(3);
+                /* Clone */
+                boolean clone = false;
+                final Matcher cm = PTEST_CLONE_PATTERN.matcher(res);
+                if (cm.matches()) {
+                    res = cm.group(1);
+                    clone = true;
+                }
+                List<String> nodes = runningOnNodes.get(res);
+                if (nodes == null) {
+                    nodes = new ArrayList<String>();
+                }
+                List<String> slaveNodes = null;
+                if (clone) {
+                    slaveNodes = slaveOnNodes.get(res);
+                    if (slaveNodes == null) {
+                        slaveNodes = new ArrayList<String>();
+                    }
+                }
+                List<String> masterNodes = null;
+                if (clone) {
+                    masterNodes = masterOnNodes.get(res);
+                    if (masterNodes == null) {
+                        masterNodes = new ArrayList<String>();
+                    }
+                }
+                if ("stop".equals(action)) {
+                    nodes.add(node); /* stop failed */
+                    if (clone) {
+                        slaveNodes.add(node);
+                    }
+                }
+                runningOnNodes.put(res, nodes);
+                if (clone) {
+                    slaveOnNodes.put(res, slaveNodes);
+                    masterOnNodes.put(res, masterNodes);
+                }
+            } else {
+                continue;
             }
-            final String[] prefixes = new String[]{"LogActions: "};
+            final String[] prefixes = new String[]{"LogActions: ",
+                                                   "ERROR: print_elem: "};
             for (final String prefix : prefixes) {
                 final int index = line.indexOf(prefix);
                 if (index >= 0) {
                     sb.append(line.substring(index + prefix.length()));
                     sb.append("<br>");
+                    isToolTip = true;
                 }
             }
+        }
+        if (!isToolTip) {
+            sb.append("no changes");
         }
         sb.append("</html>");
         this.toolTip = sb.toString();

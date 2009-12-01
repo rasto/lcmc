@@ -129,6 +129,9 @@ public final class Tools {
     /** Expert panel mutex. */
     private static final Mutex mExpertPanels = new Mutex();
 
+    /** Previous index in the scrolling menu. */
+    private static volatile int prevScrollingMenuIndex = -1;
+
     /**
      * Private constructor.
      */
@@ -1556,48 +1559,34 @@ public final class Tools {
     /**
      * Returns a popup in a scrolling pane.
      */
-    public static JScrollPane getScrollingMenu(final MyMenu menu,
-                                               final DefaultListModel m) {
-        final JList list = new JList(m);
-        list.addMouseListener(new MouseAdapter() {
-            public void mousePressed(final MouseEvent evt) {
-                final Thread thread = new Thread(new Runnable() {
-                    public void run() {
-                        final int index = list.locationToIndex(evt.getPoint());
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                list.setSelectedIndex(index);
-                                menu.setPopupMenuVisible(false);
-                                menu.setSelected(false);
-                            }
-                        });
-                        ((MyMenuItem) m.elementAt(index)).action();
-                    }
-                });
-                thread.start();
-            }
-        });
-
-        list.addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseMoved(final MouseEvent evt) {
-                final int index = list.locationToIndex(evt.getPoint());
-                list.setSelectedIndex(index);
-            }
-        });
-        return new JScrollPane(list);
-    }
-
-    /**
-     * Returns a popup in a scrolling pane.
-     */
-    public static JScrollPane getScrollingMenuTest(
+    public static JScrollPane getScrollingMenu(
                         final MyMenu menu,
                         final DefaultListModel m,
-                        final Map<MyMenuItem, ButtonCallback> callbackHash,
-                        final JList list) {
-        //final JList list = new JList(m);
+                        final JList list,
+                        final Map<MyMenuItem, ButtonCallback> callbackHash) {
+        prevScrollingMenuIndex = -1;
+        int size = m.getSize();
+        if (size > 20) {
+            size = 20;
+        } 
+        list.setVisibleRowCount(size + 1);
         list.addMouseListener(new MouseAdapter() {
+            public void mouseExited(final MouseEvent evt) {
+                if (callbackHash != null) {
+                    prevScrollingMenuIndex = -1;
+                    for (final MyMenuItem item : callbackHash.keySet()) {
+                        callbackHash.get(item).mouseOut();
+                    }
+                }
+            }
+
             public void mousePressed(final MouseEvent evt) {
+                if (callbackHash != null) {
+                    prevScrollingMenuIndex = -1;
+                    for (final MyMenuItem item : callbackHash.keySet()) {
+                        callbackHash.get(item).mouseOut();
+                    }
+                }
                 final Thread thread = new Thread(new Runnable() {
                     public void run() {
                         final int index = list.locationToIndex(evt.getPoint());
@@ -1606,40 +1595,51 @@ public final class Tools {
                                 list.setSelectedIndex(index);
                                 menu.setPopupMenuVisible(false);
                                 menu.setSelected(false);
-                            }
-                        });
-                        ((MyMenuItem) m.elementAt(index)).action();
-                    }
-                });
-                thread.start();
-            }
-        });
-
-        list.addMouseMotionListener(new MouseMotionAdapter() {
-            private volatile int prevIndex = -1;
-            public void mouseMoved(final MouseEvent evt) {
-                final Thread thread = new Thread(new Runnable() {
-                    public void run() {
-                        final int index = list.locationToIndex(evt.getPoint());
-                        if (index == prevIndex) {
-                            return;
-                        }
-                        final int lastIndex = prevIndex;
-                        prevIndex = index;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                list.setSelectedIndex(index);
                             }
                         });
                         final MyMenuItem item = (MyMenuItem) m.elementAt(index);
-                        if (lastIndex >= 0) {
-                            System.out.println("mouse out");
-                            final MyMenuItem lastItem =
-                                           (MyMenuItem) m.elementAt(lastIndex);
-                            callbackHash.get(lastItem).mouseOut();
+                        item.action();
+                    }
+                });
+                thread.start();
+            }
+        });
+
+        list.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseMoved(final MouseEvent evt) {
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        int pIndex = list.locationToIndex(evt.getPoint());
+                        if (!list.getCellBounds(pIndex, pIndex).contains(
+                                                         evt.getPoint())) {
+                            pIndex = -1;
                         }
-                        System.out.println("mouse over");
-                        callbackHash.get(item).mouseOver();
+                        final int index = pIndex;
+                        System.out.println("index: " + index);
+                        final int lastIndex = prevScrollingMenuIndex;
+                        if (index == lastIndex) {
+                            return;
+                        }
+                        prevScrollingMenuIndex = index;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                list.setSelectedIndex(index);
+                            }
+                        });
+                        if (callbackHash != null) {
+                            if (lastIndex >= 0) {
+                                System.out.println("mouse out");
+                                final MyMenuItem lastItem =
+                                           (MyMenuItem) m.elementAt(lastIndex);
+                                callbackHash.get(lastItem).mouseOut();
+                            }
+                            System.out.println("mouse over");
+                            if (index >= 0) {
+                                final MyMenuItem item =
+                                               (MyMenuItem) m.elementAt(index);
+                                callbackHash.get(item).mouseOver();
+                            }
+                        }
                     }
                 });
                 thread.start();

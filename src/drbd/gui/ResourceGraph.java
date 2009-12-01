@@ -82,6 +82,7 @@ import javax.swing.JPanel;
 import java.awt.event.MouseEvent;
 import java.awt.Paint;
 import javax.swing.JPopupMenu;
+import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
@@ -141,7 +142,8 @@ public abstract class ResourceGraph {
     /** This mutex is for protecting the animation list. */
     private final Mutex mAnimationListLock = new Mutex();
     /** List with resources that should be animated for test view. */
-    private final List<Info> testAnimationList = new ArrayList<Info>();
+    private final List<JComponent> testAnimationList =
+                                                   new ArrayList<JComponent>();
     /** This mutex is for protecting the test animation list. */
     private final Mutex mTestAnimationListLock = new Mutex();
     /** Animation thread */
@@ -249,7 +251,7 @@ public abstract class ResourceGraph {
     /**
      * Starts the animation if vertex is being tested.
      */
-    public final void startTestAnimation(final Info info,
+    public final void startTestAnimation(final JComponent component,
                                          final CountDownLatch startTestLatch) {
         try {
             mTestAnimationListLock.acquire();
@@ -305,11 +307,15 @@ public abstract class ResourceGraph {
                                 } else {
                                     mTestOnlyFlag.release();
                                 }
+                                if (!component.isShowing()) {
+                                    stopTestAnimation(component);
+                                }
                                 try {
                                     mTestAnimationListLock.acquire();
                                 } catch (java.lang.InterruptedException ie) {
                                     Thread.currentThread().interrupt();
                                 }
+
                                 if (testAnimationList.isEmpty()) {
                                     mTestAnimationListLock.release();
                                     try {
@@ -339,22 +345,21 @@ public abstract class ResourceGraph {
             }
             mTestAnimationThreadLock.release();
         }
-        testAnimationList.add(info);
+        testAnimationList.add(component);
         mTestAnimationListLock.release();
     }
 
     /**
      * Stops the test animation.
      */
-    public final void stopTestAnimation(final Info info) {
+    public final void stopTestAnimation(final JComponent component) {
         try {
             mTestAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        testAnimationList.remove(info);
+        testAnimationList.remove(component);
         mTestAnimationListLock.release();
-        repaint();
     }
 
 

@@ -164,6 +164,8 @@ public class MyButton extends JButton {
                     robot.mouseMove((int) p.getX() + xOffset,
                                     (int) p.getY() - 2);
                     robot.mouseMove((int) p.getX() + xOffset,
+                                    (int) p.getY() + 2);
+                    robot.mouseMove((int) p.getX() + xOffset,
                                     (int) p.getY());
                 }
             }
