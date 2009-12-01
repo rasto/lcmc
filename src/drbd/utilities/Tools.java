@@ -1565,15 +1565,16 @@ public final class Tools {
                         final JList list,
                         final Map<MyMenuItem, ButtonCallback> callbackHash) {
         prevScrollingMenuIndex = -1;
-        int size = m.getSize();
-        if (size > 20) {
-            size = 20;
-        } 
-        list.setVisibleRowCount(size + 1);
+        final int maxSize = m.getSize();
+        if (maxSize > 20) {
+            list.setVisibleRowCount(20);
+        } else {
+            list.setVisibleRowCount(maxSize + 1);
+        }
         list.addMouseListener(new MouseAdapter() {
             public void mouseExited(final MouseEvent evt) {
+                prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
-                    prevScrollingMenuIndex = -1;
                     for (final MyMenuItem item : callbackHash.keySet()) {
                         callbackHash.get(item).mouseOut();
                     }
@@ -1581,8 +1582,8 @@ public final class Tools {
             }
 
             public void mousePressed(final MouseEvent evt) {
+                prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
-                    prevScrollingMenuIndex = -1;
                     for (final MyMenuItem item : callbackHash.keySet()) {
                         callbackHash.get(item).mouseOut();
                     }
@@ -1615,7 +1616,6 @@ public final class Tools {
                             pIndex = -1;
                         }
                         final int index = pIndex;
-                        System.out.println("index: " + index);
                         final int lastIndex = prevScrollingMenuIndex;
                         if (index == lastIndex) {
                             return;
@@ -1628,12 +1628,10 @@ public final class Tools {
                         });
                         if (callbackHash != null) {
                             if (lastIndex >= 0) {
-                                System.out.println("mouse out");
                                 final MyMenuItem lastItem =
                                            (MyMenuItem) m.elementAt(lastIndex);
                                 callbackHash.get(lastItem).mouseOut();
                             }
-                            System.out.println("mouse over");
                             if (index >= 0) {
                                 final MyMenuItem item =
                                                (MyMenuItem) m.elementAt(index);

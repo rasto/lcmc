@@ -234,8 +234,6 @@ public class ClusterBrowser extends Browser {
     private JTree treeMenu;
     /** Global hb status lock. */
     private final Mutex mClStatusLock = new Mutex();
-    /** Ptest lock. */
-    private final Mutex mPtestLock = new Mutex();
     /** last dc host detected. */
     private Host lastDcHost = null;
     /** dc host as reported by crm. */
@@ -1303,9 +1301,10 @@ public class ClusterBrowser extends Browser {
     /**
      * Returns whether the host is in stand by.
      */
-    public final boolean isStandby(final Host host) {
+    public final boolean isStandby(final Host host, final boolean testOnly) {
         return "on".equals(clusterStatus.getNodeParameter(host.getName(),
-                                                          "standby"));
+                                                          "standby",
+                                                          testOnly));
     }
 
     /**
@@ -1604,6 +1603,53 @@ public class ClusterBrowser extends Browser {
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
             Heartbeat.startHeartbeat(host);
+        }
+    }
+
+    /**
+     * Callback to service menu items, that show ptest results in tooltips.
+     */
+    protected class MenuItemCallback implements ButtonCallback {
+        private final Info info;
+        private final JComponent component;
+        private volatile boolean mouseStillOver = false;
+
+        public MenuItemCallback(final Info info,
+                                final JComponent component) {
+            this.info = info;
+            this.component = component;
+            
+        }
+
+        public final void mouseOut() {
+            mouseStillOver = false;
+            heartbeatGraph.stopTestAnimation(component);
+            component.setToolTipText(null);
+        }
+
+        public final void mouseOver() {
+            mouseStillOver = true;
+            component.setToolTipText(
+                          Tools.getString("ClusterBrowser.StartingPtest"));
+            Tools.sleep(250);
+            if (!mouseStillOver) {
+                return;
+            }
+            mouseStillOver = false;
+            final CountDownLatch startTestLatch = new CountDownLatch(1);
+            heartbeatGraph.startTestAnimation(component, startTestLatch);
+            final Host dcHost = getDCHost();
+            ptestLockAcquire();
+            clusterStatus.setPtestData(null);
+            action(dcHost);
+            final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
+            component.setToolTipText(ptestData.getToolTip());
+            clusterStatus.setPtestData(ptestData);
+            ptestLockRelease();
+            startTestLatch.countDown();
+        }
+
+        protected void action(final Host dcHost) {
         }
     }
 
@@ -5520,11 +5566,7 @@ public class ClusterBrowser extends Browser {
                     heartbeatGraph.startTestAnimation(applyButton,
                                                       startTestLatch);
                     final Host dcHost = getDCHost();
-                    try {
-                        mPtestLock.acquire();
-                    } catch (final InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+                    ptestLockAcquire();
                     clusterStatus.setPtestData(null);
                     apply(dcHost, true);
                     final PtestData ptestData = new PtestData(
@@ -5532,7 +5574,7 @@ public class ClusterBrowser extends Browser {
                                                         );
                     applyButton.setToolTipText(ptestData.getToolTip());
                     clusterStatus.setPtestData(ptestData);
-                    mPtestLock.release();
+                    ptestLockRelease();
                     startTestLatch.countDown();
                 }
             };
@@ -7433,57 +7475,6 @@ public class ClusterBrowser extends Browser {
             }
             return null;
         }
-        
-        /**
-         * Callback to service menu items, that show ptest results in tooltips.
-         */
-        protected class MenuItemCallback implements ButtonCallback {
-            private final ServiceInfo serviceInfo;
-            private final JComponent myMenuItem;
-            private volatile boolean mouseStillOver = false;
-
-            public MenuItemCallback(final ServiceInfo serviceInfo,
-                                    final JComponent myMenuItem) {
-                this.serviceInfo = serviceInfo;
-                this.myMenuItem = myMenuItem;
-                
-            }
-
-            public final void mouseOut() {
-                mouseStillOver = false;
-                heartbeatGraph.stopTestAnimation(myMenuItem);
-                myMenuItem.setToolTipText(null);
-            }
-
-            public final void mouseOver() {
-                mouseStillOver = true;
-                myMenuItem.setToolTipText(
-                              Tools.getString("ClusterBrowser.StartingPtest"));
-                Tools.sleep(250);
-                if (!mouseStillOver) {
-                    return;
-                }
-                mouseStillOver = false;
-                final CountDownLatch startTestLatch = new CountDownLatch(1);
-                heartbeatGraph.startTestAnimation(myMenuItem, startTestLatch);
-                final Host dcHost = getDCHost();
-                try {
-                    mPtestLock.acquire();
-                } catch (final InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                clusterStatus.setPtestData(null);
-                action(dcHost);
-                final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                myMenuItem.setToolTipText(ptestData.getToolTip());
-                clusterStatus.setPtestData(ptestData);
-                mPtestLock.release();
-                startTestLatch.countDown();
-            }
-
-            protected void action(final Host dcHost) {
-            }
-        }
     }
 
     /**
@@ -8647,7 +8638,40 @@ public class ClusterBrowser extends Browser {
             if (crmXML == null) {
                 return newPanel;
             }
-            initApplyButton(null);
+            final ButtonCallback buttonCallback = new ButtonCallback() {
+                private volatile boolean mouseStillOver = false;
+                public final void mouseOut() {
+                    mouseStillOver = false;
+                    heartbeatGraph.stopTestAnimation(applyButton);
+                    applyButton.setToolTipText(null);
+                }
+
+                public final void mouseOver() {
+                    mouseStillOver = true;
+                    applyButton.setToolTipText(
+                             Tools.getString("ClusterBrowser.StartingPtest"));
+                    Tools.sleep(250);
+                    if (!mouseStillOver) {
+                        return;
+                    }
+                    mouseStillOver = false;
+                    final CountDownLatch startTestLatch = new CountDownLatch(1);
+                    heartbeatGraph.startTestAnimation(applyButton,
+                                                      startTestLatch);
+                    final Host dcHost = getDCHost();
+                    ptestLockAcquire();
+                    clusterStatus.setPtestData(null);
+                    apply(dcHost, true);
+                    final PtestData ptestData = new PtestData(
+                                                        CRM.getPtest(dcHost)
+                                                        );
+                    applyButton.setToolTipText(ptestData.getToolTip());
+                    clusterStatus.setPtestData(ptestData);
+                    ptestLockRelease();
+                    startTestLatch.countDown();
+                }
+            };
+            initApplyButton(buttonCallback);
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
             mainPanel.setLayout(new BoxLayout(mainPanel,
@@ -9858,12 +9882,14 @@ public class ClusterBrowser extends Browser {
             for (final HbConstraintInterface c : constraints) {
                 c.apply(dcHost, testOnly);
             }
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    applyButton.setEnabled(false);
-                    applyButton.setToolTipText(null);
-                }
-            });
+            if (!testOnly) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        applyButton.setEnabled(false);
+                        applyButton.setToolTipText(null);
+                    }
+                });
+            }
         }
 
         /**
@@ -9905,7 +9931,41 @@ public class ClusterBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
-            initApplyButton(null);
+            final HbConnectionInfo thisClass = this;
+            final ButtonCallback buttonCallback = new ButtonCallback() {
+                private volatile boolean mouseStillOver = false;
+                public final void mouseOut() {
+                    mouseStillOver = false;
+                    heartbeatGraph.stopTestAnimation(applyButton);
+                    applyButton.setToolTipText(null);
+                }
+
+                public final void mouseOver() {
+                    mouseStillOver = true;
+                    applyButton.setToolTipText(
+                             Tools.getString("ClusterBrowser.StartingPtest"));
+                    Tools.sleep(250);
+                    if (!mouseStillOver) {
+                        return;
+                    }
+                    mouseStillOver = false;
+                    final CountDownLatch startTestLatch = new CountDownLatch(1);
+                    heartbeatGraph.startTestAnimation(applyButton,
+                                                      startTestLatch);
+                    final Host dcHost = getDCHost();
+                    ptestLockAcquire();
+                    clusterStatus.setPtestData(null);
+                    apply(dcHost, true);
+                    final PtestData ptestData = new PtestData(
+                                                        CRM.getPtest(dcHost)
+                                                        );
+                    applyButton.setToolTipText(ptestData.getToolTip());
+                    clusterStatus.setPtestData(ptestData);
+                    ptestLockRelease();
+                    startTestLatch.countDown();
+                }
+            };
+            initApplyButton(buttonCallback);
             for (final String col : colocationIds.keySet()) {
                 colocationIds.get(col).applyButton = applyButton;
             }
@@ -10045,6 +10105,15 @@ public class ClusterBrowser extends Browser {
                                                     testOnly);
                 }
             };
+            final MenuItemCallback removeEdgeCallback =
+                         new MenuItemCallback(thisClass, removeEdgeItem) {
+                public void action(final Host dcHost) {
+                    heartbeatGraph.removeConnection(thisClass,
+                                                    getDCHost(),
+                                                    true);
+                }
+            };
+            addMouseOverListener(removeEdgeItem, removeEdgeCallback);
             registerMenuItem(removeEdgeItem);
             items.add(removeEdgeItem);
 
@@ -10085,6 +10154,25 @@ public class ClusterBrowser extends Browser {
                 }
             };
 
+            final MenuItemCallback removeOrderCallback =
+                         new MenuItemCallback(thisClass, removeOrderItem) {
+                public void action(final Host dcHost) {
+                    if (heartbeatGraph.isOrder(thisClass)) {
+                        heartbeatGraph.removeOrder(thisClass,
+                                                   getDCHost(),
+                                                   true);
+                    } else {
+                        /* there is colocation constraint so let's get the
+                         * endpoints from it. */
+                        addOrder(getLastServiceInfoRsc(),
+                                 getLastServiceInfoWithRsc());
+                        heartbeatGraph.addOrder(thisClass,
+                                                getDCHost(),
+                                                true);
+                    }
+                }
+            };
+            addMouseOverListener(removeOrderItem, removeOrderCallback);
             registerMenuItem(removeOrderItem);
             items.add(removeOrderItem);
 
@@ -10130,6 +10218,27 @@ public class ClusterBrowser extends Browser {
                 }
             };
 
+            final MenuItemCallback removeColocationCallback =
+                         new MenuItemCallback(thisClass, removeColocationItem) {
+                public void action(final Host dcHost) {
+                    if (heartbeatGraph.isColocation(thisClass)) {
+                        heartbeatGraph.removeColocation(thisClass,
+                                                        getDCHost(),
+                                                        true);
+                    } else {
+                        /* add colocation */
+                        /* there is order constraint so let's get the endpoints
+                         * from it. */
+                        addColocation(getLastServiceInfoParent(),
+                                      getLastServiceInfoChild());
+                        heartbeatGraph.addColocation(thisClass,
+                                                     getDCHost(),
+                                                     true);
+                    }
+                }
+            };
+            addMouseOverListener(removeColocationItem,
+                                 removeColocationCallback);
             registerMenuItem(removeColocationItem);
             items.add(removeColocationItem);
             ///* TODO: reverse order */
@@ -10897,5 +11006,12 @@ public class ClusterBrowser extends Browser {
             Tools.getGUIData().registerAddHostButton(newHostWizardItem);
             return items;
         }
+    }
+
+    /**
+     * Returns cluster status object.
+     */
+    public final ClusterStatus getClusterStatus() {
+        return clusterStatus;
     }
 }

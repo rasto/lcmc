@@ -109,6 +109,8 @@ public class Browser {
     /** Color of the extra panel with advanced options. */
     private static final Color EXTRA_PANEL_BACKGROUND =
                     Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Ptest lock. */
+    private final Mutex mPtestLock = new Mutex();
 
     /** Sets the top of the menu tree. */
     protected final void setTreeTop() {
@@ -719,6 +721,50 @@ public class Browser {
                new Unit("hr",   "h",  "Hour",        "Hours")
            };
         }
+
+        /**
+         * Adds mouse over listener.
+         */
+        protected final void addMouseOverListener(final Component c,
+                                                  final ButtonCallback bc) {
+            c.addMouseListener(new MouseListener() {
+                public void mouseClicked(final MouseEvent e) {
+                    /* do nothing */
+                }
+
+                public synchronized void mouseEntered(final MouseEvent e) {
+                    if (c.isShowing()
+                        && c.isEnabled()) {
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                System.out.println("mouse over: " + c);
+                                bc.mouseOver();
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+
+                public synchronized void mouseExited(final MouseEvent e) {
+                    final Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            System.out.println("mouse out: " + c);
+                            bc.mouseOut();
+                        }
+                    });
+                    t.start();
+                }
+
+                public synchronized void mousePressed(final MouseEvent e) {
+                    mouseExited(e);
+                    /* do nothing */
+                }
+
+                public void mouseReleased(final MouseEvent e) {
+                    /* do nothing */
+                }
+            });
+        }
     }
 
     /**
@@ -770,50 +816,6 @@ public class Browser {
          */
         public EditableInfo(final String name) {
             super(name);
-        }
-
-        /**
-         * Adds mouse over listener.
-         */
-        protected final void addMouseOverListener(final Component c,
-                                                  final ButtonCallback bc) {
-            c.addMouseListener(new MouseListener() {
-                public void mouseClicked(final MouseEvent e) {
-                    /* do nothing */
-                }
-
-                public synchronized void mouseEntered(final MouseEvent e) {
-                    if (c.isShowing()
-                        && c.isEnabled()) {
-                        final Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                System.out.println("mouse over: " + c);
-                                bc.mouseOver();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-
-                public synchronized void mouseExited(final MouseEvent e) {
-                    final Thread t = new Thread(new Runnable() {
-                        public void run() {
-                            System.out.println("mouse out: " + c);
-                            bc.mouseOut();
-                        }
-                    });
-                    t.start();
-                }
-
-                public synchronized void mousePressed(final MouseEvent e) {
-                    mouseExited(e);
-                    /* do nothing */
-                }
-
-                public void mouseReleased(final MouseEvent e) {
-                    /* do nothing */
-                }
-            });
         }
 
         /**
@@ -1668,5 +1670,23 @@ public class Browser {
 
             return this;
         }
+    }
+
+    /**
+     * Acquire ptest lock.
+     */
+    protected final void ptestLockAcquire() {
+        try {
+            mPtestLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Release ptest lock.
+     */
+    protected final void ptestLockRelease() {
+        mPtestLock.release();
     }
 }

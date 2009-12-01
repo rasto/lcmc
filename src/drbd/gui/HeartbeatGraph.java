@@ -1025,7 +1025,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final HostInfo hi = vertexToHostMap.get(v);
         if (hi != null) {
             icons.add(HOST_ICON);
-            if (hi.isStandby()) {
+            if (hi.isStandby(testOnly)) {
                 icons.add(HOST_STANDBY_ICON);
             }
             return icons;
@@ -1092,10 +1092,9 @@ public class HeartbeatGraph extends ResourceGraph {
     /**
      * Removes the connection, the order, the colocation or both.
      */
-    public final void removeConnection(
-                                    final HbConnectionInfo hbConnectionInfo,
-                                    final Host dcHost,
-                                    final boolean testOnly) {
+    public final void removeConnection(final HbConnectionInfo hbConnectionInfo,
+                                       final Host dcHost,
+                                       final boolean testOnly) {
         try {
             mEdgeLock.acquire();
         } catch (java.lang.InterruptedException ie) {
@@ -1119,13 +1118,17 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siWithRsc =
                                 hbConnectionInfo.getLastServiceInfoWithRsc();
         if (edgeIsColocationList.contains(edge)) {
-            edgeIsOrderList.remove(edge);
-            edgeIsColocationList.remove(edge);
+            if (!testOnly) {
+                edgeIsOrderList.remove(edge);
+                edgeIsColocationList.remove(edge);
+            }
             mEdgeLock.release();
             siRsc.removeColocation(siWithRsc, dcHost, testOnly);
         } else {
-            edgeIsOrderList.remove(edge);
-            edgeIsColocationList.remove(edge);
+            if (!testOnly) {
+                edgeIsOrderList.remove(edge);
+                edgeIsColocationList.remove(edge);
+            }
             mEdgeLock.release();
         }
     }

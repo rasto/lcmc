@@ -227,6 +227,13 @@ public class PtestData {
                         slaveNodes.add(node);
                     }
                 }
+                if ("start".equals(action)) {
+                    nodes.remove(node); /* start failed */
+                    if (clone) {
+                        slaveNodes.remove(node);
+                        masterNodes.remove(node);
+                    }
+                }
                 runningOnNodes.put(res, nodes);
                 if (clone) {
                     slaveOnNodes.put(res, slaveNodes);

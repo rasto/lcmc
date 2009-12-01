@@ -536,8 +536,14 @@ public class ClusterStatus {
       * Returns value for specified node and parameter.
       */
     public final String getNodeParameter(final String node,
-                                         final String param) {
-        final MultiKeyMap nodeParams = cibQueryMap.getNodeParameters();
+                                         final String param,
+                                         final boolean testOnly) {
+        final MultiKeyMap nodeParams;
+        if (testOnly && ptestData != null) {
+            nodeParams = shadowCibQueryMap.getNodeParameters();
+        } else {
+            nodeParams = cibQueryMap.getNodeParameters();
+        }
         if (nodeParams == null) {
             return null;
         } else {

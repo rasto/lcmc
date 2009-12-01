@@ -31,6 +31,8 @@ import drbd.data.resources.BlockDevice;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.Subtext;
+import drbd.data.PtestData;
+import drbd.data.ClusterStatus;
 import drbd.gui.ClusterBrowser.DrbdInfo;
 import drbd.gui.ClusterBrowser.DrbdResourceInfo;
 import drbd.AddDrbdUpgradeDialog;
@@ -41,6 +43,7 @@ import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Heartbeat;
 import drbd.utilities.CRM;
+import drbd.utilities.ButtonCallback;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JPanel;
@@ -60,6 +63,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -839,8 +843,9 @@ public class HostBrowser extends Browser {
             items.add(hostWizardItem);
             registerMenuItem(hostWizardItem);
             Tools.getGUIData().registerAddHostButton(hostWizardItem);
-            /* heartbeat standby on */
-            final MyMenuItem standByOnItem =
+            /* heartbeat standby on/off */
+            final HostInfo thisClass = this;
+            final MyMenuItem standbyItem =
                 new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
                                HOST_STANDBY_ICON,
                                null,
@@ -851,7 +856,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
-                        return !isStandby();
+                        return !isStandby(testOnly);
                     }
 
                     public boolean enablePredicate() {
@@ -859,15 +864,26 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        if (isStandby()) {
+                        if (isStandby(testOnly)) {
                             CRM.standByOff(host, testOnly);
                         } else {
                             CRM.standByOn(host, testOnly);
                         }
                     }
                 };
-            items.add(standByOnItem);
-            registerMenuItem(standByOnItem);
+            final MenuItemCallback standbyItemCallback =
+                            new MenuItemCallback(thisClass, standbyItem) {
+                public void action(final Host host) {
+                    if (isStandby(false)) {
+                        CRM.standByOff(host, true);
+                    } else {
+                        CRM.standByOn(host, true);
+                    }
+                }
+            };
+            addMouseOverListener(standbyItem, standbyItemCallback);
+            items.add(standbyItem);
+            registerMenuItem(standbyItem);
             /* change host color */
             final MyMenuItem changeHostColorItem =
                 new MyMenuItem(Tools.getString(
@@ -953,9 +969,9 @@ public class HostBrowser extends Browser {
         }
 
         /**
-         * Returns grahical view if there is any.
+         * Returns Cluster graph.
          */
-        public final JPanel getGraphicalView() {
+        private final HeartbeatGraph getHeartbeatGraph() {
             final Cluster c = host.getCluster();
             if (c == null) {
                 return null;
@@ -964,7 +980,14 @@ public class HostBrowser extends Browser {
             if (b == null) {
                 return null;
             }
-            final HeartbeatGraph hg = (HeartbeatGraph) b.getHeartbeatGraph();
+            return (HeartbeatGraph) b.getHeartbeatGraph();
+        }
+
+        /**
+         * Returns grahical view if there is any.
+         */
+        public final JPanel getGraphicalView() {
+            final HeartbeatGraph hg = getHeartbeatGraph();
             if (hg == null) {
                 return null;
             }
@@ -1010,7 +1033,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns whether this host is in stand by.
          */
-        public final boolean isStandby() {
+        public final boolean isStandby(final boolean testOnly) {
             final Cluster c = host.getCluster();
             if (c == null) {
                 return false;
@@ -1019,7 +1042,22 @@ public class HostBrowser extends Browser {
             if (b == null) {
                 return false;
             }
-            return b.isStandby(host);
+            return b.isStandby(host, testOnly);
+        }
+
+        /**
+         * Returns cluster status.
+         */
+        public final ClusterStatus getClusterStatus() {
+            final Cluster c = host.getCluster();
+            if (c == null) {
+                return null;
+            }
+            final ClusterBrowser b = c.getBrowser();
+            if (b == null) {
+                return null;
+            }
+            return b.getClusterStatus();
         }
 
         /**
@@ -1027,7 +1065,7 @@ public class HostBrowser extends Browser {
          */
         protected Subtext getRightCornerTextForGraph(final boolean testOnly) {
             if (getHost().isClStatus()) {
-                if (isStandby()) {
+                if (isStandby(testOnly)) {
                     return STANDBY_SUBTEXT;
                 } else {
                     return ONLINE_SUBTEXT;
@@ -1036,6 +1074,52 @@ public class HostBrowser extends Browser {
                 return OFFLINE_SUBTEXT;
             }
             return null;
+        }
+
+        /**
+         * Callback to service menu items, that show ptest results in tooltips.
+         */
+        protected class MenuItemCallback implements ButtonCallback {
+            private final Info info;
+            private final JComponent component;
+            private volatile boolean mouseStillOver = false;
+
+            public MenuItemCallback(final Info info,
+                                    final JComponent component) {
+                this.info = info;
+                this.component = component;
+                
+            }
+
+            public final void mouseOut() {
+                mouseStillOver = false;
+                getHeartbeatGraph().stopTestAnimation(component);
+                component.setToolTipText(null);
+            }
+
+            public final void mouseOver() {
+                mouseStillOver = true;
+                component.setToolTipText(
+                              Tools.getString("ClusterBrowser.StartingPtest"));
+                Tools.sleep(250);
+                if (!mouseStillOver) {
+                    return;
+                }
+                mouseStillOver = false;
+                final CountDownLatch startTestLatch = new CountDownLatch(1);
+                getHeartbeatGraph().startTestAnimation(component, startTestLatch);
+                ptestLockAcquire();
+                getClusterStatus().setPtestData(null);
+                action(host);
+                final PtestData ptestData = new PtestData(CRM.getPtest(host));
+                component.setToolTipText(ptestData.getToolTip());
+                getClusterStatus().setPtestData(ptestData);
+                ptestLockRelease();
+                startTestLatch.countDown();
+            }
+
+            protected void action(final Host dcHost) {
+            }
         }
     }
 
