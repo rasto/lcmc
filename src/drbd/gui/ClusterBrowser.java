@@ -35,6 +35,7 @@ import drbd.gui.dialog.ClusterLogs;
 import drbd.gui.dialog.ServiceLogs;
 import drbd.gui.dialog.ClusterDrbdLogs;
 import drbd.data.PtestData;
+import drbd.data.DRBDtestData;
 
 import drbd.data.Host;
 import drbd.data.Cluster;
@@ -170,6 +171,8 @@ public class ClusterBrowser extends Browser {
     private CRMXML crmXML;
     /** Object that drbd status and data. */
     private DrbdXML drbdXML;
+    /** Object that has drbd test data. */
+    private DRBDtestData drbdtestData;
 
     /** Common block device icon. */
     private static final ImageIcon COMMON_BD_ICON =
@@ -1849,7 +1852,8 @@ public class ClusterBrowser extends Browser {
                 if (params.length != 0) {
                     final StringBuffer sectionConfig = new StringBuffer("");
                     for (String param : params) {
-                        final String value = getResource().getValue(param);
+                        //final String value = getResource().getValue(param);
+                        final String value = getComboBoxValue(param);
                         if (value == null) {
                             Tools.debug(this, "section: " + section
                                     + ", param " + param + " ("
@@ -1915,7 +1919,8 @@ public class ClusterBrowser extends Browser {
                 config.append('\t');
                 config.append(param);
                 config.append('\t');
-                config.append(getResource().getValue(param));
+                //config.append(getResource().getValue(param));
+                config.append(getComboBoxValue(param));
                 config.append(";\n");
             }
             if (params.length != 0) {
@@ -1960,13 +1965,13 @@ public class ClusterBrowser extends Browser {
         /**
          * Connect block device from the specified host.
          */
-        public final void connect(final Host host) {
+        public final void connect(final Host host, final boolean testOnly) {
             if (blockDevInfo1.getHost() == host
-                && !blockDevInfo1.getBlockDevice().isConnectedOrWF()) {
-                blockDevInfo1.connect();
+                && !blockDevInfo1.isConnectedOrWF(false)) {
+                blockDevInfo1.connect(testOnly);
             } else if (blockDevInfo2.getHost() == host
-                       && !blockDevInfo2.getBlockDevice().isConnectedOrWF()) {
-                blockDevInfo2.connect();
+                       && !blockDevInfo2.isConnectedOrWF(false)) {
+                blockDevInfo2.connect(testOnly);
             }
         }
 
@@ -1974,9 +1979,9 @@ public class ClusterBrowser extends Browser {
          * Returns whether the resources is connected, meaning both devices are
          * connected.
          */
-        public final boolean isConnected() {
-            return blockDevInfo1.getBlockDevice().isConnected()
-                   && blockDevInfo2.getBlockDevice().isConnected();
+        public final boolean isConnected(final boolean testOnly) {
+            return blockDevInfo1.isConnected(testOnly)
+                   && blockDevInfo2.isConnected(testOnly);
         }
 
         /**
@@ -2351,7 +2356,51 @@ public class ClusterBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
-            initApplyButton(null);
+            final ButtonCallback buttonCallback = new ButtonCallback() {
+                private volatile boolean mouseStillOver = false;
+                public final void mouseOut() {
+                    mouseStillOver = false;
+                    drbdGraph.stopTestAnimation(applyButton);
+                    applyButton.setToolTipText(null);
+                }
+
+                public final void mouseOver() {
+                    mouseStillOver = true;
+                    applyButton.setToolTipText(
+                           Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                    Tools.sleep(250);
+                    if (!mouseStillOver) {
+                        return;
+                    }
+                    mouseStillOver = false;
+                    final CountDownLatch startTestLatch = new CountDownLatch(1);
+                    drbdGraph.startTestAnimation(applyButton, startTestLatch);
+                    drbdtestLockAcquire();
+                    //clusterStatus.setDRBDtestData(null);
+                    apply(true);
+                    final Map<Host,String> testOutput =
+                                             new LinkedHashMap<Host, String>();
+                    try {
+                        getDrbdInfo().createDrbdConfig(true);
+                        for (final Host h : cluster.getHostsArray()) {
+                            DRBD.adjust(h, "all", true);
+                            testOutput.put(h, DRBD.getDRBDtest());
+                        }
+                    } catch (Exceptions.DrbdConfigException dce) {
+                        clStatusUnlock();
+                        Tools.appError("config failed");
+                    }
+                    final DRBDtestData dtd = new DRBDtestData(testOutput);
+                    applyButton.setToolTipText(dtd.getToolTip());
+                    drbdtestdataLockAcquire();
+                    drbdtestData = dtd;
+                    drbdtestdataLockRelease();
+                    //clusterStatus.setPtestData(ptestData);
+                    drbdtestLockRelease();
+                    startTestLatch.countDown();
+                }
+            };
+            initApplyButton(buttonCallback);
 
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -2407,9 +2456,9 @@ public class ClusterBrowser extends Browser {
                                 clStatusLock();
                                 apply(false);
                                 try {
-                                    getDrbdInfo().createDrbdConfig();
+                                    getDrbdInfo().createDrbdConfig(false);
                                     for (final Host h : cluster.getHostsArray()) {
-                                        DRBD.adjust(h, "all");
+                                        DRBD.adjust(h, "all", false);
                                     }
                                 } catch (Exceptions.DrbdConfigException dce) {
                                     clStatusUnlock();
@@ -2468,7 +2517,7 @@ public class ClusterBrowser extends Browser {
             drbdGraph.removeDrbdResource(this);
             final Host[] hosts = cluster.getHostsArray();
             for (Host host : hosts) {
-                DRBD.down(host, getName());
+                DRBD.down(host, getName(), testOnly);
             }
             super.removeMyself(testOnly);
             final DrbdResourceInfo dri = drbdResHash.get(getName());
@@ -2486,7 +2535,7 @@ public class ClusterBrowser extends Browser {
             updateCommonBlockDevices();
 
             try {
-                drbdGraph.getDrbdInfo().createDrbdConfig();
+                drbdGraph.getDrbdInfo().createDrbdConfig(testOnly);
             } catch (Exceptions.DrbdConfigException dce) {
                 Tools.appError("config failed");
             }
@@ -2679,6 +2728,7 @@ public class ClusterBrowser extends Browser {
          * Returns the list of items for the popup menu for drbd resource.
          */
         public final List<UpdatableItem> createPopup() {
+            final boolean testOnly = false;
             final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
             final MyMenuItem removeResMenu = new MyMenuItem(
@@ -2692,7 +2742,7 @@ public class ClusterBrowser extends Browser {
                     /* this drbdResourceInfo remove myself and this calls
                        removeDrbdResource in this class, that removes the edge
                        in the graph. */
-                    removeMyself(false);
+                    removeMyself(testOnly);
                 }
 
                 public boolean enablePredicate() {
@@ -2719,7 +2769,7 @@ public class ClusterBrowser extends Browser {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
-                    return !isConnected();
+                    return !isConnected(testOnly);
                 }
 
                 public boolean enablePredicate() {
@@ -2731,15 +2781,15 @@ public class ClusterBrowser extends Browser {
                     BlockDevInfo destBDI   = drbdGraph.getDest(thisClass);
                     if (this.getText().equals(Tools.getString(
                                     "ClusterBrowser.Drbd.ResourceConnect"))) {
-                        if (!destBDI.getBlockDevice().isConnectedOrWF()) {
-                            destBDI.connect();
+                        if (!destBDI.isConnectedOrWF(testOnly)) {
+                            destBDI.connect(testOnly);
                         }
-                        if (!sourceBDI.getBlockDevice().isConnectedOrWF()) {
-                            sourceBDI.connect();
+                        if (!sourceBDI.isConnectedOrWF(testOnly)) {
+                            sourceBDI.connect(testOnly);
                         }
                     } else {
-                        destBDI.disconnect();
-                        sourceBDI.disconnect();
+                        destBDI.disconnect(testOnly);
+                        sourceBDI.disconnect(testOnly);
                     }
                 }
             };
@@ -2772,14 +2822,14 @@ public class ClusterBrowser extends Browser {
                     if (this.getText().equals(Tools.getString(
                                 "ClusterBrowser.Drbd.ResourceResumeSync"))) {
                         if (destBDI.getBlockDevice().isPausedSync()) {
-                            destBDI.resumeSync();
+                            destBDI.resumeSync(testOnly);
                         }
                         if (sourceBDI.getBlockDevice().isPausedSync()) {
-                            sourceBDI.resumeSync();
+                            sourceBDI.resumeSync(testOnly);
                         }
                     } else {
-                            sourceBDI.pauseSync();
-                            destBDI.pauseSync();
+                            sourceBDI.pauseSync(testOnly);
+                            destBDI.pauseSync(testOnly);
                     }
                 }
             };
@@ -10440,7 +10490,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Creates drbd config.
          */
-        public final void createDrbdConfig()
+        public final void createDrbdConfig(final boolean testOnly)
                    throws Exceptions.DrbdConfigException {
             final StringBuffer config = new StringBuffer(160);
             config.append("## generated by drbd-gui ");
@@ -10459,7 +10509,8 @@ public class ClusterBrowser extends Browser {
                     global.append(Tools.escapeConfig(value));
                     global.append(";\n");
                 } else {
-                    String value = getResource().getValue(param);
+                    //String value = getResource().getValue(param);
+                    String value = getComboBoxValue(param);
                     if (value == null && "usage-count".equals(param)) {
                         value = "yes";
                     }
@@ -10497,13 +10548,24 @@ public class ClusterBrowser extends Browser {
                         }
                     }
                 }
+                String dir;
+                String configName;
+                boolean makeBackup;
+                if (testOnly) {
+                    dir = "/var/lib/drbd/";
+                    configName = "drbd.conf-drbd-mc-test";
+                    makeBackup = false;
+                } else {
+                    dir = "/etc/";
+                    configName = "drbd.conf";
+                    makeBackup = true;
+                }
                 host.getSSH().createConfig(config.toString()
-                                             + resConfig.toString(),
-                                           "drbd.conf",
-                                           "/etc/",
+                                           + resConfig.toString(),
+                                           configName,
+                                           dir,
                                            "0600",
-                                           true);
-                //DRBD.adjust(host, "all"); // it can't be here
+                                           makeBackup);
             }
         }
 
@@ -10633,7 +10695,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Applies changes made in the info panel by user.
          */
-        public final void apply(final Host dcHost, final boolean testOnly) {
+        public final void apply(final boolean testOnly) {
             if (!testOnly) {
                 final String[] params = getParametersFromXML();
                 SwingUtilities.invokeLater(new Runnable() {
@@ -10662,7 +10724,51 @@ public class ClusterBrowser extends Browser {
                 mainPanel.add(new JLabel("drbd info not available"));
                 return mainPanel;
             }
-            initApplyButton(null);
+            final ButtonCallback buttonCallback = new ButtonCallback() {
+                private volatile boolean mouseStillOver = false;
+                public final void mouseOut() {
+                    mouseStillOver = false;
+                    drbdGraph.stopTestAnimation(applyButton);
+                    applyButton.setToolTipText(null);
+                }
+
+                public final void mouseOver() {
+                    mouseStillOver = true;
+                    applyButton.setToolTipText(
+                           Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                    Tools.sleep(250);
+                    if (!mouseStillOver) {
+                        return;
+                    }
+                    mouseStillOver = false;
+                    final CountDownLatch startTestLatch = new CountDownLatch(1);
+                    drbdGraph.startTestAnimation(applyButton, startTestLatch);
+                    drbdtestLockAcquire();
+                    //clusterStatus.setDRBDtestData(null);
+                    apply(true);
+                    final Map<Host,String> testOutput =
+                                             new LinkedHashMap<Host, String>();
+                    try {
+                        createDrbdConfig(true);
+                        for (final Host h : cluster.getHostsArray()) {
+                            DRBD.adjust(h, "all", true);
+                            testOutput.put(h, DRBD.getDRBDtest());
+                        }
+                    } catch (Exceptions.DrbdConfigException dce) {
+                        clStatusUnlock();
+                        Tools.appError("config failed");
+                    }
+                    final DRBDtestData dtd = new DRBDtestData(testOutput);
+                    applyButton.setToolTipText(dtd.getToolTip());
+                    drbdtestdataLockAcquire();
+                    drbdtestData = dtd;
+                    drbdtestdataLockRelease();
+                    //clusterStatus.setPtestData(ptestData);
+                    drbdtestLockRelease();
+                    startTestLatch.countDown();
+                }
+            };
+            initApplyButton(buttonCallback);
             mainPanel.setBackground(PANEL_BACKGROUND);
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
@@ -10707,7 +10813,16 @@ public class ClusterBrowser extends Browser {
                         Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 clStatusLock();
-                                apply(getDCHost(), false);
+                                apply(false);
+                                try {
+                                    createDrbdConfig(false);
+                                    for (final Host h : cluster.getHostsArray()) {
+                                        DRBD.adjust(h, "all", false);
+                                    }
+                                } catch (final Exceptions.DrbdConfigException dce) {
+                                    clStatusUnlock();
+                                    Tools.appError("config failed");
+                                }
                                 clStatusUnlock();
                             }
                         });
@@ -11015,5 +11130,24 @@ public class ClusterBrowser extends Browser {
      */
     public final ClusterStatus getClusterStatus() {
         return clusterStatus;
+    }
+
+    /**
+     * Returns drbd test data.
+     */
+    public final DRBDtestData getDRBDtestData() {
+        drbdtestdataLockAcquire();
+        final DRBDtestData dtd = drbdtestData;
+        drbdtestdataLockRelease();
+        return dtd;
+    }
+
+    /**
+     * Sets drbd test data.
+     */
+    public final void setDRBDtestData(final DRBDtestData drbdtestData) {
+        drbdtestdataLockAcquire();
+        this.drbdtestData = drbdtestData;
+        drbdtestdataLockRelease();
     }
 }

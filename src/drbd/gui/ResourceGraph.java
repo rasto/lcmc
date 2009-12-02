@@ -1106,6 +1106,13 @@ public abstract class ResourceGraph {
     }
 
     /**
+     * Returns whether the edge is picked.
+     */
+    public final boolean isPicked(final Edge e) {
+        return pr.isPicked(e);
+    }
+
+    /**
      * This class provides methods for different paint colors for different
      * conditions.
      */

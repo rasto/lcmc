@@ -49,6 +49,7 @@ import edu.uci.ics.jung.visualization.VertexShapeFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -294,12 +295,13 @@ public class DrbdGraph extends ResourceGraph {
             final MyEdge edge = (MyEdge) e;
             final Vertex source = edge.getSource();
             final Vertex dest = edge.getDest();
-            final BlockDevice sourceBD =
-                            ((BlockDevInfo) getInfo(source)).getBlockDevice();
-            final BlockDevice destBD =
-                            ((BlockDevInfo) getInfo(dest)).getBlockDevice();
-            if (!destBD.isConnected()) {
-                if (sourceBD.isWFConnection() && !destBD.isWFConnection()) {
+            final BlockDevInfo sourceBDI = (BlockDevInfo) getInfo(source);
+            final BlockDevInfo destBDI = (BlockDevInfo) getInfo(dest);
+            final BlockDevice sourceBD = sourceBDI.getBlockDevice();
+            final BlockDevice destBD = destBDI.getBlockDevice();
+            if (!destBDI.isConnected(isTestOnly())) {
+                if (sourceBDI.isWFConnection(isTestOnly())
+                    && !destBDI.isWFConnection(isTestOnly())) {
                     edge.setDirection(dest, source);
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
@@ -331,7 +333,7 @@ public class DrbdGraph extends ResourceGraph {
                     }
                 } else if (dri.isSplitBrain()) {
                     l.append(" (split-brain)");
-                } else if (!dri.isConnected()) {
+                } else if (!dri.isConnected(isTestOnly())) {
                     l.append(" (disconnected)");
                 }
                 return l.toString();
@@ -800,15 +802,16 @@ public class DrbdGraph extends ResourceGraph {
      */
     protected final boolean showEdgeArrow(final Edge e) {
         final MyEdge edge = (MyEdge) e;
-        final BlockDevice sourceBD =
-                ((BlockDevInfo) getInfo(edge.getSource())).getBlockDevice();
-        final BlockDevice destBD =
-                ((BlockDevInfo) getInfo(edge.getDest())).getBlockDevice();
+        final BlockDevInfo sourceBDI = (BlockDevInfo) getInfo(edge.getSource());
+        final BlockDevInfo destBDI = (BlockDevInfo) getInfo(edge.getDest());
+        final BlockDevice sourceBD = sourceBDI.getBlockDevice();
+        final BlockDevice destBD = destBDI.getBlockDevice();
 
-        if (sourceBD.isConnected()
+        if (sourceBDI.isConnected(isTestOnly())
             && sourceBD.isPrimary() != destBD.isPrimary()) {
             return true;
-        } else if (sourceBD.isWFConnection() ^ destBD.isWFConnection()) {
+        } else if (sourceBDI.isWFConnection(isTestOnly())
+                   ^ destBDI.isWFConnection(isTestOnly())) {
             /* show arrow from wf connection */
             return true;
         }
@@ -822,7 +825,7 @@ public class DrbdGraph extends ResourceGraph {
     protected final Paint getEdgeDrawPaint(final Edge e) {
         final MyEdge edge = (MyEdge) e;
         final DrbdResourceInfo dri = edgeToDrbdResourceMap.get(e);
-        if (dri.isConnected() && !dri.isSplitBrain()) {
+        if (dri.isConnected(isTestOnly()) && !dri.isSplitBrain()) {
             return super.getEdgeDrawPaint(edge);
         } else {
             return Tools.getDefaultColor(
@@ -838,7 +841,7 @@ public class DrbdGraph extends ResourceGraph {
     protected final Paint getEdgePickedPaint(final Edge e) {
         final MyEdge edge = (MyEdge) e;
         final DrbdResourceInfo dri = edgeToDrbdResourceMap.get(e);
-        if (dri.isConnected() && !dri.isSplitBrain()) {
+        if (dri.isConnected(isTestOnly()) && !dri.isSplitBrain()) {
             return super.getEdgePickedPaint(edge);
         } else {
             return Tools.getDefaultColor(
@@ -941,9 +944,37 @@ public class DrbdGraph extends ResourceGraph {
                          (int) (height));
         }
         if (isPicked(v)) {
-            g2d.setColor(Color.BLACK);
+            if (isTestOnly()) {
+                g2d.setColor(Color.RED);
+            } else {
+                g2d.setColor(Color.BLACK);
+            }
         } else {
-            g2d.setColor(Color.WHITE);
+            boolean pickedResource = false;
+            if (isTestOnly()) {
+                final Set inEdges = v.getInEdges();
+
+                for (final Object e : inEdges) {
+                    if (isPicked((Edge) e)) {
+                        pickedResource = true;
+                        break;
+                    }
+                }
+                if (!pickedResource) {
+                    final Set outEdges = v.getOutEdges();
+                    for (final Object e : outEdges) {
+                        if (isPicked((Edge) e)) {
+                            pickedResource = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (pickedResource) {
+                g2d.setColor(Color.red);
+            } else {
+                g2d.setColor(Color.WHITE);
+            }
         }
         g2d.setStroke(new BasicStroke(1.5f));
         g2d.draw(shape);

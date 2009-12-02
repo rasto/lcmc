@@ -117,17 +117,20 @@ public class DrbdConfigCreateMD extends DrbdConfig {
                     if ("internal".equals(drbdMetaDisk)) {
                         drbdMetaDisk = bdis[index].getName();
                     }
+                    final boolean testOnly = false;
                     if (destroyData) {
                         DRBD.createMDDestroyData(
                                             bdis[index].getHost(),
                                             getDrbdResourceInfo().getName(),
                                             drbdMetaDisk,
-                                            execCallback);
+                                            execCallback,
+                                            testOnly);
                     } else {
                         DRBD.createMD(bdis[index].getHost(),
                                       getDrbdResourceInfo().getName(),
                                       drbdMetaDisk,
-                                      execCallback);
+                                      execCallback,
+                                      testOnly);
                     }
                 }
             });
@@ -180,8 +183,9 @@ public class DrbdConfigCreateMD extends DrbdConfig {
     public WizardDialog nextDialog() {
         final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
-        DRBD.up(bdi1.getHost(), getDrbdResourceInfo().getName());
-        DRBD.up(bdi2.getHost(), getDrbdResourceInfo().getName());
+        final boolean testOnly = false;
+        DRBD.up(bdi1.getHost(), getDrbdResourceInfo().getName(), testOnly);
+        DRBD.up(bdi2.getHost(), getDrbdResourceInfo().getName(), testOnly);
         return new DrbdConfigCreateFS(this, getDrbdResourceInfo());
     }
 

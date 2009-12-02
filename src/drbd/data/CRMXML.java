@@ -1556,7 +1556,6 @@ public class CRMXML extends XML {
                 if ("managed".equals(isManaged)) {
                     managed = true;
                 }
-                System.out.println("id: " + id + ", managed: " + managed);
                 for (int j = 0; j < statusList.getLength(); j++) {
                     final Node setNode = statusList.item(j);
                     if (setNode.getNodeName().equals("started")) {

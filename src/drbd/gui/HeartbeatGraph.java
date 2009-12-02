@@ -1397,7 +1397,11 @@ public class HeartbeatGraph extends ResourceGraph {
             }
         }
         if (isPicked(v)) {
-            g2d.setColor(Color.BLACK);
+            if (isTestOnly()) {
+                g2d.setColor(Color.RED);
+            } else {
+                g2d.setColor(Color.BLACK);
+            }
         } else {
             g2d.setColor(Color.WHITE);
         }

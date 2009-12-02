@@ -288,16 +288,24 @@ public class BlockDevice extends Resource {
     }
 
     /**
-     * Returns net interface and port concanated with ':'
+     * Returns stored net interface and port concanated with ':'
      * It can return null if net interface or port are not defined.
      */
-    public final String getDrbdNetInterfaceWithPort() {
-        final String ni = getValue("DrbdNetInterface");
-        final String nip = getValue("DrbdNetInterfacePort");
+    public final String getDrbdNetInterfaceWithPort(final String ni,
+                                                    final String nip) {
         if (ni == null || nip == null) {
             return null;
         }
         return ni + ":" + nip;
+    }
+
+    /**
+     * Returns stored net interface and port concanated with ':'
+     * It can return null if net interface or port are not defined.
+     */
+    public final String getDrbdNetInterfaceWithPort() {
+        return getDrbdNetInterfaceWithPort(getValue("DrbdNetInterface"),
+                                           getValue("DrbdNetInterfacePort"));
     }
 
     /**
@@ -545,9 +553,8 @@ public class BlockDevice extends Resource {
     /**
      * Returns string with meta disk and index in the parenthesis.
      */
-    public final String getMetaDiskString() {
-        final String md = getValue("DrbdMetaDisk");
-        final String mdi = getValue("DrbdMetaDiskIndex");
+    public final String getMetaDiskString(final String md,
+                                          final String mdi) {
         if (md == null || mdi == null) {
             return null;
         }
@@ -564,8 +571,15 @@ public class BlockDevice extends Resource {
                 metaDiskString.append(']');
             }
         }
-
         return metaDiskString.toString();
+    }
+
+    /**
+     * Returns string with stored meta disk and index in the parenthesis.
+     */
+    public final String getMetaDiskString() {
+        return getMetaDiskString(getValue("DrbdMetaDisk"),
+                                 getValue("DrbdMetaDiskIndex"));
     }
 
     /**

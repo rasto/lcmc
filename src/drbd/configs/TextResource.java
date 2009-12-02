@@ -1392,7 +1392,14 @@ public class TextResource extends
          "<html><b>What happens when you apply it:</b><br>"
          + "Starting What-if machine...</html>"},
 
-        {"CRM.Ptest.ToolTip",
+        {"PtestData.ToolTip",
+         "What happens when you apply it:"},
+
+        {"ClusterBrowser.StartingDRBDtest",
+         "<html><b>What happens when you apply it:</b><br>"
+         + "Starting What-if machine...</html>"},
+
+        {"DRBDtestData.ToolTip",
          "What happens when you apply it:"},
 
         {"HostBrowser.HostWizard",

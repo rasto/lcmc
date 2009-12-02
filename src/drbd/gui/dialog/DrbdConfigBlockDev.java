@@ -76,8 +76,10 @@ public class DrbdConfigBlockDev extends DrbdConfig {
      * Calls drbd adjust, returns false if there is no meta-data area.
      */
     private boolean adjust(final BlockDevInfo bdi) {
+        final boolean testOnly = false;
         final int err = DRBD.adjust(bdi.getHost(),
-                                    bdi.getDrbdResourceInfo().getName());
+                                    bdi.getDrbdResourceInfo().getName(),
+                                    testOnly);
         if (err == DRBD_NO_METADATA_RC) {
             return false;
         }
@@ -99,12 +101,15 @@ public class DrbdConfigBlockDev extends DrbdConfig {
                     getDrbdResourceInfo().getOtherBlockDevInfo(blockDevInfo);
             try {
                 // TODO: check this
-                getDrbdResourceInfo().getDrbdInfo().createDrbdConfig();
+                final boolean testOnly = false;
+                getDrbdResourceInfo().getDrbdInfo().createDrbdConfig(false);
                 if (adjust(blockDevInfo) && adjust(oBdi)) {
                     DRBD.down(blockDevInfo.getHost(),
-                              getDrbdResourceInfo().getName());
+                              getDrbdResourceInfo().getName(),
+                              testOnly);
                     DRBD.down(oBdi.getHost(),
-                              getDrbdResourceInfo().getName());
+                              getDrbdResourceInfo().getName(),
+                              testOnly);
                 } else {
                     getDrbdResourceInfo().setHaveToCreateMD(true);
                 }

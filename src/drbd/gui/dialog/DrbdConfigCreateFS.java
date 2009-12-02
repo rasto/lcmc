@@ -84,7 +84,8 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     protected void finishDialog() {
         final BlockDevInfo bdiPri = getPrimaryBD();
         if (bdiPri != null) {
-            bdiPri.forcePrimary();
+            final boolean testOnly = false;
+            bdiPri.forcePrimary(testOnly);
         }
     }
 
@@ -135,11 +136,12 @@ public class DrbdConfigCreateFS extends DrbdConfig {
                 });
                 BlockDevInfo bdiPri = getPrimaryBD();
                 BlockDevInfo bdiSec = getSecondaryBD();
-                bdiPri.forcePrimary();
+                final boolean testOnly = false;
+                bdiPri.forcePrimary(testOnly);
                 final String fs = filesystemCB.getStringValue();
-                bdiPri.makeFilesystem(fs);
+                bdiPri.makeFilesystem(fs, testOnly);
                 getDrbdResourceInfo().setCreatedFs(fs);
-                bdiPri.setSecondary();
+                bdiPri.setSecondary(testOnly);
                 hostCB.setValue(NO_HOST_STRING);
                 filesystemCB.setValue(NO_FILESYSTEM_STRING);
             }

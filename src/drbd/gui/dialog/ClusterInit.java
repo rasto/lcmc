@@ -603,9 +603,10 @@ public class ClusterInit extends DialogCluster {
                                                       index).setVisible(false);
                                         }
                                     });
-                                    DRBD.load(host);
+                                    final boolean testOnly = false;
+                                    DRBD.load(host, testOnly);
                                     if (host.isDrbdUpgraded()) {
-                                        DRBD.adjust(host, "all");
+                                        DRBD.adjust(host, "all", testOnly);
                                     }
                                     checkCluster(false);
                                 }

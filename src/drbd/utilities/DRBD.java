@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Map;
 import java.util.HashMap;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class provides drbd commands.
@@ -43,6 +44,10 @@ public final class DRBD {
     private static final String DRBDDEV_PH    = "@DRBDDEV@";
     /** Filesystem placeholder. */
     private static final String FILESYSTEM_PH = "@FILESYSTEM@";
+    /** Output of the drbd test. */
+    private volatile static String drbdtestOutput = null;
+    /** DRBD test lock. */
+    private final static Mutex mDRBDtestLock = new Mutex();
 
     /**
      * Private constructor, cannot be instantiated.
@@ -59,24 +64,81 @@ public final class DRBD {
      *          The flag whether the output should appear in
      *          the terminal panel.
      */
-    private static void execCommand(final Host host,
-                                    final String command,
-                                    final ExecCallback execCallback,
-                                    final boolean outputVisible) {
-        Tools.execCommandProgressIndicator(
+    private static String execCommand(final Host host,
+                                      final String command,
+                                      final ExecCallback execCallback,
+                                      final boolean outputVisible,
+                                      final boolean testOnly) {
+        try {
+            mDRBDtestLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        drbdtestOutput = null;
+        mDRBDtestLock.release();
+        if (testOnly) {
+            if (command.indexOf("@DRYRUN@") < 0) {
+                /* it would be very bad */
+                Tools.appError("dry run not available");
+                return null;
+            }
+            String cmd = command.replaceAll("@DRYRUN@", "-d");
+            if (cmd.indexOf("@DRYRUNCONF@") >= 0) {
+                cmd = cmd.replaceAll("@DRYRUNCONF@",
+                                     "-c /var/lib/drbd/drbd.conf-drbd-mc-test");
+            }
+            final String output = Tools.execCommand(host, cmd, null, false);
+            System.out.println("test cmd: " + cmd + ", out: " + output);
+            try {
+                mDRBDtestLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            drbdtestOutput = output;
+            mDRBDtestLock.release();
+
+            return output;
+        } else {
+            String cmd;
+            if (command.indexOf("@DRYRUN@") >= 0) {
+                cmd = command.replaceAll("@DRYRUN@", "");
+            } else {
+                cmd = command;
+            }
+            if (cmd.indexOf("@DRYRUNCONF@") >= 0) {
+                cmd = cmd.replaceAll("@DRYRUNCONF@", "");
+            }
+            return Tools.execCommandProgressIndicator(
                                      host,
-                                     command,
+                                     cmd,
                                      execCallback,
                                      outputVisible,
                                      Tools.getString("DRBD.ExecutingCommand")
                                      + " " + command + "...");
+        }
+    }
+
+    /**
+     * Returns results of previous dry run.
+     */
+    public static String getDRBDtest() {
+        try {
+            mDRBDtestLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final String out = drbdtestOutput;
+        mDRBDtestLock.release();
+        return out;
     }
 
     /**
      * Executes the drbdadm attach on the specified host and resource.
      */
-    public static void attach(final Host host, final String resource) {
-        attach(host, resource, null);
+    public static void attach(final Host host,
+                              final String resource,
+                              final boolean testOnly) {
+        attach(host, resource, null, testOnly);
     }
 
     /**
@@ -85,19 +147,22 @@ public final class DRBD {
      */
     public static void attach(final Host host,
                               final String resource,
-                              final ExecCallback execCallback) {
+                              final ExecCallback execCallback,
+                              final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.attach",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm detach on the specified host and resource.
      */
-    public static void detach(final Host host, final String resource) {
-        detach(host, resource, null);
+    public static void detach(final Host host,
+                              final String resource,
+                              final boolean testOnly) {
+        detach(host, resource, null, testOnly);
     }
 
     /**
@@ -106,19 +171,22 @@ public final class DRBD {
      */
     public static void detach(final Host host,
                               final String resource,
-                              final ExecCallback execCallback) {
+                              final ExecCallback execCallback,
+                              final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.detach",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm connect on the specified host and resource.
      */
-    public static void connect(final Host host, final String resource) {
-        connect(host, resource, null);
+    public static void connect(final Host host,
+                               final String resource,
+                               final boolean testOnly) {
+        connect(host, resource, null, testOnly);
     }
 
     /**
@@ -127,19 +195,22 @@ public final class DRBD {
      */
     public static void connect(final Host host,
                                final String resource,
-                               final ExecCallback execCallback) {
+                               final ExecCallback execCallback,
+                               final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.connect",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm disconnect on the specified host and resource.
      */
-    public static void disconnect(final Host host, final String resource) {
-        disconnect(host, resource, null);
+    public static void disconnect(final Host host,
+                                  final String resource,
+                                  final boolean testOnly) {
+        disconnect(host, resource, null, testOnly);
     }
 
     /**
@@ -148,19 +219,22 @@ public final class DRBD {
      */
     public static void disconnect(final Host host,
                                   final String resource,
-                                  final ExecCallback execCallback) {
+                                  final ExecCallback execCallback,
+                                  final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.disconnect",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm pause-sync on the specified host and resource.
      */
-    public static void pauseSync(final Host host, final String resource) {
-        pauseSync(host, resource, null);
+    public static void pauseSync(final Host host,
+                                 final String resource,
+                                 final boolean testOnly) {
+        pauseSync(host, resource, null, testOnly);
     }
 
     /**
@@ -169,19 +243,22 @@ public final class DRBD {
      */
     public static void pauseSync(final Host host,
                                  final String resource,
-                                 final ExecCallback execCallback) {
+                                 final ExecCallback execCallback,
+                                 final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.pauseSync",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm resume-sync on the specified host and resource.
      */
-    public static void resumeSync(final Host host, final String resource) {
-        resumeSync(host, resource, null);
+    public static void resumeSync(final Host host,
+                                  final String resource,
+                                  final boolean testOnly) {
+        resumeSync(host, resource, null, testOnly);
     }
 
     /**
@@ -190,19 +267,22 @@ public final class DRBD {
      */
     public static void resumeSync(final Host host,
                                   final String resource,
-                                  final ExecCallback execCallback) {
+                                  final ExecCallback execCallback,
+                                  final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.resumeSync",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm primary on the specified host and resource.
      */
-    public static void setPrimary(final Host host, final String resource) {
-        setPrimary(host, resource, null);
+    public static void setPrimary(final Host host,
+                                  final String resource,
+                                  final boolean testOnly) {
+        setPrimary(host, resource, null, testOnly);
     }
 
     /**
@@ -211,19 +291,22 @@ public final class DRBD {
      */
     public static void setPrimary(final Host host,
                                   final String resource,
-                                  final ExecCallback execCallback) {
+                                  final ExecCallback execCallback,
+                                  final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.setPrimary",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm secondary on the specified host and resource.
      */
-    public static void setSecondary(final Host host, final String resource) {
-        setSecondary(host, resource, null);
+    public static void setSecondary(final Host host,
+                                    final String resource,
+                                    final boolean testOnly) {
+        setSecondary(host, resource, null, testOnly);
     }
 
     /**
@@ -232,20 +315,23 @@ public final class DRBD {
      */
     public static void setSecondary(final Host host,
                                     final String resource,
-                                    final ExecCallback execCallback) {
+                                    final ExecCallback execCallback,
+                                    final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.setSecondary",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Loads the drbd, executes the drbdadm create-md and up on the specified
      * host and resource.
      */
-    public static void initDrbd(final Host host, final String resource) {
-        initDrbd(host, resource, null);
+    public static void initDrbd(final Host host,
+                                final String resource,
+                                final boolean testOnly) {
+        initDrbd(host, resource, null, testOnly);
     }
 
     /**
@@ -254,12 +340,13 @@ public final class DRBD {
      */
     public static void initDrbd(final Host host,
                                 final String resource,
-                                final ExecCallback execCallback) {
+                                final ExecCallback execCallback,
+                                final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.initDrbd",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
@@ -268,8 +355,9 @@ public final class DRBD {
      */
     public static void createMD(final Host host,
                                 final String resource,
-                                final String device) {
-        createMD(host, resource, device, null);
+                                final String device,
+                                final boolean testOnly) {
+        createMD(host, resource, device, null, testOnly);
     }
 
     /**
@@ -279,13 +367,14 @@ public final class DRBD {
     public static void createMD(final Host host,
                                 final String resource,
                                 final String device,
-                                final ExecCallback execCallback) {
+                                final ExecCallback execCallback,
+                                final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         replaceHash.put(DEVICE_PH, device);
         final String command = host.getDistCommand("DRBD.createMD",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
@@ -294,8 +383,9 @@ public final class DRBD {
      */
     public static void createMDDestroyData(final Host host,
                                            final String resource,
-                                           final String device) {
-        createMDDestroyData(host, resource, device, null);
+                                           final String device,
+                                           final boolean testOnly) {
+        createMDDestroyData(host, resource, device, null, testOnly);
     }
 
     /**
@@ -306,13 +396,14 @@ public final class DRBD {
     public static void createMDDestroyData(final Host host,
                                            final String resource,
                                            final String device,
-                                           final ExecCallback execCallback) {
+                                           final ExecCallback execCallback,
+                                           final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         replaceHash.put(DEVICE_PH, device);
         String command = host.getDistCommand("DRBD.createMDDestroyData",
                                              replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
@@ -320,8 +411,9 @@ public final class DRBD {
      */
     public static void makeFilesystem(final Host host,
                                       final String blockDevice,
-                                      final String filesystem) {
-        makeFilesystem(host, blockDevice, filesystem, null);
+                                      final String filesystem,
+                                      final boolean testOnly) {
+        makeFilesystem(host, blockDevice, filesystem, null, testOnly);
     }
 
     /**
@@ -331,7 +423,8 @@ public final class DRBD {
     public static void makeFilesystem(final Host host,
                                       final String blockDevice,
                                       final String filesystem,
-                                      final ExecCallback execCallback) {
+                                      final ExecCallback execCallback,
+                                      final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DRBDDEV_PH, blockDevice);
         if ("jfs".equals(filesystem)
@@ -342,15 +435,17 @@ public final class DRBD {
         }
         String command = host.getDistCommand("DRBD.makeFilesystem",
                                              replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm -- --overwrite-data-of-peer connect on the specified
      * host.
      */
-    public static void forcePrimary(final Host host, final String resource) {
-        forcePrimary(host, resource, null);
+    public static void forcePrimary(final Host host,
+                                    final String resource,
+                                    final boolean testOnly) {
+        forcePrimary(host, resource, null, testOnly);
     }
 
     /**
@@ -359,19 +454,22 @@ public final class DRBD {
      */
     public static void forcePrimary(final Host host,
                                     final String resource,
-                                    final ExecCallback execCallback) {
+                                    final ExecCallback execCallback,
+                                    final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.forcePrimary",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm invalidate on the specified host and resource.
      */
-    public static void invalidate(final Host host, final String resource) {
-        invalidate(host, resource, null);
+    public static void invalidate(final Host host,
+                                  final String resource,
+                                  final boolean testOnly) {
+        invalidate(host, resource, null, testOnly);
     }
 
     /**
@@ -380,20 +478,23 @@ public final class DRBD {
      */
     public static void invalidate(final Host host,
                                   final String resource,
-                                  final ExecCallback execCallback) {
+                                  final ExecCallback execCallback,
+                                  final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.invalidate",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm -- --discard-my-data connect on the specified
      * host and resource.
      */
-    public static void discardData(final Host host, final String resource) {
-        discardData(host, resource, null);
+    public static void discardData(final Host host,
+                                   final String resource,
+                                   final boolean testOnly) {
+        discardData(host, resource, null, testOnly);
     }
 
     /**
@@ -402,19 +503,22 @@ public final class DRBD {
      */
     public static void discardData(final Host host,
                                    final String resource,
-                                   final ExecCallback execCallback) {
+                                   final ExecCallback execCallback,
+                                   final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.discardData",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm resize on the specified host and resource.
      */
-    public static void resize(final Host host, final String resource) {
-        resize(host, resource, null);
+    public static void resize(final Host host,
+                              final String resource,
+                              final boolean testOnly) {
+        resize(host, resource, null, testOnly);
     }
 
     /**
@@ -423,19 +527,22 @@ public final class DRBD {
      */
     public static void resize(final Host host,
                               final String resource,
-                              final ExecCallback execCallback) {
+                              final ExecCallback execCallback,
+                              final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.resize",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm adjust on the specified host and resource.
      */
-    public static int adjust(final Host host, final String resource) {
-        return adjust(host, resource, null);
+    public static int adjust(final Host host,
+                             final String resource,
+                             final boolean testOnly) {
+        return adjust(host, resource, null, testOnly);
     }
 
     /**
@@ -444,22 +551,29 @@ public final class DRBD {
      */
     public static int adjust(final Host host,
                              final String resource,
-                             final ExecCallback execCallback) {
+                             final ExecCallback execCallback,
+                             final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.adjust",
                                                    replaceHash);
-        final String ret = Tools.execCommandProgressIndicator(
-                                     host,
-                                     command,
-                                     execCallback,
-                                     false,
-                                     Tools.getString("DRBD.ExecutingCommand")
-                                     + " " + command + "...");
+        final String ret = execCommand(host,
+                                       command,
+                                       execCallback,
+                                       false,
+                                       testOnly);
+        System.out.println("adjust: " + ret);
+        //final String ret = Tools.execCommandProgressIndicator(
+        //                             host,
+        //                             command,
+        //                             execCallback,
+        //                             false,
+        //                             Tools.getString("DRBD.ExecutingCommand")
+        //                             + " " + command + "...");
+
         final Pattern p = Pattern.compile(".*Failure: \\((\\d+)\\).*",
                                           Pattern.DOTALL);
         final Matcher m = p.matcher(ret);
-
         if (m.matches()) {
             return Integer.parseInt(m.group(1));
         }
@@ -470,6 +584,7 @@ public final class DRBD {
      * Executes the drbdadm adjust on the specified host and resource
      * This is done without actually to make an
      * adjust with -d option to catch possible changes.
+     * TODO: obsolete
      */
     public static void adjustDryrun(final Host host, final String resource) {
         adjustDryrun(host, resource, null);
@@ -487,15 +602,17 @@ public final class DRBD {
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.adjust.dryrun",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, false);
 
     }
 
     /**
      * Executes the drbdadm down on the specified host and resource.
      */
-    public static void down(final Host host, final String resource) {
-        down(host, resource, null);
+    public static void down(final Host host,
+                            final String resource,
+                            final boolean testOnly) {
+        down(host, resource, null, testOnly);
     }
 
     /**
@@ -504,19 +621,22 @@ public final class DRBD {
      */
     public static void down(final Host host,
                             final String resource,
-                            final ExecCallback execCallback) {
+                            final ExecCallback execCallback,
+                            final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.down",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes the drbdadm up on the specified host and resource.
      */
-    public static void up(final Host host, final String resource) {
-        up(host, resource, null);
+    public static void up(final Host host,
+                          final String resource,
+                          final boolean testOnly) {
+        up(host, resource, null, testOnly);
     }
 
     /**
@@ -525,19 +645,20 @@ public final class DRBD {
      */
     public static void up(final Host host,
                           final String resource,
-                          final ExecCallback execCallback) {
+                          final ExecCallback execCallback,
+                          final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.up",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Start the drbd. Probably /etc/init.d/drbd start.
      */
-    public static void start(final Host host) {
-        start(host, null);
+    public static void start(final Host host, final boolean testOnly) {
+        start(host, null, testOnly);
     }
 
     /**
@@ -545,17 +666,18 @@ public final class DRBD {
      * function after it is done.
      */
     public static void start(final Host host,
-                             final ExecCallback execCallback) {
+                             final ExecCallback execCallback,
+                             final boolean testOnly) {
         final String command = host.getDistCommand("DRBD.start",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 
     /**
      * Executes load drbd command on the specified host.
      */
-    public static void load(final Host host) {
-        load(host, null);
+    public static void load(final Host host, final boolean testOnly) {
+        load(host, null, testOnly);
     }
 
     /**
@@ -563,9 +685,10 @@ public final class DRBD {
      * function after it is done.
      */
     public static void load(final Host host,
-                            final ExecCallback execCallback) {
+                            final ExecCallback execCallback,
+                            final boolean testOnly) {
         final String command = host.getDistCommand("DRBD.load",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, execCallback, true);
+        execCommand(host, command, execCallback, true, testOnly);
     }
 }

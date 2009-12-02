@@ -89,10 +89,17 @@ public class DrbdSplitBrain extends DrbdConfig {
                 }
                 buttonClass(finishButton()).setEnabled(false);
                 resolveButton.setEnabled(false);
-                DRBD.setSecondary(hostSec, getDrbdResourceInfo().getName());
-                DRBD.disconnect(hostSec, getDrbdResourceInfo().getName());
-                DRBD.discardData(hostSec, getDrbdResourceInfo().getName());
-                getDrbdResourceInfo().connect(hostPri);
+                final boolean testOnly = false;
+                DRBD.setSecondary(hostSec,
+                                  getDrbdResourceInfo().getName(),
+                                  testOnly);
+                DRBD.disconnect(hostSec,
+                                getDrbdResourceInfo().getName(),
+                                testOnly);
+                DRBD.discardData(hostSec,
+                                 getDrbdResourceInfo().getName(),
+                                 testOnly);
+                getDrbdResourceInfo().connect(hostPri, testOnly);
                 buttonClass(finishButton()).setEnabled(true);
                 buttonClass(cancelButton()).setEnabled(false);
             }

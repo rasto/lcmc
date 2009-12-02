@@ -70,7 +70,7 @@ public class PtestData {
                                                new HashMap<String, Boolean>();
 
     /**
-     * Prepares a new <code>AisCastAddress</code> object.
+     * Prepares a new <code>PtestData</code> object.
      */
     public PtestData(final String raw) {
         if (raw == null) {
@@ -80,7 +80,7 @@ public class PtestData {
         }
         final StringBuffer sb = new StringBuffer(300);
         sb.append("<html><b>");
-        sb.append(Tools.getString("CRM.Ptest.ToolTip"));
+        sb.append(Tools.getString("PtestData.ToolTip"));
         sb.append("</b><br>");
         String[] queries = raw.split(CRM.PTEST_END_DELIM);
         if (queries.length != 2) {

@@ -32,6 +32,7 @@ import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.Subtext;
 import drbd.data.PtestData;
+import drbd.data.DRBDtestData;
 import drbd.data.ClusterStatus;
 import drbd.gui.ClusterBrowser.DrbdInfo;
 import drbd.gui.ClusterBrowser.DrbdResourceInfo;
@@ -63,6 +64,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -450,6 +452,7 @@ public class HostBrowser extends Browser {
                                             host.getDistString(command));
             }
         };
+        Tools.getGUIData().addToVisibleInGodMode(panicMenuItem);
         submenu.add(panicMenuItem);
 
         /* reboot */
@@ -474,6 +477,7 @@ public class HostBrowser extends Browser {
                                             host.getDistString(command));
             }
         };
+        Tools.getGUIData().addToVisibleInGodMode(rebootMenuItem);
         submenu.add(rebootMenuItem);
     }
 
@@ -1325,6 +1329,7 @@ public class HostBrowser extends Browser {
             items.add(hostWizardItem);
             registerMenuItem(hostWizardItem);
             Tools.getGUIData().registerAddHostButton(hostWizardItem);
+            final boolean testOnly = false;
             /* load drbd */
             final MyMenuItem loadItem =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
@@ -1338,7 +1343,7 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        DRBD.load(getHost());
+                        DRBD.load(getHost(), testOnly);
                     }
                 };
             items.add(loadItem);
@@ -1358,9 +1363,9 @@ public class HostBrowser extends Browser {
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
                             if (bdi.getBlockDevice().isDrbd()
-                                && !bdi.getBlockDevice().isConnected()
+                                && !bdi.isConnected(testOnly)
                                 && !bdi.getBlockDevice().isAttached()) {
-                                bdi.drbdUp();
+                                bdi.drbdUp(testOnly);
                             }
                         }
                     }
@@ -1446,8 +1451,8 @@ public class HostBrowser extends Browser {
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
                             if (bdi.getBlockDevice().isDrbd()
-                                && !bdi.getBlockDevice().isConnectedOrWF()) {
-                                bdi.connect();
+                                && !bdi.isConnectedOrWF(testOnly)) {
+                                bdi.connect(testOnly);
                             }
                         }
                     }
@@ -1470,8 +1475,8 @@ public class HostBrowser extends Browser {
                     public void action() {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
                             if (bdi.getBlockDevice().isDrbd()
-                                && bdi.getBlockDevice().isConnectedOrWF()) {
-                                bdi.disconnect();
+                                && bdi.isConnectedOrWF(testOnly)) {
+                                bdi.disconnect(testOnly);
                             }
                         }
                     }
@@ -1494,7 +1499,7 @@ public class HostBrowser extends Browser {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
                             if (bdi.getBlockDevice().isDrbd()
                                 && !bdi.getBlockDevice().isAttached()) {
-                                bdi.attach();
+                                bdi.attach(testOnly);
                             }
                         }
                     }
@@ -1506,8 +1511,8 @@ public class HostBrowser extends Browser {
             final MyMenuItem setAllPrimaryItem =
                 new MyMenuItem(Tools.getString(
                                             "HostBrowser.Drbd.SetAllPrimary"),
-                               null,
-                               null) {
+                                            null,
+                                            null) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -1518,7 +1523,7 @@ public class HostBrowser extends Browser {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
                             if (bdi.getBlockDevice().isDrbd()
                                 && bdi.getBlockDevice().isSecondary()) {
-                                bdi.setPrimary();
+                                bdi.setPrimary(testOnly);
                             }
                         }
                     }
@@ -1542,7 +1547,7 @@ public class HostBrowser extends Browser {
                         for (final BlockDevInfo bdi : getBlockDevInfos()) {
                             if (bdi.getBlockDevice().isDrbd()
                                 && bdi.getBlockDevice().isPrimary()) {
-                                bdi.setSecondary();
+                                bdi.setSecondary(testOnly);
                             }
                         }
                     }
@@ -1945,9 +1950,15 @@ public class HostBrowser extends Browser {
             config.append(";\n\t\tdisk\t");
             config.append(getBlockDevice().getName());
             config.append(";\n\t\taddress\t");
-            config.append(getBlockDevice().getDrbdNetInterfaceWithPort());
+            config.append(getBlockDevice().getDrbdNetInterfaceWithPort(
+                                        getComboBoxValue(DRBD_NI_PARAM),
+                                        getComboBoxValue(DRBD_NI_PORT_PARAM)));
+            //config.append(getBlockDevice().getDrbdNetInterfaceWithPort());
             config.append(";\n\t\t");
-            config.append(getBlockDevice().getMetaDiskString());
+            config.append(getBlockDevice().getMetaDiskString(
+                                       getComboBoxValue(DRBD_MD_PARAM),
+                                       getComboBoxValue(DRBD_MD_INDEX_PARAM)));
+            //config.append(getBlockDevice().getMetaDiskString());
             config.append(";\n\t}\n");
             return config.toString();
         }
@@ -2248,75 +2259,77 @@ public class HostBrowser extends Browser {
             return list.toArray(new Info[list.size()]);
         }
 
-        public final void attach() {
-            DRBD.attach(host, drbdResourceInfo.getName());
+        public final void attach(final boolean testOnly) {
+            DRBD.attach(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void detach() {
-            DRBD.detach(host, drbdResourceInfo.getName());
+        public final void detach(final boolean testOnly) {
+            DRBD.detach(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void connect() {
-            DRBD.connect(host, drbdResourceInfo.getName());
+        public final void connect(final boolean testOnly) {
+            DRBD.connect(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void disconnect() {
-            DRBD.disconnect(host, drbdResourceInfo.getName());
+        public final void disconnect(final boolean testOnly) {
+            DRBD.disconnect(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void pauseSync() {
-            DRBD.pauseSync(host, drbdResourceInfo.getName());
+        public final void pauseSync(final boolean testOnly) {
+            DRBD.pauseSync(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void resumeSync() {
-            DRBD.resumeSync(host, drbdResourceInfo.getName());
+        public final void resumeSync(final boolean testOnly) {
+            DRBD.resumeSync(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void drbdUp() {
-            DRBD.up(host, drbdResourceInfo.getName());
+        public final void drbdUp(final boolean testOnly) {
+            DRBD.up(host, drbdResourceInfo.getName(), testOnly);
         }
 
         /**
          * Sets this drbd block device to the primary state.
          */
-        public final void setPrimary() {
-            DRBD.setPrimary(host, drbdResourceInfo.getName());
+        public final void setPrimary(final boolean testOnly) {
+            DRBD.setPrimary(host, drbdResourceInfo.getName(), testOnly);
         }
 
         /**
          * Sets this drbd block device to the secondary state.
          */
-        public final void setSecondary() {
-            DRBD.setSecondary(host, drbdResourceInfo.getName());
+        public final void setSecondary(final boolean testOnly) {
+            DRBD.setSecondary(host, drbdResourceInfo.getName(), testOnly);
         }
 
         /**
          * Initializes drbd block device.
          */
-        public final void initDrbd() {
-            DRBD.initDrbd(host, drbdResourceInfo.getName());
+        public final void initDrbd(final boolean testOnly) {
+            DRBD.initDrbd(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void makeFilesystem(final String filesystem) {
+        public final void makeFilesystem(final String filesystem,
+                                         final boolean testOnly) {
             DRBD.makeFilesystem(host,
                                 getDrbdResourceInfo().getDevice(),
-                                filesystem);
+                                filesystem,
+                                testOnly);
         }
 
-        public final void forcePrimary() {
-            DRBD.forcePrimary(host, drbdResourceInfo.getName());
+        public final void forcePrimary(final boolean testOnly) {
+            DRBD.forcePrimary(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void invalidateBD() {
-            DRBD.invalidate(host, drbdResourceInfo.getName());
+        public final void invalidateBD(final boolean testOnly) {
+            DRBD.invalidate(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void discardData() {
-            DRBD.discardData(host, drbdResourceInfo.getName());
+        public final void discardData(final boolean testOnly) {
+            DRBD.discardData(host, drbdResourceInfo.getName(), testOnly);
         }
 
-        public final void resizeDrbd() {
-            DRBD.resize(host, drbdResourceInfo.getName());
+        public final void resizeDrbd(final boolean testOnly) {
+            DRBD.resize(host, drbdResourceInfo.getName(), testOnly);
         }
 
         public final JPanel getGraphicalView() {
@@ -2349,31 +2362,34 @@ public class HostBrowser extends Browser {
         }
 
         public final void apply(final boolean testOnly) {
-            final String[] params = getParametersFromXML();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    applyButton.setEnabled(false);
+            if (!testOnly) {
+                final String[] params = getParametersFromXML();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        applyButton.setEnabled(false);
+                    }
+                });
+                if (getBlockDevice().getMetaDisk() != null) {
+                    getBlockDevice().getMetaDisk().setIsDrbdMetaDisk(false);
                 }
-            });
-            if (getBlockDevice().getMetaDisk() != null) {
-                getBlockDevice().getMetaDisk().setIsDrbdMetaDisk(false);
-            }
-            drbdVIPortList.remove(
+                drbdVIPortList.remove(
                                getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
 
-            storeComboBoxValues(params);
+                storeComboBoxValues(params);
 
-            drbdVIPortList.add(getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
-            final Object o = paramComboBoxGet(DRBD_MD_PARAM, null).getValue();
-            if (Tools.isStringInfoClass(o)) {
-                getBlockDevice().setMetaDisk(null); /* internal */
-            } else {
-                final BlockDevice metaDisk =
-                                           ((BlockDevInfo) o).getBlockDevice();
-                getBlockDevice().setMetaDisk(metaDisk);
-            }
-            if (getBlockDevice().getMetaDisk() != null) {
-                getBlockDevice().getMetaDisk().setIsDrbdMetaDisk(true);
+                drbdVIPortList.add(
+                                getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
+                final Object o = paramComboBoxGet(DRBD_MD_PARAM, null).getValue();
+                if (Tools.isStringInfoClass(o)) {
+                    getBlockDevice().setMetaDisk(null); /* internal */
+                } else {
+                    final BlockDevice metaDisk =
+                                               ((BlockDevInfo) o).getBlockDevice();
+                    getBlockDevice().setMetaDisk(metaDisk);
+                }
+                if (getBlockDevice().getMetaDisk() != null) {
+                    getBlockDevice().getMetaDisk().setIsDrbdMetaDisk(true);
+                }
             }
         }
 
@@ -2381,7 +2397,55 @@ public class HostBrowser extends Browser {
             if (infoPanel != null) {
                 return infoPanel;
             }
-            initApplyButton(null);
+            final BlockDevInfo thisClass = this;
+            final ButtonCallback buttonCallback = new ButtonCallback() {
+                private volatile boolean mouseStillOver = false;
+                public final void mouseOut() {
+                    mouseStillOver = false;
+                    final DrbdGraph drbdGraph =
+                      (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+                    drbdGraph.stopTestAnimation(applyButton);
+                    applyButton.setToolTipText(null);
+                }
+
+                public final void mouseOver() {
+                    mouseStillOver = true;
+                    applyButton.setToolTipText(
+                           Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                    Tools.sleep(250);
+                    if (!mouseStillOver) {
+                        return;
+                    }
+                    mouseStillOver = false;
+                    final CountDownLatch startTestLatch = new CountDownLatch(1);
+                    final DrbdGraph drbdGraph =
+                      (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+                    drbdGraph.startTestAnimation(applyButton, startTestLatch);
+                    drbdtestLockAcquire();
+                    //clusterStatus.setDRBDtestData(null);
+                    apply(true);
+                    final Map<Host,String> testOutput =
+                                             new LinkedHashMap<Host, String>();
+                    try {
+                        drbdResourceInfo.getDrbdInfo().createDrbdConfig(true);
+                        for (final Host h : host.getCluster().getHostsArray()) {
+                            DRBD.adjust(h, "all", true);
+                            testOutput.put(h, DRBD.getDRBDtest());
+                        }
+                    } catch (Exceptions.DrbdConfigException dce) {
+                        Tools.appError("config failed");
+                    }
+                    final DRBDtestData dtd = new DRBDtestData(testOutput);
+                    applyButton.setToolTipText(dtd.getToolTip());
+                    drbdtestdataLockAcquire();
+                    thisClass.setDRBDtestData(dtd);
+                    drbdtestdataLockRelease();
+                    //clusterStatus.setPtestData(ptestData);
+                    drbdtestLockRelease();
+                    startTestLatch.countDown();
+                }
+            };
+            initApplyButton(buttonCallback);
 
             final JPanel mainPanel = new JPanel();
             mainPanel.setBackground(PANEL_BACKGROUND);
@@ -2440,7 +2504,7 @@ public class HostBrowser extends Browser {
                                     apply(false);
                                     try {
                                         drbdResourceInfo.getDrbdInfo()
-                                                        .createDrbdConfig();
+                                                      .createDrbdConfig(false);
                                     } catch (Exceptions.DrbdConfigException e) {
                                         Tools.appError("config failed");
                                     }
@@ -2616,7 +2680,6 @@ public class HostBrowser extends Browser {
             };
             items.add(repMenuItem);
             registerMenuItem(repMenuItem);
-
             /* attach / detach */
             final MyMenuItem attachMenu =
                 new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
@@ -2645,9 +2708,9 @@ public class HostBrowser extends Browser {
                     public void action() {
                         if (this.getText().equals(
                                 Tools.getString("HostBrowser.Drbd.Attach"))) {
-                            attach();
+                            attach(testOnly);
                         } else {
-                            detach();
+                            detach(testOnly);
                         }
                     }
                 };
@@ -2666,7 +2729,7 @@ public class HostBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
-                        return getBlockDevice().isConnectedOrWF();
+                        return isConnectedOrWF(testOnly);
                     }
 
                     public boolean enablePredicate() {
@@ -2684,9 +2747,9 @@ public class HostBrowser extends Browser {
                     public void action() {
                         if (this.getText().equals(
                                 Tools.getString("HostBrowser.Drbd.Connect"))) {
-                            connect();
+                            connect(testOnly);
                         } else {
-                            disconnect();
+                            disconnect(testOnly);
                         }
                     }
                 };
@@ -2723,9 +2786,9 @@ public class HostBrowser extends Browser {
                     public void action() {
                         BlockDevInfo oBdi = getOtherBlockDevInfo();
                         if (oBdi != null && oBdi.getBlockDevice().isPrimary()) {
-                            oBdi.setSecondary();
+                            oBdi.setSecondary(testOnly);
                         }
-                        setPrimary();
+                        setPrimary(testOnly);
                     }
                 };
             items.add(setPrimaryItem);
@@ -2747,7 +2810,7 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        setSecondary();
+                        setSecondary(testOnly);
                     }
                 };
             //enableMenu(setSecondaryItem, false);
@@ -2769,7 +2832,7 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        forcePrimary();
+                        forcePrimary(testOnly);
                     }
                 };
             items.add(forcePrimaryItem);
@@ -2791,7 +2854,7 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        invalidateBD();
+                        invalidateBD(testOnly);
                     }
                 };
             items.add(invalidateItem);
@@ -2824,9 +2887,9 @@ public class HostBrowser extends Browser {
                     public void action() {
                         if (this.getText().equals(Tools.getString(
                                              "HostBrowser.Drbd.ResumeSync"))) {
-                            resumeSync();
+                            resumeSync(testOnly);
                         } else {
-                            pauseSync();
+                            pauseSync(testOnly);
                         }
                     }
                 };
@@ -2849,7 +2912,7 @@ public class HostBrowser extends Browser {
                     }
 
                     public void action() {
-                        resizeDrbd();
+                        resizeDrbd(testOnly);
                     }
                 };
             items.add(resizeItem);
@@ -2868,12 +2931,12 @@ public class HostBrowser extends Browser {
                             return false;
                         }
                         return !getBlockDevice().isSyncing()
-                               && !getBlockDevice().isConnected()
+                               && !isConnected(testOnly)
                                && !getBlockDevice().isPrimary();
                     }
 
                     public void action() {
-                        discardData();
+                        discardData(testOnly);
                     }
                 };
             items.add(discardDataItem);
@@ -2953,5 +3016,69 @@ public class HostBrowser extends Browser {
              }
              return null;
         }
+
+        /**
+         * Returns whether this device is connected via drbd.
+         */
+        final boolean isConnected(final boolean testOnly) {
+            if (testOnly) {
+                return getDRBDtestData().isConnected(host, getDrbdDev());
+            } else {
+                return getBlockDevice().isConnected();
+            }
+        }
+
+        /**
+         * Returns whether this device is connected or wait-for-c via drbd.
+         */
+        final boolean isConnectedOrWF(final boolean testOnly) {
+            if (testOnly) {
+                return getDRBDtestData().isConnected(host, getDrbdDev());
+            } else {
+                return getBlockDevice().isConnectedOrWF();
+            }
+        }
+
+        /**
+         * Returns whether this device is in wait-for-connection state.
+         */
+        final boolean isWFConnection(final boolean testOnly) {
+            if (testOnly) {
+                false;
+            } else {
+                return getBlockDevice().isWFConnection();
+            }
+        }
+
+        /**
+         * Returns drbd test data.
+         */
+        public final DRBDtestData getDRBDtestData() {
+            final Cluster c = host.getCluster();
+            if (c == null) {
+                return null;
+            }
+            final ClusterBrowser b = c.getBrowser();
+            if (b == null) {
+                return null;
+            }
+            return b.getDRBDtestData();
+        }
+
+        /**
+         * Sets drbd test data.
+         */
+        public final void setDRBDtestData(final DRBDtestData drbdtestData) {
+            final Cluster c = host.getCluster();
+            if (c == null) {
+                return;
+            }
+            final ClusterBrowser b = c.getBrowser();
+            if (b == null) {
+                return;
+            }
+            b.setDRBDtestData(drbdtestData);
+        }
+
     }
 }
