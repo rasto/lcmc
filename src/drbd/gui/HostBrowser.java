@@ -31,7 +31,6 @@ import drbd.data.resources.BlockDevice;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.Subtext;
-import drbd.data.PtestData;
 import drbd.data.DRBDtestData;
 import drbd.data.ClusterStatus;
 import drbd.gui.ClusterBrowser.DrbdInfo;
@@ -237,6 +236,17 @@ public class HostBrowser extends Browser {
                                   Tools.getString("HostBrowser.FileSystems")));
         setNode(fileSystemsNode);
         topAdd(fileSystemsNode);
+    }
+
+    /**
+     * Returns cluster browser if available.
+     */
+    private final ClusterBrowser getClusterBrowser() {
+        final Cluster c = host.getCluster();
+        if (c == null) {
+            return null;
+        }
+        return c.getBrowser();
     }
 
     /**
@@ -875,8 +885,10 @@ public class HostBrowser extends Browser {
                         }
                     }
                 };
-            final MenuItemCallback standbyItemCallback =
-                            new MenuItemCallback(thisClass, standbyItem) {
+            final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
+                     getClusterBrowser().new ClMenuItemCallback(thisClass,
+                                                                standbyItem,
+                                                                host) {
                 public void action(final Host host) {
                     if (isStandby(false)) {
                         CRM.standByOff(host, true);
@@ -976,11 +988,7 @@ public class HostBrowser extends Browser {
          * Returns Cluster graph.
          */
         private final HeartbeatGraph getHeartbeatGraph() {
-            final Cluster c = host.getCluster();
-            if (c == null) {
-                return null;
-            }
-            final ClusterBrowser b = c.getBrowser();
+            final ClusterBrowser b = getClusterBrowser();
             if (b == null) {
                 return null;
             }
@@ -1038,11 +1046,7 @@ public class HostBrowser extends Browser {
          * Returns whether this host is in stand by.
          */
         public final boolean isStandby(final boolean testOnly) {
-            final Cluster c = host.getCluster();
-            if (c == null) {
-                return false;
-            }
-            final ClusterBrowser b = c.getBrowser();
+            final ClusterBrowser b = getClusterBrowser();
             if (b == null) {
                 return false;
             }
@@ -1053,11 +1057,7 @@ public class HostBrowser extends Browser {
          * Returns cluster status.
          */
         public final ClusterStatus getClusterStatus() {
-            final Cluster c = host.getCluster();
-            if (c == null) {
-                return null;
-            }
-            final ClusterBrowser b = c.getBrowser();
+            final ClusterBrowser b = getClusterBrowser();
             if (b == null) {
                 return null;
             }
@@ -1078,52 +1078,6 @@ public class HostBrowser extends Browser {
                 return OFFLINE_SUBTEXT;
             }
             return null;
-        }
-
-        /**
-         * Callback to service menu items, that show ptest results in tooltips.
-         */
-        protected class MenuItemCallback implements ButtonCallback {
-            private final Info info;
-            private final JComponent component;
-            private volatile boolean mouseStillOver = false;
-
-            public MenuItemCallback(final Info info,
-                                    final JComponent component) {
-                this.info = info;
-                this.component = component;
-                
-            }
-
-            public final void mouseOut() {
-                mouseStillOver = false;
-                getHeartbeatGraph().stopTestAnimation(component);
-                component.setToolTipText(null);
-            }
-
-            public final void mouseOver() {
-                mouseStillOver = true;
-                component.setToolTipText(
-                              Tools.getString("ClusterBrowser.StartingPtest"));
-                Tools.sleep(250);
-                if (!mouseStillOver) {
-                    return;
-                }
-                mouseStillOver = false;
-                final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getHeartbeatGraph().startTestAnimation(component, startTestLatch);
-                ptestLockAcquire();
-                getClusterStatus().setPtestData(null);
-                action(host);
-                final PtestData ptestData = new PtestData(CRM.getPtest(host));
-                component.setToolTipText(ptestData.getToolTip());
-                getClusterStatus().setPtestData(ptestData);
-                ptestLockRelease();
-                startTestLatch.countDown();
-            }
-
-            protected void action(final Host dcHost) {
-            }
         }
     }
 
@@ -2422,7 +2376,7 @@ public class HostBrowser extends Browser {
                       (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
                     drbdGraph.startTestAnimation(applyButton, startTestLatch);
                     drbdtestLockAcquire();
-                    //clusterStatus.setDRBDtestData(null);
+                    thisClass.setDRBDtestData(null);
                     apply(true);
                     final Map<Host,String> testOutput =
                                              new LinkedHashMap<Host, String>();
@@ -2437,9 +2391,7 @@ public class HostBrowser extends Browser {
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     applyButton.setToolTipText(dtd.getToolTip());
-                    drbdtestdataLockAcquire();
                     thisClass.setDRBDtestData(dtd);
-                    drbdtestdataLockRelease();
                     //clusterStatus.setPtestData(ptestData);
                     drbdtestLockRelease();
                     startTestLatch.countDown();
@@ -2714,6 +2666,19 @@ public class HostBrowser extends Browser {
                         }
                     }
                 };
+            final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
+                   getClusterBrowser().new DRBDMenuItemCallback(thisClass,
+                                                                attachMenu,
+                                                                host) {
+                public void action(final Host host) {
+                    if (isDiskless(false)) {
+                        attach(true);
+                    } else {
+                        detach(true);
+                    }
+                }
+            };
+            addMouseOverListener(attachMenu, attachItemCallback);
             items.add(attachMenu);
             registerMenuItem(attachMenu);
 
@@ -2753,6 +2718,19 @@ public class HostBrowser extends Browser {
                         }
                     }
                 };
+            final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
+                   getClusterBrowser().new DRBDMenuItemCallback(thisClass,
+                                                                connectMenu,
+                                                                host) {
+                public void action(final Host host) {
+                    if (isConnectedOrWF(false)) {
+                        disconnect(true);
+                    } else {
+                        connect(true);
+                    }
+                }
+            };
+            addMouseOverListener(connectMenu, connectItemCallback);
             items.add(connectMenu);
             registerMenuItem(connectMenu);
 
@@ -3021,8 +2999,9 @@ public class HostBrowser extends Browser {
          * Returns whether this device is connected via drbd.
          */
         final boolean isConnected(final boolean testOnly) {
-            if (testOnly) {
-                return getDRBDtestData().isConnected(host, getDrbdDev());
+            final DRBDtestData dtd = getDRBDtestData();
+            if (testOnly && dtd != null) {
+                return !dtd.isDisconnected(host, drbdResourceInfo.getDevice());
             } else {
                 return getBlockDevice().isConnected();
             }
@@ -3032,8 +3011,9 @@ public class HostBrowser extends Browser {
          * Returns whether this device is connected or wait-for-c via drbd.
          */
         final boolean isConnectedOrWF(final boolean testOnly) {
-            if (testOnly) {
-                return getDRBDtestData().isConnected(host, getDrbdDev());
+            final DRBDtestData dtd = getDRBDtestData();
+            if (testOnly && dtd != null) {
+                return !dtd.isDisconnected(host, drbdResourceInfo.getDevice());
             } else {
                 return getBlockDevice().isConnectedOrWF();
             }
@@ -3043,10 +3023,28 @@ public class HostBrowser extends Browser {
          * Returns whether this device is in wait-for-connection state.
          */
         final boolean isWFConnection(final boolean testOnly) {
-            if (testOnly) {
-                false;
+            final DRBDtestData dtd = getDRBDtestData();
+            if (testOnly && dtd != null) {
+                return getBlockDevice().isConnectedOrWF()
+                       && !dtd.isDisconnected(host,
+                                              drbdResourceInfo.getDevice())
+                       && dtd.isDisconnected(getOtherBlockDevInfo().getHost(),
+                                             drbdResourceInfo.getDevice());
             } else {
                 return getBlockDevice().isWFConnection();
+            }
+        }
+
+        /**
+         * Returns whether this device is diskless.
+         */
+        final boolean isDiskless(final boolean testOnly) {
+            final DRBDtestData dtd = getDRBDtestData();
+            final DrbdResourceInfo dri = drbdResourceInfo;
+            if (testOnly && dtd != null && dri != null) {
+                return dtd.isDiskless(host, drbdResourceInfo.getDevice());
+            } else {
+                return getBlockDevice().isDiskless();
             }
         }
 
@@ -3054,11 +3052,7 @@ public class HostBrowser extends Browser {
          * Returns drbd test data.
          */
         public final DRBDtestData getDRBDtestData() {
-            final Cluster c = host.getCluster();
-            if (c == null) {
-                return null;
-            }
-            final ClusterBrowser b = c.getBrowser();
+            final ClusterBrowser b = getClusterBrowser();
             if (b == null) {
                 return null;
             }
@@ -3069,16 +3063,11 @@ public class HostBrowser extends Browser {
          * Sets drbd test data.
          */
         public final void setDRBDtestData(final DRBDtestData drbdtestData) {
-            final Cluster c = host.getCluster();
-            if (c == null) {
-                return;
-            }
-            final ClusterBrowser b = c.getBrowser();
+            final ClusterBrowser b = getClusterBrowser();
             if (b == null) {
                 return;
             }
             b.setDRBDtestData(drbdtestData);
         }
-
     }
 }

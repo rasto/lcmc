@@ -153,8 +153,13 @@ public class ClusterStatus {
     /**
      * Returns list of resources belonging to the specified group.
      */
-    public final List<String> getGroupResources(final String group) {
-        return cibQueryMap.getGroupsToResources().get(group);
+    public final List<String> getGroupResources(final String group,
+                                                final boolean testOnly) {
+        if (testOnly && ptestData != null) {
+            return shadowCibQueryMap.getGroupsToResources().get(group);
+        } else {
+            return cibQueryMap.getGroupsToResources().get(group);
+        }
     }
 
     /**

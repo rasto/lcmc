@@ -305,10 +305,10 @@ implements ActionListener, UpdatableItem {
                         }
                     }
                     final Point2D p = MouseInfo.getPointerInfo().getLocation();
-                    robot.mouseMove((int) p.getX() + xOffset,
-                                    (int) p.getY() - 2);
-                    robot.mouseMove((int) p.getX() + xOffset,
-                                    (int) p.getY() + 2);
+                    robot.mouseMove((int) p.getX() + xOffset - 1,
+                                    (int) p.getY());
+                    robot.mouseMove((int) p.getX() + xOffset + 1,
+                                    (int) p.getY());
                     robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
                 }
             }

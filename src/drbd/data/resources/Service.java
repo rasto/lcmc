@@ -34,10 +34,10 @@ import drbd.utilities.Tools;
 public class Service extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Id is heartbeatId whithout name of the service. */
+    /** Id is crmId whithout name of the service. */
     private String id = null;
     /** Heartbeat id of this service. */
-    private String heartbeatId = null;
+    private String crmId = null;
     /** Whether the service is newly allocated. */
     private boolean newService = false;
     /** Whether the service is removed. */
@@ -84,7 +84,7 @@ public class Service extends Resource {
      * Returns id that is used in the heartbeat for this service.
      */
     public final String getHeartbeatId() {
-        return heartbeatId;
+        return crmId;
     }
 
     /**
@@ -98,38 +98,38 @@ public class Service extends Resource {
     /**
      * Sets heartbeat id and gui id without the service name part.
      */
-    public final void setHeartbeatId(final String heartbeatId) {
-        this.heartbeatId = heartbeatId;
+    public final void setHeartbeatId(final String crmId) {
+        this.crmId = crmId;
         if (GROUP_NAME.equals(getName())) {
-            if (heartbeatId.equals(GRP_ID_PREFIX)) {
+            if (crmId.equals(GRP_ID_PREFIX)) {
                 id = "";
-            } else if (heartbeatId.startsWith(GRP_ID_PREFIX)) {
-                id = heartbeatId.substring(GRP_ID_PREFIX.length());
+            } else if (crmId.startsWith(GRP_ID_PREFIX)) {
+                id = crmId.substring(GRP_ID_PREFIX.length());
             } else {
-                id = heartbeatId;
+                id = crmId;
             }
         } else if (CLONE_SET_NAME.equals(getName())) {
-            if (heartbeatId.equals(CL_ID_PREFIX)) {
+            if (crmId.equals(CL_ID_PREFIX)) {
                 id = "";
-            } else if (heartbeatId.startsWith(CL_ID_PREFIX)) {
-                id = heartbeatId.substring(CL_ID_PREFIX.length());
+            } else if (crmId.startsWith(CL_ID_PREFIX)) {
+                id = crmId.substring(CL_ID_PREFIX.length());
             } else {
-                id = heartbeatId;
+                id = crmId;
             }
         } else if (MASTER_SLAVE_SET_NAME.equals(getName())) {
-            if (heartbeatId.equals(MS_ID_PREFIX)) {
+            if (crmId.equals(MS_ID_PREFIX)) {
                 id = "";
-            } else if (heartbeatId.startsWith(MS_ID_PREFIX)) {
-                id = heartbeatId.substring(MS_ID_PREFIX.length());
+            } else if (crmId.startsWith(MS_ID_PREFIX)) {
+                id = crmId.substring(MS_ID_PREFIX.length());
             } else {
-                id = heartbeatId;
+                id = crmId;
             }
         } else {
-            if (heartbeatId.startsWith(RES_ID_PREFIX + getName() + "_")) {
-                id = heartbeatId.substring((RES_ID_PREFIX + getName()).length()
+            if (crmId.startsWith(RES_ID_PREFIX + getName() + "_")) {
+                id = crmId.substring((RES_ID_PREFIX + getName()).length()
                                            + 1);
             } else {
-                id = heartbeatId;
+                id = crmId;
             }
         }
         setValue("id", id);
@@ -142,35 +142,41 @@ public class Service extends Resource {
         this.id = id;
     }
     /**
+     * Returns crm id from entered id.
+     */
+    public final String getCrmIdFromId(final String id) {
+        if (GROUP_NAME.equals(getName())) {
+            if (id.startsWith(GRP_ID_PREFIX)) {
+                return id;
+            } else {
+                return GRP_ID_PREFIX + id;
+            }
+        } else if (CLONE_SET_NAME.equals(getName())) {
+            if (id.startsWith(CL_ID_PREFIX)) {
+                return id;
+            } else {
+                return CL_ID_PREFIX + id;
+            }
+        } else if (MASTER_SLAVE_SET_NAME.equals(getName())) {
+            if (id.startsWith(MS_ID_PREFIX)) {
+                return id;
+            } else {
+                return MS_ID_PREFIX + id;
+            }
+        } else {
+            if (id.startsWith(RES_ID_PREFIX + getName() + "_")) {
+                return id;
+            } else {
+                return RES_ID_PREFIX + getName() + "_" + id;
+            }
+        }
+    }
+    /**
      * Sets the id and crm id.
      */
     public final void setIdAndCrmId(final String id) {
         this.id = id;
-        if (GROUP_NAME.equals(getName())) {
-            if (id.startsWith(GRP_ID_PREFIX)) {
-                heartbeatId = id;
-            } else {
-                heartbeatId = GRP_ID_PREFIX + id;
-            }
-        } else if (CLONE_SET_NAME.equals(getName())) {
-            if (id.startsWith(CL_ID_PREFIX)) {
-                heartbeatId = id;
-            } else {
-                heartbeatId = CL_ID_PREFIX + id;
-            }
-        } else if (MASTER_SLAVE_SET_NAME.equals(getName())) {
-            if (id.startsWith(MS_ID_PREFIX)) {
-                heartbeatId = id;
-            } else {
-                heartbeatId = MS_ID_PREFIX + id;
-            }
-        } else {
-            if (id.startsWith(RES_ID_PREFIX + getName() + "_")) {
-                heartbeatId = id;
-            } else {
-                heartbeatId = RES_ID_PREFIX + getName() + "_" + id;
-            }
-        }
+        crmId = getCrmIdFromId(id);
         setValue("id", id);
     }
 

@@ -272,7 +272,7 @@ public class DrbdGraph extends ResourceGraph {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         if (isVertexBlockDevice((Vertex) v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo((Vertex) v);
-            if (bdi.getBlockDevice().isDiskless()) {
+            if (bdi.isDiskless(testOnly)) {
                 icons.add(NO_HARDDISC_ICON);
                 return icons;
             } else {

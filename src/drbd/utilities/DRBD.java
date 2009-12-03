@@ -88,7 +88,6 @@ public final class DRBD {
                                      "-c /var/lib/drbd/drbd.conf-drbd-mc-test");
             }
             final String output = Tools.execCommand(host, cmd, null, false);
-            System.out.println("test cmd: " + cmd + ", out: " + output);
             try {
                 mDRBDtestLock.acquire();
             } catch (InterruptedException e) {
@@ -562,14 +561,6 @@ public final class DRBD {
                                        execCallback,
                                        false,
                                        testOnly);
-        System.out.println("adjust: " + ret);
-        //final String ret = Tools.execCommandProgressIndicator(
-        //                             host,
-        //                             command,
-        //                             execCallback,
-        //                             false,
-        //                             Tools.getString("DRBD.ExecutingCommand")
-        //                             + " " + command + "...");
 
         final Pattern p = Pattern.compile(".*Failure: \\((\\d+)\\).*",
                                           Pattern.DOTALL);

@@ -261,7 +261,7 @@ public class PtestData {
             }
         }
         if (!isToolTip) {
-            sb.append("no changes");
+            sb.append("no actions");
         }
         sb.append("</html>");
         this.toolTip = sb.toString();

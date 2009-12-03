@@ -1128,8 +1128,6 @@ public class SSH {
                 //final ConnectionMonitor connectionMonitor =
                 //                               new ConnectionMonitor() {
                 //    public void connectionLost(java.lang.Throwable reason) {
-                //        System.out.println(host.getName()
-                //                           + ": connection lost");
                 //        if (!disconnectForGood) {
                 //            connection = null;
                 //        }

@@ -48,6 +48,8 @@ public class DRBDtestData {
           Pattern.compile(".*drbdsetup\\s+(\\d+)\\s+(\\S+).*");
     /** Hash with host and drbd resource, that will be disconnected. */
     private final MultiKeyMap disconnectedHash = new MultiKeyMap();
+    /** Hash with host and drbd resource, that will be dettached. */
+    private final MultiKeyMap disklessHash = new MultiKeyMap();
 
     /**
      * Prepares a new <code>DRBDtestData</code> object.
@@ -73,7 +75,9 @@ public class DRBDtestData {
                     final String res = m.group(1);
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
-                        disconnectedHash.put(host, res, 1);
+                        disconnectedHash.put(host, "/dev/drbd" + res, 1);
+                    } else if ("detach".equals(action)) {
+                        disklessHash.put(host, "/dev/drbd" + res, 1);
                     }
                 }
                 final int index = line.indexOf("--set-defaults");
@@ -87,7 +91,7 @@ public class DRBDtestData {
             }
         }
         if (!isToolTip) {
-            sb.append("no changes");
+            sb.append("no actions");
         }
         sb.append("</html>");
         this.toolTip = sb.toString();
@@ -98,5 +102,19 @@ public class DRBDtestData {
      */
     public final String getToolTip() {
         return toolTip;
+    }
+
+    /**
+     * Returns whether the device is disconnected on the host.
+     */
+    public final boolean isDisconnected(final Host host, final String dev) {
+        return disconnectedHash.get(host, dev) != null;
+    }
+
+    /**
+     * Returns whether the drbd device is diskless on the host.
+     */
+    public final boolean isDiskless(final Host host, final String dev) {
+        return disklessHash.get(host, dev) != null;
     }
 }

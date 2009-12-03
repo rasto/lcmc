@@ -109,12 +109,8 @@ public class Browser {
     /** Color of the extra panel with advanced options. */
     private static final Color EXTRA_PANEL_BACKGROUND =
                     Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Ptest lock. */
-    private final Mutex mPtestLock = new Mutex();
     /** DRBD test lock. */
     private final Mutex mDRBDtestLock = new Mutex();
-    /** DRBD test data lock. */
-    private final Mutex mDRBDtestdataLock = new Mutex();
 
     /** Sets the top of the menu tree. */
     protected final void setTreeTop() {
@@ -1675,24 +1671,6 @@ public class Browser {
     }
 
     /**
-     * Acquire ptest lock.
-     */
-    protected final void ptestLockAcquire() {
-        try {
-            mPtestLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /**
-     * Release ptest lock.
-     */
-    protected final void ptestLockRelease() {
-        mPtestLock.release();
-    }
-
-    /**
      * Acquire drbd test lock.
      */
     protected final void drbdtestLockAcquire() {
@@ -1707,24 +1685,6 @@ public class Browser {
      * Release drbd test lock.
      */
     protected final void drbdtestLockRelease() {
-        mDRBDtestLock.release();
-    }
-
-    /**
-     * Acquire drbd test data lock.
-     */
-    protected final void drbdtestdataLockAcquire() {
-        try {
-            mDRBDtestLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /**
-     * Release drbd test data lock.
-     */
-    protected final void drbdtestdataLockRelease() {
         mDRBDtestLock.release();
     }
 }

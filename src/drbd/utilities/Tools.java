@@ -1561,15 +1561,19 @@ public final class Tools {
      */
     public static JScrollPane getScrollingMenu(
                         final MyMenu menu,
-                        final DefaultListModel m,
+                        final DefaultListModel dlm,
                         final JList list,
                         final Map<MyMenuItem, ButtonCallback> callbackHash) {
         prevScrollingMenuIndex = -1;
-        final int maxSize = m.getSize();
+        list.setFixedCellHeight(25); 
+        final int maxSize = dlm.getSize();
+        if (maxSize <= 0) {
+            return null;
+        }
         if (maxSize > 20) {
             list.setVisibleRowCount(20);
         } else {
-            list.setVisibleRowCount(maxSize + 1);
+            list.setVisibleRowCount(maxSize);
         }
         list.addMouseListener(new MouseAdapter() {
             public void mouseExited(final MouseEvent evt) {
@@ -1598,7 +1602,8 @@ public final class Tools {
                                 menu.setSelected(false);
                             }
                         });
-                        final MyMenuItem item = (MyMenuItem) m.elementAt(index);
+                        final MyMenuItem item =
+                                            (MyMenuItem) dlm.elementAt(index);
                         item.action();
                     }
                 });
@@ -1629,12 +1634,12 @@ public final class Tools {
                         if (callbackHash != null) {
                             if (lastIndex >= 0) {
                                 final MyMenuItem lastItem =
-                                           (MyMenuItem) m.elementAt(lastIndex);
+                                         (MyMenuItem) dlm.elementAt(lastIndex);
                                 callbackHash.get(lastItem).mouseOut();
                             }
                             if (index >= 0) {
                                 final MyMenuItem item =
-                                               (MyMenuItem) m.elementAt(index);
+                                             (MyMenuItem) dlm.elementAt(index);
                                 callbackHash.get(item).mouseOver();
                             }
                         }
