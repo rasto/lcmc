@@ -288,7 +288,8 @@ public abstract class ResourceGraph {
                             } catch (java.lang.InterruptedException ie) {
                                 Thread.currentThread().interrupt();
                             }
-                            testOnlyFlag = !testOnlyFlag;
+                            //testOnlyFlag = !testOnlyFlag;
+                            testOnlyFlag = true;
                             final boolean testOnlyFlagLast = testOnlyFlag;
                             mTestOnlyFlag.release();
                             repaint();

@@ -46,6 +46,8 @@ public class DRBDtestData {
     /** Pattern for dry run output: drbdsetup 0 disconnect */
     private static final Pattern DRBD_D_PATTERN =
           Pattern.compile(".*drbdsetup\\s+(\\d+)\\s+(\\S+).*");
+    /** Hash with host and drbd resource, that will be connected. */
+    private final MultiKeyMap connectedHash = new MultiKeyMap();
     /** Hash with host and drbd resource, that will be disconnected. */
     private final MultiKeyMap disconnectedHash = new MultiKeyMap();
     /** Hash with host and drbd resource, that will be dettached. */
@@ -76,6 +78,8 @@ public class DRBDtestData {
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
                         disconnectedHash.put(host, "/dev/drbd" + res, 1);
+                    } else if ("net".equals(action)) {
+                        connectedHash.put(host, "/dev/drbd" + res, 1);
                     } else if ("detach".equals(action)) {
                         disklessHash.put(host, "/dev/drbd" + res, 1);
                     }
@@ -105,10 +109,17 @@ public class DRBDtestData {
     }
 
     /**
-     * Returns whether the device is disconnected on the host.
+     * Returns whether the device will be disconnected on the host.
      */
     public final boolean isDisconnected(final Host host, final String dev) {
         return disconnectedHash.get(host, dev) != null;
+    }
+
+    /**
+     * Returns whether the device will be connected on the host.
+     */
+    public final boolean isConnected(final Host host, final String dev) {
+        return connectedHash.get(host, dev) != null;
     }
 
     /**

@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
@@ -358,6 +359,11 @@ public class HeartbeatGraph extends ResourceGraph {
             addColocation(parent, serviceInfo);
             addOrder(parent, serviceInfo);
         }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                repaint();
+            }
+        });
         return vertexExists;
     }
 
@@ -625,12 +631,12 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         addServiceMenuItem.removeAll();
         boolean separatorAdded = false;
-        final boolean testOnly = isTestOnly();
+        final boolean tOnly = isTestOnly();
         for (final ServiceInfo asi : si.getExistingServiceList(si)) {
             final MyMenuItem mmi = new MyMenuItem(asi.toString()) {
                 private static final long serialVersionUID = 1L;
                 public void action() {
-                    si.addServicePanel(asi, null, true, testOnly);
+                    si.addServicePanel(asi, null, true, tOnly);
                     repaint();
                 }
             };
@@ -718,12 +724,13 @@ public class HeartbeatGraph extends ResourceGraph {
      * Returns tool tip when mouse is over a service vertex.
      */
     public final String getVertexToolTip(final Vertex v) {
+        final boolean tOnly = isTestOnly();
 
         if (vertexToHostMap.containsKey(v)) {
-            return vertexToHostMap.get(v).getToolTipForGraph(isTestOnly());
+            return vertexToHostMap.get(v).getToolTipForGraph(tOnly);
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
-        return si.getToolTipText(isTestOnly());
+        return si.getToolTipText(tOnly);
     }
 
     /**
@@ -793,21 +800,21 @@ public class HeartbeatGraph extends ResourceGraph {
      * removed or color of the host.
      */
     protected final Color getVertexFillColor(final Vertex v) {
-        final boolean testOnly = isTestOnly();
+        final boolean tOnly = isTestOnly();
         if (vertexToHostMap.containsKey(v)) {
             return vertexToHostMap.get(v).getHost().getPmColors()[0];
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         if (getClusterBrowser().allHostsDown()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
-        } else if (si.isFailed(testOnly)) {
+        } else if (si.isFailed(tOnly)) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
-        } else if (!si.isRunning(testOnly)) {
+        } else if (!si.isRunning(tOnly)) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
         } else if (getClusterBrowser().clStatusFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
-        } else if (vertexIsPresentList.contains(v) || isTestOnly()) {
-            final List<Color> colors = si.getHostColors(testOnly);
+        } else if (vertexIsPresentList.contains(v) || tOnly) {
+            final List<Color> colors = si.getHostColors(tOnly);
             if (colors.size() >= 1) {
                 return colors.get(0);
             } else {
@@ -928,7 +935,7 @@ public class HeartbeatGraph extends ResourceGraph {
             edges.add((Edge) e);
         }
 
-        final boolean testOnly = isTestOnly();
+        final boolean tOnly = isTestOnly();
         for (int i = 0; i < edges.size(); i++) {
             final Edge e = edges.get(i);
             if (isTestEdge(e)) {
@@ -957,7 +964,7 @@ public class HeartbeatGraph extends ResourceGraph {
                     final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
                     edgeToHbconnectionMap.remove(e);
                     hbconnectionToEdgeMap.remove(hbci);
-                    hbci.removeMyself(testOnly);
+                    hbci.removeMyself(tOnly);
                 }
             }
         }
@@ -1372,7 +1379,7 @@ public class HeartbeatGraph extends ResourceGraph {
                               final double x,
                               final double y,
                               final Shape shape) {
-        final boolean testOnly = isTestOnly();
+        final boolean tOnly = isTestOnly();
         final float height = (float) shape.getBounds().getHeight();
         final float width = (float) shape.getBounds().getWidth();
         if (vertexToHostMap.containsKey(v)) {
@@ -1386,7 +1393,7 @@ public class HeartbeatGraph extends ResourceGraph {
                              width);
         } else {
             final ServiceInfo si = (ServiceInfo) getInfo(v);
-            final List<Color> colors = si.getHostColors(testOnly);
+            final List<Color> colors = si.getHostColors(tOnly);
             final int number = colors.size();
             if (number > 1) {
                 for (int i = 1; i < number; i++) {
@@ -1426,7 +1433,7 @@ public class HeartbeatGraph extends ResourceGraph {
             }
         }
         if (isPicked(v)) {
-            if (isTestOnly()) {
+            if (tOnly) {
                 g2d.setColor(Color.RED);
             } else {
                 g2d.setColor(Color.BLACK);

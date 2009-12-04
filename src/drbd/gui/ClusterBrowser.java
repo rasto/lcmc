@@ -2878,7 +2878,8 @@ public class ClusterBrowser extends Browser {
                     } else {
                         return;
                     }
-                    if (bdi.isConnectedOrWF(false)) {
+                    if (sourceBDI.isConnected(false)
+                        && destBDI.isConnected(false)) {
                         bdi.disconnect(true);
                     } else {
                         bdi.connect(true);

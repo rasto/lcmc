@@ -55,6 +55,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 /**
  * This class creates graph and provides methods to add new block device
@@ -299,13 +300,25 @@ public class DrbdGraph extends ResourceGraph {
             final BlockDevInfo destBDI = (BlockDevInfo) getInfo(dest);
             final BlockDevice sourceBD = sourceBDI.getBlockDevice();
             final BlockDevice destBD = destBDI.getBlockDevice();
-            if (!destBDI.isConnected(isTestOnly())) {
-                if (sourceBDI.isWFConnection(isTestOnly())
-                    && !destBDI.isWFConnection(isTestOnly())) {
+            final boolean tOnly = isTestOnly();
+            if (!destBDI.isConnected(tOnly)) {
+                if (sourceBDI.isWFConnection(tOnly)
+                    && !destBDI.isWFConnection(tOnly)) {
                     edge.setDirection(dest, source);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            repaint();
+                        }
+                    });
+
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
                 edge.setDirection(dest, source);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        repaint();
+                    }
+                });
             }
 
             final StringBuffer l = new StringBuffer(dri.getName());
@@ -333,7 +346,7 @@ public class DrbdGraph extends ResourceGraph {
                     }
                 } else if (dri.isSplitBrain()) {
                     l.append(" (split-brain)");
-                } else if (!dri.isConnected(isTestOnly())) {
+                } else if (!dri.isConnected(tOnly)) {
                     l.append(" (disconnected)");
                 }
                 return l.toString();
@@ -806,12 +819,12 @@ public class DrbdGraph extends ResourceGraph {
         final BlockDevInfo destBDI = (BlockDevInfo) getInfo(edge.getDest());
         final BlockDevice sourceBD = sourceBDI.getBlockDevice();
         final BlockDevice destBD = destBDI.getBlockDevice();
-
-        if (sourceBDI.isConnected(isTestOnly())
+        final boolean tOnly = isTestOnly();
+        if (sourceBDI.isConnected(tOnly)
             && sourceBD.isPrimary() != destBD.isPrimary()) {
             return true;
-        } else if (sourceBDI.isWFConnection(isTestOnly())
-                   ^ destBDI.isWFConnection(isTestOnly())) {
+        } else if (sourceBDI.isWFConnection(tOnly)
+                   ^ destBDI.isWFConnection(tOnly)) {
             /* show arrow from wf connection */
             return true;
         }
@@ -934,6 +947,7 @@ public class DrbdGraph extends ResourceGraph {
                                  width);
             }
         }
+        final boolean tOnly = isTestOnly();
         if (used > 0) {
             /** Show how much is used. */
             final double freeWidth = width * (100 - used) / 100;
@@ -944,14 +958,14 @@ public class DrbdGraph extends ResourceGraph {
                          (int) (height));
         }
         if (isPicked(v)) {
-            if (isTestOnly()) {
+            if (tOnly) {
                 g2d.setColor(Color.RED);
             } else {
                 g2d.setColor(Color.BLACK);
             }
         } else {
             boolean pickedResource = false;
-            if (isTestOnly()) {
+            if (tOnly) {
                 final Set inEdges = v.getInEdges();
 
                 for (final Object e : inEdges) {

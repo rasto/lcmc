@@ -1390,14 +1390,14 @@ public class TextResource extends
 
         {"ClusterBrowser.StartingPtest",
          "<html><b>What happens when you apply it:</b><br>"
-         + "Starting What-if machine...</html>"},
+         + "Starting policy engine test...</html>"},
 
         {"PtestData.ToolTip",
          "What happens when you apply it:"},
 
         {"ClusterBrowser.StartingDRBDtest",
          "<html><b>What happens when you apply it:</b><br>"
-         + "Starting What-if machine...</html>"},
+         + "Starting drbdadm --dry-run test...</html>"},
 
         {"DRBDtestData.ToolTip",
          "What happens when you apply it:"},

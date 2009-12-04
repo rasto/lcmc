@@ -462,7 +462,7 @@ public class HostBrowser extends Browser {
                                             host.getDistString(command));
             }
         };
-        Tools.getGUIData().addToVisibleInGodMode(panicMenuItem);
+        Tools.getGUIData().addToEnabledInGodMode(panicMenuItem);
         submenu.add(panicMenuItem);
 
         /* reboot */
@@ -487,7 +487,7 @@ public class HostBrowser extends Browser {
                                             host.getDistString(command));
             }
         };
-        Tools.getGUIData().addToVisibleInGodMode(rebootMenuItem);
+        Tools.getGUIData().addToEnabledInGodMode(rebootMenuItem);
         submenu.add(rebootMenuItem);
     }
 
@@ -2439,15 +2439,6 @@ public class HostBrowser extends Browser {
 
 
                 /* apply button */
-                addApplyButton(buttonPanel);
-
-                applyButton.setEnabled(
-                    checkResourceFields(null, params)
-                );
-
-                /* expert mode */
-                Tools.registerExpertPanel(extraOptionsPanel);
-
                 applyButton.addActionListener(
                     new ActionListener() {
                         public void actionPerformed(final ActionEvent e) {
@@ -2462,9 +2453,19 @@ public class HostBrowser extends Browser {
                                     }
                                 }
                             });
+                            thread.start();
                         }
                     }
                 );
+                addApplyButton(buttonPanel);
+
+                applyButton.setEnabled(
+                    checkResourceFields(null, params)
+                );
+
+                /* expert mode */
+                Tools.registerExpertPanel(extraOptionsPanel);
+
             }
 
             /* info */
@@ -2994,14 +2995,14 @@ public class HostBrowser extends Browser {
              }
              return null;
         }
-
         /**
          * Returns whether this device is connected via drbd.
          */
         final boolean isConnected(final boolean testOnly) {
             final DRBDtestData dtd = getDRBDtestData();
             if (testOnly && dtd != null) {
-                return !dtd.isDisconnected(host, drbdResourceInfo.getDevice());
+                return isConnectedTest(dtd)
+                       && !isWFConnection(testOnly);
             } else {
                 return getBlockDevice().isConnected();
             }
@@ -3013,7 +3014,7 @@ public class HostBrowser extends Browser {
         final boolean isConnectedOrWF(final boolean testOnly) {
             final DRBDtestData dtd = getDRBDtestData();
             if (testOnly && dtd != null) {
-                return !dtd.isDisconnected(host, drbdResourceInfo.getDevice());
+                return isConnectedTest(dtd);
             } else {
                 return getBlockDevice().isConnectedOrWF();
             }
@@ -3025,14 +3026,21 @@ public class HostBrowser extends Browser {
         final boolean isWFConnection(final boolean testOnly) {
             final DRBDtestData dtd = getDRBDtestData();
             if (testOnly && dtd != null) {
-                return getBlockDevice().isConnectedOrWF()
-                       && !dtd.isDisconnected(host,
-                                              drbdResourceInfo.getDevice())
-                       && dtd.isDisconnected(getOtherBlockDevInfo().getHost(),
-                                             drbdResourceInfo.getDevice());
+                return isConnectedOrWF(testOnly)
+                       && isConnectedTest(dtd)
+                       && !getOtherBlockDevInfo().isConnectedTest(dtd);
             } else {
                 return getBlockDevice().isWFConnection();
             }
+        }
+
+        /**
+         * Returns whether this device will be disconnected.
+         */
+        final boolean isConnectedTest(final DRBDtestData dtd) {
+            return dtd.isConnected(host, drbdResourceInfo.getDevice())
+                   || (!dtd.isDisconnected(host, drbdResourceInfo.getDevice())
+                       && getBlockDevice().isConnectedOrWF());
         }
 
         /**
@@ -3042,7 +3050,8 @@ public class HostBrowser extends Browser {
             final DRBDtestData dtd = getDRBDtestData();
             final DrbdResourceInfo dri = drbdResourceInfo;
             if (testOnly && dtd != null && dri != null) {
-                return dtd.isDiskless(host, drbdResourceInfo.getDevice());
+                return dtd.isDiskless(host, drbdResourceInfo.getDevice())
+                       || getBlockDevice().isDiskless();
             } else {
                 return getBlockDevice().isDiskless();
             }
