@@ -61,16 +61,21 @@ public class GUIData  {
     /** 'Add Host' buttons. */
     private List<JComponent> addHostButtonList =
                                                    new ArrayList<JComponent>();
+    /** Components that can be made visible in the god mode. */
+    private List<JComponent> visibleInGodModeList = new ArrayList<JComponent>();
     /** Components that can be enabled and disabled in and out of the god mode.
      */
-    private List<JComponent> visibleInGodModeList =
-                                            new ArrayList<JComponent>();
+    private List<JComponent> enabledInGodModeList = new ArrayList<JComponent>();
     /**
      * List of components that have allHostsUpdate method that must be called
      * when a host is added.
      */
     private List<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
+    /** Whether we are in god mode or not. */
+    private boolean godMode = false;
+    
+
     /**
      * Sets main frame of this application.
      */
@@ -302,8 +307,16 @@ public class GUIData  {
      * Add to the list of components that are visible only in god mode.
      */
     public final void addToVisibleInGodMode(JComponent c) {
-        c.setVisible(false);
+        c.setVisible(godMode);
         visibleInGodModeList.add(c);
+    }
+
+    /**
+     * Add to the list of components that are visible only in god mode.
+     */
+    public final void addToEnabledInGodMode(JComponent c) {
+        c.setEnabled(godMode);
+        enabledInGodModeList.add(c);
     }
 
     /**
@@ -311,8 +324,12 @@ public class GUIData  {
      * - enable/disable look and feel menu
      */
     public final void godModeChanged(boolean godMode) {
-        for (JComponent c : visibleInGodModeList) {
+        this.godMode = godMode;
+        for (final JComponent c : visibleInGodModeList) {
             c.setVisible(godMode);
+        }
+        for (final JComponent c : enabledInGodModeList) {
+            c.setEnabled(godMode);
         }
         Tools.startProgressIndicator("OH MY GOD!!!");
         Tools.stopProgressIndicator("OH MY GOD!!!");
