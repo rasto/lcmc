@@ -923,16 +923,7 @@ public class DrbdGraph extends ResourceGraph {
         final double used = getUsed(v);
         final float height = (float) shape.getBounds().getHeight();
         final float width = (float) shape.getBounds().getWidth();
-        if (!isVertexBlockDevice(v)) {
-            final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
-            drawInsideVertex(g2d,
-                             v,
-                             hi.getHost().getDrbdColors(),
-                             x,
-                             y,
-                             height,
-                             width);
-        } else {
+        if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null && bdi.getBlockDevice().isDrbdMetaDisk()) {
                 final Color[] colors = {null, null};
@@ -946,6 +937,15 @@ public class DrbdGraph extends ResourceGraph {
                                  height,
                                  width);
             }
+        } else {
+            final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
+            drawInsideVertex(g2d,
+                             v,
+                             hi.getHost().getDrbdColors(),
+                             x,
+                             y,
+                             height,
+                             width);
         }
         final boolean tOnly = isTestOnly();
         if (used > 0) {

@@ -24,9 +24,6 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -43,7 +40,7 @@ public class DRBDtestData {
     private static final long serialVersionUID = 1L;
     /** Tool tip. */
     private final String toolTip;
-    /** Pattern for dry run output: drbdsetup 0 disconnect */
+    /** Pattern for dry run output: drbdsetup 0 disconnect. */
     private static final Pattern DRBD_D_PATTERN =
           Pattern.compile(".*drbdsetup\\s+(\\d+)\\s+(\\S+).*");
     /** Hash with host and drbd resource, that will be connected. */

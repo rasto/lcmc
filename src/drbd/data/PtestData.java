@@ -41,10 +41,11 @@ import java.util.ArrayList;
 public class PtestData {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Pattern for: LogActions: Start res_IPaddr2_1     (hardy-a) */
+    /** Pattern for LogActions. e.g. "Start res_IPaddr2_1     (hardy-a)" */
     private static final Pattern PTEST_ACTIONS_PATTERN =
           Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)"
                           + "\\s+\\(([^)]*)\\).*");
+    /** Pattern for pending actions. */
     private static final Pattern PTEST_ERROR_PATTERN = Pattern.compile(
                            ".*ERROR: print_elem:\\s+\\[Action.*?: Pending "
                            + "\\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
@@ -54,7 +55,7 @@ public class PtestData {
                                                  Pattern.compile("(.*):\\d+");
     /** Tool tip. */
     private final String toolTip;
-    /** Shadow cib */
+    /** Shadow cib. */
     private final String shadowCib;
     /** Running on nodes. */
     private final Map<String, List<String>> runningOnNodes =
@@ -82,7 +83,7 @@ public class PtestData {
         sb.append("<html><b>");
         sb.append(Tools.getString("PtestData.ToolTip"));
         sb.append("</b><br>");
-        String[] queries = raw.split(CRM.PTEST_END_DELIM);
+        final String[] queries = raw.split(CRM.PTEST_END_DELIM);
         if (queries.length != 2) {
             this.shadowCib = null;
             this.toolTip = null;
@@ -129,7 +130,7 @@ public class PtestData {
                         slaveNodes.add(state);
                     }
                 } else if ("Leave".equals(action)) {
-                    if (state.indexOf(" ") >= 0) {
+                    if (state.indexOf(' ') >= 0) {
                         final String[] parts = state.split(" ");
                         if (parts.length == 2) {
                             final String what = parts[0];
@@ -180,11 +181,9 @@ public class PtestData {
                 } else if ("Demote".equals(action)) {
                     if (state.indexOf(" -> Slave ") >= 0) {
                         final String[] parts = state.split(" -> Slave ");
-                        if (parts.length > 0) {
-                            if (clone) {
+                        if (parts.length > 0 && clone) {
                                 masterNodes.remove(parts[parts.length - 1]);
                                 slaveNodes.add(parts[parts.length - 1]);
-                            }
                         }
                     }
                 } else {
@@ -201,8 +200,8 @@ public class PtestData {
                 }
             } else if (mError.matches()) {
                 String res = mError.group(1);
-                String action = mError.group(2);
-                String node = mError.group(3);
+                final String action = mError.group(2);
+                final String node = mError.group(3);
                 /* Clone */
                 boolean clone = false;
                 final Matcher cm = PTEST_CLONE_PATTERN.matcher(res);

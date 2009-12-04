@@ -146,7 +146,7 @@ public abstract class ResourceGraph {
                                                    new ArrayList<JComponent>();
     /** This mutex is for protecting the test animation list. */
     private final Mutex mTestAnimationListLock = new Mutex();
-    /** Animation thread */
+    /** Animation thread. */
     private volatile Thread animationThread = null;
     /** This mutex is for protecting the animation thread. */
     private final Mutex mAnimationThreadLock = new Mutex();
@@ -163,7 +163,7 @@ public abstract class ResourceGraph {
     private volatile boolean testOnlyFlag = false;
     /** This mutex is for protecting the testOnlyFlag. */
     private final Mutex mTestOnlyFlag = new Mutex();
-    /** Test animation thread */
+    /** Test animation thread. */
     private volatile Thread testAnimationThread = null;
     /** This mutex is for protecting the test animation thread. */
     private final Mutex mTestAnimationThreadLock = new Mutex();
@@ -240,7 +240,7 @@ public abstract class ResourceGraph {
     /**
      * Stops the animation.
      */
-    public final synchronized void stopAnimation(final Info info) {
+    public final void stopAnimation(final Info info) {
         try {
             mAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
@@ -281,15 +281,14 @@ public abstract class ResourceGraph {
                             try {
                                 startTestLatch.await();
                             } catch (InterruptedException ignored) {
-                                /* ignored */
+                                Thread.currentThread().interrupt();
                             }
                             try {
                                 mTestOnlyFlag.acquire();
                             } catch (java.lang.InterruptedException ie) {
                                 Thread.currentThread().interrupt();
                             }
-                            //testOnlyFlag = !testOnlyFlag;
-                            testOnlyFlag = true;
+                            testOnlyFlag = !testOnlyFlag;
                             final boolean testOnlyFlagLast = testOnlyFlag;
                             mTestOnlyFlag.release();
                             repaint();
@@ -298,17 +297,17 @@ public abstract class ResourceGraph {
                                 sleep = 1200;
                             }
                             final int interval = 50;
-                            for (int s = 0; s < sleep; s+=interval) {
+                            for (int s = 0; s < sleep; s += interval) {
                                 try {
                                     mTestOnlyFlag.acquire();
                                 } catch (java.lang.InterruptedException ie) {
                                     Thread.currentThread().interrupt();
                                 }
-                                if (testOnlyFlag != testOnlyFlagLast) {
+                                if (testOnlyFlag == testOnlyFlagLast) {
                                     mTestOnlyFlag.release();
-                                    repaint();
                                 } else {
                                     mTestOnlyFlag.release();
+                                    repaint();
                                 }
                                 if (!component.isShowing()) {
                                     stopTestAnimation(component);

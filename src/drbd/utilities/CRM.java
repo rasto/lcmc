@@ -495,7 +495,6 @@ public final class CRM {
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
-        final StringBuffer testcmd = new StringBuffer(300);
         final String command = host.getDistCommand(cmd, replaceHash);
         execCommand(host, command, true, testOnly);
     }
@@ -530,7 +529,7 @@ public final class CRM {
             xml.append("<nvpair id=\"");
             xml.append(heartbeatId);
             xml.append(idPostfix);
-            xml.append("-");
+            xml.append('-');
             xml.append(attr);
             xml.append("\" name=\"");
             xml.append(attr);
@@ -635,8 +634,8 @@ public final class CRM {
                                            final Map<String, String> args,
                                            final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
-        xml.append("'<crm_config>");
-        xml.append("<cluster_property_set id=\"cib-bootstrap-options\">");
+        xml.append(
+            "'<crm_config><cluster_property_set id=\"cib-bootstrap-options\">");
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         if (pmV == null
@@ -831,15 +830,6 @@ public final class CRM {
         final String pmV = host.getPacemakerVersion();
         if (attrs == null) {
             attrs = new LinkedHashMap<String, String>();
-        }
-        String firstString = "first";
-        String thenString = "then";
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            /* <= 2.1.4 */
-            firstString = "from";
-            thenString = "to";
         }
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_order id=\"");

@@ -641,7 +641,6 @@ public class Host implements Serializable {
     public final String getDrbdModuleVersion() {
         return drbdModuleVersion;
     }
-     
 
     /**
      * Sets drbdVersionToInstall. This version is one that is to be installed.

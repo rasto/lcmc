@@ -30,7 +30,6 @@ import javax.swing.JButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
-import javax.swing.SwingUtilities;
 import java.awt.geom.Point2D;
 
 import java.awt.geom.Rectangle2D;

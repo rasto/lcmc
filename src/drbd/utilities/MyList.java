@@ -22,12 +22,8 @@
 
 package drbd.utilities;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import javax.swing.JMenuItem;
 import javax.swing.JList;
 import javax.swing.JToolTip;
 import javax.swing.ListModel;
@@ -60,7 +56,7 @@ public class MyList extends JList {
         try {
             robot = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
+            Tools.appWarning("Robot error");
         }
         setBackground(bg);
     }
@@ -68,7 +64,7 @@ public class MyList extends JList {
     /**
      * Creates tooltip.
      */
-    final public JToolTip createToolTip() {
+    public final JToolTip createToolTip() {
         toolTip = super.createToolTip();
         toolTip.setBackground(Color.YELLOW);
         return toolTip;
@@ -77,34 +73,28 @@ public class MyList extends JList {
     /**
      * Sets tooltip and wiggles the mouse to refresh it.
      */
-    final public void setToolTipText(final String toolTipText) {
+    public final void setToolTipText(final String toolTipText) {
         super.setToolTipText(toolTipText);
-        if (toolTip != null) {
-            if (toolTip.isShowing()) {
-                if (robot != null) {
-                    final GraphicsDevice[] devices =
+        if (toolTip != null && toolTip.isShowing() && robot != null) {
+            final GraphicsDevice[] devices =
                             GraphicsEnvironment.getLocalGraphicsEnvironment()
                                                .getScreenDevices();
-                    int xOffset = 0;
-                    if (devices.length >= 2) {
-                        /* workaround for dual monitors that are flipped. */
-                        //TODO: not sure how is it with three monitors
-                        final int x1 =
-                            devices[0].getDefaultConfiguration().getBounds().x;
-                        final int x2 =
-                            devices[1].getDefaultConfiguration().getBounds().x;
-                        if (x1 > x2) {
-                            xOffset = -x1;
-                        }
-                    }
-                    final Point2D p = MouseInfo.getPointerInfo().getLocation();
-                    robot.mouseMove((int) p.getX() + xOffset - 1,
-                                    (int) p.getY());
-                    robot.mouseMove((int) p.getX() + xOffset + 1,
-                                    (int) p.getY());
-                    robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
+            int xOffset = 0;
+            if (devices.length >= 2) {
+                /* workaround for dual monitors that are flipped. */
+                //TODO: not sure how is it with three monitors
+                final int x1 =
+                    devices[0].getDefaultConfiguration().getBounds().x;
+                final int x2 =
+                    devices[1].getDefaultConfiguration().getBounds().x;
+                if (x1 > x2) {
+                    xOffset = -x1;
                 }
             }
+            final Point2D p = MouseInfo.getPointerInfo().getLocation();
+            robot.mouseMove((int) p.getX() + xOffset - 1, (int) p.getY());
+            robot.mouseMove((int) p.getX() + xOffset + 1, (int) p.getY());
+            robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
         }
     }
 }

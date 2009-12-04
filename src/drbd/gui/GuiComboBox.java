@@ -136,7 +136,6 @@ public class GuiComboBox extends JPanel {
                        final Map<String, String> abbreviations) {
         super();
         this.units = units;
-        //setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
             regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
@@ -454,7 +453,7 @@ public class GuiComboBox extends JPanel {
      * Enables/Disables component in a group of components identified by
      * specified string. This works only with RADIOGROUP in a moment.
      */
-    public void setEnabled(final String s, final boolean enabled) {
+    public final void setEnabled(final String s, final boolean enabled) {
         if (componentsHash.containsKey(s)) {
             componentsHash.get(s).setEnabled(enabled);
         }
@@ -621,7 +620,7 @@ public class GuiComboBox extends JPanel {
                 value = s.toString();
                 break;
             default:
-                // error
+                /* error */
         }
         if (NOTHING_SELECTED.equals(value)) {
             return null;
@@ -653,7 +652,7 @@ public class GuiComboBox extends JPanel {
             case CHECKBOX:
                 break;
             default:
-                // nothing
+                /* nothing */
         }
     }
 
@@ -845,7 +844,6 @@ public class GuiComboBox extends JPanel {
     public final void selectSubnet() {
         switch(type) {
             case TEXTFIELD:
-                //ip = ((MTextField) component).getText();
                 break;
             case PASSWDFIELD:
                 break;
@@ -915,7 +913,7 @@ public class GuiComboBox extends JPanel {
                 }
                 break;
             default:
-                // error
+                /* error */
         }
     }
 
@@ -946,7 +944,7 @@ public class GuiComboBox extends JPanel {
                 textFieldWithoutUnit.setBackground(ERROR_VALUE_BACKGROUND);
                 break;
             default:
-                // error
+                /* error */
         }
     }
 
@@ -991,7 +989,7 @@ public class GuiComboBox extends JPanel {
                 textFieldWithoutUnit.setBackground(Color.WHITE);
                 break;
             default:
-                // error
+                /* error */
         }
         Color c;
         if (required) {
@@ -1020,7 +1018,7 @@ public class GuiComboBox extends JPanel {
                 setBackground(c);
                 break;
             default:
-                // error
+                /* error */
         }
     }
 
@@ -1043,7 +1041,7 @@ public class GuiComboBox extends JPanel {
          */
         public final void keyPressed(final KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                // Simulte click on default button.
+                /* Simulte click on default button. */
                 doClick(e);
             }
         }
@@ -1103,7 +1101,7 @@ public class GuiComboBox extends JPanel {
         /**
          * Focus event.
          */
-        protected void processFocusEvent(FocusEvent e) {
+        protected void processFocusEvent(final FocusEvent e) {
             super.processFocusEvent(e);
             if (!selected) {
                 selected = true;

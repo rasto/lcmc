@@ -74,7 +74,6 @@ public class GUIData  {
                                             new ArrayList<AllHostsUpdatable>();
     /** Whether we are in god mode or not. */
     private boolean godMode = false;
-    
 
     /**
      * Sets main frame of this application.
@@ -323,7 +322,7 @@ public class GUIData  {
      * Do gui actions when we are in the god mode.
      * - enable/disable look and feel menu
      */
-    public final void godModeChanged(boolean godMode) {
+    public final void godModeChanged(final boolean godMode) {
         this.godMode = godMode;
         for (final JComponent c : visibleInGodModeList) {
             c.setVisible(godMode);
@@ -339,7 +338,8 @@ public class GUIData  {
      * Adds a component to the list of components that have allHostsUpdate
      * method that must be called when a host is added.
      */
-    public final void registerAllHostsUpdate(AllHostsUpdatable component) {
+    public final void registerAllHostsUpdate(
+                                            final AllHostsUpdatable component) {
         if (!allHostsUpdateList.contains(component)) {
             allHostsUpdateList.add(component);
         }
@@ -349,7 +349,8 @@ public class GUIData  {
      * Adds a component from the list of components that have allHostsUpdate
      * method that must be called when a host is added.
      */
-    public final void unregisterAllHostsUpdate(AllHostsUpdatable component) {
+    public final void unregisterAllHostsUpdate(
+                                            final AllHostsUpdatable component) {
         allHostsUpdateList.remove(component);
     }
 

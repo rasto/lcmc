@@ -35,8 +35,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.HashSet;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -1366,7 +1364,6 @@ public class CRMXML extends XML {
         final Node metaAttrsNode = getChildNode(resourceNode,
                                                 "meta_attributes");
         if (metaAttrsNode != null) {
-            final String metaAttrsId = getAttribute(metaAttrsNode, "id");
             /* <attributtes> only til 2.1.4 */
             NodeList nvpairsMA;
             if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
@@ -1399,9 +1396,9 @@ public class CRMXML extends XML {
                 final List<String> resList,
                 final Map<String, List<String>> groupsToResourcesMap,
                 final Map<String, Map<String, String>> parametersMap,
-                final Map<String, ResourceAgent> resourceTypeMap,                     
-                final Map<String, Map<String, String>> parametersNvpairsIdsMap,             
-                final Map<String, String> resourceInstanceAttrIdMap,           
+                final Map<String, ResourceAgent> resourceTypeMap,
+                final Map<String, Map<String, String>> parametersNvpairsIdsMap,
+                final Map<String, String> resourceInstanceAttrIdMap,
                 final MultiKeyMap operationsMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap) {
@@ -1476,7 +1473,7 @@ public class CRMXML extends XML {
         /** On which nodes the resource is slave if it is m/s resource. */
         private final List<String> slaveOnNodes;
         /** Is managed by CRM. */
-        private boolean managed = true;
+        private final boolean managed;
 
         /**
          * Creates a new ResStatus object.
@@ -1599,7 +1596,6 @@ public class CRMXML extends XML {
                                                    "instance_attributes");
         /* <nvpair...> */
         if (instanceAttrNode != null) {
-            final String iAId = getAttribute(instanceAttrNode, "id");
             NodeList nvpairsRes;
             if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
@@ -1642,7 +1638,6 @@ public class CRMXML extends XML {
                                                    "instance_attributes");
         /* <nvpair...> */
         if (instanceAttrNode != null) {
-            final String iAId = getAttribute(instanceAttrNode, "id");
             NodeList nvpairsRes;
             final String hbV = host.getHeartbeatVersion();
             final String pmV = host.getPacemakerVersion();
@@ -1659,7 +1654,6 @@ public class CRMXML extends XML {
             for (int j = 0; j < nvpairsRes.getLength(); j++) {
                 final Node optionNode = nvpairsRes.item(j);
                 if (optionNode.getNodeName().equals("nvpair")) {
-                    final String nvpairId = getAttribute(optionNode, "id");
                     final String name = getAttribute(optionNode, "name");
                     final String value = getAttribute(optionNode, "value");
                     nodeParametersMap.put(node, name, value);
@@ -1808,37 +1802,14 @@ public class CRMXML extends XML {
             } else if ("group".equals(nodeName)) {
                 parseGroup(primitiveGroupNode,
                            null,
-                           groupsToResourcesMap, 
+                           groupsToResourcesMap,
                            parametersMap,
-                           resourceTypeMap,                     
-                           parametersNvpairsIdsMap,             
-                           resourceInstanceAttrIdMap,           
+                           resourceTypeMap,
+                           parametersNvpairsIdsMap,
+                           resourceInstanceAttrIdMap,
                            operationsMap,
                            operationsIdMap,
                            resOpIdsMap);
-                //final NodeList primitives = primitiveGroupNode.getChildNodes();
-                //final String groupId = getAttribute(primitiveGroupNode, "id");
-                //parametersMap.put(groupId, new HashMap<String, String>());
-                //List<String> resList = groupsToResourcesMap.get(groupId);
-                //if (resList == null) {
-                //    resList = new ArrayList<String>();
-                //    groupsToResourcesMap.put(groupId, resList);
-                //}
-
-                //for (int j = 0; j < primitives.getLength(); j++) {
-                //    final Node primitiveNode = primitives.item(j);
-                //    if (primitiveNode.getNodeName().equals("primitive")) {
-                //        parsePrimitive(primitiveNode,
-                //                       resList,
-                //                       resourceTypeMap,
-                //                       parametersMap,
-                //                       parametersNvpairsIdsMap,
-                //                       resourceInstanceAttrIdMap,
-                //                       operationsMap,
-                //                       operationsIdMap,
-                //                       resOpIdsMap);
-                //    }
-                //}
             } else if ("master".equals(nodeName)
                        || "master_slave".equals(nodeName)
                        || "clone".equals(nodeName)) {
@@ -1873,11 +1844,11 @@ public class CRMXML extends XML {
                     } else if (primitiveNode.getNodeName().equals("group")) {
                         parseGroup(primitiveNode,
                                    resList,
-                                   groupsToResourcesMap, 
+                                   groupsToResourcesMap,
                                    parametersMap,
-                                   resourceTypeMap,                     
-                                   parametersNvpairsIdsMap,             
-                                   resourceInstanceAttrIdMap,           
+                                   resourceTypeMap,
+                                   parametersNvpairsIdsMap,
+                                   resourceInstanceAttrIdMap,
                                    operationsMap,
                                    operationsIdMap,
                                    resOpIdsMap);

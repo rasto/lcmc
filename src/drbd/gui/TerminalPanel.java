@@ -532,7 +532,7 @@ public class TerminalPanel extends JScrollPane {
                 if (s.equals(cheatCode.substring(cheatPos, cheatPos + 1))) {
                     cheatPos++;
                     if (cheatPos == cheatCode.length()) {
-                        editEnabled = !editEnabled;
+                        editEnabled ^= editEnabled;
                         Tools.getGUIData().godModeChanged(editEnabled);
                         cheatPos = 0;
                     }

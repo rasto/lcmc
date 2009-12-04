@@ -1071,10 +1071,10 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
-        if (!si.isStopped(testOnly) && !getClusterBrowser().allHostsDown()) {
-            icons.add(SERVICE_RUNNING_ICON);
-        } else {
+        if (si.isStopped(testOnly) || getClusterBrowser().allHostsDown()) {
             icons.add(SERVICE_NOT_RUNNING_ICON);
+        } else {
+            icons.add(SERVICE_RUNNING_ICON);
         }
         if (!si.isManaged(testOnly)) {
             icons.add(SERVICE_UNMANAGED_ICON);
