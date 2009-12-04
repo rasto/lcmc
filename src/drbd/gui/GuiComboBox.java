@@ -583,7 +583,10 @@ public class GuiComboBox extends JPanel {
                 }
                 break;
             case TEXTFIELDWITHUNIT:
-                final String text = textFieldWithoutUnit.getText();
+                String text = textFieldWithoutUnit.getText();
+                if (text == null) {
+                    text = "";
+                }
                 final StringBuffer s = new StringBuffer(text);
                 final Object unit = unitComboBox.getSelectedItem();
                 if (!Tools.isStringClass(unit)) {

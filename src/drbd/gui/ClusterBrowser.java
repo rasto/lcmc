@@ -4102,10 +4102,10 @@ public class ClusterBrowser extends Browser {
                             dlm.addElement(mmi);
                         }
                         final JScrollPane jsp = Tools.getScrollingMenu(
-                                                            classItem,
-                                                             dlm,
-                                                             new JList(dlm),
-                                                             null);
+                                            classItem,
+                                            dlm,
+                                            new MyList(dlm, getBackground()),
+                                            null);
                         if (jsp == null) {
                             classItem.setEnabled(false);
                         } else {
@@ -7036,10 +7036,10 @@ public class ClusterBrowser extends Browser {
                                 dlm.addElement(mmi);
                             }
                             final JScrollPane jsp = Tools.getScrollingMenu(
-                                                                classItem,
-                                                                 dlm,
-                                                                 new JList(dlm),
-                                                                 null);
+                                            classItem,
+                                            dlm,
+                                            new MyList(dlm, getBackground()),
+                                            null);
                             if (jsp == null) {
                                 classItem.setEnabled(false);
                             } else {
@@ -7071,7 +7071,7 @@ public class ClusterBrowser extends Browser {
                         DefaultListModel dlm = new DefaultListModel();
                         final Map<MyMenuItem, ButtonCallback> callbackHash =
                                      new HashMap<MyMenuItem, ButtonCallback>();
-                        final MyList list = new MyList(dlm);
+                        final MyList list = new MyList(dlm, getBackground());
                         for (final ServiceInfo asi
                                         : getExistingServiceList(thisClass)) {
                             if (asi.getGroupInfo() != null
@@ -9234,10 +9234,10 @@ public class ClusterBrowser extends Browser {
                             dlm.addElement(mmi);
                         }
                         final JScrollPane jsp = Tools.getScrollingMenu(
-                                                            classItem,
-                                                             dlm,
-                                                             new JList(dlm),
-                                                             null);
+                                            classItem,
+                                            dlm,
+                                            new MyList(dlm, getBackground()),
+                                            null);
                         if (jsp == null) {
                             classItem.setEnabled(false);
                         } else {

@@ -1648,7 +1648,10 @@ public final class Tools {
                 thread.start();
             }
         });
-        return new JScrollPane(list);
+        final JScrollPane sp = new JScrollPane(list);
+        sp.setViewportBorder(null);
+        sp.setBorder(null);
+        return sp;
     }
 
     /**

@@ -54,7 +54,7 @@ public class MyList extends JList {
     /**
      * Prepares a new <code>MyList</code> object.
      */
-    public MyList(final ListModel dataModel) {
+    public MyList(final ListModel dataModel, final Color bg) {
         super(dataModel);
         toolTip = createToolTip();
         try {
@@ -62,6 +62,7 @@ public class MyList extends JList {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        setBackground(bg);
     }
 
     /**
