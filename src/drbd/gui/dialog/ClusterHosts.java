@@ -204,7 +204,8 @@ public class ClusterHosts extends DialogCluster {
         if (getCluster().getHosts().size() == 0) {
             /* mark last two available hosts */
             for (final Host host : hosts.getHostsArray()) {
-                if (!getCluster().getHosts().contains(host)) {
+                if (!getCluster().getHosts().contains(host)
+                    && !host.isInCluster()) {
                     if (lastHost2 != null
                         && lastHost2.getIp() != null
                         && lastHost2.getIp().equals(host.getIp())) {
