@@ -41,7 +41,6 @@ import drbd.utilities.ExecCallback;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
-import drbd.utilities.Heartbeat;
 import drbd.utilities.CRM;
 import drbd.utilities.ButtonCallback;
 
@@ -182,13 +181,6 @@ public class HostBrowser extends Browser {
 
     /**
      * Prepares a new <code>HostBrowser</code> object.
-     */
-    //public HostBrowser() {
-    //    super();
-    //}
-
-    /**
-     * Prepares a new <code>HostBrowser</code> object.
      *
      * @param host
      *          host to which this resource tree belongs
@@ -241,7 +233,7 @@ public class HostBrowser extends Browser {
     /**
      * Returns cluster browser if available.
      */
-    private final ClusterBrowser getClusterBrowser() {
+    private ClusterBrowser getClusterBrowser() {
         final Cluster c = host.getCluster();
         if (c == null) {
             return null;
@@ -257,7 +249,8 @@ public class HostBrowser extends Browser {
                                         final String[] fss) {
         DefaultMutableTreeNode resource = null;
         /* net interfaces */
-        Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
+        final Map<NetInterface, NetInfo> oldNetInterfaces =
+                                                        getNetInterfacesMap();
         try {
             mNetInfosLock.acquire();
         } catch (InterruptedException e) {
@@ -279,7 +272,8 @@ public class HostBrowser extends Browser {
         mNetInfosLock.release();
 
         /* block devices */
-        Map<BlockDevice, BlockDevInfo> oldBlockDevices = getBlockDevicesMap();
+        final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
+                                                          getBlockDevicesMap();
         try {
             mBlockDevInfosLock.acquire();
         } catch (InterruptedException e) {
@@ -302,7 +296,7 @@ public class HostBrowser extends Browser {
         mBlockDevInfosLock.release();
 
         /* file systems */
-        Map<String, FilesystemInfo> oldFilesystems = getFilesystemsMap();
+        final Map<String, FilesystemInfo> oldFilesystems = getFilesystemsMap();
         try {
             mFileSystemsLock.acquire();
         } catch (InterruptedException e) {
@@ -494,7 +488,7 @@ public class HostBrowser extends Browser {
     /**
      * Returns tooltip for host.
      */
-    public String getHostToolTip(final Host host) {
+    public final String getHostToolTip(final Host host) {
         final StringBuffer tt = new StringBuffer(80);
         tt.append("<b>" + host.getName() + "</b>");
         if (host.getCluster().getBrowser().isRealDcHost(host)) {
@@ -523,48 +517,52 @@ public class HostBrowser extends Browser {
         } else {
             drbdModuleS = drbdModuleV;
         }
-        tt.append('\n');
-        tt.append("DRBD ");
+        tt.append("\nDRBD ");
         tt.append(drbdS);
         if (!drbdS.equals(drbdModuleS)) {
-            tt.append('\n');
-            tt.append("DRBD module ");
+            tt.append("\nDRBD module ");
             tt.append(drbdModuleS);
         }
-        if (!host.isDrbdLoaded()) {
-            tt.append(" (not loaded)");
-        } else {
+        if (host.isDrbdLoaded()) {
             tt.append(" (running)");
+        } else {
+            tt.append(" (not loaded)");
         }
         /* Pacemaker */
         final String pmV = host.getPacemakerVersion();
         final String hbV = host.getHeartbeatVersion();
-        String hbRunning;
+        final StringBuffer hbRunning = new StringBuffer(20);
         if (host.isHeartbeatRunning()) {
-            hbRunning = "running";
+            hbRunning.append("running");
             if (!host.isHeartbeatRc()) {
-                hbRunning += "/no rc.d";
+                hbRunning.append("/no rc.d");
             }
         } else {
-            hbRunning = "not running";
+            hbRunning.append("not running");
         }
         if (host.isHeartbeatRc()) {
-            hbRunning += "/rc.d";
+            hbRunning.append("/rc.d");
         }
         if (pmV == null) {
             if (hbV != null) {
-                tt.append('\n');
-                tt.append("Heartbeat " + hbV + " (" + hbRunning + ")");
+                tt.append("\nHeartbeat ");
+                tt.append(hbV);
+                tt.append(" (");
+                tt.append(hbRunning.toString());
+                tt.append(')');
             }
         } else {
-            String pmRunning; 
+            String pmRunning;
             if (host.isClStatus()) {
                 pmRunning = "running";
             } else {
                 pmRunning = "not running";
             }
-            tt.append('\n');
-            tt.append("Pacemaker " + pmV + " (" + pmRunning + ")");
+            tt.append("\nPacemaker ");
+            tt.append(pmV);
+            tt.append(" (");
+            tt.append(pmRunning);
+            tt.append(')');
             String corOrAis = null;
             final String corV = host.getCorosyncVersion();
             final String aisV = host.getOpenaisVersion();
@@ -575,33 +573,47 @@ public class HostBrowser extends Browser {
             }
 
             if (hbV != null && host.isHeartbeatRunning()) {
-                tt.append('\n');
-                tt.append("Heartbeat " + hbV + " (" + hbRunning + ")");
+                tt.append("\nHeartbeat ");
+                tt.append(hbV);
+                tt.append(" (");
+                tt.append(hbRunning.toString());
+                tt.append(')');
             }
             if (corOrAis != null) {
-                String csAisRunning;
-                if (host.isCsAisRunning()) {
-                    csAisRunning = "running";
-                    if (!host.isCsAisRc()) {
-                        csAisRunning += "/no rc.d";
-                    }
-                } else {
-                    csAisRunning = "not running";
-                }
-                if (host.isCsAisRc()) {
-                    csAisRunning += "/rc.d";
-                }
-                corOrAis += " (" + csAisRunning + ")";
                 tt.append('\n');
                 tt.append(corOrAis);
+                tt.append(" (");
+                if (host.isCsAisRunning()) {
+                    tt.append("running");
+                    if (!host.isCsAisRc()) {
+                        tt.append("/no rc.d");
+                    }
+                } else {
+                    tt.append("not running");
+                }
+                if (host.isCsAisRc()) {
+                    tt.append("/rc.d");
+                }
+                tt.append(')');
             }
             if (hbV != null && !host.isHeartbeatRunning()) {
-                tt.append('\n');
-                tt.append("Heartbeat " + hbV + " (" + hbRunning + ")");
+                tt.append("\nHeartbeat ");
+                tt.append(hbV);
+                tt.append(" (");
+                tt.append(hbRunning.toString());
+                tt.append(')');
             }
         }
         return tt.toString();
     }
+
+    /**
+     * Returns drbd graph object.
+     */
+    private DrbdGraph getDrbdGraph() {
+        return (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+    }
+
 
     /**
      * This class holds info data for a filesystem.
@@ -631,7 +643,7 @@ public class HostBrowser extends Browser {
          * Returns type of the info text. text/plain or text/html.
          */
         protected String getInfoType() {
-            return "text/html";
+            return Tools.MIME_TYPE_TEXT_HTML;
         }
 
         /**
@@ -886,8 +898,7 @@ public class HostBrowser extends Browser {
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
-                     getClusterBrowser().new ClMenuItemCallback(thisClass,
-                                                                standbyItem,
+                     getClusterBrowser().new ClMenuItemCallback(standbyItem,
                                                                 host) {
                 public void action(final Host host) {
                     if (isStandby(false)) {
@@ -987,7 +998,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns Cluster graph.
          */
-        private final HeartbeatGraph getHeartbeatGraph() {
+        private HeartbeatGraph getHeartbeatGraph() {
             final ClusterBrowser b = getClusterBrowser();
             if (b == null) {
                 return null;
@@ -1035,7 +1046,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears above the icon in the graph.
          */
-        public String getIconTextForGraph(final boolean testOnly) {
+        public final String getIconTextForGraph(final boolean testOnly) {
             if (!getHost().isConnected()) {
                 return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
             }
@@ -1067,7 +1078,8 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears in the corner of the graph.
          */
-        protected Subtext getRightCornerTextForGraph(final boolean testOnly) {
+        protected final Subtext getRightCornerTextForGraph(
+                                                      final boolean testOnly) {
             if (getHost().isClStatus()) {
                 if (isStandby(testOnly)) {
                     return STANDBY_SUBTEXT;
@@ -1552,8 +1564,7 @@ public class HostBrowser extends Browser {
          * Returns grahical view if there is any.
          */
         public final JPanel getGraphicalView() {
-            final DrbdGraph dg =
-                    (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+            final DrbdGraph dg = getDrbdGraph();
             dg.getDrbdInfo().setSelectedNode(null);
             return dg.getDrbdInfo().getGraphicalView();
         }
@@ -1603,7 +1614,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears above the icon in the drbd graph.
          */
-        public String getIconTextForDrbdGraph(final boolean testOnly) {
+        public final String getIconTextForDrbdGraph(final boolean testOnly) {
             if (!getHost().isConnected()) {
                 return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
             }
@@ -1613,7 +1624,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns text that appears in the corner of the drbd graph.
          */
-        protected Subtext getRightCornerTextForDrbdGraph(
+        protected final Subtext getRightCornerTextForDrbdGraph(
                                                      final boolean testOnly) {
             return null;
         }
@@ -1720,7 +1731,7 @@ public class HostBrowser extends Browser {
         /** Cache for the info panel. */
         private JComponent infoPanel = null;
         /** Extra options panel. */
-        final JPanel extraOptionsPanel = new JPanel();
+        private final JPanel extraOptionsPanel = new JPanel();
 
         /**
          * Prepares a new <code>BlockDevInfo</code> object.
@@ -1864,7 +1875,8 @@ public class HostBrowser extends Browser {
                     tt.append("</td></tr></table>");
                 } else {
                     tt.append('\n');
-                    tt.append(Tools.getString("HostBrowser.Hb.NoInfoAvailable"));
+                    tt.append(
+                            Tools.getString("HostBrowser.Hb.NoInfoAvailable"));
                 }
             }
             return tt.toString();
@@ -2290,8 +2302,7 @@ public class HostBrowser extends Browser {
             if (getBlockDevice().isDrbd()) {
                 drbdResourceInfo.getDrbdInfo().setSelectedNode(this);
             }
-            return ((DrbdGraph) host.getCluster().getBrowser().getDrbdGraph())
-                        .getDrbdInfo().getGraphicalView();
+            return getDrbdGraph().getDrbdInfo().getGraphicalView();
         }
 
         protected final void setTerminalPanel() {
@@ -2333,12 +2344,13 @@ public class HostBrowser extends Browser {
 
                 drbdVIPortList.add(
                                 getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
-                final Object o = paramComboBoxGet(DRBD_MD_PARAM, null).getValue();
+                final Object o =
+                              paramComboBoxGet(DRBD_MD_PARAM, null).getValue();
                 if (Tools.isStringInfoClass(o)) {
                     getBlockDevice().setMetaDisk(null); /* internal */
                 } else {
                     final BlockDevice metaDisk =
-                                               ((BlockDevInfo) o).getBlockDevice();
+                                           ((BlockDevInfo) o).getBlockDevice();
                     getBlockDevice().setMetaDisk(metaDisk);
                 }
                 if (getBlockDevice().getMetaDisk() != null) {
@@ -2356,8 +2368,7 @@ public class HostBrowser extends Browser {
                 private volatile boolean mouseStillOver = false;
                 public final void mouseOut() {
                     mouseStillOver = false;
-                    final DrbdGraph drbdGraph =
-                      (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+                    final DrbdGraph drbdGraph = getDrbdGraph();
                     drbdGraph.stopTestAnimation(applyButton);
                     applyButton.setToolTipText(null);
                 }
@@ -2372,8 +2383,7 @@ public class HostBrowser extends Browser {
                     }
                     mouseStillOver = false;
                     final CountDownLatch startTestLatch = new CountDownLatch(1);
-                    final DrbdGraph drbdGraph =
-                      (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+                    final DrbdGraph drbdGraph = getDrbdGraph();
                     drbdGraph.startTestAnimation(applyButton, startTestLatch);
                     drbdtestLockAcquire();
                     thisClass.setDRBDtestData(null);
@@ -2442,7 +2452,7 @@ public class HostBrowser extends Browser {
                 applyButton.addActionListener(
                     new ActionListener() {
                         public void actionPerformed(final ActionEvent e) {
-                            Thread thread = new Thread(new Runnable() {
+                            final Thread thread = new Thread(new Runnable() {
                                 public void run() {
                                     apply(false);
                                     try {
@@ -2548,6 +2558,29 @@ public class HostBrowser extends Browser {
         //}
 
         /**
+         * Returns 'add drbd resource' menu item.
+         */
+        private MyMenuItem addDrbdResourceMenuItem(final BlockDevInfo oBdi,
+                                                   final boolean testOnly) {
+            final BlockDevInfo thisClass = this;
+            return new MyMenuItem(oBdi.toString()) {
+                private static final long serialVersionUID = 1L;
+                public void action() {
+                    DrbdInfo drbdInfo = getDrbdGraph().getDrbdInfo();
+                    setInfoPanel(null);
+                    oBdi.setInfoPanel(null);
+                    drbdInfo.addDrbdResource(
+                                         null,
+                                         null,
+                                         thisClass,
+                                         oBdi,
+                                         true,
+                                         testOnly);
+                }
+            };
+        }
+
+        /**
          * Creates popup for the block device.
          */
         public final List<UpdatableItem> createPopup() {
@@ -2598,26 +2631,8 @@ public class HostBrowser extends Browser {
                                     if (oBdi.getDrbdResourceInfo() == null
                                         && oBdi.getBlockDevice()
                                                .isAvailable()) {
-                                        add(new MyMenuItem(oBdi.toString()) {
-                                            private static final long serialVersionUID = 1L;
-                                            public void action() {
-                                                DrbdInfo drbdInfo =
-                                                    ((DrbdGraph) host
-                                                               .getCluster()
-                                                               .getBrowser()
-                                                               .getDrbdGraph())
-                                                               .getDrbdInfo();
-                                                setInfoPanel(null);
-                                                oBdi.setInfoPanel(null);
-                                                drbdInfo.addDrbdResource(
-                                                                     null,
-                                                                     null,
-                                                                     thisClass,
-                                                                     oBdi,
-                                                                     true,
-                                                                     testOnly);
-                                            }
-                                        });
+                                        add(addDrbdResourceMenuItem(oBdi,
+                                                                    testOnly));
                                     }
                                     if (oBdi.getName().equals(
                                                 getBlockDevice().getName())) {
@@ -2668,8 +2683,7 @@ public class HostBrowser extends Browser {
                     }
                 };
             final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
-                   getClusterBrowser().new DRBDMenuItemCallback(thisClass,
-                                                                attachMenu,
+                   getClusterBrowser().new DRBDMenuItemCallback(attachMenu,
                                                                 host) {
                 public void action(final Host host) {
                     if (isDiskless(false)) {
@@ -2720,8 +2734,7 @@ public class HostBrowser extends Browser {
                     }
                 };
             final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
-                   getClusterBrowser().new DRBDMenuItemCallback(thisClass,
-                                                                connectMenu,
+                   getClusterBrowser().new DRBDMenuItemCallback(connectMenu,
                                                                 host) {
                 public void action(final Host host) {
                     if (isConnectedOrWF(false)) {
@@ -2998,7 +3011,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns whether this device is connected via drbd.
          */
-        final boolean isConnected(final boolean testOnly) {
+        public final boolean isConnected(final boolean testOnly) {
             final DRBDtestData dtd = getDRBDtestData();
             if (testOnly && dtd != null) {
                 return isConnectedTest(dtd)
@@ -3011,7 +3024,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns whether this device is connected or wait-for-c via drbd.
          */
-        final boolean isConnectedOrWF(final boolean testOnly) {
+        public final boolean isConnectedOrWF(final boolean testOnly) {
             final DRBDtestData dtd = getDRBDtestData();
             if (testOnly && dtd != null) {
                 return isConnectedTest(dtd);
@@ -3023,7 +3036,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns whether this device is in wait-for-connection state.
          */
-        final boolean isWFConnection(final boolean testOnly) {
+        public final boolean isWFConnection(final boolean testOnly) {
             final DRBDtestData dtd = getDRBDtestData();
             if (testOnly && dtd != null) {
                 return isConnectedOrWF(testOnly)
@@ -3037,7 +3050,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns whether this device will be disconnected.
          */
-        final boolean isConnectedTest(final DRBDtestData dtd) {
+        public final boolean isConnectedTest(final DRBDtestData dtd) {
             return dtd.isConnected(host, drbdResourceInfo.getDevice())
                    || (!dtd.isDisconnected(host, drbdResourceInfo.getDevice())
                        && getBlockDevice().isConnectedOrWF());
@@ -3046,7 +3059,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns whether this device is diskless.
          */
-        final boolean isDiskless(final boolean testOnly) {
+        public final boolean isDiskless(final boolean testOnly) {
             final DRBDtestData dtd = getDRBDtestData();
             final DrbdResourceInfo dri = drbdResourceInfo;
             if (testOnly && dtd != null && dri != null) {

@@ -110,7 +110,8 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
 
         final JLabel logo = new JLabel(logoImage);
         logoPanel.add(logo, LOGO_PANEL_STRING);
-        final JEditorPane hp = new JEditorPane("text/html", HELP_TEXT_STRING);
+        final JEditorPane hp =
+                  new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, HELP_TEXT_STRING);
         hp.setCaretPosition(0);
         Tools.setEditorFont(hp);
 

@@ -712,8 +712,7 @@ public class ClusterAisConfig extends DialogCluster {
         config.append(tab);
         config.append("user: root\n");
         config.append(tab);
-        config.append("group: root\n}");
-        config.append("\n\ncorosync {\n");
+        config.append("group: root\n}\n\ncorosync {\n");
         config.append(tab);
         config.append("user: root\n");
         config.append(tab);

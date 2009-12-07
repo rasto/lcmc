@@ -214,7 +214,7 @@ public class ClusterInit extends DialogCluster {
     /**
      * Checks drbds and heartbeats on all nodes of the cluster.
      */
-    private void checkCluster(boolean periodic) {
+    private void checkCluster(final boolean periodic) {
         /* check if modules are loaded. */
         final Host[] hosts = getCluster().getHostsArray();
         final ExecCommandThread[] infoThreads =

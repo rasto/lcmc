@@ -1392,18 +1392,22 @@ public class TextResource extends
          "<html><b>What happens when you apply it:</b><br>"
          + "Starting policy engine test...</html>"},
 
-        {"PtestData.ToolTip",
-         "What happens when you apply it:"},
-
         {"ClusterBrowser.StartingDRBDtest",
          "<html><b>What happens when you apply it:</b><br>"
          + "Starting drbdadm --dry-run test...</html>"},
+
+
+        {"PtestData.ToolTip",
+         "What happens when you apply it:"},
 
         {"DRBDtestData.ToolTip",
          "What happens when you apply it:"},
 
         {"HostBrowser.HostWizard",
          "Host Wizard"},
+
+        {"HostBrowser.Drbd.NoInfoAvailable",
+         "no info available"},
 
         {"HostBrowser.Drbd.AddDrbdResource",
          "Add Mirrored Disk"},
@@ -1537,9 +1541,6 @@ public class TextResource extends
          "Select..."},
 
         {"HostBrowser.Hb.NoInfoAvailable",
-         "no info available"},
-
-        {"HostBrowser.Drbd.NoInfoAvailable",
          "no info available"},
 
         {"HostBrowser.ExpertSubmenu",

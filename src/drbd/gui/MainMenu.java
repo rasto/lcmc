@@ -115,7 +115,7 @@ public class MainMenu extends JPanel implements ActionListener {
                     loadActionListener(),
                     null);
 
-        JMenuItem item = addMenuItem(
+        final JMenuItem item = addMenuItem(
                                 Tools.getString("MainMenu.RemoveEverything"),
                                 submenu,
                                 0,

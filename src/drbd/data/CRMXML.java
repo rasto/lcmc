@@ -185,6 +185,20 @@ public class CRMXML extends XML {
                                                           "promote",
                                                           "demote",
                                                           "stop"};
+    /** Target role stopped. */
+    public static final String TARGET_ROLE_STOPPED = "stopped";
+    /** Target role started. */
+    private static final String TARGET_ROLE_STARTED = "started";
+    /** Target role master. */
+    private static final String TARGET_ROLE_MASTER = "master";
+    /** Target role slave. */
+    private static final String TARGET_ROLE_SLAVE = "slave";
+    /** INFINITY keyword. */
+    public static final String INFINITY_STRING = "INFINITY";
+    /** -INFINITY keyword. */
+    public static final String MINUS_INFINITY_STRING = "-INFINITY";
+    /** Constraint score keyword. */
+    public static final String SCORE_STRING = "score";
     /**
      * Prepares a new <code>CRMXML</code> object.
      */
@@ -497,13 +511,13 @@ public class CRMXML extends XML {
         paramColPossibleChoices.put("rsc-role", ATTRIBUTE_ROLES);
         paramColPossibleChoicesMS.put("rsc-role", ATTRIBUTE_ROLES_MS);
 
-        colParams.add("score");
-        paramColShortDescMap.put("score", "Score");
-        paramColLongDescMap.put("score", "Score");
-        paramColTypeMap.put("score", PARAM_TYPE_INTEGER);
-        paramColDefaultMap.put("score", null);
-        //paramColPreferredMap.put("score", "INFINITY");
-        paramColPossibleChoices.put("score", integerValues);
+        colParams.add(SCORE_STRING);
+        paramColShortDescMap.put(SCORE_STRING, "Score");
+        paramColLongDescMap.put(SCORE_STRING, "Score");
+        paramColTypeMap.put(SCORE_STRING, PARAM_TYPE_INTEGER);
+        paramColDefaultMap.put(SCORE_STRING, null);
+        //paramColPreferredMap.put(SCORE_STRING, INFINITY_STRING);
+        paramColPossibleChoices.put(SCORE_STRING, integerValues);
         /* Hardcoding order params */
         ordParams.add("first-action");
         paramOrdShortDescMap.put("first-action", "rsc1 order action");
@@ -528,13 +542,13 @@ public class CRMXML extends XML {
         paramOrdDefaultMap.put("symmetrical", hbBooleanTrue);
         paramOrdPossibleChoices.put("symmetrical", booleanValues);
 
-        ordParams.add("score");
-        paramOrdShortDescMap.put("score", "Score");
-        paramOrdLongDescMap.put("score", "Score");
-        paramOrdTypeMap.put("score", PARAM_TYPE_INTEGER);
-        //paramOrdPreferredMap.put("score", "INFINITY");
-        paramOrdPossibleChoices.put("score", integerValues);
-        paramOrdDefaultMap.put("score", null);
+        ordParams.add(SCORE_STRING);
+        paramOrdShortDescMap.put(SCORE_STRING, "Score");
+        paramOrdLongDescMap.put(SCORE_STRING, "Score");
+        paramOrdTypeMap.put(SCORE_STRING, PARAM_TYPE_INTEGER);
+        //paramOrdPreferredMap.put(SCORE_STRING, INFINITY_STRING);
+        paramOrdPossibleChoices.put(SCORE_STRING, integerValues);
+        paramOrdDefaultMap.put(SCORE_STRING, null);
     }
 
     /**
@@ -558,7 +572,12 @@ public class CRMXML extends XML {
      * Returns choices for integer fields.
      */
     public final String[] getIntegerValues() {
-        return new String[]{null, "0", "2", "100", "INFINITY", "-INFINITY"};
+        return new String[]{null,
+                            "0",
+                            "2",
+                            "100",
+                            INFINITY_STRING,
+                            MINUS_INFINITY_STRING};
     }
 
 
@@ -884,7 +903,8 @@ public class CRMXML extends XML {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
+            final Pattern p = 
+                        Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
@@ -923,7 +943,8 @@ public class CRMXML extends XML {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
+            final Pattern p =
+                        Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
@@ -951,7 +972,7 @@ public class CRMXML extends XML {
         ra.addParameter(targetRoleParam);
         // TODO: Master, Slave
         ra.setParamPossibleChoices(targetRoleParam,
-                                   new String[]{"started", "stopped"});
+                      new String[]{TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
         ra.setParamIsMetaAttr(targetRoleParam, true);
         ra.setParamRequired(targetRoleParam, false);
         ra.setParamShortDesc(targetRoleParam,
@@ -959,7 +980,7 @@ public class CRMXML extends XML {
         ra.setParamLongDesc(targetRoleParam,
                             Tools.getString("CRMXML.TargetRole.LongDesc"));
         // TODO: default is different in some prev hb */
-        ra.setParamDefault(targetRoleParam, "started");
+        ra.setParamDefault(targetRoleParam, TARGET_ROLE_STARTED);
 
         ra.addParameter(isManagedParam);
         ra.setParamPossibleChoices(isManagedParam,
@@ -1555,19 +1576,21 @@ public class CRMXML extends XML {
                 }
                 for (int j = 0; j < statusList.getLength(); j++) {
                     final Node setNode = statusList.item(j);
-                    if (setNode.getNodeName().equals("started")) {
+                    if (TARGET_ROLE_STARTED.equals(setNode.getNodeName())) {
                         final String node = getText(setNode);
                         if (runningOnList == null) {
                             runningOnList = new ArrayList<String>();
                         }
                         runningOnList.add(node);
-                    } else if (setNode.getNodeName().equals("master")) {
+                    } else if (TARGET_ROLE_MASTER.equals(
+                                                      setNode.getNodeName())) {
                         final String node = getText(setNode);
                         if (masterOnList == null) {
                             masterOnList = new ArrayList<String>();
                         }
                         masterOnList.add(node);
-                    } else if (setNode.getNodeName().equals("slave")) {
+                    } else if (TARGET_ROLE_SLAVE.equals(
+                                                      setNode.getNodeName())) {
                         final String node = getText(setNode);
                         if (slaveOnList == null) {
                             slaveOnList = new ArrayList<String>();
@@ -1918,7 +1941,8 @@ public class CRMXML extends XML {
                                                         withRscString);
                     final String withRscRole = getAttribute(constraintNode,
                                                             withRscRoleString);
-                    final String score = getAttribute(constraintNode, "score");
+                    final String score = getAttribute(constraintNode,
+                                                      SCORE_STRING);
                     List<String> tos = colocationMap.get(rsc);
                     if (tos == null) {
                         tos = new ArrayList<String>();
@@ -1936,7 +1960,8 @@ public class CRMXML extends XML {
                                                         firstString);
                     final String rscTo = getAttribute(constraintNode,
                                                       thenString);
-                    final String score = getAttribute(constraintNode, "score");
+                    final String score = getAttribute(constraintNode,
+                                                      SCORE_STRING);
                     final String symmetrical = getAttribute(constraintNode,
                                                                "symmetrical");
                     final String firstAction = getAttribute(constraintNode,
@@ -1961,7 +1986,8 @@ public class CRMXML extends XML {
                     final String locId = getAttribute(constraintNode, "id");
                     final String node  = getAttribute(constraintNode, "node");
                     final String rsc   = getAttribute(constraintNode, "rsc");
-                    final String score = getAttribute(constraintNode, "score");
+                    final String score = getAttribute(constraintNode,
+                                                      SCORE_STRING);
 
                     List<String> locs = locationsIdMap.get(rsc);
                     if (locs == null) {
@@ -1984,30 +2010,30 @@ public class CRMXML extends XML {
                     final Node ruleNode = getChildNode(constraintNode,
                                                        "rule");
                     if (ruleNode != null) {
-                        final String score2 = getAttribute(ruleNode, "score");
+                        final String score2 = getAttribute(ruleNode,
+                                                           SCORE_STRING);
                         final String booleanOp = getAttribute(ruleNode,
                                                               "boolean-op");
                         // TODO: I know only "and", ignoring everything we
                         // don't know.
                         final Node expNode = getChildNode(ruleNode,
                                                           "expression");
-                        if (expNode != null) {
-                            if ("expression".equals(expNode.getNodeName())) {
-                                final String attr =
-                                         getAttribute(expNode, "attribute");
-                                final String op =
-                                         getAttribute(expNode, "operation");
-                                final String type =
-                                         getAttribute(expNode, "type");
-                                final String node2 =
-                                         getAttribute(expNode, "value");
-                                if ((booleanOp == null
-                                     || "and".equals(booleanOp))
-                                    && "#uname".equals(attr)
-                                    && "string".equals(type)
-                                    && "eq".equals(op)) {
-                                    hostScoreMap.put(node2, score2);
-                                }
+                        if (expNode != null
+                            && "expression".equals(expNode.getNodeName())) {
+                            final String attr =
+                                     getAttribute(expNode, "attribute");
+                            final String op =
+                                     getAttribute(expNode, "operation");
+                            final String type =
+                                     getAttribute(expNode, "type");
+                            final String node2 =
+                                     getAttribute(expNode, "value");
+                            if ((booleanOp == null
+                                 || "and".equals(booleanOp))
+                                && "#uname".equals(attr)
+                                && "string".equals(type)
+                                && "eq".equals(op)) {
+                                hostScoreMap.put(node2, score2);
                             }
                         }
                     }
@@ -2219,7 +2245,8 @@ public class CRMXML extends XML {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
+            final Pattern p =
+                        Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
@@ -2364,7 +2391,8 @@ public class CRMXML extends XML {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = Pattern.compile("^-?(\\d*|INFINITY)$");
+            final Pattern p =
+                         Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;

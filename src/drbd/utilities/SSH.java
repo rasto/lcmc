@@ -1097,10 +1097,8 @@ public class SSH {
          * Start connection in the thread.
          */
         public void run() {
-            if (isConnected()) {
-                if (callback != null) {
-                    callback.done(1);
-                }
+            if (callback != null && isConnected()) {
+                callback.done(1);
             }
             final Connection conn = new Connection(hostname,
                                                    host.getSSHPortInt());
@@ -1533,8 +1531,7 @@ public class SSH {
                           final String remoteFilename,
                           final String mode,
                           final boolean makeBackup) {
-        String backupCommand = "";
-        StringBuffer commands = new StringBuffer("");
+        final StringBuffer commands = new StringBuffer("");
         if (makeBackup) {
             commands.append("cp ");
             commands.append(remoteFilename);

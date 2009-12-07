@@ -141,33 +141,29 @@ public class MyButton extends JButton {
      */
     public void setToolTipText(final String toolTipText) {
         super.setToolTipText(toolTipText);
-        if (tip != null) {
-            if (tip.isShowing()) {
-                if (robot != null) {
-                    final GraphicsDevice[] devices =
-                            GraphicsEnvironment.getLocalGraphicsEnvironment()
-                                               .getScreenDevices();
-                    int xOffset = 0;
-                    if (devices.length == 2) {
-                        /* workaround for dual monitors that are flipped. */
-                        //TODO: not sure how is it with three monitors
-                        final int x1 =
-                            devices[0].getDefaultConfiguration().getBounds().x;
-                        final int x2 =
-                            devices[1].getDefaultConfiguration().getBounds().x;
-                        if (x1 > x2) {
-                            xOffset = -x1;
-                        }
-                    }
-                    final Point2D p = MouseInfo.getPointerInfo().getLocation();
-                    robot.mouseMove((int) p.getX() + xOffset - 1,
-                                    (int) p.getY());
-                    robot.mouseMove((int) p.getX() + xOffset + 1,
-                                    (int) p.getY());
-                    robot.mouseMove((int) p.getX() + xOffset,
-                                    (int) p.getY());
+        if (tip != null && robot != null && tip.isShowing()) {
+            final GraphicsDevice[] devices =
+                    GraphicsEnvironment.getLocalGraphicsEnvironment()
+                                       .getScreenDevices();
+            int xOffset = 0;
+            if (devices.length == 2) {
+                /* workaround for dual monitors that are flipped. */
+                //TODO: not sure how is it with three monitors
+                final int x1 =
+                    devices[0].getDefaultConfiguration().getBounds().x;
+                final int x2 =
+                    devices[1].getDefaultConfiguration().getBounds().x;
+                if (x1 > x2) {
+                    xOffset = -x1;
                 }
             }
+            final Point2D p = MouseInfo.getPointerInfo().getLocation();
+            robot.mouseMove((int) p.getX() + xOffset - 1,
+                            (int) p.getY());
+            robot.mouseMove((int) p.getX() + xOffset + 1,
+                            (int) p.getY());
+            robot.mouseMove((int) p.getX() + xOffset,
+                            (int) p.getY());
         }
     }
 

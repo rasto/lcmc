@@ -178,7 +178,6 @@ public class SSHGui {
                           final String defaultValue,
                           final boolean isPassword) {
             this.isPassword = isPassword;
-            int i = 0;
             final List<String> strippedContent = new ArrayList<String>();
             for (final String s : content) {
                 if (s != null && !s.equals("")) {

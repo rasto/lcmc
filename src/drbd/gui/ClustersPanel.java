@@ -333,7 +333,8 @@ public class ClustersPanel extends JPanel {
      * done.
      */
     public final JEditorPane registerUpgradeTextField() {
-        final JEditorPane upgradeField = new JEditorPane("text/html", "");
+        final JEditorPane upgradeField =
+                                new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
         final LineBorder border = new LineBorder(Color.RED);
         upgradeField.setBorder(border);
         Tools.setEditorFont(upgradeField);

@@ -400,8 +400,8 @@ public final class DRBD {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
         replaceHash.put(DEVICE_PH, device);
-        String command = host.getDistCommand("DRBD.createMDDestroyData",
-                                             replaceHash);
+        final String command = host.getDistCommand("DRBD.createMDDestroyData",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true, testOnly);
     }
 
@@ -432,8 +432,8 @@ public final class DRBD {
         } else {
             replaceHash.put(FILESYSTEM_PH, filesystem);
         }
-        String command = host.getDistCommand("DRBD.makeFilesystem",
-                                             replaceHash);
+        final String command = host.getDistCommand("DRBD.makeFilesystem",
+                                                   replaceHash);
         execCommand(host, command, execCallback, true, testOnly);
     }
 

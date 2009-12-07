@@ -60,7 +60,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
     /** Menu tree object. */
-    private JTree tree;
+    private final JTree tree;
 
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.

@@ -56,21 +56,23 @@ public class GUIData  {
     /** Main menu. */
     private MainMenu mainMenu;
     /** 'Add Cluster' buttons. */
-    private List<JComponent> addClusterButtonList =
+    private final List<JComponent> addClusterButtonList =
                                                    new ArrayList<JComponent>();
     /** 'Add Host' buttons. */
-    private List<JComponent> addHostButtonList =
+    private final List<JComponent> addHostButtonList =
                                                    new ArrayList<JComponent>();
     /** Components that can be made visible in the god mode. */
-    private List<JComponent> visibleInGodModeList = new ArrayList<JComponent>();
+    private final List<JComponent> visibleInGodModeList =
+                                                   new ArrayList<JComponent>();
     /** Components that can be enabled and disabled in and out of the god mode.
      */
-    private List<JComponent> enabledInGodModeList = new ArrayList<JComponent>();
+    private final List<JComponent> enabledInGodModeList =
+                                                   new ArrayList<JComponent>();
     /**
      * List of components that have allHostsUpdate method that must be called
      * when a host is added.
      */
-    private List<AllHostsUpdatable> allHostsUpdateList =
+    private final List<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
     /** Whether we are in god mode or not. */
     private boolean godMode = false;
@@ -305,7 +307,7 @@ public class GUIData  {
     /**
      * Add to the list of components that are visible only in god mode.
      */
-    public final void addToVisibleInGodMode(JComponent c) {
+    public final void addToVisibleInGodMode(final JComponent c) {
         c.setVisible(godMode);
         visibleInGodModeList.add(c);
     }
@@ -313,7 +315,7 @@ public class GUIData  {
     /**
      * Add to the list of components that are visible only in god mode.
      */
-    public final void addToEnabledInGodMode(JComponent c) {
+    public final void addToEnabledInGodMode(final JComponent c) {
         c.setEnabled(godMode);
         enabledInGodModeList.add(c);
     }

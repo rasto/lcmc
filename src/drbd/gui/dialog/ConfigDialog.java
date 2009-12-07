@@ -135,7 +135,7 @@ public abstract class ConfigDialog {
      * Returns answer pane in a scroll pane.
      */
     public final JScrollPane getAnswerPane(final String initialText) {
-        answerPane = new JEditorPane("text/plain", initialText);
+        answerPane = new JEditorPane(Tools.MIME_TYPE_TEXT_PLAIN, initialText);
         answerPane.setBackground(
                             Tools.getDefaultColor("ConfigDialog.AnswerPane"));
         answerPane.setEditable(false);
@@ -194,7 +194,7 @@ public abstract class ConfigDialog {
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         final JEditorPane descPane = new JEditorPane(
-                       "text/html",
+                       Tools.MIME_TYPE_TEXT_HTML,
                        "<p style='font-family:Dialog; font-size:16; "
                        + "font-weight: bold'>"
                        + getDialogTitle() + "</p>"
@@ -461,11 +461,10 @@ public abstract class ConfigDialog {
         dialogGate = new CountDownLatch(1);
         optionPane.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(final PropertyChangeEvent evt) {
-                if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())) {
-                    if (!"uninitializedValue".equals(evt.getNewValue())) {
-                        optionPaneAnswer = optionPane.getValue();
-                        dialogGate.countDown();
-                    }
+                if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
+                    && !"uninitializedValue".equals(evt.getNewValue())) {
+                    optionPaneAnswer = optionPane.getValue();
+                    dialogGate.countDown();
                 }
             }
         });

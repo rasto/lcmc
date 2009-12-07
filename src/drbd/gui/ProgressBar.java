@@ -171,17 +171,14 @@ public class ProgressBar implements ActionListener {
                         } catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }
-                        // show progress bar after delay
-                        if (time > progressBarDelay) {
-                            // TODO:this causes deadlock
-                            if (!isVisible) {
-                                isVisible = true;
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        pbPanel.setVisible(true);
-                                    }
-                                });
-                            }
+                        /* show progress bar after delay */
+                        if (time > progressBarDelay && !isVisible) {
+                            isVisible = true;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    pbPanel.setVisible(true);
+                                }
+                            });
                         }
                         if (!holdIt) {
                             SwingUtilities.invokeLater(new Runnable() {

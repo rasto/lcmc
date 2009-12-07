@@ -27,6 +27,7 @@ import drbd.data.Cluster;
 import drbd.data.Clusters;
 import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
+import drbd.data.CRMXML;
 import drbd.gui.GUIData;
 import drbd.gui.dialog.ConfirmDialog;
 
@@ -40,7 +41,6 @@ import java.util.Properties;
 import java.util.Locale;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -131,6 +131,10 @@ public final class Tools {
 
     /** Previous index in the scrolling menu. */
     private static volatile int prevScrollingMenuIndex = -1;
+    /** Text/html mime type. */
+    public static final String MIME_TYPE_TEXT_HTML = "text/html";
+    /** Text/plain mime type. */
+    public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
 
     /**
      * Private constructor.
@@ -590,7 +594,7 @@ public final class Tools {
 
 
         System.out.println("APPERROR: " + errorString);
-        final JEditorPane errorPane = new JEditorPane("text/plain",
+        final JEditorPane errorPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN,
                                                       errorString.toString());
         errorPane.setEditable(false);
         errorPane.setMinimumSize(DIALOG_PANEL_SIZE);
@@ -610,7 +614,7 @@ public final class Tools {
     public static void infoDialog(final String title,
                                   final String info1,
                                   final String info2) {
-        final JEditorPane infoPane = new JEditorPane("text/plain",
+        final JEditorPane infoPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN,
                                                      info1 + "\n" + info2);
         infoPane.setEditable(false);
         infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
@@ -948,7 +952,7 @@ public final class Tools {
     public static String getDistString(final String text,
                                        String dist,
                                        String version,
-                                       String arch) {
+                                       final String arch) {
         if (dist == null) {
             dist = "";
         }
@@ -1225,37 +1229,6 @@ public final class Tools {
         return resultSet;
     }
 
-    ///**
-    // * converts score to the string.
-    // *
-    // * @param score
-    // *          score, that is to be converted
-    // *
-    // * @return score as string
-    // */
-    //public static String scoreToString(final String score) {
-    //    String str = "";
-    //    if ("-INFINITY".equals(score)) {
-    //        str = Tools.getString("Score.MinusInfinityString");
-    //    } else if ("INFINITY".equals(score)) {
-    //        str = Tools.getString("Score.InfinityString");
-    //    } else {
-    //        try {
-    //            final long scoreInt = Integer.valueOf(score);
-    //            if (scoreInt == 0) {
-    //                str = Tools.getString("Score.ZeroString");
-    //            } else if (scoreInt > 0) {
-    //                str = Tools.getString("Score.PlusString");
-    //            } else {
-    //                str = Tools.getString("Score.MinusString");
-    //            }
-    //        } catch (Exception e) {
-    //            str = Tools.getString("Score.Unknown");
-    //        }
-    //    }
-    //    return str + " (" + scoreToHBString(score) + ")";
-    //}
-
     /**
      * converts score to the score as used in the heartbeat.
      *
@@ -1266,9 +1239,9 @@ public final class Tools {
      */
     public static String scoreToHBString(final String score) {
         String str = "";
-        if ("-INFINITY".equals(score)) {
+        if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
             str = "-infinity";
-        } else if ("INFINITY".equals(score)) {
+        } else if (CRMXML.INFINITY_STRING.equals(score)) {
             str = "infinity";
         } else {
             str = score;
@@ -1745,7 +1718,7 @@ public final class Tools {
     /**
      * Convenience sleep wrapper.
      */
-    public static void sleep(int ms) {
+    public static void sleep(final int ms) {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException ex) {

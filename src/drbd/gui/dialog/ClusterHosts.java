@@ -299,10 +299,11 @@ public class ClusterHosts extends DialogCluster {
 
         private int getPreferredHeight() {
             int rv = 0;
-            for (int k = 0, count = getComponentCount(); k < count; k++) {
+            final int count = getComponentCount();
+            for (int k = 0; k < count; k++) {
                 final Component comp = getComponent(k);
                 final Rectangle r = comp.getBounds();
-                int height = r.y + r.height;
+                final int height = r.y + r.height;
                 if (height > rv) {
                     rv = height;
                 }

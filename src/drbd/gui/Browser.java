@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.ButtonCallback;
 import drbd.data.resources.Resource;
+import drbd.data.CRMXML;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Unit;
 
@@ -352,6 +353,7 @@ public class Browser {
          * Sets the terminal panel, if necessary.
          */
         protected void setTerminalPanel() {
+            /* set terminal panel, or don't */
         }
 
         /**
@@ -429,15 +431,13 @@ public class Browser {
         public void updateInfo() {
             if (resourceInfoArea != null) {
                 final String newInfo = getInfo();
-                if (newInfo != null) {
-                    if (!newInfo.equals(infoCache)) {
-                        infoCache = newInfo;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                resourceInfoArea.setText(newInfo);
-                            }
-                        });
-                    }
+                if (newInfo != null && !newInfo.equals(infoCache)) {
+                    infoCache = newInfo;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            resourceInfoArea.setText(newInfo);
+                        }
+                    });
                 }
             }
         }
@@ -446,13 +446,14 @@ public class Browser {
          * example, if command has to be executed to get the info.
          */
         protected void updateInfo(final JEditorPane ep) {
+            /* override this method. */
         }
 
         /**
          * Returns type of the info text. text/plain or text/html.
          */
         protected String getInfoType() {
-            return "text/plain";
+            return Tools.MIME_TYPE_TEXT_PLAIN;
         }
 
         /**
@@ -732,7 +733,7 @@ public class Browser {
                     /* do nothing */
                 }
 
-                public synchronized void mouseEntered(final MouseEvent e) {
+                public void mouseEntered(final MouseEvent e) {
                     if (c.isShowing()
                         && c.isEnabled()) {
                         final Thread thread = new Thread(new Runnable() {
@@ -744,7 +745,7 @@ public class Browser {
                     }
                 }
 
-                public synchronized void mouseExited(final MouseEvent e) {
+                public void mouseExited(final MouseEvent e) {
                     final Thread t = new Thread(new Runnable() {
                         public void run() {
                             bc.mouseOut();
@@ -753,7 +754,7 @@ public class Browser {
                     t.start();
                 }
 
-                public synchronized void mousePressed(final MouseEvent e) {
+                public void mousePressed(final MouseEvent e) {
                     mouseExited(e);
                     /* do nothing */
                 }
@@ -1235,7 +1236,7 @@ public class Browser {
             getResource().setPossibleChoices(param,
                                              getParamPossibleChoices(param));
             /* set default value */
-            String value = getResource().getValue(param);
+            final String value = getResource().getValue(param);
             String initValue;
             if (value == null || "".equals(value)) {
                 initValue = getParamPreferred(param);
@@ -1249,10 +1250,11 @@ public class Browser {
             String regexp = null;
             Map<String, String> abbreviations = new HashMap<String, String>();
             if (isInteger(param)) {
-                regexp = "^(-?(\\d*|INFINITY))|@NOTHING_SELECTED@$";
+                regexp = "^(-?(\\d*|" + CRMXML.INFINITY_STRING
+                         + "))|@NOTHING_SELECTED@$";
                 abbreviations = new HashMap<String, String>();
-                abbreviations.put("i", "INFINITY");
-                abbreviations.put("I", "INFINITY");
+                abbreviations.put("i", CRMXML.INFINITY_STRING);
+                abbreviations.put("I", CRMXML.INFINITY_STRING);
             }
             GuiComboBox.Type type = null;
             Unit[] units = null;

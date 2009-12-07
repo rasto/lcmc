@@ -810,7 +810,7 @@ public class HeartbeatGraph extends ResourceGraph {
         } else if (si.isFailed(tOnly)) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
         } else if (!si.isRunning(tOnly)) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
+            return ClusterBrowser.FILL_PAINT_STOPPED;
         } else if (getClusterBrowser().clStatusFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (vertexIsPresentList.contains(v) || tOnly) {
