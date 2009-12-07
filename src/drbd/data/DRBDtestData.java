@@ -47,6 +47,8 @@ public class DRBDtestData {
     private final MultiKeyMap connectedHash = new MultiKeyMap();
     /** Hash with host and drbd resource, that will be disconnected. */
     private final MultiKeyMap disconnectedHash = new MultiKeyMap();
+    /** Hash with host and drbd resource, that will be attached. */
+    private final MultiKeyMap attachedHash = new MultiKeyMap();
     /** Hash with host and drbd resource, that will be dettached. */
     private final MultiKeyMap disklessHash = new MultiKeyMap();
 
@@ -79,6 +81,8 @@ public class DRBDtestData {
                         connectedHash.put(host, "/dev/drbd" + res, 1);
                     } else if ("detach".equals(action)) {
                         disklessHash.put(host, "/dev/drbd" + res, 1);
+                    } else if ("disk".equals(action)) {
+                        attachedHash.put(host, "/dev/drbd" + res, 1);
                     }
                 }
                 final int index = line.indexOf("--set-defaults");
@@ -124,5 +128,12 @@ public class DRBDtestData {
      */
     public final boolean isDiskless(final Host host, final String dev) {
         return disklessHash.get(host, dev) != null;
+    }
+
+    /**
+     * Returns whether the drbd device is diskless on the host.
+     */
+    public final boolean isAttached(final Host host, final String dev) {
+        return attachedHash.get(host, dev) != null;
     }
 }

@@ -3450,8 +3450,8 @@ public class ClusterBrowser extends Browser {
                         }
                     }
                 }
-                super.apply(dcHost, testOnly);
             }
+            super.apply(dcHost, testOnly);
             //TODO: escape dir
         }
 

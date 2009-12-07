@@ -3051,7 +3051,8 @@ public class HostBrowser extends Browser {
             final DrbdResourceInfo dri = drbdResourceInfo;
             if (testOnly && dtd != null && dri != null) {
                 return dtd.isDiskless(host, drbdResourceInfo.getDevice())
-                       || getBlockDevice().isDiskless();
+                       || (!dtd.isAttached(host, drbdResourceInfo.getDevice())
+                           && getBlockDevice().isDiskless());
             } else {
                 return getBlockDevice().isDiskless();
             }
