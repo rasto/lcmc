@@ -46,7 +46,7 @@ public class HostLinbitLoginForUpgrade extends HostLinbitLogin {
     /**
      * Returns the next dialog. HostDrbdAvailFilesForUpgrade
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return new HostDrbdAvailFilesForUpgrade(this, getHost());
     }
 

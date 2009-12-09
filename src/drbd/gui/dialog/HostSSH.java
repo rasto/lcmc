@@ -56,7 +56,7 @@ public class HostSSH extends DialogHost {
     /**
      * Connects to all hosts.
      */
-    private String connectHost() {
+    private final String connectHost() {
         final String res = null;
         final SSHGui sshGui = new SSHGui(getDialogPanel(),
                                          getHost(),
@@ -101,14 +101,14 @@ public class HostSSH extends DialogHost {
     /**
      * Returns the next dialog. HostDevices
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return new HostDevices(getPreviousDialog(), getHost());
     }
 
     /**
      * Inits the dialog and start connecting to the hosts.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
@@ -125,7 +125,7 @@ public class HostSSH extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.HostSSH.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostSSH.Title");
     }
 
@@ -133,14 +133,14 @@ public class HostSSH extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.HostSSH.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostSSH.Description");
     }
 
     /**
      * Returns a pane where ssh connection will be attempted.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane(
                     new CancelCallback() {

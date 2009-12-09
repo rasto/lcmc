@@ -53,7 +53,7 @@ public class HostDevices extends DialogHost {
 
     /**
      * Checks the answer and makes it visible to the user. */
-    public void checkAnswer(final String ans) {
+    public final void checkAnswer(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
             progressBarDoneError();
             answerPaneSetTextError(Tools.getString(
@@ -76,7 +76,7 @@ public class HostDevices extends DialogHost {
     /**
      * Inits the dialog and starts the info collecting thread.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
@@ -110,7 +110,7 @@ public class HostDevices extends DialogHost {
     /**
      * Returns info for input pane.
      */
-    protected void getAllInfo() {
+    protected final void getAllInfo() {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final ExecCommandThread t = getHost().execCommand("GetHostAllInfo",
                          (ProgressBar) null, //getProgressBar(),
@@ -135,7 +135,7 @@ public class HostDevices extends DialogHost {
     /**
      * Returns the next dialog object.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return new HostDistDetection(this, getHost());
     }
 
@@ -143,7 +143,7 @@ public class HostDevices extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostDevices.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostDevices.Title");
     }
 
@@ -151,14 +151,14 @@ public class HostDevices extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostDevices.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostDevices.Description");
     }
 
     /**
      * Returns pane where collected info is displayed.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

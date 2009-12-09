@@ -46,7 +46,7 @@ public class HostDistForUpgrade extends HostDrbdLinbitAvailPackages {
     /**
      * Returns the next dialog.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return new HostCheckInstallationForUpgrade(this, getHost());
     }
 }

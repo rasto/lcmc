@@ -130,7 +130,7 @@ public class HostCheckInstallation extends DialogHost {
     /**
      * Inits dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         drbdOk = false;
         pmOk = false;
@@ -159,7 +159,7 @@ public class HostCheckInstallation extends DialogHost {
                     getHost().setDrbdInstallMethod(im.getIndex());
                     final String button = e.getActionCommand();
                     if (!drbdOk || button.equals(Tools.getString(
-                        "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"))) {
+                   "Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton"))) {
                         if (im.isLinbitMethod()) {
                             nextDialogObject =
                                 new HostDrbdLinbitAvailPackages(thisClass,
@@ -247,7 +247,7 @@ public class HostCheckInstallation extends DialogHost {
     /**
      * Checks whether drbd is installed and starts heartbeat/pacemaker check.
      */
-    public void checkDrbd(final String ans) {
+    public final void checkDrbd(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -310,7 +310,7 @@ public class HostCheckInstallation extends DialogHost {
      * Checks whether heartbeat/pacemaker is installed and starts
      * openais/pacemaker check.
      */
-    public void checkAisHbPm(final String ans) {
+    public final void checkAisHbPm(final String ans) {
         getHost().setPacemakerVersion(null);
         getHost().setOpenaisVersion(null);
         getHost().setHeartbeatVersion(null);
@@ -327,7 +327,7 @@ public class HostCheckInstallation extends DialogHost {
             && (getHost().getPacemakerVersion() == null
                 || (corosyncVersion == null && aisVersion == null))) {
             final InstallMethods hbim =
-                                       (InstallMethods) hbPmInstMethodCB.getValue();
+                                  (InstallMethods) hbPmInstMethodCB.getValue();
             if (hbim != null) {
                 hbPmButton.setEnabled(true);
                 hbPmInstMethodCB.setEnabled(true);
@@ -335,7 +335,8 @@ public class HostCheckInstallation extends DialogHost {
                 hbPmInstMethodCB.setToolTipText(toolTip);
                 hbPmButton.setToolTipText(toolTip);
             }
-            final InstallMethods pmim = (InstallMethods) pmInstMethodCB.getValue();
+            final InstallMethods pmim =
+                                    (InstallMethods) pmInstMethodCB.getValue();
             if (pmim != null) {
                 pmButton.setEnabled(true);
                 pmInstMethodCB.setEnabled(true);
@@ -468,7 +469,7 @@ public class HostCheckInstallation extends DialogHost {
     /**
      * Returns the next dialog object. It is set dynamicaly.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -476,7 +477,7 @@ public class HostCheckInstallation extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostCheckInstallation.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostCheckInstallation.Title");
     }
 
@@ -484,7 +485,7 @@ public class HostCheckInstallation extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostCheckInstallation.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostCheckInstallation.Description");
     }
 
@@ -842,7 +843,7 @@ public class HostCheckInstallation extends DialogHost {
     /**
      * Returns input pane with installation pane and answer pane.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getInstallationPane());
         pane.add(getProgressBarPane());
@@ -858,7 +859,7 @@ public class HostCheckInstallation extends DialogHost {
     /**
      * Enable skip button.
      */
-    protected boolean skipButtonEnabled() {
+    protected final boolean skipButtonEnabled() {
         return true;
     }
 }

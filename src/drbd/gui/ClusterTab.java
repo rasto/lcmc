@@ -57,7 +57,7 @@ public class ClusterTab extends JPanel {
     /**
      * adds host views to the desktop.
      */
-    public void addClusterView() {
+    public final void addClusterView() {
         if (cluster.hostsCount() > 1) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -71,14 +71,14 @@ public class ClusterTab extends JPanel {
     /**
      * Returns cluster object.
      */
-    public Cluster getCluster() {
+    public final Cluster getCluster() {
         return cluster;
     }
 
     /**
      * Returns name of the cluster.
      */
-    public String getName() {
+    public final String getName() {
         if (cluster == null) {
             return null;
         }

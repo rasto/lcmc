@@ -56,7 +56,8 @@ public class HostPmInst extends DialogHost {
      * Checks the answer of the installation and enables/disables the
      * components accordingly.
      */
-    public void checkAnswer(final String ans, final String installMethod) {
+    public final void checkAnswer(final String ans,
+                                  final String installMethod) {
         // TODO: check if it really failes
         nextDialogObject = new HostCheckInstallation(
                                         getPreviousDialog().getPreviousDialog(),
@@ -74,7 +75,7 @@ public class HostPmInst extends DialogHost {
     /**
      * Inits the dialog and starts the installation procedure.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         installPm();
@@ -145,7 +146,7 @@ public class HostPmInst extends DialogHost {
     /**
      * Returns the next dialog.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -153,7 +154,7 @@ public class HostPmInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.HostPmInst.Description in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostPmInst.Title");
     }
 
@@ -161,14 +162,14 @@ public class HostPmInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.HostPmInst.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostPmInst.Description");
     }
 
     /**
      * Returns the input pane with info about the installation progress.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

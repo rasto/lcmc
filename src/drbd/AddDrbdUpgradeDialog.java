@@ -52,7 +52,7 @@ public class AddDrbdUpgradeDialog {
     /**
      * Shows step by step dialogs that upgrade the drbd.
      */
-    public void showDialogs() {
+    public final void showDialogs() {
         WizardDialog dialog = new HostDistForUpgrade(null,
                                                      hostDrbdInfo.getHost());
         while (true) {
@@ -72,7 +72,7 @@ public class AddDrbdUpgradeDialog {
     /**
      * Returns whether the wizard was canceled.
      */
-    public boolean isCanceled() {
+    public final boolean isCanceled() {
         return canceled;
     }
 }

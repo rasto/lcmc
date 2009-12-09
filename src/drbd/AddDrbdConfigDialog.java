@@ -51,7 +51,7 @@ public class AddDrbdConfigDialog {
     /**
      * Shows step by step dialogs that add and configure new drbd resource.
      */
-    public void showDialogs() {
+    public final void showDialogs() {
         DrbdConfig dialog = new DrbdConfigResource(null, dri);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
@@ -70,7 +70,7 @@ public class AddDrbdConfigDialog {
     /**
      * Returns whether the wizard was canceled.
      */
-    public boolean isCanceled() {
+    public final boolean isCanceled() {
         return canceled;
     }
 }

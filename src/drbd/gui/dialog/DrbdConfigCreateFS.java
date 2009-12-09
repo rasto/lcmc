@@ -81,7 +81,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
      * Finishes the dialog. If primary bd was choosen it is forced to be a
      * primary.
      */
-    protected void finishDialog() {
+    protected final void finishDialog() {
         final BlockDevInfo bdiPri = getPrimaryBD();
         if (bdiPri != null) {
             final boolean testOnly = false;
@@ -92,7 +92,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     /**
      * Returns the primary block device.
      */
-    protected BlockDevInfo getPrimaryBD() {
+    protected final BlockDevInfo getPrimaryBD() {
         final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
         final String h = hostCB.getStringValue();
@@ -108,7 +108,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     /**
      * Returns the secondary block device.
      */
-    protected BlockDevInfo getSecondaryBD() {
+    protected final BlockDevInfo getSecondaryBD() {
         final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
         final String h = hostCB.getStringValue();
@@ -125,7 +125,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     /**
      * Creates the file system.
      */
-    protected void createFilesystem() {
+    protected final void createFilesystem() {
         final Runnable runnable = new Runnable() {
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -154,7 +154,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
     /**
      * Returns the next dialog, null in this dialog.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return null;
     }
 
@@ -162,7 +162,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
      * Returns title of the dialog.
      * It is defined in TextResources as "Dialog.DrbdConfigCreateFS.Title"
      */
-    protected String getDialogTitle() {
+    protected final String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfigCreateFS.Title");
     }
 
@@ -170,14 +170,14 @@ public class DrbdConfigCreateFS extends DrbdConfig {
      * Returns description of the dialog.
      * It is defined in TextResources as "Dialog.DrbdConfigCreateFS.Description"
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.DrbdConfigCreateFS.Description");
     }
 
     /**
      * Inits dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
         enableComponents();
@@ -194,7 +194,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
      * Enables and disables the make fs and finish buttons depending on what
      * was chosen by user.
      */
-    protected void checkButtons() {
+    protected final void checkButtons() {
         final boolean noHost = hostCB.getStringValue().equals(NO_HOST_STRING);
         final boolean noFileSystem = filesystemCB.getStringValue().equals(
                                                         NO_FILESYSTEM_STRING);
@@ -226,7 +226,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
      * Returns input pane, where file system can be created on the selected
      * host.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         makeFsButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());

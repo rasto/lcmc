@@ -180,7 +180,7 @@ public class DrbdConfigCreateMD extends DrbdConfig {
      * Returns next dialog plus it calls drbd up command for both devices and
      * returns the drbd config create fs dialog.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
         final boolean testOnly = false;
@@ -193,7 +193,7 @@ public class DrbdConfigCreateMD extends DrbdConfig {
      * Returns the title of the dialog. This is specified as
      * Dialog.DrbdConfigCreateMD.Title in the TextResources.
      */
-    protected String getDialogTitle() {
+    protected final String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfigCreateMD.Title");
     }
 
@@ -201,14 +201,14 @@ public class DrbdConfigCreateMD extends DrbdConfig {
      * Returns the description of the dialog. This is specified as
      * Dialog.DrbdConfigCreateMD.Description in the TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.DrbdConfigCreateMD.Description");
     }
 
     /**
      * Inits dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         if (getDrbdResourceInfo().isHaveToCreateMD()) {
             enableComponentsLater(new JComponent[]{});
@@ -228,7 +228,7 @@ public class DrbdConfigCreateMD extends DrbdConfig {
     /**
      * Returns input pane with choices what to do with meta-data.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
 

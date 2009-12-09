@@ -68,7 +68,7 @@ public class DrbdConfigBlockDev extends DrbdConfig {
     /**
      * Applies the changes to the blockDevInfo object.
      */
-    protected void finishDialog() {
+    protected final void finishDialog() {
         blockDevInfo.apply(false);
     }
 
@@ -91,7 +91,7 @@ public class DrbdConfigBlockDev extends DrbdConfig {
      * drbd config create md dialog. In the second case the drbd admin adjust
      * is called.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         if (getDrbdResourceInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi =
                     getDrbdResourceInfo().getOtherBlockDevInfo(blockDevInfo);
@@ -123,21 +123,21 @@ public class DrbdConfigBlockDev extends DrbdConfig {
     /**
      * Returns title of the dialog.
      */
-    protected String getDialogTitle() {
+    protected final String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfigBlockDev.Title");
     }
 
     /**
      * Returns description of the dialog.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.DrbdConfigBlockDev.Description");
     }
 
     /**
      * Inits the dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
@@ -157,7 +157,7 @@ public class DrbdConfigBlockDev extends DrbdConfig {
     /**
      * Returns the input pane with block device parameters.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.Y_AXIS));
 

@@ -50,7 +50,7 @@ public class EditHostDialog {
     /**
      * Shows step by step dialogs that configure a host.
      */
-    public void showDialogs() {
+    public final void showDialogs() {
         host.setHostnameEntered(host.getHostname());
         DialogHost dialog = new HostNewHost(null, host);
         while (true) {

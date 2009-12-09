@@ -903,7 +903,7 @@ public class CRMXML extends XML {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
-            final Pattern p = 
+            final Pattern p =
                         Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {

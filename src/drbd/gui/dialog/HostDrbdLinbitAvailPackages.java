@@ -85,7 +85,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Checks the available drbd verisions.
      */
-    protected void availVersions() {
+    protected final void availVersions() {
         /* get drbd available versions,
          * they are independent from distribution and kernel version and
          * are first directory part in the download area.*/
@@ -132,7 +132,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Checks the available distributions.
      */
-    protected void availDistributions() {
+    protected final void availDistributions() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 drbdKernelDirCombo.setEnabled(false);
@@ -173,7 +173,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Checks what are the available kernels for this distribution.
      */
-    protected void availKernels() {
+    protected final void availKernels() {
         final String distVersion = getHost().getDistVersion();
         if (drbdDistItems == null || !drbdDistItems.contains(distVersion)) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -222,7 +222,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Checks what are the available architectures for this distribution.
      */
-    protected void availArchs() {
+    protected final void availArchs() {
         final String kernelVersion = getHost().getKernelVersion();
         final String arch = getHost().getArch();
         if (drbdDistItems == null
@@ -281,7 +281,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Checks what are the avail drbd versions for this distribution.
      */
-    protected void availVersionsForDist() {
+    protected final void availVersionsForDist() {
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailVersionsForDist",
                           null, /* ProgressBar */
@@ -309,7 +309,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
      * Is called after all is done. It adds the listeners if it is the first
      * time it is called.
      */
-    protected void allDone(final String ans) {
+    protected final void allDone(final String ans) {
         progressBarDone();
 
         enableComponents();
@@ -357,7 +357,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Inits dialog and starts the distribution detection.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         availVersions();
@@ -378,7 +378,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostDrbdLinbitAvailPackages.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostDrbdLinbitAvailPackages.Title");
     }
 
@@ -386,7 +386,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostDrbdLinbitAvailPackages.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString(
                             "Dialog.HostDrbdLinbitAvailPackages.Description");
     }
@@ -394,7 +394,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Returns the pane with all combo boxes.
      */
-    protected JPanel getChoiceBoxes() {
+    protected final JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
         final int maxX = (int) pane.getMaximumSize().getWidth();
@@ -486,7 +486,7 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
     /**
      * Returns the input pane with check boxes and other info.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel progrPane = getProgressBarPane();
         pane.add(progrPane);

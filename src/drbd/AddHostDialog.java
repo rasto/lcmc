@@ -41,7 +41,7 @@ public class AddHostDialog {
     /**
      * Shows step by step dialogs that add and configure new host.
      */
-    public void showDialogs() {
+    public final void showDialogs() {
         Tools.getGUIData().enableAddHostButtons(false);
         final Host host = new Host();
         DialogHost dialog = new HostNewHost(null, host);

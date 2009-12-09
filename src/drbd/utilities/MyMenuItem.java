@@ -275,7 +275,7 @@ implements ActionListener, UpdatableItem {
     /**
      * Creates tooltip.
      */
-    public JToolTip createToolTip() {
+    public final JToolTip createToolTip() {
         toolTip = super.createToolTip();
         toolTip.setBackground(Color.YELLOW);
         return toolTip;
@@ -284,7 +284,7 @@ implements ActionListener, UpdatableItem {
     /**
      * Sets tooltip and wiggles the mouse to refresh it.
      */
-    public void setToolTipText(final String toolTipText) {
+    public final void setToolTipText(final String toolTipText) {
         super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             final GraphicsDevice[] devices =

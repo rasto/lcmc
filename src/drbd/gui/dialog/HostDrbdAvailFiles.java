@@ -68,7 +68,7 @@ public class HostDrbdAvailFiles extends DialogHost {
      * Inits the dialog and starts detecting the available drbd builds and
      * files.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         listenersAdded = false;
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
@@ -94,7 +94,7 @@ public class HostDrbdAvailFiles extends DialogHost {
     /**
      * Finds abailable builds.
      */
-    protected void availBuilds() {
+    protected final void availBuilds() {
         getHost().execCommandCache(
                           "DrbdAvailBuilds",
                           null, /* ProgresBar */
@@ -158,7 +158,7 @@ public class HostDrbdAvailFiles extends DialogHost {
     /**
      * Finds available files.
      */
-    protected void availFiles() {
+    protected final void availFiles() {
 
         drbdBuildCombo.setEnabled(true);
         getHost().execCommandCache("DrbdAvailFiles",
@@ -207,7 +207,7 @@ public class HostDrbdAvailFiles extends DialogHost {
      * Is called after everything is done. It adds listeners if called for the
      * first time.
      */
-    protected void allDone() {
+    protected final void allDone() {
 
         //nextDialogObject = new HostDrbdInst(this, getHost());
         nextDialogObject = new HostLinbitLogin(this, getHost());
@@ -235,7 +235,7 @@ public class HostDrbdAvailFiles extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostDrbdAvailFiles.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostDrbdAvailFiles.Title");
     }
 
@@ -243,14 +243,14 @@ public class HostDrbdAvailFiles extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostDrbdAvailFiles.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostDrbdAvailFiles.Description");
     }
 
     /**
      * Returns the panel with combo boxes.
      */
-    protected JPanel getChoiceBoxes() {
+    protected final JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* drbd version combo box */
@@ -321,7 +321,7 @@ public class HostDrbdAvailFiles extends DialogHost {
     /**
      * Returns input pane with available drbd files.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getChoiceBoxes());

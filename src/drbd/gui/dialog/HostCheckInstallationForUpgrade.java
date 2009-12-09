@@ -87,7 +87,7 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
     /**
      * Inits the dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         drbdOk = false;
         final HostCheckInstallationForUpgrade thisClass = this;
@@ -126,7 +126,7 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
     /**
      * Checks if drbd installation was ok.
      */
-    public void checkDrbd(final String ans) {
+    public final void checkDrbd(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
             DRBD_LABEL.setText(": " + Tools.getString(
                             "Dialog.HostCheckInstallation.DrbdNotInstalled"));
@@ -159,7 +159,7 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
     /**
      * Returns the next dialog object. It is set dynamicaly.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -167,7 +167,7 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostCheckInstallation.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostCheckInstallation.Title");
     }
 
@@ -175,7 +175,7 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostCheckInstallation.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostCheckInstallation.Description");
     }
 
@@ -199,7 +199,7 @@ public class HostCheckInstallationForUpgrade extends DialogHost {
     /**
      * Returns input pane with installation pane and answer pane.
      */
-    protected JPanel getInputPane() {
+    protected final JPanel getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getInstallationPane());
         pane.add(getProgressBarPane());

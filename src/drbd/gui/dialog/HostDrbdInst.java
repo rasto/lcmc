@@ -56,15 +56,9 @@ public class HostDrbdInst extends DialogHost {
     /**
      * Inits dialog and starts the drbd install procedure.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        //SwingUtilities.invokeLater(new Runnable() {
-        //    public void run() {
-        //        buttonClass(backButton()).setEnabled(false);
-        //        buttonClass(cancelButton()).setEnabled(false);
-        //    }
-        //});
         getProgressBar().start(50000);
 
         getHost().execCommand("DrbdInst.mkdir",
@@ -88,7 +82,7 @@ public class HostDrbdInst extends DialogHost {
     /**
      * Checks whether the files have to be downloaded.
      */
-    public void checkFile(final String ans) {
+    public final void checkFile(final String ans) {
         answerPaneSetText(Tools.getString("Dialog.HostDrbdInst.CheckingFile"));
         getHost().execCommand("DrbdInst.test",
                           getProgressBar(),
@@ -113,7 +107,7 @@ public class HostDrbdInst extends DialogHost {
     /**
      * Download the drbd packages.
      */
-    public void downloadDrbd() {
+    public final void downloadDrbd() {
         answerPaneSetText(Tools.getString("Dialog.HostDrbdInst.Downloading"));
         getHost().execCommand("DrbdInst.wget",
                           getProgressBar(),
@@ -136,7 +130,7 @@ public class HostDrbdInst extends DialogHost {
     /**
      * Install the drbd packages.
      */
-    public void installDrbd() {
+    public final void installDrbd() {
         getHost().setDrbdWasInstalled(true); /* even if we fail */
         Tools.getConfigData().setLastDrbdInstalledMethod(
                                             getHost().getDrbdInstallMethod());
@@ -165,7 +159,7 @@ public class HostDrbdInst extends DialogHost {
     /**
      * Called after the installation is completed.
      */
-    public void installationDone() {
+    public final void installationDone() {
         nextDialogObject = new HostCheckInstallation(
                    getPreviousDialog().getPreviousDialog().getPreviousDialog()
                                       .getPreviousDialog().getPreviousDialog(),
@@ -192,7 +186,7 @@ public class HostDrbdInst extends DialogHost {
      * Returns the title of the dialog defined as
      * Dialog.HostDrbdInst.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostDrbdInst.Title");
     }
 
@@ -200,14 +194,14 @@ public class HostDrbdInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.HostDrbdInst.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostDrbdInst.Description");
     }
 
     /**
      * Returns an input pane with progress of the drbd installation.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

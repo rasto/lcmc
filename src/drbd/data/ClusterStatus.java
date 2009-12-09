@@ -43,7 +43,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
 public class ClusterStatus {
     /** Data from cib query. */
     private volatile CibQuery cibQueryMap = new CibQuery();
-    /** Data from shadow cib */
+    /** Data from shadow cib. */
     private volatile CibQuery shadowCibQueryMap = new CibQuery();
     /** CRMXML object. */
     private final CRMXML crmXML;

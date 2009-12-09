@@ -130,7 +130,7 @@ public class MyButton extends JButton {
     /**
      * Creates tooltip.
      */
-    public JToolTip createToolTip() {
+    public final JToolTip createToolTip() {
         tip = super.createToolTip();
         tip.setBackground(Color.YELLOW);
         return tip;
@@ -139,7 +139,7 @@ public class MyButton extends JButton {
     /**
      * Sets tooltip and wiggles the mouse to refresh it.
      */
-    public void setToolTipText(final String toolTipText) {
+    public final void setToolTipText(final String toolTipText) {
         super.setToolTipText(toolTipText);
         if (tip != null && robot != null && tip.isShowing()) {
             final GraphicsDevice[] devices =

@@ -68,7 +68,7 @@ public class DrbdSplitBrain extends DrbdConfig {
     /**
      * Resolves the split brain.
      */
-    protected void resolve() {
+    protected final void resolve() {
         final Host h1 = getDrbdResourceInfo().getFirstBlockDevInfo().getHost();
         final Host h2 = getDrbdResourceInfo().getSecondBlockDevInfo().getHost();
         final String h = hostCB.getStringValue();
@@ -111,7 +111,7 @@ public class DrbdSplitBrain extends DrbdConfig {
     /**
      * Returns next dialog which is null.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return null;
     }
 
@@ -119,7 +119,7 @@ public class DrbdSplitBrain extends DrbdConfig {
      * Returns the title for the dialog. It is defined in TextResources as
      * Dialog.DrbdSplitBrain.Title.
      */
-    protected String getDialogTitle() {
+    protected final String getDialogTitle() {
         return Tools.getString("Dialog.DrbdSplitBrain.Title");
     }
 
@@ -127,14 +127,14 @@ public class DrbdSplitBrain extends DrbdConfig {
      * Returns the description for the dialog. It is defined in TextResources
      * as Dialog.DrbdSplitBrain.Description.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.DrbdSplitBrain.Description");
     }
 
     /**
      * Inits the dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponents();
     }
@@ -143,7 +143,7 @@ public class DrbdSplitBrain extends DrbdConfig {
      * Returns an input pane, where user can select the host with more recent
      * data.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* host */

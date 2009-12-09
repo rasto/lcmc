@@ -51,7 +51,7 @@ public class HostDistDetection extends DialogHost {
     /**
      * Inits dialog and starts the distribution detection.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
@@ -74,7 +74,7 @@ public class HostDistDetection extends DialogHost {
     /**
      * Returns the next dialog which is HostCheckInstallation.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return new HostCheckInstallation(this, getHost());
     }
 
@@ -82,7 +82,7 @@ public class HostDistDetection extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostDistDetection.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostDistDetection.Title");
     }
 
@@ -90,14 +90,14 @@ public class HostDistDetection extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostDistDetection.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostDistDetection.Description");
     }
 
     /**
      * Returns the input pane with check boxes and other info.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getAnswerPane(Tools.getString(
                                        "Dialog.HostDistDetection.Executing")));

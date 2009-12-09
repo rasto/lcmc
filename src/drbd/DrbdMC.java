@@ -91,7 +91,7 @@ public class DrbdMC extends JPanel {
         /**
          * Called when window is closed.
          */
-        public void windowClosing(final WindowEvent event) {
+        public final void windowClosing(final WindowEvent event) {
             Tools.getConfigData().disconnectAllHosts();
             System.exit(0);
         }

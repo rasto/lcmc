@@ -284,7 +284,7 @@ public abstract class ConfigDialog {
      * button has to be defined there. If Ok button is used, resource file
      * has to contain ConfigDialog.Ok item.
      */
-    protected String buttonString(final String b) {
+    protected final String buttonString(final String b) {
         return Tools.getString("Dialog.Dialog." + b);
     }
 
@@ -553,8 +553,7 @@ public abstract class ConfigDialog {
      * Enables components that were disabled with disableComponents, except
      * the ones that are in componentsToDisable array.
      */
-    protected void enableComponents(
-                                    final JComponent[] componentsToDisable) {
+    protected void enableComponents(final JComponent[] componentsToDisable) {
         final HashSet<JComponent> ctdHash =
                 new HashSet<JComponent>(Arrays.asList(componentsToDisable));
         SwingUtilities.invokeLater(new Runnable() {
@@ -573,7 +572,7 @@ public abstract class ConfigDialog {
      * Enables components after disableComponents, but they will be really
      * enabled only after enableComponents without arguments is be called.
      */
-    protected final void enableComponentsLater(
+    protected void enableComponentsLater(
                                     final JComponent[] componentsToEnable) {
         for (final JComponent c : componentsToEnable) {
             disabledComponents.add(c);

@@ -64,7 +64,7 @@ public class HostLinbitLogin extends DialogHost {
     /**
      * Finishes the dialog and sets the information.
      */
-    protected void finishDialog() {
+    protected final void finishDialog() {
         Tools.getConfigData().setDownloadLogin(
                                 downloadUserField.getStringValue().trim(),
                                 downloadPasswordField.getStringValue().trim(),
@@ -83,7 +83,7 @@ public class HostLinbitLogin extends DialogHost {
      * Check all fields if they are correct.
      * TODO: two checkfields?
      */
-    protected void checkFields() {
+    protected final void checkFields() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean v =
@@ -98,7 +98,7 @@ public class HostLinbitLogin extends DialogHost {
     /**
      * Check all fields if they are correct.
      */
-    protected void checkFields(final GuiComboBox field) {
+    protected final void checkFields(final GuiComboBox field) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean v =
@@ -114,7 +114,7 @@ public class HostLinbitLogin extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.HostLinbitLogin.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostLinbitLogin.Title");
     }
 
@@ -122,14 +122,14 @@ public class HostLinbitLogin extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.HostLinbitLogin.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostLinbitLogin.Description");
     }
 
     /**
      * Inits the dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
@@ -149,7 +149,7 @@ public class HostLinbitLogin extends DialogHost {
      * Returns the input pane, where user can enter the user name, password and
      * can select a check box to save the info for later.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* user */

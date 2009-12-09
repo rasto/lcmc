@@ -47,7 +47,7 @@ public class EditClusterDialog {
     /**
      * Shows step by step dialogs that configure a new cluster.
      */
-    public void showDialogs() {
+    public final void showDialogs() {
         DialogCluster dialog = new ClusterName(null, cluster);
         while (true) {
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();

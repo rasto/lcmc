@@ -204,14 +204,14 @@ public abstract class WizardDialog extends ConfigDialog {
     /**
      * Returns default button, none by default.
      */
-    protected String defaultButton() {
+    protected final String defaultButton() {
         return null;
     }
 
     /**
      * After next or finish buttons are pressed, this function is called.
      */
-    protected boolean checkAfterNextFinish() {
+    protected final boolean checkAfterNextFinish() {
         return true;
     }
 
@@ -230,7 +230,8 @@ public abstract class WizardDialog extends ConfigDialog {
     /**
      * Enables components except the ones that are passed as the argument.
      */
-    protected void enableComponents(final JComponent[] componentsToDisable) {
+    protected final void enableComponents(
+                                     final JComponent[] componentsToDisable) {
         super.enableComponents(componentsToDisable);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -252,7 +253,7 @@ public abstract class WizardDialog extends ConfigDialog {
     /**
      * Requests focus.
      */
-    protected void requestFocusLater(final JButton b) {
+    protected final void requestFocusLater(final JButton b) {
         getDialogPanel().getRootPane().setDefaultButton(b);
         b.requestFocus();
     }
@@ -260,14 +261,14 @@ public abstract class WizardDialog extends ConfigDialog {
     /**
      * Sets as default button.
      */
-    protected void makeDefaultButton(final JButton b) {
+    protected final void makeDefaultButton(final JButton b) {
         getDialogPanel().getRootPane().setDefaultButton(b);
     }
 
     /**
      * Enables components.
      */
-    protected void enableComponents() {
+    protected final void enableComponents() {
         enableComponents(new JComponent[]{});
     }
 
@@ -321,7 +322,7 @@ public abstract class WizardDialog extends ConfigDialog {
     /**
      * if retry button was pressed this method will be executed.
      */
-    protected void retryWasPressed() {
+    protected final void retryWasPressed() {
         /* no action */
     }
 
@@ -331,7 +332,7 @@ public abstract class WizardDialog extends ConfigDialog {
      * pressed. If checkAfterNextFinish() returns true return next dialog,
      * if next button was pressed.
      */
-    protected ConfigDialog checkAnswer() {
+    protected final ConfigDialog checkAnswer() {
         if (isPressedButton(backButton())) {
             return getPreviousDialog();
         }
@@ -367,7 +368,7 @@ public abstract class WizardDialog extends ConfigDialog {
      * prints error text in the answer pane, reenables
      * buttons and adds retry button.
      */
-    public void printErrorAndRetry(String text,
+    public final void printErrorAndRetry(String text,
                                    final String ans,
                                    final int exitCode) {
         if (ans != null) {
@@ -396,7 +397,7 @@ public abstract class WizardDialog extends ConfigDialog {
     /**
      * reenables buttons and adds retry button.
      */
-    public void retry() {
+    public final void retry() {
         addRetryButton();
         if (buttonClass(retryButton()) != null) {
             SwingUtilities.invokeLater(new Runnable() {

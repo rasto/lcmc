@@ -53,7 +53,7 @@ public class AddDrbdSplitBrainDialog {
     /**
      * Shows step by step dialogs that resolve a drbd split-brain.
      */
-    public void showDialogs() {
+    public final void showDialogs() {
         DrbdConfig dialog = new DrbdSplitBrain(null, dri);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
@@ -72,7 +72,7 @@ public class AddDrbdSplitBrainDialog {
     /**
      * Returns whether the wizard was canceled.
      */
-    public boolean isCanceled() {
+    public final boolean isCanceled() {
         return canceled;
     }
 }

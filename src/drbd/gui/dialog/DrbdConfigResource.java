@@ -88,7 +88,7 @@ public class DrbdConfigResource extends DrbdConfig {
     /**
      * Applies the changes and returns next dialog (DrbdConfigBlockDev).
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         getDrbdResourceInfo().apply(false);
         return new DrbdConfigBlockDev(
                                   this,
@@ -100,7 +100,7 @@ public class DrbdConfigResource extends DrbdConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.DrbdConfigResource.Title in TextResources.
      */
-    protected String getDialogTitle() {
+    protected final String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfigResource.Title");
     }
 
@@ -108,14 +108,14 @@ public class DrbdConfigResource extends DrbdConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.DrbdConfigResource.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.DrbdConfigResource.Description");
     }
 
     /**
      * Inits dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
@@ -131,7 +131,7 @@ public class DrbdConfigResource extends DrbdConfig {
     /**
      * Returns input pane where user can configure a drbd resource.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
 

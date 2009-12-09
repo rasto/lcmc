@@ -37,11 +37,11 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  */
 public final class CRM {
     /** Output of the ptest. */
-    private volatile static String ptestOutput = null;
+    private static volatile String ptestOutput = null;
     /** Ptest lock. */
-    private final static Mutex mPtestLock = new Mutex();
+    private static final Mutex mPtestLock = new Mutex();
     /** Delimiter that delimits the ptest and test cib part. */
-    public final static String PTEST_END_DELIM = "--- PTEST END ---";
+    public static final String PTEST_END_DELIM = "--- PTEST END ---";
     /**
      * No instantiation.
      */

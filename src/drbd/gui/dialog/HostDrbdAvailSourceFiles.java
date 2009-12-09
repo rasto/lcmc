@@ -67,7 +67,7 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
      * Inits the dialog and starts detecting the available drbd source
      * tarballs.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         disableComponents(new JComponent[]{drbdTarballCombo});
@@ -78,7 +78,7 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
     /**
      * Finds abailable tarballs.
      */
-    protected void availTarballs() {
+    protected final void availTarballs() {
         getHost().execCommandCache(
               "DrbdAvailVersionsSource",
               null, /* ProgresBar */
@@ -135,7 +135,7 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
      * Is called after everything is done. It adds listeners if called for the
      * first time.
      */
-    protected void allDone(final ComboInfo versionInfo) {
+    protected final void allDone(final ComboInfo versionInfo) {
         if (versionInfo != null) {
             answerPaneSetText("http://oss.linbit.com/drbd/"
                               + versionInfo.getStringValue());
@@ -161,7 +161,7 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
     /**
      * Returns the next dialog.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -169,7 +169,7 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostDrbdAvailSourceFiles.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostDrbdAvailSourceFiles.Title");
     }
 
@@ -177,14 +177,14 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostDrbdAvailSourceFiles.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostDrbdAvailSourceFiles.Description");
     }
 
     /**
      * Returns the panel with combo boxes.
      */
-    protected JPanel getChoiceBoxes() {
+    protected final JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* build combo box */
@@ -224,7 +224,7 @@ public class HostDrbdAvailSourceFiles extends DialogHost {
     /**
      * Returns input pane with available drbd files.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getChoiceBoxes());

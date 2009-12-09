@@ -56,7 +56,7 @@ public class HostDrbdCommandInst extends DialogHost {
      * Checks the answer of the installation and enables/disables the
      * components accordingly.
      */
-    public void checkAnswer(final String ans) {
+    public final void checkAnswer(final String ans) {
         nextDialogObject = new HostCheckInstallation(
                    getPreviousDialog().getPreviousDialog().getPreviousDialog(),
                    getHost());
@@ -74,7 +74,7 @@ public class HostDrbdCommandInst extends DialogHost {
     /**
      * Inits the dialog and starts the installation procedure.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         getProgressBar().start(50000);
@@ -84,7 +84,7 @@ public class HostDrbdCommandInst extends DialogHost {
     /**
      * Installs the drbd.
      */
-    private void installDrbd() {
+    private final void installDrbd() {
         String arch = getHost().getDistString("DrbdInst.install."
                                               + getHost().getArch());
         if (arch == null) {
@@ -135,7 +135,7 @@ public class HostDrbdCommandInst extends DialogHost {
     /**
      * Returns the next dialog.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -143,7 +143,7 @@ public class HostDrbdCommandInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.HostDrbdCommandInst.Description in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostDrbdCommandInst.Title");
     }
 
@@ -151,14 +151,14 @@ public class HostDrbdCommandInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.HostDrbdCommandInst.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostDrbdCommandInst.Description");
     }
 
     /**
      * Returns the input pane with info about the installation progress.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

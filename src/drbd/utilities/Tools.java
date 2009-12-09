@@ -1538,7 +1538,7 @@ public final class Tools {
                         final JList list,
                         final Map<MyMenuItem, ButtonCallback> callbackHash) {
         prevScrollingMenuIndex = -1;
-        list.setFixedCellHeight(25); 
+        list.setFixedCellHeight(25);
         final int maxSize = dlm.getSize();
         if (maxSize <= 0) {
             return null;

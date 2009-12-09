@@ -45,9 +45,9 @@ public final class DRBD {
     /** Filesystem placeholder. */
     private static final String FILESYSTEM_PH = "@FILESYSTEM@";
     /** Output of the drbd test. */
-    private volatile static String drbdtestOutput = null;
+    private static volatile String drbdtestOutput = null;
     /** DRBD test lock. */
-    private final static Mutex mDRBDtestLock = new Mutex();
+    private static final Mutex mDRBDtestLock = new Mutex();
 
     /**
      * Private constructor, cannot be instantiated.

@@ -360,7 +360,7 @@ public class Browser {
          * Returns whether the info object is being updated. This can be used
          * for animations.
          */
-        protected boolean isUpdated() {
+        protected final boolean isUpdated() {
             return updated;
         }
 
@@ -1527,7 +1527,7 @@ public class Browser {
             try {
                 infoPanelLatch.await();
             } catch (InterruptedException ignored) {
-                /* ignored */
+                Thread.currentThread().interrupt();
             }
         }
 

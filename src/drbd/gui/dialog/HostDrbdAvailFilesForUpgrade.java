@@ -45,7 +45,7 @@ public class HostDrbdAvailFilesForUpgrade extends HostDrbdAvailFiles {
 
     /**
      * Returns the next dialog. HostDrbdInstForUpgrade. */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return new HostDrbdInstForUpgrade(this, getHost());
     }
 }

@@ -78,7 +78,7 @@ public class HostConfiguration extends DialogHost {
     /**
      * Finishes the dialog and stores the values.
      */
-    protected void finishDialog() {
+    protected final void finishDialog() {
         final String name = nameField.getStringValue().trim();
         getHost().setHostname(Tools.join(",", hostnames, getHops()));
         getHost().setName(name);
@@ -94,7 +94,7 @@ public class HostConfiguration extends DialogHost {
      * Returns the next dialog. Depending on if the host is already connected
      * it is the HostSSH or it is skipped and HostDevices is the next dialog.
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         if (hostnameOk) {
             if (getHost().isConnected()) {
                 return new HostDevices(this, getHost());
@@ -109,7 +109,7 @@ public class HostConfiguration extends DialogHost {
     /**
      * Checks the fields and if they are correct the buttons will be enabled.
      */
-    protected void checkFields(final GuiComboBox field) {
+    protected final void checkFields(final GuiComboBox field) {
         final String name = nameField.getStringValue().trim();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -126,7 +126,7 @@ public class HostConfiguration extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostConfiguration.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostConfiguration.Title");
     }
 
@@ -134,7 +134,7 @@ public class HostConfiguration extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostConfiguration.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostConfiguration.Description");
     }
 
@@ -142,7 +142,8 @@ public class HostConfiguration extends DialogHost {
      * Checks the dns entries for all the hosts.
      * This assumes that getHost().hostnameEntered was set.
      */
-    protected boolean checkDNS(final int hop, final String hostnameEntered) {
+    protected final boolean checkDNS(final int hop,
+                                     final String hostnameEntered) {
         InetAddress[] addresses = null;
         try {
             addresses = InetAddress.getAllByName(hostnameEntered);
@@ -213,7 +214,7 @@ public class HostConfiguration extends DialogHost {
         /**
          * Runs the check dns thread.
          */
-        public void run() {
+        public final void run() {
             answerPaneSetText(
                         Tools.getString("Dialog.HostConfiguration.DNSLookup"));
             hostnameOk = checkDNS(hop, hostnameEntered);
@@ -251,7 +252,7 @@ public class HostConfiguration extends DialogHost {
     /**
      * Returns number of hops.
      */
-    protected int getHops() {
+    protected final int getHops() {
         final String hostnameEntered = getHost().getHostnameEntered();
         return Tools.charCount(hostnameEntered, ',') + 1;
     }
@@ -259,7 +260,7 @@ public class HostConfiguration extends DialogHost {
     /**
      * Inits dialog and starts dns check for every host.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
@@ -349,7 +350,7 @@ public class HostConfiguration extends DialogHost {
      * Returns input pane where names of host or more hosts delimited with
      * comma, can be entered.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final int hops = getHops();
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);

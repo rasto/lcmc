@@ -3679,7 +3679,6 @@ public class ClusterBrowser extends Browser {
                     newDri.addLinbitDrbd(this, dcHost, testOnly);
                 }
             }
-            return;
         }
 
         /**
@@ -5609,7 +5608,7 @@ public class ClusterBrowser extends Browser {
          */
         public void addResourceBefore(final Host dcHost,
                                       final boolean testOnly) {
-            return;
+            /* Override to add resource before this one. */
         }
 
         /**
@@ -6867,7 +6866,7 @@ public class ClusterBrowser extends Browser {
                     super.update();
                     removeAll();
 
-                    DefaultListModel dlm = new DefaultListModel();
+                    final DefaultListModel dlm = new DefaultListModel();
                     final Map<MyMenuItem, ButtonCallback> callbackHash =
                                  new HashMap<MyMenuItem, ButtonCallback>();
                     final MyList list = new MyList(dlm, getBackground());
@@ -7070,7 +7069,7 @@ public class ClusterBrowser extends Browser {
                     for (final String cl : HB_CLASSES) {
                         final MyMenu classItem =
                                             new MyMenu(HB_CLASS_MENU.get(cl));
-                        DefaultListModel dlm = new DefaultListModel();
+                        final DefaultListModel dlm = new DefaultListModel();
                         for (final ResourceAgent ra : getAddServiceList(cl)) {
                             final MyMenuItem mmi =
                                            new MyMenuItem(ra.getMenuName()) {

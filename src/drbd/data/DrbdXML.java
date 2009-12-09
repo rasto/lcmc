@@ -937,7 +937,8 @@ public class DrbdXML extends XML {
          */
         Pattern p =
             Pattern.compile(
-                "^(\\d+)\\s+ST\\s+(\\d+)\\s+\\{\\s+cs:(\\S+)\\s+(?:st|ro):(\\S+)/(\\S+)\\s+ds:(\\S+)/(\\S+)\\s+(\\S+).*?");
+                "^(\\d+)\\s+ST\\s+(\\d+)\\s+\\{\\s+cs:(\\S+)\\s+"
+                + "(?:st|ro):(\\S+)/(\\S+)\\s+ds:(\\S+)/(\\S+)\\s+(\\S+).*?");
         Matcher m = p.matcher(output);
         if (m.matches()) {
             /* String counter      = m.group(1); // not used */

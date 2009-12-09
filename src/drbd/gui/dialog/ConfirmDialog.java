@@ -66,7 +66,7 @@ public class ConfirmDialog extends ConfigDialog {
      * Returns the text of the yes button. ConfirmDialog.Yes from TextResources
      * by default.
      */
-    protected String yesButton() {
+    protected final String yesButton() {
         if (yesButton == null) {
             return Tools.getString("ConfirmDialog.Yes");
         } else {
@@ -78,7 +78,7 @@ public class ConfirmDialog extends ConfigDialog {
      * Returns the text of the no button. ConfirmDialog.No from TextResources
      * by default.
      */
-    protected String noButton() {
+    protected final String noButton() {
         if (noButton == null) {
             return Tools.getString("ConfirmDialog.No");
         } else {
@@ -89,14 +89,14 @@ public class ConfirmDialog extends ConfigDialog {
     /**
      * Returns the default button. It is "No" by default.
      */
-    protected String defaultButton() {
+    protected final String defaultButton() {
         return noButton();
     }
 
     /**
      * Returns an icon for this dialog. Null by default.
      */
-    protected ImageIcon icon() {
+    protected final ImageIcon icon() {
         return null;
     }
 
@@ -104,7 +104,7 @@ public class ConfirmDialog extends ConfigDialog {
      * Returns width of the dialog.
      * ConfirmDialog.width from AppDefaults by default.
      */
-    protected int dialogWidth() {
+    protected final int dialogWidth() {
         return Tools.getDefaultInt("ConfirmDialog.width");
     }
 
@@ -112,44 +112,42 @@ public class ConfirmDialog extends ConfigDialog {
      * Returns height of the dialog.
      * ConfirmDialog.height from AppDefaults by default.
      */
-    protected int dialogHeight() {
+    protected final int dialogHeight() {
         return Tools.getDefaultInt("ConfirmDialog.height");
     }
 
     /**
      * Returns the type of the message JOptionPane.WARNING_MESSAGE by default.
      */
-    protected int getMessageType() {
+    protected final int getMessageType() {
         return JOptionPane.WARNING_MESSAGE;
     }
 
    /**
     * Returns true if Yes button was pressed.
     */
-    public boolean isPressedYesButton() {
+    public final boolean isPressedYesButton() {
         return isPressedButton(yesButton());
     }
 
     /**
      * Returns array with 'yes' and 'no' buttons.
      */
-    protected String[] buttons() {
+    protected final String[] buttons() {
         return new String[]{yesButton(), noButton()};
     }
 
     /**
      * Returns icons for yes and no buttons. Null, null by default, (for now).
      */
-    protected ImageIcon[] getIcons() {
+    protected final ImageIcon[] getIcons() {
         return new ImageIcon[]{null, null};
     }
 
     /**
      * Inits the dialog.
      */
-    protected void initDialog() {
-        //super.initDialog();
-        //enableComponents();
+    protected final void initDialog() {
     }
 
     /**

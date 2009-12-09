@@ -75,14 +75,14 @@ public class HostFinish extends DialogHost {
     /**
      * Returns next dialog. Null
      */
-    public WizardDialog nextDialog() {
+    public final WizardDialog nextDialog() {
         return nextDialog;
     }
 
     /**
      * Finishes the dialog, and saves the host.
      */
-    protected void finishDialog() {
+    protected final void finishDialog() {
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
             Tools.save(saveFile);
@@ -92,7 +92,7 @@ public class HostFinish extends DialogHost {
     /**
      * Inits the dialog.
      */
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
@@ -135,7 +135,7 @@ public class HostFinish extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.HostFinish.Title in TextResources.
      */
-    protected String getHostDialogTitle() {
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.HostFinish.Title");
     }
 
@@ -143,7 +143,7 @@ public class HostFinish extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.HostFinish.Description in TextResources.
      */
-    protected String getDescription() {
+    protected final String getDescription() {
         return Tools.getString("Dialog.HostFinish.Description");
     }
 
@@ -151,7 +151,7 @@ public class HostFinish extends DialogHost {
      * Returns input pane with two big buttons: configure a cluster or add
      * another host.
      */
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
         /* host wizard button */
         addAnotherHostButton = new MyButton(

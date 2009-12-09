@@ -47,7 +47,7 @@ public class AddClusterDialog {
      * Shows step by step dialogs that add and configure new cluster.
      * Must allways be called from thread.
      */
-    public void showDialogs() {
+    public final void showDialogs() {
         Tools.getGUIData().enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
         DialogCluster dialog = new ClusterName(null, cluster);
@@ -77,14 +77,14 @@ public class AddClusterDialog {
     /**
      * Whether the wizard was canceled.
      */
-    public boolean canceled() {
+    public final boolean canceled() {
         return canceled;
     }
 
     /**
      * Returns the clusters.
      */
-    public Clusters getClusters() {
+    public final Clusters getClusters() {
         return clusters;
     }
 }
