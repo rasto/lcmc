@@ -113,7 +113,21 @@ public class DrbdMC extends JPanel {
                     }
                 });
             boolean auto = false;
+            boolean tightvnc = false;
+            boolean ultravnc = false;
+            boolean realvnc = false;
+            boolean vncportoffset = false;
             for (final String arg : args) {
+                if (vncportoffset && Tools.isNumber(arg)) {
+                    Tools.getConfigData().setVncPortOffset(
+                                                        Integer.parseInt(arg));
+                }
+                if ("--vnc-port-offset".equals(arg)) {
+                    vncportoffset = true;
+                    continue;
+                } else {
+                    vncportoffset = false;
+                }
                 if (auto) {
                     Tools.parseAutoArgs(arg);
                 } else if ("--keep-helper".equals(arg)) {
@@ -124,11 +138,35 @@ public class DrbdMC extends JPanel {
                     System.out.println("--keep-helper do not overwrite "
                                        + "the drbd-gui-helper program.");
                     System.out.println("--auto for testing");
+                    System.out.println("--tightvnc enable tight vnc viewer");
+                    System.out.println("--ultravnc enable ultra vnc viewer");
+                    System.out.println("--realvnc enable real vnc viewer");
+                    System.out.println(
+                                "--vnc-port-offset offset for port forwarding");
                     System.exit(0);
+                } else if ("--tightvnc".equals(arg)) {
+                    tightvnc = true;
+                } else if ("--ultravnc".equals(arg)) {
+                    ultravnc = true;
+                } else if ("--realvnc".equals(arg)) {
+                    realvnc = true;
                 } else if ("--auto".equals(arg)) {
                     auto = true;
                 }
             }
+            if (!tightvnc && !ultravnc && !realvnc) {
+                if (Tools.isLinux()) {
+                    tightvnc = true;
+                } else if (Tools.isWindows()) {
+                    ultravnc = true;
+                } else {
+                    tightvnc = true;
+                    ultravnc = true;
+                }
+            }
+            Tools.getConfigData().setTightvnc(tightvnc);
+            Tools.getConfigData().setUltravnc(ultravnc);
+            Tools.getConfigData().setRealvnc(realvnc);
             /* Schedule a job for the event-dispatching thread:
                creating and showing this application's GUI. */
             javax.swing.SwingUtilities.invokeLater(new Runnable() {

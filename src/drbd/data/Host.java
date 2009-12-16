@@ -1129,11 +1129,11 @@ public class Host implements Serializable {
      * function will be called. In case of error, callback.doneError is called.
      */
     public final ExecCommandThread execCommandRaw(
-                                            final String command,
-                                            final ProgressBar progressBar,
-                                            final ExecCallback execCallback,
-                                            final boolean outputVisible,
-                                            final boolean commandVisible) {
+                                                final String command,
+                                                final ProgressBar progressBar,
+                                                final ExecCallback execCallback,
+                                                final boolean outputVisible,
+                                                final boolean commandVisible) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }

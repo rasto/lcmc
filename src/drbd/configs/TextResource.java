@@ -864,6 +864,9 @@ public class TextResource extends
 + "* muse, released under the terms of the Apache License\n"
 + "* xalan, released under the terms of the Apache License\n"
 + "* xml, released under the terms of the Apache License\n"
++ "* tightvnc, released under the terms of the GPL License\n"
++ "* ultravnc, released under the terms of the GPL License\n"
++ "* realvnc, released under the terms of the GPL License\n"
          },
 
 
@@ -1709,6 +1712,9 @@ public class TextResource extends
          "Getting DRBD parameters..."},
         {"Error.Title",
          "Error"},
+
+        {"VNCXML.GetConfig",
+         "Parsing libvirt config..."},
 
         {"EmptyViewPanel.HelpButton",
          "I am new here"},

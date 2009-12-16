@@ -4519,13 +4519,14 @@ public class ClusterBrowser extends Browser {
             setParameters(resourceNode);
         }
 
-        ///**
-        // * Returns id of the service, which is heartbeatId.
-        // * TODO: bad idea
-        // */
-        //public String getId() {
-        //    return getService().getHeartbeatId();
-        //}
+        /**
+         * Returns id of the service, which is heartbeatId.
+         * TODO: this id is used for stored position info, should be named
+         * differently.
+         */
+        public String getId() {
+            return getService().getHeartbeatId();
+        }
 
         /**
          * Sets info panel of the service.
@@ -6089,8 +6090,7 @@ public class ClusterBrowser extends Browser {
                             continue;
                         }
                         final GuiComboBox cb =
-                            (GuiComboBox) operationsComboBoxHash.get(op,
-                                                                     param);
+                            (GuiComboBox) operationsComboBoxHash.get(op, param);
                         String value;
                         if (cb != null) {
                             value = cb.getStringValue();
@@ -6203,7 +6203,8 @@ public class ClusterBrowser extends Browser {
 
             pacemakerResAttrs.put("id",       heartbeatId);
             pacemakerResAttrs.put("class",    raClass);
-            if (!HB_HEARTBEAT_CLASS.equals(raClass)) {
+            if (!HB_HEARTBEAT_CLASS.equals(raClass)
+                && !raClass.equals(HB_LSB_CLASS)) {
                 pacemakerResAttrs.put("provider", provider);
             }
             pacemakerResAttrs.put("type",     type);
@@ -7421,6 +7422,103 @@ public class ClusterBrowser extends Browser {
             };
             registerMenuItem(viewLogMenu);
             items.add(viewLogMenu);
+            if ("VirtualDomain".equals(getService().getName())) {
+                if (Tools.getConfigData().isTightvnc()) {
+                    /* tight vnc test menu */
+                    final MyMenuItem tightvncViewerMenu = new MyMenuItem(
+                                                    "start TIGHT VNC viewer",
+                                                    null,
+                                                    null) {
+
+                        private static final long serialVersionUID = 1L;
+
+                        public boolean enablePredicate() {
+                            return !getService().isNew() && isRunning(testOnly);
+                        }
+
+                        public void action() {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    getPopup().setVisible(false);
+                                }
+                            });
+                            final List<String> nodes =
+                                                   getRunningOnNodes(testOnly);
+                            if (nodes != null && !nodes.isEmpty()) {
+                                Tools.startTightVncViewer(
+                                      getCluster().getHostByName(nodes.get(0)),
+                                      getComboBoxValue("config"));
+                            }
+                        }
+                    };
+                    registerMenuItem(tightvncViewerMenu);
+                    items.add(tightvncViewerMenu);
+                }
+
+                if (Tools.getConfigData().isUltravnc()) {
+                    /* ultra vnc test menu */
+                    final MyMenuItem ultravncViewerMenu = new MyMenuItem(
+                                    "start ULTRA VNC viewer",
+                                    null,
+                                    null) {
+
+                        private static final long serialVersionUID = 1L;
+
+                        public boolean enablePredicate() {
+                            return !getService().isNew() && isRunning(testOnly);
+                        }
+
+                        public void action() {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    getPopup().setVisible(false);
+                                }
+                            });
+                            final List<String> nodes =
+                                                   getRunningOnNodes(testOnly);
+                            if (nodes != null && !nodes.isEmpty()) {
+                                Tools.startUltraVncViewer(
+                                      getCluster().getHostByName(nodes.get(0)),
+                                      getComboBoxValue("config"));
+                            }
+                        }
+                    };
+                    registerMenuItem(ultravncViewerMenu);
+                    items.add(ultravncViewerMenu);
+                }
+
+                if (Tools.getConfigData().isRealvnc()) {
+                    /* real vnc test menu */
+                    final MyMenuItem realvncViewerMenu = new MyMenuItem(
+                                    "start REAL VNC test",
+                                    null,
+                                    null) {
+
+                        private static final long serialVersionUID = 1L;
+
+                        public boolean enablePredicate() {
+                            return !getService().isNew() && isRunning(testOnly);
+                        }
+
+                        public void action() {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    getPopup().setVisible(false);
+                                }
+                            });
+                            final List<String> nodes =
+                                                   getRunningOnNodes(testOnly);
+                            if (nodes != null && !nodes.isEmpty()) {
+                                Tools.startRealVncViewer(
+                                      getCluster().getHostByName(nodes.get(0)),
+                                      getComboBoxValue("config"));
+                            }
+                        }
+                    };
+                    registerMenuItem(realvncViewerMenu);
+                    items.add(realvncViewerMenu);
+                }
+            }
             return items;
         }
 

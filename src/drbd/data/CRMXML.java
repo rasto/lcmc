@@ -1102,8 +1102,7 @@ public class CRMXML extends XML {
         if (resourceClass == null) {
             resourceClass = "ocf";
         }
-        List<ResourceAgent> raList =
-                                        classToServicesMap.get(resourceClass);
+        List<ResourceAgent> raList = classToServicesMap.get(resourceClass);
         if (raList == null) {
             raList = new ArrayList<ResourceAgent>();
             classToServicesMap.put(resourceClass, raList);

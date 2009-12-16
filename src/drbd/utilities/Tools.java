@@ -28,6 +28,7 @@ import drbd.data.Clusters;
 import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
 import drbd.data.CRMXML;
+import drbd.data.VNCXML;
 import drbd.gui.GUIData;
 import drbd.gui.dialog.ConfirmDialog;
 
@@ -65,6 +66,11 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.Toolkit;
+import java.awt.Point;
+import java.awt.Cursor;
+import java.awt.image.MemoryImageSource;
+import java.awt.Image;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -125,6 +131,7 @@ public final class Tools {
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(
                                                           DIALOG_PANEL_WIDTH,
                                                           DIALOG_PANEL_HEIGHT);
+    /** Array of expert pannels. */
     private static final List<JPanel> expertPanels = new ArrayList<JPanel>();
     /** Expert panel mutex. */
     private static final Mutex mExpertPanels = new Mutex();
@@ -1635,6 +1642,13 @@ public final class Tools {
     }
 
     /**
+     * Returns whether the computer, where this program is run, is Windows.
+     */
+    public static boolean isWindows() {
+        return System.getProperty("os.name").indexOf("Windows") == 0;
+    }
+
+    /**
      * Sets the html font of the editor pane to be the default font.
      */
     public static void setEditorFont(final JEditorPane ep) {
@@ -1770,6 +1784,131 @@ public final class Tools {
             Tools.appError("wrong uri", e);
         } catch (java.net.URISyntaxException e) {
             Tools.appError("error opening browser", e);
+        }
+    }
+
+    /**
+     * Prepares vnc viewer, gets the port and creates ssh tunnel. Returns true
+     * if ssh tunnel was created.
+     */
+    private static int prepareVncViewer(final Host host,
+                                        final String configFile) {
+        final VNCXML vncxml = new VNCXML(host, configFile);
+        final int remotePort = vncxml.getRemotePort();
+        if (remotePort < 0) {
+            return -1;
+        }
+        final int localPort = remotePort + getConfigData().getVncPortOffset();
+        debug("start port forwarding " + remotePort + " -> " + localPort);
+        try {
+            host.getSSH().startVncPortForwarding(host.getIp(), remotePort);
+        } catch (final java.io.IOException e) {
+            Tools.appError("unable to create tunnel", e);
+            return -1;
+        }
+        return localPort;
+    }
+
+    /**
+     * Cleans up after vnc viewer. It stops ssh tunnel.
+     */
+    private static void cleanupVncViewer(final Host host,
+                                         final int localPort) {
+        final int remotePort = localPort - getConfigData().getVncPortOffset();
+        debug("stop port forwarding " + remotePort);
+        try {
+            host.getSSH().stopVncPortForwarding(remotePort);
+        } catch (final java.io.IOException e) {
+            Tools.appError("unable to close tunnel", e);
+        }
+    }
+
+    /**
+     * Starts Tight VNC viewer.
+     */
+    public static void startTightVncViewer(final Host host,
+                                           final String configFile) {
+        final int localPort = prepareVncViewer(host, configFile);
+        if (localPort < 0) {
+            return;
+        }
+        final tightvnc.VncViewer v = new tightvnc.VncViewer(
+                                     new String[]{"HOST",
+                                                  "127.0.0.1",
+                                                  "PORT",
+                                                  Integer.toString(localPort)},
+                                     false,
+                                     true);
+        v.init();
+        v.start();
+        v.join();
+        cleanupVncViewer(host, localPort);
+    }
+
+    /**
+     * Starts Ultra VNC viewer.
+     */
+    public static void startUltraVncViewer(final Host host,
+                                           final String configFile) {
+        final int localPort = prepareVncViewer(host, configFile);
+        if (localPort < 0) {
+            return;
+        }
+        final JavaViewer.VncViewer v = new JavaViewer.VncViewer(
+                                     new String[]{"HOST",
+                                                  "127.0.0.1",
+                                                  "PORT",
+                                                  Integer.toString(localPort)},
+                                     false,
+                                     true);
+
+        v.init();
+        v.start();
+        v.join();
+        cleanupVncViewer(host, localPort);
+    }
+
+    /**
+     * Starts Real VNC viewer.
+     */
+    public static void startRealVncViewer(final Host host,
+                                          final String configFile) {
+        final int localPort = prepareVncViewer(host, configFile);
+        if (localPort < 0) {
+            return;
+        }
+        final vncviewer.VNCViewer v = new vncviewer.VNCViewer(
+                              new String[]{"127.0.0.1:"
+                                  + (Integer.toString(localPort - 5900))});
+
+        v.start();
+        v.join();
+        cleanupVncViewer(host, localPort);
+    }
+
+    /**
+     * Hides mouse pointer.
+     */
+    public static void hideMousePointer(final Component c) {
+        final int[] pixels = new int[16 * 16];
+        final Image image = Toolkit.getDefaultToolkit().createImage(
+                                 new MemoryImageSource(16, 16, pixels, 0, 16));
+        final Cursor transparentCursor =
+             Toolkit.getDefaultToolkit().createCustomCursor(image,
+                                                            new Point(0, 0),
+                                                            "invisibleCursor");
+        c.setCursor(transparentCursor);
+    }
+
+    /**
+     * Check whether the string is number.
+     */
+    public static boolean isNumber(final String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (final NumberFormatException nfe) {
+            return false;
         }
     }
 }

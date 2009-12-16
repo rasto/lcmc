@@ -51,7 +51,9 @@ public class VNCXML extends XML {
     private int remotePort = -1;
     /** Autoport. */
     private boolean autoport = false;
-    private static final Pattern DISPLAY_PATTERN = Pattern.compile(".*:(\\d+)$");
+    /** Pattern that maches display e.g. :4. */
+    private static final Pattern DISPLAY_PATTERN =
+                                                 Pattern.compile(".*:(\\d+)$");
     /**
      * Prepares a new <code>VNCXML</code> object.
      */
@@ -75,8 +77,8 @@ public class VNCXML extends XML {
             final Map<String, String> vncreplaceHash =
                                                  new HashMap<String, String>();
             vncreplaceHash.put("@NAME@", name);
-            final String vnccommand = host.getDistCommand("VNCXML.GetVncDisplay",
-                                                          vncreplaceHash);
+            final String vnccommand =
+                   host.getDistCommand("VNCXML.GetVncDisplay", vncreplaceHash);
             final String display = Tools.execCommandProgressIndicator(
                                            host,
                                            vnccommand,

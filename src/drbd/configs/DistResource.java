@@ -300,5 +300,10 @@ public class DistResource extends
 
         {"MakeKernelPanic", "echo c > /proc/sysrq-trigger"},
         {"MakeKernelReboot", "echo b > /proc/sysrq-trigger"},
+
+        {"VNCXML.GetConfig",
+         "cat @CONFIG@"},
+        {"VNCXML.GetVncDisplay",
+         "virsh vncdisplay @NAME@"},
     };
 }

@@ -124,7 +124,7 @@ public class ClusterHosts extends DialogCluster {
             }
         }
         boolean enable = true;
-        final List<String> ips = new ArrayList<String>();
+        final List<String> hostnames = new ArrayList<String>();
         if (selected < 2) {
             enable = false;
         } else {
@@ -133,12 +133,12 @@ public class ClusterHosts extends DialogCluster {
             for (final JCheckBox button : checkBoxToHost.keySet()) {
                 if (button.isSelected() && button.isEnabled()) {
                     final Host host = checkBoxToHost.get(button);
-                    final String ip = host.getHostname();
-                    if (ips.contains(ip)) {
+                    final String hostname = host.getHostname();
+                    if (hostnames.contains(hostname)) {
                         enable = false;
                         break;
                     }
-                    ips.add(ip);
+                    hostnames.add(hostname);
                 }
             }
         }

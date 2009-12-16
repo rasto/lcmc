@@ -41,6 +41,7 @@ import com.trilead.ssh2.InteractiveCallback;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.KnownHosts;
+import com.trilead.ssh2.LocalPortForwarder;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
@@ -84,6 +85,8 @@ public class SSH {
     private final Mutex mConnectionLock = new Mutex();
     /** Connection thread mutex. */
     private final Mutex mConnectionThreadLock = new Mutex();
+    /** Local port forwarder. */
+    private LocalPortForwarder localPortForwarder = null;
 
     /**
      * Reconnect.
@@ -1531,7 +1534,7 @@ public class SSH {
                           final String remoteFilename,
                           final String mode,
                           final boolean makeBackup) {
-        final StringBuffer commands = new StringBuffer("");
+        final StringBuffer commands = new StringBuffer(40);
         if (makeBackup) {
             commands.append("cp ");
             commands.append(remoteFilename);
@@ -1564,6 +1567,38 @@ public class SSH {
             t.join();
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Starts port forwarding for vnc.
+     */
+    public final void startVncPortForwarding(final String remoteHost,
+                                             final int remotePort)
+        throws java.io.IOException {
+        final int localPort =
+                        remotePort + Tools.getConfigData().getVncPortOffset();
+        try {
+            localPortForwarder =
+                connection.createLocalPortForwarder(localPort,
+                                                    "127.0.0.1",
+                                                    remotePort);
+        } catch (final java.io.IOException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Stops port forwarding for vnc.
+     */
+    public final void stopVncPortForwarding(final int remotePort)
+        throws java.io.IOException {
+        final int localPort =
+                        remotePort + Tools.getConfigData().getVncPortOffset();
+        try {
+            localPortForwarder.close();
+        } catch (final java.io.IOException e) {
+            throw e;
         }
     }
 }

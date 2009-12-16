@@ -93,6 +93,14 @@ public class ConfigData implements Serializable {
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     /** Name of the group pacemaker object. */
     public static final String PM_GROUP_NAME = "Group";
+    /** Remote port offset when making ssh tunnel for vnc. */
+    private int vncPortOffset = 0;
+    /** Whether tight vnc viewer should be used. */
+    private boolean tightvnc = false;
+    /** Whether ultra vnc viewer should be used. */
+    private boolean ultravnc = false;
+    /** Whether real vnc viewer should be used. */
+    private boolean realvnc = false;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -338,113 +346,169 @@ public class ConfigData implements Serializable {
     /**
      * Returns last drbd installed method.
      */
-     public final String getLastDrbdInstalledMethod() {
-         return lastDrbdInstalledMethod;
-     }
+    public final String getLastDrbdInstalledMethod() {
+        return lastDrbdInstalledMethod;
+    }
 
-     /**
-      * Sets whether the drbd gui helper should be kept or overwritten all
-      * the time.
-      */
-      public final void setKeepHelper(final boolean keepHelper) {
-          this.keepHelper = keepHelper;
-      }
+    /**
+     * Sets whether the drbd gui helper should be kept or overwritten all
+     * the time.
+     */
+    public final void setKeepHelper(final boolean keepHelper) {
+        this.keepHelper = keepHelper;
+    }
 
-     /**
-      * Returns whether the drbd gui helper should be kept or overwritten
-      * all the time.
-      */
-      public final boolean getKeepHelper() {
-          return keepHelper;
-      }
+    /**
+     * Returns whether the drbd gui helper should be kept or overwritten
+     * all the time.
+     */
+    public final boolean getKeepHelper() {
+        return keepHelper;
+    }
 
-      /**
-       * Adds auto option that starts automatic actions in the gui.
-       */
-      public final void addAutoOption(final String hostOrCluster,
-                                      final String option,
-                                      final String value) {
-          autoOptions.put(hostOrCluster, option, value);
-      }
+    /**
+     * Adds auto option that starts automatic actions in the gui.
+     */
+    public final void addAutoOption(final String hostOrCluster,
+                                    final String option,
+                                    final String value) {
+        autoOptions.put(hostOrCluster, option, value);
+    }
 
-      /**
-       * Adds host on which automatic actions will be performed.
-       */
-      public final void addAutoHost(final String host) {
-          autoHosts.add(host);
-      }
+    /**
+     * Adds host on which automatic actions will be performed.
+     */
+    public final void addAutoHost(final String host) {
+        autoHosts.add(host);
+    }
 
-      /**
-       * Returns hosts on which automatic actions will be performed.
-       */
-      public final List<String> getAutoHosts() {
-          return autoHosts;
-      }
+    /**
+     * Returns hosts on which automatic actions will be performed.
+     */
+    public final List<String> getAutoHosts() {
+        return autoHosts;
+    }
 
-      /**
-       * Removes host after it is done.
-       */
-      public final void removeAutoHost() {
-          if (!autoHosts.isEmpty()) {
-              autoHosts.remove(0);
-          }
-      }
+    /**
+     * Removes host after it is done.
+     */
+    public final void removeAutoHost() {
+        if (!autoHosts.isEmpty()) {
+            autoHosts.remove(0);
+        }
+    }
 
-      /**
-       * Adds cluster on which automatic actions will be performed.
-       */
-      public final void addAutoCluster(final String cluster) {
-          autoClusters.add(cluster);
-      }
+    /**
+     * Adds cluster on which automatic actions will be performed.
+     */
+    public final void addAutoCluster(final String cluster) {
+        autoClusters.add(cluster);
+    }
 
-      /**
-       * Returns clusters on which automatic actions will be performed.
-       */
-      public final List<String> getAutoClusters() {
-          return autoClusters;
-      }
+    /**
+     * Returns clusters on which automatic actions will be performed.
+     */
+    public final List<String> getAutoClusters() {
+        return autoClusters;
+    }
 
-      /**
-       * Removes cluster after it is done.
-       */
-      public final void removeAutoCluster() {
-          if (!autoClusters.isEmpty()) {
-              autoClusters.remove(0);
-          }
-      }
+    /**
+     * Removes cluster after it is done.
+     */
+    public final void removeAutoCluster() {
+        if (!autoClusters.isEmpty()) {
+            autoClusters.remove(0);
+        }
+    }
 
-      /**
-       * Returns an auto option for gui testing.
-       */
-      public final String getAutoOption(final String hostOrCluster,
-                                        final String option) {
-          return (String) autoOptions.get(hostOrCluster, option);
-      }
+    /**
+     * Returns an auto option for gui testing.
+     */
+    public final String getAutoOption(final String hostOrCluster,
+                                      final String option) {
+        return (String) autoOptions.get(hostOrCluster, option);
+    }
 
-      /**
-       * Returns an auto option for the first host in the list.
-       */
-      public final String getAutoOptionHost(final String option) {
-          if (autoHosts.isEmpty()) {
-              return null;
-          }
-          return (String) autoOptions.get(autoHosts.get(0), option);
-      }
+    /**
+     * Returns an auto option for the first host in the list.
+     */
+    public final String getAutoOptionHost(final String option) {
+        if (autoHosts.isEmpty()) {
+            return null;
+        }
+        return (String) autoOptions.get(autoHosts.get(0), option);
+    }
 
-      /**
-       * Returns an auto option for first cluster in the list.
-       */
-      public final String getAutoOptionCluster(final String option) {
-          if (autoClusters.isEmpty()) {
-              return null;
-          }
-          return (String) autoOptions.get(autoClusters.get(0), option);
-      }
+    /**
+     * Returns an auto option for first cluster in the list.
+     */
+    public final String getAutoOptionCluster(final String option) {
+        if (autoClusters.isEmpty()) {
+            return null;
+        }
+        return (String) autoOptions.get(autoClusters.get(0), option);
+    }
 
-      /**
-       * Returns a global option.
-       */
-      public final String getAutoOptionGlobal(final String option) {
-          return (String) autoOptions.get("global", option);
-      }
+    /**
+     * Returns a global option.
+     */
+    public final String getAutoOptionGlobal(final String option) {
+        return (String) autoOptions.get("global", option);
+    }
+
+    /**
+     * Returns remote port offset when making ssh tunnel for vnc.
+     */
+    public final int getVncPortOffset() {
+        return vncPortOffset;
+    }
+
+    /**
+     * Sets remote port offset when making ssh tunnel for vnc.
+     */
+    public final void setVncPortOffset(final int vncPortOffset) {
+        this.vncPortOffset = vncPortOffset;
+    }
+
+    /**
+     * Sets whether tight vnc viewer should be used.
+     */
+    public final void setTightvnc(final boolean tightvnc) {
+        this.tightvnc = tightvnc;
+    }
+
+    /**
+     * Sets whether ultra vnc viewer should be used.
+     */
+    public final void setUltravnc(final boolean ultravnc) {
+        this.ultravnc = ultravnc;
+    }
+
+    /**
+     * Sets whether real vnc viewer should be used.
+     */
+    public final void setRealvnc(final boolean realvnc) {
+        this.realvnc = realvnc;
+    }
+
+    /**
+     * Returns whether tight vnc viewer should be used.
+     */
+    public final boolean isTightvnc() {
+        return tightvnc;
+    }
+
+    /**
+     * Returns whether ultra vnc viewer should be used.
+     */
+    public final boolean isUltravnc() {
+        return ultravnc;
+    }
+
+    /**
+     * Returns whether real vnc viewer should be used.
+     */
+    public final boolean isRealvnc() {
+        return realvnc;
+    }
 }
