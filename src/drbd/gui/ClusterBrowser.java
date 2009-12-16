@@ -81,6 +81,7 @@ import javax.swing.JMenuBar;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JRadioButton;
+import javax.swing.JMenuItem;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
@@ -4112,8 +4113,9 @@ public class ClusterBrowser extends Browser {
          */
         public List<UpdatableItem> createPopup() {
             final List<UpdatableItem>items = super.createPopup();
+            final boolean testOnly = false;
             /* add group service */
-            final MyMenu addGroupServiceMenuItem =new MyMenu(
+            final MyMenu addGroupServiceMenuItem = new MyMenu(
                         Tools.getString("ClusterBrowser.Hb.AddGroupService")) {
                 private static final long serialVersionUID = 1L;
 
@@ -4167,6 +4169,34 @@ public class ClusterBrowser extends Browser {
             items.add(1, (UpdatableItem) addGroupServiceMenuItem);
             registerMenuItem((UpdatableItem) addGroupServiceMenuItem);
 
+            /* group services */
+            final List<String> resources = clusterStatus.getGroupResources(
+                                                 getHeartbeatId(testOnly),
+                                                 testOnly);
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    final ServiceInfo gsi = heartbeatIdToServiceInfo.get(hbId);
+                    final MyMenu groupServicesMenu =
+                                                   new MyMenu(gsi.toString()) {
+                        private static final long serialVersionUID = 1L;
+
+                        public boolean enablePredicate() {
+                            return true;
+                        }
+
+                        public void update() {
+                            super.update();
+                            removeAll();
+                            for (final UpdatableItem u : gsi.createPopup()) {
+                                add((MyMenuItem) u);
+                                ((MyMenuItem) u).update();
+                            }
+                        }
+                    };
+                    items.add((UpdatableItem) groupServicesMenu);
+                    registerMenuItem((UpdatableItem) groupServicesMenu);
+                }
+            }
             return items;
         }
 
@@ -7196,57 +7226,6 @@ public class ClusterBrowser extends Browser {
                                           getExistingServiceMenuItem(testOnly);
                 items.add((UpdatableItem) existingServiceMenuItem);
                 registerMenuItem((UpdatableItem) existingServiceMenuItem);
-            } else { /* group service */
-                final MyMenuItem moveUpMenuItem =
-                    new MyMenuItem(Tools.getString(
-                                            "ClusterBrowser.Hb.ResGrpMoveUp"),
-                                   null, /* upIcon, */
-                                   null) {
-                        private static final long serialVersionUID = 1L;
-
-                        public boolean enablePredicate() {
-                            // TODO: don't if it is up
-                            return !clStatusFailed()
-                                   && getService().isAvailable();
-                        }
-
-                        public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
-                            moveGroupResUp(getDCHost(), testOnly);
-                        }
-                    };
-                items.add(moveUpMenuItem);
-                registerMenuItem(moveUpMenuItem);
-
-                /* move down */
-                final MyMenuItem moveDownMenuItem =
-                    new MyMenuItem(Tools.getString(
-                                            "ClusterBrowser.Hb.ResGrpMoveDown"),
-                                   null, // TODO: downIcon,
-                                   null) {
-                        private static final long serialVersionUID = 1L;
-
-                        public boolean enablePredicate() {
-                            // TODO: don't if it is down
-                            return !clStatusFailed()
-                                   && getService().isAvailable();
-                        }
-
-                        public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
-                            moveGroupResDown(getDCHost(), testOnly);
-                        }
-                    };
-                items.add(moveDownMenuItem);
-                registerMenuItem(moveDownMenuItem);
             }
             /* start resource */
             final MyMenuItem startMenuItem =
