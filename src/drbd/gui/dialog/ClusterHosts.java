@@ -133,7 +133,7 @@ public class ClusterHosts extends DialogCluster {
             for (final JCheckBox button : checkBoxToHost.keySet()) {
                 if (button.isSelected() && button.isEnabled()) {
                     final Host host = checkBoxToHost.get(button);
-                    final String ip = host.getIp();
+                    final String ip = host.getHostname();
                     if (ips.contains(ip)) {
                         enable = false;
                         break;
