@@ -4186,10 +4186,18 @@ public class ClusterBrowser extends Browser {
 
                         public void update() {
                             super.update();
-                            removeAll();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    removeAll();
+                                }
+                            });
                             for (final UpdatableItem u : gsi.createPopup()) {
-                                add((MyMenuItem) u);
-                                ((MyMenuItem) u).update();
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        add((JMenuItem) u);
+                                        u.update();
+                                    }
+                                });
                             }
                         }
                     };
@@ -8238,8 +8246,46 @@ public class ClusterBrowser extends Browser {
         protected void addMigrateMenuItems(final List<UpdatableItem> items) {
             /* no migrate / unmigrate menu items for clones. */
         }
-    }
 
+        /**
+         * Returns items for the clone popup.
+         */
+        public List<UpdatableItem> createPopup() {
+            final List<UpdatableItem> items = super.createPopup();
+            final ServiceInfo cs = containedService;
+            if (cs == null) {
+                return items;
+            }
+            final MyMenu csMenu = new MyMenu(cs.toString()) {
+                private static final long serialVersionUID = 1L;
+
+                public boolean enablePredicate() {
+                    return true;
+                }
+
+                public void update() {
+                    super.update();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            removeAll();
+                        }
+                    });
+                    for (final UpdatableItem u : cs.createPopup()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                add((JMenuItem) u);
+                                u.update();
+                            }
+                        });
+                    }
+                }
+            };
+            items.add((UpdatableItem) csMenu);
+            registerMenuItem((UpdatableItem) csMenu);
+            return items;
+        }
+    }
+    
     /**
      * This class is used for all kind of categories in the heartbeat
      * hierarchy. Its point is to show heartbeat graph all the time, ane
