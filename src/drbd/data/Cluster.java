@@ -83,7 +83,6 @@ public class Cluster {
      */
     public final void createClusterBrowser() {
         clusterBrowser = new ClusterBrowser(this);
-        clusterBrowser.initClusterResources();
     }
 
     /**

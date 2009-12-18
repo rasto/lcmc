@@ -180,8 +180,6 @@ public class ViewPanel extends JPanel {
                 }
             }
         );
-
-
         return tree;
     }
 

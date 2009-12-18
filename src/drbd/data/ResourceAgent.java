@@ -410,6 +410,13 @@ public class ResourceAgent {
     }
 
     /**
+     * Returns whether this service is VirtualDomain.
+     */
+    public final boolean isVirtualDomain() {
+        return isOCFClass() && "VirtualDomain".equals(name);
+    }
+
+    /**
      * Returns whether this service/object is group.
      */
     public final boolean isGroup() {

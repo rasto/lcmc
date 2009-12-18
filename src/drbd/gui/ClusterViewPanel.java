@@ -69,6 +69,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         super();
         this.cluster = cluster;
         cluster.createClusterBrowser();
+        tree = getTree(cluster.getBrowser());
+        cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
 
         /* wizard buttons */
@@ -109,14 +111,13 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         buttonArea.setBackground(STATUS_BACKGROUND);
         buttonArea.add(buttonPanel, BorderLayout.WEST);
         final JLabel logo = new JLabel(Tools.createImageIcon(
-                                Tools.getDefault("ClusterViewPanel.Logo")));
+                                  Tools.getDefault("ClusterViewPanel.Logo")));
         final JPanel l = new JPanel(new BorderLayout());
         l.setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
         l.add(logo, BorderLayout.NORTH);
         buttonArea.add(l, BorderLayout.EAST);
         add(buttonArea, BorderLayout.NORTH);
 
-        tree = getTree(cluster.getBrowser());
         allHostsUpdate();
         Tools.getGUIData().registerAllHostsUpdate(this);
     }
@@ -126,7 +127,6 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
      */
     public final void allHostsUpdate() {
         cluster.getBrowser().updateClusterResources(
-                                                tree,
                                                 cluster.getHostsArray(),
                                                 cluster.getCommonFileSystems(),
                                                 cluster.getCommonMountPoints());

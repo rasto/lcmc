@@ -1163,6 +1163,10 @@ public class TextResource extends
         {"ClusterBrowser.Heartbeat",
          "Cluster"},
 
+        {"ClusterBrowser.VMs",
+         "VMs"},
+
+
         {"ClusterBrowser.Services",
          "Services"},
 

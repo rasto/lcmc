@@ -138,6 +138,8 @@ public class ClusterBrowser extends Browser {
     private DefaultMutableTreeNode servicesNode;
     /** Menu's drbd node. */
     private DefaultMutableTreeNode drbdNode;
+    /** Menu's VMs node. */
+    private DefaultMutableTreeNode vmsNode = null;
     /** Common file systems on all cluster nodes. */
     private String[] commonFileSystems;
     /** Common mount points on all cluster nodes. */
@@ -230,8 +232,6 @@ public class ClusterBrowser extends Browser {
     private boolean drbdStatusCanceled = true;
     /** Whether hb status was canceled by user. */
     private boolean clStatusCanceled = true;
-    /** Tree menu root. */
-    private JTree treeMenu;
     /** Global hb status lock. */
     private final Mutex mClStatusLock = new Mutex();
     /** Ptest lock. */
@@ -374,6 +374,8 @@ public class ClusterBrowser extends Browser {
     /** Cluster status error string. */
     private static final String CLUSTER_STATUS_ERROR =
                                   "---start---\r\nerror\r\n\r\n---done---\r\n";
+    private static final Pattern LIBVIRT_CONF_PATTERN =
+                                              Pattern.compile(".*/(\\w+).xml$");
     /**
      * Prepares a new <code>CusterBrowser</code> object.
      */
@@ -555,10 +557,23 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
+     * Adds VMs node.
+     */
+    private void addVMSNode() {
+        /* VMs */
+        if (vmsNode == null) {
+            vmsNode = new DefaultMutableTreeNode(
+                     new CategoryInfo(Tools.getString("ClusterBrowser.VMs")));
+            setNode(vmsNode);
+            topAdd(vmsNode);
+            reload(getTreeTop());
+        }
+    }
+
+    /**
      * Initializes cluster resources for cluster view.
      */
-    public final void initClusterResources() {
-
+    public final void initClusterBrowser() {
         /* all hosts */
         allHostsNode = new DefaultMutableTreeNode(new AllHostsInfo());
         setNode(allHostsNode);
@@ -622,11 +637,9 @@ public class ClusterBrowser extends Browser {
      * @param commonMountPoints
      *          mount points that are common on both hosts
      */
-    public final void updateClusterResources(final JTree treeMenu,
-                                             final Host[] clusterHosts,
+    public final void updateClusterResources(final Host[] clusterHosts,
                                              final String[] commonFileSystems,
                                              final String[] commonMountPoints) {
-        this.treeMenu = treeMenu;
         this.commonFileSystems = commonFileSystems;
         this.commonMountPoints = commonMountPoints;
         DefaultMutableTreeNode resource;
@@ -666,7 +679,6 @@ public class ClusterBrowser extends Browser {
                 heartbeatGraph.scale();
             }
         });
-
         updateHeartbeatDrbdThread();
     }
 
@@ -3363,6 +3375,330 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
+     * This class holds info about VirtualDomain service in the VMs category,
+     * but not in the cluster view.
+     */
+    class VMSVirtualDomainInfo extends Info {
+        /** VirtualDomain object from cluster view. */
+        private final VirtualDomainInfo virtualDomainInfo;
+        /** Cache for the info panel. */
+        private JComponent infoPanel = null;
+        /** Extra options panel. */
+        private final JPanel extraOptionsPanel = new JPanel();
+        /**
+         * Creates the VMSVirtualDomainInfo object.
+         */
+        public VMSVirtualDomainInfo(final VirtualDomainInfo virtualDomainInfo) {
+            super(virtualDomainInfo.getName());
+            this.virtualDomainInfo = virtualDomainInfo;
+        }
+
+        /**
+         * Returns a name of the service with virtual domain name.
+         */
+        public String toString() {
+            final StringBuffer s = new StringBuffer(30);
+            final String string;
+            final String id = virtualDomainInfo.getService().getId();
+            String configName =
+                          virtualDomainInfo.getResource().getValue("config");
+            if (configName != null) {
+                final Matcher m = LIBVIRT_CONF_PATTERN.matcher(configName);
+                if (m.matches()) {
+                    string = m.group(1);
+                } else {
+                    string = id;
+                }
+            } else {
+                string = id;
+            }
+            if (string == null) {
+                s.insert(0, "new ");
+            } else {
+                if (!"".equals(string)) {
+                    s.append(string);
+                }
+            }
+            return s.toString();
+        }
+        
+        /**
+         * Returns info panel.
+         */
+        public JComponent getInfoPanel() {
+            if (infoPanel != null) {
+                return infoPanel;
+            }
+            /* main, button and options panels */
+            final JPanel mainPanel = new JPanel();
+            mainPanel.setBackground(PANEL_BACKGROUND);
+            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+            final JPanel buttonPanel = new JPanel(new BorderLayout());
+            buttonPanel.setBackground(STATUS_BACKGROUND);
+            buttonPanel.setMinimumSize(new Dimension(0, 50));
+            buttonPanel.setPreferredSize(new Dimension(0, 50));
+            buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+
+            final JPanel optionsPanel = new JPanel();
+            optionsPanel.setBackground(PANEL_BACKGROUND);
+            optionsPanel.setLayout(new BoxLayout(optionsPanel,
+                                                 BoxLayout.Y_AXIS));
+            optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            extraOptionsPanel.setBackground(EXTRA_PANEL_BACKGROUND);
+            extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
+                                        BoxLayout.Y_AXIS));
+            extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            /* Actions */
+            final JMenuBar mb = new JMenuBar();
+            mb.setBackground(PANEL_BACKGROUND);
+            JMenu serviceCombo;
+            serviceCombo = getActionsMenu();
+            updateMenus(null);
+            mb.add(serviceCombo);
+            buttonPanel.add(mb, BorderLayout.EAST);
+            Tools.registerExpertPanel(extraOptionsPanel);
+
+            mainPanel.add(optionsPanel);
+            mainPanel.add(extraOptionsPanel);
+            final JPanel newPanel = new JPanel();
+            newPanel.setBackground(PANEL_BACKGROUND);
+            newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+            newPanel.add(buttonPanel);
+            newPanel.add(new JScrollPane(mainPanel));
+            newPanel.add(Box.createVerticalGlue());
+            infoPanel = newPanel;
+            //infoPanelDone();
+            return infoPanel;
+        }
+
+        /**
+         * Returns list of menu items for VM.
+         */
+        public List<UpdatableItem> createPopup() {
+            final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+            virtualDomainInfo.addVncViewersToTheMenu(items);
+            return items;
+        }
+    }
+
+    /**
+     * This class holds info about VirtualDomain service in the cluster menu.
+     */
+    class VirtualDomainInfo extends ServiceInfo {
+        /** VirtualDomain in the VMs menu. */
+        private VMSVirtualDomainInfo vmsVirtualDomainInfo = null;
+
+        /**
+         * Creates the VirtualDomainInfo object.
+         */
+        public VirtualDomainInfo(final String name,
+                                 final ResourceAgent ra) {
+            super(name, ra);
+            addVirtualDomain();
+        }
+
+        /**
+         * Creates the VirtualDomainInfo object.
+         */
+        public VirtualDomainInfo(final String name,
+                                 final ResourceAgent ra,
+                                 final String hbId,
+                                 final Map<String, String> resourceNode) {
+            super(name, ra, hbId, resourceNode);
+            addVirtualDomain();
+        }
+
+        /**
+         * Removes the service without confirmation dialog.
+         */
+        protected void removeMyselfNoConfirm(final Host dcHost,
+                                             final boolean testOnly) {
+            if (!testOnly) {
+                removeVirtualDomain();
+            }
+            super.removeMyselfNoConfirm(dcHost, testOnly);
+        }
+
+        /**
+         * Adds VirtualDomain panel in the VMs menu. */
+        public final void addVirtualDomain() {
+            addVMSNode();
+            vmsVirtualDomainInfo = new VMSVirtualDomainInfo(this);
+            final DefaultMutableTreeNode vmNode =
+                         new DefaultMutableTreeNode(vmsVirtualDomainInfo);
+            vmsVirtualDomainInfo.setNode(vmNode);
+            vmsNode.add(vmNode);
+            reload(vmsNode);
+        }
+
+        /**
+         * Removes VirtualDomain panel from the VMS menu.
+         */
+        public final void removeVirtualDomain() {
+            final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
+            if (vdi != null) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        vmsNode.remove(vdi.getNode());
+                        reload(vmsNode);
+                    }
+                });
+            }
+        }
+
+        /**
+         * Adds vnc viewer menu items.
+         */
+        public final void addVncViewersToTheMenu(
+                                            final List<UpdatableItem> items) {
+            final boolean testOnly = false;
+            if (Tools.getConfigData().isTightvnc()) {
+                /* tight vnc test menu */
+                final MyMenuItem tightvncViewerMenu = new MyMenuItem(
+                                                    "start TIGHT VNC viewer",
+                                                    null,
+                                                    null) {
+
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return !getService().isNew() && isRunning(testOnly);
+                    }
+
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        final List<String> nodes = getRunningOnNodes(testOnly);
+                        if (nodes != null && !nodes.isEmpty()) {
+                            Tools.startTightVncViewer(
+                                      getCluster().getHostByName(nodes.get(0)),
+                                      getComboBoxValue("config"));
+                        }
+                    }
+                };
+                registerMenuItem(tightvncViewerMenu);
+                items.add(tightvncViewerMenu);
+            }
+
+            if (Tools.getConfigData().isUltravnc()) {
+                /* ultra vnc test menu */
+                final MyMenuItem ultravncViewerMenu = new MyMenuItem(
+                                                    "start ULTRA VNC viewer",
+                                                    null,
+                                                    null) {
+
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return !getService().isNew() && isRunning(testOnly);
+                    }
+
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        final List<String> nodes = getRunningOnNodes(testOnly);
+                        if (nodes != null && !nodes.isEmpty()) {
+                            Tools.startUltraVncViewer(
+                                      getCluster().getHostByName(nodes.get(0)),
+                                      getComboBoxValue("config"));
+                        }
+                    }
+                };
+                registerMenuItem(ultravncViewerMenu);
+                items.add(ultravncViewerMenu);
+            }
+
+            if (Tools.getConfigData().isRealvnc()) {
+                /* real vnc test menu */
+                final MyMenuItem realvncViewerMenu = new MyMenuItem(
+                                                        "start REAL VNC test",
+                                                        null,
+                                                        null) {
+
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        return !getService().isNew() && isRunning(testOnly);
+                    }
+
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        final List<String> nodes = getRunningOnNodes(testOnly);
+                        if (nodes != null && !nodes.isEmpty()) {
+                            Tools.startRealVncViewer(
+                                      getCluster().getHostByName(nodes.get(0)),
+                                      getComboBoxValue("config"));
+                        }
+                    }
+                };
+                registerMenuItem(realvncViewerMenu);
+                items.add(realvncViewerMenu);
+            }
+        }
+
+        /**
+         * Returns list of items for service popup menu with actions that can
+         * be executed on the pacemaker services.
+         */
+        public List<UpdatableItem> createPopup() {
+            final List<UpdatableItem> items = super.createPopup();
+            addVncViewersToTheMenu(items);
+            return items;
+        }
+
+        /**
+         * Returns a name of the service with virtual domain name.
+         */
+        public String toString() {
+            final StringBuffer s = new StringBuffer(30);
+            s.append(getName());
+            final String string;
+            final String id = getService().getId();
+            String configName = getResource().getValue("config");
+            if (configName != null) {
+                final Matcher m = LIBVIRT_CONF_PATTERN.matcher(configName);
+                if (m.matches()) {
+                    string = m.group(1);
+                } else {
+                    string = id;
+                }
+            } else {
+                string = id;
+            }
+            if (string == null) {
+                s.insert(0, "new ");
+            } else {
+                if (!"".equals(string)) {
+                    s.append(" (" + string + ")");
+                }
+            }
+            return s.toString();
+        }
+
+        /**
+         * Applies the changes to the service parameters.
+         */
+        public void apply(final Host dcHost, final boolean testOnly) {
+            super.apply(dcHost, testOnly);
+            reload(vmsNode);
+        }
+    }
+
+
+    /**
      * This class holds info about Filesystem service. It is treated in special
      * way, so that it can use block device information and drbd devices. If
      * drbd device is selected, the drbddisk service will be added too.
@@ -3997,6 +4333,8 @@ public class ClusterBrowser extends Browser {
                 newServiceInfo = new DrbddiskInfo(name, newRA);
             } else if (newRA.isIPaddr()) {
                 newServiceInfo = new IPaddrInfo(name, newRA);
+            } else if (newRA.isVirtualDomain()) {
+                newServiceInfo = new VirtualDomainInfo(name, newRA);
             } else if (newRA.isGroup()) {
                 Tools.appError("No groups in group allowed");
                 return;
@@ -6412,6 +6750,7 @@ public class ClusterBrowser extends Browser {
                 reload(getNode());
                 heartbeatGraph.repaint();
             }
+            reload(getNode());
         }
 
         /**
@@ -6561,6 +6900,8 @@ public class ClusterBrowser extends Browser {
                 newServiceInfo = new DrbddiskInfo(name, newRA);
             } else if (newRA.isIPaddr()) {
                 newServiceInfo = new IPaddrInfo(name, newRA);
+            } else if (newRA.isVirtualDomain()) {
+                newServiceInfo = new VirtualDomainInfo(name, newRA);
             } else if (newRA.isGroup()) {
                 newServiceInfo = new GroupInfo(newRA);
             } else if (newRA.isClone()) {
@@ -7409,103 +7750,6 @@ public class ClusterBrowser extends Browser {
             };
             registerMenuItem(viewLogMenu);
             items.add(viewLogMenu);
-            if ("VirtualDomain".equals(getService().getName())) {
-                if (Tools.getConfigData().isTightvnc()) {
-                    /* tight vnc test menu */
-                    final MyMenuItem tightvncViewerMenu = new MyMenuItem(
-                                                    "start TIGHT VNC viewer",
-                                                    null,
-                                                    null) {
-
-                        private static final long serialVersionUID = 1L;
-
-                        public boolean enablePredicate() {
-                            return !getService().isNew() && isRunning(testOnly);
-                        }
-
-                        public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
-                            final List<String> nodes =
-                                                   getRunningOnNodes(testOnly);
-                            if (nodes != null && !nodes.isEmpty()) {
-                                Tools.startTightVncViewer(
-                                      getCluster().getHostByName(nodes.get(0)),
-                                      getComboBoxValue("config"));
-                            }
-                        }
-                    };
-                    registerMenuItem(tightvncViewerMenu);
-                    items.add(tightvncViewerMenu);
-                }
-
-                if (Tools.getConfigData().isUltravnc()) {
-                    /* ultra vnc test menu */
-                    final MyMenuItem ultravncViewerMenu = new MyMenuItem(
-                                    "start ULTRA VNC viewer",
-                                    null,
-                                    null) {
-
-                        private static final long serialVersionUID = 1L;
-
-                        public boolean enablePredicate() {
-                            return !getService().isNew() && isRunning(testOnly);
-                        }
-
-                        public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
-                            final List<String> nodes =
-                                                   getRunningOnNodes(testOnly);
-                            if (nodes != null && !nodes.isEmpty()) {
-                                Tools.startUltraVncViewer(
-                                      getCluster().getHostByName(nodes.get(0)),
-                                      getComboBoxValue("config"));
-                            }
-                        }
-                    };
-                    registerMenuItem(ultravncViewerMenu);
-                    items.add(ultravncViewerMenu);
-                }
-
-                if (Tools.getConfigData().isRealvnc()) {
-                    /* real vnc test menu */
-                    final MyMenuItem realvncViewerMenu = new MyMenuItem(
-                                    "start REAL VNC test",
-                                    null,
-                                    null) {
-
-                        private static final long serialVersionUID = 1L;
-
-                        public boolean enablePredicate() {
-                            return !getService().isNew() && isRunning(testOnly);
-                        }
-
-                        public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
-                            final List<String> nodes =
-                                                   getRunningOnNodes(testOnly);
-                            if (nodes != null && !nodes.isEmpty()) {
-                                Tools.startRealVncViewer(
-                                      getCluster().getHostByName(nodes.get(0)),
-                                      getComboBoxValue("config"));
-                            }
-                        }
-                    };
-                    registerMenuItem(realvncViewerMenu);
-                    items.add(realvncViewerMenu);
-                }
-            }
             return items;
         }
 
@@ -8745,7 +8989,11 @@ public class ClusterBrowser extends Browser {
                                                newRA,
                                                hbId,
                                                resourceNode);
-
+                    } else if (newRA.isVirtualDomain()) {
+                        newSi = new VirtualDomainInfo(serviceName,
+                                                      newRA,
+                                                      hbId,
+                                                      resourceNode);
                     } else {
                         newSi = new ServiceInfo(serviceName,
                                                 newRA,
@@ -9075,6 +9323,8 @@ public class ClusterBrowser extends Browser {
                 newServiceInfo = new DrbddiskInfo(name, newRA);
             } else if (newRA.isIPaddr()) {
                 newServiceInfo = new IPaddrInfo(name, newRA);
+            } else if (newRA.isVirtualDomain()) {
+                newServiceInfo = new VirtualDomainInfo(name, newRA);
             } else if (newRA.isGroup()) {
                 newServiceInfo = new GroupInfo(newRA);
             } else if (newRA.isClone()) {
