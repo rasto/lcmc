@@ -42,18 +42,32 @@ public class DistResource_redhatenterpriseserver_5 extends
 
         /* support */
         {"Support", "redhatenterpriseserver-5"},
+
+        /* Heartbeat/Pacemaker clusterlabs */
         {"HbPmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+         "clusterlabs repo: 1.0.x/3.0.x" },
+
+        {"HbPmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/epel-5/clusterlabs.repo && "
+         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
+         + "/epel-release-5-3.noarch.rpm && "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
+         + "&& /sbin/chkconfig --add heartbeat"},
 
         /* Heartbeat/Pacemaker opensuse */
-        {"HbPmInst.install.1",
+        {"HbPmInst.install.text.2",
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+
+        {"HbPmInst.install.2",
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
          + "yum -y install resource-agents heartbeat.`uname -m"
          + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
          + "/sbin/chkconfig --add heartbeat"},
 
-        {"HbPmInst.install.1.i686",
+        {"HbPmInst.install.2.i686",
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
          + "yum -y install resource-agents heartbeat.`uname -m"
@@ -71,7 +85,7 @@ public class DistResource_redhatenterpriseserver_5 extends
          + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
          + "/epel-release-5-3.noarch.rpm && "
          + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi)"
