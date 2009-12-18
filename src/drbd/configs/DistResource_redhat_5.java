@@ -56,7 +56,7 @@ public class DistResource_redhat_5 extends
          + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
          + "/epel-release-5-3.noarch.rpm && "
          + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi)"
@@ -79,20 +79,33 @@ public class DistResource_redhat_5 extends
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
-        /* Heartbeat/Pacemaker Opensuse */
+        /* Heartbeat/Pacemaker clusterlabs */
         {"HbPmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+         "clusterlabs repo: 1.0.x/3.0.x" },
 
         {"HbPmInst.install.1",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/epel-5/clusterlabs.repo && "
+         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
+         + "/epel-release-5-3.noarch.rpm && "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
+         + " && /sbin/chkconfig --add heartbeat"},
+
+        /* Heartbeat/Pacemaker Opensuse */
+        {"HbPmInst.install.text.2",
+         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+
+        {"HbPmInst.install.2",
          "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* "
          + " install heartbeat pacemaker resource-agents "
          + "&& /sbin/chkconfig --add heartbeat"},
 
-        {"HbPmInst.install.text.2", "the centos way: HB 2.1.3 (obsolete)" },
+        {"HbPmInst.install.text.3", "the centos way: HB 2.1.3 (obsolete)" },
 
-        {"HbPmInst.install.2",
+        {"HbPmInst.install.3",
          "/usr/sbin/useradd hacluster 2>/dev/null; "
          + "/usr/bin/yum -y install heartbeat "
          + "&& /sbin/chkconfig --add heartbeat"},
