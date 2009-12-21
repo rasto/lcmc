@@ -563,24 +563,12 @@ public class ClusterAisConfig extends DialogCluster {
                     configPanel.add(new JLabel(""));
                     rows++;
                     final JLabel label = l;
-                    l.addFocusListener(new FocusListener() {
-                        public void focusGained(final FocusEvent e) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    if (configScrollPane != null) {
-                                        configScrollPane.getViewport()
-                                            .setViewPosition(
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            configScrollPane.getViewport().setViewPosition(
                                               label.getBounds().getLocation());
-                                        configScrollPane = null;
-                                    }
-                                }
-                            });
-                        }
-                        public void focusLost(final FocusEvent e) {
-                            /* nothing */
                         }
                     });
-                    l.requestFocus();
                 }
 
                 configPanel.add(new JLabel(""));

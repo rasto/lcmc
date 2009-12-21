@@ -506,19 +506,12 @@ public class ClusterHbConfig extends DialogCluster {
                     configPanel.add(new JLabel(""));
                     rows++;
                     final JLabel label = l;
-                    l.addFocusListener(new FocusListener() {
-                        public void focusGained(final FocusEvent e) {
-                            if (configScrollPane != null) {
-                                configScrollPane.getViewport().setViewPosition(
-                                              label.getBounds().getLocation());
-                                label.removeFocusListener(this); /* only once */
-                            }
-                        }
-                        public void focusLost(final FocusEvent e) {
-                            /* nothing */
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            configScrollPane.getViewport().setViewPosition(
+                                            label.getBounds().getLocation());
                         }
                     });
-                    l.requestFocus();
                 }
                 /* addresses */
                 for (final CastAddress c : castAddresses) {
