@@ -375,7 +375,7 @@ public class ClusterBrowser extends Browser {
     private static final String CLUSTER_STATUS_ERROR =
                                   "---start---\r\nerror\r\n\r\n---done---\r\n";
     private static final Pattern LIBVIRT_CONF_PATTERN =
-                                              Pattern.compile(".*/(\\w+).xml$");
+                                             Pattern.compile(".*?([^/]+).xml$");
     /**
      * Prepares a new <code>CusterBrowser</code> object.
      */
