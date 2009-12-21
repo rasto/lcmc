@@ -90,7 +90,7 @@ public class HostPmInst extends DialogHost {
         if (arch == null) {
             arch = getHost().getArch();
         }
-        final String archString = arch;
+        final String archString = arch.replaceAll("i686", "i386");
         String installCommand = "PmInst.install";
         final String installMethod = getHost().getPmInstallMethod();
         if (installMethod != null) {
