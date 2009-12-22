@@ -928,7 +928,7 @@ public class DrbdGraph extends ResourceGraph {
             if (bdi != null && bdi.getBlockDevice().isDrbdMetaDisk()) {
                 final Color[] colors = {null, null};
                 colors[1] = getVertexFillColor(blockDeviceToVertexMap.get(
-                             bdi.getBlockDevice().getMetaDiskOfBlockDevice()));
+                     bdi.getBlockDevice().getMetaDiskOfBlockDevices().get(0)));
                 drawInsideVertex(g2d,
                                  v,
                                  colors,

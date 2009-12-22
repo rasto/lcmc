@@ -720,7 +720,11 @@ public class ClusterBrowser extends Browser {
                 crmXML = new CRMXML(firstHost);
                 clusterStatus = new ClusterStatus(firstHost, crmXML);
                 initOperations();
-                drbdXML = new DrbdXML(cluster.getHostsArray());
+                final DrbdXML newDrbdXML = new DrbdXML(cluster.getHostsArray());
+                for (final Host h : cluster.getHostsArray()) {
+                    newDrbdXML.update(h);
+                }
+                drbdXML = newDrbdXML;
                 /* available services */
                 final String clusterName = getCluster().getName();
                 Tools.startProgressIndicator(clusterName,
@@ -899,7 +903,10 @@ public class ClusterBrowser extends Browser {
                                host.setDrbdStatus(true);
                            }
                            final String[] lines = output.split("\n");
-                           drbdXML.update(host);
+                           final DrbdXML newDrbdXML =
+                                          new DrbdXML(cluster.getHostsArray());
+                           newDrbdXML.update(host);
+                           drbdXML = newDrbdXML;
                            host.setDrbdStatus(true);
                            drbdGraph.repaint();
                            for (int i = 0; i < lines.length; i++) {
@@ -1232,13 +1239,14 @@ public class ClusterBrowser extends Browser {
      * Updates drbd resources.
      */
     private void updateDrbdResources() {
-        final String[] drbdResources = drbdXML.getResources();
+        final DrbdXML dxml = drbdXML;
+        final String[] drbdResources = dxml.getResources();
         final boolean testOnly = false;
         for (int i = 0; i < drbdResources.length; i++) {
             final String resName = drbdResources[i];
-            final String drbdDev = drbdXML.getDrbdDevice(resName);
+            final String drbdDev = dxml.getDrbdDevice(resName);
             final Map<String, String> hostDiskMap =
-                                                drbdXML.getHostDiskMap(resName);
+                                                dxml.getHostDiskMap(resName);
             BlockDevInfo bd1 = null;
             BlockDevInfo bd2 = null;
             for (String hostName : hostDiskMap.keySet()) {
@@ -1263,24 +1271,25 @@ public class ClusterBrowser extends Browser {
                 }
                 bdi.getBlockDevice().setValue(
                                       "DrbdNetInterfacePort",
-                                      drbdXML.getVirtualInterfacePort(hostName,
-                                                                      resName));
+                                      dxml.getVirtualInterfacePort(hostName,
+                                                                   resName));
                 bdi.getBlockDevice().setValue(
                                           "DrbdNetInterface",
-                                          drbdXML.getVirtualInterface(hostName,
-                                                                      resName));
-                final String drbdMetaDisk = drbdXML.getMetaDisk(hostName,
-                                                                resName);
+                                          dxml.getVirtualInterface(hostName,
+                                                                   resName));
+                final String drbdMetaDisk = dxml.getMetaDisk(hostName,
+                                                             resName);
                 bdi.getBlockDevice().setValue("DrbdMetaDisk", drbdMetaDisk);
                 bdi.getBlockDevice().setValue(
                                             "DrbdMetaDiskIndex",
-                                            drbdXML.getMetaDiskIndex(hostName,
-                                                                     resName));
+                                            dxml.getMetaDiskIndex(hostName,
+                                                                  resName));
                 if (!"internal".equals(drbdMetaDisk)) {
                     final BlockDevInfo mdI =
                                       drbdGraph.findBlockDevInfo(hostName,
                                                                  drbdMetaDisk);
-                    mdI.getBlockDevice().setIsDrbdMetaDisk(true);
+                    mdI.getBlockDevice().addMetaDiskOfBlockDevice(
+                                                        bdi.getBlockDevice());
                     bdi.getBlockDevice().setMetaDisk(mdI.getBlockDevice());
                 }
                 if (bd1 == null) {
@@ -1426,10 +1435,11 @@ public class ClusterBrowser extends Browser {
      */
     public final void parseDrbdEvent(final String hostName,
                                      final String output) {
-        if (drbdXML == null) {
+        final DrbdXML dxml = drbdXML;
+        if (dxml == null) {
             return;
         }
-        drbdXML.parseDrbdEvent(hostName, drbdGraph, output);
+        dxml.parseDrbdEvent(hostName, drbdGraph, output);
     }
 
     /**
@@ -1970,13 +1980,14 @@ public class ClusterBrowser extends Browser {
         private String drbdSectionsConfig()
                                         throws Exceptions.DrbdConfigException {
             final StringBuffer config = new StringBuffer("");
-            final String[] sections = drbdXML.getSections();
+            final DrbdXML dxml = drbdXML;
+            final String[] sections = dxml.getSections();
             for (String section : sections) {
                 if ("resource".equals(section) || "global".equals(section)) {
                     // TODO: Tools.getString
                     continue;
                 }
-                final String[] params = drbdXML.getSectionParams(section);
+                final String[] params = dxml.getSectionParams(section);
 
                 if (params.length != 0) {
                     final StringBuffer sectionConfig = new StringBuffer("");
@@ -10953,7 +10964,8 @@ public class ClusterBrowser extends Browser {
             config.append("\n\n");
 
             final StringBuffer global = new StringBuffer(80);
-            final String[] params = drbdXML.getGlobalParams();
+            final DrbdXML dxml = drbdXML;
+            final String[] params = dxml.getGlobalParams();
             global.append("global {\n");
             for (String param : params) {
                 if ("usage-count".equals(param)) {
@@ -10972,7 +10984,7 @@ public class ClusterBrowser extends Browser {
                     if (value == null) {
                         continue;
                     }
-                    if (!value.equals(drbdXML.getParamDefault(param))) {
+                    if (!value.equals(dxml.getParamDefault(param))) {
                         global.append("\t\t");
                         global.append(param);
                         global.append('\t');
@@ -11387,7 +11399,7 @@ public class ClusterBrowser extends Browser {
             }
             drbdGraph.startAnimation(bd1);
             drbdGraph.startAnimation(bd2);
-
+            final DrbdXML dxml = drbdXML;
             if (name == null && drbdDevStr == null) {
                 int index = getNewDrbdResourceIndex();
                 name = "r" + Integer.toString(index);
@@ -11401,15 +11413,14 @@ public class ClusterBrowser extends Browser {
                 dri = new DrbdResourceInfo(name, drbdDevStr, bd1, bd2);
             } else {
                 dri = new DrbdResourceInfo(name, drbdDevStr, bd1, bd2);
-
-                final String[] sections = drbdXML.getSections();
+                final String[] sections = dxml.getSections();
                 for (String section : sections) {
-                    final String[] params = drbdXML.getSectionParams(section);
+                    final String[] params = dxml.getSectionParams(section);
                     for (String param : params) {
                         String value =
-                            drbdXML.getConfigValue(name, section, param);
+                            dxml.getConfigValue(name, section, param);
                         if ("".equals(value)) {
-                            value = drbdXML.getParamDefault(param);
+                            value = dxml.getParamDefault(param);
                         }
                         dri.getDrbdResource().setValue(param, value);
                     }
@@ -11476,6 +11487,14 @@ public class ClusterBrowser extends Browser {
                         AddDrbdConfigDialog adrd
                             = new AddDrbdConfigDialog(driF);
                         adrd.showDialogs();
+                        /* remove wizard parameters from hashes. */
+                        for (final String p : bd1.getParametersFromXML()) {
+                            bd1.paramComboBoxRemove(p, "wizard");
+                            bd2.paramComboBoxRemove(p, "wizard");
+                        }
+                        for (final String p : driF.getParametersFromXML()) {
+                            driF.paramComboBoxRemove(p, "wizard");
+                        }
                         if (adrd.isCanceled()) {
                             driF.removeMyselfNoConfirm(testOnly);
                             drbdGraph.stopAnimation(bd1);
@@ -11484,8 +11503,11 @@ public class ClusterBrowser extends Browser {
                         }
 
                         updateCommonBlockDevices();
-                        drbdXML.update(bd1.getHost());
-                        drbdXML.update(bd2.getHost());
+                        final DrbdXML newDrbdXML =
+                                        new DrbdXML(cluster.getHostsArray());
+                        newDrbdXML.update(bd1.getHost());
+                        newDrbdXML.update(bd2.getHost());
+                        drbdXML = newDrbdXML;
                         resetFilesystems();
                     }
                 });

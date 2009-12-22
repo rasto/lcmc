@@ -23,6 +23,8 @@
 package drbd.data.resources;
 
 import drbd.utilities.Tools;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This class holds data of one block device.
@@ -47,14 +49,13 @@ public class BlockDevice extends Resource {
     /** Whether this block device is used by crm in Filesystem service.
      */
     private boolean isUsedByCRM;
-    /** Whether this device is used as a drbd meta-disk. */
-    private boolean isDrbdMetaDisk;
     /** Drbd net interface of this block device. */
     private NetInterface netInterface;
     /** Drbd meta disk of this block device. */
     private BlockDevice metaDisk = null;
     /** Block device of which this block device is a meta disk. */
-    private BlockDevice metaDiskOfBlockDevice;
+    private List<BlockDevice> metaDiskOfBlockDevices =
+                                                new ArrayList<BlockDevice>();
     /**
      * Whether the block device is in drbd split-brain situation. */
     private boolean splitBrain = false;
@@ -186,14 +187,14 @@ public class BlockDevice extends Resource {
      * Returns true if this device is used as drbd meta-disk.
      */
     public final boolean isDrbdMetaDisk() {
-        return isDrbdMetaDisk;
+        return !metaDiskOfBlockDevices.isEmpty();
     }
 
     /**
-     * Returns the block device of which this block device is a meta disk.
+     * Returns the block devices of which this block device is a meta disk.
      */
-    public final BlockDevice getMetaDiskOfBlockDevice() {
-        return metaDiskOfBlockDevice;
+    public final List<BlockDevice> getMetaDiskOfBlockDevices() {
+        return metaDiskOfBlockDevices;
     }
 
     /**
@@ -202,7 +203,7 @@ public class BlockDevice extends Resource {
      * not used by CRM.
      */
     public final boolean isAvailable() {
-        return !isMounted() && !isUsedByCRM && !isDrbdMetaDisk;
+        return !isMounted() && !isUsedByCRM && !isDrbdMetaDisk();
     }
 
 
@@ -219,10 +220,10 @@ public class BlockDevice extends Resource {
             drbdFlags             = null;
             netInterface          = null;
             if (metaDisk != null) {
-                metaDisk.resetMetadisk();
+                metaDisk.removeMetadiskOfBlockDevice(this);
                 metaDisk              = null;
             }
-            metaDiskOfBlockDevice = null;
+            metaDiskOfBlockDevices = new ArrayList<BlockDevice>();
         }
     }
 
@@ -234,18 +235,12 @@ public class BlockDevice extends Resource {
     }
 
     /**
-     * Sets this device used as drbd meta-disk flag.
-     */
-    public final void setIsDrbdMetaDisk(final boolean isDrbdMetaDisk) {
-        this.isDrbdMetaDisk = isDrbdMetaDisk;
-    }
-    /**
-     * Sets metaDiskOfBlockDevice which is a block device of which block device
+     * Adds metaDiskOfBlockDevice which is a block device of which block device
      * is this meta disk.
      */
-    public final void setMetaDiskOfBlockDevice(
+    public final void addMetaDiskOfBlockDevice(
                                     final BlockDevice metaDiskOfBlockDevice) {
-        this.metaDiskOfBlockDevice = metaDiskOfBlockDevice;
+        metaDiskOfBlockDevices.add(metaDiskOfBlockDevice);
     }
 
     /**
@@ -261,16 +256,16 @@ public class BlockDevice extends Resource {
     public final void setMetaDisk(final BlockDevice metaDisk) {
         this.metaDisk = metaDisk;
         if (metaDisk != null) {
-            metaDisk.setMetaDiskOfBlockDevice(this);
+            metaDisk.addMetaDiskOfBlockDevice(this);
         }
     }
 
     /**
      * Removes the meta disk info.
      */
-    public final void resetMetadisk() {
-        setMetaDiskOfBlockDevice(null);
-        isDrbdMetaDisk = false;
+    public final void removeMetadiskOfBlockDevice(
+                                    final BlockDevice metaDiskOfBlockDevice) {
+        metaDiskOfBlockDevices.remove(metaDiskOfBlockDevice);
     }
 
     /**

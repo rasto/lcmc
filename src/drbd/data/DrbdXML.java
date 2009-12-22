@@ -152,7 +152,7 @@ public class DrbdXML extends XML {
                                                     (ConvertCmdCallback) null);
 
             final String output =
-                        Tools.execCommandProgressIndicator(
+                        Tools.execCommand(
                                     host,
                                     command,
                                     null,  /* ExecCallback */
@@ -187,7 +187,7 @@ public class DrbdXML extends XML {
                     }
                 }
             }
-            update(host); // TODO: don't do this here.
+//            update(host); // TODO: don't do this here.
         }
 
     }

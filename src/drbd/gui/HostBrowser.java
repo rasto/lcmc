@@ -1848,7 +1848,14 @@ public class HostBrowser extends Browser {
             }
             tt.append("</b>");
             if (getBlockDevice().isDrbdMetaDisk()) {
-                tt.append("(Meta Disk)\n");
+                tt.append(" (Meta Disk)\n");
+                for (final BlockDevice mb:
+                                getBlockDevice().getMetaDiskOfBlockDevices()) {
+                    tt.append("&nbsp;&nbsp;of ");
+                    tt.append(mb.getName());
+                    tt.append('\n');
+                }
+
             }
 
             if (getBlockDevice().isDrbd()) {
@@ -2033,9 +2040,17 @@ public class HostBrowser extends Browser {
                         indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
                     }
                 }
-                ind.setEnabled(!internal);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        ind.setEnabled(!internal);
+                    }
+                });
                 if (indW != null) {
-                    indW.setEnabled(!internal);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            indW.setEnabled(!internal);
+                        }
+                    });
                 }
             } else if (DRBD_NI_PORT_PARAM.equals(param)) {
                 if (drbdVIPortList.contains(value)
@@ -2215,8 +2230,7 @@ public class HostBrowser extends Browser {
                                                                .getUserObject();
                 final BlockDevice bd = bdi.getBlockDevice();
                 if (bd.toString().equals(savedMetaDisk)
-                    || (!bd.isDrbdMetaDisk()
-                        && !bd.isDrbd()
+                    || (!bd.isDrbd()
                         && !bd.isUsedByCRM()
                         && !bd.isMounted())) {
                     list.add(bdi);
@@ -2335,7 +2349,8 @@ public class HostBrowser extends Browser {
                     }
                 });
                 if (getBlockDevice().getMetaDisk() != null) {
-                    getBlockDevice().getMetaDisk().setIsDrbdMetaDisk(false);
+                    getBlockDevice().getMetaDisk().removeMetadiskOfBlockDevice(
+                                                              getBlockDevice());
                 }
                 drbdVIPortList.remove(
                                getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
@@ -2354,7 +2369,8 @@ public class HostBrowser extends Browser {
                     getBlockDevice().setMetaDisk(metaDisk);
                 }
                 if (getBlockDevice().getMetaDisk() != null) {
-                    getBlockDevice().getMetaDisk().setIsDrbdMetaDisk(true);
+                    getBlockDevice().getMetaDisk().addMetaDiskOfBlockDevice(
+                                                             getBlockDevice());
                 }
             }
         }
@@ -2595,8 +2611,10 @@ public class HostBrowser extends Browser {
                         Tools.getString("HostBrowser.Drbd.AddDrbdResource")) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return (drbdResourceInfo == null);
+                public final boolean enablePredicate() {
+                    return drbdResourceInfo == null
+                           && getHost().isConnected()
+                           && getHost().isDrbdLoaded();
                 }
 
                 public void update() {
@@ -2611,7 +2629,12 @@ public class HostBrowser extends Browser {
                         MyMenu hostMenu = new MyMenu(oHost.getName()) {
                             private static final long serialVersionUID = 1L;
 
-                            public void update() {
+                            public final boolean enablePredicate() {
+                                return oHost.isConnected()
+                                       && oHost.isDrbdLoaded();
+                            }
+
+                            public final void update() {
                                 super.update();
                                 removeAll();
                                 List<BlockDevInfo> blockDevInfos =
