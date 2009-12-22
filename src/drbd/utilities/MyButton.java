@@ -43,7 +43,7 @@ import java.awt.GraphicsEnvironment;
 /**
  * This class creates a button with any gradient colors.
  */
-public class MyButton extends JButton {
+public class MyButton extends JButton implements ComponentWithTest {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** First color in the gradient. */
@@ -53,10 +53,12 @@ public class MyButton extends JButton {
     /** Robot to move a mouse a little if a tooltip has changed. */
     private Robot robot = null;
     /** Button tooltip. */
-    private JToolTip tip = null;
+    private JToolTip toolTip = null;
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    /** Tooltip background color */
+    private Color toolTipBackground = null;
 
     /**
      * Prepares a new <code>MyButton</code> object.
@@ -102,9 +104,9 @@ public class MyButton extends JButton {
      */
     public MyButton(final String text,
                     final ImageIcon icon,
-                    final String toolTip) {
+                    final String toolTipText) {
         this(text, icon);
-        super.setToolTipText(toolTip);
+        super.setToolTipText(toolTipText);
     }
     /**
      * Prepares a new <code>MyButton</code> object.
@@ -131,9 +133,18 @@ public class MyButton extends JButton {
      * Creates tooltip.
      */
     public final JToolTip createToolTip() {
-        tip = super.createToolTip();
-        tip.setBackground(Color.YELLOW);
-        return tip;
+        toolTip = super.createToolTip();
+        if (toolTipBackground != null) {
+            toolTip.setBackground(toolTipBackground);
+        }
+        return toolTip;
+    }
+
+    /**
+     * Sets tooltip's background color.
+     */
+    public final void setToolTipBackground(final Color toolTipBackground) {
+        this.toolTipBackground = toolTipBackground;
     }
 
     /**
@@ -141,7 +152,7 @@ public class MyButton extends JButton {
      */
     public final void setToolTipText(final String toolTipText) {
         super.setToolTipText(toolTipText);
-        if (tip != null && robot != null && tip.isShowing()) {
+        if (toolTip != null && robot != null && toolTip.isShowing()) {
             final GraphicsDevice[] devices =
                     GraphicsEnvironment.getLocalGraphicsEnvironment()
                                        .getScreenDevices();

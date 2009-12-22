@@ -2393,6 +2393,8 @@ public class HostBrowser extends Browser {
                     mouseStillOver = true;
                     applyButton.setToolTipText(
                            Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                    applyButton.setToolTipBackground(Tools.getDefaultColor(
+                                    "ClusterBrowser.Test.Tooltip.Background"));
                     Tools.sleep(250);
                     if (!mouseStillOver) {
                         return;

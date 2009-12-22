@@ -40,7 +40,7 @@ import java.awt.GraphicsEnvironment;
  * method and be enabled/disabled depending on the enablePredicate() method.
  */
 public class MyMenuItem extends JMenuItem
-implements ActionListener, UpdatableItem {
+implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Text of the item. */
@@ -56,7 +56,7 @@ implements ActionListener, UpdatableItem {
     /** Alternate short decription of the item for tool tip. */
     private String shortDesc2;
     /** Tools tip object. */
-    private JToolTip toolTip;
+    private JToolTip toolTip = null;
     /** Pos of the click that can be used in the overriden action method. */
     private Point2D pos;
     /** Robot to move a mouse a little if a tooltip has changed. */
@@ -64,6 +64,8 @@ implements ActionListener, UpdatableItem {
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    /** Tooltip background color */
+    private Color toolTipBackground = null;
 
     /**
      * Prepares a new <code>MyMenuItem</code> object.
@@ -277,8 +279,17 @@ implements ActionListener, UpdatableItem {
      */
     public final JToolTip createToolTip() {
         toolTip = super.createToolTip();
-        toolTip.setBackground(Color.YELLOW);
+        if (toolTipBackground != null) {
+            toolTip.setBackground(toolTipBackground);
+        }
         return toolTip;
+    }
+
+    /**
+     * Sets tooltip's background color.
+     */
+    public final void setToolTipBackground(final Color toolTipBackground) {
+        this.toolTipBackground = toolTipBackground;
     }
 
     /**

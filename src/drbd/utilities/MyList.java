@@ -36,7 +36,7 @@ import java.awt.GraphicsEnvironment;
 /**
  * A Jlist with updatable tooltips.
  */
-public class MyList extends JList {
+public class MyList extends JList implements ComponentWithTest {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Tools tip object. */
@@ -46,6 +46,8 @@ public class MyList extends JList {
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    /** Tooltip background color */
+    private Color toolTipBackground = null;
 
     /**
      * Prepares a new <code>MyList</code> object.
@@ -66,8 +68,17 @@ public class MyList extends JList {
      */
     public final JToolTip createToolTip() {
         toolTip = super.createToolTip();
-        toolTip.setBackground(Color.YELLOW);
+        if (toolTipBackground != null) {
+            toolTip.setBackground(toolTipBackground);
+        }
         return toolTip;
+    }
+
+    /**
+     * Sets tooltip's background color.
+     */
+    public final void setToolTipBackground(final Color toolTipBackground) {
+        this.toolTipBackground = toolTipBackground;
     }
 
     /**

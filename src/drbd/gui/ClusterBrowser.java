@@ -58,6 +58,7 @@ import drbd.data.Subtext;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
+import drbd.utilities.ComponentWithTest;
 import drbd.utilities.ButtonCallback;
 
 import drbd.gui.HostBrowser.BlockDevInfo;
@@ -1666,7 +1667,7 @@ public class ClusterBrowser extends Browser {
      */
     public abstract class ClMenuItemCallback implements ButtonCallback {
         /** Menu component on which this callback works. */
-        private final JComponent component;
+        private final ComponentWithTest component;
         /** Host if over a menu item that belongs to a host. */
         private final Host menuHost;
         /** Whether the mouse is still over. */
@@ -1675,7 +1676,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Creates new ClMenuItemCallback object.
          */
-        public ClMenuItemCallback(final JComponent component,
+        public ClMenuItemCallback(final ComponentWithTest component,
                                   final Host menuHost) {
             this.component = component;
             this.menuHost = menuHost;
@@ -1686,7 +1687,7 @@ public class ClusterBrowser extends Browser {
          */
         public final void mouseOut() {
             mouseStillOver = false;
-            heartbeatGraph.stopTestAnimation(component);
+            heartbeatGraph.stopTestAnimation((JComponent) component);
             component.setToolTipText(null);
         }
 
@@ -1696,13 +1697,16 @@ public class ClusterBrowser extends Browser {
         public final void mouseOver() {
             mouseStillOver = true;
             component.setToolTipText(STARTING_PTEST_TOOLTIP);
+            component.setToolTipBackground(
+              Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
             Tools.sleep(250);
             if (!mouseStillOver) {
                 return;
             }
             mouseStillOver = false;
             final CountDownLatch startTestLatch = new CountDownLatch(1);
-            heartbeatGraph.startTestAnimation(component, startTestLatch);
+            heartbeatGraph.startTestAnimation((JComponent) component,
+                                              startTestLatch);
             ptestLockAcquire();
             clusterStatus.setPtestData(null);
             Host h;
@@ -1730,7 +1734,7 @@ public class ClusterBrowser extends Browser {
      */
     public abstract class DRBDMenuItemCallback implements ButtonCallback {
         /** Menu component on which this callback works. */
-        private final JComponent component;
+        private final ComponentWithTest component;
         /** Host if over a menu item that belongs to a host. */
         private final Host menuHost;
         /** Whether the mouse is still over. */
@@ -1739,7 +1743,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Creates new DRBDMenuItemCallback object.
          */
-        public DRBDMenuItemCallback(final JComponent component,
+        public DRBDMenuItemCallback(final ComponentWithTest component,
                                     final Host menuHost) {
             this.component = component;
             this.menuHost = menuHost;
@@ -1750,7 +1754,7 @@ public class ClusterBrowser extends Browser {
          */
         public final void mouseOut() {
             mouseStillOver = false;
-            drbdGraph.stopTestAnimation(component);
+            drbdGraph.stopTestAnimation((JComponent) component);
             component.setToolTipText(null);
         }
 
@@ -1761,13 +1765,16 @@ public class ClusterBrowser extends Browser {
             mouseStillOver = true;
             component.setToolTipText(
                           Tools.getString("ClusterBrowser.StartingDRBDtest"));
+            component.setToolTipBackground(
+              Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
             Tools.sleep(250);
             if (!mouseStillOver) {
                 return;
             }
             mouseStillOver = false;
             final CountDownLatch startTestLatch = new CountDownLatch(1);
-            drbdGraph.startTestAnimation(component, startTestLatch);
+            drbdGraph.startTestAnimation((JComponent) component,
+                                         startTestLatch);
             drbdtestLockAcquire();
             final Map<Host, String> testOutput =
                                              new LinkedHashMap<Host, String>();
@@ -2508,6 +2515,8 @@ public class ClusterBrowser extends Browser {
                     mouseStillOver = true;
                     applyButton.setToolTipText(
                            Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                    applyButton.setToolTipBackground(Tools.getDefaultColor(
+                                    "ClusterBrowser.Test.Tooltip.Background"));
                     Tools.sleep(250);
                     if (!mouseStillOver) {
                         return;
@@ -6204,6 +6213,8 @@ public class ClusterBrowser extends Browser {
                 public final void mouseOver() {
                     mouseStillOver = true;
                     applyButton.setToolTipText(STARTING_PTEST_TOOLTIP);
+                    applyButton.setToolTipBackground(Tools.getDefaultColor(
+                                    "ClusterBrowser.Test.Tooltip.Background"));
                     Tools.sleep(250);
                     if (!mouseStillOver) {
                         return;
@@ -7299,7 +7310,6 @@ public class ClusterBrowser extends Browser {
                             }
                         };
                         dlm.addElement(mmi);
-
                         final ClMenuItemCallback mmiCallback =
                                    new ClMenuItemCallback(list, null) {
                                        public void action(final Host dcHost) {
@@ -9213,6 +9223,8 @@ public class ClusterBrowser extends Browser {
                 public final void mouseOver() {
                     mouseStillOver = true;
                     applyButton.setToolTipText(STARTING_PTEST_TOOLTIP);
+                    applyButton.setToolTipBackground(Tools.getDefaultColor(
+                                    "ClusterBrowser.Test.Tooltip.Background"));
                     Tools.sleep(250);
                     if (!mouseStillOver) {
                         return;
@@ -10492,6 +10504,8 @@ public class ClusterBrowser extends Browser {
                 public final void mouseOver() {
                     mouseStillOver = true;
                     applyButton.setToolTipText(STARTING_PTEST_TOOLTIP);
+                    applyButton.setToolTipBackground(Tools.getDefaultColor(
+                                    "ClusterBrowser.Test.Tooltip.Background"));
                     Tools.sleep(250);
                     if (!mouseStillOver) {
                         return;
@@ -11203,6 +11217,8 @@ public class ClusterBrowser extends Browser {
                     mouseStillOver = true;
                     applyButton.setToolTipText(
                            Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                    applyButton.setToolTipBackground(Tools.getDefaultColor(
+                                    "ClusterBrowser.Test.Tooltip.Background"));
                     Tools.sleep(250);
                     if (!mouseStillOver) {
                         return;
