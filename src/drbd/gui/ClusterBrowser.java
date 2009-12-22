@@ -4608,8 +4608,13 @@ public class ClusterBrowser extends Browser {
          */
         public void removeMyselfNoConfirm(final Host dcHost,
                                           final boolean testOnly) {
-            super.removeMyselfNoConfirm(dcHost, testOnly);
-            if (!getService().isNew()) {
+            if (getService().isNew()) {
+                if (!testOnly) {
+                    getService().setNew(false);
+                    heartbeatGraph.killRemovedVertices();
+                }
+            } else {
+                super.removeMyselfNoConfirm(dcHost, testOnly);
                 String cloneId = null;
                 boolean master = false;
                 if (getCloneInfo() != null) {
@@ -6703,6 +6708,8 @@ public class ClusterBrowser extends Browser {
                                               colAttrsList,
                                               ordAttrsList,
                                               testOnly);
+                } else {
+                    groupInfo.resetPopup();
                 }
             } else {
                 if (cloneInfo != null) {
@@ -7121,7 +7128,10 @@ public class ClusterBrowser extends Browser {
             }
 
             if (getService().isNew()) {
-                heartbeatGraph.killRemovedVertices();
+                if (!testOnly) {
+                    getService().setNew(false);
+                    heartbeatGraph.killRemovedVertices();
+                }
             } else {
                 if (groupInfo == null) {
                     final HbConnectionInfo[] hbcis =
@@ -7170,6 +7180,7 @@ public class ClusterBrowser extends Browser {
                             groupId = group;
                             groupInfo.getService().doneRemoving();
                         }
+                        groupInfo.resetPopup();
                     }
                     String cloneId = null;
                     boolean master = false;
@@ -7519,38 +7530,44 @@ public class ClusterBrowser extends Browser {
         public List<UpdatableItem> createPopup() {
             final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
             final boolean testOnly = false;
-            /* remove service */
-            final MyMenuItem removeMenuItem = new MyMenuItem(
-                        Tools.getString("ClusterBrowser.Hb.RemoveService"),
-                        REMOVE_ICON,
-                        STARTING_PTEST_TOOLTIP) {
-                private static final long serialVersionUID = 1L;
+            if (cloneInfo == null) {
+                /* remove service */
+                final MyMenuItem removeMenuItem = new MyMenuItem(
+                            Tools.getString("ClusterBrowser.Hb.RemoveService"),
+                            REMOVE_ICON,
+                            STARTING_PTEST_TOOLTIP) {
+                    private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return !clStatusFailed()
-                           && !getService().isRemoved();
-                }
+                    public boolean enablePredicate() {
+                        return !clStatusFailed()
+                               && !getService().isRemoved()
+                               && (groupInfo == null 
+                                   || clusterStatus.getGroupResources(
+                                          groupInfo.getHeartbeatId(testOnly),
+                                          testOnly).size() > 1);
+                    }
 
-                public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
-                    removeMyself(false);
-                    heartbeatGraph.repaint();
-                }
-            };
-            final ServiceInfo thisClass = this;
-            final ClMenuItemCallback removeItemCallback =
-                      new ClMenuItemCallback(removeMenuItem, null) {
-                public void action(final Host dcHost) {
-                    removeMyselfNoConfirm(dcHost, true); /* test only */
-                }
-            };
-            addMouseOverListener(removeMenuItem, removeItemCallback);
-            items.add((UpdatableItem) removeMenuItem);
-            registerMenuItem((UpdatableItem) removeMenuItem);
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        removeMyself(false);
+                        heartbeatGraph.repaint();
+                    }
+                };
+                final ServiceInfo thisClass = this;
+                final ClMenuItemCallback removeItemCallback =
+                          new ClMenuItemCallback(removeMenuItem, null) {
+                    public void action(final Host dcHost) {
+                        removeMyselfNoConfirm(dcHost, true); /* test only */
+                    }
+                };
+                addMouseOverListener(removeMenuItem, removeItemCallback);
+                items.add((UpdatableItem) removeMenuItem);
+                registerMenuItem((UpdatableItem) removeMenuItem);
+            }
 
             if (groupInfo == null && cloneInfo == null) {
                 /* add new group and dependency*/

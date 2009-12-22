@@ -671,7 +671,7 @@ public class Browser {
             if (menu == null) {
                 menu = new JMenu(name);
                 menu.setIcon(ACTIONS_ICON);
-                final List<UpdatableItem>items = createPopup();
+                final List<UpdatableItem> items = createPopup();
                 if (items != null) {
                     for (final UpdatableItem u : items) {
                         menu.add((JMenuItem) u);
@@ -694,6 +694,13 @@ public class Browser {
             }
             updateMenus(null);
             return menu;
+        }
+
+        /**
+         * Force popup to be recreated.
+         */
+        protected final void resetPopup() {
+            popup = null;
         }
 
         /**
