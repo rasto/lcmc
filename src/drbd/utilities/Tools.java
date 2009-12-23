@@ -594,13 +594,12 @@ public final class Tools {
             errorString.append(sw.toString());
         }
 
+
+        System.out.println("APPERROR: " + errorString);
         if (!appError) {
-            debug("APPERROR: " + errorString);
             return;
         }
 
-
-        System.out.println("APPERROR: " + errorString);
         final JEditorPane errorPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN,
                                                       errorString.toString());
         errorPane.setEditable(false);
@@ -898,8 +897,14 @@ public final class Tools {
      * @return integer with default value.
      */
     public static int getDefaultInt(final String option) {
+        synchronized (Tools.class) {
+            if (resourceAppDefaults == null) {
+                resourceAppDefaults =
+                        ResourceBundle.getBundle("drbd.configs.AppDefaults");
+            }
+        }
         try {
-            return ((Integer) resourceAppDefaults.getObject(option)).intValue();
+            return (Integer) resourceAppDefaults.getObject(option);
         } catch (Exception e) {
             appError("AppError.getInt.Exception",
                      option + ": " + getDefault(option),

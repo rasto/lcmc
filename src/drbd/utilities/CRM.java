@@ -405,7 +405,6 @@ public final class CRM {
                                       final String cloneId,
                                       final boolean master,
                                       final boolean testOnly) {
-        Tools.printStackTrace("remove resource");
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
         final String hbV = host.getHeartbeatVersion();

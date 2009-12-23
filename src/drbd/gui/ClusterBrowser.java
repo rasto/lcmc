@@ -4497,6 +4497,10 @@ public class ClusterBrowser extends Browser {
                                 public void action() {
                                     SwingUtilities.invokeLater(new Runnable() {
                                         public void run() {
+                                            final CloneInfo ci = getCloneInfo();
+                                            if (ci != null) {
+                                                ci.getPopup().setVisible(false);
+                                            }
                                             getPopup().setVisible(false);
                                         }
                                     });
@@ -7539,12 +7543,19 @@ public class ClusterBrowser extends Browser {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
-                        return !clStatusFailed()
-                               && !getService().isRemoved()
-                               && (groupInfo == null 
-                                   || clusterStatus.getGroupResources(
+                        if (clStatusFailed()
+                            || getService().isRemoved()) {
+                            return false;
+                        }
+                        if (groupInfo == null) {
+                            return true;
+                        }
+                        final List<String> gr = clusterStatus.getGroupResources(
                                           groupInfo.getHeartbeatId(testOnly),
-                                          testOnly).size() > 1);
+                                          testOnly);
+
+
+                        return gr != null && gr.size() > 1;
                     }
 
                     public void action() {

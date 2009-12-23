@@ -56,7 +56,7 @@ public class AppDefaults extends
         /* show application errors in a dialog and stderr */
         {"AppError",         "n"},
         {"AppWarning",       "y"}, /* shows application warnings in stderr */
-        {"DebugLevel",       1},   /* level -1 - no messages, 2 all messages */
+        {"DebugLevel",       0}, /* level -1 - no messages, 2 all messages */
 
         /*
          * locale
