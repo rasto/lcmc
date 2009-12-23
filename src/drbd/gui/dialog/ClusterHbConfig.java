@@ -40,8 +40,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -506,10 +506,28 @@ public class ClusterHbConfig extends DialogCluster {
                     configPanel.add(new JLabel(""));
                     rows++;
                     final JLabel label = l;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            configScrollPane.getViewport().setViewPosition(
+                    label.addComponentListener(new ComponentListener() {
+                        public final void componentHidden(
+                                                    final ComponentEvent e) {
+                        }
+
+                        public final void componentMoved(
+                                                      final ComponentEvent e) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    configScrollPane.getViewport()
+                                                    .setViewPosition(
                                             label.getBounds().getLocation());
+                                }
+                            });
+                        }
+
+                        public final void componentResized(
+                                                      final ComponentEvent e) {
+                        }
+
+                        public final void componentShown(
+                                                      final ComponentEvent e) {
                         }
                     });
                 }
