@@ -1240,10 +1240,10 @@ public class TextResource extends
          "Start Before"},
 
         {"ClusterBrowser.Hb.AddDependentGroup",
-         "Add Dependent Group"},
+         "Add New Dependent Group"},
 
         {"ClusterBrowser.Hb.AddDependency",
-         "Add Dependent Service"},
+         "Add New Dependent Service"},
 
         {"ClusterBrowser.Hb.AddGroupService",
          "Add Group Service"},

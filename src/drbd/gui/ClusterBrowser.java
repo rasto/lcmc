@@ -1681,44 +1681,55 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Can be overwritten to disable the whole thing.
+         */
+        protected boolean isEnabled() {
+            return true;
+        }
+
+        /**
          * Mouse out, stops animation.
          */
         public final void mouseOut() {
-            mouseStillOver = false;
-            heartbeatGraph.stopTestAnimation((JComponent) component);
-            component.setToolTipText(null);
+            if (isEnabled()) {
+                mouseStillOver = false;
+                heartbeatGraph.stopTestAnimation((JComponent) component);
+                component.setToolTipText(null);
+            }
         }
 
         /**
          * Mouse over, starts animation, calls action() and sets tooltip.
          */
         public final void mouseOver() {
-            mouseStillOver = true;
-            component.setToolTipText(STARTING_PTEST_TOOLTIP);
-            component.setToolTipBackground(
-              Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
-            Tools.sleep(250);
-            if (!mouseStillOver) {
-                return;
+            if (isEnabled()) {
+                mouseStillOver = true;
+                component.setToolTipText(STARTING_PTEST_TOOLTIP);
+                component.setToolTipBackground(
+                  Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
+                Tools.sleep(250);
+                if (!mouseStillOver) {
+                    return;
+                }
+                mouseStillOver = false;
+                final CountDownLatch startTestLatch = new CountDownLatch(1);
+                heartbeatGraph.startTestAnimation((JComponent) component,
+                                                  startTestLatch);
+                ptestLockAcquire();
+                clusterStatus.setPtestData(null);
+                Host h;
+                if (menuHost == null) {
+                    h = getDCHost();
+                } else {
+                    h = menuHost;
+                }
+                action(h);
+                final PtestData ptestData = new PtestData(CRM.getPtest(h));
+                component.setToolTipText(ptestData.getToolTip());
+                clusterStatus.setPtestData(ptestData);
+                ptestLockRelease();
+                startTestLatch.countDown();
             }
-            mouseStillOver = false;
-            final CountDownLatch startTestLatch = new CountDownLatch(1);
-            heartbeatGraph.startTestAnimation((JComponent) component,
-                                              startTestLatch);
-            ptestLockAcquire();
-            clusterStatus.setPtestData(null);
-            Host h;
-            if (menuHost == null) {
-                h = getDCHost();
-            } else {
-                h = menuHost;
-            }
-            action(h);
-            final PtestData ptestData = new PtestData(CRM.getPtest(h));
-            component.setToolTipText(ptestData.getToolTip());
-            clusterStatus.setPtestData(ptestData);
-            ptestLockRelease();
-            startTestLatch.countDown();
         }
 
         /**
@@ -4572,6 +4583,12 @@ public class ClusterBrowser extends Browser {
          * Removes this group from the cib.
          */
         public void removeMyself(final boolean testOnly) {
+            if (getService().isNew()) {
+                removeMyselfNoConfirm(getDCHost(), testOnly);
+                getService().setNew(false);
+                getService().doneRemoving();
+                return;
+            }
             String desc = Tools.getString(
                             "ClusterBrowser.confirmRemoveGroup.Description");
 
@@ -4600,9 +4617,9 @@ public class ClusterBrowser extends Browser {
                     getService().setRemoved(true);
                 }
                 removeMyselfNoConfirm(getDCHost(), testOnly);
+                getService().setNew(false);
             }
             getService().doneRemoving();
-            getService().setNew(false);
         }
 
         /**
@@ -7210,6 +7227,11 @@ public class ClusterBrowser extends Browser {
          * Removes this service from the heartbeat with confirmation dialog.
          */
         public void removeMyself(final boolean testOnly) {
+            if (getService().isNew()) {
+                removeMyselfNoConfirm(getDCHost(), testOnly);
+                getService().setNew(false);
+                return;
+            }
             String desc = Tools.getString(
                             "ClusterBrowser.confirmRemoveService.Description");
 
@@ -7220,8 +7242,8 @@ public class ClusterBrowser extends Browser {
                    Tools.getString("ClusterBrowser.confirmRemoveService.Yes"),
                    Tools.getString("ClusterBrowser.confirmRemoveService.No"))) {
                 removeMyselfNoConfirm(getDCHost(), testOnly);
+                getService().setNew(false);
             }
-            getService().setNew(false);
         }
 
         /**
@@ -7274,7 +7296,9 @@ public class ClusterBrowser extends Browser {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !clStatusFailed() && !getService().isRemoved();
+                    return !clStatusFailed()
+                           && !getService().isRemoved()
+                           && !getService().isNew();
                 }
 
                 public void update() {
@@ -7358,7 +7382,8 @@ public class ClusterBrowser extends Browser {
 
                 public boolean enablePredicate() {
                     return !clStatusFailed()
-                           && !getService().isRemoved();
+                           && !getService().isRemoved()
+                           && !getService().isNew();
                 }
 
                 public void update() {
@@ -7569,6 +7594,9 @@ public class ClusterBrowser extends Browser {
                 final ServiceInfo thisClass = this;
                 final ClMenuItemCallback removeItemCallback =
                           new ClMenuItemCallback(removeMenuItem, null) {
+                    protected boolean isEnabled() {
+                        return !getService().isNew();
+                    }
                     public void action(final Host dcHost) {
                         removeMyselfNoConfirm(dcHost, true); /* test only */
                     }
@@ -7589,7 +7617,8 @@ public class ClusterBrowser extends Browser {
 
                         public boolean enablePredicate() {
                             return !clStatusFailed()
-                                   && !getService().isRemoved();
+                                   && !getService().isRemoved()
+                                   && !getService().isNew();
                         }
 
                         public void action() {
