@@ -163,7 +163,11 @@ public class Browser {
 
     /** Sets the node change for the node. */
     protected final void nodeChanged(final DefaultMutableTreeNode node) {
-        treeModel.nodeChanged(node);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                treeModel.nodeChanged(node);
+            }
+        });
     }
 
     /** Adds the node to the top level. */
