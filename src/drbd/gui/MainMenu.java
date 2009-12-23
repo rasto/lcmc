@@ -108,12 +108,13 @@ public class MainMenu extends JPanel implements ActionListener {
 
         submenu.add(menuNew);
 
-        addMenuItem(Tools.getString("MainMenu.Load"),
-                    submenu,
-                    KeyEvent.VK_L,
-                    KeyEvent.VK_L,
-                    loadActionListener(),
-                    null);
+        final JMenuItem loadItem = addMenuItem(Tools.getString("MainMenu.Load"),
+                                               submenu,
+                                               KeyEvent.VK_L,
+                                               KeyEvent.VK_L,
+                                               loadActionListener(),
+                                               null);
+        Tools.getGUIData().addToEnabledInGodMode(loadItem);
 
         final JMenuItem item = addMenuItem(
                                 Tools.getString("MainMenu.RemoveEverything"),
