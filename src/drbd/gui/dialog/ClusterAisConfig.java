@@ -746,7 +746,7 @@ public class ClusterAisConfig extends DialogCluster {
         config.append(tab);
         config.append("join: 60\n");
         config.append(tab);
-        //config.append("consensus: 1500\n");
+        config.append("consensus: 4000\n");
         config.append(tab);
         config.append("vsftype: none\n");
         config.append(tab);
