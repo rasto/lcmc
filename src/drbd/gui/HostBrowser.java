@@ -1926,12 +1926,10 @@ public class HostBrowser extends Browser {
             config.append(getBlockDevice().getDrbdNetInterfaceWithPort(
                                         getComboBoxValue(DRBD_NI_PARAM),
                                         getComboBoxValue(DRBD_NI_PORT_PARAM)));
-            //config.append(getBlockDevice().getDrbdNetInterfaceWithPort());
             config.append(";\n\t\t");
             config.append(getBlockDevice().getMetaDiskString(
                                        getComboBoxValue(DRBD_MD_PARAM),
                                        getComboBoxValue(DRBD_MD_INDEX_PARAM)));
-            //config.append(getBlockDevice().getMetaDiskString());
             config.append(";\n\t}\n");
             return config.toString();
         }
@@ -2367,10 +2365,6 @@ public class HostBrowser extends Browser {
                     final BlockDevice metaDisk =
                                            ((BlockDevInfo) o).getBlockDevice();
                     getBlockDevice().setMetaDisk(metaDisk);
-                }
-                if (getBlockDevice().getMetaDisk() != null) {
-                    getBlockDevice().getMetaDisk().addMetaDiskOfBlockDevice(
-                                                             getBlockDevice());
                 }
             }
         }

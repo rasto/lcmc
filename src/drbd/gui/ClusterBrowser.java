@@ -1289,8 +1289,6 @@ public class ClusterBrowser extends Browser {
                     final BlockDevInfo mdI =
                                       drbdGraph.findBlockDevInfo(hostName,
                                                                  drbdMetaDisk);
-                    mdI.getBlockDevice().addMetaDiskOfBlockDevice(
-                                                        bdi.getBlockDevice());
                     bdi.getBlockDevice().setMetaDisk(mdI.getBlockDevice());
                 }
                 if (bd1 == null) {
