@@ -668,8 +668,14 @@ sub get_resource_status {
 			} else {
 				if ($state =~ /^(Stopped)/) {
 				} else {
-					($what, $on) =
+					if ($state =~ /\s/) {
+						($what, $on) =
 						  map {lc} split /\s+/, $state;
+					} else {
+						$what = "started";
+						$on = $state;
+					}
+					
 				}
 			}
 		} elsif ($line
@@ -1111,4 +1117,5 @@ sub get_cluster_versions {
 	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
 }
+
 
