@@ -1683,7 +1683,20 @@ public class ClusterBrowser extends Browser {
         /**
          * Can be overwritten to disable the whole thing.
          */
-        protected boolean isEnabled() {
+        public boolean isEnabled() {
+            Host h;
+            if (menuHost == null) {
+                h = getDCHost();
+            } else {
+                h = menuHost;
+            }
+            final String hbV = h.getHeartbeatVersion();
+            final String pmV = h.getPacemakerVersion();
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                return false;
+            }
             return true;
         }
 
@@ -1759,9 +1772,19 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Whether the whole thing should be enabled.
+         */
+        public final boolean isEnabled() {
+            return true;
+        }
+
+        /**
          * Mouse out, stops animation.
          */
         public final void mouseOut() {
+            if (!isEnabled()) {
+                return;
+            }
             mouseStillOver = false;
             drbdGraph.stopTestAnimation((JComponent) component);
             component.setToolTipText(null);
@@ -1771,6 +1794,9 @@ public class ClusterBrowser extends Browser {
          * Mouse over, starts animation, calls action() and sets tooltip.
          */
         public final void mouseOver() {
+            if (!isEnabled()) {
+                return;
+            }
             mouseStillOver = true;
             component.setToolTipText(
                           Tools.getString("ClusterBrowser.StartingDRBDtest"));
@@ -2514,13 +2540,26 @@ public class ClusterBrowser extends Browser {
             }
             final ButtonCallback buttonCallback = new ButtonCallback() {
                 private volatile boolean mouseStillOver = false;
+                /**
+                 * Whether the whole thing should be enabled.
+                 */
+                public final boolean isEnabled() {
+                    return true;
+                }
+
                 public final void mouseOut() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = false;
                     drbdGraph.stopTestAnimation(applyButton);
                     applyButton.setToolTipText(null);
                 }
 
                 public final void mouseOver() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = true;
                     applyButton.setToolTipText(
                            Tools.getString("ClusterBrowser.StartingDRBDtest"));
@@ -6228,13 +6267,36 @@ public class ClusterBrowser extends Browser {
             final ServiceInfo thisClass = this;
             final ButtonCallback buttonCallback = new ButtonCallback() {
                 private volatile boolean mouseStillOver = false;
+                /**
+                 * Whether the whole thing should be enabled.
+                 */
+                public final boolean isEnabled() {
+                    final Host dcHost = getDCHost();
+                    if (dcHost == null) {
+                        return false;
+                    }
+                    final String pmV = dcHost.getPacemakerVersion();
+                    final String hbV = dcHost.getHeartbeatVersion();
+                    if (pmV == null
+                        && hbV != null
+                        && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
                 public final void mouseOut() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = false;
                     heartbeatGraph.stopTestAnimation(applyButton);
                     applyButton.setToolTipText(null);
                 }
 
                 public final void mouseOver() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = true;
                     applyButton.setToolTipText(STARTING_PTEST_TOOLTIP);
                     applyButton.setToolTipBackground(Tools.getDefaultColor(
@@ -7594,10 +7656,10 @@ public class ClusterBrowser extends Browser {
                 final ServiceInfo thisClass = this;
                 final ClMenuItemCallback removeItemCallback =
                           new ClMenuItemCallback(removeMenuItem, null) {
-                    protected boolean isEnabled() {
-                        return !getService().isNew();
+                    public final boolean isEnabled() {
+                        return super.isEnabled() && !getService().isNew();
                     }
-                    public void action(final Host dcHost) {
+                    public final void action(final Host dcHost) {
                         removeMyselfNoConfirm(dcHost, true); /* test only */
                     }
                 };
@@ -9269,13 +9331,38 @@ public class ClusterBrowser extends Browser {
             }
             final ButtonCallback buttonCallback = new ButtonCallback() {
                 private volatile boolean mouseStillOver = false;
+
+                /**
+                 * Whether the whole thing should be enabled.
+                 */
+                public final boolean isEnabled() {
+                    final Host dcHost = getDCHost();
+                    if (dcHost == null) {
+                        return false;
+                    }
+                    final String pmV = dcHost.getPacemakerVersion();
+                    final String hbV = dcHost.getHeartbeatVersion();
+                    if (pmV == null
+                        && hbV != null
+                        && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+
                 public final void mouseOut() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = false;
                     heartbeatGraph.stopTestAnimation(applyButton);
                     applyButton.setToolTipText(null);
                 }
 
                 public final void mouseOver() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = true;
                     applyButton.setToolTipText(STARTING_PTEST_TOOLTIP);
                     applyButton.setToolTipBackground(Tools.getDefaultColor(
@@ -10550,13 +10637,38 @@ public class ClusterBrowser extends Browser {
             final HbConnectionInfo thisClass = this;
             final ButtonCallback buttonCallback = new ButtonCallback() {
                 private volatile boolean mouseStillOver = false;
+
+                /**
+                 * Whether the whole thing should be enabled.
+                 */
+                public final boolean isEnabled() {
+                    final Host dcHost = getDCHost();
+                    if (dcHost == null) {
+                        return false;
+                    }
+                    final String pmV = dcHost.getPacemakerVersion();
+                    final String hbV = dcHost.getHeartbeatVersion();
+                    if (pmV == null
+                        && hbV != null
+                        && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+
                 public final void mouseOut() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = false;
                     heartbeatGraph.stopTestAnimation(applyButton);
                     applyButton.setToolTipText(null);
                 }
 
                 public final void mouseOver() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = true;
                     applyButton.setToolTipText(STARTING_PTEST_TOOLTIP);
                     applyButton.setToolTipBackground(Tools.getDefaultColor(
@@ -11262,13 +11374,38 @@ public class ClusterBrowser extends Browser {
             }
             final ButtonCallback buttonCallback = new ButtonCallback() {
                 private volatile boolean mouseStillOver = false;
+
+                /**
+                 * Whether the whole thing should be enabled.
+                 */
+                public final boolean isEnabled() {
+                    final Host dcHost = getDCHost();
+                    if (dcHost == null) {
+                        return false;
+                    }
+                    final String pmV = dcHost.getPacemakerVersion();
+                    final String hbV = dcHost.getHeartbeatVersion();
+                    if (pmV == null
+                        && hbV != null
+                        && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+
                 public final void mouseOut() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = false;
                     drbdGraph.stopTestAnimation(applyButton);
                     applyButton.setToolTipText(null);
                 }
 
                 public final void mouseOver() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = true;
                     applyButton.setToolTipText(
                            Tools.getString("ClusterBrowser.StartingDRBDtest"));

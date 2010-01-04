@@ -2376,7 +2376,18 @@ public class HostBrowser extends Browser {
             final BlockDevInfo thisClass = this;
             final ButtonCallback buttonCallback = new ButtonCallback() {
                 private volatile boolean mouseStillOver = false;
+
+                /**
+                 * Whether the whole thing should be enabled.
+                 */
+                public final boolean isEnabled() {
+                    return true;
+                }
+
                 public final void mouseOut() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = false;
                     final DrbdGraph drbdGraph = getDrbdGraph();
                     drbdGraph.stopTestAnimation(applyButton);
@@ -2384,6 +2395,9 @@ public class HostBrowser extends Browser {
                 }
 
                 public final void mouseOver() {
+                    if (!isEnabled()) {
+                        return;
+                    }
                     mouseStillOver = true;
                     applyButton.setToolTipText(
                            Tools.getString("ClusterBrowser.StartingDRBDtest"));

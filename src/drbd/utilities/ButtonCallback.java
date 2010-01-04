@@ -28,6 +28,10 @@ package drbd.utilities;
  */
 public interface ButtonCallback {
     /**
+     * Whether it should be enabled.
+     */
+    boolean isEnabled();
+    /**
      * On mouse over.
      */
     void mouseOver();

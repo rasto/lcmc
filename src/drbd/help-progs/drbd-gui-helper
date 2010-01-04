@@ -643,7 +643,7 @@ sub get_cluster_events {
 }
 
 #
-# Get info from crm_mon and make xml from it. This is used only to find out
+# Get info from ptest and make xml from it. This is used only to find out
 # if a resource is running, not running and/or unmanaged
 # unmanaged etc.
 sub get_resource_status {
