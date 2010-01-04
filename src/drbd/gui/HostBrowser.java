@@ -897,18 +897,20 @@ public class HostBrowser extends Browser {
                         }
                     }
                 };
-            final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
-                     getClusterBrowser().new ClMenuItemCallback(standbyItem,
-                                                                host) {
-                public void action(final Host host) {
-                    if (isStandby(false)) {
-                        CRM.standByOff(host, true);
-                    } else {
-                        CRM.standByOn(host, true);
+            final ClusterBrowser cb = getClusterBrowser();
+            if (cb != null) {
+                final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
+                                  cb.new ClMenuItemCallback(standbyItem, host) {
+                    public void action(final Host host) {
+                        if (isStandby(false)) {
+                            CRM.standByOff(host, true);
+                        } else {
+                            CRM.standByOn(host, true);
+                        }
                     }
-                }
-            };
-            addMouseOverListener(standbyItem, standbyItemCallback);
+                };
+                addMouseOverListener(standbyItem, standbyItemCallback);
+            }
             items.add(standbyItem);
             registerMenuItem(standbyItem);
             /* change host color */
