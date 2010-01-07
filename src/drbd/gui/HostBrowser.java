@@ -2717,18 +2717,20 @@ public class HostBrowser extends Browser {
                         }
                     }
                 };
-            final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
-                   getClusterBrowser().new DRBDMenuItemCallback(attachMenu,
-                                                                host) {
-                public void action(final Host host) {
-                    if (isDiskless(false)) {
-                        attach(true);
-                    } else {
-                        detach(true);
+            final ClusterBrowser cb = getClusterBrowser();
+            if (cb != null) {
+                final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
+                                cb.new DRBDMenuItemCallback(attachMenu, host) {
+                    public void action(final Host host) {
+                        if (isDiskless(false)) {
+                            attach(true);
+                        } else {
+                            detach(true);
+                        }
                     }
-                }
-            };
-            addMouseOverListener(attachMenu, attachItemCallback);
+                };
+                addMouseOverListener(attachMenu, attachItemCallback);
+            }
             items.add(attachMenu);
             registerMenuItem(attachMenu);
 
@@ -2768,18 +2770,19 @@ public class HostBrowser extends Browser {
                         }
                     }
                 };
-            final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
-                   getClusterBrowser().new DRBDMenuItemCallback(connectMenu,
-                                                                host) {
-                public void action(final Host host) {
-                    if (isConnectedOrWF(false)) {
-                        disconnect(true);
-                    } else {
-                        connect(true);
+            if (cb != null) {
+                final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
+                               cb.new DRBDMenuItemCallback(connectMenu, host) {
+                    public void action(final Host host) {
+                        if (isConnectedOrWF(false)) {
+                            disconnect(true);
+                        } else {
+                            connect(true);
+                        }
                     }
-                }
-            };
-            addMouseOverListener(connectMenu, connectItemCallback);
+                };
+                addMouseOverListener(connectMenu, connectItemCallback);
+            }
             items.add(connectMenu);
             registerMenuItem(connectMenu);
 
