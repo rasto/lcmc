@@ -8437,6 +8437,12 @@ public class ClusterBrowser extends Browser {
          * will be removed.
          */
         public final void removeMyself(final boolean testOnly) {
+            if (getService().isNew()) {
+                removeMyselfNoConfirm(getDCHost(), testOnly);
+                getService().setNew(false);
+                getService().doneRemoving();
+                return;
+            }
             containedService.removeMyself(testOnly);
         }
 
