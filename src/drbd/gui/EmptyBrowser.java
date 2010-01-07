@@ -299,6 +299,9 @@ public class EmptyBrowser extends Browser {
                                     public void run() {
                                         removeMarkedClustersBtn.setEnabled(
                                                                      false);
+                                        startMarkedClustersBtn.setEnabled(
+                                                                     false);
+                                        stopMarkedClustersBtn.setEnabled(false);
                                     }
                                 });
                                 final List<Cluster> selectedRunningClusters =
@@ -326,6 +329,24 @@ public class EmptyBrowser extends Browser {
                                 }
                                 Tools.stopClusters(selectedRunningClusters);
                                 Tools.removeClusters(selectedClusters);
+                                final String saveFile =
+                                    Tools.getConfigData().getSaveFile();
+                                    Tools.save(saveFile);
+                                mainPanel.repaint();
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        for (final Cluster cluster :
+                                                            selectedClusters) {
+                                            final JPanel p =
+                                                clusterBackgrounds.get(cluster);
+                                            if (p != null) {
+                                                clusterBackgrounds.remove(
+                                                                       cluster);
+                                                mainPanel.remove(p);
+                                            }
+                                        }
+                                    }
+                                });
                             }
                         });
                         t.start();
@@ -556,7 +577,7 @@ public class EmptyBrowser extends Browser {
                                                      notRunningCount == 0);
                         }
                         //TODO: still not working
-                        //removeMarkedClustersBtn.setEnabled(true);
+                        removeMarkedClustersBtn.setEnabled(true);
                     }
                 });
             } else {
