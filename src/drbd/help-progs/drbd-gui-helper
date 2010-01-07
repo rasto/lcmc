@@ -869,10 +869,11 @@ sub get_drbd_xml {
 		$from = "";
 		my $desc = shift @a;
 		my $command = shift @a;
-		# split lines that are max 80 characters long.
+		$desc =~ s/.\\" drbd.conf:.*$//gm;
 		$desc =~ s/\n(?!\n)/ /g;
 		$desc =~ s/\.RS 4/\n/g;
 		$desc =~ s/\.sp/\n\n/g;
+		# split lines that are max 80 characters long.
 		my $cols = 80;
 		$desc = join "\n",
 			map {
@@ -890,6 +891,8 @@ sub get_drbd_xml {
 			    $_.$a}
 			    split /\n/, $desc;
 		for ($desc, $command) {
+			s/\\m\[blue\]//g;
+			s/\\m\[\].*?s\+2//g;
 			s/\\-/-/g;
 			s/\\'/'/g;
 			s/\\&//g;
