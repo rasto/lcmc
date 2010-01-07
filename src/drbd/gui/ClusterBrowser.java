@@ -980,7 +980,7 @@ public class ClusterBrowser extends Browser {
             final String online = clusterStatus.isOnlineNode(host.getName());
             if ("yes".equals(online)) {
                 host.setClStatus(true);
-            } else if ("no".equals(online)) {
+            } else {
                 host.setClStatus(false);
             }
         }
