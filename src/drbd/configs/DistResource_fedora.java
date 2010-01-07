@@ -81,7 +81,7 @@ public class DistResource_fedora extends
          + "export CLUSTER_GROUP=haclient;"
          + "/usr/bin/yum -y install autoconf automake libtool glib2-devel"
          + " libxml2-devel bzip2-devel libtool-ltdl-devel e2fsprogs-devel"
-         + " net-snmp-devel subversion libxslt-devel"
+         + " net-snmp-devel subversion libxslt-devel libuuid-devel"
          + " && /bin/mkdir -p /tmp/pminst "
          /* cluster glue */
          + " && /usr/bin/wget -N -O /tmp/pminst/cluster-glue.tar.bz2"
