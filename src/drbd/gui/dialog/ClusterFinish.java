@@ -64,6 +64,7 @@ public class ClusterFinish extends DialogCluster {
      * Finishes the dialog, and saves the cluster.
      */
     protected final void finishDialog() {
+        Tools.getGUIData().getEmptyBrowser().addClusterBox(getCluster());
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
             Tools.save(saveFile);

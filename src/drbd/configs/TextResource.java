@@ -1036,11 +1036,23 @@ public class TextResource extends
         {"EmptyBrowser.RemoveMarkedClusters.ToolTip",
          "Remove marked clusters from the GUI."},
 
-        {"EmptyBrowser.StartClusterButton",
+        {"EmptyBrowser.LoadClusterButton",
          "Load"},
 
         {"EmptyBrowser.NewHostWizard",
          "New Host Wizard"},
+
+        {"EmptyBrowser.confirmRemoveMarkedClusters.Title",
+         "Remove Marked Clusters"},
+
+        {"EmptyBrowser.confirmRemoveMarkedClusters.Desc",
+         "Are you sure you want to remove marked clusters?<br>@CLUSTERS@"},
+
+        {"EmptyBrowser.confirmRemoveMarkedClusters.Yes",
+         "Remove"},
+
+        {"EmptyBrowser.confirmRemoveMarkedClusters.No",
+         "Cancel"},
 
         {"Browser.ActionsMenu",
          "Actions"},

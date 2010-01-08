@@ -48,6 +48,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.swing.SwingUtilities;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -186,8 +187,12 @@ public class DrbdGuiXML extends XML {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }
-                        cluster.getClusterTab().addClusterView();
-                        cluster.getClusterTab().requestFocus();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                cluster.getClusterTab().addClusterView();
+                                cluster.getClusterTab().requestFocus();
+                            }
+                        });
                     }
                 };
                 final Thread thread = new Thread(runnable);

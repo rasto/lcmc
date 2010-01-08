@@ -55,6 +55,8 @@ public class GUIData  {
     private ProgressIndicatorPanel mainGlassPane;
     /** Main menu. */
     private MainMenu mainMenu;
+    /** Browser that appears if there are no clusters. */
+    private EmptyBrowser emptyBrowser;
     /** 'Add Cluster' buttons. */
     private final List<JComponent> addClusterButtonList =
                                                    new ArrayList<JComponent>();
@@ -103,6 +105,20 @@ public class GUIData  {
      */
     public final MainMenu getMainMenu() {
         return mainMenu;
+    }
+
+    /**
+     * Sets empty browser of this application.
+     */
+    public final void setEmptyBrowser(final EmptyBrowser emptyBrowser) {
+        this.emptyBrowser = emptyBrowser;
+    }
+
+    /**
+     * Gets empty browser of this application.
+     */
+    public final EmptyBrowser getEmptyBrowser() {
+        return emptyBrowser;
     }
 
     /**

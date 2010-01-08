@@ -108,6 +108,15 @@ public class EmptyBrowser extends Browser {
     }
 
     /**
+     * Adds small box with cluster possibility to load it and remove it.
+     */
+    public final void addClusterBox(final Cluster cluster) {
+        allHostsInfo.addClusterBox(cluster);
+        allHostsInfo.setAsStarted(cluster);
+        allHostsInfo.addCheckboxListener(cluster);
+    }
+
+    /**
      * Sets the empty view panel.
      */
     public final void setEmptyViewPanel(final EmptyViewPanel emptyViewPanel) {
@@ -167,6 +176,36 @@ public class EmptyBrowser extends Browser {
         private final Host host;
         /** infoPanel cache. */
         private JPanel infoPanel = null;
+        /** Checkboxes in the cluster boxes. */
+        private final Map<Cluster, JCheckBox> allCheckboxes =
+                                             new HashMap<Cluster, JCheckBox>();
+        /** Start/Load buttons. */
+        private final Map<Cluster, MyButton> allStartButtons =
+                                             new HashMap<Cluster, MyButton>();
+        /** Backgrounds of the small boxes with clusters. */
+        private final Map<Cluster, JPanel> clusterBackgrounds =
+                                             new HashMap<Cluster, JPanel>();
+        /** Main panel. */
+        private final JPanel mainPanel = new JPanel(new GridBagLayout());
+        /** Constraints. */
+        private final GridBagConstraints c = new GridBagConstraints();
+        /** Start marked clusters button. */
+        private final MyButton startMarkedClustersBtn = new MyButton(
+                  Tools.getString("EmptyBrowser.StartMarkedClusters"),
+                  CLUSTER_ICON,
+                  Tools.getString("EmptyBrowser.StartMarkedClusters.ToolTip"));
+        /** Stop marked clusters button. */
+        private final MyButton stopMarkedClustersBtn = new MyButton(
+                      Tools.getString("EmptyBrowser.StopMarkedClusters"),
+                      CLUSTER_ICON,
+                      Tools.getString(
+                                   "EmptyBrowser.StopMarkedClusters.ToolTip"));
+        /** Remove marked clusters button. */
+        private final MyButton removeMarkedClustersBtn = new MyButton(
+                      Tools.getString("EmptyBrowser.RemoveMarkedClusters"),
+                      CLUSTER_ICON,
+                      Tools.getString(
+                                 "EmptyBrowser.RemoveMarkedClusters.ToolTip"));
 
         /**
          * Creates a new AllHostsInfo instance.
@@ -174,6 +213,75 @@ public class EmptyBrowser extends Browser {
         public AllHostsInfo() {
             super(Tools.getString("ClusterBrowser.AllHosts"));
             host = null;
+        }
+
+        /**
+         * Remove marked clusters.
+         */
+        private void removeMarkedClusters() {
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    final List<Cluster> selectedRunningClusters =
+                                                  new ArrayList<Cluster>();
+                    final List<Cluster> selectedClusters =
+                                                  new ArrayList<Cluster>();
+                    final List<String> clusterNames = new ArrayList<String>();
+                    final Set<Cluster> clusters =
+                         Tools.getConfigData().getClusters().getClusterSet();
+                    for (final Cluster cluster : clusters) {
+                        final JCheckBox cb = allCheckboxes.get(cluster);
+                        if (cb.isSelected()) {
+                            selectedClusters.add(cluster);
+                            clusterNames.add(cluster.getName());
+                            if (cluster.getClusterTab() != null) {
+                                selectedRunningClusters.add(cluster);
+                            }
+                        }
+                    }
+                    final String clustersString =
+                      Tools.join(", ", clusterNames.toArray(
+                                         new String[clusterNames.size()]));
+                    if (!Tools.confirmDialog(
+                         Tools.getString(
+                             "EmptyBrowser.confirmRemoveMarkedClusters.Title"),
+                         Tools.getString(
+                             "EmptyBrowser.confirmRemoveMarkedClusters.Desc").
+                             replaceAll("@CLUSTERS@", clustersString),
+                         Tools.getString(
+                             "EmptyBrowser.confirmRemoveMarkedClusters.Yes"),
+                         Tools.getString(
+                             "EmptyBrowser.confirmRemoveMarkedClusters.No"))) {
+                        return;
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            removeMarkedClustersBtn.setEnabled(false);
+                            startMarkedClustersBtn.setEnabled(false);
+                            stopMarkedClustersBtn.setEnabled(false);
+                        }
+                    });
+                    Tools.stopClusters(selectedRunningClusters);
+                    Tools.removeClusters(selectedClusters);
+                    final String saveFile = Tools.getConfigData().getSaveFile();
+                    Tools.save(saveFile);
+                    mainPanel.repaint();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            for (final Cluster cluster : selectedClusters) {
+                                final JPanel p = clusterBackgrounds.get(
+                                                                      cluster);
+                                if (p != null) {
+                                    clusterBackgrounds.remove(cluster);
+                                    allCheckboxes.remove(cluster);
+                                    allStartButtons.remove(cluster);
+                                    mainPanel.remove(p);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            t.start();
         }
 
         /**
@@ -188,8 +296,6 @@ public class EmptyBrowser extends Browser {
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
             infoPanel.setBackground(PANEL_BACKGROUND);
-            final JPanel mainPanel = new JPanel(new GridBagLayout());
-            final GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;
             c.insets = new Insets(3, 3, 0, 0);
@@ -206,28 +312,13 @@ public class EmptyBrowser extends Browser {
                                             new FlowLayout(FlowLayout.LEFT));
                 markedPanel.setBackground(STATUS_BACKGROUND);
                 /* start marked clusters */
-                final MyButton startMarkedClustersBtn = new MyButton(
-                      Tools.getString("EmptyBrowser.StartMarkedClusters"),
-                      CLUSTER_ICON,
-                      Tools.getString(
-                                "EmptyBrowser.StartMarkedClusters.ToolTip"));
                 startMarkedClustersBtn.setEnabled(false);
                 markedPanel.add(startMarkedClustersBtn);
 
                 /* stop marked clusters */
-                final MyButton stopMarkedClustersBtn = new MyButton(
-                      Tools.getString("EmptyBrowser.StopMarkedClusters"),
-                      CLUSTER_ICON,
-                      Tools.getString(
-                                   "EmptyBrowser.StopMarkedClusters.ToolTip"));
                 stopMarkedClustersBtn.setEnabled(false);
                 markedPanel.add(stopMarkedClustersBtn);
                 /* remove marked clusters */
-                final MyButton removeMarkedClustersBtn = new MyButton(
-                      Tools.getString("EmptyBrowser.RemoveMarkedClusters"),
-                      CLUSTER_ICON,
-                      Tools.getString(
-                                "EmptyBrowser.RemoveMarkedClusters.ToolTip"));
                 removeMarkedClustersBtn.setEnabled(false);
                 markedPanel.add(removeMarkedClustersBtn);
 
@@ -240,19 +331,8 @@ public class EmptyBrowser extends Browser {
                 mb.add(actionsMenu);
                 bPanel.add(mb, BorderLayout.EAST);
                 infoPanel.add(bPanel);
-                final Map<Cluster, JCheckBox> allCheckboxes =
-                                        new HashMap<Cluster, JCheckBox>();
-                final Map<Cluster, MyButton> allStartButtons =
-                                        new HashMap<Cluster, MyButton>();
-                final Map<Cluster, JPanel> clusterBackgrounds =
-                                        new HashMap<Cluster, JPanel>();
                 for (final Cluster cluster : clusters) {
-                    addClusterPanel(cluster,
-                                    mainPanel,
-                                    clusterBackgrounds,
-                                    c,
-                                    allCheckboxes,
-                                    allStartButtons);
+                    addClusterBox(cluster);
                 }
 
                 /* start marked clusters action listener */
@@ -261,11 +341,7 @@ public class EmptyBrowser extends Browser {
                     public void actionPerformed(final ActionEvent e) {
                         final Thread t = new Thread(new Runnable() {
                             public void run() {
-                                startMarkedClusters(clusters,
-                                                    startMarkedClustersBtn,
-                                                    clusterBackgrounds,
-                                                    allCheckboxes,
-                                                    allStartButtons);
+                                startMarkedClusters(clusters);
                             }
                         });
                         t.start();
@@ -278,10 +354,7 @@ public class EmptyBrowser extends Browser {
                     public void actionPerformed(final ActionEvent e) {
                         final Thread t = new Thread(new Runnable() {
                             public void run() {
-                                stopMarkedClusters(clusters,
-                                                   stopMarkedClustersBtn,
-                                                   clusterBackgrounds,
-                                                   allCheckboxes);
+                                stopMarkedClusters(clusters);
                             }
                         });
                         t.start();
@@ -292,88 +365,13 @@ public class EmptyBrowser extends Browser {
                 removeMarkedClustersBtn.addActionListener(
                                                     new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
-                        final Thread t = new Thread(new Runnable() {
-                            public void run() {
-                                // TODO: are you sure? dialog
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        removeMarkedClustersBtn.setEnabled(
-                                                                     false);
-                                        startMarkedClustersBtn.setEnabled(
-                                                                     false);
-                                        stopMarkedClustersBtn.setEnabled(false);
-                                    }
-                                });
-                                final List<Cluster> selectedRunningClusters =
-                                                  new ArrayList<Cluster>();
-                                final List<Cluster> selectedClusters =
-                                                  new ArrayList<Cluster>();
-                                for (final Cluster cluster : clusters) {
-                                    selectedClusters.add(cluster);
-                                    if (cluster.getClusterTab() != null) {
-                                        final JCheckBox cb =
-                                            allCheckboxes.get(cluster);
-                                        if (cb.isSelected()) {
-                                            SwingUtilities.invokeLater(
-                                                new Runnable() {
-                                                    public void run() {
-                                                        clusterBackgrounds.get(
-                                                         cluster).setBackground(
-                                                                   Color.WHITE);
-                                                    }
-                                                });
-                                            selectedRunningClusters.add(
-                                                                       cluster);
-                                        }
-                                    }
-                                }
-                                Tools.stopClusters(selectedRunningClusters);
-                                Tools.removeClusters(selectedClusters);
-                                final String saveFile =
-                                    Tools.getConfigData().getSaveFile();
-                                    Tools.save(saveFile);
-                                mainPanel.repaint();
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        for (final Cluster cluster :
-                                                            selectedClusters) {
-                                            final JPanel p =
-                                                clusterBackgrounds.get(cluster);
-                                            if (p != null) {
-                                                clusterBackgrounds.remove(
-                                                                       cluster);
-                                                mainPanel.remove(p);
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                        t.start();
+                        removeMarkedClusters();
                     }
                 });
 
                 /* mark checkbox item listeners */
                 for (final Cluster cluster : clusters) {
-                    final JCheckBox cb = allCheckboxes.get(cluster);
-                    cb.addItemListener(new ItemListener() {
-                        public void itemStateChanged(final ItemEvent e) {
-                            final Thread thread = new Thread(new Runnable() {
-                                public void run() {
-                                    allCheckboxesListener(
-                                                    clusters,
-                                                    allCheckboxes,
-                                                    allStartButtons,
-                                                    startMarkedClustersBtn,
-                                                    stopMarkedClustersBtn,
-                                                    removeMarkedClustersBtn,
-                                                    cb);
-                                }
-                            });
-                            thread.start();
-                        }
-
-                    });
+                    addCheckboxListener(cluster);
                 }
             }
 
@@ -391,15 +389,9 @@ public class EmptyBrowser extends Browser {
         }
 
         /**
-         * adds one cluster panel to the main cluster.
+         * adds one cluster box to the main cluster.
          */
-        private void addClusterPanel(
-                             final Cluster cluster,
-                             final JPanel mainPanel,
-                             final Map<Cluster, JPanel> clusterBackgrounds,
-                             final GridBagConstraints c,
-                             final Map<Cluster, JCheckBox> allCheckboxes,
-                             final Map<Cluster, MyButton> allStartButtons) {
+        public void addClusterBox(final Cluster cluster) {
             final JPanel label = new JPanel();
             label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
             label.add(new JLabel(cluster.getName()));
@@ -423,14 +415,14 @@ public class EmptyBrowser extends Browser {
             left.add(markCB);
             left.add(label);
             startPanel.add(left, BorderLayout.LINE_START);
-            /* Start Cluster Button */
-            final MyButton startClusterBtn = new MyButton(
-               Tools.getString("EmptyBrowser.StartClusterButton"));
-            startClusterBtn.setEnabled(cluster.getClusterTab() == null);
-            allStartButtons.put(cluster, startClusterBtn);
-            startClusterBtn.addActionListener(new ActionListener() {
+            /* Load cluster button */
+            final MyButton loadClusterBtn = new MyButton(
+               Tools.getString("EmptyBrowser.LoadClusterButton"));
+            loadClusterBtn.setEnabled(cluster.getClusterTab() == null);
+            allStartButtons.put(cluster, loadClusterBtn);
+            loadClusterBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    startClusterBtn.setEnabled(false);
+                    loadClusterBtn.setEnabled(false);
                     final Thread t = new Thread(new Runnable() {
                         public void run() {
                             List<Cluster> selectedClusters =
@@ -449,7 +441,7 @@ public class EmptyBrowser extends Browser {
                     t.start();
                 }
             });
-            startPanel.add(startClusterBtn, BorderLayout.LINE_END);
+            startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
             c.fill = GridBagConstraints.HORIZONTAL;
             mainPanel.add(startPanel, c);
             c.gridx++;
@@ -460,14 +452,49 @@ public class EmptyBrowser extends Browser {
         }
 
         /**
+         * Sets this cluster as started. It is called after user enters a
+         * cluster through the dialogs.
+         */
+        public void setAsStarted(final Cluster cluster) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    allStartButtons.get(cluster).setEnabled(false);
+                    clusterBackgrounds.get(cluster).setBackground(
+                                                       Color.GREEN);
+                    allCheckboxes.get(cluster).setSelected(false);
+                }
+            });
+        }
+
+        /**
+         * Adds checkbox listener for this cluster's checkbox.
+         */
+        public void addCheckboxListener(final Cluster cluster) {
+            final JCheckBox cb = allCheckboxes.get(cluster);
+            cb.addItemListener(new ItemListener() {
+                public void itemStateChanged(final ItemEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            final Set<Cluster> clusters =
+                                    Tools.getConfigData()
+                                    .getClusters()
+                                    .getClusterSet();
+
+                            allCheckboxesListener(
+                                            clusters,
+                                            cb);
+                        }
+                    });
+                    thread.start();
+                }
+
+            });
+        }
+
+        /**
          * Starts marked clusters.
          */
-        private void startMarkedClusters(
-                             final Set<Cluster> clusters,
-                             final MyButton startMarkedClustersBtn,
-                             final Map<Cluster, JPanel> clusterBackgrounds,
-                             final Map<Cluster, JCheckBox> allCheckboxes,
-                             final Map<Cluster, MyButton> allStartButtons) {
+        private void startMarkedClusters(final Set<Cluster> clusters) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     startMarkedClustersBtn.setEnabled(false);
@@ -478,15 +505,8 @@ public class EmptyBrowser extends Browser {
                 if (cluster.getClusterTab() == null) {
                     final JCheckBox cb = allCheckboxes.get(cluster);
                     if (cb.isSelected()) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                allStartButtons.get(cluster).setEnabled(false);
-                                clusterBackgrounds.get(cluster).setBackground(
-                                                                   Color.GREEN);
-                                allCheckboxes.get(cluster).setSelected(false);
-                            }
-                        });
                         selectedClusters.add(cluster);
+                        setAsStarted(cluster);
                     } else if (cluster.getClusterTab() == null) {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -502,11 +522,7 @@ public class EmptyBrowser extends Browser {
         /**
          * Stops marked clusters.
          */
-        private void stopMarkedClusters(
-                             final Set<Cluster> clusters,
-                             final MyButton stopMarkedClustersBtn,
-                             final Map<Cluster, JPanel> clusterBackgrounds,
-                             final Map<Cluster, JCheckBox> allCheckboxes) {
+        private void stopMarkedClusters(final Set<Cluster> clusters) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     stopMarkedClustersBtn.setEnabled(false);
@@ -534,14 +550,8 @@ public class EmptyBrowser extends Browser {
         /**
          * Listener for checkboxes that is called from thread.
          */
-        private void allCheckboxesListener(
-                                 final Set<Cluster> clusters,
-                                 final Map<Cluster, JCheckBox> allCheckboxes,
-                                 final Map<Cluster, MyButton> allStartButtons,
-                                 final MyButton startMarkedClustersBtn,
-                                 final MyButton stopMarkedClustersBtn,
-                                 final MyButton removeMarkedClustersBtn,
-                                 final JCheckBox cb) {
+        private void allCheckboxesListener(final Set<Cluster> clusters,
+                                           final JCheckBox cb) {
             int rc = 0;
             int nrc = 0;
             int ac = 0;
@@ -586,10 +596,10 @@ public class EmptyBrowser extends Browser {
                     public void run() {
                         if (notRunningCount == 0) {
                             for (final Cluster cluster : clusters) {
-                                if (cluster.getClusterTab() == null) {
-                                    allStartButtons.get(cluster).setEnabled(
-                                                        true);
-                                }
+                                //if (cluster.getClusterTab() == null) {
+                                //    allStartButtons.get(cluster).setEnabled(
+                                //                        true);
+                                //}
                             }
                             startMarkedClustersBtn.setEnabled(false);
                             if (runningCount > 0) {

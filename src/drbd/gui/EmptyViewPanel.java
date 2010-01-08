@@ -94,6 +94,7 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     public EmptyViewPanel() {
         super();
         browser = new EmptyBrowser();
+        Tools.getGUIData().setEmptyBrowser(browser);
         browser.setEmptyViewPanel(this);
         browser.initHosts();
 

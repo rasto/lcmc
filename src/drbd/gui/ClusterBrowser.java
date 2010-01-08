@@ -931,15 +931,13 @@ public class ClusterBrowser extends Browser {
                            thread.start();
                        }
                    });
-            if (!host.isDrbdStatus()) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
+            firstTime.countDown();
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
             host.waitOnDrbdStatus();
-            firstTime.countDown();
             if (drbdStatusCanceled) {
                 break;
             }

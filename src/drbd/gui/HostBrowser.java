@@ -491,7 +491,8 @@ public class HostBrowser extends Browser {
     public final String getHostToolTip(final Host host) {
         final StringBuffer tt = new StringBuffer(80);
         tt.append("<b>" + host.getName() + "</b>");
-        if (host.getCluster().getBrowser().isRealDcHost(host)) {
+        final ClusterBrowser b = getClusterBrowser();
+        if (b != null && b.isRealDcHost(host)) {
             tt.append(" (designated co-ordinator)");
         }
         if (!host.isConnected()) {
