@@ -1018,16 +1018,16 @@ public class TextResource extends
         {"ConfirmDialog.No",
          "No"},
 
-        {"EmptyBrowser.StartMarkedClusters",
+        {"EmptyBrowser.LoadMarkedClusters",
          "Load Marked Clusters"},
 
-        {"EmptyBrowser.StartMarkedClusters.ToolTip",
+        {"EmptyBrowser.LoadMarkedClusters.ToolTip",
          "Load marked clusters in the GUI."},
 
-        {"EmptyBrowser.StopMarkedClusters",
+        {"EmptyBrowser.UnloadMarkedClusters",
          "Unload Marked Clusters"},
 
-        {"EmptyBrowser.StopMarkedClusters.ToolTip",
+        {"EmptyBrowser.UnloadMarkedClusters.ToolTip",
          "Unload marked clusters in the GUI."},
 
         {"EmptyBrowser.RemoveMarkedClusters",

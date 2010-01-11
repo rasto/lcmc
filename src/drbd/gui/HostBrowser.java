@@ -612,7 +612,11 @@ public class HostBrowser extends Browser {
      * Returns drbd graph object.
      */
     private DrbdGraph getDrbdGraph() {
-        return (DrbdGraph) host.getCluster().getBrowser().getDrbdGraph();
+        final ClusterBrowser b = getClusterBrowser();
+        if (b == null) {
+            return null;
+        }
+        return (DrbdGraph) b.getDrbdGraph();
     }
 
 
@@ -1568,6 +1572,9 @@ public class HostBrowser extends Browser {
          */
         public final JPanel getGraphicalView() {
             final DrbdGraph dg = getDrbdGraph();
+            if (dg == null) {
+                return null;
+            }
             dg.getDrbdInfo().setSelectedNode(null);
             return dg.getDrbdInfo().getGraphicalView();
         }
