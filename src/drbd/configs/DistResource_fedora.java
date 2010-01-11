@@ -73,7 +73,7 @@ public class DistResource_fedora extends
 
         /* corosync/pacemaker from source */
         {"PmInst.install.text.9",
-         "from source: latest/1.1.x"},
+         "from source: latest/1.2.x"},
 
         {"PmInst.install.9",
          "export LCRSODIR=/usr/libexec/lcrso;"
@@ -114,7 +114,8 @@ public class DistResource_fedora extends
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make"
          + " && make install"
-         + " && cp init/redhat /etc/init.d/corosync"
+         + " && (cp init/generic /etc/init.d/corosync"
+         + "    || cp init/redhat /etc/init.d/corosync)"
          + " && chmod a+x /etc/init.d/corosync"
          + " && (groupadd ais;"
          + " useradd -g ais --shell /bin/false ais;"
