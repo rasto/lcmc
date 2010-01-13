@@ -741,7 +741,7 @@ sub get_resource_status {
 		$info.= "  <resource id=\"$res\""
 			." running=\"$running\""
 			." managed=\"$managed\">\n";
-		for my $on (keys %{$role{$res}}) {
+		for my $on (sort keys %{$role{$res}}) {
 			my $tag = $role{$res}{$on};
 			$info.="   <$tag>$on</$tag>\n";
 		}

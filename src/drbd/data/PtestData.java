@@ -27,7 +27,7 @@ import drbd.utilities.CRM;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -59,16 +59,16 @@ public class PtestData {
     private final String shadowCib;
     /** Running on nodes. */
     private final Map<String, List<String>> runningOnNodes =
-                                         new HashMap<String, List<String>>();
+                                     new LinkedHashMap<String, List<String>>();
     /** Slave on nodes. */
     private final Map<String, List<String>> slaveOnNodes =
-                                         new HashMap<String, List<String>>();
+                                     new LinkedHashMap<String, List<String>>();
     /** Master on nodes. */
     private final Map<String, List<String>> masterOnNodes =
-                                         new HashMap<String, List<String>>();
+                                     new LinkedHashMap<String, List<String>>();
     /** Which resources are managed. */
     private final Map<String, Boolean> managedHash =
-                                               new HashMap<String, Boolean>();
+                                     new LinkedHashMap<String, Boolean>();
 
     /**
      * Prepares a new <code>PtestData</code> object.

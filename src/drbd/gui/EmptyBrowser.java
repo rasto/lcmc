@@ -199,7 +199,7 @@ public class EmptyBrowser extends Browser {
                       Tools.getString("EmptyBrowser.UnloadMarkedClusters"),
                       CLUSTER_ICON,
                       Tools.getString(
-                                   "EmptyBrowser.UnloadMarkedClusters.ToolTip"));
+                                 "EmptyBrowser.UnloadMarkedClusters.ToolTip"));
         /** Remove marked clusters button. */
         private final MyButton removeMarkedClustersBtn = new MyButton(
                       Tools.getString("EmptyBrowser.RemoveMarkedClusters"),

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Collections;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
@@ -474,6 +475,7 @@ public class ClusterStatus {
         if (testOnly && pd != null) {
             final List<String> ron = pd.getRunningOnNodes(hbId);
             if (ron != null) {
+                Collections.sort(ron);
                 return ron;
             }
         }
@@ -484,6 +486,7 @@ public class ClusterStatus {
         if (resStatus == null) {
             return null;
         }
+        /* this one is already sorted. */
         return resStatus.getRunningOnNodes();
     }
 
@@ -496,6 +499,7 @@ public class ClusterStatus {
         if (testOnly && pd != null) {
             final List<String> son = pd.getSlaveOnNodes(hbId);
             if (son != null) {
+                Collections.sort(son);
                 return son;
             }
         }
@@ -516,9 +520,10 @@ public class ClusterStatus {
                                               final boolean testOnly) {
         final PtestData pd = ptestData;
         if (testOnly && pd != null) {
-            final List<String> son = pd.getMasterOnNodes(hbId);
-            if (son != null) {
-                return son;
+            final List<String> mon = pd.getMasterOnNodes(hbId);
+            if (mon != null) {
+                Collections.sort(mon);
+                return mon;
             }
         }
         if (resStateMap == null) {
