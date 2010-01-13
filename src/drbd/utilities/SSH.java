@@ -308,13 +308,13 @@ public class SSH {
      * After this method is called a reconnect will work as expected.
      */
     public final void forceReconnect() {
-        Tools.printStackTrace("force reconnect");
         try {
             mConnectionLock.acquire();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         if (connection != null) {
+            Tools.printStackTrace("force reconnect");
             connection = null;
             mConnectionLock.release();
             Tools.debug(this, "force reconnecting: " + host.getName(), 0);
@@ -418,7 +418,8 @@ public class SSH {
                 return new Object[]{"", 0};
             }
             try {
-                if (sess == null) {
+                final Session thisSession = sess;
+                if (thisSession == null) {
                     return new Object[]{"", 130};
                 }
                 /* requestPTY mixes stdout and strerr together, but it works
@@ -427,17 +428,17 @@ public class SSH {
                     && command.indexOf("/etc/init.d/openais reload") < 0) {
                     /* aisexec does not work when pty is requested for some
                      * reason, so here is the workaround. */
-                    sess.requestPTY("dumb", 0, 0, 0, 0, null);
+                    thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
                 }
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "
                                   + host.getHoppedCommand(command),
                                   1);
-                sess.execCommand(host.getHoppedCommand(command));
+                thisSession.execCommand(host.getHoppedCommand(command));
 
-                final InputStream stdout = sess.getStdout();
-                final InputStream stderr = sess.getStderr();
+                final InputStream stdout = thisSession.getStdout();
+                final InputStream stderr = thisSession.getStderr();
                 //byte[] buff = new byte[8192];
                 final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
                 while (true) {
@@ -452,7 +453,7 @@ public class SSH {
                          */
                         int conditions = 0;
                         if (!cancelIt) {
-                            conditions = sess.waitForCondition(
+                            conditions = thisSession.waitForCondition(
                                             ChannelCondition.STDOUT_DATA
                                             | ChannelCondition.STDERR_DATA
                                             | ChannelCondition.EOF,
@@ -548,10 +549,11 @@ public class SSH {
                 if (outputVisible) {
                     host.getTerminalPanel().nextCommand();
                 }
-                sess.waitForCondition(ChannelCondition.EXIT_STATUS, 10000);
-                exitCode = sess.getExitStatus();
+                thisSession.waitForCondition(ChannelCondition.EXIT_STATUS,
+                                             10000);
+                exitCode = thisSession.getExitStatus();
                 //Tools.debug(this, "exitCode: " + exitCode);
-                sess.close();
+                thisSession.close();
                 sess = null;
             } catch (IOException e) {
                 exitCode = ERROR_EXIT_CODE;
@@ -571,9 +573,11 @@ public class SSH {
          */
         public final void cancel() {
             cancelIt = true;
-            if (sess != null) {
-                sess.close();
-                sess = null;
+            //TODO need lock for session
+            final Session thisSession = sess;
+            sess = null;
+            if (thisSession != null) {
+                thisSession.close();
             }
         }
 
@@ -679,13 +683,6 @@ public class SSH {
             if (execCallback != null) {
                 execCallback.done(ans.toString());
             }
-        }
-
-        /**
-         * Returns the session object.
-         */
-        public final Session getSession() {
-            return sess;
         }
     }
 

@@ -239,6 +239,8 @@ public class ClusterBrowser extends Browser {
     private final Mutex mPtestLock = new Mutex();
     /** DRBD test data lock. */
     private final Mutex mDRBDtestdataLock = new Mutex();
+    /** Can be used to cancel server status. */
+    private volatile boolean serverStatus = true;
     /** last dc host detected. */
     private Host lastDcHost = null;
     /** dc host as reported by crm. */
@@ -375,6 +377,7 @@ public class ClusterBrowser extends Browser {
     /** Cluster status error string. */
     private static final String CLUSTER_STATUS_ERROR =
                                   "---start---\r\nerror\r\n\r\n---done---\r\n";
+    /** pattern that captures a name from xml file name. */
     private static final Pattern LIBVIRT_CONF_PATTERN =
                                              Pattern.compile(".*?([^/]+).xml$");
     /**
@@ -800,7 +803,17 @@ public class ClusterBrowser extends Browser {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
+            if (!serverStatus) {
+                break;
+            }
         }
+    }
+
+    /**
+     * Cancels the server status.
+     */
+    public final void cancelServerStatus() {
+        serverStatus = false;
     }
 
     /**
@@ -1265,9 +1278,9 @@ public class ClusterBrowser extends Browser {
                         continue;
                     }
                 }
-                if (bdi.getBlockDevice().isDrbd()) {
-                    continue;
-                }
+                //if (bdi.getBlockDevice().isDrbd()) {
+                //    continue;
+                //}
                 bdi.getBlockDevice().setValue(
                                       "DrbdNetInterfacePort",
                                       dxml.getVirtualInterfacePort(hostName,
@@ -1296,9 +1309,9 @@ public class ClusterBrowser extends Browser {
                 }
             }
             if (bd1 != null
-                && bd2 != null
-                && !bd1.getBlockDevice().isDrbd()
-                && !bd2.getBlockDevice().isDrbd()) {
+                && bd2 != null) {
+//                && !bd1.getBlockDevice().isDrbd()
+//                && !bd2.getBlockDevice().isDrbd()) {
                 drbdGraph.getDrbdInfo().addDrbdResource(resName,
                                                         drbdDev,
                                                         bd1,
@@ -1717,7 +1730,8 @@ public class ClusterBrowser extends Browser {
                 mouseStillOver = true;
                 component.setToolTipText(STARTING_PTEST_TOOLTIP);
                 component.setToolTipBackground(
-                  Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
+                  Tools.getDefaultColor(
+                                   "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
                     return;
@@ -2703,6 +2717,13 @@ public class ClusterBrowser extends Browser {
             }
         }
 
+        public final void removeFromHashes() {
+            drbdResHash.remove(getName());
+            drbdDevHash.remove(getDevice());
+            blockDevInfo1.removeFromDrbd();
+            blockDevInfo2.removeFromDrbd();
+        }
+
         /**
          * removes this object from jtree and from list of drbd resource
          * infos without confirmation dialog.
@@ -3487,7 +3508,7 @@ public class ClusterBrowser extends Browser {
             }
             return s.toString();
         }
-        
+
         /**
          * Returns info panel.
          */
@@ -8671,7 +8692,7 @@ public class ClusterBrowser extends Browser {
             return items;
         }
     }
-    
+
     /**
      * This class is used for all kind of categories in the heartbeat
      * hierarchy. Its point is to show heartbeat graph all the time, ane
@@ -11605,12 +11626,13 @@ public class ClusterBrowser extends Browser {
                                           final BlockDevInfo bd2,
                                           final boolean interactive,
                                           final boolean testOnly) {
+            if (drbdResHash.containsKey(name)) {
+                return;
+            }
             DrbdResourceInfo dri;
             if (bd1 == null || bd2 == null) {
                 return;
             }
-            drbdGraph.startAnimation(bd1);
-            drbdGraph.startAnimation(bd2);
             final DrbdXML dxml = drbdXML;
             if (name == null && drbdDevStr == null) {
                 int index = getNewDrbdResourceIndex();
@@ -11727,8 +11749,6 @@ public class ClusterBrowser extends Browser {
             } else {
                 resetFilesystems();
             }
-            drbdGraph.stopAnimation(bd1);
-            drbdGraph.stopAnimation(bd2);
         }
 
         /**

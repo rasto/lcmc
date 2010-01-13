@@ -752,8 +752,8 @@ public final class Tools {
             for (final Host host : cluster.getHosts()) {
                 // TODO: can be run concurrently.
                 host.disconnect();
-                host.setCluster(null);
             }
+            cluster.removeCluster();
             getGUIData().getClustersPanel().removeTab(cluster);
         }
     }

@@ -100,6 +100,18 @@ public class Cluster {
     }
 
     /**
+     * Removes the cluster.
+     */
+    public final void removeCluster() {
+        final ClusterBrowser cb = clusterBrowser;
+        if (cb != null) {
+            clusterBrowser.cancelServerStatus();
+            clusterBrowser.stopDrbdStatus();
+            clusterBrowser.stopClStatus();
+        }
+    }
+
+    /**
      * Adds host to hosts, that are part of this cluster.
      */
     public final void addHost(final Host host) {

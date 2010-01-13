@@ -209,13 +209,18 @@ public class DrbdGraph extends ResourceGraph {
             oldVertexList = new ArrayList<Vertex>(vertexList);
         }
         final List<BlockDevInfo> blockDevInfos =
-                                    host.getBrowser().getBlockDevInfos();
+                                        host.getBrowser().getBlockDevInfos();
         if (oldVertexList != null) {
             for (final Vertex vertex : oldVertexList) {
                 final BlockDevInfo bdi = (BlockDevInfo) getInfo(vertex);
                 if (!blockDevInfos.contains(bdi)) {
                     /* removing */
                     final Vertex bdv = bdiToVertexMap.get(bdi);
+                    final DrbdResourceInfo dri = bdi.getDrbdResourceInfo();
+                    if (dri != null) {
+                        removeDrbdResource(dri);
+                        dri.removeFromHashes();
+                    }
                     getGraph().removeVertex(bdv);
                     removeInfo(bdv);
                     removeVertex(bdi);
@@ -467,8 +472,12 @@ public class DrbdGraph extends ResourceGraph {
                                       final BlockDevInfo bdi1,
                                       final BlockDevInfo bdi2) {
         if (bdi1 != null && bdi2 != null) {
-            final MyEdge edge = new MyEdge(bdiToVertexMap.get(bdi1),
-                                           bdiToVertexMap.get(bdi2));
+            final Vertex v1 = bdiToVertexMap.get(bdi1);
+            final Vertex v2 = bdiToVertexMap.get(bdi2);
+            if (v1.findEdge(v2) != null || v2.findEdge(v1) != null) {
+                return;
+            }
+            final MyEdge edge = new MyEdge(v1, v2);
             final Edge e = getGraph().addEdge(edge);
             edgeToDrbdResourceMap.put(e, dri);
             drbdResourceToEdgeMap.put(dri, e);
@@ -724,8 +733,9 @@ public class DrbdGraph extends ResourceGraph {
         if (v.equals(hostVertex)) {
             /* host */
             return hi.getHost().getDrbdColors()[0];
-        } else if (!hi.getHost().isDrbdStatus()
-                   && hi.getHost().isDrbdLoaded()) {
+        } else if (hi.getHost() == null
+                   || (!hi.getHost().isDrbdStatus()
+                       && hi.getHost().isDrbdLoaded())) {
             return Tools.getDefaultColor("DrbdGraph.FillPaintUnknown");
         } else {
             if (!isVertexDrbd(v)) {
