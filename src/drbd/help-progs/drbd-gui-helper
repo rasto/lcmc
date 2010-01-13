@@ -87,6 +87,8 @@ if ($option eq "all") {
 	get_old_style_resources(@ARGV);
 } elsif ($option eq "get-lsb-resources") {
 	get_lsb_resources(@ARGV);
+} elsif ($option eq "get-stonith-devices") {
+	get_stonith_devices(@ARGV);
 } elsif ($option eq "get-drbd-xml") {
 	get_drbd_xml();
 } elsif ($option eq "get-cluster-events") {
@@ -799,6 +801,84 @@ sub get_lsb_resources {
 	}
 }
 
+sub get_stonith_devices {
+	my $libdir = "lib";
+	my $arch = `uname -m`;
+	chomp $arch;
+	if ($arch eq "x86_64") {
+		$libdir = "lib64";
+	}
+	for my $subtype ("external") {
+		my $dir = "/usr/$libdir/stonith/plugins/$subtype/";
+		for (`find $dir -perm -a=x -type f -printf "%f\n"`) {
+			chomp;
+			print get_ocf_like_stonith_devices(
+					"$subtype/$_",
+					$dir,
+					`$dir/$_ getinfo-devid`,
+					`$dir/$_ getinfo-devdescr`,
+					+ `$dir/$_ getinfo-devurl`,
+					`$dir/$_ getinfo-xml`);
+		}
+	}
+
+	for my $subtype ("stonith2") {
+		my $dir = "/usr/$libdir/stonith/plugins/$subtype/";
+		for (`find $dir -type f -name *.so -printf "%f\n"`) {
+			chomp;
+			my $name = $_;
+			$name =~ s/\.so$//;
+			my $info = `/usr/sbin/stonith -t $name -h`;
+			if (!$info) {
+				next;
+			}
+			my ($shortdesc, $longdesc) = $info
+			   =~ /^STONITH Device:\s+(.*?)$(.*?)List of valid/ms;
+			my $content;
+			open my $fh, "$dir/$_" or next;
+			{
+				local $/;
+				$content = <$fh>;
+			}
+			close $fh;
+			if (!$content) {
+				next;
+			}
+			my ($parameters) =
+				$content =~ /(<parameters>.*?<\/parameters>)/s;
+			print get_ocf_like_stonith_devices($name,
+							   $dir,
+							   $shortdesc,
+							   $longdesc,
+							   $parameters);
+		}
+	}
+}
+
+sub get_ocf_like_stonith_devices {
+	my $device     = shift;
+	my $dir        = shift;
+	my $shortdesc  = shift;
+	my $longdesc   = shift;
+	my $parameters = shift;
+	my $class = "stonith";
+
+	my $xml = <<XML;
+<?xml version="1.0"?>
+<resource-agent name="$device" class="$class">
+<version>1.0</version>
+
+<shortdesc lang="en">$shortdesc</shortdesc>
+<longdesc lang="en">$longdesc</longdesc>
+$parameters
+<actions>
+<action name="monitor" timeout="60" interval="60" />
+<action name="start"   timeout="60" />
+<action name="stop"    timeout="60" />
+</actions>
+</resource-agent>
+XML
+}
 
 sub get_ocf_like_xml {
 	my $resource = shift;
@@ -1120,5 +1200,7 @@ sub get_cluster_versions {
 	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
 }
+
+
 
 

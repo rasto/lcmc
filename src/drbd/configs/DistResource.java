@@ -206,6 +206,7 @@ public class DistResource extends
          + "done;"
          + "echo 'provider:heartbeat';"
          + "echo 'master:';"
+         + "/usr/local/bin/drbd-gui-helper get-stonith-devices;"
          + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
          + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
         /* vmxpath env is needed so that vmware meta-data does not hang */

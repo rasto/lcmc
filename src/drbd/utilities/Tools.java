@@ -52,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JList;
+import javax.swing.JTextArea;
 import javax.swing.DefaultListModel;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.UIManager;
@@ -328,7 +329,9 @@ public final class Tools {
         System.out.println("ERROR: " + getErrorString(msg));
         JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
-                            getErrorString(msg),
+                            new JScrollPane(new JTextArea(getErrorString(msg),
+                                                          20,
+                                                          60)),
                             Tools.getString("Error.Title"),
                             JOptionPane.ERROR_MESSAGE
                            );

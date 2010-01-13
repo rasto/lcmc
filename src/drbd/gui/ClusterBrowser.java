@@ -296,6 +296,8 @@ public class ClusterBrowser extends Browser {
     private static final String HB_HEARTBEAT_CLASS = "heartbeat";
     /** Name of lsb style resource (/etc/init.d/*). */
     private static final String HB_LSB_CLASS = "lsb";
+    /** Name of stonith device class. */
+    private static final String HB_STONITH_CLASS = "stonith";
 
     /** Name of the provider. TODO: other providers? */
     private static final String HB_HEARTBEAT_PROVIDER = "heartbeat";
@@ -303,7 +305,8 @@ public class ClusterBrowser extends Browser {
     /** String array with all hb classes. */
     private static final String[] HB_CLASSES = {HB_OCF_CLASS,
                                                 HB_HEARTBEAT_CLASS,
-                                                HB_LSB_CLASS};
+                                                HB_LSB_CLASS,
+                                                HB_STONITH_CLASS};
 
     /** Hb start operation. */
     private static final String HB_OP_START = "start";
@@ -392,6 +395,7 @@ public class ClusterBrowser extends Browser {
         HB_CLASS_MENU.put(HB_OCF_CLASS,       "heartbeat 2 (ocf)");
         HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "heartbeat 1 (hb)");
         HB_CLASS_MENU.put(HB_LSB_CLASS,       "lsb (init.d)");
+        HB_CLASS_MENU.put(HB_STONITH_CLASS,   "stonith");
 
     }
 
@@ -1509,15 +1513,16 @@ public class ClusterBrowser extends Browser {
         if (pmId == null) {
             if (PM_GROUP_NAME.equals(si.getName())) {
                 pmId = Service.GRP_ID_PREFIX;
-            } else if (PM_CLONE_SET_NAME.equals(si.getName())
-                       || PM_MASTER_SLAVE_SET_NAME.equals(si.getName())) {
+            } else if (PM_CLONE_SET_NAME.equals(si.getService().getName())
+                       || PM_MASTER_SLAVE_SET_NAME.equals(
+                                                si.getService().getName())) {
                 if (si.getService().isMaster()) {
                     pmId = Service.MS_ID_PREFIX;
                 } else {
                     pmId = Service.CL_ID_PREFIX;
                 }
             } else {
-                pmId = Service.RES_ID_PREFIX + si.getName() + "_";
+                pmId = Service.RES_ID_PREFIX + si.getService().getName() + "_";
             }
             String newPmId;
             if (id == null) {
@@ -4979,7 +4984,7 @@ public class ClusterBrowser extends Browser {
                            final ResourceAgent resourceAgent) {
             super(name);
             this.resourceAgent = resourceAgent;
-            setResource(new Service(name));
+            setResource(new Service(name.replaceAll("/", "_")));
             getService().setNew(true);
         }
 
@@ -5099,8 +5104,9 @@ public class ClusterBrowser extends Browser {
                 } else {
                     if (heartbeatId == null) {
                         ret = true;
-                    } else if (heartbeatId.equals(
-                                Service.RES_ID_PREFIX + getName() + "_" + id)
+                    } else if (heartbeatId.equals(Service.RES_ID_PREFIX
+                                                  + getService().getName()
+                                                  + "_" + id)
                         || heartbeatId.equals(id)) {
                         ret = checkHostScoreFieldsChanged()
                               || checkOperationFieldsChanged();
@@ -6700,14 +6706,15 @@ public class ClusterBrowser extends Browser {
             final Map<String,String> pacemakerMetaArgs =
                                                   new HashMap<String,String>();
             final String raClass = getService().getResourceClass();
-            final String type = getResource().getName();
+            final String type = getName();
             final String provider = resourceAgent.getProvider();
             final String heartbeatId = getHeartbeatId(testOnly);
 
             pacemakerResAttrs.put("id",       heartbeatId);
             pacemakerResAttrs.put("class",    raClass);
             if (!HB_HEARTBEAT_CLASS.equals(raClass)
-                && !raClass.equals(HB_LSB_CLASS)) {
+                && !raClass.equals(HB_LSB_CLASS)
+                && !raClass.equals(HB_STONITH_CLASS)) {
                 pacemakerResAttrs.put("provider", provider);
             }
             pacemakerResAttrs.put("type",     type);
