@@ -802,28 +802,31 @@ sub get_lsb_resources {
 }
 
 sub get_stonith_devices {
-	my $libdir = "lib";
+	my $libdir = "/usr/lib/stonith/plugins";
 	my $arch = `uname -m`;
 	chomp $arch;
 	if ($arch eq "x86_64") {
-		$libdir = "lib64";
+		my $libdir64 = "/usr/lib64/stonith/plugins";
+		if (-e $libdir64) {
+			$libdir = $libdir64;
+		}
 	}
 	for my $subtype ("external") {
-		my $dir = "/usr/$libdir/stonith/plugins/$subtype/";
+		my $dir = "$libdir/$subtype/";
 		for (`find $dir -perm -a=x -type f -printf "%f\n"`) {
 			chomp;
 			print get_ocf_like_stonith_devices(
 					"$subtype/$_",
 					$dir,
-					`$dir/$_ getinfo-devid`,
-					`$dir/$_ getinfo-devdescr`,
-					+ `$dir/$_ getinfo-devurl`,
-					`$dir/$_ getinfo-xml`);
+					scalar `$dir/$_ getinfo-devid`,
+					scalar `$dir/$_ getinfo-devdescr`
+					.`$dir/$_ getinfo-devurl`,
+					scalar `$dir/$_ getinfo-xml`);
 		}
 	}
 
 	for my $subtype ("stonith2") {
-		my $dir = "/usr/$libdir/stonith/plugins/$subtype/";
+		my $dir = "$libdir/$subtype/";
 		for (`find $dir -type f -name *.so -printf "%f\n"`) {
 			chomp;
 			my $name = $_;
