@@ -90,6 +90,10 @@ public class CibQuery {
     private MultiKeyMap resHostToLocId = new MultiKeyMap();
     /** Operations map. */
     private MultiKeyMap operations = new MultiKeyMap();
+    /** Operations refs map. */
+    private Map<String, String>  operationsRefs = new HashMap<String, String>();
+    /** Metaattrs refs map. */
+    private Map<String, String>  metaAttrsRefs = new HashMap<String, String>();
     /** Operations id map. */
     private Map<String, String> operationsId = new HashMap<String, String>();
     /** "op" tag id map. */
@@ -441,10 +445,40 @@ public class CibQuery {
     }
 
     /**
+     * Sets operations refs map.
+     */
+    public final void setOperationsRefs(
+                                final Map<String, String> operationsRefs) {
+        this.operationsRefs = operationsRefs;
+    }
+
+    /**
+     * Sets meta attrs refs map.
+     */
+    public final void setMetaAttrsRefs(
+                                final Map<String, String> metaAttrsIdRefs) {
+        this.metaAttrsRefs = metaAttrsRefs;
+    }
+
+    /**
      * Returns operations map.
      */
     public final MultiKeyMap getOperations() {
         return operations;
+    }
+
+    /**
+     * Returns operations refs map.
+     */
+    public final Map<String, String> getOperationsRefs() {
+        return operationsRefs;
+    }
+
+    /**
+     * Returns meta attrs refs map.
+     */
+    public final Map<String, String> getMetaAttrsRefs() {
+        return metaAttrsRefs;
     }
 
     /**

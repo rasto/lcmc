@@ -447,6 +447,15 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns crm id from serivce that this service has operations from,
+     * or null.
+     */
+    public final String getOperationsRef(final String hbId) {
+        return cibQueryMap.getOperationsRefs().get(hbId);
+    }
+
+
+    /**
      * Returns on which nodes the resource is managed.
      */
     public final boolean isManaged(final String hbId,

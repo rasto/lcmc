@@ -5208,6 +5208,11 @@ public class ClusterBrowser extends Browser {
 
             /* set operations */
             for (final String op : HB_OPERATIONS) {
+                String refCRMId = clusterStatus.getOperationsRef(
+                                                getService().getHeartbeatId());
+                if (refCRMId == null) {
+                    refCRMId = getService().getHeartbeatId();
+                }
                 for (final String param : HB_OPERATION_PARAMS.get(op)) {
                     final String defaultValue =
                                  resourceAgent.getOperationDefault(op, param);
@@ -5215,7 +5220,7 @@ public class ClusterBrowser extends Browser {
                         continue;
                     }
                     String value = clusterStatus.getOperation(
-                                                getService().getHeartbeatId(),
+                                                refCRMId,
                                                 op,
                                                 param);
                     if (value == null) {

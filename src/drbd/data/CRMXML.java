@@ -1294,19 +1294,23 @@ public class CRMXML extends XML {
      */
     private void parseAttributes(
               final Node resourceNode,
-              final String hbId,
+              final String crmId,
               final Map<String, Map<String, String>> parametersMap,
               final Map<String, Map<String, String>> parametersNvpairsIdsMap,
               final Map<String, String> resourceInstanceAttrIdMap,
               final MultiKeyMap operationsMap,
               final Map<String, String> operationsIdMap,
-              final Map<String, Map<String, String>> resOpIdsMap) {
+              final Map<String, Map<String, String>> resOpIdsMap,
+              final Map<String, String> operationsIdRefs,
+              final Map<String, String> operationsIdtoCRMId,
+              final Map<String, String> metaAttrsIdRefs,
+              final Map<String, String> metaAttrsIdToCRMId) {
         final Map<String, String> params =
                                         new HashMap<String, String>();
-        parametersMap.put(hbId, params);
+        parametersMap.put(crmId, params);
         final Map<String, String> nvpairIds =
                                         new HashMap<String, String>();
-        parametersNvpairsIdsMap.put(hbId, nvpairIds);
+        parametersNvpairsIdsMap.put(crmId, nvpairIds);
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         /* <instance_attributes> */
@@ -1316,7 +1320,7 @@ public class CRMXML extends XML {
         /* <nvpair...> */
         if (instanceAttrNode != null) {
             final String iAId = getAttribute(instanceAttrNode, "id");
-            resourceInstanceAttrIdMap.put(hbId, iAId);
+            resourceInstanceAttrIdMap.put(crmId, iAId);
             NodeList nvpairsRes;
             if (pmV == null
                 && hbV != null
@@ -1341,41 +1345,38 @@ public class CRMXML extends XML {
         }
 
         /* <operations> */
-        final Node operationsNode = getChildNode(resourceNode,
-                                                 "operations");
+        final Node operationsNode = getChildNode(resourceNode, "operations");
         if (operationsNode != null) {
-            final String operationsId = getAttribute(operationsNode,
-                                                     "id");
-            operationsIdMap.put(hbId, operationsId);
-            final Map<String, String> opIds = new HashMap<String, String>();
-            resOpIdsMap.put(hbId, opIds);
-            /* <op> */
-            final NodeList ops = operationsNode.getChildNodes();
-            for (int k = 0; k < ops.getLength(); k++) {
-                final Node opNode = ops.item(k);
-                if (opNode.getNodeName().equals("op")) {
-                    final String opId = getAttribute(opNode,
-                                                            "id");
-                    final String name = getAttribute(opNode, "name");
-                    final String timeout = getAttribute(opNode,
-                                                        "timeout");
-                    final String interval = getAttribute(opNode,
-                                                         "interval");
-                    final String startDelay = getAttribute(opNode,
-                                                           "start-delay");
-                    operationsMap.put(hbId,
-                                      name,
-                                      "interval",
-                                      interval);
-                    operationsMap.put(hbId,
-                                      name,
-                                      "timeout",
-                                      timeout);
-                    operationsMap.put(hbId,
-                                      name,
-                                      "start-delay",
-                                      startDelay);
-                    opIds.put(name, opId);
+            final String operationsIdRef = getAttribute(operationsNode,
+                                                        "id-ref");
+            if (operationsIdRef != null) {
+                operationsIdRefs.put(crmId, operationsIdRef);
+            } else {
+                final String operationsId = getAttribute(operationsNode, "id");
+                operationsIdMap.put(crmId, operationsId);
+                operationsIdtoCRMId.put(operationsId, crmId);
+                final Map<String, String> opIds = new HashMap<String, String>();
+                resOpIdsMap.put(crmId, opIds);
+                /* <op> */
+                final NodeList ops = operationsNode.getChildNodes();
+                for (int k = 0; k < ops.getLength(); k++) {
+                    final Node opNode = ops.item(k);
+                    if (opNode.getNodeName().equals("op")) {
+                        final String opId = getAttribute(opNode, "id");
+                        final String name = getAttribute(opNode, "name");
+                        final String timeout = getAttribute(opNode, "timeout");
+                        final String interval = getAttribute(opNode,
+                                                             "interval");
+                        final String startDelay = getAttribute(opNode,
+                                                               "start-delay");
+                        operationsMap.put(crmId, name, "interval", interval);
+                        operationsMap.put(crmId, name, "timeout", timeout);
+                        operationsMap.put(crmId,
+                                          name,
+                                          "start-delay",
+                                          startDelay);
+                        opIds.put(name, opId);
+                    }
                 }
             }
         }
@@ -1384,25 +1385,31 @@ public class CRMXML extends XML {
         final Node metaAttrsNode = getChildNode(resourceNode,
                                                 "meta_attributes");
         if (metaAttrsNode != null) {
-            /* <attributtes> only til 2.1.4 */
-            NodeList nvpairsMA;
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
-                final Node attrsNode =
-                                    getChildNode(metaAttrsNode, "attributes");
-                nvpairsMA = attrsNode.getChildNodes();
+            final String metaAttrsIdRef = getAttribute(metaAttrsNode, "id-ref");
+            if (metaAttrsIdRef != null) {
+                metaAttrsIdRefs.put(crmId, metaAttrsIdRef);
             } else {
-                nvpairsMA = metaAttrsNode.getChildNodes();
-            }
-            /* <nvpair...> */
-            /* target-role and is-managed */
-            for (int l = 0; l < nvpairsMA.getLength(); l++) {
-                final Node maNode = nvpairsMA.item(l);
-                if (maNode.getNodeName().equals("nvpair")) {
-                    final String nvpairId = getAttribute(maNode, "id");
-                    final String name = getAttribute(maNode, "name");
-                    final String value = getAttribute(maNode, "value");
-                    params.put(name, value);
-                    nvpairIds.put(name, nvpairId);
+                final String opId = getAttribute(metaAttrsNode, "id");
+                /* <attributtes> only til 2.1.4 */
+                NodeList nvpairsMA;
+                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    final Node attrsNode =
+                                      getChildNode(metaAttrsNode, "attributes");
+                    nvpairsMA = attrsNode.getChildNodes();
+                } else {
+                    nvpairsMA = metaAttrsNode.getChildNodes();
+                }
+                /* <nvpair...> */
+                /* target-role and is-managed */
+                for (int l = 0; l < nvpairsMA.getLength(); l++) {
+                    final Node maNode = nvpairsMA.item(l);
+                    if (maNode.getNodeName().equals("nvpair")) {
+                        final String nvpairId = getAttribute(maNode, "id");
+                        final String name = getAttribute(maNode, "name");
+                        final String value = getAttribute(maNode, "value");
+                        params.put(name, value);
+                        nvpairIds.put(name, nvpairId);
+                    }
                 }
             }
         }
@@ -1421,7 +1428,11 @@ public class CRMXML extends XML {
                 final Map<String, String> resourceInstanceAttrIdMap,
                 final MultiKeyMap operationsMap,
                 final Map<String, String> operationsIdMap,
-                final Map<String, Map<String, String>> resOpIdsMap) {
+                final Map<String, Map<String, String>> resOpIdsMap,
+                final Map<String, String> operationsIdRefs,
+                final Map<String, String> operationsIdtoCRMId,
+                final Map<String, String> metaAttrsIdRefs,
+                final Map<String, String> metaAttrsIdToCRMId) {
         final NodeList primitives = groupNode.getChildNodes();
         final String groupId = getAttribute(groupNode, "id");
         if (resList != null) {
@@ -1445,7 +1456,11 @@ public class CRMXML extends XML {
                                resourceInstanceAttrIdMap,
                                operationsMap,
                                operationsIdMap,
-                               resOpIdsMap);
+                               resOpIdsMap,
+                               operationsIdRefs,
+                               operationsIdtoCRMId,
+                               metaAttrsIdRefs,
+                               metaAttrsIdToCRMId);
             }
         }
     }
@@ -1462,24 +1477,32 @@ public class CRMXML extends XML {
                 final Map<String, String> resourceInstanceAttrIdMap,
                 final MultiKeyMap operationsMap,
                 final Map<String, String> operationsIdMap,
-                final Map<String, Map<String, String>> resOpIdsMap) {
+                final Map<String, Map<String, String>> resOpIdsMap,
+                final Map<String, String> operationsIdRefs,
+                final Map<String, String> operationsIdtoCRMId,
+                final Map<String, String> metaAttrsIdRefs,
+                final Map<String, String> metaAttrsIdToCRMId) {
         final String raClass = getAttribute(primitiveNode, "class");
-        final String hbId = getAttribute(primitiveNode, "id");
+        final String crmId = getAttribute(primitiveNode, "id");
         String provider = getAttribute(primitiveNode, "provider");
         if (provider == null) {
             provider = "heartbeat";
         }
         final String type = getAttribute(primitiveNode, "type");
-        resourceTypeMap.put(hbId, getResourceAgent(type, provider, raClass));
-        groupResList.add(hbId);
+        resourceTypeMap.put(crmId, getResourceAgent(type, provider, raClass));
+        groupResList.add(crmId);
         parseAttributes(primitiveNode,
-                        hbId,
+                        crmId,
                         parametersMap,
                         parametersNvpairsIdsMap,
                         resourceInstanceAttrIdMap,
                         operationsMap,
                         operationsIdMap,
-                        resOpIdsMap);
+                        resOpIdsMap,
+                        operationsIdRefs,
+                        operationsIdtoCRMId,
+                        metaAttrsIdRefs,
+                        metaAttrsIdToCRMId);
     }
 
     /**
@@ -1806,6 +1829,14 @@ public class CRMXML extends XML {
         groupsToResourcesMap.put("none", new ArrayList<String>());
 
         final NodeList primitivesGroups = resourcesNode.getChildNodes();
+        final Map<String, String> operationsIdRefs =
+                                                new HashMap<String, String>();
+        final Map<String, String> operationsIdtoCRMId =
+                                                new HashMap<String, String>();
+        final Map<String, String> metaAttrsIdRefs =
+                                                new HashMap<String, String>();
+        final Map<String, String> metaAttrsIdToCRMId =
+                                                new HashMap<String, String>();
         for (int i = 0; i < primitivesGroups.getLength(); i++) {
             final Node primitiveGroupNode = primitivesGroups.item(i);
             final String nodeName = primitiveGroupNode.getNodeName();
@@ -1820,7 +1851,11 @@ public class CRMXML extends XML {
                                resourceInstanceAttrIdMap,
                                operationsMap,
                                operationsIdMap,
-                               resOpIdsMap);
+                               resOpIdsMap,
+                               operationsIdRefs,
+                               operationsIdtoCRMId,
+                               metaAttrsIdRefs,
+                               metaAttrsIdToCRMId);
             } else if ("group".equals(nodeName)) {
                 parseGroup(primitiveGroupNode,
                            null,
@@ -1831,7 +1866,11 @@ public class CRMXML extends XML {
                            resourceInstanceAttrIdMap,
                            operationsMap,
                            operationsIdMap,
-                           resOpIdsMap);
+                           resOpIdsMap,
+                           operationsIdRefs,
+                           operationsIdtoCRMId,
+                           metaAttrsIdRefs,
+                           metaAttrsIdToCRMId);
             } else if ("master".equals(nodeName)
                        || "master_slave".equals(nodeName)
                        || "clone".equals(nodeName)) {
@@ -1850,7 +1889,11 @@ public class CRMXML extends XML {
                                 resourceInstanceAttrIdMap,
                                 operationsMap,
                                 operationsIdMap,
-                                resOpIdsMap);
+                                resOpIdsMap,
+                                operationsIdRefs,
+                                operationsIdtoCRMId,
+                                metaAttrsIdRefs,
+                                metaAttrsIdToCRMId);
                 for (int j = 0; j < primitives.getLength(); j++) {
                     final Node primitiveNode = primitives.item(j);
                     if (primitiveNode.getNodeName().equals("primitive")) {
@@ -1862,7 +1905,11 @@ public class CRMXML extends XML {
                                        resourceInstanceAttrIdMap,
                                        operationsMap,
                                        operationsIdMap,
-                                       resOpIdsMap);
+                                       resOpIdsMap,
+                                       operationsIdRefs,
+                                       operationsIdtoCRMId,
+                                       metaAttrsIdRefs,
+                                       metaAttrsIdToCRMId);
                     } else if (primitiveNode.getNodeName().equals("group")) {
                         parseGroup(primitiveNode,
                                    resList,
@@ -1873,7 +1920,11 @@ public class CRMXML extends XML {
                                    resourceInstanceAttrIdMap,
                                    operationsMap,
                                    operationsIdMap,
-                                   resOpIdsMap);
+                                   resOpIdsMap,
+                                   operationsIdRefs,
+                                   operationsIdtoCRMId,
+                                   metaAttrsIdRefs,
+                                   metaAttrsIdToCRMId);
                     }
                 }
                 if (!resList.isEmpty()) {
@@ -1884,6 +1935,21 @@ public class CRMXML extends XML {
                     }
                 }
             }
+        }
+
+        /* operationsRefs crm id -> crm id */
+        final Map<String, String> operationsRefs =
+                                                 new HashMap<String, String>();
+        for (final String crmId : operationsIdRefs.keySet()) {
+            final String idRef = operationsIdRefs.get(crmId);
+            operationsRefs.put(crmId, operationsIdtoCRMId.get(idRef));
+        }
+
+        /* mettaAttrsRefs crm id -> crm id */
+        final Map<String, String> metaAttrsRefs = new HashMap<String, String>();
+        for (final String crmId : metaAttrsIdRefs.keySet()) {
+            final String idRef = metaAttrsIdRefs.get(crmId);
+            metaAttrsRefs.put(crmId, metaAttrsIdToCRMId.get(idRef));
         }
 
         /* <constraints> */
@@ -2109,6 +2175,8 @@ public class CRMXML extends XML {
         cibQueryData.setResHostToLocId(resHostToLocIdMap);
         cibQueryData.setOperations(operationsMap);
         cibQueryData.setOperationsId(operationsIdMap);
+        cibQueryData.setOperationsRefs(operationsRefs);
+        cibQueryData.setMetaAttrsRefs(metaAttrsRefs);
         cibQueryData.setResOpIds(resOpIdsMap);
         cibQueryData.setNodeOnline(nodeOnline);
         cibQueryData.setGroupsToResources(groupsToResourcesMap);
