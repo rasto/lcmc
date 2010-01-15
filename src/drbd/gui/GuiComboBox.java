@@ -146,8 +146,9 @@ public class GuiComboBox extends JPanel {
             } else if (items.length == 0) {
                 this.type = Type.TEXTFIELD;
             } else if (items.length == 2) {
-                if (items[0].toString().equalsIgnoreCase(
+                if (items[0] != null && items[0].toString().equalsIgnoreCase(
                             Tools.getString("Boolean.True"))
+                    && items[1] != null
                     && items[1].toString().equalsIgnoreCase(
                                         Tools.getString("Boolean.False"))) {
                     this.type = type.CHECKBOX;
@@ -666,6 +667,13 @@ public class GuiComboBox extends JPanel {
                 for (final JComponent c : componentsHash.values()) {
                     c.setEnabled(enabled);
                 }
+                switch(type) {
+                    case TEXTFIELDWITHUNIT:
+                        System.out.println("tf set enabled: " + enabled);
+                        textFieldWithoutUnit.setEnabled(enabled);
+                        unitComboBox.setEnabled(enabled);
+                    break;
+                }
             }
         });
     }
@@ -713,7 +721,8 @@ public class GuiComboBox extends JPanel {
                     Object selectedObject = null;
                     for (int i = 0; i < cb.getItemCount(); i++) {
                         final Object it = cb.getItemAt(i);
-                        if (it.toString().equals(item)
+                        if (it == item
+                            || it.toString().equals(item)
                             || it.equals(item)
                             || (NOTHING_SELECTED.equals(it) && item == null)) {
                             selectedObject = it;

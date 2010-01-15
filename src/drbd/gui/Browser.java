@@ -102,7 +102,7 @@ public class Browser {
     private static final ImageIcon APPLY_ICON =
             Tools.createImageIcon(Tools.getDefault("Browser.ApplyIcon"));
     /** Actions memu icon. */
-    private static final ImageIcon ACTIONS_ICON =
+    protected static final ImageIcon ACTIONS_ICON =
             Tools.createImageIcon(Tools.getDefault("Browser.ActionsIcon"));
     /** Color of the most of backgrounds. */
     private static final Color PANEL_BACKGROUND =
@@ -229,7 +229,7 @@ public class Browser {
      * etc. It provides methods to show this info and graphical view if
      * available.
      */
-    public class Info {
+    public class Info implements Comparable {
         /** Menu node of this object. */
         private DefaultMutableTreeNode node;
         /** Name of the object. */
@@ -778,6 +778,10 @@ public class Browser {
                     /* do nothing */
                 }
             });
+        }
+
+        public final int compareTo(Object o) {
+            return toString().compareToIgnoreCase(o.toString()); 
         }
     }
 

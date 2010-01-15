@@ -432,6 +432,12 @@ public class ResourceAgent {
                && "clone".equals(resourceClass);
     }
 
+    /**
+     * Returns whether this service/object is stonith device.
+     */
+    public final boolean isStonith() {
+        return "stonith".equals(resourceClass);
+    }
 
     /**
      * Returns whether this service is in the heartbeat class.

@@ -99,6 +99,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Enumeration;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -228,6 +230,11 @@ public class ClusterBrowser extends Browser {
     /** Migrated subtext. */
     private static final Subtext MIGRATED_SUBTEXT =
                                          new Subtext("(migrated)", Color.RED);
+    /** default values item in the "same as" scrolling list in operations. */
+    private static final String OPERATIONS_DEFAULT_VALUES_TEXT =
+                                                            "default values";
+    /** default values internal name */
+    private static final String OPERATIONS_DEFAULT_VALUES = "default";
 
     /** Whether drbd status was canceled by user. */
     private boolean drbdStatusCanceled = true;
@@ -1511,7 +1518,7 @@ public class ClusterBrowser extends Browser {
         final String id = si.getService().getId();
         String pmId = si.getService().getHeartbeatId();
         if (pmId == null) {
-            if (PM_GROUP_NAME.equals(si.getName())) {
+            if (PM_GROUP_NAME.equals(si.getService().getName())) {
                 pmId = Service.GRP_ID_PREFIX;
             } else if (PM_CLONE_SET_NAME.equals(si.getService().getName())
                        || PM_MASTER_SLAVE_SET_NAME.equals(
@@ -4954,6 +4961,12 @@ public class ClusterBrowser extends Browser {
          * operation name like "start" and second key is parameter like
          * "timeout". */
         private final MultiKeyMap savedOperation = new MultiKeyMap();
+        /** Whether id-ref for operations is used. */
+        private ServiceInfo savedOperationIdRef = null;
+        /** Combo box with same as operations option. */
+        private GuiComboBox sameAsOperationsCB;
+        /** saved operations lock */
+        private final Mutex mSavedOperationsLock = new Mutex();
         /** A map from operation to its combo box. */
         private final MultiKeyMap operationsComboBoxHash = new MultiKeyMap();
         /** idField text field. */
@@ -4984,7 +4997,11 @@ public class ClusterBrowser extends Browser {
                            final ResourceAgent resourceAgent) {
             super(name);
             this.resourceAgent = resourceAgent;
-            setResource(new Service(name.replaceAll("/", "_")));
+            if (resourceAgent.isStonith()) {
+                setResource(new Service(name.replaceAll("/", "_")));
+            } else {
+                setResource(new Service(name));
+            }
             getService().setNew(true);
         }
 
@@ -5206,32 +5223,43 @@ public class ClusterBrowser extends Browser {
                 }
             }
 
+            boolean allAreDefaultValues = true;
+            boolean allSavedAreDefaultValues = true;
             /* set operations */
+            String refCRMId = clusterStatus.getOperationsRef(
+                                            getService().getHeartbeatId());
+            if (refCRMId == null) {
+                refCRMId = getService().getHeartbeatId();
+            }
+            try {
+                mSavedOperationsLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             for (final String op : HB_OPERATIONS) {
-                String refCRMId = clusterStatus.getOperationsRef(
-                                                getService().getHeartbeatId());
-                if (refCRMId == null) {
-                    refCRMId = getService().getHeartbeatId();
-                }
                 for (final String param : HB_OPERATION_PARAMS.get(op)) {
                     final String defaultValue =
                                  resourceAgent.getOperationDefault(op, param);
                     if (defaultValue == null) {
                         continue;
                     }
-                    String value = clusterStatus.getOperation(
-                                                refCRMId,
-                                                op,
-                                                param);
+                    String value = clusterStatus.getOperation(refCRMId,
+                                                              op,
+                                                              param);
                     if (value == null) {
                         value = "";
                     }
+                    if (!defaultValue.equals(value)) {
+                        allAreDefaultValues = false;
+                    }
+                    if (!defaultValue.equals(savedOperation.get(op, param))) {
+                        allSavedAreDefaultValues = false;
+                    }
                     if (!value.equals(savedOperation.get(op, param))) {
                         savedOperation.put(op, param, value);
+                        final GuiComboBox cb =
+                           (GuiComboBox) operationsComboBoxHash.get(op, param);
                         if (infoPanelOk) {
-                            final GuiComboBox cb =
-                               (GuiComboBox) operationsComboBoxHash.get(op,
-                                                                        param);
                             if (value != null) {
                                 cb.setValue(value);
                             }
@@ -5239,6 +5267,33 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
+            final ServiceInfo operationIdRef =
+                                        heartbeatIdToServiceInfo.get(refCRMId);
+            if ((operationIdRef != null
+                 && savedOperationIdRef != null
+                 && !operationIdRef.toString().equals(
+                                             savedOperationIdRef.toString()))
+                || (operationIdRef != savedOperationIdRef)) {
+                savedOperationIdRef = operationIdRef;
+                if (sameAsOperationsCB != null) {
+                    if (operationIdRef == null) {
+                        if (allAreDefaultValues) {
+                            if (!allSavedAreDefaultValues) {
+                                sameAsOperationsCB.setValue(
+                                           OPERATIONS_DEFAULT_VALUES_TEXT);
+                            }
+                        } else {
+                            if (savedOperationIdRef != null) {
+                                sameAsOperationsCB.setValue(
+                                           GuiComboBox.NOTHING_SELECTED);
+                            }
+                        }
+                    } else {
+                        sameAsOperationsCB.setValue(operationIdRef);
+                    }
+                }
+            }
+            mSavedOperationsLock.release();
             getService().setAvailable();
         }
 
@@ -5557,6 +5612,12 @@ public class ClusterBrowser extends Browser {
          */
         private boolean checkOperationFieldsChanged() {
             boolean changed = false;
+            boolean allAreDefaultValues = true;
+            try {
+                mSavedOperationsLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             for (final String op : HB_OPERATIONS) {
                 for (final String param : HB_OPERATION_PARAMS.get(op)) {
                     final String defaultValue =
@@ -5567,9 +5628,13 @@ public class ClusterBrowser extends Browser {
                     final GuiComboBox cb =
                             (GuiComboBox) operationsComboBoxHash.get(op, param);
                     if (cb == null) {
+                        mSavedOperationsLock.release();
                         return false;
                     }
                     final String value = cb.getStringValue();
+                    if (!defaultValue.equals(value)) {
+                        allAreDefaultValues = false;
+                    }
                     final String savedOp =
                                         (String) savedOperation.get(op, param);
                     if (savedOp == null) {
@@ -5581,6 +5646,38 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
+            if (sameAsOperationsCB != null) {
+                final Info info = (Info) sameAsOperationsCB.getValue();
+                final boolean defaultValues =
+                        OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString());
+                if (!GuiComboBox.NOTHING_SELECTED.equals(info.toString())
+                    && !defaultValues
+                    && info != savedOperationIdRef) {
+                    changed = true;
+                } else {
+                    if (sameAsOperationsCB != null
+                        && defaultValues != allAreDefaultValues) {
+                        if (allAreDefaultValues) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    // TODO: listeners from this make 
+                                    // problems
+                                    //sameAsOperationsCB.setValue(
+                                    //           OPERATIONS_DEFAULT_VALUES_TEXT);
+                                }
+                            });
+                        } else {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    //sameAsOperationsCB.setValue(
+                                    //            GuiComboBox.NOTHING_SELECTED);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            mSavedOperationsLock.release();
             return changed;
         }
 
@@ -5905,6 +6002,73 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns all services except this one, that are of the same type.
+         */
+        private Info[] getSameServices() {
+            final List<Info> sl = new ArrayList<Info>();
+            sl.add(new StringInfo(GuiComboBox.NOTHING_SELECTED, null));
+            sl.add(new StringInfo(OPERATIONS_DEFAULT_VALUES_TEXT,
+                                  OPERATIONS_DEFAULT_VALUES));
+            for (final Info i
+                    : new TreeSet<Info>(heartbeatIdToServiceInfo.values())) {
+                if (i != this && i.getName().equals(getName())) {
+                    sl.add(i);
+                }
+            }
+            return sl.toArray(new Info[sl.size()]);
+        }
+
+        /**
+         * Sets operations with same values as other service info, or default
+         * values.
+         */
+        private void setOperationsSameAs(final Info info) {
+            if (sameAsOperationsCB == null) {
+                return;
+            }
+            if (GuiComboBox.NOTHING_SELECTED.equals(info.toString())) {
+                return;
+            } else {
+                boolean sameAs = true; 
+                if (OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
+                    sameAs = false;
+                }
+                try {
+                    mSavedOperationsLock.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                for (final String op : HB_OPERATIONS) {
+                    for (final String param : HB_OPERATION_PARAMS.get(op)) {
+                        String defaultValue =
+                                  resourceAgent.getOperationDefault(op, param);
+                        if (defaultValue == null) {
+                            continue;
+                        }
+                        if (sameAs) {
+                            /* same as some other service */
+                            defaultValue = (String)
+                              ((ServiceInfo) info).getSavedOperation().get(
+                                                                         op,
+                                                                         param);
+                        }
+                        final String newValue = defaultValue;
+                        final GuiComboBox cb =
+                          (GuiComboBox) operationsComboBoxHash.get(op, param);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (cb != null) {
+                                    cb.setValue(newValue);
+                                }
+                            }
+                        });
+                    }
+                }
+                mSavedOperationsLock.release();
+            }
+        }
+
+        /**
          * Creates operations combo boxes with labels,
          */
         protected void addOperations(final JPanel optionsPanel,
@@ -5918,11 +6082,36 @@ public class ClusterBrowser extends Browser {
 
             final JPanel panel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
-            final JPanel extraPanel = getParamPanel(
-                        Tools.getString("ClusterBrowser.AdvancedOperations"),
-                        EXTRA_PANEL_BACKGROUND
-                        );
-
+            // TODO: must be reloaded
+            String defaultOpIdRef = null;
+            try {
+                mSavedOperationsLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final ServiceInfo savedOpIdRef = savedOperationIdRef;
+            mSavedOperationsLock.release();
+            if (savedOpIdRef != null) {
+                defaultOpIdRef = savedOpIdRef.toString();
+            }
+            sameAsOperationsCB = new GuiComboBox(defaultOpIdRef,
+                                                 getSameServices(),
+                                                 null,
+                                                 null,
+                                                 rightWidth,
+                                                 null);
+            addField(panel,
+                     new JLabel("same as"),
+                     sameAsOperationsCB,
+                     leftWidth,
+                     rightWidth);
+            rows++;
+            boolean allAreDefaultValues = true;
+            try {
+                mSavedOperationsLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             for (final String op : HB_OPERATIONS) {
                 for (final String param : HB_OPERATION_PARAMS.get(op)) {
                     String defaultValue =
@@ -5937,6 +6126,14 @@ public class ClusterBrowser extends Browser {
                     if (defaultValue == null) {
                         defaultValue = "0";
                     }
+                    final String savedValue =
+                                        (String) savedOperation.get(op, param);
+                    if (!defaultValue.equals(savedValue)) {
+                        allAreDefaultValues = false;
+                    }
+                    if (savedValue != null) {
+                        defaultValue = savedValue;
+                    }
                     final GuiComboBox cb = new GuiComboBox(defaultValue,
                                                            null,
                                                            getUnits(),
@@ -5946,22 +6143,8 @@ public class ClusterBrowser extends Browser {
                                                            null);
 
                     operationsComboBoxHash.put(op, param, cb);
-                    final String savedValue =
-                                        (String) savedOperation.get(op, param);
-                    if (savedValue != null) {
-                        cb.setValue(savedValue);
-                    }
-
-                    JPanel p;
-                    if (HB_OP_BASIC.contains(op)) {
-                        p = panel;
-                        rows++;
-                    } else {
-                        p = extraPanel;
-                        extraRows++;
-                    }
-
-                    addField(p,
+                    rows++;
+                    addField(panel,
                              new JLabel(Tools.ucfirst(op)
                                         + " / " + Tools.ucfirst(param)),
                              cb,
@@ -5969,15 +6152,32 @@ public class ClusterBrowser extends Browser {
                              rightWidth);
                 }
             }
+            mSavedOperationsLock.release();
+            if (allAreDefaultValues && savedOpIdRef == null) {
+                sameAsOperationsCB.setValue(OPERATIONS_DEFAULT_VALUES_TEXT);
+            }
+            sameAsOperationsCB.addListeners(
+                new ItemListener() {
+                    public void itemStateChanged(final ItemEvent e) {
+                        if (e.getStateChange() == ItemEvent.SELECTED) {
+                            final Thread thread = new Thread(
+                                                          new Runnable() {
+                                public void run() {
+                                    setOperationsSameAs(
+                                          (Info) sameAsOperationsCB.getValue());
+                                }
+                            });
+                            thread.start();
+                        }
+                    }
+                },
+                null
+            );
 
             SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
                                             1, 1,           /* initX, initY */
                                             1, 1);          /* xPad, yPad */
-            SpringUtilities.makeCompactGrid(extraPanel, extraRows, 2,
-                                            1, 1,
-                                            1, 1);
             optionsPanel.add(panel);
-            extraOptionsPanel.add(extraPanel);
         }
 
         /**
@@ -8200,6 +8400,13 @@ public class ClusterBrowser extends Browser {
                 }
             }
             return null;
+        }
+
+        /**
+         * Returns hash with saved operations. 
+         */
+        public MultiKeyMap getSavedOperation() {
+            return savedOperation;
         }
     }
 
