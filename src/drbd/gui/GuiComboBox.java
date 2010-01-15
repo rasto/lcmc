@@ -84,7 +84,6 @@ public class GuiComboBox extends JPanel {
     /** Widget type. */
     public enum Type { TEXTFIELD, PASSWDFIELD, COMBOBOX, RADIOGROUP, CHECKBOX,
                        TEXTFIELDWITHUNIT };
-
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Component of this widget. */

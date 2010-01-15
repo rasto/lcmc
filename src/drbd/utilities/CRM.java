@@ -148,6 +148,7 @@ public final class CRM {
                            final Map<String, String> nvpairIdsHash,
                            final Map<String, Map<String, String>> pacemakerOps,
                            String operationsId,
+                           final String operationsRefId,
                            final boolean testOnly) {
         if (instanceAttrId == null) {
             instanceAttrId = heartbeatId + "-instance_attributes";
@@ -235,7 +236,12 @@ public final class CRM {
             xml.append("</instance_attributes>");
         }
         /* operations */
-        if (!pacemakerOps.isEmpty()) {
+        if (operationsRefId != null) {
+            xml.append("<operations id-ref=\"");
+            xml.append(operationsRefId);
+            xml.append("\"/>");
+        } else if (!pacemakerOps.isEmpty()) {
+            //TODO: not "else if" but update the referred service. 
             if (pmV != null
                 || hbV == null
                 || Tools.compareVersions(hbV, "2.99.0") >= 0) {

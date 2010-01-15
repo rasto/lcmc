@@ -5650,11 +5650,17 @@ public class ClusterBrowser extends Browser {
                 final Info info = (Info) sameAsOperationsCB.getValue();
                 final boolean defaultValues =
                         OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString());
-                if (!GuiComboBox.NOTHING_SELECTED.equals(info.toString())
+                final boolean nothingSelected =
+                          GuiComboBox.NOTHING_SELECTED.equals(info.toString());
+                if (!nothingSelected
                     && !defaultValues
                     && info != savedOperationIdRef) {
                     changed = true;
                 } else {
+                    if ((nothingSelected || defaultValues)
+                        && savedOperationIdRef != null) {
+                        changed = true;
+                    }
                     if (sameAsOperationsCB != null
                         && defaultValues != allAreDefaultValues) {
                         if (allAreDefaultValues) {
@@ -6850,6 +6856,24 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns id of the operations to which operations of this service are
+         * referring to.
+         */
+        private String getOperationsRefId() {
+            String operationsRefId = null;
+            if (sameAsOperationsCB != null) {
+                final Info i = (Info) sameAsOperationsCB.getValue();
+                if (!GuiComboBox.NOTHING_SELECTED.equals(i.toString())
+                    && !OPERATIONS_DEFAULT_VALUES_TEXT.equals(i.toString())) {
+                    final ServiceInfo si  = (ServiceInfo) i;
+                    operationsRefId = clusterStatus.getOperationsId(
+                                            si.getService().getHeartbeatId());
+                }
+            }
+            return operationsRefId;
+        }
+
+        /**
          * Applies the changes to the service parameters.
          */
         public void apply(final Host dcHost, final boolean testOnly) {
@@ -6984,6 +7008,7 @@ public class ClusterBrowser extends Browser {
                                   null,
                                   getOperations(heartbeatId),
                                   null,
+                                  getOperationsRefId(),
                                   testOnly);
                 if (groupInfo == null) {
                     final String[] parents = heartbeatGraph.getParents(this);
@@ -7069,6 +7094,7 @@ public class ClusterBrowser extends Browser {
                         clusterStatus.getParametersNvpairsIds(heartbeatId),
                         getOperations(heartbeatId),
                         clusterStatus.getOperationsId(heartbeatId),
+                        getOperationsRefId(),
                         testOnly);
                 if (isFailed(testOnly)) {
                     cleanupResource(dcHost, testOnly);
