@@ -100,6 +100,7 @@ import java.util.Iterator;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.TreeMap;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
@@ -150,7 +151,10 @@ public class ClusterBrowser extends Browser {
 
     /** name (hb type) + id to service info hash. */
     private final Map<String, Map<String, ServiceInfo>> nameToServiceInfoHash =
-                                new HashMap<String, Map<String, ServiceInfo>>();
+                                new TreeMap<String, Map<String, ServiceInfo>>(
+                                                String.CASE_INSENSITIVE_ORDER);
+    /** Name to service hash lock. */
+    private final Mutex mNameToServiceLock = new Mutex();
     /** drbd resource name string to drbd resource info hash. */
     private final Map<String, DrbdResourceInfo> drbdResHash =
                                 new HashMap<String, DrbdResourceInfo>();
@@ -1483,12 +1487,19 @@ public class ClusterBrowser extends Browser {
      */
     protected final ServiceInfo getServiceInfoFromId(final String name,
                                                      final String id) {
+        try {
+            mNameToServiceLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         final Map<String, ServiceInfo> idToInfoHash =
                                                 nameToServiceInfoHash.get(name);
         if (idToInfoHash == null) {
             return null;
         }
-        return idToInfoHash.get(id);
+        final ServiceInfo si = idToInfoHash.get(id);
+        mNameToServiceLock.release();
+        return si;
     }
 
     /**
@@ -1498,13 +1509,19 @@ public class ClusterBrowser extends Browser {
      *              service info object
      */
     protected final void removeFromServiceInfoHash(
-                                                final ServiceInfo serviceInfo) {
+                                               final ServiceInfo serviceInfo) {
         final Service service = serviceInfo.getService();
+        try {
+            mNameToServiceLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         final Map<String, ServiceInfo> idToInfoHash =
                         nameToServiceInfoHash.get(service.getName());
         if (idToInfoHash != null) {
             idToInfoHash.remove(service.getId());
         }
+        mNameToServiceLock.release();
     }
 
     /**
@@ -1582,6 +1599,11 @@ public class ClusterBrowser extends Browser {
         /* add to the hash with service name and id as
          * keys */
         final Service service = serviceInfo.getService();
+        try {
+            mNameToServiceLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         Map<String, ServiceInfo> idToInfoHash =
                                 nameToServiceInfoHash.get(service.getName());
         String csPmId = null;
@@ -1647,6 +1669,7 @@ public class ClusterBrowser extends Browser {
         idToInfoHash.put(service.getId(), serviceInfo);
         nameToServiceInfoHash.remove(service.getName());
         nameToServiceInfoHash.put(service.getName(), idToInfoHash);
+        mNameToServiceLock.release();
     }
 
     /**
@@ -4144,6 +4167,14 @@ public class ClusterBrowser extends Browser {
                                            final boolean drbddiskIsPreferred) {
             this.drbddiskIsPreferred = drbddiskIsPreferred;
         }
+
+        /**
+         * Reload filesystem combo boxes.
+         */
+        public void reloadComboBoxes() {
+            super.reloadComboBoxes();
+        }
+
     }
 
     /**
@@ -4957,6 +4988,8 @@ public class ClusterBrowser extends Browser {
         /** A map from host to stored score. */
         private final Map<HostInfo, String> savedHostScores =
                                                new HashMap<HostInfo, String>();
+        /** Saved operations id. */
+        private String savedOperationsId = null;
         /** A map from operation to the stored value. First key is
          * operation name like "start" and second key is parameter like
          * "timeout". */
@@ -4964,7 +4997,7 @@ public class ClusterBrowser extends Browser {
         /** Whether id-ref for operations is used. */
         private ServiceInfo savedOperationIdRef = null;
         /** Combo box with same as operations option. */
-        private GuiComboBox sameAsOperationsCB;
+        private GuiComboBox sameAsOperationsCB = null;
         /** saved operations lock */
         private final Mutex mSavedOperationsLock = new Mutex();
         /** A map from operation to its combo box. */
@@ -5175,6 +5208,17 @@ public class ClusterBrowser extends Browser {
                 Tools.appError("crmXML is null");
                 return;
             }
+            final String newOperationsId = clusterStatus.getOperationsId(
+                                                getService().getHeartbeatId());
+            if ((savedOperationsId == null && newOperationsId != null)
+                || (savedOperationsId != null
+                    && !savedOperationsId.equals(newOperationsId))) {
+                /* newly generated operations id, reload all other combo
+                   boxes. */
+                heartbeatGraph.getServicesInfo().reloadAllComboBoxes(this);
+            }
+            savedOperationsId = newOperationsId;
+
             final String[] params = crmXML.getParameters(resourceAgent);
             if (params != null) {
                 for (String param : params) {
@@ -5228,6 +5272,8 @@ public class ClusterBrowser extends Browser {
             /* set operations */
             String refCRMId = clusterStatus.getOperationsRef(
                                             getService().getHeartbeatId());
+            final ServiceInfo operationIdRef =
+                                        heartbeatIdToServiceInfo.get(refCRMId);
             if (refCRMId == null) {
                 refCRMId = getService().getHeartbeatId();
             }
@@ -5257,9 +5303,15 @@ public class ClusterBrowser extends Browser {
                     }
                     if (!value.equals(savedOperation.get(op, param))) {
                         savedOperation.put(op, param, value);
-                        final GuiComboBox cb =
-                           (GuiComboBox) operationsComboBoxHash.get(op, param);
                         if (infoPanelOk) {
+                            final GuiComboBox cb =
+                               (GuiComboBox) operationsComboBoxHash.get(op,
+                                                                        param);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    cb.setEnabled(operationIdRef == null);
+                                }
+                            });
                             if (value != null) {
                                 cb.setValue(value);
                             }
@@ -5267,8 +5319,6 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
-            final ServiceInfo operationIdRef =
-                                        heartbeatIdToServiceInfo.get(refCRMId);
             if ((operationIdRef != null
                  && savedOperationIdRef != null
                  && !operationIdRef.toString().equals(
@@ -5722,6 +5772,11 @@ public class ClusterBrowser extends Browser {
         public List<ServiceInfo> getExistingServiceList(final ServiceInfo p) {
             final List<ServiceInfo> existingServiceList =
                                                    new ArrayList<ServiceInfo>();
+            try {
+                mNameToServiceLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             for (final String name : nameToServiceInfoHash.keySet()) {
                 final Map<String, ServiceInfo> idHash =
                                                 nameToServiceInfoHash.get(name);
@@ -5732,6 +5787,7 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
+            mNameToServiceLock.release();
             return existingServiceList;
         }
 
@@ -6008,6 +6064,36 @@ public class ClusterBrowser extends Browser {
         }
 
         /**
+         * Returns whetrher this service's operations are referenced by some
+         * other service.
+         */
+        private boolean isOperatationReferenced() {
+            for (final ServiceInfo si : heartbeatIdToServiceInfo.values()) {
+                final String refCRMId = clusterStatus.getOperationsRef(
+                                            si.getService().getHeartbeatId());
+                if (refCRMId != null
+                    && refCRMId.equals(getService().getHeartbeatId())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Returns selected operations id reference.
+         */
+        private Info getSameServiceOpIdRef() {
+            try {
+                mSavedOperationsLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final ServiceInfo savedOpIdRef = savedOperationIdRef;
+            mSavedOperationsLock.release();
+            return savedOpIdRef;
+        }
+
+        /**
          * Returns all services except this one, that are of the same type.
          */
         private Info[] getSameServices() {
@@ -6015,12 +6101,42 @@ public class ClusterBrowser extends Browser {
             sl.add(new StringInfo(GuiComboBox.NOTHING_SELECTED, null));
             sl.add(new StringInfo(OPERATIONS_DEFAULT_VALUES_TEXT,
                                   OPERATIONS_DEFAULT_VALUES));
-            for (final Info i
-                    : new TreeSet<Info>(heartbeatIdToServiceInfo.values())) {
-                if (i != this && i.getName().equals(getName())) {
-                    sl.add(i);
+            if (isOperatationReferenced()) {
+                return sl.toArray(new Info[sl.size()]);
+            }
+            try {
+                mNameToServiceLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final Map<String, ServiceInfo> idToInfoHash =
+                                          nameToServiceInfoHash.get(getName());
+            for (final ServiceInfo si : new TreeSet<ServiceInfo>(
+                                                      idToInfoHash.values())) {
+                if (si != this
+                    && clusterStatus.getOperationsId(
+                                 si.getService().getHeartbeatId()) != null
+                    && clusterStatus.getOperationsRef(
+                                 si.getService().getHeartbeatId()) == null) {
+                    sl.add(si);
                 }
             }
+            for (final String name : nameToServiceInfoHash.keySet()) {
+                final Map<String, ServiceInfo> idToInfo =
+                                              nameToServiceInfoHash.get(name);
+                for (final ServiceInfo si : new TreeSet<ServiceInfo>(
+                                                      idToInfo.values())) {
+                    if (si != this
+                        && !si.getName().equals(getName())
+                        && clusterStatus.getOperationsId(
+                                   si.getService().getHeartbeatId()) != null
+                        && clusterStatus.getOperationsRef(
+                                   si.getService().getHeartbeatId()) == null) {
+                        sl.add(si);
+                    }
+                }
+            }
+            mNameToServiceLock.release();
             return sl.toArray(new Info[sl.size()]);
         }
 
@@ -6032,25 +6148,30 @@ public class ClusterBrowser extends Browser {
             if (sameAsOperationsCB == null) {
                 return;
             }
+            boolean nothingSelected = false;
             if (GuiComboBox.NOTHING_SELECTED.equals(info.toString())) {
-                return;
-            } else {
-                boolean sameAs = true; 
-                if (OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
-                    sameAs = false;
-                }
-                try {
-                    mSavedOperationsLock.acquire();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                for (final String op : HB_OPERATIONS) {
-                    for (final String param : HB_OPERATION_PARAMS.get(op)) {
-                        String defaultValue =
-                                  resourceAgent.getOperationDefault(op, param);
-                        if (defaultValue == null) {
-                            continue;
-                        }
+                nothingSelected = true;
+            }
+            boolean sameAs = true; 
+            if (OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
+                sameAs = false;
+            }
+            try {
+                mSavedOperationsLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            for (final String op : HB_OPERATIONS) {
+                for (final String param : HB_OPERATION_PARAMS.get(op)) {
+                    String defaultValue =
+                              resourceAgent.getOperationDefault(op, param);
+                    if (defaultValue == null) {
+                        continue;
+                    }
+                    final GuiComboBox cb =
+                      (GuiComboBox) operationsComboBoxHash.get(op, param);
+                    cb.setEnabled(!sameAs || nothingSelected);
+                    if (!nothingSelected) {
                         if (sameAs) {
                             /* same as some other service */
                             defaultValue = (String)
@@ -6059,8 +6180,6 @@ public class ClusterBrowser extends Browser {
                                                                          param);
                         }
                         final String newValue = defaultValue;
-                        final GuiComboBox cb =
-                          (GuiComboBox) operationsComboBoxHash.get(op, param);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 if (cb != null) {
@@ -6070,8 +6189,8 @@ public class ClusterBrowser extends Browser {
                         });
                     }
                 }
-                mSavedOperationsLock.release();
             }
+            mSavedOperationsLock.release();
         }
 
         /**
@@ -6088,15 +6207,8 @@ public class ClusterBrowser extends Browser {
 
             final JPanel panel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
-            // TODO: must be reloaded
             String defaultOpIdRef = null;
-            try {
-                mSavedOperationsLock.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            final ServiceInfo savedOpIdRef = savedOperationIdRef;
-            mSavedOperationsLock.release();
+            final Info savedOpIdRef = getSameServiceOpIdRef();
             if (savedOpIdRef != null) {
                 defaultOpIdRef = savedOpIdRef.toString();
             }
@@ -6106,8 +6218,10 @@ public class ClusterBrowser extends Browser {
                                                  null,
                                                  rightWidth,
                                                  null);
+            sameAsOperationsCB.setToolTipText(defaultOpIdRef);
             addField(panel,
-                     new JLabel("same as"),
+                     new JLabel(Tools.getString(
+                                            "ClusterBrowser.OperationsSameAs")),
                      sameAsOperationsCB,
                      leftWidth,
                      rightWidth);
@@ -6147,6 +6261,7 @@ public class ClusterBrowser extends Browser {
                                                            regexp,
                                                            rightWidth,
                                                            null);
+                    cb.setEnabled(savedOpIdRef == null);
 
                     operationsComboBoxHash.put(op, param, cb);
                     rows++;
@@ -6169,8 +6284,22 @@ public class ClusterBrowser extends Browser {
                             final Thread thread = new Thread(
                                                           new Runnable() {
                                 public void run() {
-                                    setOperationsSameAs(
-                                          (Info) sameAsOperationsCB.getValue());
+                                    final Info info =
+                                         (Info) sameAsOperationsCB.getValue();
+                                    setOperationsSameAs(info);
+                                    final String[] params =
+                                                    getParametersFromXML();
+                                    final boolean enable =
+                                        checkResourceFields(CACHED_FIELD,
+                                                            params);
+                                    SwingUtilities.invokeLater(
+                                    new Runnable() {
+                                        public void run() {
+                                            applyButton.setEnabled(enable);
+                                            sameAsOperationsCB.setToolTipText(
+                                                               info.toString());
+                                        }
+                                    });
                                 }
                             });
                             thread.start();
@@ -7339,6 +7468,8 @@ public class ClusterBrowser extends Browser {
                     reload(servicesNode);
                     reload(newServiceNode);
                 }
+                heartbeatGraph.getServicesInfo().reloadAllComboBoxes(
+                                                                  serviceInfo);
             }
             if (reloadNode && serviceInfo.getResourceAgent().isMasterSlave()) {
                 serviceInfo.changeType(MASTER_SLAVE_TYPE_STRING);
@@ -7539,6 +7670,7 @@ public class ClusterBrowser extends Browser {
                 infoPanel = null;
                 getService().doneRemoving();
                 Tools.unregisterExpertPanel(extraOptionsPanel);
+                heartbeatGraph.getServicesInfo().reloadAllComboBoxes(this);
             }
         }
 
@@ -8433,6 +8565,26 @@ public class ClusterBrowser extends Browser {
          */
         public MultiKeyMap getSavedOperation() {
             return savedOperation;
+        }
+
+        /**
+         * Reload combo boxes.
+         */
+        public void reloadComboBoxes() {
+            if (sameAsOperationsCB != null) {
+                String defaultOpIdRef = null;
+                final Info savedOpIdRef = getSameServiceOpIdRef();
+                if (savedOpIdRef != null) {
+                    defaultOpIdRef = savedOpIdRef.toString();
+                }
+                final String idRef = defaultOpIdRef;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        sameAsOperationsCB.reloadComboBox(idRef,
+                                                          getSameServices());
+                    }
+                });
+            }
         }
     }
 
@@ -9819,6 +9971,8 @@ public class ClusterBrowser extends Browser {
                     reload(servicesNode);
                     reload(newServiceNode);
                 }
+                heartbeatGraph.getServicesInfo().reloadAllComboBoxes(
+                                                               newServiceInfo);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         heartbeatGraph.scale();
@@ -10098,6 +10252,11 @@ public class ClusterBrowser extends Browser {
         public List<ServiceInfo> getExistingServiceList() {
             final List<ServiceInfo> existingServiceList =
                                             new ArrayList<ServiceInfo>();
+            try {
+                mNameToServiceLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             for (final String name : nameToServiceInfoHash.keySet()) {
                 final Map<String, ServiceInfo> idHash =
                                             nameToServiceInfoHash.get(name);
@@ -10106,6 +10265,7 @@ public class ClusterBrowser extends Browser {
                     existingServiceList.add(si);
                 }
             }
+            mNameToServiceLock.release();
             return existingServiceList;
         }
 
@@ -10130,6 +10290,28 @@ public class ClusterBrowser extends Browser {
         public void removeMyself(final boolean testOnly) {
             super.removeMyself(testOnly);
             Tools.unregisterExpertPanel(extraOptionsPanel);
+        }
+
+        /**
+         * Reloads all combo boxes that need to be reloaded.
+         */
+        public void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
+            try {
+                mNameToServiceLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            for (final String name : nameToServiceInfoHash.keySet()) {
+                final Map<String, ServiceInfo> idToInfoHash =
+                                                nameToServiceInfoHash.get(name);
+                for (final String id : idToInfoHash.keySet()) {
+                    final ServiceInfo si = idToInfoHash.get(id);
+                    if (si != exceptThisOne) {
+                        si.reloadComboBoxes();
+                    }
+                }
+            }
+            mNameToServiceLock.release();
         }
     }
 

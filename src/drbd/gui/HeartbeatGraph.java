@@ -805,6 +805,9 @@ public class HeartbeatGraph extends ResourceGraph {
             return vertexToHostMap.get(v).getHost().getPmColors()[0];
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
+        if (si == null) {
+            return null;
+        }
         if (getClusterBrowser().allHostsDown()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (si.isFailed(tOnly)) {

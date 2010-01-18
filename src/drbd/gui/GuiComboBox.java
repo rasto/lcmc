@@ -370,6 +370,7 @@ public class GuiComboBox extends JPanel {
 
         final JComboBox cb = (JComboBox) component;
         cb.setSelectedIndex(-1);
+        cb.removeAllItems();
         for (final Object item : comboList) {
             if (!itemCache.contains(item.toString())) {
                 cb.addItem(item);
@@ -607,12 +608,14 @@ public class GuiComboBox extends JPanel {
                     } else {
                         if (u.isEmpty()) {
                             u.setEmpty(false);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    unitComboBox.repaint();
-                                    unitComboBox.setEnabled(true);
-                                }
-                            });
+                            if (textFieldWithoutUnit.isEnabled()) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        unitComboBox.repaint();
+                                        unitComboBox.setEnabled(true);
+                                    }
+                                });
+                            }
                         }
                         s.append(u.getShortName());
                     }
@@ -668,7 +671,6 @@ public class GuiComboBox extends JPanel {
                 }
                 switch(type) {
                     case TEXTFIELDWITHUNIT:
-                        System.out.println("tf set enabled: " + enabled);
                         textFieldWithoutUnit.setEnabled(enabled);
                         unitComboBox.setEnabled(enabled);
                     break;
@@ -753,24 +755,26 @@ public class GuiComboBox extends JPanel {
                 break;
 
             case TEXTFIELDWITHUNIT:
-                final Matcher m = unitPattern.matcher((String) item);
-                String number = "";
-                String unit = "";
-                if (m.matches()) {
-                    number = m.group(1);
-                    unit = m.group(2);
-                }
-
-                textFieldWithoutUnit.setText(number);
-
-                Object selectedUnitInfo = null;
-                for (Unit u : units) {
-                    if (u.equals(unit)) {
-                        selectedUnitInfo = u;
+                if (item != null) {
+                    final Matcher m = unitPattern.matcher((String) item);
+                    String number = "";
+                    String unit = "";
+                    if (m.matches()) {
+                        number = m.group(1);
+                        unit = m.group(2);
                     }
-                }
 
-                unitComboBox.setSelectedItem(selectedUnitInfo);
+                    textFieldWithoutUnit.setText(number);
+
+                    Object selectedUnitInfo = null;
+                    for (Unit u : units) {
+                        if (u.equals(unit)) {
+                            selectedUnitInfo = u;
+                        }
+                    }
+
+                    unitComboBox.setSelectedItem(selectedUnitInfo);
+                }
                 break;
             default:
                 Tools.appError("impossible type");

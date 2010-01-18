@@ -1415,6 +1415,9 @@ public class TextResource extends
          "<html><b>What happens when you apply it:</b><br>"
          + "Starting drbdadm --dry-run test...</html>"},
 
+        {"ClusterBrowser.OperationsSameAs",
+         "Same As"},
+
 
         {"PtestData.ToolTip",
          "What happens when you apply it:"},
