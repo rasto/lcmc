@@ -79,8 +79,7 @@ public class DistResource_redhatenterpriseas_4_0 extends
         /* --no-check-certificate does not work on older rhel4, I don't know
            exactly which ones. */
         {"DrbdInst.wget",    "/usr/bin/wget --http-user='@USER@' --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
-         + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
-         + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
+         + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGES@"},
 
         {"HbPmInst.install.text.1",
          "opensuse:ha-clustering repo: 1.0.x/2.99.x" },

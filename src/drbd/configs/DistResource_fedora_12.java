@@ -42,7 +42,7 @@ public class DistResource_fedora_12 extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"PmInst.install.text.1",
          "the Fedora way: 1.0.x/1.2.x" },

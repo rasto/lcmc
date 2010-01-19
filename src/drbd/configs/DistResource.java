@@ -126,7 +126,13 @@ public class DistResource extends
          + "@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@"
          + "/@KERNELVERSIONDIR@/"
          + " -O - |perl -ple '($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?"
-         + "(?:(?:km|module|utils)[_-]@BUILD@)?[-_]?@DRBDVERSION@.*?[._]@ARCH@"
+         + "(?:bash-completion)?"
+         + "(?:heartbeat)?"
+         + "(?:pacemaker)?"
+         + "(?:udev)?"
+         + "(?:xen)?"
+         + "(?:(?:km|module|utils|bash-completion|heartbeat|pacemaker|udev|xen)"
+         + "[_-]@BUILD@)?[-_]?@DRBDVERSION@.*?[._]@ARCH@"
          + "\\.(?:rpm|deb))\"! or goto LINE'"
         },
 
@@ -134,8 +140,7 @@ public class DistResource extends
 
         /* donwload and installation */
         {"DrbdInst.test",
-         "/bin/ls /tmp/drbdinst/@DRBDPACKAGE@"
-         + " && /bin/ls /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+         "/bin/ls /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"DrbdInst.mkdir",   "/bin/mkdir -p /tmp/drbdinst/"},
 
@@ -143,9 +148,11 @@ public class DistResource extends
          "/usr/bin/wget --no-check-certificate --http-user='@USER@'"
          + " --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
          + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
-         + "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
-         + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
-         + "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
+         + "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGES@"},
+         //+ "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
+         //+ "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
+         //+ "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
+         //+ "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
         {"DrbdInst.start",   "/etc/init.d/drbd start"},
 
         {"installGuiHelper", "installGuiHelper"}, // is treated specially by ssh class.

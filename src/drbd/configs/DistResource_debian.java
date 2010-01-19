@@ -48,7 +48,8 @@ public class DistResource_debian extends
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+).*"},
 
-        {"DrbdInst.install", "echo | dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+        {"DrbdInst.install",
+         "echo | dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"HbPmInst.install.text.1", "the debian way: HB 2.1.x (obsolete)"},
         {"HbPmInst.install.1",

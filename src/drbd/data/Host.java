@@ -104,10 +104,8 @@ public class Host implements Serializable {
     private String drbdVersionUrlStringToInstall = null;
     /** Build, which will be installed. */
     private String drbdBuildToInstall = null;
-    /** Drbd package, that will be installed. */
-    private String drbdPackageToInstall = null;
-    /** Drbd module package, that will be installed. */
-    private String drbdModulePackageToInstall = null;
+    /** Drbd packages, that will be installed. */
+    private String drbdPackagesToInstall = null;
     /** Cluster data object. */
     private Cluster cluster = null;
     /** Drbd version of drbdadm tool. */
@@ -693,35 +691,12 @@ public class Host implements Serializable {
     }
 
     /**
-     * Sets drbd package that will be installed.
+     * Sets drbd packages to install.
      */
-    public final void setDrbdPackageToInstall(
-                                            final String drbdPackageToInstall) {
-        this.drbdPackageToInstall = drbdPackageToInstall;
+    public final void setDrbdPackagesToInstall(
+                                        final String drbdPackagesToInstall) {
+        this.drbdPackagesToInstall = drbdPackagesToInstall;
     }
-
-    /**
-     * Sets drbd module package that will be installed.
-     */
-    public final void setDrbdModulePackageToInstall(
-                                    final String drbdModulePackageToInstall) {
-        this.drbdModulePackageToInstall = drbdModulePackageToInstall;
-    }
-
-    /**
-     * Gets drbd package that will be installed.
-     */
-    public final String getDrbdPackageToInstall() {
-        return drbdPackageToInstall;
-    }
-
-    /**
-     * Gets drbd module package that will be installed.
-     */
-    public final String getDrbdModulePackageToInstall() {
-        return drbdModulePackageToInstall;
-    }
-
 
     /**
      * Sets distribution info for this host from array of strings.
@@ -1681,7 +1656,10 @@ public class Host implements Serializable {
                                    Tools.getConfigData().getDownloadPassword());
             }
         }
-        final String supportDir = "support";
+        String supportDir = "support";
+        if (Tools.getConfigData().isStagingDrbd()) {
+            supportDir = "support/staging";
+        }
         final String drbdDir = "drbd";
         if (kernelVersion != null
             && command.indexOf("@KERNELVERSIONDIR@") > -1) {
@@ -1703,14 +1681,10 @@ public class Host implements Serializable {
             && command.indexOf("@BUILD@") > -1) {
             command = command.replaceAll("@BUILD@", drbdBuildToInstall);
         }
-        if (drbdBuildToInstall != null
-            && command.indexOf("@DRBDPACKAGE@") > -1) {
-            command = command.replaceAll("@DRBDPACKAGE@", drbdPackageToInstall);
-        }
-        if (drbdBuildToInstall != null
-            && command.indexOf("@DRBDMODULEPACKAGE@") > -1) {
-            command = command.replaceAll("@DRBDMODULEPACKAGE@",
-                                         drbdModulePackageToInstall);
+        if (drbdPackagesToInstall != null
+            && command.indexOf("@DRBDPACKAGES@") > -1) {
+            command = command.replaceAll("@DRBDPACKAGES@",
+                                         drbdPackagesToInstall);
         }
         if (command.indexOf("@SUPPORTDIR@") > -1) {
             command = command.replaceAll("@SUPPORTDIR@", supportDir);

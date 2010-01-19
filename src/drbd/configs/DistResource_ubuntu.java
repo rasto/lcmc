@@ -48,8 +48,7 @@ public class DistResource_ubuntu extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+).*"},
 
         {"DrbdInst.install",
-         "dpkg -i --force-confold"
-         + " /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+         "dpkg -i --force-confold" + " /tmp/drbdinst/@DRBDPACKAGES@"},
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",

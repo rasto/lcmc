@@ -1462,10 +1462,12 @@ public class Browser {
                         final boolean check = checkParam(otherParam, newValue);
                         if (check) {
                             cb.setBackground(getParamDefault(otherParam),
+                                             getResource().getValue(otherParam),
                                              isRequired(otherParam));
                             if (wizardCb != null) {
                                 wizardCb.setBackground(
                                             getParamDefault(otherParam),
+                                            getResource().getValue(otherParam),
                                             isRequired(otherParam));
                             }
                         } else {

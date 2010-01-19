@@ -54,7 +54,7 @@ public class DistResource_redhatenterpriseas extends
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?EL\\d*).*"},
-        {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+        {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"HbPmInst.install.text.1", "the redhat way: HB 2.1.3 (obsolete)"},
         {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},

@@ -43,7 +43,6 @@ import javax.swing.SwingUtilities;
  *
  * @author Rasto Levrinc
  * @version $Id$
- *
  */
 public class HostDrbdAvailFiles extends DialogHost {
     /** Serial version UID. */
@@ -159,7 +158,6 @@ public class HostDrbdAvailFiles extends DialogHost {
      * Finds available files.
      */
     protected final void availFiles() {
-
         drbdBuildCombo.setEnabled(true);
         getHost().execCommandCache("DrbdAvailFiles",
                       null, /* ProgresBar */
@@ -171,10 +169,9 @@ public class HostDrbdAvailFiles extends DialogHost {
                                 }
                             });
                             final String[] files = ans.split("\\r?\\n");
-                            if (files.length == 2) {
-                                getHost().setDrbdPackageToInstall(files[0]);
-                                getHost().setDrbdModulePackageToInstall(
-                                                                 files[1]);
+                            if (files.length >= 2) {
+                                getHost().setDrbdPackagesToInstall(
+                                                       Tools.shellList(files));
                                 allDone();
                             } else {
                                 SwingUtilities.invokeLater(new Runnable() {

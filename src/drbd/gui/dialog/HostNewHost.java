@@ -132,6 +132,7 @@ public class HostNewHost extends DialogHost {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     hostField.setBackground(getHost().getHostnameEntered(),
+                                            getHost().getHostnameEntered(),
                                             true);
                 }
             });
@@ -142,7 +143,9 @@ public class HostNewHost extends DialogHost {
         if (uf) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    usernameField.setBackground(getHost().getUsername(), true);
+                    usernameField.setBackground(getHost().getUsername(),
+                                                getHost().getUsername(),
+                                                true);
                 }
             });
         } else {
@@ -152,7 +155,9 @@ public class HostNewHost extends DialogHost {
         if (pf) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    sshPortField.setBackground(getHost().getSSHPort(), true);
+                    sshPortField.setBackground(getHost().getSSHPort(),
+                                               getHost().getSSHPort(),
+                                               true);
                 }
             });
         } else {
@@ -236,7 +241,9 @@ public class HostNewHost extends DialogHost {
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField);
         inputPane.add(hostField);
-        hostField.setBackground(getHost().getHostnameEntered(), true);
+        hostField.setBackground(getHost().getHostnameEntered(),
+                                getHost().getHostnameEntered(),
+                                true);
 
         /* SSH Port */
         final JLabel sshPortLabel = new JLabel(
@@ -252,7 +259,9 @@ public class HostNewHost extends DialogHost {
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField);
         inputPane.add(sshPortField);
-        sshPortField.setBackground(getHost().getSSHPort(), true);
+        sshPortField.setBackground(getHost().getSSHPort(),
+                                   getHost().getSSHPort(),
+                                   true);
 
 
         /* Username */
@@ -265,7 +274,9 @@ public class HostNewHost extends DialogHost {
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField);
         inputPane.add(usernameField);
-        usernameField.setBackground(getHost().getUsername(), true);
+        usernameField.setBackground(getHost().getUsername(),
+                                    getHost().getUsername(),
+                                    true);
         inputPane.add(new JLabel(""));
         inputPane.add(new JLabel(""));
 

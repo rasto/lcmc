@@ -1919,4 +1919,30 @@ public final class Tools {
             return false;
         }
     }
+
+    /**
+     * Returns list that is expandable by shell. {'a','b'...}
+     */
+    public static String shellList(final String[] items) {
+        final StringBuffer list = new StringBuffer("");
+        if (items == null || items.length == 0) {
+            return null;
+        } else if (items.length == 1) {
+            list.append(items[0]);
+        } else {
+            list.append('{');
+            for (int i = 0; i < items.length - 1; i++) {
+                list.append('\'');
+                list.append(items[i]);
+                list.append("',");
+            }
+            if (items.length != 0) {
+                list.append('\'');
+                list.append(items[items.length - 1]);
+                list.append('\'');
+            }
+            list.append('}');
+        }
+        return list.toString();
+    }
 }

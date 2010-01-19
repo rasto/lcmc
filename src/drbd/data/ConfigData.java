@@ -101,6 +101,8 @@ public class ConfigData implements Serializable {
     private boolean ultravnc = false;
     /** Whether real vnc viewer should be used. */
     private boolean realvnc = false;
+    /** Whether the drbd packages should be downloaded from staging dir. */
+    private boolean stagingDrbd = false;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -496,6 +498,22 @@ public class ConfigData implements Serializable {
      */
     public final boolean isTightvnc() {
         return tightvnc;
+    }
+
+    /**
+     * Sets whether the drbd packages should be downloaded from staging
+     * directory for testing.
+     */
+    public final void setStagingDrbd(final boolean stagingDrbd) {
+        this.stagingDrbd = stagingDrbd;
+    }
+
+    /**
+     * Returns whether the drbd packages should be downloaded from staging
+     * directory for testing.
+     */
+    public final boolean isStagingDrbd() {
+        return stagingDrbd;
     }
 
     /**

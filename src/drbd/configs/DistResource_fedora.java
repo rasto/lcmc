@@ -46,7 +46,7 @@ public class DistResource_fedora extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"HbPmInst.install.text.3",
          "the fedora way: HB 2.1.x (obsolete)" },

@@ -102,18 +102,8 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
                                 /* all drbd versions are stored in form
                                  * {version1,version2,...}. This will be
                                  * later expanded by shell. */
-                                StringBuffer item = new StringBuffer("{");
-                                for (int i = 0; i < items.length - 1; i++) {
-                                    item.append("'" + items[i] + "',");
-                                }
-                                if (items.length != 0) {
-                                    item.append("'"
-                                                + items[items.length - 1]
-                                                + "'");
-                                }
-                                item.append('}');
                                 getHost().setDrbdVersionToInstall(
-                                                               item.toString());
+                                                        Tools.shellList(items));
                                 availDistributions();
                             }
                             public void doneError(final String ans,
@@ -471,16 +461,19 @@ public class HostDrbdLinbitAvailPackages extends DialogHost {
         final ItemListener archItemListener = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    String v = getHost().getArch();
-                    if (drbdArchItems == null || !drbdArchItems.contains(v)) {
-                        v = NO_MATCH_STRING;
-                    }
-                    drbdArchCombo.setValue(v);
+                    enableComponentsLater(
+                                new JComponent[]{buttonClass(nextButton())});
+                    getHost().setArch(drbdArchCombo.getStringValue());
+                    //String v = getHost().getArch();
+                    //if (drbdArchItems == null || !drbdArchItems.contains(v)) {
+                    //    v = NO_MATCH_STRING;
+                    //}
+                    //drbdArchCombo.setValue(v);
+                    availVersionsForDist();
                 }
             }
         };
         drbdArchCombo.addListeners(archItemListener, null);
-
     }
 
     /**

@@ -52,8 +52,7 @@ public class DistResource_suse extends
         /* drbd donwload and installation */
         // { "DrbdCheck.version", "/bin/rpm -qa|grep drbd- | sed s/drbd-//" },
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@"
-         + " /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
         /* heartbeat donwload and installation */
         //{ "HbCheck.version", "/bin/rpm -qa|grep heartbeat | sed s/.*heartbeat-//" },
         {"HbPmInst.install.i386", "i586" },

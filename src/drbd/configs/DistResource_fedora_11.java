@@ -42,7 +42,7 @@ public class DistResource_fedora_11 extends
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGE@ /tmp/drbdinst/@DRBDMODULEPACKAGE@"},
+         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",

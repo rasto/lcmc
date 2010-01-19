@@ -5681,17 +5681,25 @@ public class ClusterBrowser extends Browser {
                         mSavedOperationsLock.release();
                         return false;
                     }
-                    final String value = cb.getStringValue();
-                    if (!defaultValue.equals(value)) {
+                    final Object value = cb.getValue();
+                    if (value != null && !value.equals(defaultValue)) {
                         allAreDefaultValues = false;
                     }
                     final String savedOp =
                                         (String) savedOperation.get(op, param);
                     if (savedOp == null) {
-                        if (value != null && !value.equals(defaultValue)) {
+                        if (value != null
+                            && ((value instanceof Unit
+                                 && !((Unit) value).equals(defaultValue))
+                                || !value.equals(defaultValue))) {
                             changed = true;
                         }
-                    } else if (!savedOp.equals(value)) {
+                    } else if (value != null
+                               && ((value instanceof Unit
+                                    && !((Unit) value).equals(savedOp))
+                                   || !value.equals(savedOp))) {
+                        System.out.println("savedOp: " + savedOp
+                                           + ", value: " + value);
                         changed = true;
                     }
                 }
@@ -5734,6 +5742,8 @@ public class ClusterBrowser extends Browser {
                 }
             }
             mSavedOperationsLock.release();
+            System.out.println(toString()
+                                + ": op fields changed: " + changed);
             return changed;
         }
 
@@ -5741,21 +5751,22 @@ public class ClusterBrowser extends Browser {
          * Returns true if some of the scores have changed.
          */
         private boolean checkHostScoreFieldsChanged() {
+            boolean changed = false;
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
                 final String hsSaved = savedHostScores.get(hi);
                 if (cb == null) {
-                    return false;
+                    continue;
                 }
                 final String hs = cb.getStringValue();
                 if (hsSaved == null && !"".equals(hs)) {
-                    return true;
+                    changed = true;
                 } else if (hsSaved != null && !hs.equals(hsSaved)) {
-                    return true;
+                    changed = true;
                 }
             }
-            return false;
+            return changed;
         }
 
         /**
@@ -6111,14 +6122,16 @@ public class ClusterBrowser extends Browser {
             }
             final Map<String, ServiceInfo> idToInfoHash =
                                           nameToServiceInfoHash.get(getName());
-            for (final ServiceInfo si : new TreeSet<ServiceInfo>(
+            if (idToInfoHash != null) {
+                for (final ServiceInfo si : new TreeSet<ServiceInfo>(
                                                       idToInfoHash.values())) {
-                if (si != this
-                    && clusterStatus.getOperationsId(
-                                 si.getService().getHeartbeatId()) != null
-                    && clusterStatus.getOperationsRef(
-                                 si.getService().getHeartbeatId()) == null) {
-                    sl.add(si);
+                    if (si != this
+                        && clusterStatus.getOperationsId(
+                                    si.getService().getHeartbeatId()) != null
+                        && clusterStatus.getOperationsRef(
+                                   si.getService().getHeartbeatId()) == null) {
+                        sl.add(si);
+                    }
                 }
             }
             for (final String name : nameToServiceInfoHash.keySet()) {
@@ -8512,12 +8525,12 @@ public class ClusterBrowser extends Browser {
          */
         protected final Unit[] getUnits() {
             return new Unit[]{
-                new Unit("", "", "Second", "Seconds"), /* default unit */
+                new Unit("", "s", "Second", "Seconds"), /* default unit */
                 new Unit("ms", "ms", "Millisecond", "Milliseconds"),
                 new Unit("us", "us", "Microsecond", "Microseconds"),
                 new Unit("s",  "s",  "Second",      "Seconds"),
-                new Unit("m",  "m",  "Minute",      "Minutes"),
-                new Unit("h",   "h",  "Hour",        "Hours")
+                new Unit("min","m",  "Minute",      "Minutes"),
+                new Unit("h",  "h",  "Hour",        "Hours")
             };
         }
 
@@ -8573,7 +8586,7 @@ public class ClusterBrowser extends Browser {
         public void reloadComboBoxes() {
             if (sameAsOperationsCB != null) {
                 String defaultOpIdRef = null;
-                final Info savedOpIdRef = getSameServiceOpIdRef();
+                final Info savedOpIdRef = (Info) sameAsOperationsCB.getValue();
                 if (savedOpIdRef != null) {
                     defaultOpIdRef = savedOpIdRef.toString();
                 }
@@ -11055,8 +11068,8 @@ public class ClusterBrowser extends Browser {
             boolean correct = true;
             for (final HbConstraintInterface c : constraints) {
                 final boolean cor = c.checkResourceFieldsCorrect(
-                                      param,
-                                      c.getParametersFromXML());
+                                                  param,
+                                                  c.getParametersFromXML());
                 if (!cor) {
                     correct = false;
                     break;

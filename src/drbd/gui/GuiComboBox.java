@@ -111,6 +111,9 @@ public class GuiComboBox extends JPanel {
     /** Background of the field if the value is wrong. */
     private static final Color ERROR_VALUE_BACKGROUND =
                             Tools.getDefaultColor("GuiComboBox.ErrorValue");
+    /** Background of the field if the value has changed. */
+    private static final Color CHANGED_VALUE_BACKGROUND =
+                            Tools.getDefaultColor("GuiComboBox.ChangedValue");
     /** No scrollbar ever. */
     private static final int SCROLLBAR_MAX_ROWS = 10000;
     /** Widget default height. */
@@ -398,6 +401,9 @@ public class GuiComboBox extends JPanel {
                     && ((StringInfo) items[i]).getStringValue() != null
                     && ((StringInfo) items[i]).getStringValue().equals(
                                                              selectedValue)) {
+                    selectedValueInfo = items[i];
+                } else if (items[i] instanceof Unit
+                    && ((Unit) items[i]).equals(selectedValue)) {
                     selectedValueInfo = items[i];
                 } else if (items[i].toString().equals(selectedValue)
                     || items[i].equals(selectedValue)) {
@@ -933,31 +939,7 @@ public class GuiComboBox extends JPanel {
      * Sets the background for the component which value is incorrect (failed).
      */
     public final void wrongValue() {
-        switch(type) {
-            case TEXTFIELD:
-                component.setBackground(ERROR_VALUE_BACKGROUND);
-                break;
-            case PASSWDFIELD:
-                component.setBackground(ERROR_VALUE_BACKGROUND);
-                break;
-            case COMBOBOX:
-                setBackground(ERROR_VALUE_BACKGROUND);
-                break;
-            case RADIOGROUP:
-                component.setBackground(ERROR_VALUE_BACKGROUND);
-                for (final JComponent c : componentsHash.values()) {
-                    c.setBackground(ERROR_VALUE_BACKGROUND);
-                }
-                break;
-            case CHECKBOX:
-                component.setBackground(ERROR_VALUE_BACKGROUND);
-                break;
-            case TEXTFIELDWITHUNIT:
-                textFieldWithoutUnit.setBackground(ERROR_VALUE_BACKGROUND);
-                break;
-            default:
-                /* error */
-        }
+        setBackgroundColor(ERROR_VALUE_BACKGROUND);
     }
 
     /**
@@ -966,6 +948,7 @@ public class GuiComboBox extends JPanel {
      * Must be called after combo box was already added to some panel.
      */
     public final void setBackground(final String defaultValue,
+                                    final String savedValue,
                                     final boolean required) {
         final String value = getStringValue();
 
@@ -974,64 +957,70 @@ public class GuiComboBox extends JPanel {
             Tools.appError("wrong call to setBackground");
         }
         final Color backgroundColor = getParent().getBackground();
-        if (value.equals(defaultValue)) {
-            compColor = Tools.getDefaultColor("GuiComboBox.DefaultValue");
+        if (!value.equals(savedValue)) {
+            setBackgroundColor(
+                            Tools.getDefaultColor("GuiComboBox.ChangedValue"));
+        } else if (value.equals(defaultValue)) {
+            setBackgroundColor(
+                            Tools.getDefaultColor("GuiComboBox.DefaultValue"));
+        } else {
+            setBackgroundColor(null);
         }
-        switch(type) {
-            case TEXTFIELD:
-                /* change color possibly set by wrongValue() */
-                component.setBackground(compColor);
-                break;
-            case PASSWDFIELD:
-                component.setBackground(compColor);
-                break;
-            case COMBOBOX:
-                setBackground(Color.WHITE);
-                break;
-            case RADIOGROUP:
-                component.setBackground(backgroundColor);
-                for (final JComponent c : componentsHash.values()) {
-                    c.setBackground(backgroundColor);
-                }
-                break;
-            case CHECKBOX:
-                component.setBackground(backgroundColor);
-                break;
-            case TEXTFIELDWITHUNIT:
-                textFieldWithoutUnit.setBackground(Color.WHITE);
-                break;
-            default:
-                /* error */
-        }
-        Color c;
-        if (required) {
-            //TODO: required fields should be marked differently
-            c = Color.BLACK;
-        } else  {
-            c = backgroundColor;
-        }
-        switch(type) {
-            case TEXTFIELD:
-                setBackground(c);
-                break;
-            case PASSWDFIELD:
-                setBackground(c);
-                break;
-            case COMBOBOX:
-                setBackground(c);
-                break;
-            case RADIOGROUP:
-                setBackground(c);
-                break;
-            case CHECKBOX:
-                setBackground(c);
-                break;
-            case TEXTFIELDWITHUNIT:
-                setBackground(c);
-                break;
-            default:
-                /* error */
-        }
+        //switch(type) {
+        //    case TEXTFIELD:
+        //        /* change color possibly set by wrongValue() */
+        //        component.setBackground(compColor);
+        //        break;
+        //    case PASSWDFIELD:
+        //        component.setBackground(compColor);
+        //        break;
+        //    case COMBOBOX:
+        //        setBackground(Color.WHITE);
+        //        break;
+        //    case RADIOGROUP:
+        //        component.setBackground(backgroundColor);
+        //        for (final JComponent c : componentsHash.values()) {
+        //            c.setBackground(backgroundColor);
+        //        }
+        //        break;
+        //    case CHECKBOX:
+        //        component.setBackground(backgroundColor);
+        //        break;
+        //    case TEXTFIELDWITHUNIT:
+        //        textFieldWithoutUnit.setBackground(Color.WHITE);
+        //        break;
+        //    default:
+        //        /* error */
+        //}
+        //Color c = compColor;
+        ////if (required) {
+        ////    //TODO: required fields should be marked differently
+        ////    c = backgroundColor;
+        ////} else  {
+        ////    c = backgroundColor;
+        ////}
+        //switch(type) {
+        //    case TEXTFIELD:
+        //        setBackground(c);
+        //        break;
+        //    case PASSWDFIELD:
+        //        setBackground(c);
+        //        break;
+        //    case COMBOBOX:
+        //        setBackground(c);
+        //        break;
+        //    case RADIOGROUP:
+        //        setBackground(c);
+        //        break;
+        //    case CHECKBOX:
+        //        setBackground(c);
+        //        break;
+        //    case TEXTFIELDWITHUNIT:
+        //        setBackground(c);
+        //        break;
+        //    default:
+        //        /* error */
+        //}
     }
 
     /**
@@ -1215,10 +1204,30 @@ public class GuiComboBox extends JPanel {
     public final void setBackgroundColor(final Color bg) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                setBackground(bg);
-                component.setBackground(bg);
-                for (final JComponent c : componentsHash.values()) {
-                    c.setBackground(bg);
+                switch(type) {
+                    case TEXTFIELD:
+                        component.setBackground(bg);
+                        break;
+                    case PASSWDFIELD:
+                        component.setBackground(bg);
+                        break;
+                    case COMBOBOX:
+                        setBackground(bg);
+                        break;
+                    case RADIOGROUP:
+                        component.setBackground(bg);
+                        for (final JComponent c : componentsHash.values()) {
+                            c.setBackground(bg);
+                        }
+                        break;
+                    case CHECKBOX:
+                        setBackground(bg);
+                        break;
+                    case TEXTFIELDWITHUNIT:
+                        textFieldWithoutUnit.setBackground(bg);
+                        break;
+                    default:
+                        /* error */
                 }
             }
         });

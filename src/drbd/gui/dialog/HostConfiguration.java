@@ -372,7 +372,9 @@ public class HostConfiguration extends DialogHost {
                                     COMBO_BOX_WIDTH,
                                     null);
         inputPane.add(nameField);
-        nameField.setBackground(getHost().getName(), true);
+        nameField.setBackground(getHost().getName(),
+                                getHost().getName(),
+                                true);
         for (int i = 0; i < hops - 1; i++) {
             inputPane.add(new JLabel(""));
         }

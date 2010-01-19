@@ -70,8 +70,8 @@ public class DistResource_redhatenterpriseas_4 extends
          "/usr/bin/wget -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O - |perl -ple '($_) = m!href=\"(drbd8?-(?:plus8?-)?(?:utils)?(?:(?:km|module|utils)[_-]@BUILD@)?[-_]?@DRBDVERSION@.*?[._]@ARCH@\\.(?:rpm|deb))\"! or goto LINE'"
         },
         {"DrbdInst.wget",    "/usr/bin/wget --no-check-certificate --http-user='@USER@' --http-passwd='@PASSWORD@' --directory-prefix=/tmp/drbdinst/ "
-         + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
-         + "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
+         +
+         "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGES@"},
 
         /* Corosync/Openais/Pacemaker Opensuse */
         {"PmInst.install.text.1",
