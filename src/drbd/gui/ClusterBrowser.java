@@ -5698,8 +5698,6 @@ public class ClusterBrowser extends Browser {
                                && ((value instanceof Unit
                                     && !((Unit) value).equals(savedOp))
                                    || !value.equals(savedOp))) {
-                        System.out.println("savedOp: " + savedOp
-                                           + ", value: " + value);
                         changed = true;
                     }
                 }
@@ -5742,8 +5740,6 @@ public class ClusterBrowser extends Browser {
                 }
             }
             mSavedOperationsLock.release();
-            System.out.println(toString()
-                                + ": op fields changed: " + changed);
             return changed;
         }
 
@@ -6060,8 +6056,10 @@ public class ClusterBrowser extends Browser {
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
+                final JLabel label = new JLabel("on " + hi.getName());
+                cb.setLabel(label);
                 addField(panel,
-                         new JLabel("on " + hi.getName()),
+                         label,
                          cb,
                          leftWidth,
                          rightWidth);
@@ -6232,9 +6230,11 @@ public class ClusterBrowser extends Browser {
                                                  rightWidth,
                                                  null);
             sameAsOperationsCB.setToolTipText(defaultOpIdRef);
+            final JLabel label = new JLabel(Tools.getString(
+                                           "ClusterBrowser.OperationsSameAs"));
+            sameAsOperationsCB.setLabel(label);
             addField(panel,
-                     new JLabel(Tools.getString(
-                                            "ClusterBrowser.OperationsSameAs")),
+                     label,
                      sameAsOperationsCB,
                      leftWidth,
                      rightWidth);
@@ -6278,9 +6278,12 @@ public class ClusterBrowser extends Browser {
 
                     operationsComboBoxHash.put(op, param, cb);
                     rows++;
+                    final JLabel cbLabel = new JLabel(Tools.ucfirst(op)
+                                                      + " / "
+                                                      + Tools.ucfirst(param));
+                    cb.setLabel(label);
                     addField(panel,
-                             new JLabel(Tools.ucfirst(op)
-                                        + " / " + Tools.ucfirst(param)),
+                             cbLabel,
                              cb,
                              leftWidth,
                              rightWidth);

@@ -949,6 +949,7 @@ public class Browser {
 
                 /* label */
                 final JLabel label = new JLabel(getParamShortDesc(param));
+                paramCb.setLabel(label);
                 labelMap.put(paramCb, label);
 
                 /* tool tip */
@@ -1110,6 +1111,7 @@ public class Browser {
                 /* label */
                 final JLabel label = new JLabel(getParamShortDesc(param));
                 labelMap.put(paramCb, label);
+                paramCb.setLabel(label);
 
                 /* tool tip */
                 final String longDesc = getParamLongDesc(param);
@@ -1530,6 +1532,7 @@ public class Browser {
          * Return JLabel object for the combobox.
          */
         protected final JLabel getLabel(final GuiComboBox cb) {
+            //TODO: labelMap can be removed. cb.getLabel()
             return labelMap.get(cb);
         }
 

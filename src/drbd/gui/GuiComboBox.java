@@ -126,6 +126,8 @@ public class GuiComboBox extends JPanel {
     /** Nothing selected string, that returns null, if selected. */
     public static final String NOTHING_SELECTED =
                                 Tools.getString("GuiComboBox.NothingSelected");
+    /** Label of this component. */
+    private JComponent label = null;
     /**
      * Prepares a new <code>GuiComboBox</code> object with specified units.
      */
@@ -952,46 +954,54 @@ public class GuiComboBox extends JPanel {
                                     final boolean required) {
         final String value = getStringValue();
 
-        Color compColor = Color.WHITE;
         if (getParent() == null) {
             Tools.appError("wrong call to setBackground");
         }
         final Color backgroundColor = getParent().getBackground();
+        final Color compColor = Color.WHITE;
         if (!value.equals(savedValue)) {
-            setBackgroundColor(
+            if (label != null) {
+                label.setForeground(
                             Tools.getDefaultColor("GuiComboBox.ChangedValue"));
+            }
         } else if (value.equals(defaultValue)) {
-            setBackgroundColor(
+            if (label != null) {
+                label.setForeground(
                             Tools.getDefaultColor("GuiComboBox.DefaultValue"));
+            }
         } else {
-            setBackgroundColor(null);
+            if (label != null) {
+                label.setForeground(
+                            Tools.getDefaultColor("GuiComboBox.SavedValue"));
+            }
         }
-        //switch(type) {
-        //    case TEXTFIELD:
-        //        /* change color possibly set by wrongValue() */
-        //        component.setBackground(compColor);
-        //        break;
-        //    case PASSWDFIELD:
-        //        component.setBackground(compColor);
-        //        break;
-        //    case COMBOBOX:
-        //        setBackground(Color.WHITE);
-        //        break;
-        //    case RADIOGROUP:
-        //        component.setBackground(backgroundColor);
-        //        for (final JComponent c : componentsHash.values()) {
-        //            c.setBackground(backgroundColor);
-        //        }
-        //        break;
-        //    case CHECKBOX:
-        //        component.setBackground(backgroundColor);
-        //        break;
-        //    case TEXTFIELDWITHUNIT:
-        //        textFieldWithoutUnit.setBackground(Color.WHITE);
-        //        break;
-        //    default:
-        //        /* error */
-        //}
+        setBackground(backgroundColor);
+        switch(type) {
+            case TEXTFIELD:
+                /* change color possibly set by wrongValue() */
+                component.setBackground(compColor);
+                break;
+            case PASSWDFIELD:
+                component.setBackground(compColor);
+                break;
+            case COMBOBOX:
+                setBackground(Color.WHITE);
+                break;
+            case RADIOGROUP:
+                component.setBackground(backgroundColor);
+                for (final JComponent c : componentsHash.values()) {
+                    c.setBackground(backgroundColor);
+                }
+                break;
+            case CHECKBOX:
+                component.setBackground(backgroundColor);
+                break;
+            case TEXTFIELDWITHUNIT:
+                textFieldWithoutUnit.setBackground(Color.WHITE);
+                break;
+            default:
+                /* error */
+        }
         //Color c = compColor;
         ////if (required) {
         ////    //TODO: required fields should be marked differently
@@ -1221,7 +1231,7 @@ public class GuiComboBox extends JPanel {
                         }
                         break;
                     case CHECKBOX:
-                        setBackground(bg);
+                        component.setBackground(bg);
                         break;
                     case TEXTFIELDWITHUNIT:
                         textFieldWithoutUnit.setBackground(bg);
@@ -1231,5 +1241,12 @@ public class GuiComboBox extends JPanel {
                 }
             }
         });
+    }
+
+    /**
+     * Sets label for this component.
+     */
+    public final void setLabel(final JComponent label) {
+        this.label = label;
     }
 }

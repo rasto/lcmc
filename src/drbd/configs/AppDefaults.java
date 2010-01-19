@@ -190,8 +190,9 @@ public class AppDefaults extends
         {"Host.ErrorColor",                       Color.RED },
         {"Host.NoStatusColor",                    Color.LIGHT_GRAY },
 
-        {"GuiComboBox.DefaultValue",              new Color(255, 255, 240) },
-        {"GuiComboBox.ChangedValue",              Color.YELLOW},
+        {"GuiComboBox.DefaultValue",              new Color(50, 50, 50) },
+        {"GuiComboBox.SavedValue",                new Color(0, 120, 0) },
+        {"GuiComboBox.ChangedValue",              Color.RED},
         {"GuiComboBox.ErrorValue",                new Color(255, 100, 100) },
 
         {"ClusterBrowser.Background",             new Color(255, 255, 255) },
