@@ -399,9 +399,9 @@ public class GuiComboBox extends JPanel {
                 if (items[i] == null) {
                     items[i] = GuiComboBox.NOTHING_SELECTED;
                 }
-                if (items[i] instanceof StringInfo
-                    && ((StringInfo) items[i]).getStringValue() != null
-                    && ((StringInfo) items[i]).getStringValue().equals(
+                if (items[i] instanceof Info
+                    && ((Info) items[i]).getStringValue() != null
+                    && ((Info) items[i]).getStringValue().equals(
                                                              selectedValue)) {
                     selectedValueInfo = items[i];
                 } else if (items[i] instanceof Unit
@@ -545,7 +545,12 @@ public class GuiComboBox extends JPanel {
         if (o == null) {
             return "";
         } else {
-            return o.toString();
+            if (type == Type.TEXTFIELDWITHUNIT) {
+                return ((Object[]) o)[0].toString()
+                       + ((Unit) ((Object[]) o)[1]).getShortName();
+            } else {
+                return o.toString();
+            }
         }
     }
 
@@ -595,12 +600,11 @@ public class GuiComboBox extends JPanel {
                 if (text == null) {
                     text = "";
                 }
-                final StringBuffer s = new StringBuffer(text);
                 final Object unit = unitComboBox.getSelectedItem();
                 if (!Tools.isStringClass(unit)) {
                     final Unit u = (Unit) unit;
-                    if (u.isPlural() == "1".equals(s.toString())) {
-                        u.setPlural(!"1".equals(s.toString()));
+                    if (u.isPlural() == "1".equals(text)) {
+                        u.setPlural(!"1".equals(text));
                         unitComboBox.repaint();
                     }
                     if ("".equals(text)) {
@@ -625,10 +629,10 @@ public class GuiComboBox extends JPanel {
                                 });
                             }
                         }
-                        s.append(u.getShortName());
+                        //unitText = u.getShortName();
                     }
                 }
-                value = s.toString();
+                value = new Object[]{text, unit};
                 break;
             default:
                 /* error */
@@ -949,22 +953,22 @@ public class GuiComboBox extends JPanel {
      * as its default value and if it is a required argument.
      * Must be called after combo box was already added to some panel.
      */
-    public final void setBackground(final String defaultValue,
-                                    final String savedValue,
+    public final void setBackground(final Object defaultValue,
+                                    final Object savedValue,
                                     final boolean required) {
-        final String value = getStringValue();
+        final Object value = getValue();
 
         if (getParent() == null) {
             Tools.appError("wrong call to setBackground");
         }
         final Color backgroundColor = getParent().getBackground();
         final Color compColor = Color.WHITE;
-        if (!value.equals(savedValue)) {
+        if (!Tools.areEqual(value, savedValue)) {
             if (label != null) {
                 label.setForeground(
                             Tools.getDefaultColor("GuiComboBox.ChangedValue"));
             }
-        } else if (value.equals(defaultValue)) {
+        } else if (Tools.areEqual(value, defaultValue)) {
             if (label != null) {
                 label.setForeground(
                             Tools.getDefaultColor("GuiComboBox.DefaultValue"));

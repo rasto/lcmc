@@ -1643,7 +1643,7 @@ public class HostBrowser extends Browser {
     /**
      * This class holds info data for a net interface.
      */
-    class NetInfo extends Info {
+    public class NetInfo extends Info {
 
         /**
          * Prepares a new <code>NetInfo</code> object.
@@ -1717,7 +1717,18 @@ public class HostBrowser extends Browser {
         public boolean equals(final Object value) {
             if (Tools.isStringClass(value)) {
                 // TODO: race is here
-                return getNetInterface().getIp().equals(value.toString());
+                final NetInterface ni = getNetInterface();
+                if (value == null) {
+                    return false;
+                }
+                if (ni == null) {
+                    return false;
+                }
+                final String ip = ni.getIp();
+                if (ip == null) {
+                    return false;
+                }
+                return ip.equals(value.toString());
             } else {
                 return toString().equals(value.toString());
             }
@@ -2376,6 +2387,7 @@ public class HostBrowser extends Browser {
                                            ((BlockDevInfo) o).getBlockDevice();
                     getBlockDevice().setMetaDisk(metaDisk);
                 }
+                checkResourceFields(null, params);
             }
         }
 

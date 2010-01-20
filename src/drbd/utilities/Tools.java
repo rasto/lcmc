@@ -25,6 +25,10 @@ import drbd.data.ConfigData;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.Clusters;
+import drbd.gui.Browser.StringInfo;
+import drbd.gui.HostBrowser.NetInfo;
+import drbd.gui.ClusterBrowser.DrbdResourceInfo;
+import drbd.gui.Browser.Info;
 import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
 import drbd.data.CRMXML;
@@ -143,7 +147,8 @@ public final class Tools {
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     /** Text/plain mime type. */
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
-
+    /** Pattern that matches a number and unit. */
+    private static Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
     /**
      * Private constructor.
      */
@@ -1945,4 +1950,93 @@ public final class Tools {
         }
         return list.toString();
     }
+
+    /**
+     * Returns whether two objects are equal. Special handling for Units and
+     * StringInfo objects.
+     */
+    public static boolean areEqual(Object o1, Object o2) {
+        if (o1 == null && o2 == null) {
+            return true;
+        } else if (o1 != null && o1 instanceof DrbdResourceInfo) {
+            /* this is special case, because this object represents devices in
+             * filesystem ra and also after field in drbd.conf. */
+            final String device = ((DrbdResourceInfo) o1).getStringValue();
+            if (device.equals(o2)) {
+                return true;
+            }
+            final String res = ((DrbdResourceInfo) o1).getName();
+            if (res.equals(o2)) {
+                return true;
+            }
+            return false;
+        } else if (o1 != null && o1 instanceof Info) {
+            final String s1 = ((Info) o1).getStringValue();
+            if (s1 == null) {
+                return o2 == null;
+            }
+            if (o2 == null) {
+                return false;
+            }
+            if (o2 instanceof Info) {
+                return s1.equals(((Info) o2).getStringValue());
+            } else {
+                return s1.equals(o2);
+            }
+        } else if (o2 != null && o2 instanceof Info) {
+            final String s2 = ((Info) o2).getStringValue();
+            if (s2 == null) {
+                return o1 == null;
+            }
+            if (o1 == null) {
+                return false;
+            }
+            if (o1 instanceof Info) {
+                return s2.equals(((Info) o1).getStringValue());
+            } else {
+                return s2.equals(o1);
+            }
+        } else if ((o1 == null && o2 != null)
+            || (o1 == null && o2 != null)) {
+            return false;
+        } else if (o1 instanceof Object[]
+                   || o2 instanceof Object[]) {
+            final Object[] array1 = (Object[]) o1;
+            final Object[] array2 = (Object[]) o2;
+            for (int i = 0; i < array1.length; i++) {
+                if (!areEqual(array1[i], array2[i])) {
+                    return false;
+                }
+            }
+            return true;
+        } else if (o1 instanceof Unit) {
+            return ((Unit) o1).equals(o2);
+        } else if (o2 instanceof Unit) {
+            return ((Unit) o2).equals(o1);
+        } else if (o1 instanceof ComboInfo) {
+            return ((ComboInfo) o1).equals(o2);
+        } else if (o2 instanceof ComboInfo) {
+            return ((ComboInfo) o2).equals(o1);
+        } else {
+            return o1.equals(o2);
+        }
+    }
+
+    /**
+     * Returns value unit pair extracting from string. E.g. "10min" becomes 10
+     * and "min" pair.
+     */
+    public static Object[] extractUnit(final String time) {
+        final Object[] o = new Object[]{null, null};
+        if (time == null) {
+            return o;
+        }
+        final Matcher m = UNIT_PATTERN.matcher(time);
+        if (m.matches()) {
+            o[0] = m.group(1);
+            o[1] = m.group(2);
+        }
+        return o;
+    }
+    
 }

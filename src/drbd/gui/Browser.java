@@ -729,7 +729,8 @@ public class Browser {
          */
         protected Unit[] getUnits() {
             return new Unit[]{
-               new Unit("", "", "", ""),
+               //new Unit("", "", "", ""),
+               new Unit("", "s", "Second", "Seconds"), /* default unit */
                new Unit("msec", "ms", "Millisecond", "Milliseconds"),
                new Unit("usec", "us", "Microsecond", "Microseconds"),
                new Unit("sec",  "s",  "Second",      "Seconds"),
@@ -803,6 +804,10 @@ public class Browser {
         protected abstract boolean isInteger(String param);
         /** Returns whether this parameter is of the time type. */
         protected abstract boolean isTimeType(String param);
+        /** Returns whether this parameter has a unit prefix. */
+        protected boolean hasUnitPrefix(String param) {
+            return false;
+        }
         /** Returns whether this parameter is of the check box type, like
          * boolean. */
         protected abstract boolean isCheckBox(String param);
@@ -1232,6 +1237,9 @@ public class Browser {
             String value;
             if (Tools.isStringClass(o)) {
                 value = cb.getStringValue();
+            } else if (o instanceof Object[]) {
+                value = ((Object[]) o)[0].toString()
+                           + ((Unit) ((Object[]) o)[1]).getShortName();
             } else {
                 value = ((Info) o).getStringValue();
             }
@@ -1445,6 +1453,9 @@ public class Browser {
                     final Object o = cb.getValue();
                     if (Tools.isStringClass(o)) {
                         newValue = cb.getStringValue();
+                    } else if (o instanceof Object[]) {
+                        newValue = ((Object[]) o)[0].toString()
+                                   + ((Unit) ((Object[]) o)[1]).getShortName();
                     } else {
                         newValue = ((Info) o).getStringValue();
                     }
@@ -1456,21 +1467,43 @@ public class Browser {
                             final Object wo = wizardCb.getValue();
                             if (Tools.isStringClass(wo)) {
                                 newValue = wizardCb.getStringValue();
+                            } else if (wo instanceof Object[]) {
+                                newValue =
+                                   ((Object[]) wo)[0].toString()
+                                   + ((Unit) ((Object[]) wo)[1]).getShortName();
                             } else {
                                 newValue = ((Info) wo).getStringValue();
                             }
                         }
-
                         final boolean check = checkParam(otherParam, newValue);
                         if (check) {
-                            cb.setBackground(getParamDefault(otherParam),
+                            if (isTimeType(otherParam)
+                                || hasUnitPrefix(otherParam)) {
+                                cb.setBackground(
+                                     Tools.extractUnit(
+                                                  getParamDefault(otherParam)),
+                                     Tools.extractUnit(
+                                           getResource().getValue(otherParam)),
+                                     isRequired(otherParam));
+                                if (wizardCb != null) {
+                                    wizardCb.setBackground(
+                                        Tools.extractUnit(
+                                                  getParamDefault(otherParam)),
+                                        Tools.extractUnit(
+                                            getResource().getValue(otherParam)),
+                                        isRequired(otherParam));
+                                }
+                            } else {
+                                cb.setBackground(
+                                             getParamDefault(otherParam),
                                              getResource().getValue(otherParam),
                                              isRequired(otherParam));
-                            if (wizardCb != null) {
-                                wizardCb.setBackground(
+                                if (wizardCb != null) {
+                                    wizardCb.setBackground(
                                             getParamDefault(otherParam),
                                             getResource().getValue(otherParam),
                                             isRequired(otherParam));
+                                }
                             }
                         } else {
                             cb.wrongValue();
@@ -1504,23 +1537,17 @@ public class Browser {
                     if (cb == null) {
                         return false; // TODO: should it be so?
                     }
-                    final Object o = cb.getValue();
-                    String newValue;
-                    if (Tools.isStringClass(o)) {
-                        newValue = cb.getStringValue();
-                    } else {
-                        newValue = ((Info) o).getStringValue();
-                    }
+                    final Object newValue = cb.getValue();
 
                     /* check if value changed */
-                    String oldValue = getResource().getValue(otherParam);
+                    Object oldValue = getResource().getValue(otherParam);
                     if (oldValue == null) {
                         oldValue = getParamDefault(otherParam);
                     }
-                    if (oldValue == null) {
-                        oldValue = "";
+                    if (isTimeType(otherParam) || hasUnitPrefix(otherParam)) {
+                        oldValue = Tools.extractUnit((String) oldValue);
                     }
-                    if (!oldValue.equals(newValue)) {
+                    if (!Tools.areEqual(newValue, oldValue)) {
                         changedValue = true;
                     }
                 }

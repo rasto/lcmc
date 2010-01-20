@@ -236,7 +236,7 @@ public class ClusterBrowser extends Browser {
                                          new Subtext("(migrated)", Color.RED);
     /** default values item in the "same as" scrolling list in operations. */
     private static final String OPERATIONS_DEFAULT_VALUES_TEXT =
-                                                            "default values";
+                                                          "advisory minimum";
     /** default values internal name */
     private static final String OPERATIONS_DEFAULT_VALUES = "default";
 
@@ -1081,6 +1081,10 @@ public class ClusterBrowser extends Browser {
                                               heartbeatGraph.getServicesInfo();
                                 ssi.setGlobalConfig();
                                 ssi.setAllResources(testOnly);
+                                if (firstTime.getCount() == 1) {
+                                    /* one more time so that id-refs work. */
+                                    ssi.setAllResources(testOnly);
+                                }
                                 repaintTree();
                             }
                         }
@@ -2259,8 +2263,8 @@ public class ClusterBrowser extends Browser {
         protected final boolean checkParam(final String param,
                                            final String newValue) {
             if (DRBD_RES_PARAM_AFTER.equals(param)) {
-                /* drbdsetup xml syncer says it should be numeric and it is
-                 * wrong. drbd 8.3.4 */
+                /* drbdsetup xml syncer says it should be numeric, but in 
+                   /etc/drbd.conf it is not. */
                 return true;
             }
             return drbdXML.checkParam(param, newValue);
@@ -2443,7 +2447,8 @@ public class ClusterBrowser extends Browser {
                 paramComboBoxAdd(param, prefix, paramCb);
 
             } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
-                final List<Object> l = new ArrayList<Object>();
+                // TODO: has to be reloaded
+                final List<Info> l = new ArrayList<Info>();
                 String defaultItem =
                                 getResource().getValue(DRBD_RES_PARAM_AFTER);
                 final StringInfo di = new StringInfo(
@@ -2452,6 +2457,11 @@ public class ClusterBrowser extends Browser {
                 l.add(di);
                 if (defaultItem == null || "-1".equals(defaultItem)) {
                     defaultItem = Tools.getString("ClusterBrowser.None");
+                } else if (defaultItem != null) {
+                    final DrbdResourceInfo dri = drbdResHash.get(defaultItem);
+                    if (dri != null) {
+                        defaultItem = dri.getDevice();
+                    }
                 }
 
                 for (final String drbdRes : drbdResHash.keySet()) {
@@ -2468,9 +2478,8 @@ public class ClusterBrowser extends Browser {
                         l.add(r);
                     }
                 }
-
                 paramCb = new GuiComboBox(defaultItem,
-                                          l.toArray(new Object[l.size()]),
+                                          l.toArray(new Info[l.size()]),
                                           null,
                                           null,
                                           width,
@@ -2574,6 +2583,7 @@ public class ClusterBrowser extends Browser {
                 drbdResHash.put(name, this);
                 drbdDevHash.put(drbdDevStr, this);
                 drbdGraph.repaint();
+                checkResourceFields(null, params);
             }
         }
 
@@ -4417,6 +4427,7 @@ public class ClusterBrowser extends Browser {
             if (!testOnly) {
                 storeComboBoxValues(params);
                 reload(getNode());
+                checkResourceFields(null, params);
             }
             heartbeatGraph.repaint();
         }
@@ -5319,11 +5330,7 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
-            if ((operationIdRef != null
-                 && savedOperationIdRef != null
-                 && !operationIdRef.toString().equals(
-                                             savedOperationIdRef.toString()))
-                || (operationIdRef != savedOperationIdRef)) {
+            if (!Tools.areEqual(operationIdRef, savedOperationIdRef)) {
                 savedOperationIdRef = operationIdRef;
                 if (sameAsOperationsCB != null) {
                     if (operationIdRef == null) {
@@ -5679,27 +5686,29 @@ public class ClusterBrowser extends Browser {
                             (GuiComboBox) operationsComboBoxHash.get(op, param);
                     if (cb == null) {
                         mSavedOperationsLock.release();
-                        return false;
+                        continue;
                     }
+                    final Object[] defaultValueE =
+                                            Tools.extractUnit(defaultValue);
                     final Object value = cb.getValue();
-                    if (value != null && !value.equals(defaultValue)) {
+                    if (!Tools.areEqual(value, defaultValueE)) {
                         allAreDefaultValues = false;
                     }
                     final String savedOp =
                                         (String) savedOperation.get(op, param);
+                    final Object[] savedOpE =
+                                            Tools.extractUnit(savedOp);
                     if (savedOp == null) {
-                        if (value != null
-                            && ((value instanceof Unit
-                                 && !((Unit) value).equals(defaultValue))
-                                || !value.equals(defaultValue))) {
+                        if (!Tools.areEqual(value, defaultValueE)) {
                             changed = true;
                         }
-                    } else if (value != null
-                               && ((value instanceof Unit
-                                    && !((Unit) value).equals(savedOp))
-                                   || !value.equals(savedOp))) {
+                    } else if (!Tools.areEqual(value, savedOpE)) {
                         changed = true;
                     }
+                    cb.setBackground(defaultValueE,
+                                     savedOpE,
+                                     false);
+                                     
                 }
             }
             if (sameAsOperationsCB != null) {
@@ -5717,22 +5726,21 @@ public class ClusterBrowser extends Browser {
                         && savedOperationIdRef != null) {
                         changed = true;
                     }
-                    if (sameAsOperationsCB != null
-                        && defaultValues != allAreDefaultValues) {
+                    if (defaultValues != allAreDefaultValues) {
                         if (allAreDefaultValues) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     // TODO: listeners from this make 
                                     // problems
-                                    //sameAsOperationsCB.setValue(
-                                    //           OPERATIONS_DEFAULT_VALUES_TEXT);
+                                    sameAsOperationsCB.setValue(
+                                               OPERATIONS_DEFAULT_VALUES_TEXT);
                                 }
                             });
                         } else {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
-                                    //sameAsOperationsCB.setValue(
-                                    //            GuiComboBox.NOTHING_SELECTED);
+                                    sameAsOperationsCB.setValue(
+                                                GuiComboBox.NOTHING_SELECTED);
                                 }
                             });
                         }
@@ -5761,6 +5769,9 @@ public class ClusterBrowser extends Browser {
                 } else if (hsSaved != null && !hs.equals(hsSaved)) {
                     changed = true;
                 }
+                cb.setBackground(null,
+                                 hsSaved,
+                                 false);
             }
             return changed;
         }
@@ -6181,6 +6192,7 @@ public class ClusterBrowser extends Browser {
                     }
                     final GuiComboBox cb =
                       (GuiComboBox) operationsComboBoxHash.get(op, param);
+                    final Object oldValue = cb.getValue();
                     cb.setEnabled(!sameAs || nothingSelected);
                     if (!nothingSelected) {
                         if (sameAs) {
@@ -6191,13 +6203,16 @@ public class ClusterBrowser extends Browser {
                                                                          param);
                         }
                         final String newValue = defaultValue;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                if (cb != null) {
-                                    cb.setValue(newValue);
+                        if (!Tools.areEqual(oldValue,
+                                            Tools.extractUnit(newValue))) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (cb != null) {
+                                        cb.setValue(newValue);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
             }
@@ -6281,7 +6296,7 @@ public class ClusterBrowser extends Browser {
                     final JLabel cbLabel = new JLabel(Tools.ucfirst(op)
                                                       + " / "
                                                       + Tools.ucfirst(param));
-                    cb.setLabel(label);
+                    cb.setLabel(cbLabel);
                     addField(panel,
                              cbLabel,
                              cb,
@@ -6852,6 +6867,8 @@ public class ClusterBrowser extends Browser {
             /* add item listeners to the host scores combos */
             if (cloneInfo == null) {
                 addHostScoreListeners();
+            } else {
+                cloneInfo.addHostScoreListeners();
             }
             /* apply button */
             addApplyButton(buttonPanel);
@@ -7261,6 +7278,7 @@ public class ClusterBrowser extends Browser {
 
                 reload(getNode());
                 heartbeatGraph.repaint();
+                checkResourceFields(null, params);
             }
             reload(getNode());
         }
@@ -9373,6 +9391,7 @@ public class ClusterBrowser extends Browser {
             CRM.setGlobalParameters(dcHost, args, testOnly);
             if (!testOnly) {
                 storeComboBoxValues(params);
+                checkResourceFields(null, params);
             }
         }
 
@@ -9507,6 +9526,8 @@ public class ClusterBrowser extends Browser {
                                final CloneInfo newCi,
                                final List<ServiceInfo> groupServiceIsPresent,
                                final boolean testOnly) {
+            final Map<ServiceInfo, Map<String, String>> setParametersHash =
+                               new HashMap<ServiceInfo, Map<String, String>>();
             for (String hbId : clusterStatus.getGroupResources(groupId,
                                                                testOnly)) {
                 if (allGroupsAndClones.contains(hbId)) {
@@ -9592,17 +9613,21 @@ public class ClusterBrowser extends Browser {
                                                                     testOnly);
                     }
                 } else {
-                    newSi.setParameters(resourceNode);
-                    if (!testOnly) {
-                        newSi.setUpdated(false);
-                        heartbeatGraph.repaint();
-                    }
+                    setParametersHash.put(newSi, resourceNode);
                 }
                 newSi.getService().setNew(false);
                 //newSi.getTypeRadioGroup().setEnabled(false);
                 heartbeatGraph.setVertexIsPresent(newSi);
                 if (newGi != null || newCi != null) {
                     groupServiceIsPresent.add(newSi);
+                }
+            }
+
+            for (final ServiceInfo newSi : setParametersHash.keySet()) {
+                newSi.setParameters(setParametersHash.get(newSi));
+                if (!testOnly) {
+                    newSi.setUpdated(false);
+                    heartbeatGraph.repaint();
                 }
             }
         }
@@ -10290,7 +10315,7 @@ public class ClusterBrowser extends Browser {
          */
         protected final Unit[] getUnits() {
             return new Unit[]{
-                new Unit("", "", "", ""),
+                new Unit("", "s", "Second", "Seconds"), /* default unit */
                 new Unit("ms",  "ms", "Millisecond", "Milliseconds"),
                 new Unit("us",  "us", "Microsecond", "Microseconds"),
                 new Unit("s",   "s",  "Second",      "Seconds"),
@@ -10597,6 +10622,7 @@ public class ClusterBrowser extends Browser {
                              testOnly);
                 if (!testOnly) {
                     storeComboBoxValues(params);
+                    checkResourceFields(null, params);
                 }
             }
         }
@@ -10839,6 +10865,7 @@ public class ClusterBrowser extends Browser {
             }
             if (!testOnly) {
                 storeComboBoxValues(params);
+                checkResourceFields(null, params);
             }
         }
 
@@ -11821,6 +11848,7 @@ public class ClusterBrowser extends Browser {
                     }
                 });
                 storeComboBoxValues(params);
+                checkResourceFields(null, params);
             }
         }
 
