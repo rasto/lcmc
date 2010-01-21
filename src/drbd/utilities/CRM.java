@@ -22,6 +22,7 @@
 package drbd.utilities;
 
 import drbd.data.Host;
+import drbd.data.HostLocation;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -342,12 +343,60 @@ public final class CRM {
     }
 
     /**
+     * Returns xml for location xml.
+     */
+    private static String getLocationXML(final String heartbeatId,
+                                         final String onHost,
+                                         final String score,
+                                         final String op,
+                                         final String locationId) {
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<rsc_location id=\"");
+        xml.append(locationId);
+        xml.append("\" rsc=\"");
+        xml.append(heartbeatId);
+        if (op == null || "eq".equals(op)) {
+            /* eq */
+            if (onHost != null) {
+                xml.append("\" node=\"");
+                xml.append(onHost);
+            }
+            if (score != null) {
+                xml.append("\" score=\"");
+                xml.append(score);
+            }
+            xml.append("\"/>'");
+        } else {
+            /* ne, etc. */
+            xml.append("\"><rule id=\"loc_");
+            xml.append(heartbeatId);
+            xml.append("-rule\"");
+            if (score != null) {
+                xml.append(" score=\"");
+                xml.append(score);
+                xml.append("\"");
+                if (onHost != null) {
+                    xml.append("><expression attribute=\"#uname\" id=\"loc_");
+                    xml.append(heartbeatId);
+                    xml.append("-expression\" operation=\"");
+                    xml.append(op);
+                    xml.append("\" value=\"");
+                    xml.append(onHost);
+                    xml.append("\"/");
+                }
+            }
+            xml.append("></rule></rsc_location>'");
+        }
+        return xml.toString();
+    }
+
+    /**
      * Sets location constraint.
      */
     public static void setLocation(final Host host,
                                    final String heartbeatId,
                                    final String onHost,
-                                   final String score,
+                                   final HostLocation hostLocation,
                                    String locationId,
                                    final boolean testOnly) {
         String command = "-U";
@@ -355,23 +404,19 @@ public final class CRM {
             locationId = "loc_" + heartbeatId + "_" + onHost;
             command = "-C";
         }
-
-        final StringBuffer xml = new StringBuffer(360);
-        xml.append("'<rsc_location id=\"");
-        xml.append(locationId);
-        xml.append("\" rsc=\"");
-        xml.append(heartbeatId);
-        xml.append("\" node=\"");
-        xml.append(onHost);
-        if (score != null) {
-            xml.append("\" score=\"");
-            xml.append(score);
+        String score = null;
+        String op = null;
+        if (hostLocation != null) {
+            score = hostLocation.getScore();
+            op = hostLocation.getOperation();
         }
-        xml.append("\"/>'");
+        final String xml = getLocationXML(heartbeatId,
+                                          onHost,
+                                          score,
+                                          op,
+                                          locationId);
         execCommand(host,
-                    getCibCommand(command,
-                                  "constraints",
-                                  xml.toString()),
+                    getCibCommand(command, "constraints", xml),
                     true,
                     testOnly);
     }
@@ -382,21 +427,20 @@ public final class CRM {
     public static void removeLocation(final Host host,
                                       final String locationId,
                                       final String heartbeatId,
-                                      final String score,
+                                      final HostLocation hostLocation,
                                       final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
-        xml.append("'<rsc_location id=\"");
-        xml.append(locationId);
-        xml.append("\" rsc=\"");
-        xml.append(heartbeatId);
-        if (score != null) {
-            xml.append("\" score=\"");
-            xml.append(score);
+        String score = null;
+        String op = null;
+        if (hostLocation != null) {
+            score = hostLocation.getScore();
+            op = hostLocation.getOperation();
         }
-        xml.append("\"/>'");
-        final String command = getCibCommand("-D",
-                                             "constraints",
-                                             xml.toString());
+        final String xml = getLocationXML(heartbeatId,
+                                          null,
+                                          score,
+                                          op,
+                                          locationId);
+        final String command = getCibCommand("-D", "constraints", xml);
         execCommand(host, command, true, testOnly);
     }
 

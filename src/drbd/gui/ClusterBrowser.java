@@ -36,6 +36,7 @@ import drbd.gui.dialog.ServiceLogs;
 import drbd.gui.dialog.ClusterDrbdLogs;
 import drbd.data.PtestData;
 import drbd.data.DRBDtestData;
+import drbd.data.HostLocation;
 
 import drbd.data.Host;
 import drbd.data.Cluster;
@@ -64,8 +65,6 @@ import drbd.utilities.ButtonCallback;
 import drbd.gui.HostBrowser.BlockDevInfo;
 import drbd.gui.HostBrowser.HostInfo;
 
-import java.awt.Color;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -84,6 +83,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JRadioButton;
 import javax.swing.JMenuItem;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.geom.Point2D;
@@ -92,6 +92,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -4986,6 +4988,20 @@ public class ClusterBrowser extends Browser {
             }
             return true;
         }
+
+        /**
+         * Returns whether the specified parameter or any of the parameters
+         * have changed. If group does not have any services, its changes
+         * cannot by applied.
+         */
+        public boolean checkResourceFieldsChanged(final String param,
+                                                  final String[] params) {
+            final Enumeration e = getNode().children();
+            if (!e.hasMoreElements()) {
+                return false;
+            }
+            return super.checkResourceFieldsChanged(param, params);
+        }
     }
 
     /**
@@ -4997,8 +5013,8 @@ public class ClusterBrowser extends Browser {
         private final Map<HostInfo, GuiComboBox> scoreComboBoxHash =
                                     new HashMap<HostInfo, GuiComboBox>();
         /** A map from host to stored score. */
-        private final Map<HostInfo, String> savedHostScores =
-                                               new HashMap<HostInfo, String>();
+        private final Map<HostInfo, HostLocation> savedHostLocations =
+                                         new HashMap<HostInfo, HostLocation>();
         /** Saved operations id. */
         private String savedOperationsId = null;
         /** A map from operation to the stored value. First key is
@@ -5143,7 +5159,7 @@ public class ClusterBrowser extends Browser {
                         ret = true;
                     } else if (heartbeatId.equals(Service.GRP_ID_PREFIX + id)
                         || heartbeatId.equals(id)) {
-                        ret = checkHostScoreFieldsChanged()
+                        ret = checkHostLocationsFieldsChanged()
                               || checkOperationFieldsChanged();
                     } else {
                         ret = true;
@@ -5158,7 +5174,7 @@ public class ClusterBrowser extends Browser {
                     }
                     if (heartbeatId.equals(prefix + id)
                         || heartbeatId.equals(id)) {
-                        ret = checkHostScoreFieldsChanged();
+                        ret = checkHostLocationsFieldsChanged();
                     } else {
                         ret = true;
                     }
@@ -5169,7 +5185,7 @@ public class ClusterBrowser extends Browser {
                                                   + getService().getName()
                                                   + "_" + id)
                         || heartbeatId.equals(id)) {
-                        ret = checkHostScoreFieldsChanged()
+                        ret = checkHostLocationsFieldsChanged()
                               || checkOperationFieldsChanged();
                     } else {
                         ret = true;
@@ -5258,22 +5274,30 @@ public class ClusterBrowser extends Browser {
             /* set scores */
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
-                final String score = clusterStatus.getScore(
+                final HostLocation hostLocation = clusterStatus.getScore(
                                             getService().getHeartbeatId(),
                                             hi.getName(),
                                             false);
-                final String savedScore = savedHostScores.get(hi);
-                if ((score == null && score != savedScore)
-                     || (score != null
-                         && !score.equals(savedScore))) {
-                    if (score == null) {
-                        savedHostScores.remove(hi);
+                final HostLocation savedLocation = savedHostLocations.get(hi);
+                if (!Tools.areEqual(hostLocation, savedLocation)) {
+                    if (hostLocation == null) {
+                        savedHostLocations.remove(hi);
                     } else {
-                        savedHostScores.put(hi, score);
+                        savedHostLocations.put(hi, hostLocation);
                     }
                     if (infoPanelOk) {
                         final GuiComboBox cb = scoreComboBoxHash.get(hi);
+                        String score = null;
+                        String op = null;
+                        if (hostLocation != null) {
+                            score = hostLocation.getScore();
+                            op = hostLocation.getOperation();
+                        }
                         cb.setValue(score);
+                        final JLabel label = cb.getLabel();
+                        final String text = getHostLocationLabel(hi.getName(),
+                                                                 op);
+                        label.setText(text);
                     }
                 }
             }
@@ -5463,11 +5487,18 @@ public class ClusterBrowser extends Browser {
         public final Host getMigratedTo(final boolean testOnly) {
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
-                final String score = clusterStatus.getScore(
-                                            getHeartbeatId(testOnly),
-                                            hi.getName(),
-                                            testOnly);
-                if (CRMXML.INFINITY_STRING.equals(score)) {
+                final HostLocation hostLocation = clusterStatus.getScore(
+                                                      getHeartbeatId(testOnly),
+                                                      hi.getName(),
+                                                      testOnly);
+                String score = null;
+                String op = null;
+                if (hostLocation != null) {
+                    score = hostLocation.getScore();
+                    op = hostLocation.getOperation();
+                }
+                if (CRMXML.INFINITY_STRING.equals(score)
+                    && "eq".equals(op)) {
                     return host;
                 }
             }
@@ -5597,8 +5628,8 @@ public class ClusterBrowser extends Browser {
         /**
          * Gets saved host scores.
          */
-        public Map<HostInfo, String> getSavedHostScores() {
-            return savedHostScores;
+        public Map<HostInfo, HostLocation> getSavedHostLocations() {
+            return savedHostLocations;
         }
 
         /**
@@ -5648,20 +5679,24 @@ public class ClusterBrowser extends Browser {
         /**
          * Stores scores for host.
          */
-        private void storeHostScores() {
-            savedHostScores.clear();
+        private void storeHostLocations() {
+            savedHostLocations.clear();
             for (final Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
                 final String score = cb.getStringValue();
+                // TODO: for now we use what is stored
+                String op = null;
+                final HostLocation hl = savedHostLocations.get(hi);
+                if (hl != null) {
+                    op = hl.getOperation();
+                }
                 if (score == null || "".equals(score)) {
-                    savedHostScores.remove(hi);
+                    savedHostLocations.remove(hi);
                 } else {
-                    savedHostScores.put(hi, score);
+                    savedHostLocations.put(hi, new HostLocation(score, op));
                 }
             }
-            //// TODO: rename this
-            //heartbeatGraph.setHomeNode(this, savedHostScores);
         }
 
         /**
@@ -5754,22 +5789,31 @@ public class ClusterBrowser extends Browser {
         /**
          * Returns true if some of the scores have changed.
          */
-        private boolean checkHostScoreFieldsChanged() {
+        private boolean checkHostLocationsFieldsChanged() {
             boolean changed = false;
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                final String hsSaved = savedHostScores.get(hi);
+                final HostLocation hlSaved = savedHostLocations.get(hi);
+                String hsSaved = null;
+                String opSaved = null;
+                if (hlSaved != null) {
+                    hsSaved = hlSaved.getScore();
+                    opSaved = hlSaved.getOperation();
+                }
+                final String opSavedLabel = getHostLocationLabel(host.getName(),
+                                                                 opSaved);
                 if (cb == null) {
                     continue;
                 }
-                final String hs = cb.getStringValue();
-                if (hsSaved == null && !"".equals(hs)) {
-                    changed = true;
-                } else if (hsSaved != null && !hs.equals(hsSaved)) {
+                if (!Tools.areEqual(hsSaved, cb.getStringValue())
+                    || (!Tools.areEqual(opSavedLabel, cb.getLabel().getText())
+                        && (hsSaved != null  && !"".equals(hsSaved)))) {
                     changed = true;
                 }
-                cb.setBackground(null,
+                cb.setBackground(getHostLocationLabel(host.getName(), "eq"),
+                                 null,
+                                 opSavedLabel,
                                  hsSaved,
                                  false);
             }
@@ -5961,9 +6005,9 @@ public class ClusterBrowser extends Browser {
                                 SERVICE_LABEL_WIDTH,
                                 SERVICE_FIELD_WIDTH);
 
-            cloneInfo.addHostScores(optionsPanel,
-                                    SERVICE_LABEL_WIDTH,
-                                    SERVICE_FIELD_WIDTH);
+            cloneInfo.addHostLocations(optionsPanel,
+                                       SERVICE_LABEL_WIDTH,
+                                       SERVICE_FIELD_WIDTH);
         }
 
 
@@ -6018,17 +6062,32 @@ public class ClusterBrowser extends Browser {
             optionsPanel.add(panel);
         }
 
+        private String getHostLocationLabel(final String hostName,
+                                            final String op) {
+            final StringBuffer sb = new StringBuffer(20);
+            if (op == null || "eq".equals(op)) {
+                sb.append("on ");
+            } else if ("ne".equals(op)) {
+                sb.append("NOT on ");
+            } else {
+                sb.append(op);
+                sb.append(' ');
+            }
+            sb.append(hostName);
+            return sb.toString();
+        }
+
         /**
          * Creates host score combo boxes with labels, one per host.
          */
-        protected void addHostScores(final JPanel optionsPanel,
-                                     final int leftWidth,
-                                     final int rightWidth) {
+        protected void addHostLocations(final JPanel optionsPanel,
+                                        final int leftWidth,
+                                        final int rightWidth) {
             int rows = 0;
             scoreComboBoxHash.clear();
 
             final JPanel panel =
-                   getParamPanel(Tools.getString("ClusterBrowser.HostScores"));
+                 getParamPanel(Tools.getString("ClusterBrowser.HostLocations"));
 
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
@@ -6058,8 +6117,12 @@ public class ClusterBrowser extends Browser {
                 scoreComboBoxHash.put(hi, cb);
 
                 /* set selected host scores in the combo box from
-                 * savedHostScores */
-                final String hsSaved = savedHostScores.get(hi);
+                 * savedHostLocations */
+                final HostLocation hl = savedHostLocations.get(hi);
+                String hsSaved = null;
+                if (hl != null) {
+                    hsSaved = hl.getScore();
+                }
                 cb.setValue(hsSaved);
             }
 
@@ -6067,7 +6130,44 @@ public class ClusterBrowser extends Browser {
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                final JLabel label = new JLabel("on " + hi.getName());
+                String op = null;
+                final HostLocation hl = savedHostLocations.get(hi);
+                if (hl != null) {
+                    op = hl.getOperation();
+                }
+                final String text = getHostLocationLabel(hi.getName(), op);
+                final JLabel label = new JLabel(text);
+                final String onText = getHostLocationLabel(hi.getName(), "eq");
+                final String notOnText =
+                                    getHostLocationLabel(hi.getName(), "ne");
+                label.addMouseListener(new MouseListener() {
+                    public final void mouseClicked(MouseEvent e) {
+                    }
+                    public final void mouseEntered(MouseEvent e) {
+                    }
+                    public final void mouseExited(MouseEvent e) {
+                    }
+                    public final void mousePressed(final MouseEvent e) {
+                        final String currentText = label.getText();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (currentText.equals(onText)) {
+                                    label.setText(notOnText);
+                                } else if (currentText.equals(notOnText)) {
+                                    label.setText(onText);
+                                } else {
+                                    /* wierd things */
+                                    label.setText(onText);
+                                }
+                                final String[] params = getParametersFromXML();
+                                applyButton.setEnabled(
+                                    checkResourceFields(CACHED_FIELD, params));
+                            }
+                        });
+                    }
+                    public final void mouseReleased(MouseEvent e) {
+                    }
+                });
                 cb.setLabel(label);
                 addField(panel,
                          label,
@@ -6516,7 +6616,7 @@ public class ClusterBrowser extends Browser {
         /**
          * Adds host score listeners.
          */
-        protected void addHostScoreListeners() {
+        protected void addHostLocationsListeners() {
             final String[] params = getParametersFromXML();
             for (Host host : getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
@@ -6836,9 +6936,9 @@ public class ClusterBrowser extends Browser {
 
             if (cloneInfo == null) {
                 /* score combo boxes */
-                addHostScores(optionsPanel,
-                              SERVICE_LABEL_WIDTH,
-                              SERVICE_FIELD_WIDTH);
+                addHostLocations(optionsPanel,
+                                 SERVICE_LABEL_WIDTH,
+                                 SERVICE_FIELD_WIDTH);
             }
 
             /* get dependent resources and create combo boxes for ones, that
@@ -6866,9 +6966,9 @@ public class ClusterBrowser extends Browser {
             }
             /* add item listeners to the host scores combos */
             if (cloneInfo == null) {
-                addHostScoreListeners();
+                addHostLocationsListeners();
             } else {
-                cloneInfo.addHostScoreListeners();
+                cloneInfo.addHostLocationsListeners();
             }
             /* apply button */
             addApplyButton(buttonPanel);
@@ -6913,34 +7013,57 @@ public class ClusterBrowser extends Browser {
                 } else if ("NEVER".equals(hs)) {
                     hs = CRMXML.MINUS_INFINITY_STRING;
                 }
-
-                final String hsSaved = savedHostScores.get(hi);
-                if ((hsSaved == null && !"".equals(hs))
-                    || (hsSaved != null && !hs.equals(hsSaved))) {
-                    final String onHost = hi.getName();
-                    final String score = hs;
-                    final String locationId =
-                              clusterStatus.getLocationId(
-                                                getHeartbeatId(testOnly),
-                                                onHost);
-                    if (score == null || "".equals(score)) {
-                        CRM.removeLocation(dcHost,
-                                           locationId,
-                                           getHeartbeatId(testOnly),
-                                           hsSaved,
-                                           testOnly);
+                final HostLocation hlSaved = savedHostLocations.get(hi);
+                String hsSaved = null;
+                String opSaved = null;
+                if (hlSaved != null) {
+                    hsSaved = hlSaved.getScore();
+                    opSaved = hlSaved.getOperation();
+                }
+                final String opLabelText = cb.getLabel().getText();
+                final String onHost = hi.getName();
+                int l = opLabelText.length();
+                int k = onHost.length();
+                String op = null;
+                if (l > k) {
+                    final String labelPart =
+                                           opLabelText.substring(0, l - k - 1);
+                    if ("on".equals(labelPart)) {
+                        op = "eq";
+                    } else if ("NOT on".equals(labelPart)) {
+                        op = "ne";
                     } else {
+                        op = labelPart;
+                    }
+                }
+                final HostLocation hostLoc = new HostLocation(hs, op);
+                if (!hostLoc.equals(hlSaved)) {
+                    String locationId = clusterStatus.getLocationId(
+                                                    getHeartbeatId(testOnly),
+                                                    onHost);
+                    if ((hs == null || "".equals(hs))
+                        || !Tools.areEqual(op, opSaved)) {
+                        if (locationId != null) {
+                            CRM.removeLocation(dcHost,
+                                               locationId,
+                                               getHeartbeatId(testOnly),
+                                               hlSaved,
+                                               testOnly);
+                            locationId = null;
+                        }
+                    }
+                    if (hs != null && !"".equals(hs)) {
                         CRM.setLocation(dcHost,
                                         getHeartbeatId(testOnly),
                                         onHost,
-                                        score,
+                                        hostLoc,
                                         locationId,
                                         testOnly);
                     }
                 }
             }
             if (!testOnly) {
-                storeHostScores();
+                storeHostLocations();
             }
         }
 
@@ -7241,6 +7364,8 @@ public class ClusterBrowser extends Browser {
                 }
 
                 groupId = null; /* we don't want to replace the whole group */
+                //TODO: should not be called if only host locations have
+                //changed.
                 CRM.setParameters(
                         dcHost,
                         "-R",
@@ -7646,12 +7771,13 @@ public class ClusterBrowser extends Browser {
 
                     for (String locId : clusterStatus.getLocationIds(
                                                   getHeartbeatId(testOnly))) {
-                        final String locScore =
-                            clusterStatus.getLocationScore(locId);
+                        // TODO: remove locationMap, is null anyway
+                        final HostLocation loc =
+                            clusterStatus.getHostLocationFromId(locId);
                         CRM.removeLocation(dcHost,
                                            locId,
                                            getHeartbeatId(testOnly),
-                                           locScore,
+                                           loc,
                                            testOnly);
                     }
                 }

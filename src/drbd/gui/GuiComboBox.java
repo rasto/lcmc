@@ -40,9 +40,12 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Document;
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.ButtonGroup;
 import javax.swing.Box;
 import javax.swing.ComboBoxEditor;
+import javax.swing.SpringLayout;
+import javax.swing.event.DocumentListener;
 
 import java.awt.BorderLayout;
 
@@ -57,9 +60,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 import java.awt.Component;
-import javax.swing.SpringLayout;
-
-import javax.swing.event.DocumentListener;
 
 import java.util.List;
 import java.util.Map;
@@ -127,7 +127,7 @@ public class GuiComboBox extends JPanel {
     public static final String NOTHING_SELECTED =
                                 Tools.getString("GuiComboBox.NothingSelected");
     /** Label of this component. */
-    private JComponent label = null;
+    private JLabel label = null;
     /**
      * Prepares a new <code>GuiComboBox</code> object with specified units.
      */
@@ -949,26 +949,44 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
-     * Sets background of the component depending if the value is the same
-     * as its default value and if it is a required argument.
-     * Must be called after combo box was already added to some panel.
+     * Sets background without considering the label.
      */
     public final void setBackground(final Object defaultValue,
                                     final Object savedValue,
                                     final boolean required) {
+        setBackground(null, defaultValue, null, savedValue, required);
+    }
+
+    /**
+     * Sets background of the component depending if the value is the same
+     * as its default value and if it is a required argument.
+     * Must be called after combo box was already added to some panel.
+     */
+    public final void setBackground(final String defaultLabel,
+                                    final Object defaultValue,
+                                    final String savedLabel,
+                                    final Object savedValue,
+                                    final boolean required) {
         final Object value = getValue();
+        String labelText = null;
+        if (savedLabel != null) { 
+            labelText = label.getText();
+        }
 
         if (getParent() == null) {
             Tools.appError("wrong call to setBackground");
         }
         final Color backgroundColor = getParent().getBackground();
         final Color compColor = Color.WHITE;
-        if (!Tools.areEqual(value, savedValue)) {
+        if (!Tools.areEqual(value, savedValue)
+            || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
                 label.setForeground(
                             Tools.getDefaultColor("GuiComboBox.ChangedValue"));
             }
-        } else if (Tools.areEqual(value, defaultValue)) {
+        } else if (Tools.areEqual(value, defaultValue)
+                   && (savedLabel != null
+                       && Tools.areEqual(labelText, defaultLabel))) {
             if (label != null) {
                 label.setForeground(
                             Tools.getDefaultColor("GuiComboBox.DefaultValue"));
@@ -1250,7 +1268,14 @@ public class GuiComboBox extends JPanel {
     /**
      * Sets label for this component.
      */
-    public final void setLabel(final JComponent label) {
+    public final void setLabel(final JLabel label) {
         this.label = label;
+    }
+
+    /**
+     * Returns label for this component.
+     */
+    public final JLabel getLabel() {
+        return label;
     }
 }

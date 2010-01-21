@@ -78,14 +78,14 @@ public class CibQuery {
     /** Order direction map. */
     private MultiKeyMap orderDirection;
     /** Location map. */
-    private Map<String, Map<String, String>> location =
-                                    new HashMap<String, Map<String, String>>();
+    private Map<String, Map<String, HostLocation>> location =
+                              new HashMap<String, Map<String, HostLocation>>();
     /** Locations id map. */
     private Map<String, List<String>> locationsId =
                                            new HashMap<String, List<String>>();
-    /** Location id to score map. */
-    private Map<String, String> locationScore =
-                                           new HashMap<String, String>();
+    /** Location id to host location map. */
+    private Map<String, HostLocation> idToLocation =
+                                           new HashMap<String, HostLocation>();
     /** Map from resource and host to location id. */
     private MultiKeyMap resHostToLocId = new MultiKeyMap();
     /** Operations map. */
@@ -382,14 +382,14 @@ public class CibQuery {
      * Sets location map.
      */
     public final void setLocation(
-                            final Map<String, Map<String, String>> location) {
+                       final Map<String, Map<String, HostLocation>> location) {
         this.location = location;
     }
 
     /**
      * Returns location map.
      */
-    public final Map<String, Map<String, String>> getLocation() {
+    public final Map<String, Map<String, HostLocation>> getLocation() {
         return location;
     }
 
@@ -411,16 +411,16 @@ public class CibQuery {
     /**
      * Sets map from location id to the score.
      */
-    public final void setLocationScore(
-                                    final Map<String, String> locationScore) {
-        this.locationScore = locationScore;
+    public final void setLocationMap(
+                            final Map<String, HostLocation> idToLocation) {
+        this.idToLocation = idToLocation;
     }
 
     /**
      * Returns map from location id to the score.
      */
-    public final Map<String, String> getLocationScore() {
-        return locationScore;
+    public final Map<String, HostLocation> getLocationMap() {
+        return idToLocation;
     }
 
     /**

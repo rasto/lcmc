@@ -1973,8 +1973,8 @@ public class CRMXML extends XML {
         final MultiKeyMap orderScoreMap = new MultiKeyMap();
         final MultiKeyMap orderSymmetricalMap = new MultiKeyMap();
 
-        final Map<String, Map<String, String>> locationMap =
-                                    new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, HostLocation>> locationMap =
+                              new HashMap<String, Map<String, HostLocation>>();
         final Map<String, List<String>> locationsIdMap =
                                            new HashMap<String, List<String>>();
         final MultiKeyMap resHostToLocIdMap = new MultiKeyMap();
@@ -2063,17 +2063,17 @@ public class CRMXML extends XML {
                         locs = new ArrayList<String>();
                         locationsIdMap.put(rsc, locs);
                     }
-                    Map<String, String> hostScoreMap =
-                                                locationMap.get(rsc);
+                    Map<String, HostLocation> hostScoreMap =
+                                                          locationMap.get(rsc);
                     if (hostScoreMap == null) {
-                        hostScoreMap = new HashMap<String, String>();
+                        hostScoreMap = new HashMap<String, HostLocation>();
                         locationMap.put(rsc, hostScoreMap);
                     }
                     if (node != null) {
                         resHostToLocIdMap.put(rsc, node, locId);
                     }
                     if (score != null) {
-                        hostScoreMap.put(node, score);
+                        hostScoreMap.put(node, new HostLocation(score, "eq"));
                     }
                     locs.add(locId);
                     final Node ruleNode = getChildNode(constraintNode,
@@ -2099,10 +2099,10 @@ public class CRMXML extends XML {
                                      getAttribute(expNode, "value");
                             if ((booleanOp == null
                                  || "and".equals(booleanOp))
-                                && "#uname".equals(attr)
-                                && "string".equals(type)
-                                && "eq".equals(op)) {
-                                hostScoreMap.put(node2, score2);
+                                && "#uname".equals(attr)) {
+                                hostScoreMap.put(node2, new HostLocation(score2,
+                                                                         op));
+                                resHostToLocIdMap.put(rsc, node2, locId);
                             }
                         }
                     }

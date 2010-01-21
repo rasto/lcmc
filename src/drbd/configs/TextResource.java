@@ -1224,8 +1224,8 @@ public class TextResource extends
         {"ClusterBrowser.Group",
          "Group"},
 
-        {"ClusterBrowser.HostScores",
-         "Host Scores"},
+        {"ClusterBrowser.HostLocations",
+         "Host Locations"},
 
         {"ClusterBrowser.Operations",
          "Operations"},

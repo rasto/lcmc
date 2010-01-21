@@ -1406,12 +1406,13 @@ public class Host implements Serializable {
                 return ip;
             }
 
-            final int index = nodeName.indexOf('.');
-            if (index > 0 && !Tools.checkIp(nodeName)) {
-                return nodeName.substring(0, index);
-            } else {
-                return nodeName;
-            }
+            //final int index = nodeName.indexOf('.');
+            //if (index > 0 && !Tools.checkIp(nodeName)) {
+            //    return nodeName.substring(0, index);
+            //} else {
+            //    return nodeName;
+            //}
+            return nodeName;
         } else {
             return name;
         }

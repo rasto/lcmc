@@ -757,6 +757,7 @@ sub get_resource_status {
 
 sub get_cluster_info {
 	my $info = get_resource_status();
+	# TODO: use cib.xml if cibadmin can't connect
 	my $cibinfo = `/usr/sbin/cibadmin -Ql 2>/dev/null`;
 	if ($cibinfo) {
 		my $res_status = "res_status";

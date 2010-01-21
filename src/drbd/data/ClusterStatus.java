@@ -389,10 +389,10 @@ public class ClusterStatus {
     /**
      * Returns score for resource and host.
      */
-    public final String getScore(final String hbId,
-                                 final String onHost,
-                                 final boolean testOnly) {
-        Map<String, String> hostToScoreMap;
+    public final HostLocation getScore(final String hbId,
+                                    final String onHost,
+                                    final boolean testOnly) {
+        Map<String, HostLocation> hostToScoreMap;
         if (testOnly && ptestData != null) {
             hostToScoreMap = shadowCibQueryMap.getLocation().get(hbId);
         } else {
@@ -407,8 +407,8 @@ public class ClusterStatus {
     /**
      * Returns score from location id.
      */
-    public final String getLocationScore(final String locationId) {
-        return cibQueryMap.getLocationScore().get(locationId);
+    public final HostLocation getHostLocationFromId(final String locationId) {
+        return cibQueryMap.getLocationMap().get(locationId);
     }
 
     /**
