@@ -1043,8 +1043,13 @@ public class CRMXML extends XML {
                                                            "content");
                 if (contentParamNode != null) {
                     final String type = getAttribute(contentParamNode, "type");
-                    final String defaultValue = getAttribute(contentParamNode,
+                    String defaultValue = getAttribute(contentParamNode,
                                                                     "default");
+                    if ("force_stop".equals(param)
+                        && "0".equals(defaultValue)) {
+                        // Workaround, default is "0" and should be false
+                        defaultValue = "false";
+                    }
 
                     ra.setParamType(param, type);
                     ra.setParamDefault(param, defaultValue);
@@ -1220,10 +1225,9 @@ public class CRMXML extends XML {
                     if (contentParamNode != null) {
                         final String type = getAttribute(contentParamNode,
                                                          "type");
-                        final String defaultValue =
-                                                getAttribute(contentParamNode,
-                                                             "default");
-
+                        final String defaultValue = getAttribute(
+                                                           contentParamNode,
+                                                           "default");
                         paramGlobalTypeMap.put(param, type);
                         if (!"expected-quorum-votes".equals(param)) {
                             // TODO: workaround
