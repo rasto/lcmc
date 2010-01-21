@@ -240,7 +240,9 @@ public class BlockDevice extends Resource {
      */
     public final void addMetaDiskOfBlockDevice(
                                     final BlockDevice metaDiskOfBlockDevice) {
-        metaDiskOfBlockDevices.add(metaDiskOfBlockDevice);
+        if (!metaDiskOfBlockDevices.contains(metaDiskOfBlockDevice)) {
+            metaDiskOfBlockDevices.add(metaDiskOfBlockDevice);
+        }
     }
 
     /**
