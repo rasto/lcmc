@@ -203,6 +203,9 @@ public class Browser {
      * underneath.
      */
     public final JComponent getInfoPanel(final Object nodeInfo) {
+        if (nodeInfo == null) {
+            return null;
+        }
         final JPanel gView = ((Info) nodeInfo).getGraphicalView();
         final JComponent iPanel = ((Info) nodeInfo).getInfoPanel();
         if (gView == null) {

@@ -10620,10 +10620,10 @@ public class ClusterBrowser extends Browser {
                              serviceInfoChild.getHeartbeatId(testOnly),
                              attrs,
                              testOnly);
-                if (!testOnly) {
-                    storeComboBoxValues(params);
-                    checkResourceFields(null, params);
-                }
+            }
+            if (!testOnly) {
+                storeComboBoxValues(params);
+                checkResourceFields(null, params);
             }
         }
 
@@ -11105,20 +11105,17 @@ public class ClusterBrowser extends Browser {
                     break;
                 }
             }
-            if (correct) {
-                boolean changed = false;
-                for (final HbConstraintInterface c : constraints) {
-                    final boolean chg = c.checkResourceFieldsChanged(
-                                      param,
-                                      c.getParametersFromXML());
-                    if (chg) {
-                        changed = true;
-                        break;
-                    }
+            boolean changed = false;
+            for (final HbConstraintInterface c : constraints) {
+                final boolean chg = c.checkResourceFieldsChanged(
+                                  param,
+                                  c.getParametersFromXML());
+                if (chg) {
+                    changed = true;
+                    break;
                 }
-                return changed;
             }
-            return correct;
+            return correct && changed;
         }
 
         /**

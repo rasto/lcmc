@@ -1996,9 +1996,10 @@ public final class Tools {
             } else {
                 return s2.equals(o1);
             }
-        } else if ((o1 == null && o2 != null)
-            || (o1 == null && o2 != null)) {
-            return false;
+        } else if (o1 == null && o2 != null) {
+            return o2.toString().equals("");
+        } else if (o2 == null && o1 != null) {
+            return o1.toString().equals("");
         } else if (o1 instanceof Object[]
                    || o2 instanceof Object[]) {
             final Object[] array1 = (Object[]) o1;
