@@ -784,8 +784,11 @@ public class Browser {
             });
         }
 
-        public final int compareTo(Object o) {
-            return toString().compareToIgnoreCase(o.toString()); 
+        /**
+         * Compares ignoring case.
+         */
+        public final int compareTo(final Object o) {
+            return toString().compareToIgnoreCase(o.toString());
         }
     }
 
@@ -808,7 +811,7 @@ public class Browser {
         /** Returns whether this parameter is of the time type. */
         protected abstract boolean isTimeType(String param);
         /** Returns whether this parameter has a unit prefix. */
-        protected boolean hasUnitPrefix(String param) {
+        protected boolean hasUnitPrefix(final String param) {
             return false;
         }
         /** Returns whether this parameter is of the check box type, like
@@ -1074,13 +1077,31 @@ public class Browser {
 
         /**
          * Adds parameters to the panel.
-         * Returns number of rows.
          */
-        public final void addParams(final JPanel optionsPanel,
-                                    final JPanel extraOptionsPanel,
-                                    final String[] params,
-                                    final int leftWidth,
-                                    final int rightWidth) {
+        public final void addParams(
+                                final JPanel optionsPanel,
+                                final JPanel extraOptionsPanel,
+                                final String[] params,
+                                final int leftWidth,
+                                final int rightWidth) {
+            addParams(optionsPanel,
+                      extraOptionsPanel,
+                      params,
+                      leftWidth,
+                      rightWidth,
+                      null);
+        }
+
+        /**
+         * Adds parameters to the panel.
+         */
+        public final void addParams(
+                                final JPanel optionsPanel,
+                                final JPanel extraOptionsPanel,
+                                final String[] params,
+                                final int leftWidth,
+                                final int rightWidth,
+                                final Map<String, GuiComboBox> sameAsFields) {
             if (params == null) {
                 return;
             }
@@ -1112,8 +1133,20 @@ public class Browser {
                     sectionPanelMap.put(section, panel);
                     sectionRowsMap.put(section, 1);
                     sectionIsRequiredMap.put(section, isRequired);
-                    //if (!isRequired)
-                    //    panel.setVisible(false);
+                    if (sameAsFields != null) {
+                        final GuiComboBox sameAsCombo =
+                                                     sameAsFields.get(section);
+                        if (sameAsCombo != null) {
+                            final JLabel label = new JLabel("Same As");
+                            addField(panel,
+                                     label,
+                                     sameAsCombo,
+                                     leftWidth,
+                                     rightWidth);
+                            final int rows = sectionRowsMap.get(section);
+                            sectionRowsMap.put(section, rows + 1);
+                        }
+                    }
                 }
 
                 /* label */
@@ -1228,7 +1261,6 @@ public class Browser {
                 }
             }
             Tools.hideExpertModePanel(extraOptionsPanel);
-
         }
 
         /**
@@ -1268,7 +1300,7 @@ public class Browser {
             getResource().setPossibleChoices(param,
                                              getParamPossibleChoices(param));
             /* set default value */
-            final String value = getResource().getValue(param);
+            final String value = getParamSaved(param);
             String initValue;
             if (value == null || "".equals(value)) {
                 initValue = getParamPreferred(param);
@@ -1342,6 +1374,13 @@ public class Browser {
          * Returns default value of a parameter.
          */
         protected abstract String getParamDefault(String param);
+
+        /**
+         * Returns saved value of a parameter.
+         */
+        protected String getParamSaved(final String param) {
+            return getResource().getValue(param);
+        }
 
         /**
          * Returns preferred value of a parameter.
@@ -1486,25 +1525,25 @@ public class Browser {
                                      Tools.extractUnit(
                                                   getParamDefault(otherParam)),
                                      Tools.extractUnit(
-                                           getResource().getValue(otherParam)),
+                                           getParamSaved(otherParam)),
                                      isRequired(otherParam));
                                 if (wizardCb != null) {
                                     wizardCb.setBackground(
                                         Tools.extractUnit(
                                                   getParamDefault(otherParam)),
                                         Tools.extractUnit(
-                                            getResource().getValue(otherParam)),
+                                            getParamSaved(otherParam)),
                                         isRequired(otherParam));
                                 }
                             } else {
                                 cb.setBackground(
                                              getParamDefault(otherParam),
-                                             getResource().getValue(otherParam),
+                                             getParamSaved(otherParam),
                                              isRequired(otherParam));
                                 if (wizardCb != null) {
                                     wizardCb.setBackground(
                                             getParamDefault(otherParam),
-                                            getResource().getValue(otherParam),
+                                            getParamSaved(otherParam),
                                             isRequired(otherParam));
                                 }
                             }
@@ -1538,12 +1577,12 @@ public class Browser {
                 for (String otherParam : params) {
                     final GuiComboBox cb = paramComboBoxGet(otherParam, null);
                     if (cb == null) {
-                        return false; // TODO: should it be so?
+                        continue;
                     }
                     final Object newValue = cb.getValue();
 
-                    /* check if value changed */
-                    Object oldValue = getResource().getValue(otherParam);
+                    /* check if value has changed */
+                    Object oldValue = getParamSaved(otherParam);
                     if (oldValue == null) {
                         oldValue = getParamDefault(otherParam);
                     }

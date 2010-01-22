@@ -1303,6 +1303,7 @@ public class CRMXML extends XML {
               final Map<String, Map<String, String>> parametersNvpairsIdsMap,
               final Map<String, String> resourceInstanceAttrIdMap,
               final MultiKeyMap operationsMap,
+              final Map<String, String> metaAttrsIdMap,
               final Map<String, String> operationsIdMap,
               final Map<String, Map<String, String>> resOpIdsMap,
               final Map<String, String> operationsIdRefs,
@@ -1393,7 +1394,9 @@ public class CRMXML extends XML {
             if (metaAttrsIdRef != null) {
                 metaAttrsIdRefs.put(crmId, metaAttrsIdRef);
             } else {
-                final String opId = getAttribute(metaAttrsNode, "id");
+                final String metaAttrsId = getAttribute(metaAttrsNode, "id");
+                metaAttrsIdMap.put(crmId, metaAttrsId);
+                metaAttrsIdToCRMId.put(metaAttrsId, crmId);
                 /* <attributtes> only til 2.1.4 */
                 NodeList nvpairsMA;
                 if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
@@ -1431,6 +1434,7 @@ public class CRMXML extends XML {
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
                 final Map<String, String> resourceInstanceAttrIdMap,
                 final MultiKeyMap operationsMap,
+                final Map<String, String> metaAttrsIdMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap,
                 final Map<String, String> operationsIdRefs,
@@ -1459,6 +1463,7 @@ public class CRMXML extends XML {
                                parametersNvpairsIdsMap,
                                resourceInstanceAttrIdMap,
                                operationsMap,
+                               metaAttrsIdMap,
                                operationsIdMap,
                                resOpIdsMap,
                                operationsIdRefs,
@@ -1480,6 +1485,7 @@ public class CRMXML extends XML {
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
                 final Map<String, String> resourceInstanceAttrIdMap,
                 final MultiKeyMap operationsMap,
+                final Map<String, String> metaAttrsIdMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap,
                 final Map<String, String> operationsIdRefs,
@@ -1501,6 +1507,7 @@ public class CRMXML extends XML {
                         parametersNvpairsIdsMap,
                         resourceInstanceAttrIdMap,
                         operationsMap,
+                        metaAttrsIdMap,
                         operationsIdMap,
                         resOpIdsMap,
                         operationsIdRefs,
@@ -1818,6 +1825,8 @@ public class CRMXML extends XML {
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
         final MultiKeyMap operationsMap = new MultiKeyMap();
+        final Map<String, String> metaAttrsIdMap =
+                                                new HashMap<String, String>();
         final Map<String, String> operationsIdMap =
                                                 new HashMap<String, String>();
         final Map<String, Map<String, String>> resOpIdsMap =
@@ -1854,6 +1863,7 @@ public class CRMXML extends XML {
                                parametersNvpairsIdsMap,
                                resourceInstanceAttrIdMap,
                                operationsMap,
+                               metaAttrsIdMap,
                                operationsIdMap,
                                resOpIdsMap,
                                operationsIdRefs,
@@ -1869,6 +1879,7 @@ public class CRMXML extends XML {
                            parametersNvpairsIdsMap,
                            resourceInstanceAttrIdMap,
                            operationsMap,
+                           metaAttrsIdMap,
                            operationsIdMap,
                            resOpIdsMap,
                            operationsIdRefs,
@@ -1880,7 +1891,7 @@ public class CRMXML extends XML {
                        || "clone".equals(nodeName)) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String cloneId = getAttribute(primitiveGroupNode, "id");
-                parametersMap.put(cloneId, new HashMap<String, String>());
+                //parametersMap.put(cloneId, new HashMap<String, String>());
                 List<String> resList = groupsToResourcesMap.get(cloneId);
                 if (resList == null) {
                     resList = new ArrayList<String>();
@@ -1892,6 +1903,7 @@ public class CRMXML extends XML {
                                 parametersNvpairsIdsMap,
                                 resourceInstanceAttrIdMap,
                                 operationsMap,
+                                metaAttrsIdMap,
                                 operationsIdMap,
                                 resOpIdsMap,
                                 operationsIdRefs,
@@ -1908,6 +1920,7 @@ public class CRMXML extends XML {
                                        parametersNvpairsIdsMap,
                                        resourceInstanceAttrIdMap,
                                        operationsMap,
+                                       metaAttrsIdMap,
                                        operationsIdMap,
                                        resOpIdsMap,
                                        operationsIdRefs,
@@ -1923,6 +1936,7 @@ public class CRMXML extends XML {
                                    parametersNvpairsIdsMap,
                                    resourceInstanceAttrIdMap,
                                    operationsMap,
+                                   metaAttrsIdMap,
                                    operationsIdMap,
                                    resOpIdsMap,
                                    operationsIdRefs,
@@ -2180,6 +2194,7 @@ public class CRMXML extends XML {
         cibQueryData.setOperations(operationsMap);
         cibQueryData.setOperationsId(operationsIdMap);
         cibQueryData.setOperationsRefs(operationsRefs);
+        cibQueryData.setMetaAttrsId(metaAttrsIdMap);
         cibQueryData.setMetaAttrsRefs(metaAttrsRefs);
         cibQueryData.setResOpIds(resOpIdsMap);
         cibQueryData.setNodeOnline(nodeOnline);

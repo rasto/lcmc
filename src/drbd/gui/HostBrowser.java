@@ -1661,7 +1661,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns info of this net interface, which is updatable.
          */
-        public void updateInfo(final JEditorPane ep) {
+        public final void updateInfo(final JEditorPane ep) {
             final Runnable runnable = new Runnable() {
                 public void run() {
                     String text = Tools.execCommand(
@@ -1681,7 +1681,7 @@ public class HostBrowser extends Browser {
         /**
          * Returns string representation of the net interface.
          */
-        public String toString() {
+        public final String toString() {
             final StringBuffer s = new StringBuffer(getName());
             final String ip = getNetInterface().getIp();
             if (ip != null) {
@@ -1693,28 +1693,28 @@ public class HostBrowser extends Browser {
         /**
          * Returns icon of the net interface for the menu.
          */
-        public ImageIcon getMenuIcon(final boolean testOnly) {
+        public final ImageIcon getMenuIcon(final boolean testOnly) {
             return NET_I_ICON;
         }
 
         /**
          * Returns ip of the net interface.
          */
-        public String getStringValue() {
+        public final String getStringValue() {
             return getNetInterface().getIp();
         }
 
         /**
          * Returns net interface resource.
          */
-        public NetInterface getNetInterface() {
+        public final NetInterface getNetInterface() {
             return (NetInterface) getResource();
         }
 
         /**
          * Returns whether ips equal.
          */
-        public boolean equals(final Object value) {
+        public final boolean equals(final Object value) {
             if (Tools.isStringClass(value)) {
                 // TODO: race is here
                 final NetInterface ni = getNetInterface();
@@ -1870,8 +1870,8 @@ public class HostBrowser extends Browser {
             tt.append("</b>");
             if (getBlockDevice().isDrbdMetaDisk()) {
                 tt.append(" (Meta Disk)\n");
-                for (final BlockDevice mb:
-                                getBlockDevice().getMetaDiskOfBlockDevices()) {
+                for (final BlockDevice mb
+                             : getBlockDevice().getMetaDiskOfBlockDevices()) {
                     tt.append("&nbsp;&nbsp;of ");
                     tt.append(mb.getName());
                     tt.append('\n');
@@ -2614,7 +2614,7 @@ public class HostBrowser extends Browser {
             return new MyMenuItem(oBdi.toString()) {
                 private static final long serialVersionUID = 1L;
                 public void action() {
-                    DrbdInfo drbdInfo = getDrbdGraph().getDrbdInfo();
+                    final DrbdInfo drbdInfo = getDrbdGraph().getDrbdInfo();
                     setInfoPanel(null);
                     oBdi.setInfoPanel(null);
                     drbdInfo.addDrbdResource(

@@ -91,9 +91,11 @@ public class CibQuery {
     /** Operations map. */
     private MultiKeyMap operations = new MultiKeyMap();
     /** Operations refs map. */
-    private Map<String, String>  operationsRefs = new HashMap<String, String>();
+    private Map<String, String> operationsRefs = new HashMap<String, String>();
+    /** Meta attrs id map. */
+    private Map<String, String> metaAttrsId = new HashMap<String, String>();
     /** Metaattrs refs map. */
-    private Map<String, String>  metaAttrsRefs = new HashMap<String, String>();
+    private Map<String, String> metaAttrsRefs = new HashMap<String, String>();
     /** Operations id map. */
     private Map<String, String> operationsId = new HashMap<String, String>();
     /** "op" tag id map. */
@@ -456,9 +458,31 @@ public class CibQuery {
      * Sets meta attrs refs map.
      */
     public final void setMetaAttrsRefs(
-                                final Map<String, String> metaAttrsIdRefs) {
+                                final Map<String, String> metaAttrsRefs) {
         this.metaAttrsRefs = metaAttrsRefs;
     }
+
+    /**
+     * Sets meta attrs id map.
+     */
+    public final void setMetaAttrsId(final Map<String, String> metaAttrsId) {
+        this.metaAttrsId = metaAttrsId;
+    }
+
+    /**
+     * Returns meta attrs id map.
+     */
+    public final Map<String, String> getMetaAttrsId() {
+        return metaAttrsId;
+    }
+
+    /**
+     * Returns meta attrs refs map.
+     */
+    public final Map<String, String> getMetaAttrsRefs() {
+        return metaAttrsRefs;
+    }
+
 
     /**
      * Returns operations map.
@@ -472,13 +496,6 @@ public class CibQuery {
      */
     public final Map<String, String> getOperationsRefs() {
         return operationsRefs;
-    }
-
-    /**
-     * Returns meta attrs refs map.
-     */
-    public final Map<String, String> getMetaAttrsRefs() {
-        return metaAttrsRefs;
     }
 
     /**

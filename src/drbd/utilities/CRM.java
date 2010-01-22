@@ -149,6 +149,8 @@ public final class CRM {
                            final Map<String, String> nvpairIdsHash,
                            final Map<String, Map<String, String>> pacemakerOps,
                            String operationsId,
+                           final String metaAttrsRefId,
+                           final String cloneMetaAttrsRefId,
                            final String operationsRefId,
                            final boolean testOnly) {
         if (instanceAttrId == null) {
@@ -182,11 +184,12 @@ public final class CRM {
             xml.append(cloneId);
             xml.append("\">");
             /* mater/slave meta_attributes */
-            if (!cloneMetaArgs.isEmpty()) {
-                xml.append(getMetaAttributes(host,
-                                             cloneId,
-                                             cloneMetaArgs));
-            }
+            //if (!cloneMetaArgs.isEmpty()) {
+            xml.append(getMetaAttributes(host,
+                                         cloneId,
+                                         cloneMetaArgs,
+                                         cloneMetaAttrsRefId));
+            //}
         }
         if (groupId != null) {
             xml.append("<group id=\"");
@@ -242,7 +245,7 @@ public final class CRM {
             xml.append(operationsRefId);
             xml.append("\"/>");
         } else if (!pacemakerOps.isEmpty()) {
-            //TODO: not "else if" but update the referred service. 
+            //TODO: not "else if" but update the referred service.
             if (pmV != null
                 || hbV == null
                 || Tools.compareVersions(hbV, "2.99.0") >= 0) {
@@ -272,11 +275,12 @@ public final class CRM {
             xml.append("</operations>");
         }
         /* meta_attributes */
-        if (!pacemakerMetaArgs.isEmpty()) {
-            xml.append(getMetaAttributes(host,
-                                         heartbeatId,
-                                         pacemakerMetaArgs));
-        }
+        //if (!pacemakerMetaArgs.isEmpty()) {
+        xml.append(getMetaAttributes(host,
+                                     heartbeatId,
+                                     pacemakerMetaArgs,
+                                     metaAttrsRefId));
+        //}
         xml.append("</primitive>");
         if (groupId != null) {
             xml.append("</group>");
@@ -374,7 +378,7 @@ public final class CRM {
             if (score != null) {
                 xml.append(" score=\"");
                 xml.append(score);
-                xml.append("\"");
+                xml.append('"');
                 if (onHost != null) {
                     xml.append("><expression attribute=\"#uname\" id=\"loc_");
                     xml.append(heartbeatId);
@@ -437,8 +441,8 @@ public final class CRM {
         }
         final String xml = getLocationXML(heartbeatId,
                                           null,
-                                          score,
-                                          op,
+                                          null,
+                                          null,
                                           locationId);
         final String command = getCibCommand("-D", "constraints", xml);
         execCommand(host, command, true, testOnly);
@@ -553,7 +557,8 @@ public final class CRM {
      */
     private static String getMetaAttributes(final Host host,
                                            final String heartbeatId,
-                                           final Map<String, String> attrs) {
+                                           final Map<String, String> attrs,
+                                           final String metaAttrsRefId) {
         final StringBuffer xml = new StringBuffer(360);
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
@@ -563,37 +568,43 @@ public final class CRM {
             && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             idPostfix = "-meta-options";
         }
-        xml.append("<meta_attributes id=\"");
-        xml.append(heartbeatId);
-        xml.append(idPostfix);
-        xml.append("\">");
-
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            /* 2.1.4 */
-            xml.append("<attributes>");
-        }
-        for (final String attr : attrs.keySet()) {
-            xml.append("<nvpair id=\"");
+        if (metaAttrsRefId != null) {
+            xml.append("<meta_attributes id-ref=\"");
+            xml.append(metaAttrsRefId);
+            xml.append("\"/>");
+        } else {
+            xml.append("<meta_attributes id=\"");
             xml.append(heartbeatId);
             xml.append(idPostfix);
-            xml.append('-');
-            xml.append(attr);
-            xml.append("\" name=\"");
-            xml.append(attr);
-            xml.append("\" value=\"");
-            xml.append(attrs.get(attr));
-            xml.append("\"/>");
-        }
+            xml.append("\">");
 
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            /* 2.1.4 */
-            xml.append("</attributes>");
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                /* 2.1.4 */
+                xml.append("<attributes>");
+            }
+            for (final String attr : attrs.keySet()) {
+                xml.append("<nvpair id=\"");
+                xml.append(heartbeatId);
+                xml.append(idPostfix);
+                xml.append('-');
+                xml.append(attr);
+                xml.append("\" name=\"");
+                xml.append(attr);
+                xml.append("\" value=\"");
+                xml.append(attrs.get(attr));
+                xml.append("\"/>");
+            }
+
+            if (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                /* 2.1.4 */
+                xml.append("</attributes>");
+            }
+            xml.append("</meta_attributes>");
         }
-        xml.append("</meta_attributes>");
         return xml.toString();
     }
 

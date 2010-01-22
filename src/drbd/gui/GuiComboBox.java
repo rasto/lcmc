@@ -26,7 +26,6 @@ import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.PatternDocument;
 import drbd.gui.Browser.Info;
-import drbd.gui.Browser.StringInfo;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -112,8 +111,14 @@ public class GuiComboBox extends JPanel {
     private static final Color ERROR_VALUE_BACKGROUND =
                             Tools.getDefaultColor("GuiComboBox.ErrorValue");
     /** Background of the field if the value has changed. */
-    private static final Color CHANGED_VALUE_BACKGROUND =
+    private static final Color CHANGED_VALUE_COLOR =
                             Tools.getDefaultColor("GuiComboBox.ChangedValue");
+    /** Background of the field if the value is default. */
+    private static final Color DEFAULT_VALUE_COLOR =
+                            Tools.getDefaultColor("GuiComboBox.DefaultValue");
+    /** Background of the field if the value is saved. */
+    private static final Color SAVED_VALUE_COLOR =
+                            Tools.getDefaultColor("GuiComboBox.SavedValue");
     /** No scrollbar ever. */
     private static final int SCROLLBAR_MAX_ROWS = 10000;
     /** Widget default height. */
@@ -969,7 +974,7 @@ public class GuiComboBox extends JPanel {
                                     final boolean required) {
         final Object value = getValue();
         String labelText = null;
-        if (savedLabel != null) { 
+        if (savedLabel != null) {
             labelText = label.getText();
         }
 
@@ -981,20 +986,19 @@ public class GuiComboBox extends JPanel {
         if (!Tools.areEqual(value, savedValue)
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
-                label.setForeground(
-                            Tools.getDefaultColor("GuiComboBox.ChangedValue"));
+                //Tools.printStackTrace("changed: " + value + " != "
+                //                      + savedValue);
+                label.setForeground(CHANGED_VALUE_COLOR);
             }
         } else if (Tools.areEqual(value, defaultValue)
-                   && (savedLabel != null
-                       && Tools.areEqual(labelText, defaultLabel))) {
+                   && (savedLabel == null
+                       || Tools.areEqual(labelText, defaultLabel))) {
             if (label != null) {
-                label.setForeground(
-                            Tools.getDefaultColor("GuiComboBox.DefaultValue"));
+                label.setForeground(DEFAULT_VALUE_COLOR);
             }
         } else {
             if (label != null) {
-                label.setForeground(
-                            Tools.getDefaultColor("GuiComboBox.SavedValue"));
+                label.setForeground(SAVED_VALUE_COLOR);
             }
         }
         setBackground(backgroundColor);

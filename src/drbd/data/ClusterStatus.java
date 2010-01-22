@@ -419,6 +419,13 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns id from meta_attributes tag.
+     */
+    public final String getMetaAttrsId(final String hbId) {
+        return cibQueryMap.getMetaAttrsId().get(hbId);
+    }
+
+    /**
      * Returns value of an operation.
      */
     public final String getOperation(final String hbId,
@@ -447,13 +454,20 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns crm id from serivce that this service has meta attributes from,
+     * or null.
+     */
+    public final String getMetaAttrsRef(final String hbId) {
+        return cibQueryMap.getMetaAttrsRefs().get(hbId);
+    }
+
+    /**
      * Returns crm id from serivce that this service has operations from,
      * or null.
      */
     public final String getOperationsRef(final String hbId) {
         return cibQueryMap.getOperationsRefs().get(hbId);
     }
-
 
     /**
      * Returns on which nodes the resource is managed.
