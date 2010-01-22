@@ -143,8 +143,6 @@ public class DrbdMC extends JPanel {
                     System.out.println("--realvnc enable real vnc viewer");
                     System.out.println(
                                 "--vnc-port-offset offset for port forwarding");
-                    System.out.println(
-                                   "--staging-drbd use staging drbd packages");
                     System.exit(0);
                 } else if ("--tightvnc".equals(arg)) {
                     tightvnc = true;
