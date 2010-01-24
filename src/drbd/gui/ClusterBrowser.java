@@ -4067,7 +4067,7 @@ public class ClusterBrowser extends Browser {
                 //}
                 getResource().setPossibleChoices(param, items);
                 final String selectedValue = getParamSaved("directory");
-                final String regexp = "^/.*$";
+                final String regexp = "^.+$";
                 paramCb = new GuiComboBox(selectedValue,
                                           items,
                                           null,
