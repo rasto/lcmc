@@ -5130,6 +5130,25 @@ public class ClusterBrowser extends Browser {
             if (!super.checkResourceFieldsCorrect(param, params)) {
                 return false;
             }
+            if (cloneInfo == null) {
+                boolean on = false;
+                for (Host host : getClusterHosts()) {
+                    final HostInfo hi = host.getBrowser().getHostInfo();
+                    /* at least one "eq" */
+                    final GuiComboBox cb = scoreComboBoxHash.get(hi);
+                    if (cb != null) {
+                        final String op = getOpFromLabel(hi.getName(),
+                                                      cb.getLabel().getText());
+                        if (cb.getValue() == null || "eq".equals(op)) {
+                            on = true;
+                            break;
+                        }
+                    }
+                }
+                if (!on) {
+                    return false;
+                }
+            }
             if (!ret) {
                 return false;
             }
@@ -5826,22 +5845,8 @@ public class ClusterBrowser extends Browser {
                 final HostInfo hi = host.getBrowser().getHostInfo();
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
                 final String score = cb.getStringValue();
-                final String opLabelText = cb.getLabel().getText();
-                final String onHost = hi.getName();
-                final int l = opLabelText.length();
-                final int k = onHost.length();
-                String op = null;
-                if (l > k) {
-                    final String labelPart =
-                                       opLabelText.substring(0, l - k - 1);
-                    if ("on".equals(labelPart)) {
-                        op = "eq";
-                    } else if ("NOT on".equals(labelPart)) {
-                        op = "ne";
-                    } else {
-                        op = labelPart;
-                    }
-                }
+                final String op = getOpFromLabel(hi.getName(),
+                                                 cb.getLabel().getText());
                 if (score == null || "".equals(score)) {
                     savedHostLocations.remove(hi);
                 } else {
@@ -7383,6 +7388,27 @@ public class ClusterBrowser extends Browser {
             return infoPanel == null;
         }
 
+        /** 
+         * Returns operation from host location label. "eq", "ne" etc.
+         */
+        private String getOpFromLabel(final String onHost,
+                                      final String labelText) {
+            final int l = labelText.length();
+            final int k = onHost.length();
+            String op = null;
+            if (l > k) {
+                final String labelPart = labelText.substring(0, l - k - 1);
+                if ("on".equals(labelPart)) {
+                    op = "eq";
+                } else if ("NOT on".equals(labelPart)) {
+                    op = "ne";
+                } else {
+                    op = labelPart;
+                }
+            }
+            return op;
+        }
+
         /**
          * Goes through the scores and sets preferred locations.
          */
@@ -7405,22 +7431,8 @@ public class ClusterBrowser extends Browser {
                     hsSaved = hlSaved.getScore();
                     opSaved = hlSaved.getOperation();
                 }
-                final String opLabelText = cb.getLabel().getText();
                 final String onHost = hi.getName();
-                final int l = opLabelText.length();
-                final int k = onHost.length();
-                String op = null;
-                if (l > k) {
-                    final String labelPart =
-                                           opLabelText.substring(0, l - k - 1);
-                    if ("on".equals(labelPart)) {
-                        op = "eq";
-                    } else if ("NOT on".equals(labelPart)) {
-                        op = "ne";
-                    } else {
-                        op = labelPart;
-                    }
-                }
+                String op = getOpFromLabel(onHost, cb.getLabel().getText());
                 final HostLocation hostLoc = new HostLocation(hs, op);
                 if (!hostLoc.equals(hlSaved)) {
                     String locationId = clusterStatus.getLocationId(
