@@ -2992,27 +2992,6 @@ public class ClusterBrowser extends Browser {
         public final List<UpdatableItem> createPopup() {
             final boolean testOnly = false;
             final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-
-            final MyMenuItem removeResMenu = new MyMenuItem(
-                            Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
-                            REMOVE_ICON,
-                            Tools.getString(
-                                    "ClusterBrowser.Drbd.RemoveEdge.ToolTip")
-                           ) {
-                private static final long serialVersionUID = 1L;
-                public void action() {
-                    /* this drbdResourceInfo remove myself and this calls
-                       removeDrbdResource in this class, that removes the edge
-                       in the graph. */
-                    removeMyself(testOnly);
-                }
-
-                public boolean enablePredicate() {
-                    return !isUsedByCRM();
-                }
-            };
-            registerMenuItem(removeResMenu);
-            items.add(removeResMenu);
             final DrbdResourceInfo thisClass = this;
 
             final MyMenuItem connectMenu = new MyMenuItem(
@@ -3141,6 +3120,28 @@ public class ClusterBrowser extends Browser {
             };
             registerMenuItem(splitBrainMenu);
             items.add(splitBrainMenu);
+
+            /* remove resource */
+            final MyMenuItem removeResMenu = new MyMenuItem(
+                            Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
+                            REMOVE_ICON,
+                            Tools.getString(
+                                    "ClusterBrowser.Drbd.RemoveEdge.ToolTip")
+                           ) {
+                private static final long serialVersionUID = 1L;
+                public void action() {
+                    /* this drbdResourceInfo remove myself and this calls
+                       removeDrbdResource in this class, that removes the edge
+                       in the graph. */
+                    removeMyself(testOnly);
+                }
+
+                public boolean enablePredicate() {
+                    return !isUsedByCRM();
+                }
+            };
+            registerMenuItem(removeResMenu);
+            items.add(removeResMenu);
 
             /* view log */
             final MyMenuItem viewLogMenu = new MyMenuItem(
@@ -6450,7 +6451,10 @@ public class ClusterBrowser extends Browser {
             sl.add(new StringInfo(GuiComboBox.NOTHING_SELECTED, null));
             sl.add(new StringInfo(META_ATTRS_DEFAULT_VALUES_TEXT,
                                   META_ATTRS_DEFAULT_VALUES));
-            if (isMetaAttrReferenced()) {
+            final String hbV = getDCHost().getHeartbeatVersion();
+            
+            if (isMetaAttrReferenced()
+                || Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 return sl.toArray(new Info[sl.size()]);
             }
             try {
@@ -6472,6 +6476,7 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
+            final boolean clone = getResourceAgent().isClone();
             for (final String name : nameToServiceInfoHash.keySet()) {
                 final Map<String, ServiceInfo> idToInfo =
                                               nameToServiceInfoHash.get(name);
@@ -6479,6 +6484,7 @@ public class ClusterBrowser extends Browser {
                                                       idToInfo.values())) {
                     if (si != this
                         && !si.getName().equals(getName())
+                        && si.getResourceAgent().isClone() == clone
                         && clusterStatus.getMetaAttrsId(
                                    si.getService().getHeartbeatId()) != null
                         && clusterStatus.getMetaAttrsRef(
@@ -6500,7 +6506,9 @@ public class ClusterBrowser extends Browser {
             sl.add(new StringInfo(GuiComboBox.NOTHING_SELECTED, null));
             sl.add(new StringInfo(OPERATIONS_DEFAULT_VALUES_TEXT,
                                   OPERATIONS_DEFAULT_VALUES));
-            if (isOperationReferenced()) {
+            final String hbV = getDCHost().getHeartbeatVersion();
+            if (isOperationReferenced()
+                || Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 return sl.toArray(new Info[sl.size()]);
             }
             try {
@@ -6522,12 +6530,14 @@ public class ClusterBrowser extends Browser {
                     }
                 }
             }
+            final boolean clone = getResourceAgent().isClone();
             for (final String name : nameToServiceInfoHash.keySet()) {
                 final Map<String, ServiceInfo> idToInfo =
                                               nameToServiceInfoHash.get(name);
                 for (final ServiceInfo si : new TreeSet<ServiceInfo>(
                                                       idToInfo.values())) {
                     if (si != this
+                        && si.getResourceAgent().isClone() == clone
                         && !si.getName().equals(getName())
                         && clusterStatus.getOperationsId(
                                    si.getService().getHeartbeatId()) != null
@@ -8571,54 +8581,6 @@ public class ClusterBrowser extends Browser {
         public List<UpdatableItem> createPopup() {
             final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
             final boolean testOnly = false;
-            if (cloneInfo == null) {
-                /* remove service */
-                final MyMenuItem removeMenuItem = new MyMenuItem(
-                            Tools.getString("ClusterBrowser.Hb.RemoveService"),
-                            REMOVE_ICON,
-                            STARTING_PTEST_TOOLTIP) {
-                    private static final long serialVersionUID = 1L;
-
-                    public boolean enablePredicate() {
-                        if (clStatusFailed()
-                            || getService().isRemoved()) {
-                            return false;
-                        }
-                        if (groupInfo == null) {
-                            return true;
-                        }
-                        final List<String> gr = clusterStatus.getGroupResources(
-                                          groupInfo.getHeartbeatId(testOnly),
-                                          testOnly);
-
-
-                        return gr != null && gr.size() > 1;
-                    }
-
-                    public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
-                        removeMyself(false);
-                        heartbeatGraph.repaint();
-                    }
-                };
-                final ServiceInfo thisClass = this;
-                final ClMenuItemCallback removeItemCallback =
-                          new ClMenuItemCallback(removeMenuItem, null) {
-                    public final boolean isEnabled() {
-                        return super.isEnabled() && !getService().isNew();
-                    }
-                    public final void action(final Host dcHost) {
-                        removeMyselfNoConfirm(dcHost, true); /* test only */
-                    }
-                };
-                addMouseOverListener(removeMenuItem, removeItemCallback);
-                items.add((UpdatableItem) removeMenuItem);
-                registerMenuItem((UpdatableItem) removeMenuItem);
-            }
 
             if (groupInfo == null && cloneInfo == null) {
                 /* add new group and dependency*/
@@ -8814,6 +8776,54 @@ public class ClusterBrowser extends Browser {
             items.add((UpdatableItem) manageMenuItem);
             registerMenuItem((UpdatableItem) manageMenuItem);
             addMigrateMenuItems(items);
+            if (cloneInfo == null) {
+                /* remove service */
+                final MyMenuItem removeMenuItem = new MyMenuItem(
+                            Tools.getString("ClusterBrowser.Hb.RemoveService"),
+                            REMOVE_ICON,
+                            STARTING_PTEST_TOOLTIP) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean enablePredicate() {
+                        if (clStatusFailed()
+                            || getService().isRemoved()) {
+                            return false;
+                        }
+                        if (groupInfo == null) {
+                            return true;
+                        }
+                        final List<String> gr = clusterStatus.getGroupResources(
+                                          groupInfo.getHeartbeatId(testOnly),
+                                          testOnly);
+
+
+                        return gr != null && gr.size() > 1;
+                    }
+
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        removeMyself(false);
+                        heartbeatGraph.repaint();
+                    }
+                };
+                final ServiceInfo thisClass = this;
+                final ClMenuItemCallback removeItemCallback =
+                          new ClMenuItemCallback(removeMenuItem, null) {
+                    public final boolean isEnabled() {
+                        return super.isEnabled() && !getService().isNew();
+                    }
+                    public final void action(final Host dcHost) {
+                        removeMyselfNoConfirm(dcHost, true); /* test only */
+                    }
+                };
+                addMouseOverListener(removeMenuItem, removeItemCallback);
+                items.add((UpdatableItem) removeMenuItem);
+                registerMenuItem((UpdatableItem) removeMenuItem);
+            }
             /* view log */
             final MyMenuItem viewLogMenu = new MyMenuItem(
                             Tools.getString("ClusterBrowser.Hb.ViewServiceLog"),
@@ -10611,46 +10621,6 @@ public class ClusterBrowser extends Browser {
         public List<UpdatableItem> createPopup() {
             final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
             final boolean testOnly = false;
-
-            final MyMenuItem removeMenuItem = new MyMenuItem(
-                    Tools.getString(
-                            "ClusterBrowser.Hb.RemoveAllServices"),
-                    REMOVE_ICON) {
-                private static final long serialVersionUID = 1L;
-
-                public boolean enablePredicate() {
-                    return !clStatusFailed()
-                           && !getExistingServiceList().isEmpty();
-                }
-
-                public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
-                    if (Tools.confirmDialog(
-                         Tools.getString(
-                             "ClusterBrowser.confirmRemoveAllServices.Title"),
-                         Tools.getString(
-                         "ClusterBrowser.confirmRemoveAllServices.Description"),
-                         Tools.getString(
-                             "ClusterBrowser.confirmRemoveAllServices.Yes"),
-                         Tools.getString(
-                             "ClusterBrowser.confirmRemoveAllServices.No"))) {
-                        final Host dcHost = getDCHost();
-                        for (ServiceInfo si : getExistingServiceList()) {
-                            if (si.getGroupInfo() == null) {
-                                si.removeMyselfNoConfirm(dcHost, false);
-                            }
-                        }
-                        heartbeatGraph.repaint();
-                    }
-                }
-            };
-            items.add((UpdatableItem) removeMenuItem);
-            registerMenuItem((UpdatableItem) removeMenuItem);
-
             /* add group */
             final MyMenuItem addGroupMenuItem =
                 new MyMenuItem(Tools.getString("ClusterBrowser.Hb.AddGroup"),
@@ -10839,6 +10809,46 @@ public class ClusterBrowser extends Browser {
             };
             items.add((UpdatableItem) addServiceMenuItem);
             registerMenuItem((UpdatableItem) addServiceMenuItem);
+            /* remove all services. */
+            final MyMenuItem removeMenuItem = new MyMenuItem(
+                    Tools.getString(
+                            "ClusterBrowser.Hb.RemoveAllServices"),
+                    REMOVE_ICON) {
+                private static final long serialVersionUID = 1L;
+
+                public boolean enablePredicate() {
+                    return !clStatusFailed()
+                           && !getExistingServiceList().isEmpty();
+                }
+
+                public void action() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getPopup().setVisible(false);
+                        }
+                    });
+                    if (Tools.confirmDialog(
+                         Tools.getString(
+                             "ClusterBrowser.confirmRemoveAllServices.Title"),
+                         Tools.getString(
+                         "ClusterBrowser.confirmRemoveAllServices.Description"),
+                         Tools.getString(
+                             "ClusterBrowser.confirmRemoveAllServices.Yes"),
+                         Tools.getString(
+                             "ClusterBrowser.confirmRemoveAllServices.No"))) {
+                        final Host dcHost = getDCHost();
+                        for (ServiceInfo si : getExistingServiceList()) {
+                            if (si.getGroupInfo() == null) {
+                                si.removeMyselfNoConfirm(dcHost, false);
+                            }
+                        }
+                        heartbeatGraph.repaint();
+                    }
+                }
+            };
+            items.add((UpdatableItem) removeMenuItem);
+            registerMenuItem((UpdatableItem) removeMenuItem);
+
 
             /* view logs */
             final MyMenuItem viewLogsItem =

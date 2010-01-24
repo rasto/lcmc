@@ -1243,7 +1243,7 @@ public class TextResource extends
          "Remove All Services"},
 
         {"ClusterBrowser.Hb.RemoveService",
-         "Remove"},
+         "Remove Service"},
 
         {"ClusterBrowser.Hb.AddService",
          "Add Service"},
@@ -1541,7 +1541,7 @@ public class TextResource extends
          "Go Out of Standby"},
 
         {"HostBrowser.RemoveHost",
-         "Remove"},
+         "Remove Host"},
 
         /* Host Browser */
         {"HostBrowser.idDrbdNode",

@@ -963,6 +963,22 @@ public class HostBrowser extends Browser {
                 };
             items.add(viewLogsItem);
             registerMenuItem(viewLogsItem);
+            /* expert options */
+            final MyMenu hostExpertSubmenu = new MyMenu(
+                            Tools.getString("HostBrowser.ExpertSubmenu")) {
+                private static final long serialVersionUID = 1L;
+                public boolean enablePredicate() {
+                    return host.isConnected();
+                }
+
+                public void update() {
+                    super.update();
+                    addExpertMenu(this);
+                }
+            };
+            items.add(hostExpertSubmenu);
+            registerMenuItem(hostExpertSubmenu);
+
             /* remove host from gui */
             final MyMenuItem removeHostItem =
                 new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
@@ -983,21 +999,6 @@ public class HostBrowser extends Browser {
             registerMenuItem(removeHostItem);
             items.add(removeHostItem);
 
-            /* expert options */
-            final MyMenu hostExpertSubmenu = new MyMenu(
-                            Tools.getString("HostBrowser.ExpertSubmenu")) {
-                private static final long serialVersionUID = 1L;
-                public boolean enablePredicate() {
-                    return host.isConnected();
-                }
-
-                public void update() {
-                    super.update();
-                    addExpertMenu(this);
-                }
-            };
-            items.add(hostExpertSubmenu);
-            registerMenuItem(hostExpertSubmenu);
 
             return items;
         }
