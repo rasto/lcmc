@@ -1240,6 +1240,7 @@ public class GuiComboBox extends JPanel {
     public final void setBackgroundColor(final Color bg) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                setBackground(bg);
                 switch(type) {
                     case TEXTFIELD:
                         component.setBackground(bg);
