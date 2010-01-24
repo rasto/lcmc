@@ -5909,9 +5909,11 @@ public class ClusterBrowser extends Browser {
             if (sameAsOperationsCB != null) {
                 final Info info = (Info) sameAsOperationsCB.getValue();
                 final boolean defaultValues =
-                        OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString());
+                    info != null
+                    && OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString());
                 final boolean nothingSelected =
-                          GuiComboBox.NOTHING_SELECTED.equals(info.toString());
+                      info == null
+                      || GuiComboBox.NOTHING_SELECTED.equals(info.toString());
                 if (!nothingSelected
                     && !defaultValues
                     && info != savedOperationIdRef) {
@@ -6390,7 +6392,10 @@ public class ClusterBrowser extends Browser {
                     if (!isMetaAttr(param)) {
                         continue;
                     }
-                    String defaultValue = getParamDefault(param);
+                    String defaultValue = getParamPreferred(param);
+                    if (defaultValue == null) {
+                        defaultValue = getParamDefault(param);
+                    }
                     final GuiComboBox cb = paramComboBoxGet(param, null);
                     if (cb == null) {
                         continue;
@@ -6780,10 +6785,13 @@ public class ClusterBrowser extends Browser {
                 final String crmId = getService().getHeartbeatId();
                 final String refCRMId = clusterStatus.getMetaAttrsRef(crmId);
                 if (refCRMId != null) {
-                    final String value =
+                    String value =
                         clusterStatus.getParameter(refCRMId, param, false);
                     if (value == null) {
-                        return getParamDefault(param);
+                        value = getParamPreferred(param);
+                        if (value == null) {
+                            return getParamDefault(param);
+                        }
                     }
                     return value;
                 }
@@ -6795,7 +6803,10 @@ public class ClusterBrowser extends Browser {
                                                   param,
                                                   false);
                 if (value == null) {
-                    return getParamDefault(param);
+                    value = getParamPreferred(param);
+                    if (value == null) {
+                        return getParamDefault(param);
+                    }
                 }
             }
             return value;
