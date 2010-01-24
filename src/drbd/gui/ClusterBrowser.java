@@ -2817,7 +2817,7 @@ public class ClusterBrowser extends Browser {
          */
         public final String toString() {
             String name = getName();
-            if (name == null) {
+            if (name == null || "".equals(name)) {
                 name = Tools.getString("ClusterBrowser.DrbdResUnconfigured");
             }
             return "drbd: " + name;
@@ -3333,7 +3333,7 @@ public class ClusterBrowser extends Browser {
          */
         public String toString() {
             String name = getName();
-            if (name == null) {
+            if (name == null || "".equals(name)) {
                 name = Tools.getString(
                                    "ClusterBrowser.CommonBlockDevUnconfigured");
             }
@@ -3500,7 +3500,7 @@ public class ClusterBrowser extends Browser {
             final StringBuffer s = new StringBuffer(getName());
             final String inside = id + " / ";
             String ip = getParamSaved("ip");
-            if (ip == null) {
+            if (ip == null || "".equals(ip)) {
                 ip = Tools.getString("ClusterBrowser.Ip.Unconfigured");
             }
             s.append(" (" + inside + ip + ")");
@@ -3989,14 +3989,18 @@ public class ClusterBrowser extends Browser {
                                     final String selectedValue =
                                                       getParamSaved("fstype");
                                     String createdFs;
-                                    if (selectedValue != null) {
-                                        createdFs = selectedValue;
-                                    } else {
+                                    if (selectedValue == null
+                                        || "".equals(selectedValue)) {
                                         final CommonDeviceInterface cdi =
                                                 (CommonDeviceInterface) item;
                                         createdFs = cdi.getCreatedFs();
+                                    } else {
+                                        createdFs = selectedValue;
                                     }
-                                    fstypeParamCb.setValue(createdFs);
+                                    if (createdFs != null
+                                        && !"".equals(createdFs)) {
+                                        fstypeParamCb.setValue(createdFs);
+                                    }
                                 }
                             });
                             thread.start();
@@ -4101,7 +4105,7 @@ public class ClusterBrowser extends Browser {
                 s.delete(0, s.length());
                 s.append("Filesystem / Drbd");
             }
-            if (id == null) {
+            if (id == null || "".equals(id)) {
                 id = Tools.getString(
                             "ClusterBrowser.ClusterBlockDevice.Unconfigured");
             }
