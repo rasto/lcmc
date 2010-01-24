@@ -29,13 +29,15 @@ package drbd;
 import drbd.gui.MainPanel;
 import drbd.gui.MainMenu;
 import drbd.gui.ProgressIndicatorPanel;
-
 import drbd.utilities.Tools;
+
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.JPanel;
+import javax.swing.ToolTipManager;
+import java.util.concurrent.CountDownLatch;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
-import javax.swing.ToolTipManager;
 
 /**
  * This is the central class with main function. It starts the DRBD GUI.
@@ -92,6 +94,17 @@ public class DrbdMC extends JPanel {
          * Called when window is closed.
          */
         public final void windowClosing(final WindowEvent event) {
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    Tools.sleep(10000);
+                    System.out.println("force exit");
+                    System.exit(5);
+                }
+            });
+            t.start();
+            Tools.getGUIData().getMainFrame().setVisible(false);
+            final String saveFile = Tools.getConfigData().getSaveFile();
+            Tools.save(saveFile);
             Tools.getConfigData().disconnectAllHosts();
             System.exit(0);
         }
