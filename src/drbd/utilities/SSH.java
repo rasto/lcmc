@@ -1544,13 +1544,16 @@ public class SSH {
             commands.append(dir);
             commands.append(';');
         }
-        final Thread t = host.execCommandRaw(
-                                commands.toString()
-                                + "echo \""
-                                + host.escapeQuotes(fileContent, 1)
-                                + "\">" + remoteFilename
-                                + ";chmod " + mode + " "
-                                + remoteFilename,
+        if  (!isConnected()) {
+            return; 
+        }
+        final Thread t = execCommand(
+                            commands.toString()
+                            + "echo \""
+                            + host.escapeQuotes(fileContent, 1)
+                            + "\">" + remoteFilename
+                            + ";chmod " + mode + " "
+                            + remoteFilename,
                             new ExecCallback() {
                                 public void done(final String ans) {
                                     /* ok */
@@ -1559,7 +1562,10 @@ public class SSH {
                                                       final int exitCode) {
                                     Tools.sshError(host, "scp", ans, exitCode);
                                 }
-                            }, false, true);
+                            },
+                            false,
+                            true,
+                            10000); /* smaller timeout */
         try {
             t.join();
         } catch (java.lang.InterruptedException e) {

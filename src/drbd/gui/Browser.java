@@ -1268,6 +1268,9 @@ public class Browser {
          */
         protected final String getComboBoxValue(final String param) {
             final GuiComboBox cb = paramComboBoxGet(param, null);
+            if (cb == null) {
+                return null;
+            }
             final Object o = cb.getValue();
             String value;
             if (Tools.isStringClass(o)) {

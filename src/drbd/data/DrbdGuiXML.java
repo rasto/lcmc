@@ -138,8 +138,7 @@ public class DrbdGuiXML extends XML {
             clusterNode.setAttribute(CLUSTER_NAME_ATTR, clusterName);
             for (final Host host : cluster.getHosts()) {
                 final String hostName = host.getHostname();
-                final Element hostNode =
-                                (Element) clusterNode.appendChild(
+                final Element hostNode = (Element) clusterNode.appendChild(
                                         doc.createElement(HOST_NODE_STRING));
                 hostNode.appendChild(doc.createTextNode(hostName));
             }
@@ -207,6 +206,9 @@ public class DrbdGuiXML extends XML {
      */
     public final void loadXML(final String xml) {
         final Document document = getXMLDocument(xml);
+        if (document == null) {
+            return;
+        }
         /* get root <drbdgui> */
         final Node rootNode = getChildNode(document, "drbdgui");
         final Map<String, Host> hostMap = new LinkedHashMap<String, Host>();

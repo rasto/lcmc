@@ -315,12 +315,15 @@ public final class Tools {
      */
     public static void warning(final String msg) {
         System.out.println("WARNING: " + Tools.getString(msg));
-        JOptionPane.showMessageDialog(
-                            guiData.getMainFrame(),
-                            Tools.getString(msg),
-                            Tools.getString("Tools.Warning.Title"),
-                            JOptionPane.WARNING_MESSAGE
-                           );
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JOptionPane.showMessageDialog(
+                                        guiData.getMainFrame(),
+                                        Tools.getString(msg),
+                                        Tools.getString("Tools.Warning.Title"),
+                                        JOptionPane.WARNING_MESSAGE);
+            }
+        });
 
     }
 
@@ -332,14 +335,17 @@ public final class Tools {
      */
     public static void error(final String msg) {
         System.out.println("ERROR: " + getErrorString(msg));
-        JOptionPane.showMessageDialog(
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
                             new JScrollPane(new JTextArea(getErrorString(msg),
                                                           20,
                                                           60)),
                             Tools.getString("Error.Title"),
-                            JOptionPane.ERROR_MESSAGE
-                           );
+                            JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
     }
 
@@ -361,11 +367,11 @@ public final class Tools {
             onHost.append(host.getName());
         }
         Tools.printStackTrace();
-        Tools.error(Tools.getString("Tools.sshError.command")
-                    + " '" + command + "'" + onHost.toString() + "\n"
-                    + Tools.getString("Tools.sshError.returned")
-                    + " " + exitCode + "\n"
-                    + ans);
+        Tools.warning(Tools.getString("Tools.sshError.command")
+                      + " '" + command + "'" + onHost.toString() + "\n"
+                      + Tools.getString("Tools.sshError.returned")
+                      + " " + exitCode + "\n"
+                      + ans);
     }
 
     /**
@@ -614,12 +620,14 @@ public final class Tools {
         errorPane.setMinimumSize(DIALOG_PANEL_SIZE);
         errorPane.setMaximumSize(DIALOG_PANEL_SIZE);
         errorPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        JOptionPane.showMessageDialog(
-                            guiData.getMainFrame(),
-                            new JScrollPane(errorPane),
-                            getErrorString("AppError.Title"),
-                            JOptionPane.ERROR_MESSAGE
-                           );
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JOptionPane.showMessageDialog(guiData.getMainFrame(),
+                                              new JScrollPane(errorPane),
+                                              getErrorString("AppError.Title"),
+                                              JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     /**
@@ -634,12 +642,14 @@ public final class Tools {
         infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
         infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
         infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        JOptionPane.showMessageDialog(
-                            guiData.getMainFrame(),
-                            new JScrollPane(infoPane),
-                            getErrorString(title),
-                            JOptionPane.ERROR_MESSAGE
-                           );
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JOptionPane.showMessageDialog(guiData.getMainFrame(),
+                                              new JScrollPane(infoPane),
+                                              getErrorString(title),
+                                              JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     /**

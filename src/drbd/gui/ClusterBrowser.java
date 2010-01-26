@@ -914,6 +914,7 @@ public class ClusterBrowser extends Browser {
                                if (exitCode == 255) {
                                    /* looks like connection was lost */
                                    host.getSSH().forceReconnect();
+                                   host.setConnected();
                                }
                            }
                            //TODO: repaint ok?
@@ -1166,6 +1167,7 @@ public class ClusterBrowser extends Browser {
                              /* looks like connection was lost */
                              heartbeatGraph.repaint();
                              host.getSSH().forceReconnect();
+                             host.setConnected();
                          }
                          firstTime.countDown();
                      }
@@ -5374,18 +5376,15 @@ public class ClusterBrowser extends Browser {
                     if (infoPanelOk) {
                         final GuiComboBox cb = paramComboBoxGet(param,
                                                                 null);
-                        if (cb != null && isMetaAttr(param)) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    cb.setEnabled(metaAttrInfoRef == null);
-                                }
-                            });
-                        }
-                        if (!Tools.areEqual(value, oldValue)
-                            || isMetaAttr(param)) {
+                        final boolean haveChanged = !Tools.areEqual(value, oldValue);
+                        if (haveChanged
+                            || (metaAttrInfoRef != null && isMetaAttr(param))) {
                             getResource().setValue(param, value);
                             if (cb != null) {
                                 cb.setValue(value);
+                                if (haveChanged) {
+                                    cb.setEnabled(metaAttrInfoRef == null);
+                                }
                             }
                         }
                     }
@@ -6465,10 +6464,12 @@ public class ClusterBrowser extends Browser {
             sl.add(new StringInfo(GuiComboBox.NOTHING_SELECTED, null));
             sl.add(new StringInfo(META_ATTRS_DEFAULT_VALUES_TEXT,
                                   META_ATTRS_DEFAULT_VALUES));
-            final String hbV = getDCHost().getHeartbeatVersion();
+            final Host dcHost = getDCHost();
+            final String pmV = dcHost.getPacemakerVersion();
+            final String hbV = dcHost.getHeartbeatVersion();
             
             if (isMetaAttrReferenced()
-                || Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                || (pmV == null && Tools.compareVersions(hbV, "2.1.4") <= 0)) {
                 return sl.toArray(new Info[sl.size()]);
             }
             try {
@@ -6520,9 +6521,11 @@ public class ClusterBrowser extends Browser {
             sl.add(new StringInfo(GuiComboBox.NOTHING_SELECTED, null));
             sl.add(new StringInfo(OPERATIONS_DEFAULT_VALUES_TEXT,
                                   OPERATIONS_DEFAULT_VALUES));
-            final String hbV = getDCHost().getHeartbeatVersion();
+            final Host dcHost = getDCHost();
+            final String pmV = dcHost.getPacemakerVersion();
+            final String hbV = dcHost.getHeartbeatVersion();
             if (isOperationReferenced()
-                || Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                || (pmV == null && Tools.compareVersions(hbV, "2.1.4") <= 0)) {
                 return sl.toArray(new Info[sl.size()]);
             }
             try {

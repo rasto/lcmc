@@ -48,7 +48,7 @@ public class DistResource_redhat_5 extends
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "clusterlabs repo: 1.0.x/1.1.x" },
+         "clusterlabs repo: 1.0.x/1.2.x" },
 
         {"PmInst.install.1",
          "wget -N -nd -P /etc/yum.repos.d/"
