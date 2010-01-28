@@ -24,13 +24,13 @@ package drbd.gui;
 
 import drbd.utilities.Tools;
 import drbd.data.Host;
-import drbd.data.resources.BlockDevice;
 import drbd.data.Subtext;
-import drbd.gui.HostBrowser.HostDrbdInfo;
-import drbd.gui.ClusterBrowser.DrbdInfo;
-import drbd.gui.ClusterBrowser.DrbdResourceInfo;
-import drbd.gui.HostBrowser.BlockDevInfo;
-import drbd.gui.Browser.Info;
+import drbd.data.resources.BlockDevice;
+import drbd.gui.resources.HostDrbdInfo;
+import drbd.gui.resources.DrbdInfo;
+import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.BlockDevInfo;
+import drbd.gui.resources.Info;
 
 import java.awt.Shape;
 import java.awt.Graphics2D;

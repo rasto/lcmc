@@ -25,9 +25,9 @@ package drbd.gui.dialog;
 import drbd.utilities.Tools;
 import drbd.data.Host;
 import drbd.gui.SpringUtilities;
-import drbd.gui.HostBrowser.BlockDevInfo;
-import drbd.gui.ClusterBrowser.DrbdResourceInfo;
-import drbd.gui.Browser.StringInfo;
+import drbd.gui.resources.BlockDevInfo;
+import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.StringInfo;
 import drbd.gui.GuiComboBox;
 import drbd.utilities.MyButton;
 
@@ -278,7 +278,7 @@ public class DrbdConfigCreateFS extends DrbdConfig {
             defaultValue = "ext3";
         }
         final StringInfo[] filesystems =
-                    getDrbdResourceInfo().getCommonFileSystems2(defaultValue);
+                    getDrbdResourceInfo().getCommonFileSystems(defaultValue);
 
         filesystemCB = new GuiComboBox(defaultValue,
                                        filesystems,

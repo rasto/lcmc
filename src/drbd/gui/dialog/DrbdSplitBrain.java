@@ -26,7 +26,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
 import drbd.data.Host;
 import drbd.gui.SpringUtilities;
-import drbd.gui.ClusterBrowser.DrbdResourceInfo;
+import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.GuiComboBox;
 import drbd.utilities.MyButton;
 

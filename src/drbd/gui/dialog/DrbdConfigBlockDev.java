@@ -24,8 +24,8 @@ package drbd.gui.dialog;
 
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
-import drbd.gui.ClusterBrowser.DrbdResourceInfo;
-import drbd.gui.HostBrowser.BlockDevInfo;
+import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.BlockDevInfo;
 import drbd.utilities.MyButton;
 import drbd.Exceptions;
 

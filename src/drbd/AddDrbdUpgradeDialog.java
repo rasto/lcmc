@@ -26,7 +26,7 @@ import drbd.utilities.Tools;
 
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.dialog.HostDistForUpgrade;
-import drbd.gui.HostBrowser.HostDrbdInfo;
+import drbd.gui.resources.HostDrbdInfo;
 
 /**
  * AddDrbdUpgradeDialog.

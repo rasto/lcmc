@@ -25,10 +25,8 @@ import drbd.data.ConfigData;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.Clusters;
-import drbd.gui.Browser.StringInfo;
-import drbd.gui.HostBrowser.NetInfo;
-import drbd.gui.ClusterBrowser.DrbdResourceInfo;
-import drbd.gui.Browser.Info;
+import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.Info;
 import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
 import drbd.data.CRMXML;
@@ -148,7 +146,7 @@ public final class Tools {
     /** Text/plain mime type. */
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
     /** Pattern that matches a number and unit. */
-    private static Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
+    private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
     /**
      * Private constructor.
      */
@@ -1302,8 +1300,6 @@ public final class Tools {
         if (o == null || o instanceof String) {
             return true;
         }
-        //if (o.getClass().getName().equals("java.lang.String"))
-        //    return true;
         return false;
     }
 
@@ -1312,7 +1308,7 @@ public final class Tools {
      */
     public static boolean isStringInfoClass(final Object o) {
         if (o == null
-            || o.getClass().getName().equals("drbd.gui.Browser$StringInfo")) {
+            || o.getClass().getName().equals("drbd.gui.resources.StringInfo")) {
             return true;
         }
         return false;
@@ -1965,7 +1961,7 @@ public final class Tools {
      * Returns whether two objects are equal. Special handling for Units and
      * StringInfo objects.
      */
-    public static boolean areEqual(Object o1, Object o2) {
+    public static boolean areEqual(final Object o1, final Object o2) {
         if (o1 == null && o2 == null) {
             return true;
         } else if (o1 != null && o1 instanceof DrbdResourceInfo) {
@@ -2049,5 +2045,4 @@ public final class Tools {
         }
         return o;
     }
-    
 }

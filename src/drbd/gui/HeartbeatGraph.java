@@ -23,12 +23,12 @@ package drbd.gui;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
-import drbd.gui.ClusterBrowser.ServiceInfo;
-import drbd.gui.Browser.Info;
-import drbd.gui.ClusterBrowser.ServicesInfo;
-import drbd.gui.ClusterBrowser.GroupInfo;
-import drbd.gui.ClusterBrowser.HbConnectionInfo;
-import drbd.gui.HostBrowser.HostInfo;
+import drbd.gui.resources.Info;
+import drbd.gui.resources.ServiceInfo;
+import drbd.gui.resources.ServicesInfo;
+import drbd.gui.resources.GroupInfo;
+import drbd.gui.resources.HbConnectionInfo;
+import drbd.gui.resources.HostInfo;
 import drbd.data.Subtext;
 import drbd.data.Host;
 
@@ -632,7 +632,8 @@ public class HeartbeatGraph extends ResourceGraph {
         addServiceMenuItem.removeAll();
         boolean separatorAdded = false;
         final boolean tOnly = isTestOnly();
-        for (final ServiceInfo asi : si.getExistingServiceList(si)) {
+        for (final ServiceInfo asi
+                            : getClusterBrowser().getExistingServiceList(si)) {
             final MyMenuItem mmi = new MyMenuItem(asi.toString()) {
                 private static final long serialVersionUID = 1L;
                 public void action() {

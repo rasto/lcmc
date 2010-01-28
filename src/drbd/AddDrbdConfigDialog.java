@@ -25,7 +25,7 @@ import drbd.utilities.Tools;
 
 import drbd.gui.dialog.DrbdConfig;
 import drbd.gui.dialog.DrbdConfigResource;
-import drbd.gui.ClusterBrowser.DrbdResourceInfo;
+import drbd.gui.resources.DrbdResourceInfo;
 
 /**
  * AddDrbdConfigDialog.

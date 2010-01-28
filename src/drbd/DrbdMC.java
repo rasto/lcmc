@@ -32,10 +32,8 @@ import drbd.gui.ProgressIndicatorPanel;
 import drbd.utilities.Tools;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
-import java.util.concurrent.CountDownLatch;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 

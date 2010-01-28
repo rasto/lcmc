@@ -22,7 +22,7 @@
 package drbd.gui;
 
 import drbd.utilities.Tools;
-import drbd.gui.Browser.Info;
+import drbd.gui.resources.Info;
 import drbd.utilities.MyMenuItem;
 import drbd.data.Host;
 import drbd.data.Subtext;

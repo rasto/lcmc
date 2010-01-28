@@ -2,7 +2,8 @@
  * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
  * written by Rasto Levrinc.
  *
- * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+ * Copyright (C) 2009-2010, LINBIT HA-Solutions GmbH.
+ * Copyright (C) 2009-2010, Rasto Levrinc
  *
  * DRBD Management Console is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -18,38 +19,37 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+package drbd.gui.resources;
 
-
-package drbd.gui.dialog;
-
-import drbd.gui.resources.DrbdResourceInfo;
-
+import drbd.gui.Browser;
+import javax.swing.ImageIcon;
 /**
- * DrbdConfig super class from which all the drbd config wizards can be
- * extended. It just adds DrbdResourceInfo field.
- *
- * @author Rasto Levrinc
- * @version $Id$
+ * This class holds info data for a category.
+ * Nothing is displayed.
  */
-public abstract class DrbdConfig extends WizardDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Drbd resource info object. */
-    private final DrbdResourceInfo dri;
-
+public class CategoryInfo extends Info {
     /**
-     * Prepares a new <code>DrbdConfig</code> object.
+     * Prepares a new <code>CategoryInfo</code> object.
+     *
+     * @param name
+     *      name that will be shown in the tree
      */
-    public DrbdConfig(final WizardDialog previousDialog,
-                      final DrbdResourceInfo dri) {
-        super(previousDialog);
-        this.dri = dri;
+    public CategoryInfo(final String name, final Browser browser) {
+        super(name, browser);
     }
 
     /**
-     * Returns drbd resource info object.
+     * Info panel for the category.
      */
-    protected final DrbdResourceInfo getDrbdResourceInfo() {
-        return dri;
+    public String getInfo() {
+        return null;
+    }
+
+    /**
+     * Returns the icon.
+     */
+    public ImageIcon getMenuIcon(final boolean testOnly) {
+        return Browser.CATEGORY_ICON;
     }
 }
+

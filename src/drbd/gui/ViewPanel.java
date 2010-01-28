@@ -22,7 +22,7 @@
 
 package drbd.gui;
 
-import drbd.gui.Browser.Info;
+import drbd.gui.resources.Info;
 import drbd.utilities.Tools;
 
 import java.awt.Dimension;

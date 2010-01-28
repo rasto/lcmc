@@ -1545,7 +1545,7 @@ public class SSH {
             commands.append(';');
         }
         if  (!isConnected()) {
-            return; 
+            return;
         }
         final Thread t = execCommand(
                             commands.toString()

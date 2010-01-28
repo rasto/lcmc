@@ -23,7 +23,7 @@
 package drbd.data;
 
 import drbd.gui.DrbdGraph;
-import drbd.gui.HostBrowser.BlockDevInfo;
+import drbd.gui.resources.BlockDevInfo;
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
 

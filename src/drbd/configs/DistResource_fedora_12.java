@@ -78,7 +78,7 @@ public class DistResource_fedora_12 extends
 
         {"HbPmInst.install.1",
          "yum -y install pacemaker heartbeat"},
-         
+
         ///* Heartbeat/Pacemaker clusterlabs*/
         //{"HbPmInst.install.text.1",
         // "clusterlabs repo: 1.0.x/3.0.x" },

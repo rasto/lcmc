@@ -25,7 +25,7 @@ package drbd.gui;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.PatternDocument;
-import drbd.gui.Browser.Info;
+import drbd.gui.resources.Info;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;

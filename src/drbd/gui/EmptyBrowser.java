@@ -28,6 +28,7 @@ import drbd.utilities.MyMenuItem;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.AddHostDialog;
+import drbd.gui.resources.Info;
 
 import java.awt.Color;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class EmptyBrowser extends Browser {
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(
                                 Tools.getDefault("EmptyBrowser.HostIcon"));
     /** All hosts info object of the host of this browser. */
-    private final AllHostsInfo allHostsInfo = new AllHostsInfo();
+    private final AllHostsInfo allHostsInfo = new AllHostsInfo(this);
 
     /**
      * Prepares a new <code>CusterBrowser</code> object.
@@ -210,8 +211,8 @@ public class EmptyBrowser extends Browser {
         /**
          * Creates a new AllHostsInfo instance.
          */
-        public AllHostsInfo() {
-            super(Tools.getString("ClusterBrowser.AllHosts"));
+        public AllHostsInfo(final Browser browser) {
+            super(Tools.getString("ClusterBrowser.AllHosts"), browser);
             host = null;
         }
 

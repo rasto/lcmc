@@ -23,7 +23,7 @@
 package drbd.gui.dialog;
 
 import drbd.utilities.Tools;
-import drbd.gui.ClusterBrowser.DrbdResourceInfo;
+import drbd.gui.resources.DrbdResourceInfo;
 import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
