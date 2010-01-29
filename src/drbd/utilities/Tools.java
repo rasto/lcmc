@@ -316,10 +316,12 @@ public final class Tools {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JOptionPane.showMessageDialog(
-                                        guiData.getMainFrame(),
-                                        Tools.getString(msg),
-                                        Tools.getString("Tools.Warning.Title"),
-                                        JOptionPane.WARNING_MESSAGE);
+                            guiData.getMainFrame(),
+                            new JScrollPane(new JTextArea(Tools.getString(msg),
+                                                          20,
+                                                          60)),
+                            Tools.getString("Tools.Warning.Title"),
+                            JOptionPane.WARNING_MESSAGE);
             }
         });
 
