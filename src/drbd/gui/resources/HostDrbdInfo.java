@@ -361,8 +361,8 @@ public class HostDrbdInfo extends Info {
                 }
 
                 public void action() {
-                    drbd.gui.dialog.DrbdsLog l =
-                                        new drbd.gui.dialog.DrbdsLog(host);
+                    drbd.gui.dialog.drbd.DrbdsLog l =
+                                      new drbd.gui.dialog.drbd.DrbdsLog(host);
                     l.showDialog();
                 }
             };

@@ -73,13 +73,6 @@ class FilesystemInfo extends ServiceInfo {
     }
 
     /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
-        return (ClusterBrowser) super.getBrowser();
-    }
-
-    /**
      * Sets Linbit::drbd info object for this Filesystem service if it uses
      * drbd block device.
      */

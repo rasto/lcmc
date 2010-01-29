@@ -182,10 +182,10 @@ public class TextResource extends
         {"Dialog.Dialog.Ok",
          "OK"},
 
-        {"Dialog.HostNewHost.Title",
+        {"Dialog.Host.NewHost.Title",
          "Host Wizard"},
 
-        {"Dialog.HostNewHost.Description",
+        {"Dialog.Host.NewHost.Description",
          "Enter the <b>hostname/IP</b> and <b>username</b> of the server. "
          + "Host can be entered either as hostname or IP address. Enter a "
          + "hostname only if it is resolvable by DNS. Username will be used "
@@ -196,80 +196,80 @@ public class TextResource extends
          + "If this is the case you have to enter the same number of "
          + "usernames and hostnames/IPs as they are hops."},
 
-        {"Dialog.HostNewHost.EnterHost",
+        {"Dialog.Host.NewHost.EnterHost",
          "Host:"},
 
-        {"Dialog.HostNewHost.EnterUsername",
+        {"Dialog.Host.NewHost.EnterUsername",
          "Username:"},
 
-        {"Dialog.HostNewHost.SSHPort",
+        {"Dialog.Host.NewHost.SSHPort",
          "SSH Port:"},
 
-        {"Dialog.HostNewHost.EnterPassword",
+        {"Dialog.Host.NewHost.EnterPassword",
          "Password:"},
 
-        {"Dialog.HostConfiguration.Title",
+        {"Dialog.Host.Configuration.Title",
          "Host configuration"},
 
-        {"Dialog.HostConfiguration.Description",
+        {"Dialog.Host.Configuration.Description",
          "Trying to do a DNS lookup of the host. If DNS lookup failed, "
          + "go back and enter an IP of the host if the host is not "
          + "resolvable by DNS or make the hostname resolvable."},
 
-        {"Dialog.HostConfiguration.Name",
+        {"Dialog.Host.Configuration.Name",
          "nodename:"}, // TODO: this is not necessary anymore
 
-        {"Dialog.HostConfiguration.Hostname",
+        {"Dialog.Host.Configuration.Hostname",
          "hostname:"},
 
-        {"Dialog.HostConfiguration.Ip",
+        {"Dialog.Host.Configuration.Ip",
          "IP:"},
 
-        {"Dialog.HostConfiguration.DNSLookup",
+        {"Dialog.Host.Configuration.DNSLookup",
          "DNS lookup"},
 
-        {"Dialog.HostConfiguration.DNSLookupOk",
+        {"Dialog.Host.Configuration.DNSLookupOk",
          "DNS lookup done."},
 
-        {"Dialog.HostConfiguration.DNSLookupError",
+        {"Dialog.Host.Configuration.DNSLookupError",
          "DNS lookup failed."},
 
-        {"Dialog.HostSSH.Title",
+        {"Dialog.Host.SSH.Title",
          "Create SSH Connection"},
 
-        {"Dialog.HostSSH.Description",
+        {"Dialog.Host.SSH.Description",
          "Trying to connect to host via ssh. You can either enter "
          + "a RSA or DSA key or enter a password in the pop up dialog. "
          + "You can switch between passphrase and password "
          + "authentication by pressing enter without entering "
          + "anything."},
 
-        {"Dialog.HostSSH.Connecting",
+        {"Dialog.Host.SSH.Connecting",
          "Connecting..."},
 
-        {"Dialog.HostSSH.Connected",
+        {"Dialog.Host.SSH.Connected",
          "Connection established."},
 
-        {"Dialog.HostSSH.NotConnected",
+        {"Dialog.Host.SSH.NotConnected",
          "Connection failed."},
 
-        {"Dialog.HostDevices.Title",
+        {"Dialog.Host.Devices.Title",
          "Host devices"},
 
-        {"Dialog.HostDevices.Description",
+        {"Dialog.Host.Devices.Description",
          "Trying to retrieve information about block, network devices "
          + "and installation information of the host."},
 
-        {"Dialog.HostDevices.Executing",
+        {"Dialog.Host.Devices.Executing",
          "Executing..."},
 
-        {"Dialog.HostDevices.CheckError",
+        {"Dialog.Host.Devices.CheckError",
          "Failed."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.Title",
+        {"Dialog.Host.DrbdLinbitAvailPackages.Title",
          "Available Packages"},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.Description",
+        {"Dialog.Host.DrbdLinbitAvailPackages.Description",
          "Trying to match distribution, kernel package and architecture of "
          + "the server to the available binary DRBD packages. If none is "
          + "selected, most likely there is no DRBD package available for "
@@ -277,62 +277,62 @@ public class TextResource extends
          + "package will be provided to you by LINBIT support (not free). "
          + "After that you may retry this step again."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Dist",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Dist",
          "There are no DRBD packages available for your distribution."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Kernel",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Kernel",
          "There are no DRBD packages available for your kernel version."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NotAvailable.Arch",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Arch",
          "There are no DRBD packages available at www.linbit.com for your "
          + "kernel architecture."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.AvailablePackages",
+        {"Dialog.Host.DrbdLinbitAvailPackages.AvailablePackages",
          "Available packages at www.linbit.com: "},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NoDist",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NoDist",
          "DRBD package not found."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NotALinux",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NotALinux",
          "Cannot determine an operating system."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NoArch",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NoArch",
          "Cannot determine the architecture"},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.Executing",
+        {"Dialog.Host.DrbdLinbitAvailPackages.Executing",
          "Looking for available packages..."},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.AvailVersions",
+        {"Dialog.Host.DrbdLinbitAvailPackages.AvailVersions",
          "Available versions: "},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NoKernels",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NoKernels",
          "Not available for this kernel"},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NoVersions",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NoVersions",
          "Could not find any DRBD versions"},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NoDistributions",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NoDistributions",
          "No distributions found"},
 
-        {"Dialog.HostDrbdLinbitAvailPackages.NoArchs",
+        {"Dialog.Host.DrbdLinbitAvailPackages.NoArchs",
          "No archs found"},
 
-        {"Dialog.HostDistDetection.Title",
+        {"Dialog.Host.DistDetection.Title",
          "Distribution Detection"},
 
-        {"Dialog.HostDistDetection.Description",
+        {"Dialog.Host.DistDetection.Description",
          "Trying to detect the Linux distribution of the host. It is Linux, "
          + "right? If none is detected, it means that the distribution is "
          + "not supported. You may then choose a distribution that is "
          + "similar, which may or may not work for you."},
 
-        {"Dialog.HostDistDetection.Executing",
+        {"Dialog.Host.DistDetection.Executing",
          "Executing..."},
 
-        {"Dialog.HostCheckInstallation.Title",
+        {"Dialog.Host.CheckInstallation.Title",
          "Installation Check"},
 
-        {"Dialog.HostCheckInstallation.Description",
+        {"Dialog.Host.CheckInstallation.Description",
          "Checking if DRBD, Pacemaker and other important "
          + "components are already installed. If not, you can press "
          + "one of the 'Install' buttons to install them. You can check "
@@ -344,78 +344,78 @@ public class TextResource extends
          + "Clusterlabs and Opensuse repositories, yes even if your "
          + "distribution is not an Opensuse."},
 
-        {"Dialog.HostCheckInstallation.Drbd.NotInstalled",
+        {"Dialog.Host.CheckInstallation.Drbd.NotInstalled",
          "DRBD is not installed. Click 'Install' button to install a new "
          + "shiny DRBD."},
 
-        {"Dialog.HostCheckInstallation.Heartbeat.AlreadyInstalled",
+        {"Dialog.Host.CheckInstallation.Heartbeat.AlreadyInstalled",
          "is already installed."},
 
-        {"Dialog.HostCheckInstallation.Heartbeat.NotInstalled",
+        {"Dialog.Host.CheckInstallation.Heartbeat.NotInstalled",
          "Heartbeat is not installed or is installed improperly. "
          + "Press 'Next' button in order to install the Heartbeat packages."},
 
-        {"Dialog.HostCheckInstallation.Heartbeat.CheckError",
+        {"Dialog.Host.CheckInstallation.Heartbeat.CheckError",
          "Check failed."},
 
-        {"Dialog.HostCheckInstallation.Checking",
+        {"Dialog.Host.CheckInstallation.Checking",
          "Checking..."},
 
-        {"Dialog.HostCheckInstallation.CheckError",
+        {"Dialog.Host.CheckInstallation.CheckError",
          "Check failed."},
 
-        {"Dialog.HostCheckInstallation.AllOk",
+        {"Dialog.Host.CheckInstallation.AllOk",
          "All required components are installed."},
 
-        {"Dialog.HostCheckInstallation.SomeFailed",
+        {"Dialog.Host.CheckInstallation.SomeFailed",
          "Some of the required components are not installed."},
 
-        {"Dialog.HostCheckInstallation.DrbdNotInstalled",
+        {"Dialog.Host.CheckInstallation.DrbdNotInstalled",
          "not installed"},
 
-        {"Dialog.HostCheckInstallation.PmNotInstalled",
+        {"Dialog.Host.CheckInstallation.PmNotInstalled",
          "not installed"},
 
-        {"Dialog.HostCheckInstallation.HbPmNotInstalled",
+        {"Dialog.Host.CheckInstallation.HbPmNotInstalled",
          "not installed"},
 
-        {"Dialog.HostCheckInstallation.DrbdUpgradeButton",
+        {"Dialog.Host.CheckInstallation.DrbdUpgradeButton",
          "Upgrade"},
 
-        {"Dialog.HostCheckInstallation.DrbdCheckForUpgradeButton",
+        {"Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton",
          "Check for Upgrade"},
 
-        {"Dialog.HostCheckInstallation.DrbdInstallButton",
+        {"Dialog.Host.CheckInstallation.DrbdInstallButton",
          "Install"},
 
-        {"Dialog.HostCheckInstallation.PmInstallButton",
+        {"Dialog.Host.CheckInstallation.PmInstallButton",
          "Install"},
 
-        {"Dialog.HostCheckInstallation.HbPmInstallButton",
+        {"Dialog.Host.CheckInstallation.HbPmInstallButton",
          "Install"},
 
-        {"Dialog.HostCheckInstallation.CheckingPm",
+        {"Dialog.Host.CheckInstallation.CheckingPm",
          "checking..."},
 
-        {"Dialog.HostCheckInstallation.CheckingHbPm",
+        {"Dialog.Host.CheckInstallation.CheckingHbPm",
          "checking..."},
 
-        {"Dialog.HostCheckInstallation.CheckingDrbd",
+        {"Dialog.Host.CheckInstallation.CheckingDrbd",
          "checking..."},
 
-        {"Dialog.HostCheckInstallation.PmInstallMethod",
+        {"Dialog.Host.CheckInstallation.PmInstallMethod",
          "Installation method: "},
 
-        {"Dialog.HostCheckInstallation.HbPmInstallMethod",
+        {"Dialog.Host.CheckInstallation.HbPmInstallMethod",
          "Installation method: "},
 
-        {"Dialog.HostCheckInstallation.DrbdInstallMethod",
+        {"Dialog.Host.CheckInstallation.DrbdInstallMethod",
          "Installation method: "},
 
-        {"Dialog.HostLinbitLogin.Title",
+        {"Dialog.Host.LinbitLogin.Title",
          "Log in"},
 
-        {"Dialog.HostLinbitLogin.Description",
+        {"Dialog.Host.LinbitLogin.Description",
          "You need to log in to the http://www.linbit.com/support download "
          + "area to get a package for your distribution. Please provide "
          + "your username and password. Contact LINBIT support to obtain "
@@ -425,19 +425,19 @@ public class TextResource extends
          + "about it, only in the next step, when you will be unable to "
          + "download anything."},
 
-        {"Dialog.HostLinbitLogin.EnterUser",
+        {"Dialog.Host.LinbitLogin.EnterUser",
          "Username"},
 
-        {"Dialog.HostLinbitLogin.EnterPassword",
+        {"Dialog.Host.LinbitLogin.EnterPassword",
          "Password"},
 
-        {"Dialog.HostLinbitLogin.Save",
+        {"Dialog.Host.LinbitLogin.Save",
          "Save"},
 
-        {"Dialog.HostDrbdAvailFiles.Title",
+        {"Dialog.Host.DrbdAvailFiles.Title",
          "Available DRBD Packages"},
 
-        {"Dialog.HostDrbdAvailFiles.Description",
+        {"Dialog.Host.DrbdAvailFiles.Description",
          "Trying to detect available packages. There should be one module "
          + "and one util package if you use stock distribution kernel. "
          + "If no package was auto-detected, you may choose appropriate "
@@ -446,33 +446,33 @@ public class TextResource extends
          + "case contact LINBIT support and packages will be provided "
          + "to you as soon as possible."},
 
-        {"Dialog.HostDrbdAvailFiles.Executing",
+        {"Dialog.Host.DrbdAvailFiles.Executing",
          "Executing..."},
 
-        {"Dialog.HostDrbdAvailFiles.NoFiles",
+        {"Dialog.Host.DrbdAvailFiles.NoFiles",
          "No packages found."},
 
-        {"Dialog.HostDrbdAvailFiles.NoBuilds",
+        {"Dialog.Host.DrbdAvailFiles.NoBuilds",
          "No builds found."},
 
-        {"Dialog.HostDrbdAvailSourceFiles.Title",
+        {"Dialog.Host.DrbdAvailSourceFiles.Title",
          "Available DRBD Source Tarballs"},
 
-        {"Dialog.HostDrbdAvailSourceFiles.Description",
+        {"Dialog.Host.DrbdAvailSourceFiles.Description",
          "Trying to parse available source tarballs from the LINBIT website. "
          + "If you don't know which DRBD version should be installed, take "
          + "the already selected one, this is also the newest one."},
 
-        {"Dialog.HostDrbdAvailSourceFiles.Executing",
+        {"Dialog.Host.DrbdAvailSourceFiles.Executing",
          "Executing..."},
 
-        {"Dialog.HostDrbdAvailSourceFiles.NoBuilds",
+        {"Dialog.Host.DrbdAvailSourceFiles.NoBuilds",
          "Could not find any builds"},
 
-        {"Dialog.HostDrbdInst.Title",
+        {"Dialog.Host.DrbdLinbitInst.Title",
          "DRBD Installation"},
 
-        {"Dialog.HostDrbdInst.Description",
+        {"Dialog.Host.DrbdLinbitInst.Description",
          "DRBD is being installed. If it fails with authorization errors, "
          + "you entered a wrong username or password, going back, entering "
          + "it correctly, would fix it. Other possibility is that wrong "
@@ -481,72 +481,72 @@ public class TextResource extends
          + "servers are down, but this is not very likely, since LINBIT "
          + "servers are fault-tolerant using DRBD."},
 
-        {"Dialog.HostDrbdInst.CheckingFile",
+        {"Dialog.Host.DrbdLinbitInst.CheckingFile",
          "Checking installed file..."},
 
-        {"Dialog.HostDrbdInst.FileExists",
+        {"Dialog.Host.DrbdLinbitInst.FileExists",
          "File already exists."},
 
-        {"Dialog.HostDrbdInst.Downloading",
+        {"Dialog.Host.DrbdLinbitInst.Downloading",
          "Downloading..."},
 
-        {"Dialog.HostDrbdInst.Installing",
+        {"Dialog.Host.DrbdLinbitInst.Installing",
          "DRBD is being installed..."},
 
-        {"Dialog.HostDrbdInst.InstallationDone",
+        {"Dialog.Host.DrbdLinbitInst.InstallationDone",
          "Installation done."},
 
-        {"Dialog.HostDrbdInst.InstallationFailed",
+        {"Dialog.Host.DrbdLinbitInst.InstallationFailed",
          "Installation failed."},
 
-        {"Dialog.HostDrbdInst.Executing",
+        {"Dialog.Host.DrbdLinbitInst.Executing",
          "Executing..."},
 
-        {"Dialog.HostDrbdInst.Starting",
+        {"Dialog.Host.DrbdLinbitInst.Starting",
          "Starting DRBD..."},
 
-        {"Dialog.HostDrbdInst.MkdirError",
+        {"Dialog.Host.DrbdLinbitInst.MkdirError",
          "Could not create a directory"},
 
-        {"Dialog.HostDrbdInst.WgetError",
+        {"Dialog.Host.DrbdLinbitInst.WgetError",
          "Could not get DRBD packages."},
 
-        {"Dialog.HostHbInst.Title",
+        {"Dialog.Host.HeartbeatInst.Title",
          "Heartbeat Install"},
 
-        {"Dialog.HostHbInst.Description",
+        {"Dialog.Host.HeartbeatInst.Description",
          "Heartbeat and Pacemaker packages are being installed."},
 
-        {"Dialog.HostHbInst.Executing",
+        {"Dialog.Host.HeartbeatInst.Executing",
          "Installing..."},
 
-        {"Dialog.HostHbInst.InstOk",
+        {"Dialog.Host.HeartbeatInst.InstOk",
          "Heartbeat and Pacemaker were successfully installed."},
 
-        {"Dialog.HostHbInst.InstError",
+        {"Dialog.Host.HeartbeatInst.InstError",
          "Installation error: you may have to go to the command line and fix "
          + "whatever needs fixing there."},
 
-        {"Dialog.HostPmInst.Title",
+        {"Dialog.Host.PacemakerInst.Title",
          "Corosync/OpenAIS/Pacemaker Install"},
 
-        {"Dialog.HostPmInst.Description",
+        {"Dialog.Host.PacemakerInst.Description",
          "Pacemaker with Corosync and/or OpenAIS packages is being installed."},
 
-        {"Dialog.HostPmInst.Executing",
+        {"Dialog.Host.PacemakerInst.Executing",
          "Installing..."},
 
-        {"Dialog.HostPmInst.InstOk",
+        {"Dialog.Host.PacemakerInst.InstOk",
          "Pacemaker was successfully installed."},
 
-        {"Dialog.HostPmInst.InstError",
+        {"Dialog.Host.PacemakerInst.InstError",
          "Installation error: you may have to go to the command line and fix "
          + "whatever needs fixing there."},
 
-        {"Dialog.HostDrbdCommandInst.Title",
+        {"Dialog.Host.DrbdCommandInst.Title",
          "DRBD Install"},
 
-        {"Dialog.HostDrbdCommandInst.Description",
+        {"Dialog.Host.DrbdCommandInst.Description",
          "DRBD is being installed. For some distributions, especially "
          + "older RedHats, if you use an older kernel than is currently "
          + "available, you may need to find, download and install the "
@@ -554,30 +554,30 @@ public class TextResource extends
          + "the kernel. You can find out your kernel version with \"uname -r\" "
          + "command. After that you can retry this step again."},
 
-        {"Dialog.HostDrbdCommandInst.Executing",
+        {"Dialog.Host.DrbdCommandInst.Executing",
          "Installing..."},
 
-        {"Dialog.HostDrbdCommandInst.InstOk",
+        {"Dialog.Host.DrbdCommandInst.InstOk",
          "DRBD was successfully installed."},
 
-        {"Dialog.HostDrbdCommandInst.InstError",
+        {"Dialog.Host.DrbdCommandInst.InstError",
          "Installation error: you may have to go to the command line and fix "
          + "whatever needs fixing there:\n"},
 
-        {"Dialog.HostFinish.Title",
+        {"Dialog.Host.Finish.Title",
          "Finish"},
 
-        {"Dialog.HostFinish.Description",
+        {"Dialog.Host.Finish.Description",
          "Configuration of the host is now complete. You can now add another "
          + "host or configure a cluster."},
 
-        {"Dialog.HostFinish.AddAnotherHostButton",
+        {"Dialog.Host.Finish.AddAnotherHostButton",
          "Add Another Host"},
 
-        {"Dialog.HostFinish.ConfigureClusterButton",
+        {"Dialog.Host.Finish.ConfigureClusterButton",
          "Configure Cluster"},
 
-        {"Dialog.HostFinish.Save",
+        {"Dialog.Host.Finish.Save",
          "Save"},
 
         {"Dialog.ConfigDialog.NoMatch",
@@ -592,33 +592,33 @@ public class TextResource extends
         {"Dialog.ConnectDialog.Description",
          "Trying to establish an SSH connection."},
 
-        {"Dialog.ClusterName.Title",
+        {"Dialog.Cluster.Name.Title",
          "Cluster Wizard"},
 
-        {"Dialog.ClusterName.EnterName",
+        {"Dialog.Cluster.Name.EnterName",
          "Name:"},
 
-        {"Dialog.ClusterName.Description",
+        {"Dialog.Cluster.Name.Description",
          "Enter a name for the cluster. This name can be anything as long "
          + "as it is unique. It is used only as an identification in "
          + "the GUI and can be changed later."},
 
-        {"Dialog.ClusterHosts.Title",
+        {"Dialog.Cluster.ClusterHosts.Title",
          "Select Hosts"},
 
-        {"Dialog.ClusterHosts.Description",
+        {"Dialog.Cluster.ClusterHosts.Description",
          "Select two or more hosts that are part of the "
          + "DRBD/Pacemaker cluster."},
 
-        {"Dialog.ClusterConnect.Title",
+        {"Dialog.Cluster.Connect.Title",
          "Cluster Connect"},
-        {"Dialog.ClusterConnect.Description",
+        {"Dialog.Cluster.Connect.Description",
          "Trying to connect to all the hosts in the cluster."},
 
-        {"Dialog.ClusterCommStack.Title",
+        {"Dialog.Cluster.CommStack.Title",
          "Cluster Communication Stack"},
 
-        {"Dialog.ClusterCommStack.Description",
+        {"Dialog.Cluster.CommStack.Description",
          "Now you have to choose between Corosync/OpenAIS and Heartbeat, "
          + "if you have "
          + "installed both. It is either one or another from now on, although "
@@ -628,10 +628,10 @@ public class TextResource extends
          + "tested at the moment, but is unmaintained and is being completely "
          + "displaced by Corosync."},
 
-        {"Dialog.ClusterAisConfig.Title",
+        {"Dialog.Cluster.CoroConfig.Title",
          "Corosync/OpenAIS Config File"},
 
-        {"Dialog.ClusterAisConfig.Description",
+        {"Dialog.Cluster.CoroConfig.Description",
          "In this step Corosync config (/etc/corosync/corosync.conf) or "
          + "OpenAIS config (/etc/ais/openais.conf) is created and "
          + "OpenAIS is started. You do not have to overwrite your old "
@@ -640,61 +640,61 @@ public class TextResource extends
          + "\"Create Config\" button to save the new configuration on all "
          + "hosts. "},
 
-        {"Dialog.ClusterAisConfig.CreateAisConfig",
+        {"Dialog.Cluster.CoroConfig.CreateAisConfig",
          "Create/Overwrite Config"},
 
-        {"Dialog.ClusterAisConfig.WarningAtLeastTwoInt",
+        {"Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt",
          "# (specify at least two interfaces)"}, // TODO: does not work so good
 
-        {"Dialog.ClusterAisConfig.WarningAtLeastTwoInt.OneMore",
+        {"Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt.OneMore",
          "# (specify at least two interfaces: one more to go)"},
 
-        {"Dialog.ClusterAisConfig.RemoveIntButton",
+        {"Dialog.Cluster.CoroConfig.RemoveIntButton",
          "remove"},
 
-        {"Dialog.ClusterAisConfig.AddIntButton",
+        {"Dialog.Cluster.CoroConfig.AddIntButton",
          "add"},
 
-        {"Dialog.ClusterAisConfig.UseDopdCheckBox.ToolTip",
+        {"Dialog.Cluster.CoroConfig.UseDopdCheckBox.ToolTip",
          "use DRBD Peer Outdater"},
 
-        {"Dialog.ClusterAisConfig.UseDopdCheckBox",
+        {"Dialog.Cluster.CoroConfig.UseDopdCheckBox",
          ""},
 
-        {"Dialog.ClusterAisConfig.UseMgmtdCheckBox.ToolTip",
+        {"Dialog.Cluster.CoroConfig.UseMgmtdCheckBox.ToolTip",
          "use mgmtd, if you want to use Pacemaker-GUI"},
 
-        {"Dialog.ClusterAisConfig.UseMgmtdCheckBox",
+        {"Dialog.Cluster.CoroConfig.UseMgmtdCheckBox",
          ""},
 
-        {"Dialog.ClusterAisConfig.NoConfigFound",
+        {"Dialog.Cluster.CoroConfig.NoConfigFound",
          ": file not found"},
 
-        {"Dialog.ClusterAisConfig.ConfigsNotTheSame",
+        {"Dialog.Cluster.CoroConfig.ConfigsNotTheSame",
          "configuration files are not the same on all hosts"},
 
-        {"Dialog.ClusterAisConfig.Loading",
+        {"Dialog.Cluster.CoroConfig.Loading",
          "loading..."},
 
-        {"Dialog.ClusterAisConfig.CurrentConfig",
+        {"Dialog.Cluster.CoroConfig.CurrentConfig",
          "current config:"},
 
-        {"Dialog.ClusterAisConfig.Interfaces",
+        {"Dialog.Cluster.CoroConfig.Interfaces",
          "interfaces:"},
 
-        {"Dialog.ClusterAisConfig.ais.conf.ok",
+        {"Dialog.Cluster.CoroConfig.ais.conf.ok",
          " the same on all nodes"},
 
-        {"Dialog.ClusterAisConfig.Checkbox.EditConfig",
+        {"Dialog.Cluster.CoroConfig.Checkbox.EditConfig",
          "edit a new config"},
 
-        {"Dialog.ClusterAisConfig.Checkbox.SeeExisting",
+        {"Dialog.Cluster.CoroConfig.Checkbox.SeeExisting",
          "see the existing configs"},
 
-        {"Dialog.ClusterHbConfig.Title",
+        {"Dialog.Cluster.HbConfig.Title",
          "Heartbeat Initialization"},
 
-        {"Dialog.ClusterHbConfig.Description",
+        {"Dialog.Cluster.HbConfig.Description",
          "In this step Heartbeat config (/etc/ha.d/ha.cf) is created and "
          + "Heartbeat is started. You do not have to overwrite your old "
          + "config if you have some special options. You can modify it by "
@@ -704,128 +704,128 @@ public class TextResource extends
          + "own interface, it will be ignored, at the same time it allows to "
          + "have the same config file on all hosts."},
 
-        {"Dialog.ClusterHbConfig.CreateHbConfig",
+        {"Dialog.Cluster.HbConfig.CreateHbConfig",
          "Create/Overwrite HB Config"},
 
-        {"Dialog.ClusterHbConfig.WarningAtLeastTwoInt",
+        {"Dialog.Cluster.HbConfig.WarningAtLeastTwoInt",
          "# (specify at least two interfaces)"},
 
-        {"Dialog.ClusterHbConfig.WarningAtLeastTwoInt.OneMore",
+        {"Dialog.Cluster.HbConfig.WarningAtLeastTwoInt.OneMore",
          "# (specify at least two interfaces: one more to go)"},
 
-        {"Dialog.ClusterHbConfig.RemoveIntButton",
+        {"Dialog.Cluster.HbConfig.RemoveIntButton",
          "remove"},
 
-        {"Dialog.ClusterHbConfig.AddIntButton",
+        {"Dialog.Cluster.HbConfig.AddIntButton",
          "add"},
 
-        {"Dialog.ClusterHbConfig.UseDopdCheckBox.ToolTip",
+        {"Dialog.Cluster.HbConfig.UseDopdCheckBox.ToolTip",
          "use DRBD Peer Outdater"},
 
-        {"Dialog.ClusterHbConfig.UseDopdCheckBox",
+        {"Dialog.Cluster.HbConfig.UseDopdCheckBox",
          ""},
 
-        {"Dialog.ClusterHbConfig.UseMgmtdCheckBox.ToolTip",
+        {"Dialog.Cluster.HbConfig.UseMgmtdCheckBox.ToolTip",
          "use mgmtd, if you want to use Pacemaker-GUI"},
 
-        {"Dialog.ClusterHbConfig.UseMgmtdCheckBox",
+        {"Dialog.Cluster.HbConfig.UseMgmtdCheckBox",
          ""},
 
-        {"Dialog.ClusterHbConfig.NoConfigFound",
+        {"Dialog.Cluster.HbConfig.NoConfigFound",
          "/etc/ha.d/ha.cf: file not found"},
 
-        {"Dialog.ClusterHbConfig.ConfigsNotTheSame",
+        {"Dialog.Cluster.HbConfig.ConfigsNotTheSame",
          "configuration files are not the same on all hosts"},
 
-        {"Dialog.ClusterHbConfig.Loading",
+        {"Dialog.Cluster.HbConfig.Loading",
          "loading..."},
 
-        {"Dialog.ClusterHbConfig.CurrentConfig",
+        {"Dialog.Cluster.HbConfig.CurrentConfig",
          "current config:"},
 
-        {"Dialog.ClusterHbConfig.Interfaces",
+        {"Dialog.Cluster.HbConfig.Interfaces",
          "interfaces:"},
 
-        {"Dialog.ClusterHbConfig.ha.cf.ok",
+        {"Dialog.Cluster.HbConfig.ha.cf.ok",
          "/etc/ha.d/ha.cf the same on all nodes"},
 
-        {"Dialog.ClusterHbConfig.Checkbox.EditConfig",
+        {"Dialog.Cluster.HbConfig.Checkbox.EditConfig",
          "edit a new config"},
 
-        {"Dialog.ClusterHbConfig.Checkbox.SeeExisting",
+        {"Dialog.Cluster.HbConfig.Checkbox.SeeExisting",
          "see the existing configs"},
 
-        {"Dialog.ClusterInit.Title",
+        {"Dialog.Cluster.Init.Title",
          "Cluster/DRBD Initialization"},
 
-        {"Dialog.ClusterInit.Description",
+        {"Dialog.Cluster.Init.Description",
          "Cluster/DRBD Initialization. Load the DRBD and start the "
          + "Corosync(OpenAIS) or Heartbeat, if you wish at this point."},
 
-        {"Dialog.ClusterInit.CheckingDrbd",
+        {"Dialog.Cluster.Init.CheckingDrbd",
          "checking..."},
 
-        {"Dialog.ClusterInit.LoadDrbdButton",
+        {"Dialog.Cluster.Init.LoadDrbdButton",
          "Load"},
 
-        {"Dialog.ClusterInit.CheckingPm",
+        {"Dialog.Cluster.Init.CheckingPm",
          "checking..."},
 
-        {"Dialog.ClusterInit.StartCsAisButton",
+        {"Dialog.Cluster.Init.StartCsAisButton",
          "Start"},
 
-        {"Dialog.ClusterInit.CsAisButtonRc",
+        {"Dialog.Cluster.Init.CsAisButtonRc",
          "Run at system start-up"},
 
-        {"Dialog.ClusterInit.CsAisButtonSwitch",
+        {"Dialog.Cluster.Init.CsAisButtonSwitch",
          "Switch to Corosync"},
 
-        {"Dialog.ClusterInit.CsAisIsRunning",
+        {"Dialog.Cluster.Init.CsAisIsRunning",
          " is running"},
 
-        {"Dialog.ClusterInit.CsAisIsRc",
+        {"Dialog.Cluster.Init.CsAisIsRc",
          " is running at system start-up"},
 
-        {"Dialog.ClusterInit.CsAisIsStopped",
+        {"Dialog.Cluster.Init.CsAisIsStopped",
          " is stopped"},
 
-        {"Dialog.ClusterInit.CsAisIsNotInstalled",
+        {"Dialog.Cluster.Init.CsAisIsNotInstalled",
          " is not installed"},
 
-        {"Dialog.ClusterInit.CsAisIsNotConfigured",
+        {"Dialog.Cluster.Init.CsAisIsNotConfigured",
          " is not configured"},
 
-        {"Dialog.ClusterInit.CheckingHb",
+        {"Dialog.Cluster.Init.CheckingHb",
          "checking..."},
 
-        {"Dialog.ClusterInit.StartHbButton",
+        {"Dialog.Cluster.Init.StartHbButton",
          "Start"},
 
-        {"Dialog.ClusterInit.HbButtonRc",
+        {"Dialog.Cluster.Init.HbButtonRc",
          "Run at system start-up"},
 
-        {"Dialog.ClusterInit.HbButtonSwitch",
+        {"Dialog.Cluster.Init.HbButtonSwitch",
          "Switch to HB"},
 
-        {"Dialog.ClusterInit.HbIsRunning",
+        {"Dialog.Cluster.Init.HbIsRunning",
          "Heartbeat is running"},
 
-        {"Dialog.ClusterInit.HbIsRc",
+        {"Dialog.Cluster.Init.HbIsRc",
          "Heartbeat is running at system start-up"},
 
-        {"Dialog.ClusterInit.HbIsStopped",
+        {"Dialog.Cluster.Init.HbIsStopped",
          "Heartbeat is stopped"},
 
-        {"Dialog.ClusterInit.HbIsNotInstalled",
+        {"Dialog.Cluster.Init.HbIsNotInstalled",
          "Heartbeat is not installed"},
 
-        {"Dialog.ClusterInit.HbIsNotConfigured",
+        {"Dialog.Cluster.Init.HbIsNotConfigured",
          "Heartbeat is not configured"},
 
-        {"Dialog.ClusterInit.DrbdIsLoaded",
+        {"Dialog.Cluster.Init.DrbdIsLoaded",
          "DRBD is loaded"},
 
-        {"Dialog.ClusterInit.DrbdIsNotLoaded",
+        {"Dialog.Cluster.Init.DrbdIsNotLoaded",
          "DRBD is not loaded"},
 
         {"Dialog.About.Title",
@@ -870,21 +870,21 @@ public class TextResource extends
          },
 
 
-        {"Dialog.ClusterFinish.Title",
+        {"Dialog.Cluster.Finish.Title",
          "Finish"},
 
-        {"Dialog.ClusterFinish.Description",
+        {"Dialog.Cluster.Finish.Description",
          "Configuration of the cluster is now complete. You can now "
          + "configure DRBD and Pacemaker services from the menu in "
          + "the cluster view."},
 
-        {"Dialog.ClusterFinish.Save",
+        {"Dialog.Cluster.Finish.Save",
          "Save"},
 
-        {"Dialog.DrbdConfigResource.Title",
+        {"Dialog.DrbdConfig.Resource.Title",
          "Configure DRBD Resource"},
 
-        {"Dialog.DrbdConfigResource.Description",
+        {"Dialog.DrbdConfig.Resource.Description",
          "Configure the new DRBD resource. Enter the <b>name</b> of the "
          + "resource. "
          + "You can call it whatever you want as long it is unique. "
@@ -897,10 +897,10 @@ public class TextResource extends
          + "the fields, or you are satisfied with the defaults, press "
          + "<b>Next</b> to continue."},
 
-        {"Dialog.DrbdConfigBlockDev.Title",
+        {"Dialog.DrbdConfig.BlockDev.Title",
          "Configure DRBD Block Device"},
 
-        {"Dialog.DrbdConfigBlockDev.Description",
+        {"Dialog.DrbdConfig.BlockDev.Description",
          "Enter the information about the DRBD block device. Choose a "
          + "DRBD net interface that will be used for DRBD communication "
          + "and a port. The port must not be used by anything else and must "
@@ -910,91 +910,93 @@ public class TextResource extends
          + "internal to make it simple or learn external DRBD meta disk to "
          + "make it faster."},
 
-        {"Dialog.DrbdConfigCreateFS.Title",
+        {"Dialog.DrbdConfig.CreateFS.Title",
          "Initialize DRBD block devices."},
 
-        {"Dialog.DrbdConfigCreateFS.Description",
+        {"Dialog.DrbdConfig.CreateFS.Description",
          "In this step you can initialize and start the DRBD cluster. "
          + "You can choose one host as a primary host. You can create a "
          + "filesystem on it, but in this case you have to choose one host "
          + "as a primary, choose the file system and press "
          + "\"Create File System\" button."},
 
-        {"Dialog.DrbdConfigCreateFS.NoHostString",
+        {"Dialog.DrbdConfig.CreateFS.NoHostString",
          "none"},
 
-        {"Dialog.DrbdConfigCreateFS.ChooseHost",
+        {"Dialog.DrbdConfig.CreateFS.ChooseHost",
          "host (primary)"},
 
-        {"Dialog.DrbdConfigCreateFS.Filesystem",
+        {"Dialog.DrbdConfig.CreateFS.Filesystem",
          "file system"},
 
-        {"Dialog.DrbdConfigCreateFS.SelectFilesystem",
+        {"Dialog.DrbdConfig.CreateFS.SelectFilesystem",
          "Use existing data"},
 
-        {"Dialog.DrbdConfigCreateFS.CreateFsButton",
+        {"Dialog.DrbdConfig.CreateFS.CreateFsButton",
          "Create File System"},
 
-        {"Dialog.DrbdConfigCreateMD.Title",
+        {"Dialog.DrbdConfig.CreateMD.Title",
          "Create DRBD Meta-Data"},
 
-        {"Dialog.DrbdConfigCreateMD.Description",
+        {"Dialog.DrbdConfig.CreateMD.Description",
          "In this step you can create new meta-data, overwrite them "
          + "or use the old ones, if they are already there."},
 
-        {"Dialog.DrbdConfigCreateMD.Metadata",
+        {"Dialog.DrbdConfig.CreateMD.Metadata",
          "meta-data"},
 
-        {"Dialog.DrbdConfigCreateMD.UseExistingMetadata",
+        {"Dialog.DrbdConfig.CreateMD.UseExistingMetadata",
          "Use existing meta-data"},
 
-        {"Dialog.DrbdConfigCreateMD.CreateNewMetadata",
+        {"Dialog.DrbdConfig.CreateMD.CreateNewMetadata",
          "Create new meta-data"},
 
-        {"Dialog.DrbdConfigCreateMD.CreateNewMetadataDestroyData",
+        {"Dialog.DrbdConfig.CreateMD.CreateNewMetadataDestroyData",
          "Create new meta-data & destroy data"},
 
-        {"Dialog.DrbdConfigCreateMD.OverwriteMetadata",
+        {"Dialog.DrbdConfig.CreateMD.OverwriteMetadata",
          "Overwrite meta-data"},
 
-        {"Dialog.DrbdConfigCreateMD.CreateMDButton",
+        {"Dialog.DrbdConfig.CreateMD.CreateMDButton",
          "Create Meta-Data"},
 
-        {"Dialog.DrbdConfigCreateMD.OverwriteMDButton",
+        {"Dialog.DrbdConfig.CreateMD.OverwriteMDButton",
          "Overwrite Meta-Data"},
 
-        {"Dialog.DrbdConfigCreateMD.CreateMD.Done",
+        {"Dialog.DrbdConfig.CreateMD.CreateMD.Done",
          "Meta-data on @HOST@ have been created."  },
 
-        {"Dialog.DrbdConfigCreateMD.CreateMD.Failed",
+        {"Dialog.DrbdConfig.CreateMD.CreateMD.Failed",
          "Could not create meta-data on @HOST@."  },
 
-        {"Dialog.DrbdConfigCreateMD.CreateMD.Failed.40",
+        {"Dialog.DrbdConfig.CreateMD.CreateMD.Failed.40",
          "Could not create meta-data on @HOST@, because there is no room "
          + "for it. You can either destroy the file\n"
          + "system from here by choosing 'Create new meta-data & destroy data'"
          + " from the pull-down menu, resize\nthe file system manually, or "
          + "use external meta-data."},
 
-        {"Dialog.DrbdSplitBrain.Title",
+        {"Dialog.Drbd.SplitBrain.Title",
          "Resolve DRBD Split-Brain"},
 
-        {"Dialog.DrbdSplitBrain.Description",
+        {"Dialog.Drbd.SplitBrain.Description",
          "A split-brain condition was detected, a condition where two or "
          + "more nodes have written to the same DRBD block device without "
          + "knowing about each other. Choose the host which you think "
          + "have newer and/or more correct data. Be warned though, the "
          + "data from other host on this block device will be discarded."},
 
-        {"Dialog.DrbdSplitBrain.ChooseHost",
+        {"Dialog.Drbd.SplitBrain.ChooseHost",
          "host"},
 
-        {"Dialog.DrbdSplitBrain.ResolveButton",
+        {"Dialog.Drbd.SplitBrain.ResolveButton",
          "Resolve"},
 
-        {"Dialog.Logs.Title",
+        {"Dialog.HostLogs.Title",
          "Log Viewer"},
 
+        {"Dialog.ClusterLogs.Title",
+         "Log Viewer"},
 
         {"AppError.Title",
          "Application Error"},

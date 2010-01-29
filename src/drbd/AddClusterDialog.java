@@ -24,8 +24,8 @@ package drbd;
 
 import drbd.data.Clusters;
 import drbd.data.Cluster;
-import drbd.gui.dialog.DialogCluster;
-import drbd.gui.dialog.ClusterName;
+import drbd.gui.dialog.cluster.DialogCluster;
+import drbd.gui.dialog.cluster.Name;
 import drbd.utilities.Tools;
 
 /**
@@ -50,7 +50,7 @@ public class AddClusterDialog {
     public final void showDialogs() {
         Tools.getGUIData().enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
-        DialogCluster dialog = new ClusterName(null, cluster);
+        DialogCluster dialog = new Name(null, cluster);
         while (true) {
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {

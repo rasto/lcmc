@@ -19,48 +19,34 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-package drbd;
+package drbd.gui.dialog.drbdUpgrade;
 
 import drbd.data.Host;
-
-import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.gui.dialog.WizardDialog;
 
 /**
- * EditHostDialog.
- *
- * Show step by step dialogs that configure a host.
+ * An implementation of a dialog where available versions of drbd will be
+ * determined.
  *
  * @author Rasto Levrinc
  * @version $Id$
+ *
  */
-public class EditHostDialog {
-
-    /** The host object. */
-    private final Host host;
+public class DrbdAvailFiles extends drbd.gui.dialog.host.DrbdAvailFiles {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Prepares a new <code>EditHostDialog</code> object.
+     * Prepares a new <code>DrbdAvailFiles</code> object.
      */
-    public EditHostDialog(final Host host) {
-        this.host = host;
+    public DrbdAvailFiles(final WizardDialog previousDialog,
+                          final Host host) {
+        super(previousDialog, host);
     }
 
     /**
-     * Shows step by step dialogs that configure a host.
-     */
-    public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
-        while (true) {
-            final DialogHost newdialog = (DialogHost) dialog.showDialog();
-            if (dialog.isPressedCancelButton()) {
-                return;
-            } else if (dialog.isPressedFinishButton()) {
-                break;
-            }
-            dialog = newdialog;
-        }
+     * Returns the next dialog.drbdUpgrade.DrbdLinbitInst. */
+    public final WizardDialog nextDialog() {
+        return new DrbdLinbitInst(this, getHost());
     }
 }

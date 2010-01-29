@@ -76,7 +76,7 @@ public abstract class WizardDialog extends ConfigDialog {
      * Returns previous dialog. It is used to get with the back button to
      * the dialog before this one.
      */
-    protected WizardDialog getPreviousDialog() {
+    public WizardDialog getPreviousDialog() {
         return previousDialog;
     }
 

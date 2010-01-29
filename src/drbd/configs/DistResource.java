@@ -240,7 +240,7 @@ public class DistResource extends
         {"OpenAIS.getAisConfig",     "cat /etc/ais/openais.conf"},
         {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
 
-        {"ClusterInit.getInstallationInfo",
+        {"Cluster.Init.getInstallationInfo",
          "/usr/local/bin/drbd-gui-helper installation-info"},
 
 

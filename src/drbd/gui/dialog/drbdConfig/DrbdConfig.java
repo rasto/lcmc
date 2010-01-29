@@ -20,47 +20,37 @@
  */
 
 
-package drbd;
+package drbd.gui.dialog.drbdConfig;
 
-import drbd.data.Host;
-
-import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.dialog.WizardDialog;
 
 /**
- * EditHostDialog.
- *
- * Show step by step dialogs that configure a host.
+ * DrbdConfig super class from which all the drbd config wizards can be
+ * extended. It just adds DrbdResourceInfo field.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EditHostDialog {
-
-    /** The host object. */
-    private final Host host;
+public abstract class DrbdConfig extends WizardDialog {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
+    /** Drbd resource info object. */
+    private final DrbdResourceInfo dri;
 
     /**
-     * Prepares a new <code>EditHostDialog</code> object.
+     * Prepares a new <code>DrbdConfig</code> object.
      */
-    public EditHostDialog(final Host host) {
-        this.host = host;
+    public DrbdConfig(final WizardDialog previousDialog,
+                      final DrbdResourceInfo dri) {
+        super(previousDialog);
+        this.dri = dri;
     }
 
     /**
-     * Shows step by step dialogs that configure a host.
+     * Returns drbd resource info object.
      */
-    public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
-        while (true) {
-            final DialogHost newdialog = (DialogHost) dialog.showDialog();
-            if (dialog.isPressedCancelButton()) {
-                return;
-            } else if (dialog.isPressedFinishButton()) {
-                break;
-            }
-            dialog = newdialog;
-        }
+    protected final DrbdResourceInfo getDrbdResourceInfo() {
+        return dri;
     }
 }

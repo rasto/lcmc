@@ -68,7 +68,7 @@ public class Host implements Serializable {
     private String hostnameEntered = Tools.getDefault("SSH.Host");
     /** Ip of the host. */
     private String ip;
-    /** Ips in the combo in Dialog.HostConfiguration. */
+    /** Ips in the combo in Dialog.Host.Configuration. */
     private final Map<Integer, String[]> ips = new HashMap<Integer, String[]>();
     /** Hostname of the host. */
     private String hostname = "unknown";

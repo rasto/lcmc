@@ -20,47 +20,35 @@
  */
 
 
-package drbd;
+package drbd.gui.dialog.drbdUpgrade;
 
 import drbd.data.Host;
-
-import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.gui.dialog.WizardDialog;
 
 /**
- * EditHostDialog.
- *
- * Show step by step dialogs that configure a host.
+ * An implementation of a dialog where user can enter ip of the host.
  *
  * @author Rasto Levrinc
  * @version $Id$
+ *
  */
-public class EditHostDialog {
-
-    /** The host object. */
-    private final Host host;
+public class LinbitLogin extends drbd.gui.dialog.host.LinbitLogin {
+    /** Serial Version UID. */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Prepares a new <code>EditHostDialog</code> object.
+     * Prepares a new <code>LinbitLogin</code> object.
      */
-    public EditHostDialog(final Host host) {
-        this.host = host;
+    public LinbitLogin(final WizardDialog previousDialog,
+                       final Host host) {
+        super(previousDialog, host);
     }
 
     /**
-     * Shows step by step dialogs that configure a host.
+     * Returns the next dialog.drbdUpgrade.DrbdAvailFiles
      */
-    public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
-        while (true) {
-            final DialogHost newdialog = (DialogHost) dialog.showDialog();
-            if (dialog.isPressedCancelButton()) {
-                return;
-            } else if (dialog.isPressedFinishButton()) {
-                break;
-            }
-            dialog = newdialog;
-        }
+    public final WizardDialog nextDialog() {
+        return new DrbdAvailFiles(this, getHost());
     }
+
 }

@@ -1540,7 +1540,11 @@ public abstract class ResourceGraph {
         for (final Object v : graph.getVertices()) {
             final Info info = getInfo((Vertex) v);
             final Point2D p = new Point2D.Double();
-            p.setLocation(layout.getLocation((Vertex) v));
+            final Point2D loc = layout.getLocation((Vertex) v);
+            if (loc == null) {
+                continue;
+            }
+            p.setLocation(loc);
             p.setLocation(p.getX() + (getDefaultVertexWidth((Vertex) v)
                                       - getVertexWidth((Vertex) v)) / 2,
                           p.getY() + (getDefaultVertexHeight((Vertex) v)

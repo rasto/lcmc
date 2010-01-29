@@ -27,7 +27,7 @@ import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.gui.HeartbeatGraph;
-import drbd.gui.dialog.ClusterDrbdLogs;
+import drbd.gui.dialog.cluster.DrbdLogs;
 import drbd.data.Cluster;
 import drbd.data.resources.DrbdResource;
 import drbd.data.Host;
@@ -1251,7 +1251,7 @@ public class DrbdResourceInfo extends EditableInfo
                     }
                 });
                 final String device = getDevice();
-                ClusterDrbdLogs l = new ClusterDrbdLogs(getCluster(), device);
+                DrbdLogs l = new DrbdLogs(getCluster(), device);
                 l.showDialog();
             }
         };

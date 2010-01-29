@@ -25,8 +25,8 @@ package drbd;
 import drbd.data.Host;
 import drbd.utilities.Tools;
 
-import drbd.gui.dialog.DialogHost;
-import drbd.gui.dialog.HostNewHost;
+import drbd.gui.dialog.host.DialogHost;
+import drbd.gui.dialog.host.NewHost;
 
 /**
  * AddHostDialog.
@@ -44,7 +44,7 @@ public class AddHostDialog {
     public final void showDialogs() {
         Tools.getGUIData().enableAddHostButtons(false);
         final Host host = new Host();
-        DialogHost dialog = new HostNewHost(null, host);
+        DialogHost dialog = new NewHost(null, host);
         while (true) {
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {

@@ -104,11 +104,11 @@ public class AppDefaults extends
         {"Browser.InfoPanelMinimalWidth",        440},
         {"Browser.FieldHeight",                  30},
 
-        {"Dialog.DrbdConfigResource.LabelWidth", 150},
-        {"Dialog.DrbdConfigResource.FieldWidth", 150},
+        {"Dialog.DrbdConfig.Resource.LabelWidth", 150},
+        {"Dialog.DrbdConfig.Resource.FieldWidth", 150},
 
-        {"Dialog.DrbdConfigBlockDev.LabelWidth", 150},
-        {"Dialog.DrbdConfigBlockDev.FieldWidth", 150},
+        {"Dialog.DrbdConfig.BlockDev.LabelWidth", 150},
+        {"Dialog.DrbdConfig.BlockDev.FieldWidth", 150},
 
         {"MainMenu.DrbdGuiFiles.Extension",     "drbdg"},
         {"MainMenu.DrbdGuiFiles.Default",       System.getProperty("user.home")
@@ -207,12 +207,13 @@ public class AppDefaults extends
         {"ConfigDialog.Icon",                     "teaser_drdb_boxes_01.png"},
         {"ClusterViewPanel.Logo",                 "logo_test.png"},
 
-        {"Dialog.ClusterHosts.HostCheckedIcon",  "Icons/Checked.gif"},
-        {"Dialog.ClusterHosts.HostUncheckedIcon", "Icons/Unchecked.gif"},
-        {"Dialog.ClusterHbConfig.DopdCheckedIcon",  "Icons/Checked.gif"},
-        {"Dialog.ClusterHbConfig.DopdUncheckedIcon", "Icons/Unchecked.gif"},
-        {"Dialog.ClusterAisConfig.DefaultMCastAddress", "226.94.1.1"},
-        {"Dialog.ClusterAisConfig.DefaultMCastPort",    "5405"},
+        {"Dialog.Cluster.ClusterHosts.HostCheckedIcon",  "Icons/Checked.gif"},
+        {"Dialog.Cluster.ClusterHosts.HostUncheckedIcon",
+          "Icons/Unchecked.gif"},
+        {"Dialog.Cluster.HbConfig.DopdCheckedIcon",  "Icons/Checked.gif"},
+        {"Dialog.Cluster.HbConfig.DopdUncheckedIcon", "Icons/Unchecked.gif"},
+        {"Dialog.Cluster.CoroConfig.DefaultMCastAddress", "226.94.1.1"},
+        {"Dialog.Cluster.CoroConfig.DefaultMCastPort",    "5405"},
         {"Browser.ResourceIcon", "Icons/16X16/crab.png"},
         {"Browser.CategoryIcon", "Icons/tango/16x16/folder_16x16.png"},
         {"Browser.ApplyIcon",    "Icons/tango/16x16/ok_16x16.png"},
@@ -293,22 +294,22 @@ public class AppDefaults extends
         {"Dialog.Dialog.CancelIcon",   "Icons/tango/16x16/cancel_16x16.png"},
         {"Dialog.Dialog.FinishIcon",   "Icons/tango/16x16/finish2_16x16.png"},
 
-        {"Dialog.HostCheckInstallation.CheckingIcon",
+        {"Dialog.Host.CheckInstallation.CheckingIcon",
          "Icons/32X32/dialog-information.png"},
 
-        {"Dialog.HostCheckInstallation.NotInstalledIcon",
+        {"Dialog.Host.CheckInstallation.NotInstalledIcon",
          "Icons/32X32/software-update-urgent.png"},
 
-        {"Dialog.HostCheckInstallation.InstalledIcon",
+        {"Dialog.Host.CheckInstallation.InstalledIcon",
          "Icons/32X32/weather-clear.png"},
 
-        {"Dialog.HostCheckInstallation.UpgrAvailIcon",
+        {"Dialog.Host.CheckInstallation.UpgrAvailIcon",
          "Icons/32X32/software-update-available.png"},
 
-        {"Dialog.HostFinish.HostIcon",
+        {"Dialog.Host.Finish.HostIcon",
          "Icons/tango/32x32/host_32x32.png"},
 
-        {"Dialog.HostFinish.ClusterIcon",
+        {"Dialog.Host.Finish.ClusterIcon",
          "Icons/tango/32x32/cluster_32x32.png"},
 
         /*

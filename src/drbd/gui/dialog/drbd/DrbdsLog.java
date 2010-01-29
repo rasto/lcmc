@@ -20,47 +20,39 @@
  */
 
 
-package drbd;
+package drbd.gui.dialog.drbd;
 
 import drbd.data.Host;
-
-import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.gui.dialog.HostLogs;
 
 /**
- * EditHostDialog.
- *
- * Show step by step dialogs that configure a host.
+ * An implementation of an dialog with log files.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EditHostDialog {
-
-    /** The host object. */
-    private final Host host;
+public class DrbdsLog extends HostLogs {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Prepares a new <code>EditHostDialog</code> object.
+     * Prepares a new <code>DrbdsLog</code> object.
      */
-    public EditHostDialog(final Host host) {
-        this.host = host;
+    public DrbdsLog(final Host host) {
+        super(host);
     }
 
     /**
-     * Shows step by step dialogs that configure a host.
+     * Returns a command name from the DistResource that gets the drbd log file.
      */
-    public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
-        while (true) {
-            final DialogHost newdialog = (DialogHost) dialog.showDialog();
-            if (dialog.isPressedCancelButton()) {
-                return;
-            } else if (dialog.isPressedFinishButton()) {
-                break;
-            }
-            dialog = newdialog;
-        }
+    protected String logFileCommand() {
+        return "DrbdLog.log";
+    }
+
+    /**
+     * Returns a pattern that should be searched in the config file. ("drbd")
+     */
+    protected String grepPattern() {
+        return "drbd";
     }
 }

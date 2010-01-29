@@ -350,7 +350,8 @@ public class HostInfo extends Info {
                 }
 
                 public void action() {
-                    drbd.gui.dialog.Logs l = new drbd.gui.dialog.Logs(host);
+                    drbd.gui.dialog.HostLogs l =
+                                           new drbd.gui.dialog.HostLogs(host);
                     l.showDialog();
                 }
             };

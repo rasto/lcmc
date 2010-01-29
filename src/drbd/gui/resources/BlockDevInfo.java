@@ -1339,8 +1339,8 @@ public class BlockDevInfo extends EditableInfo {
 
                 public void action() {
                     String device = getDrbdResourceInfo().getDevice();
-                    drbd.gui.dialog.DrbdLog l =
-                                new drbd.gui.dialog.DrbdLog(getHost(), device);
+                    drbd.gui.dialog.drbd.DrbdLog l =
+                           new drbd.gui.dialog.drbd.DrbdLog(getHost(), device);
                     l.showDialog();
                 }
             };

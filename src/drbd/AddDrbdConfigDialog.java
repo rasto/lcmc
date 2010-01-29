@@ -23,8 +23,8 @@ package drbd;
 
 import drbd.utilities.Tools;
 
-import drbd.gui.dialog.DrbdConfig;
-import drbd.gui.dialog.DrbdConfigResource;
+import drbd.gui.dialog.drbdConfig.DrbdConfig;
+import drbd.gui.dialog.drbdConfig.Resource;
 import drbd.gui.resources.DrbdResourceInfo;
 
 /**
@@ -52,7 +52,7 @@ public class AddDrbdConfigDialog {
      * Shows step by step dialogs that add and configure new drbd resource.
      */
     public final void showDialogs() {
-        DrbdConfig dialog = new DrbdConfigResource(null, dri);
+        DrbdConfig dialog = new Resource(null, dri);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {

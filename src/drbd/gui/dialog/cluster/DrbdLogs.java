@@ -20,47 +20,43 @@
  */
 
 
-package drbd;
+package drbd.gui.dialog.cluster;
 
-import drbd.data.Host;
-
-import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.data.Cluster;
+import drbd.gui.dialog.ClusterLogs;
 
 /**
- * EditHostDialog.
- *
- * Show step by step dialogs that configure a host.
+ * An implementation of an dialog with log files from many hosts.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EditHostDialog {
-
-    /** The host object. */
-    private final Host host;
+public class DrbdLogs extends ClusterLogs {
+    /** Serial version UUID. */
+    private static final long serialVersionUID = 1L;
+    /** Name of the drbd device. */
+    private final String deviceName;
 
     /**
-     * Prepares a new <code>EditHostDialog</code> object.
+     * Prepares a new <code>DrbdLogs</code> object.
      */
-    public EditHostDialog(final Host host) {
-        this.host = host;
+    public DrbdLogs(final Cluster cluster, final String device) {
+        super(cluster);
+        deviceName = device.substring(device.lastIndexOf('/') + 1) + ":";
     }
 
     /**
-     * Shows step by step dialogs that configure a host.
+     * Returns command string (defined in Distresource...) that prints the drbd
+     * log.
      */
-    public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
-        while (true) {
-            final DialogHost newdialog = (DialogHost) dialog.showDialog();
-            if (dialog.isPressedCancelButton()) {
-                return;
-            } else if (dialog.isPressedFinishButton()) {
-                break;
-            }
-            dialog = newdialog;
-        }
+    protected final String logFileCommand() {
+        return "DrbdLog.log";
+    }
+
+    /**
+     * Returns pattern that will be greped in the log.
+     */
+    protected final String grepPattern() {
+        return deviceName;
     }
 }

@@ -20,43 +20,55 @@
  */
 
 
-package drbd;
+package drbd.gui.dialog.cluster;
 
 import drbd.data.Cluster;
-import drbd.gui.dialog.cluster.DialogCluster;
-import drbd.gui.dialog.cluster.Name;
+import drbd.gui.dialog.WizardDialog;
 
 /**
- * EditClusterDialog.
- *
- * Show step by step dialogs that configure a cluster.
+ * DialogCluster.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EditClusterDialog {
+public abstract class DialogCluster extends WizardDialog {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
     /** Cluster object. */
     private final Cluster cluster;
 
     /**
-     * Prepares new <code>EditClusterDialog</code> object.
+     * Prepares a new <code>DialogCluster</code> object.
      */
-    public EditClusterDialog(final Cluster cluster) {
+    public DialogCluster(final WizardDialog previousDialog,
+                         final Cluster cluster) {
+        super(previousDialog);
         this.cluster = cluster;
     }
+
     /**
-     * Shows step by step dialogs that configure a new cluster.
+     * Returns cluster object.
      */
-    public final void showDialogs() {
-        DialogCluster dialog = new Name(null, cluster);
-        while (true) {
-            final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
-            if (dialog.isPressedButton("Cancel")) {
-                return;
-            } else if (dialog.isPressedButton("Finish")) {
-                break;
-            }
-            dialog = newdialog;
-        }
+    protected final Cluster getCluster() {
+        return cluster;
     }
+
+    /**
+     * Returns dialog title with cluster name attached.
+     */
+    protected final String getDialogTitle() {
+        final StringBuffer s = new StringBuffer(40);
+        s.append(getClusterDialogTitle());
+        if (cluster != null && cluster.getName() != null) {
+            s.append(" (");
+            s.append(cluster.getName());
+            s.append(')');
+        }
+        return s.toString();
+    }
+
+    /**
+     * Returns title for the getDialogTitle() function.
+     */
+    protected abstract String getClusterDialogTitle();
 }

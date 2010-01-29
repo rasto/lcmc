@@ -25,7 +25,7 @@ package drbd;
 import drbd.utilities.Tools;
 
 import drbd.gui.dialog.WizardDialog;
-import drbd.gui.dialog.HostDistForUpgrade;
+import drbd.gui.dialog.drbdUpgrade.Dist;
 import drbd.gui.resources.HostDrbdInfo;
 
 /**
@@ -53,8 +53,7 @@ public class AddDrbdUpgradeDialog {
      * Shows step by step dialogs that upgrade the drbd.
      */
     public final void showDialogs() {
-        WizardDialog dialog = new HostDistForUpgrade(null,
-                                                     hostDrbdInfo.getHost());
+        WizardDialog dialog = new Dist(null, hostDrbdInfo.getHost());
         while (true) {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {

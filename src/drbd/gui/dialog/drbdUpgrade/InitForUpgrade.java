@@ -20,47 +20,28 @@
  */
 
 
-package drbd;
+package drbd.gui.dialog.drbdUpgrade;
 
-import drbd.data.Host;
-
-import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.data.Cluster;
+import drbd.gui.dialog.WizardDialog;
+import drbd.gui.dialog.cluster.Init;
 
 /**
- * EditHostDialog.
- *
- * Show step by step dialogs that configure a host.
+ * An implementation of a dialog where heartbeat is initialized on all hosts.
  *
  * @author Rasto Levrinc
  * @version $Id$
+ *
  */
-public class EditHostDialog {
-
-    /** The host object. */
-    private final Host host;
-
-    /**
-     * Prepares a new <code>EditHostDialog</code> object.
-     */
-    public EditHostDialog(final Host host) {
-        this.host = host;
-    }
+public class InitForUpgrade extends Init {
+    /** Serial Version UID. */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Shows step by step dialogs that configure a host.
+     * Prepares a new <code>InitForUpgrade</code> object.
      */
-    public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
-        while (true) {
-            final DialogHost newdialog = (DialogHost) dialog.showDialog();
-            if (dialog.isPressedCancelButton()) {
-                return;
-            } else if (dialog.isPressedFinishButton()) {
-                break;
-            }
-            dialog = newdialog;
-        }
+    public InitForUpgrade(final WizardDialog previousDialog,
+                          final Cluster cluster) {
+        super(previousDialog, cluster);
     }
 }

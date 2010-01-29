@@ -19,48 +19,44 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-package drbd;
+package drbd.gui.dialog.drbd;
 
 import drbd.data.Host;
-
-import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.gui.dialog.HostLogs;
 
 /**
- * EditHostDialog.
- *
- * Show step by step dialogs that configure a host.
+ * An implementation of an dialog with log files.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EditHostDialog {
-
-    /** The host object. */
-    private final Host host;
+public class DrbdLog extends HostLogs {
+    /** Serial Version UID. */
+    private static final long serialVersionUID = 1L;
+    /** Drbd device name. */
+    private final String deviceName;
 
     /**
-     * Prepares a new <code>EditHostDialog</code> object.
+     * Prepares a new <code>DrbdLog</code> object.
      */
-    public EditHostDialog(final Host host) {
-        this.host = host;
+    public DrbdLog(final Host host, final String device) {
+        super(host);
+        deviceName = device.substring(device.lastIndexOf('/') + 1) + ":";
     }
 
     /**
-     * Shows step by step dialogs that configure a host.
+     * Returns a command name from the DistResource that gets the drbd log file.
+     * "DrbdLog.log"
      */
-    public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
-        while (true) {
-            final DialogHost newdialog = (DialogHost) dialog.showDialog();
-            if (dialog.isPressedCancelButton()) {
-                return;
-            } else if (dialog.isPressedFinishButton()) {
-                break;
-            }
-            dialog = newdialog;
-        }
+    protected String logFileCommand() {
+        return "DrbdLog.log";
+    }
+
+    /**
+     * Returns a pattern that should be searched in the config file. (device
+     * name)
+     */
+    protected String grepPattern() {
+        return deviceName;
     }
 }

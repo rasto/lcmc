@@ -24,8 +24,8 @@ package drbd;
 
 import drbd.utilities.Tools;
 
-import drbd.gui.dialog.DrbdConfig;
-import drbd.gui.dialog.DrbdSplitBrain;
+import drbd.gui.dialog.drbdConfig.DrbdConfig;
+import drbd.gui.dialog.drbd.SplitBrain;
 import drbd.gui.resources.DrbdResourceInfo;
 
 /**
@@ -54,7 +54,7 @@ public class AddDrbdSplitBrainDialog {
      * Shows step by step dialogs that resolve a drbd split-brain.
      */
     public final void showDialogs() {
-        DrbdConfig dialog = new DrbdSplitBrain(null, dri);
+        DrbdConfig dialog = new SplitBrain(null, dri);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {

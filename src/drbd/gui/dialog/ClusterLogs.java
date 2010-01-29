@@ -87,7 +87,7 @@ public class ClusterLogs extends ConfigDialog {
      * Grep pattern for the log.
      */
     protected String grepPattern() {
-        return "heartbeat:";
+        return "lrmd";
     }
 
     /**
@@ -248,7 +248,7 @@ public class ClusterLogs extends ConfigDialog {
      * Gets the title of the dialog as string.
      */
     protected final String getDialogTitle() {
-        return Tools.getString("Dialog.Logs.Title");
+        return Tools.getString("Dialog.ClusterLogs.Title");
     }
 
     /**
