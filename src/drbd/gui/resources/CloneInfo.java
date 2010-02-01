@@ -165,13 +165,9 @@ public class CloneInfo extends ServiceInfo {
         if (cs != null) {
             final ClusterStatus clStatus = getBrowser().getClusterStatus();
             if (getService().isMaster()) {
-                return clStatus.getMasterOnNodes(
-                                        cs.getHeartbeatId(testOnly),
-                                        testOnly);
+                return cs.getMasterOnNodes(testOnly);
             } else {
-                return clStatus.getRunningOnNodes(
-                                        cs.getHeartbeatId(testOnly),
-                                        testOnly);
+                return cs.getRunningOnNodes(testOnly);
             }
         }
         return null;
@@ -232,6 +228,20 @@ public class CloneInfo extends ServiceInfo {
             notRunningOnNodes.add(h.getName());
         }
         texts.add(new Subtext(toString(), null));
+        final ServiceInfo cs = getContainedService();
+        if (cs != null && cs.getResourceAgent().isGroup()) {
+            final ClusterStatus clStatus = getBrowser().getClusterStatus();
+            final List<String> resources = clStatus.getGroupResources(
+                                                   cs.getHeartbeatId(testOnly),
+                                                   testOnly);
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    final ServiceInfo si =
+                                   getBrowser().getServiceInfoFromCRMId(hbId);
+                    texts.add(new Subtext("   " + si.toString(), null));
+                }
+            }
+        }
         if (getBrowser().allHostsDown()) {
             return texts.toArray(new Subtext[texts.size()]);
         }

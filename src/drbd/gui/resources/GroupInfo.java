@@ -231,6 +231,31 @@ public class GroupInfo extends ServiceInfo {
     }
 
     /**
+     * Returns node name of the host where this service is running.
+     */
+    public List<String> getMasterOnNodes(final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
+        final List<String> allNodes = new ArrayList<String>();
+        if (resources != null) {
+            for (final String hbId : resources) {
+                final List<String> ns = cs.getMasterOnNodes(hbId,
+                                                            testOnly);
+                if (ns != null) {
+                    for (final String n : ns) {
+                        if (!allNodes.contains(n)) {
+                            allNodes.add(n);
+                        }
+                    }
+                }
+            }
+        }
+        return allNodes;
+    }
+
+    /**
      * Starts all resources in the group.
      */
     public final void startResource(final Host dcHost,
@@ -507,8 +532,10 @@ public class GroupInfo extends ServiceInfo {
         } else {
             sb.append(" running on nodes: ");
         }
-        sb.append(Tools.join(", ", hostNames.toArray(
+        if (hostNames != null && !hostNames.isEmpty()) {
+            sb.append(Tools.join(", ", hostNames.toArray(
                                                new String[hostNames.size()])));
+        }
         sb.append("</b>");
 
         final Enumeration e = getNode().children();
