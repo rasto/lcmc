@@ -495,6 +495,7 @@ public class BlockDevice extends Resource {
      */
     public final boolean isSyncing() {
         if (nodeState == null) {
+            syncedProgress = null;
             return false;
         }
         if ("SyncTarget".equals(connectionState)
@@ -503,6 +504,7 @@ public class BlockDevice extends Resource {
             || "PausedSyncT".equals(connectionState)) {
             return true;
         }
+        syncedProgress = null;
         return false;
     }
 

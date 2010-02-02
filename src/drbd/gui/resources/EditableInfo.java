@@ -698,19 +698,6 @@ public abstract class EditableInfo extends Info {
         ret.append("</b></td><td>");
         ret.append(defaultValue);
         ret.append("</td></tr>");
-        final String pt = getParamType(param);
-        if (pt != null) {
-            final StringBuffer paramType = new StringBuffer(pt);
-            /* uppercase the first character */
-            paramType.replace(0,
-                              1,
-                              paramType.substring(0, 1).toUpperCase());
-            ret.append("<tr><td><b>");
-            ret.append(Tools.getString("Browser.ParamType"));
-            ret.append("</b></td><td>");
-            ret.append(paramType);
-            ret.append("</td></tr>");
-        }
         ret.append("</table></html>");
         return ret.toString();
 

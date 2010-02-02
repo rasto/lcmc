@@ -52,7 +52,8 @@ public class Resource extends DrbdConfig {
                                             "device",
                                             "protocol",
                                             "cram-hmac-alg",
-                                            "shared-secret"};
+                                            "shared-secret",
+                                            "on-io-error"};
     /** Length of the secret string. */
     private static final int SECRET_STRING_LENGTH = 32;
 
@@ -147,6 +148,7 @@ public class Resource extends DrbdConfig {
         getDrbdResourceInfo().getResource().setValue("cram-hmac-alg", "sha1");
         getDrbdResourceInfo().getResource().setValue("shared-secret",
                                                      getRandomSecret());
+        getDrbdResourceInfo().getResource().setValue("on-io-error", "detach");
 
         getDrbdResourceInfo().addWizardParams(
                   optionsPanel,
