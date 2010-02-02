@@ -625,8 +625,8 @@ public class TextResource extends
          + "theoretically you may be able seamlessly switch between them at "
          + "any time. "
          + "Heartbeat is more widely used and thus better "
-         + "tested at the moment, but is unmaintained and is being completely "
-         + "displaced by Corosync."},
+         + "tested at the moment, but beeing in the maintenance mode only, "
+         + " it is not actively developed anymore."},
 
         {"Dialog.Cluster.CoroConfig.Title",
          "Corosync/OpenAIS Config File"},
