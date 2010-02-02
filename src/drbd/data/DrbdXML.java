@@ -26,6 +26,7 @@ import drbd.gui.DrbdGraph;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
+import drbd.gui.resources.StringInfo;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -93,8 +94,8 @@ public class DrbdXML extends XML {
                                                 new HashMap<String, Boolean>();
 
     /** Map from perameter name to its items if there is a choice list. */
-    private final Map<String, List<String>> paramItemsMap =
-                                    new LinkedHashMap<String, List<String>>();
+    private final Map<String, List<Object>> paramItemsMap =
+                                    new LinkedHashMap<String, List<Object>>();
     /** List of all parameters. */
     private final List<String> parametersList =
                                                 new ArrayList<String>();
@@ -133,6 +134,13 @@ public class DrbdXML extends XML {
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
+    /** DRBD protocol C, that is a default. */
+    private static final String PROTOCOL_C = "C / Synchronous";
+    /** DRBD communication protocols. */
+    public static final StringInfo[] PROTOCOLS =
+        {new StringInfo("A / Asynchronous",     "A", null),
+         new StringInfo("B / Semi-Synchronous", "B", null),
+         new StringInfo(PROTOCOL_C,             "C", null)};
 
     /**
      * Prepares a new <code>DrbdXML</code> object.
@@ -143,8 +151,8 @@ public class DrbdXML extends XML {
         addSpecialParameter("resource", "device", true);
         addParameter("resource",
                      "protocol",
-                     "C",
-                     new String[]{"A", "B", "C"},
+                     PROTOCOL_C,
+                     PROTOCOLS,
                      true);
         for (Host host : hosts) {
             final String command =
@@ -411,10 +419,10 @@ public class DrbdXML extends XML {
     private void addParameter(final String section,
                               final String param,
                               final String defaultValue,
-                              final String[] items,
+                              final Object[] items,
                               final boolean required) {
         addParameter(section, param, defaultValue, required);
-        final List<String> l = new ArrayList<String>();
+        final List<Object> l = new ArrayList<Object>();
         for (int i = 0; i < items.length; i++) {
             if (!l.contains(items[i])) {
                 l.add(items[i]);
@@ -495,12 +503,12 @@ public class DrbdXML extends XML {
     /**
      * Returns possible choices.
      */
-    public final String[] getPossibleChoices(final String param) {
-        final List<String> items = paramItemsMap.get(param);
+    public final Object[] getPossibleChoices(final String param) {
+        final List<Object> items = paramItemsMap.get(param);
         if (items == null) {
             return null;
         } else {
-            return items.toArray(new String[items.size()]);
+            return items.toArray(new Object[items.size()]);
         }
     }
 
@@ -532,9 +540,9 @@ public class DrbdXML extends XML {
                 final String type = getAttribute(optionNode, "type");
 
                 if ("handler".equals(type)) {
-                    paramItemsMap.put(name, new ArrayList<String>());
+                    paramItemsMap.put(name, new ArrayList<Object>());
                 } else if ("boolean".equals(type)) {
-                    final List<String> l = new ArrayList<String>();
+                    final List<Object> l = new ArrayList<Object>();
                     paramItemsMap.put(name, l);
                     l.add(Tools.getString("Boolean.True"));
                     l.add(Tools.getString("Boolean.False"));

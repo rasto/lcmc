@@ -488,7 +488,12 @@ public class GuiComboBox extends JPanel {
      * Sets the tooltip text.
      */
     public final void setToolTipText(final String text) {
-        component.setToolTipText(text);
+        if (type == Type.TEXTFIELDWITHUNIT) {
+            textFieldWithoutUnit.setToolTipText(text);
+            unitComboBox.setToolTipText(text);
+        } else {
+            component.setToolTipText(text);
+        }
     }
 
     /**

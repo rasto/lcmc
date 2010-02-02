@@ -215,7 +215,12 @@ public abstract class EditableInfo extends Info {
 
             /* tool tip */
             final String longDesc = getParamLongDesc(param);
-            label.setToolTipText(longDesc);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    label.setToolTipText(longDesc);
+                    paramCb.setToolTipText(getToolTipText(param));
+                }
+            });
             final GuiComboBox realParamCb = paramComboBoxGet(param, null);
             addField(panel, label, paramCb, leftWidth, rightWidth);
             realParamCb.setValue(paramCb.getValue());
@@ -393,7 +398,12 @@ public abstract class EditableInfo extends Info {
 
             /* tool tip */
             final String longDesc = getParamLongDesc(param);
-            label.setToolTipText(longDesc);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    paramCb.setToolTipText(getToolTipText(param));
+                    label.setToolTipText(longDesc);
+                }
+            });
             addField(panel, label, paramCb, leftWidth, rightWidth);
         }
 
@@ -526,6 +536,10 @@ public abstract class EditableInfo extends Info {
         for (String param : params) {
             final String value = getComboBoxValue(param);
             getResource().setValue(param, value);
+            final GuiComboBox cb = paramComboBoxGet(param, null);
+            if (cb != null) {
+               cb.setToolTipText(getToolTipText(param));
+            }
         }
     }
 
@@ -574,7 +588,6 @@ public abstract class EditableInfo extends Info {
                                                     abbreviations);
         paramComboBoxAdd(param, prefix, paramCb);
         paramCb.setEditable(true);
-        paramCb.setToolTipText(getToolTipText(param, getParamDefault(param)));
         return paramCb;
     }
 
@@ -666,14 +679,21 @@ public abstract class EditableInfo extends Info {
      * Returns on mouse over text for parameter. If value is different
      * from default value, default value will be returned.
      */
-    protected final String getToolTipText(final String param,
-                                          final String value) {
+    protected final String getToolTipText(final String param) {
         String defaultValue = getParamDefault(param);
         if (defaultValue == null || defaultValue.equals("")) {
             defaultValue = "\"\"";
         }
         final StringBuffer ret = new StringBuffer(120);
-        ret.append("<html><table><tr><td><b>");
+        ret.append("<html>");
+        final GuiComboBox cb = paramComboBoxGet(param, null);
+        if (cb != null) {
+            final Object value = cb.getStringValue();
+            ret.append("<b>");
+            ret.append(value);
+            ret.append("</b>");
+        }
+        ret.append("<table><tr><td><b>");
         ret.append(Tools.getString("Browser.ParamDefault"));
         ret.append("</b></td><td>");
         ret.append(defaultValue);
