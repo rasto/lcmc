@@ -197,9 +197,11 @@ public class DrbdResourceInfo extends EditableInfo
                     }
                     if (!value.equals(getParamDefault(param))) {
                         if (isCheckBox(param)
-                            && value.equals(Tools.getString("Boolean.True"))) {
-                            /* boolean parameter */
-                            sectionConfig.append("\t\t" + param + ";\n");
+                            || "booleanhandler".equals(getParamType(param))) {
+                            if (value.equals(Tools.getString("Boolean.True"))) {
+                                /* boolean parameter */
+                                sectionConfig.append("\t\t" + param + ";\n");
+                            }
                         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
                             /* after parameter */
                             /* we get drbd device here, so it is converted

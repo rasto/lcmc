@@ -1440,10 +1440,10 @@ public class TextResource extends
          "Remove DRBD Resource"},
 
         {"HostBrowser.Drbd.SetPrimary",
-         "Set Primary"},
+         "Promote To Primary"},
 
         {"HostBrowser.Drbd.SetPrimaryOtherSecondary",
-         "Change To Primary"},
+         "Promote To Primary"},
 
         {"HostBrowser.Drbd.Attach",
          "Attach Disk"},
@@ -1464,13 +1464,13 @@ public class TextResource extends
          "Disconnect From Peer"},
 
         {"HostBrowser.Drbd.SetSecondary",
-         "Set Secondary"},
+         "Demote To Secondary"},
 
         {"HostBrowser.Drbd.SetSecondary.ToolTip",
-         "Set secondary"},
+         "Demote to secondary"},
 
         {"HostBrowser.Drbd.ForcePrimary",
-         "Force Primary"},
+         "Force Promotion To Primary"},
 
         {"HostBrowser.Drbd.Invalidate",
          "Invalidate"},

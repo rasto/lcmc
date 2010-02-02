@@ -141,6 +141,14 @@ public class DrbdXML extends XML {
         {new StringInfo("A / Asynchronous",     "A", null),
          new StringInfo("B / Semi-Synchronous", "B", null),
          new StringInfo(PROTOCOL_C,             "C", null)};
+    /** DRBD single-primary mode, that is a default. */
+    private static final String MODE_SINGLE_PRIMARY = "False";
+    /** DRBD single and dual primary mode. */
+    public static final List<Object> MODES = new ArrayList<Object>();
+    static {
+        MODES.add(new StringInfo("Single-Primary", MODE_SINGLE_PRIMARY, null));
+        MODES.add(new StringInfo("Dual-Primary",   "True",   null));
+    }
 
     /**
      * Prepares a new <code>DrbdXML</code> object.
@@ -149,11 +157,7 @@ public class DrbdXML extends XML {
         super();
         addSpecialParameter("resource", "name", true);
         addSpecialParameter("resource", "device", true);
-        addParameter("resource",
-                     "protocol",
-                     PROTOCOL_C,
-                     PROTOCOLS,
-                     true);
+        addParameter("resource", "protocol", PROTOCOL_C, PROTOCOLS, true);
         for (Host host : hosts) {
             final String command =
                                 host.getDistCommand("Drbd.getParameters",
@@ -537,9 +541,13 @@ public class DrbdXML extends XML {
             /* <option> */
             if (optionNode.getNodeName().equals("option")) {
                 final String name = getAttribute(optionNode, "name");
-                final String type = getAttribute(optionNode, "type");
+                String type = getAttribute(optionNode, "type");
 
-                if ("handler".equals(type)) {
+                if ("allow-two-primaries".equals(name)) {
+                    paramItemsMap.put(name, MODES);
+                    paramDefaultMap.put(name, MODE_SINGLE_PRIMARY);
+                    type = "booleanhandler";
+                } else if ("handler".equals(type)) {
                     paramItemsMap.put(name, new ArrayList<Object>());
                 } else if ("boolean".equals(type)) {
                     final List<Object> l = new ArrayList<Object>();
