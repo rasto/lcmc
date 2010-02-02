@@ -631,7 +631,7 @@ public class DrbdResourceInfo extends EditableInfo
                          "GiByte" + unitPart,
                          "GiBytes" + unitPart),
 
-                new Unit("S",
+                new Unit("s",
                          "s",
                          "Sector" + unitPart,
                          "Sectors" + unitPart)
@@ -1288,7 +1288,46 @@ public class DrbdResourceInfo extends EditableInfo
      * Returns tool tip when mouse is over the resource edge.
      */
     public String getToolTipForGraph(final boolean testOnly) {
-        return getName();
+        final StringBuffer s = new StringBuffer(30);
+        s.append("<html><b>");
+        s.append(getName());
+        s.append("</b><br>");
+        if (isSyncing()) {
+            final String spString = getSyncedProgress();
+            final String bsString =
+                                blockDevInfo1.getBlockDevice().getBlockSize();
+            final String rateString = getResource().getValue("rate");
+            if (spString != null && bsString != null &&
+                rateString != null) {
+                final double sp = Double.parseDouble(spString);
+                final double bs = Double.parseDouble(bsString);
+                final Object[] rateObj = Tools.extractUnit(rateString);
+                double rate = Double.parseDouble((String) rateObj[0]);
+                if ("k".equalsIgnoreCase((String) rateObj[1])) {
+                } else if ("m".equalsIgnoreCase((String) rateObj[1])) {
+                    rate *= 1024;
+                } else if ("g".equalsIgnoreCase((String) rateObj[1])) {
+                    rate *= 1024 * 1024;
+                } else if ("".equalsIgnoreCase((String) rateObj[1])) {
+                    rate /= 1024;
+                } else {
+                    rate = 0;
+                }
+                if (rate > 0) {
+                    s.append("\nremaining at least: ");
+                    double seconds = ((100 - sp) / 100 * bs) / rate;
+                    if (seconds < 60*5) {
+                        s.append((int) seconds);
+                        s.append(" Seconds");
+                    } else {
+                        s.append((int) (seconds / 60));
+                        s.append(" Minutes");
+                    }
+                }
+            }
+        }
+        s.append("</html>");
+        return s.toString();
     }
 
     /**
