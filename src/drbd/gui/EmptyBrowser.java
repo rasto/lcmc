@@ -384,6 +384,19 @@ public class EmptyBrowser extends Browser {
                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
             infoPanel.add(clustersPane);
+            if (Tools.getConfigData().getAutoHosts().isEmpty()
+                && !Tools.getConfigData().getAutoClusters().isEmpty()) {
+                for (final Cluster cl : allLoadButtons.keySet()) {
+                    if (Tools.getConfigData().getAutoClusters().contains(
+                                                               cl.getName())) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                allLoadButtons.get(cl).pressButton();
+                            }
+                        });
+                    }
+                }
+            }
             return infoPanel;
         }
 

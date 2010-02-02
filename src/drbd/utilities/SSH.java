@@ -1148,6 +1148,10 @@ public class SSH {
                     if (lastPassword == null) {
                         lastPassword =
                                 Tools.getConfigData().getAutoOptionHost("pw");
+                        if (lastPassword == null) {
+                            lastPassword =
+                              Tools.getConfigData().getAutoOptionCluster("pw");
+                        }
                     }
                     if (lastPassword == null) {
                         if (enablePublicKey
