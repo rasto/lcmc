@@ -284,6 +284,8 @@ public class DistResource extends
 
         {"DRBD.resize",        "echo|/sbin/drbdadm @DRYRUN@ resize @RESOURCE@"},
 
+        {"DRBD.verify",        "echo|/sbin/drbdadm @DRYRUN@ verify @RESOURCE@"},
+
         {"DRBD.getDrbdStatus",
          "/usr/local/bin/drbd-gui-helper get-drbd-events"},
 

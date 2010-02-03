@@ -417,7 +417,9 @@ public class BlockDevice extends Resource {
             || "WFBitMapT".equals(connectionState)
             || "WFSyncUUID".equals(connectionState)
             || "PausedSyncS".equals(connectionState)
-            || "PausedSyncT".equals(connectionState)) {
+            || "PausedSyncT".equals(connectionState)
+            || "VerifyS".equals(connectionState)
+            || "VerifyT".equals(connectionState)) {
             setSplitBrain(false);
             return true;
         }
@@ -507,6 +509,21 @@ public class BlockDevice extends Resource {
         syncedProgress = null;
         return false;
     }
+
+    /**
+     * Returns whether the node is verifying with other node.
+     */
+    public final boolean isVerifying() {
+        if (nodeState == null) {
+            return false;
+        }
+        if ("VerifyS".equals(connectionState)
+            || "VerifyT".equals(connectionState)) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Returns true if this node is source of the data, false if this node gets

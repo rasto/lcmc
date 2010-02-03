@@ -677,6 +677,14 @@ public class BlockDevInfo extends EditableInfo {
         DRBD.discardData(getHost(), drbdResourceInfo.getName(), testOnly);
     }
 
+    /**
+     * Start on-line verification.
+     */
+    public final void verify(final boolean testOnly) {
+        DRBD.verify(getHost(), drbdResourceInfo.getName(), testOnly);
+    }
+
+
     public final void resizeDrbd(final boolean testOnly) {
         DRBD.resize(getHost(), drbdResourceInfo.getName(), testOnly);
     }
@@ -1232,7 +1240,8 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    return !getBlockDevice().isSyncing();
+                    return !getBlockDevice().isSyncing()
+                           && !getDrbdResourceInfo().isVerifying();
                 }
 
                 public void action() {

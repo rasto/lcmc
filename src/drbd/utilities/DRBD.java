@@ -520,6 +520,7 @@ public final class DRBD {
         resize(host, resource, null, testOnly);
     }
 
+
     /**
      * Executes the drbdadm resize on the specified host and resource and
      * calls the callback function.
@@ -528,11 +529,19 @@ public final class DRBD {
                               final String resource,
                               final ExecCallback execCallback,
                               final boolean testOnly) {
+    }
+
+    /**
+     * Executes the drbdadm verify on the specified host and resource.
+     */
+    public static void verify(final Host host,
+                              final String resource,
+                              final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
-        final String command = host.getDistCommand("DRBD.resize",
+        final String command = host.getDistCommand("DRBD.verify",
                                                    replaceHash);
-        execCommand(host, command, execCallback, true, testOnly);
+        execCommand(host, command, null, true, testOnly);
     }
 
     /**

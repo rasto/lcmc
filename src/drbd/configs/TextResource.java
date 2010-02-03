@@ -1394,6 +1394,12 @@ public class TextResource extends
         {"ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip",
          "Resolve Split-Brain"},
 
+        {"ClusterBrowser.Drbd.Verify",
+         "Online Verification"},
+
+        {"ClusterBrowser.Drbd.Verify.ToolTip",
+         "Starts online verification."},
+
         {"ClusterBrowser.Drbd.ViewLogs",
          "View Logs"},
 

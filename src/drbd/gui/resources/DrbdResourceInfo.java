@@ -295,7 +295,16 @@ public class DrbdResourceInfo extends EditableInfo
      * Returns whether the cluster is syncing.
      */
     public final boolean isSyncing() {
-        return blockDevInfo1.getBlockDevice().isSyncing();
+        return blockDevInfo1.getBlockDevice().isSyncing()
+               || blockDevInfo2.getBlockDevice().isSyncing();
+    }
+
+    /**
+     * Returns whether the cluster is being verified.
+     */
+    public final boolean isVerifying() {
+        return blockDevInfo1.getBlockDevice().isVerifying()
+               || blockDevInfo2.getBlockDevice().isVerifying();
     }
 
     /**
@@ -1072,6 +1081,13 @@ public class DrbdResourceInfo extends EditableInfo
     }
 
     /**
+     * Starts online verification.
+     */
+    public final void verify(final boolean testOnly) {
+        blockDevInfo1.verify(testOnly);
+    }
+
+    /**
      * Returns whether the specified host has this drbd resource.
      */
     public final boolean resourceInHost(final Host host) {
@@ -1214,6 +1230,27 @@ public class DrbdResourceInfo extends EditableInfo
         registerMenuItem(splitBrainMenu);
         items.add(splitBrainMenu);
 
+        /* start online verification */
+        final MyMenuItem verifyMenu = new MyMenuItem(
+                Tools.getString("ClusterBrowser.Drbd.Verify"),
+                null,
+                Tools.getString(
+                            "ClusterBrowser.Drbd.Verify.ToolTip")) {
+
+            private static final long serialVersionUID = 1L;
+
+            public boolean enablePredicate() {
+                return isConnected(testOnly)
+                       && !isSyncing()
+                       && !isVerifying();
+            }
+
+            public void action() {
+                verify(testOnly);
+            }
+        };
+        registerMenuItem(verifyMenu);
+        items.add(verifyMenu);
         /* remove resource */
         final MyMenuItem removeResMenu = new MyMenuItem(
                         Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),

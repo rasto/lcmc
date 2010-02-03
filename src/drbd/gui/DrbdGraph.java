@@ -353,6 +353,8 @@ public class DrbdGraph extends ResourceGraph {
                     l.append(" (split-brain)");
                 } else if (!dri.isConnected(tOnly)) {
                     l.append(" (disconnected)");
+                } else if (dri.isVerifying()) {
+                    l.append(" (verify)");
                 }
                 return l.toString();
             }
