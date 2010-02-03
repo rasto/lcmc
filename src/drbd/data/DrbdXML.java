@@ -581,6 +581,11 @@ public class DrbdXML extends XML {
                     l.add("");
                     l.add("/usr/lib/drbd/crm-unfence-peer.sh");
                     paramItemsMap.put(name, l);
+                } else if ("split-brain".equals(name)) {
+                    final List<Object> l = new ArrayList<Object>();
+                    l.add("");
+                    l.add("/usr/lib/drbd/notify-split-brain.sh root");
+                    paramItemsMap.put(name, l);
                 } else if ("become-primary-on".equals(name)) {
                     final List<Object> l = new ArrayList<Object>();
                     l.add("");
