@@ -627,9 +627,12 @@ public class DrbdXML extends XML {
                     } else if ("unit".equals(tag)) {
                         paramUnitLongMap.put(name, getText(optionInfo));
                     } else if ("unit_prefix".equals(tag)) {
-                        paramDefaultUnitMap.put(
-                                            name,
-                                            getText(optionInfo).toUpperCase());
+                        String option = getText(optionInfo);
+                        if (!"s".equals(option)) {
+                            /* "s" is an exception */
+                            option = option.toUpperCase();
+                        }
+                        paramDefaultUnitMap.put(name, option);
                     } else if ("desc".equals(tag)) {
                         paramLongDescMap.put(name, getText(optionInfo));
                     }
