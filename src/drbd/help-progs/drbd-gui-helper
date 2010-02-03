@@ -44,6 +44,8 @@ if ($option eq "all") {
 	get_disk_info();
 	print "filesystems-info\n";
 	get_filesystems_info();
+	print "crypto-info\n";
+	get_crypto_info();
 	print "mount-points-info\n";
 	get_mount_points_info();
 	print "gui-info\n";
@@ -59,6 +61,8 @@ if ($option eq "all") {
 	get_disk_info();
 	print "filesystems-info\n";
 	get_filesystems_info();
+	print "crypto-info\n";
+	get_crypto_info();
 	print "mount-points-info\n";
 	get_mount_points_info();
 	#print "gui-info\n";
@@ -75,6 +79,8 @@ if ($option eq "all") {
 	get_disk_info();
 } elsif ($option eq "get-filesystems-info") {
 	get_filesystems_info();
+} elsif ($option eq "get-crypto-info") {
+	get_crypto_info();
 } elsif ($option eq "get-gui-info") {
 	get_gui_info();
 } elsif ($option eq "get-mount-point-info") {
@@ -424,6 +430,33 @@ sub get_mount_points_info {
 	if (opendir(DIR, $dir)) {
 		print "$dir/$_\n" for (sort grep { $_ !~ /^\./ && -d "$dir/$_" } readdir(DIR));
 		closedir DIR;
+	}
+}
+
+# get_crypto_info
+#
+# prints available crypto modules on this host.
+sub get_crypto_info {
+	my @modules;
+	my %module_exists;
+	for (`cat /proc/crypto`) {
+		my ($cr) = /^name\s*:\s*(\S+)/;
+		next if !$cr || $cr =~ /\(/ || $module_exists{$cr};
+		push @modules, $cr;
+		$module_exists{$cr}++;
+		
+	}
+	for (`ls /lib/modules/\`uname -r\`/kernel/crypto/*.ko`) {
+		my ($cr) = /([^\/]+).ko$/;
+		next if $module_exists{$cr};
+		if ($cr eq "sha1" || $cr eq "md5" || $cr eq "crc32c") {
+			unshift @modules, $cr;
+		} else {
+			push @modules, $cr;
+		}
+	}
+	for (@modules) {
+		print "$_\n";
 	}
 }
 

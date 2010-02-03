@@ -124,7 +124,7 @@ public class GuiComboBox extends JPanel {
     private static final Color SAVED_VALUE_COLOR =
                             Tools.getDefaultColor("GuiComboBox.SavedValue");
     /** No scrollbar ever. */
-    private static final int SCROLLBAR_MAX_ROWS = 10000;
+    private static final int SCROLLBAR_MAX_ROWS = 10;
     /** Widget default height. */
     private static final int WIDGET_HEIGHT = 28;
     /** Widget enclosing component default height. */

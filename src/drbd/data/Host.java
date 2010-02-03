@@ -119,6 +119,8 @@ public class Host implements Serializable {
                                      new LinkedHashMap<String, NetInterface>();
     /** Available file systems. */
     private final List<String> fileSystems = new ArrayList<String>();
+    /** Available crypto modules. */
+    private final List<String> cryptoModules = new ArrayList<String>();
     /** Mount points that exist in /mnt dir. */
     private final List<String> mountPoints = new ArrayList<String>();
     /** List of block devices of this host. */
@@ -531,6 +533,21 @@ public class Host implements Serializable {
      */
     public final void addFileSystem(final String fileSystem) {
         fileSystems.add(fileSystem);
+    }
+
+    /**
+     * Returns available crypto modules as a list of strings.
+     */
+    public final List<String> getCryptoModules() {
+        return cryptoModules;
+    }
+
+
+    /**
+     * Adds crypto module to the list of crypto modules.
+     */
+    public final void addCryptoModule(final String cryptoModule) {
+        cryptoModules.add(cryptoModule);
     }
 
     /**
@@ -1737,6 +1754,7 @@ public class Host implements Serializable {
             if ("net-info".equals(line)
                 || "disk-info".equals(line)
                 || "filesystems-info".equals(line)
+                || "crypto-info".equals(line)
                 || "mount-points-info".equals(line)
                 || "gui-info".equals(line)
                 || "installation-info".equals(line)
@@ -1766,6 +1784,8 @@ public class Host implements Serializable {
                 }
             } else if ("filesystems-info".equals(type)) {
                 addFileSystem(line);
+            } else if ("crypto-info".equals(type)) {
+                addCryptoModule(line);
             } else if ("mount-points-info".equals(type)) {
                 addMountPoint(line);
             } else if ("gui-info".equals(type)) {

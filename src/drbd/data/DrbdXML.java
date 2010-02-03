@@ -589,6 +589,13 @@ public class DrbdXML extends XML {
                         l.add(h.getName());
                     }
                     paramItemsMap.put(name, l);
+                } else if ("verify-alg".equals(name)) {
+                    final List<Object> l = new ArrayList<Object>();
+                    l.add("");
+                    for (final String cr : host.getCryptoModules()) {
+                        l.add(cr);
+                    }
+                    paramItemsMap.put(name, l);
                 }
                 final NodeList optionInfos = optionNode.getChildNodes();
                 for (int j = 0; j < optionInfos.getLength(); j++) {
