@@ -652,7 +652,8 @@ public class DrbdResourceInfo extends EditableInfo
             paramComboBoxAdd(param, prefix, paramCb);
         } else {
             paramCb = super.getParamComboBox(param, prefix, width);
-            if (possibleChoices != null) {
+            if (possibleChoices != null
+                && !getBrowser().getDrbdXML().isStringType(param)) {
                 paramCb.setEditable(false);
             }
         }

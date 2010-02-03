@@ -193,7 +193,7 @@ public class DrbdXML extends XML {
                     xml.append('\n');
                     final Matcher m2 = ep.matcher(line);
                     if (m2.matches()) {
-                        parseSection(section, xml.toString());
+                        parseSection(section, xml.toString(), host, hosts);
                         section = null;
                         xml.delete(0, xml.length() - 1);
                     }
@@ -393,6 +393,14 @@ public class DrbdXML extends XML {
     }
 
     /**
+     * Returns whether parameter expects string value.
+     */
+    public final boolean isStringType(final String param) {
+        final String type = paramTypeMap.get(param);
+        return "string".equals(type);
+    }
+
+    /**
      * Checks in the cache if the parameter was correct.
      */
     public final boolean checkParamCache(final String param) {
@@ -526,7 +534,10 @@ public class DrbdXML extends XML {
     /**
      * Parses command xml for parameters and fills up the hashes.
      */
-    private void parseSection(final String section, final String xml) {
+    private void parseSection(final String section,
+                              final String xml,
+                              final Host host,
+                              final Host[] hosts) {
         final Document document = getXMLDocument(xml);
 
         /* get root <command> */
@@ -547,14 +558,37 @@ public class DrbdXML extends XML {
                     paramItemsMap.put(name, MODES);
                     paramDefaultMap.put(name, MODE_SINGLE_PRIMARY);
                     type = "booleanhandler";
+                } else if ("protocol".equals(name)) {
+                    type = "handler";
                 } else if ("handler".equals(type)) {
                     paramItemsMap.put(name, new ArrayList<Object>());
                 } else if ("boolean".equals(type)) {
                     final List<Object> l = new ArrayList<Object>();
-                    paramItemsMap.put(name, l);
                     l.add(Tools.getString("Boolean.True"));
                     l.add(Tools.getString("Boolean.False"));
+                    paramItemsMap.put(name, l);
                     paramDefaultMap.put(name, Tools.getString("Boolean.False"));
+                }
+                if ("fence-peer".equals(name)) {
+                    final List<Object> l = new ArrayList<Object>();
+                    l.add("");
+                    l.add(host.getHeartbeatLibPath()
+                          + "/drbd-peer-outdater -t 5");
+                    l.add("/usr/lib/drbd/crm-fence-peer.sh");
+                    paramItemsMap.put(name, l);
+                } else if ("after-resync-target".equals(name)) {
+                    final List<Object> l = new ArrayList<Object>();
+                    l.add("");
+                    l.add("/usr/lib/drbd/crm-unfence-peer.sh");
+                    paramItemsMap.put(name, l);
+                } else if ("become-primary-on".equals(name)) {
+                    final List<Object> l = new ArrayList<Object>();
+                    l.add("");
+                    l.add("both");
+                    for (final Host h : hosts) {
+                        l.add(h.getName());
+                    }
+                    paramItemsMap.put(name, l);
                 }
                 final NodeList optionInfos = optionNode.getChildNodes();
                 for (int j = 0; j < optionInfos.getLength(); j++) {

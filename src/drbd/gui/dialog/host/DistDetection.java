@@ -23,7 +23,6 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.gui.SpringUtilities;
-import drbd.gui.dialog.host.DistDetection;
 import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.Tools;
 

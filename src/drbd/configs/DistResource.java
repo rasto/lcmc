@@ -234,6 +234,20 @@ public class DistResource extends
         {"Heartbeat.reloadHeartbeat", "/etc/init.d/heartbeat reload"},
 
         {"Heartbeat.getHbConfig",    "cat /etc/ha.d/ha.cf"},
+
+        {"Heartbeat.dopdWorkaround",
+         "if [ ! -e /var/run/heartbeat/crm ]; then"
+         + " mkdir /var/run/heartbeat/crm;"
+         + " chown hacluster:haclient /var/run/heartbeat/crm;"
+         + " fi"},
+        {"Heartbeat.enableDopd",
+         "chgrp haclient /sbin/drbdsetup;"
+         + "chmod o-x /sbin/drbdsetup;"
+         + "chmod u+s /sbin/drbdsetup;"
+         + "chgrp haclient /sbin/drbdmeta;"
+         + "chmod o-x /sbin/drbdmeta;"
+         + "chmod u+s /sbin/drbdmeta;"},
+
         {"CRM.standByOn",      "crm_standby -U @HOST@ -v on"},
         {"CRM.standByOff",     "crm_standby -U @HOST@ -v off"},
 

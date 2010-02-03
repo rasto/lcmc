@@ -167,4 +167,23 @@ public final class Heartbeat {
             reloadHeartbeat(host);
         }
     }
+
+    /**
+     * Enables dopd.
+     * With workaround for dopd, that needs /var/run/heartbeat/crm directory.
+     */
+    public static void enableDopd(final Host host, final boolean workAround) {
+        String cmd;
+        if (workAround) {
+            cmd = "Heartbeat.dopdWorkaround;;;Heartbeat.enableDopd";
+        } else {
+            cmd = "Heartbeat.enableDopd";
+        }
+        final Thread t = host.execCommand(cmd, null, null, true);
+        try {
+            t.join();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }

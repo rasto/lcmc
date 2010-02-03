@@ -138,10 +138,10 @@ public class HbConfig extends DialogCluster {
     private static final int REMOVE_BUTTON_HEIGHT = 14;
     /** Checkbox text (Edit the config). */
     private static final String EDIT_CONFIG_STRING = Tools.getString(
-                                 "Dialog.Cluster.HbConfig.Checkbox.EditConfig");
+                               "Dialog.Cluster.HbConfig.Checkbox.EditConfig");
     /** Checkbox text (See existing). */
     private static final String SEE_EXISTING_STRING = Tools.getString(
-                                 "Dialog.Cluster.HbConfig.Checkbox.SeeExisting");
+                               "Dialog.Cluster.HbConfig.Checkbox.SeeExisting");
     /** /etc/ha.d/ha.cf read error string. */
     private static final String HA_CF_ERROR_STRING = "error: read error";
     /** Newline. */
@@ -179,6 +179,20 @@ public class HbConfig extends DialogCluster {
 
                                 Heartbeat.createHBConfig(hosts, config);
                                 boolean configOk = updateOldHbConfig();
+                                if (dopdCB.isSelected()) {
+                                    for (final Host h : hosts) {
+                                        final String hbV =
+                                                    h.getHeartbeatVersion();
+                                        boolean wa = false;
+                                        if (hbV != null
+                                            && Tools.compareVersions(
+                                                            hbV,
+                                                            "3.0.2") <= 0) {
+                                            wa = true;
+                                        }
+                                        Heartbeat.enableDopd(h, wa);
+                                    }
+                                }
                                 Heartbeat.reloadHeartbeats(hosts);
                                 enableComponents();
                                 if (configOk) {

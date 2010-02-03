@@ -116,6 +116,10 @@ public class Name extends DialogCluster {
                     Tools.getConfigData().addClusterToClusters(getCluster());
                     Tools.getGUIData().addClusterTab(getCluster());
                 }
+            }
+        });
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 nameField.requestFocus();
             }
         });

@@ -26,7 +26,6 @@ import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.gui.GuiComboBox;
 import drbd.gui.Browser;
-import drbd.gui.ClusterBrowser;
 
 import java.util.Map;
 import java.awt.event.ItemListener;

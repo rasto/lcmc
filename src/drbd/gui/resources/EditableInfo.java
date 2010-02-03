@@ -239,6 +239,8 @@ public abstract class EditableInfo extends Info {
                                         public void run() {
                                             wizardApplyButton.setEnabled(
                                                                        enable);
+                                            paramCb.setToolTipText(
+                                                        getToolTipText(param));
                                         }
                                     });
                                 }
@@ -259,6 +261,8 @@ public abstract class EditableInfo extends Info {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         wizardApplyButton.setEnabled(check);
+                                        paramCb.setToolTipText(
+                                                        getToolTipText(param));
                                     }
                                 });
                             }
@@ -272,8 +276,8 @@ public abstract class EditableInfo extends Info {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 wizardApplyButton.setEnabled(check);
-                                realParamCb.setValue(
-                                                    paramCb.getValue());
+                                realParamCb.setValue(paramCb.getValue());
+                                paramCb.setToolTipText(getToolTipText(param));
                             }
                         });
                         thread.start();
@@ -283,14 +287,13 @@ public abstract class EditableInfo extends Info {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 final boolean check =
-                                    checkResourceFieldsCorrect(param,
-                                                               params);
-                                realParamCb.setValue(
-                                                    paramCb.getValue());
+                                    checkResourceFieldsCorrect(param, params);
+                                realParamCb.setValue(paramCb.getValue());
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        wizardApplyButton.
-                                                setEnabled(check);
+                                        wizardApplyButton.setEnabled(check);
+                                        paramCb.setToolTipText(
+                                                        getToolTipText(param));
                                     }
                                 });
                             }
@@ -418,13 +421,13 @@ public abstract class EditableInfo extends Info {
                                 public void run() {
                                     paramCb.setEditable();
                                     final boolean check =
-                                            checkResourceFields(param,
-                                                                params);
+                                            checkResourceFields(param, params);
                                     SwingUtilities.invokeLater(
                                         new Runnable() {
                                             public void run() {
-                                                applyButton.setEnabled(
-                                                                check);
+                                                applyButton.setEnabled(check);
+                                                paramCb.setToolTipText(
+                                                        getToolTipText(param));
                                             }
                                         });
                                 }
@@ -438,12 +441,13 @@ public abstract class EditableInfo extends Info {
                 public void insertUpdate(final DocumentEvent e) {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            final boolean check =
-                                      checkResourceFields(param,
-                                                          params);
+                            final boolean check = checkResourceFields(param,
+                                                                      params);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     applyButton.setEnabled(check);
+                                    paramCb.setToolTipText(
+                                                        getToolTipText(param));
                                 }
                             });
                         }
@@ -452,33 +456,32 @@ public abstract class EditableInfo extends Info {
                 }
 
                 public void removeUpdate(final DocumentEvent e) {
-                    final Thread thread = new Thread(
-                        new Runnable() {
-                            public void run() {
-                                final boolean check =
-                                          checkResourceFields(param,
-                                                              params);
-                                SwingUtilities.invokeLater(
-                                    new Runnable() {
-                                        public void run() {
-                                            applyButton.setEnabled(
-                                                                check);
-                                        }
-                                    });
-                            }
-                        });
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            final boolean check =
+                                      checkResourceFields(param, params);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    applyButton.setEnabled(check);
+                                    paramCb.setToolTipText(
+                                                getToolTipText(param));
+                                }
+                            });
+                        }
+                    });
                     thread.start();
                 }
 
                 public void changedUpdate(final DocumentEvent e) {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            final boolean check =
-                                           checkResourceFields(param,
-                                                               params);
+                            final boolean check = checkResourceFields(param,
+                                                                      params);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     applyButton.setEnabled(check);
+                                    paramCb.setToolTipText(
+                                                getToolTipText(param));
                                 }
                             });
                         }
@@ -588,6 +591,20 @@ public abstract class EditableInfo extends Info {
                                                     abbreviations);
         paramComboBoxAdd(param, prefix, paramCb);
         paramCb.setEditable(true);
+        //addMouseOverListener(
+        //    paramCb, 
+        //    new ButtonCallback() {
+        //        public final boolean isEnabled() {
+        //            return true;
+        //        }
+        //        public final void mouseOut() {
+        //            /* do nothing */
+        //        }
+        //        public final void mouseOver() {
+        //            System.out.println("set tool tip: " + param);
+        //            paramCb.setToolTipText(getToolTipText(param));
+        //        }
+        //    });
         return paramCb;
     }
 

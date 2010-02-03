@@ -45,6 +45,8 @@ import javax.swing.Box;
 import javax.swing.ComboBoxEditor;
 import javax.swing.SpringLayout;
 import javax.swing.event.DocumentListener;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 
 import java.awt.BorderLayout;
 
@@ -58,6 +60,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.event.PopupMenuEvent;
 import java.awt.Component;
 
 import java.util.List;
@@ -355,6 +359,35 @@ public class GuiComboBox extends JPanel {
 
             public void focusLost(final FocusEvent e) {
                 /* do nothing */
+            }
+        });
+        cb.addPopupMenuListener(new PopupMenuListener() {
+            public final void popupMenuCanceled(final PopupMenuEvent pe) {
+                /* do nothing */
+            }
+            public final void popupMenuWillBecomeInvisible(
+                                                     final PopupMenuEvent pe) {
+                /* do nothing */
+            }
+            public final void popupMenuWillBecomeVisible(
+                                                    final PopupMenuEvent pe) {
+                /* workaround to have items with bigger widths than jcombobox */
+                final JComboBox cb = (JComboBox) pe.getSource();
+                final Object c = cb.getUI().getAccessibleChild(cb, 0);
+                if (!(c instanceof JPopupMenu)) {
+                    return;
+                }
+                final JScrollPane scrollPane =
+                            (JScrollPane) ((JPopupMenu) c).getComponent(0);
+                final Dimension size = scrollPane.getPreferredSize();
+                final JComponent view =
+                            (JComponent) scrollPane.getViewport().getView();
+                final int newSize = view.getPreferredSize().width;
+                if (newSize > size.width) {
+                    size.width = newSize;
+                    scrollPane.setPreferredSize(size);
+                    scrollPane.setMaximumSize(size);
+                }
             }
         });
         return cb;
@@ -1033,35 +1066,6 @@ public class GuiComboBox extends JPanel {
             default:
                 /* error */
         }
-        //Color c = compColor;
-        ////if (required) {
-        ////    //TODO: required fields should be marked differently
-        ////    c = backgroundColor;
-        ////} else  {
-        ////    c = backgroundColor;
-        ////}
-        //switch(type) {
-        //    case TEXTFIELD:
-        //        setBackground(c);
-        //        break;
-        //    case PASSWDFIELD:
-        //        setBackground(c);
-        //        break;
-        //    case COMBOBOX:
-        //        setBackground(c);
-        //        break;
-        //    case RADIOGROUP:
-        //        setBackground(c);
-        //        break;
-        //    case CHECKBOX:
-        //        setBackground(c);
-        //        break;
-        //    case TEXTFIELDWITHUNIT:
-        //        setBackground(c);
-        //        break;
-        //    default:
-        //        /* error */
-        //}
     }
 
     /**
