@@ -1099,7 +1099,7 @@ sub get_drbd_xml {
 sub is_script_rc {
 	my $script = shift;
 	return 
-	  "(/usr/sbin/update-rc.d -n $script defaults 1|grep 'already exist'"
+	  "(/usr/sbin/update-rc.d -n $script defaults 1|grep 'already '"
          ." || /sbin/chkconfig --list $script 2>/dev/null"
          ."|grep ':on') 2>/dev/null"
          ."|sed s/.*/on/|uniq";
