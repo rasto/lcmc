@@ -44,6 +44,7 @@ import java.util.Properties;
 import java.util.Locale;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -2046,5 +2047,27 @@ public final class Tools {
             o[1] = m.group(2);
         }
         return o;
+    }
+
+    /**
+     * Returns random secret of the specified lenght.
+     */
+    public static String getRandomSecret(final int len) {
+        final Random rand = new Random();
+        final ArrayList<Character> charsL = new ArrayList<Character>();
+        for (int a = 'a'; a <= 'z'; a++) {
+            charsL.add((char) a);
+            charsL.add(Character.toUpperCase((char) a));
+        }
+        for (int a = '0'; a <= '9'; a++) {
+            charsL.add((char) a);
+        }
+
+        final Character[] chars = charsL.toArray(new Character[charsL.size()]);
+        final StringBuffer s = new StringBuffer(len + 1);
+        for (int i = 0; i < len; i++) {
+            s.append(chars[rand.nextInt(chars.length)]);
+        }
+        return s.toString();
     }
 }

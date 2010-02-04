@@ -37,6 +37,10 @@ public final class Openais {
     private static final String AIS_CONF_NAME = "openais.conf";
     /** Permissions of the openais.conf config file. */
     private static final String AIS_CONF_PERMS = "0600";
+    /** Authkeys config file. */
+    private static final String AUTHKEYS_CONF_NAME = "authkey";
+    /** Permissions of the authkeys config file. */
+    private static final String AUTHKEYS_CONF_PERMS = "0400";
 
     /**
      * No instantiation.
@@ -119,6 +123,14 @@ public final class Openais {
                                      AIS_CONF_NAME,
                                      AIS_CONF_DIR,
                                      AIS_CONF_PERMS,
+                                     true);
+        final StringBuffer authkeys =
+                                  new StringBuffer(Tools.getRandomSecret(128));
+        Tools.createConfigOnAllHosts(hosts,
+                                     authkeys.toString(),
+                                     AUTHKEYS_CONF_NAME,
+                                     AIS_CONF_DIR,
+                                     AUTHKEYS_CONF_PERMS,
                                      true);
 
     }

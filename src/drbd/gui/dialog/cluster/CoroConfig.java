@@ -755,7 +755,7 @@ public class CoroConfig extends DialogCluster {
         config.append(tab);
         config.append("clear_node_high_bit: yes\n");
         config.append(tab);
-        config.append("secauth: off\n");
+        config.append("secauth: on\n");
         config.append(tab);
         config.append("threads: 0\n");
         config.append(tab);

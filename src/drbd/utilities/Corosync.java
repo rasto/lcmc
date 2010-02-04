@@ -37,6 +37,10 @@ public final class Corosync {
     private static final String COROSYNC_CONF_NAME = "corosync.conf";
     /** Permissions of the corosync.conf config file. */
     private static final String COROSYNC_CONF_PERMS = "0600";
+    /** Authkeys config file. */
+    private static final String AUTHKEYS_CONF_NAME = "authkey";
+    /** Permissions of the authkeys config file. */
+    private static final String AUTHKEYS_CONF_PERMS = "0400";
 
     /**
      * No instantiation.
@@ -120,6 +124,14 @@ public final class Corosync {
                                      COROSYNC_CONF_NAME,
                                      COROSYNC_CONF_DIR,
                                      COROSYNC_CONF_PERMS,
+                                     true);
+        final StringBuffer authkeys =
+                                  new StringBuffer(Tools.getRandomSecret(128));
+        Tools.createConfigOnAllHosts(hosts,
+                                     authkeys.toString(),
+                                     AUTHKEYS_CONF_NAME,
+                                     COROSYNC_CONF_DIR,
+                                     AUTHKEYS_CONF_PERMS,
                                      true);
 
     }

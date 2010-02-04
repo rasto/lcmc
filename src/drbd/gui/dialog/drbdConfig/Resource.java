@@ -33,7 +33,6 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 
 import java.awt.Component;
-import java.util.Random;
 import java.util.ArrayList;
 
 /**
@@ -69,22 +68,7 @@ public class Resource extends DrbdConfig {
      * Returns a string with SECRET_STRING_LENGTH random characters.
      */
     private String getRandomSecret() {
-        final Random rand = new Random();
-        final ArrayList<Character> charsL = new ArrayList<Character>();
-        for (int a = 'a'; a <= 'z'; a++) {
-            charsL.add((char) a);
-            charsL.add(Character.toUpperCase((char) a));
-        }
-        for (int a = '0'; a <= '9'; a++) {
-            charsL.add((char) a);
-        }
-
-        final Character[] chars = charsL.toArray(new Character[charsL.size()]);
-        final StringBuffer s = new StringBuffer(32);
-        for (int i = 0; i < SECRET_STRING_LENGTH; i++) {
-            s.append(chars[rand.nextInt(chars.length)]);
-        }
-        return s.toString();
+        return Tools.getRandomSecret(SECRET_STRING_LENGTH);
     }
 
     /**
