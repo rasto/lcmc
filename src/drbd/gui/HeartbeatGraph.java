@@ -1209,10 +1209,11 @@ public class HeartbeatGraph extends ResourceGraph {
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        final ServiceInfo siP = hbConnectionInfo.getLastServiceInfoParent();
-        final ServiceInfo siC = hbConnectionInfo.getLastServiceInfoChild();
+        final ServiceInfo siRsc = hbConnectionInfo.getLastServiceInfoRsc();
+        final ServiceInfo siWithRsc =
+                                  hbConnectionInfo.getLastServiceInfoWithRsc();
         mEdgeLock.release();
-        siC.addOrder(siP, dcHost, testOnly);
+        siRsc.addOrder(siWithRsc, dcHost, testOnly);
     }
 
     /**
@@ -1253,11 +1254,10 @@ public class HeartbeatGraph extends ResourceGraph {
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        final ServiceInfo siRsc = hbConnectionInfo.getLastServiceInfoRsc();
-        final ServiceInfo siWithRsc =
-                                  hbConnectionInfo.getLastServiceInfoWithRsc();
+        final ServiceInfo siP = hbConnectionInfo.getLastServiceInfoParent();
+        final ServiceInfo siC = hbConnectionInfo.getLastServiceInfoChild();
         mEdgeLock.release();
-        siRsc.addColocation(siWithRsc, dcHost, testOnly);
+        siP.addColocation(siC, dcHost, testOnly);
     }
 
     /**
