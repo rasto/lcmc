@@ -1428,6 +1428,7 @@ public class ClusterBrowser extends Browser {
         final Map<String, ServiceInfo> idToInfoHash =
                                                 nameToServiceInfoHash.get(name);
         if (idToInfoHash == null) {
+            mNameToServiceLock.release();
             return null;
         }
         final ServiceInfo si = idToInfoHash.get(id);
