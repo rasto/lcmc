@@ -3504,30 +3504,27 @@ public class ServiceInfo extends EditableInfo {
                     final MyMenuItem mmi = new MyMenuItem(asi.toString()) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
-                            final Thread thread = new Thread(
-                                new Runnable() {
-                                    public void run() {
-                                        SwingUtilities.invokeLater(
-                                            new Runnable() {
-                                                public void run() {
-                                                    getPopup().setVisible(
-                                                                     false);
-                                                }
+                            final Thread thread = new Thread(new Runnable() {
+                                public void run() {
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                            getPopup().setVisible(
+                                                             false);
+                                        }
+                                    });
+                                    addServicePanel(asi,
+                                                    null,
+                                                    true,
+                                                    testOnly);
+                                    SwingUtilities.invokeLater(
+                                        new Runnable() {
+                                            public void run() {
+                                                repaint();
                                             }
-                                        );
-                                        addServicePanel(asi,
-                                                        null,
-                                                        true,
-                                                        testOnly);
-                                        SwingUtilities.invokeLater(
-                                            new Runnable() {
-                                                public void run() {
-                                                    repaint();
-                                                }
-                                            }
-                                        );
-                                    }
-                                });
+                                        }
+                                    );
+                                }
+                            });
                             thread.start();
                         }
                     };
@@ -3707,6 +3704,9 @@ public class ServiceInfo extends EditableInfo {
                                 if (ra.isLinbitDrbd()
                                     &&
                                      !getBrowser().linbitDrbdConfirmDialog()) {
+                                    return;
+                                } else if (ra.isHbDrbd()
+                                     && !getBrowser().hbDrbdConfirmDialog()) {
                                     return;
                                 }
                                 addServicePanel(ra,

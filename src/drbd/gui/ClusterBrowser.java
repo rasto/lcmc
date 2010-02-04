@@ -1661,6 +1661,21 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
+     * Returns true if user wants the heartbeat:drbd, which is not recommended.
+     */
+    public final boolean hbDrbdConfirmDialog() {
+        final Host dcHost = getDCHost();
+        final String hbV = dcHost.getHeartbeatVersion();
+        final String pmV = dcHost.getPacemakerVersion();
+        return Tools.confirmDialog(
+           Tools.getString("ClusterBrowser.confirmHbDrbd.Title"),
+           Tools.getString("ClusterBrowser.confirmHbDrbd.Description"),
+           Tools.getString("ClusterBrowser.confirmHbDrbd.Yes"),
+           Tools.getString("ClusterBrowser.confirmHbDrbd.No"));
+    }
+
+
+    /**
      * Returns true if user wants the linbit:drbd even, for old version of
      * hb or simply true if we have pacemaker.
      */

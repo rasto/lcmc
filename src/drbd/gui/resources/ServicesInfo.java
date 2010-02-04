@@ -1062,6 +1062,10 @@ public class ServicesInfo extends EditableInfo {
                                     &&
                                      !getBrowser().linbitDrbdConfirmDialog()) {
                                     return;
+                                } else if (ra.isHbDrbd()
+                                    &&
+                                     !getBrowser().hbDrbdConfirmDialog()) {
+                                    return;
                                 }
                                 addServicePanel(ra,
                                                 getPos(),

@@ -1146,6 +1146,20 @@ public class TextResource extends
         {"ClusterBrowser.confirmLinbitDrbd.No",
          "Cancel"},
 
+        {"ClusterBrowser.confirmHbDrbd.Title",
+         "Create Heartbeat:DRBD Service"},
+
+        {"ClusterBrowser.confirmHbDrbd.Description",
+         "<b>This is not a good idea!</b><br>"
+         + " You should use Linbit:DRBD resource agent instead.<br>"
+         + "<b>Are you sure?!<b>"},
+
+        {"ClusterBrowser.confirmHbDrbd.Yes",
+         "Yes (Don't click)"},
+
+        {"ClusterBrowser.confirmHbDrbd.No",
+         "Cancel"},
+
         {"ClusterBrowser.CreateDir.Title",
          "@DIR@ does not exist"},
 

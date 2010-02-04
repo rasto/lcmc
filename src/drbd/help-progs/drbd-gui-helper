@@ -365,7 +365,6 @@ sub get_disk_info {
 		    || $major == 8
 		    || $major == 72
 		    || $major == 202
-		    || $major == 147
 		    || $major == 104) { # ide and scsi disks
 		    	# 104 cciss0
 			if ($_ !~ /\d$/) { # whole disk
