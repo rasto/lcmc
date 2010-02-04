@@ -361,11 +361,20 @@ sub get_disk_info {
 		my ($major, $minor, $blocks, $name) = split;
 		next if $$devs_with_lvm{$name} || $$devs_in_raid{$name};
 		my $device;
-		if ($major == 3
-		    || $major == 8
-		    || $major == 72
-		    || $major == 202
-		    || $major == 104) { # ide and scsi disks
+		if ($major == $device_mapper_major) {
+			if ($$major_minor_to_dev{"$major:$minor"}) {
+				$device = "/dev/".$$major_minor_to_dev{"$major:$minor"};
+				my $dev = $$major_minor_to_dev{"$major:$minor"};
+				$dev = $name if !$dev;
+				$device = "/dev/".$dev;
+			} else {
+				$device = "/dev/$name";
+			}
+		} elsif ($major == 3
+		         || $major == 8
+		         || $major == 72
+		         || $major == 202
+		         || $major == 104) { # ide and scsi disks
 		    	# 104 cciss0
 			if ($_ !~ /\d$/) { # whole disk
 				$device = "/dev/$name";
@@ -376,16 +385,6 @@ sub get_disk_info {
 			}
 		} elsif ($major == 9 || $major == 254) { # raid
 			$device = "/dev/$name";
-		} elsif ($major == $device_mapper_major) {
-			if ($$major_minor_to_dev{"$major:$minor"}) {
-				$device = "/dev/".$$major_minor_to_dev{"$major:$minor"};
-				my $dev = $$major_minor_to_dev{"$major:$minor"};
-				$dev = $name if !$dev;
-				$device = "/dev/".$dev;
-			} else {
-				$device = "/dev/$name";
-			}
-
 		} elsif ($name =~ /^drbd/) {
 			next;
 		} else {
