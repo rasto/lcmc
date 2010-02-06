@@ -54,7 +54,7 @@ public class AppDefaults extends
          * error and warning messages handling.
          */
         /* show application errors in a dialog and stderr */
-        {"AppError",         "n"},
+        {"AppError",         "y"},
         {"AppWarning",       "y"}, /* shows application warnings in stderr */
         {"DebugLevel",       0}, /* level -1 - no messages, 2 all messages */
 
@@ -277,6 +277,11 @@ public class AppDefaults extends
                                 "Icons/tango/32x32/service_migrated_32x32.png"},
         {"HeartbeatGraph.UnmigrateIcon",
                               "Icons/tango/32x32/service_unmigrate_32x32.png"},
+
+        {"VMSVirtualDomainInfo.VMRunningIcon",
+                                "Icons/tango/16x16/service_active_16x16.png"},
+        {"VMSVirtualDomainInfo.VMStoppedIcon",
+                                       "Icons/tango/16x16/service_16x16.png"},
 
         {"ClusterViewPanel.HostIcon",    "Icons/tango/32x32/host_32x32.png"},
         {"ClusterTab.ClusterIcon",      "Icons/tango/32x32/cluster_32x32.png"},

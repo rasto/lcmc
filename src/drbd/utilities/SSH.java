@@ -112,7 +112,7 @@ public class SSH {
             return false;
         }
         if (!isConnected()) {
-            Tools.debug(this, "connecting: " + host.getName());
+            Tools.debug(this, "connecting: " + host.getName(), 1);
             this.callback = null;
             this.progressBar = null;
             this.sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
@@ -1455,7 +1455,7 @@ public class SSH {
                     Tools.debug(this, "authentication ok");
                 }
             } catch (IOException e) {
-                Tools.debug(this, "connecting: " + e.getMessage(), 0);
+                Tools.debug(this, "connecting: " + e.getMessage(), 1);
                 connectionFailed = true;
                 if (!cancelIt) {
                     host.getTerminalPanel().addCommandOutput(e.getMessage()

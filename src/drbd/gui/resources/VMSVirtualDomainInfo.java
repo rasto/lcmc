@@ -23,8 +23,11 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
+import drbd.data.VMSXML;
+import drbd.data.Host;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
+import drbd.utilities.MyMenuItem;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -33,6 +36,8 @@ import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.ArrayList;
@@ -51,6 +56,14 @@ class VMSVirtualDomainInfo extends Info {
     private JComponent infoPanel = null;
     /** Extra options panel. */
     private final JPanel extraOptionsPanel = new JPanel();
+    /** Running VM icon. */
+    private static final ImageIcon VM_RUNNING_ICON =
+        Tools.createImageIcon(
+                Tools.getDefault("VMSVirtualDomainInfo.VMRunningIcon"));
+    /** Stopped VM icon. */
+    private static final ImageIcon VM_STOPPED_ICON =
+        Tools.createImageIcon(
+                Tools.getDefault("VMSVirtualDomainInfo.VMStoppedIcon"));
     /**
      * Creates the VMSVirtualDomainInfo object.
      */
@@ -145,7 +158,131 @@ class VMSVirtualDomainInfo extends Info {
      */
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        virtualDomainInfo.addVncViewersToTheMenu(items);
+        addVncViewersToTheMenu(items);
         return items;
     }
+
+    /**
+     * Returns service icon in the menu. It can be started or stopped.
+     * TODO: broken icon, not managed icon.
+     */
+    public ImageIcon getMenuIcon(final boolean testOnly) {
+        final VMSXML vmsxml = virtualDomainInfo.getVMSXML();
+        if (vmsxml != null && vmsxml.isRunning()) {
+            return VM_RUNNING_ICON;
+        }
+        return VM_STOPPED_ICON;
+    }
+
+    /**
+     * Adds vnc viewer menu items.
+     */
+    public final void addVncViewersToTheMenu(final List<UpdatableItem> items) {
+        final boolean testOnly = false;
+        if (Tools.getConfigData().isTightvnc()) {
+            /* tight vnc test menu */
+            final MyMenuItem tightvncViewerMenu = new MyMenuItem(
+                                                    "start TIGHT VNC viewer",
+                                                    null,
+                                                    null) {
+
+                private static final long serialVersionUID = 1L;
+
+                public boolean enablePredicate() {
+                    final VMSXML vmsxml = virtualDomainInfo.getVMSXML();
+                    return vmsxml != null
+                           && vmsxml.isRunning();
+                }
+
+                public void action() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getPopup().setVisible(false);
+                        }
+                    });
+                    final VMSXML vxml = virtualDomainInfo.getVMSXML();
+                    if (vxml != null) {
+                        final int remotePort = vxml.getRemotePort();
+                        final Host host = vxml.getHost();
+                        if (host != null && remotePort > 0) {
+                            Tools.startTightVncViewer(host, remotePort);
+                        }
+                    }
+                }
+            };
+            registerMenuItem(tightvncViewerMenu);
+            items.add(tightvncViewerMenu);
+        }
+
+        if (Tools.getConfigData().isUltravnc()) {
+            /* ultra vnc test menu */
+            final MyMenuItem ultravncViewerMenu = new MyMenuItem(
+                                                    "start ULTRA VNC viewer",
+                                                    null,
+                                                    null) {
+
+                private static final long serialVersionUID = 1L;
+
+                public boolean enablePredicate() {
+                    final VMSXML vmsxml = virtualDomainInfo.getVMSXML();
+                    return vmsxml != null
+                           && vmsxml.isRunning();
+                }
+
+                public void action() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getPopup().setVisible(false);
+                        }
+                    });
+                    final VMSXML vxml = virtualDomainInfo.getVMSXML();
+                    if (vxml != null) {
+                        final int remotePort = vxml.getRemotePort();
+                        final Host host = vxml.getHost();
+                        if (host != null && remotePort > 0) {
+                            Tools.startUltraVncViewer(host, remotePort);
+                        }
+                    }
+                }
+            };
+            registerMenuItem(ultravncViewerMenu);
+            items.add(ultravncViewerMenu);
+        }
+
+        if (Tools.getConfigData().isRealvnc()) {
+            /* real vnc test menu */
+            final MyMenuItem realvncViewerMenu = new MyMenuItem(
+                                                        "start REAL VNC test",
+                                                        null,
+                                                        null) {
+
+                private static final long serialVersionUID = 1L;
+
+                public boolean enablePredicate() {
+                    final VMSXML vmsxml = virtualDomainInfo.getVMSXML();
+                    return vmsxml != null
+                           && vmsxml.isRunning();
+                }
+
+                public void action() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getPopup().setVisible(false);
+                        }
+                    });
+                    final VMSXML vxml = virtualDomainInfo.getVMSXML();
+                    if (vxml != null) {
+                        final int remotePort = vxml.getRemotePort();
+                        final Host host = vxml.getHost();
+                        if (host != null && remotePort > 0) {
+                            Tools.startRealVncViewer(host, remotePort);
+                        }
+                    }
+                }
+            };
+            registerMenuItem(realvncViewerMenu);
+            items.add(realvncViewerMenu);
+        }
+    }
+
 }

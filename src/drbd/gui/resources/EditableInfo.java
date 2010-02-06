@@ -592,7 +592,7 @@ public abstract class EditableInfo extends Info {
         paramComboBoxAdd(param, prefix, paramCb);
         paramCb.setEditable(true);
         //addMouseOverListener(
-        //    paramCb, 
+        //    paramCb,
         //    new ButtonCallback() {
         //        public final boolean isEnabled() {
         //            return true;

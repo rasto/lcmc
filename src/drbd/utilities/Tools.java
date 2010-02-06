@@ -30,7 +30,6 @@ import drbd.gui.resources.Info;
 import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
 import drbd.data.CRMXML;
-import drbd.data.VNCXML;
 import drbd.gui.GUIData;
 import drbd.gui.dialog.ConfirmDialog;
 
@@ -45,6 +44,8 @@ import java.util.Locale;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.HashSet;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -108,6 +109,10 @@ public final class Tools {
     private static boolean appWarning;
     /** Whether application errors should show a dialog. */
     private static boolean appError;
+    /** Map with all warnings, so that they don't appear more than once. */
+    private static Set<String> appWarningHash = new HashSet<String>();
+    /** Map with all errors, so that they don't appear more than once. */
+    private static Set<String> appErrorHash = new HashSet<String>();
 
     /** Locales. */
     private static String localeLang = "";
@@ -527,10 +532,13 @@ public final class Tools {
      *          warning message
      */
     public static void appWarning(final String msg) {
-        if (appWarning) {
-            System.out.println("APPWARNING: " + msg);
-        } else {
-            debug("APPWARNING: " + msg, 2);
+        if (!appWarningHash.contains(msg)) {
+            appWarningHash.add(msg);
+            if (appWarning) {
+                System.out.println("APPWARNING: " + msg);
+            } else {
+                debug("APPWARNING: " + msg, 2);
+            }
         }
     }
 
@@ -580,6 +588,10 @@ public final class Tools {
     public static void appError(final String msg,
                                 final String msg2,
                                 final Exception e) {
+        if (appErrorHash.contains(msg + msg2)) {
+            return;
+        }
+        appErrorHash.add(msg + msg2);
         final StringBuffer errorString = new StringBuffer(300);
         errorString.append(getErrorString("AppError.Text"));
         errorString.append("\nrelease: ");
@@ -1814,9 +1826,7 @@ public final class Tools {
      * if ssh tunnel was created.
      */
     private static int prepareVncViewer(final Host host,
-                                        final String configFile) {
-        final VNCXML vncxml = new VNCXML(host, configFile);
-        final int remotePort = vncxml.getRemotePort();
+                                        final int remotePort) {
         if (remotePort < 0) {
             return -1;
         }
@@ -1849,8 +1859,8 @@ public final class Tools {
      * Starts Tight VNC viewer.
      */
     public static void startTightVncViewer(final Host host,
-                                           final String configFile) {
-        final int localPort = prepareVncViewer(host, configFile);
+                                           final int remotePort) {
+        final int localPort = prepareVncViewer(host, remotePort);
         if (localPort < 0) {
             return;
         }
@@ -1871,8 +1881,8 @@ public final class Tools {
      * Starts Ultra VNC viewer.
      */
     public static void startUltraVncViewer(final Host host,
-                                           final String configFile) {
-        final int localPort = prepareVncViewer(host, configFile);
+                                           final int remotePort) {
+        final int localPort = prepareVncViewer(host, remotePort);
         if (localPort < 0) {
             return;
         }
@@ -1894,8 +1904,8 @@ public final class Tools {
      * Starts Real VNC viewer.
      */
     public static void startRealVncViewer(final Host host,
-                                          final String configFile) {
-        final int localPort = prepareVncViewer(host, configFile);
+                                          final int remotePort) {
+        final int localPort = prepareVncViewer(host, remotePort);
         if (localPort < 0) {
             return;
         }

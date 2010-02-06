@@ -1754,7 +1754,7 @@ public class TextResource extends
         {"Error.Title",
          "Error"},
 
-        {"VNCXML.GetConfig",
+        {"VMSXML.GetConfig",
          "Parsing libvirt config..."},
 
         {"EmptyViewPanel.HelpButton",

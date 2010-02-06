@@ -23,6 +23,7 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.data.Host;
+import drbd.data.VMSXML;
 import drbd.data.ResourceAgent;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.MyMenuItem;
@@ -44,6 +45,8 @@ class VirtualDomainInfo extends ServiceInfo {
     /** pattern that captures a name from xml file name. */
     public static final Pattern LIBVIRT_CONF_PATTERN =
                                             Pattern.compile(".*?([^/]+).xml$");
+    /** Data from virsh. */
+    private VMSXML vmsxml = null;
 
     /**
      * Creates the VirtualDomainInfo object.
@@ -53,6 +56,28 @@ class VirtualDomainInfo extends ServiceInfo {
                              final Browser browser) {
         super(name, ra, browser);
         addVirtualDomain();
+    }
+
+    public final void setParameters(final Map<String, String> resourceNode) {
+        super.setParameters(resourceNode);
+        final String configFile = getComboBoxValue("config");
+        if (configFile != null) {
+            final List<String> nodes = getRunningOnNodes(false);
+            if (nodes != null
+                && !nodes.isEmpty()) {
+                final Host host = getBrowser().getCluster().getHostByName(
+                                                                    nodes.get(0));
+                final VMSXML newvmsxml = new VMSXML(host, configFile);
+                vmsxml = newvmsxml;
+            }
+        }
+    }
+
+    /**
+     * Returns object with vm data.
+     */
+    public final VMSXML getVMSXML() {
+        return vmsxml;
     }
 
     /**
@@ -122,7 +147,10 @@ class VirtualDomainInfo extends ServiceInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !getService().isNew() && isRunning(testOnly);
+                    return !getService().isNew()
+                           && vmsxml != null
+                           && vmsxml.isRunning()
+                           && isRunning(testOnly);
                 }
 
                 public void action() {
@@ -131,11 +159,13 @@ class VirtualDomainInfo extends ServiceInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    final List<String> nodes = getRunningOnNodes(testOnly);
-                    if (nodes != null && !nodes.isEmpty()) {
-                        Tools.startTightVncViewer(
-                         getBrowser().getCluster().getHostByName(nodes.get(0)),
-                         getComboBoxValue("config"));
+                    final VMSXML vxml = vmsxml;
+                    if (vxml != null) {
+                        final int remotePort = vxml.getRemotePort();
+                        final Host host = vxml.getHost();
+                        if (host != null && remotePort > 0) {
+                            Tools.startTightVncViewer(host, remotePort);
+                        }
                     }
                 }
             };
@@ -153,7 +183,10 @@ class VirtualDomainInfo extends ServiceInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !getService().isNew() && isRunning(testOnly);
+                    return !getService().isNew()
+                           && vmsxml != null
+                           && vmsxml.isRunning()
+                           && isRunning(testOnly);
                 }
 
                 public void action() {
@@ -162,11 +195,13 @@ class VirtualDomainInfo extends ServiceInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    final List<String> nodes = getRunningOnNodes(testOnly);
-                    if (nodes != null && !nodes.isEmpty()) {
-                        Tools.startUltraVncViewer(
-                         getBrowser().getCluster().getHostByName(nodes.get(0)),
-                         getComboBoxValue("config"));
+                    final VMSXML vxml = vmsxml;
+                    if (vxml != null) {
+                        final int remotePort = vxml.getRemotePort();
+                        final Host host = vxml.getHost();
+                        if (host != null && remotePort > 0) {
+                            Tools.startUltraVncViewer(host, remotePort);
+                        }
                     }
                 }
             };
@@ -184,7 +219,10 @@ class VirtualDomainInfo extends ServiceInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !getService().isNew() && isRunning(testOnly);
+                    return !getService().isNew()
+                           && vmsxml != null
+                           && vmsxml.isRunning()
+                           && isRunning(testOnly);
                 }
 
                 public void action() {
@@ -193,11 +231,13 @@ class VirtualDomainInfo extends ServiceInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    final List<String> nodes = getRunningOnNodes(testOnly);
-                    if (nodes != null && !nodes.isEmpty()) {
-                        Tools.startRealVncViewer(
-                         getBrowser().getCluster().getHostByName(nodes.get(0)),
-                         getComboBoxValue("config"));
+                    final VMSXML vxml = vmsxml;
+                    if (vxml != null) {
+                        final int remotePort = vxml.getRemotePort();
+                        final Host host = vxml.getHost();
+                        if (host != null && remotePort > 0) {
+                            Tools.startRealVncViewer(host, remotePort);
+                        }
                     }
                 }
             };

@@ -33,7 +33,6 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 
 import java.awt.Component;
-import java.util.ArrayList;
 
 /**
  * An implementation of a dialog where user can enter drbd resource

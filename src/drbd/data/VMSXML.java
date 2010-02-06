@@ -44,54 +44,39 @@ import java.util.regex.Matcher;
  * @version $Id$
  *
  */
-public class VNCXML extends XML {
+public class VMSXML extends XML {
     /** Domain name. */
     private String name = null;
     /** Remote port. */
     private int remotePort = -1;
     /** Autoport. */
     private boolean autoport = false;
+    /** Whether the domain is running. */
+    private boolean running = false;
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
+    /** Host on which the vm is defined. */
+    private Host host;
     /**
-     * Prepares a new <code>VNCXML</code> object.
+     * Prepares a new <code>VMSXML</code> object.
      */
-    public VNCXML(final Host host, final String configFile) {
+    public VMSXML(final Host host, final String configFile) {
         super();
+        this.host = host;
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@", configFile);
-        final String command = host.getDistCommand("VNCXML.GetConfig",
+        final String command = host.getDistCommand("VMSXML.GetConfig",
                                                    replaceHash);
-        final String output = Tools.execCommandProgressIndicator(
-                                       host,
-                                       command,
-                                       null,  /* ExecCallback */
-                                       false, /* outputVisible */
-                                       Tools.getString("VNCXML.GetConfig"));
+        final String output = Tools.execCommand(host,
+                                                command,
+                                                null,  /* ExecCallback */
+                                                false); /* outputVisible */
         if (output == null) {
             return;
         }
         parseConfig(output);
-        if (name != null) {
-            final Map<String, String> vncreplaceHash =
-                                                 new HashMap<String, String>();
-            vncreplaceHash.put("@NAME@", name);
-            final String vnccommand =
-                   host.getDistCommand("VNCXML.GetVncDisplay", vncreplaceHash);
-            final String display = Tools.execCommandProgressIndicator(
-                                           host,
-                                           vnccommand,
-                                           null,  /* ExecCallback */
-                                           false, /* outputVisible */
-                                           Tools.getString("VNCXML.GetConfig"));
-            if (display != null) {
-                final Matcher m = DISPLAY_PATTERN.matcher(display.trim());
-                if (m.matches()) {
-                    remotePort = Integer.parseInt(m.group(1)) + 5900;
-                }
-            }
-        }
+        updateData();
     }
 
     /**
@@ -147,6 +132,46 @@ public class VNCXML extends XML {
     }
 
     /**
+     * Updates all data for this domain.
+     */
+
+    public final void updateData() {
+        if (name != null) {
+            final Map<String, String> vncreplaceHash =
+                                                 new HashMap<String, String>();
+            vncreplaceHash.put("@NAME@", name);
+            final String vnccommand =
+                   host.getDistCommand("VMSXML.GetVncInfo", vncreplaceHash);
+            final String output = Tools.execCommand(host,
+                                                    vnccommand,
+                                                    null,  /* ExecCallback */
+                                                    false); /* outputVisible */
+            for (final String line : output.split("\n")) {
+                final String[] nameValue = line.split(":");
+                if (nameValue.length == 2) {
+                    final String name = nameValue[0].trim();
+                    final String value = nameValue[1].trim();
+                    if ("vncdisplay".equals(name)) {
+                        final Matcher m = DISPLAY_PATTERN.matcher(value);
+                        if (m.matches()) {
+                            remotePort = Integer.parseInt(m.group(1)) + 5900;
+                        }
+                    } else if ("State".equals(name)) {
+                        running = "running".equals(value);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns whether the domain is running.
+     */
+    public final boolean isRunning() {
+        return running;
+    }
+
+    /**
      * Returns domain name.
      */
     public final String getName() {
@@ -158,5 +183,12 @@ public class VNCXML extends XML {
      */
     public final int getRemotePort() {
         return remotePort;
+    }
+
+    /**
+     * Returns host.
+     */
+    public final Host getHost() {
+        return host;
     }
 }
