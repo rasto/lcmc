@@ -828,7 +828,7 @@ sub get_old_style_resources {
 
 sub get_lsb_resources {
 	my $dir = "/etc/init.d/";
-	for (`find $dir -perm -a=x -type f -printf "%f\n"`) {
+	for (`find $dir -perm -u=x -type f -printf "%f\n"`) {
 		chomp;
 		print get_ocf_like_xml($_, $dir, "lsb");
 	}
