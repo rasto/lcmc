@@ -169,6 +169,9 @@ public abstract class ResourceGraph {
     private final Mutex mTestAnimationThreadLock = new Mutex();
     /** List of edges that are made only during test. */
     private final List<Edge> testEdges = new ArrayList<Edge>();
+    /** Interval beetween two animation frames. */
+    private final int animInterval =
+                             (int)(1000 / Tools.getConfigData().getAnimFPS());
 
     /**
      * Prepares a new <code>ResourceGraph</code> object.
@@ -199,7 +202,7 @@ public abstract class ResourceGraph {
                     public void run() {
                         while (true) {
                             try {
-                                Thread.sleep(50);
+                                Thread.sleep(animInterval);
                             } catch (InterruptedException ex) {
                                 Thread.currentThread().interrupt();
                             }
@@ -296,8 +299,7 @@ public abstract class ResourceGraph {
                             if (testOnlyFlag) {
                                 sleep = 1200;
                             }
-                            final int interval = 50;
-                            for (int s = 0; s < sleep; s += interval) {
+                            for (int s = 0; s < sleep; s += animInterval) {
                                 try {
                                     mTestOnlyFlag.acquire();
                                 } catch (java.lang.InterruptedException ie) {
@@ -338,7 +340,7 @@ public abstract class ResourceGraph {
                                     break FOREVER;
                                 }
                                 mTestAnimationListLock.release();
-                                Tools.sleep(interval);
+                                Tools.sleep(animInterval);
                             }
                         }
                     }

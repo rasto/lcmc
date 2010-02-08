@@ -382,7 +382,6 @@ public class ResourceAgent {
      * Returns whether this service is heartbeat drbd ra.
      */
     public final boolean isHbDrbd() {
-        System.out.println("is hb drbd: " + name + ", pr: " + provider);
         return "drbd".equals(name) && "heartbeat".equals(provider);
     }
 

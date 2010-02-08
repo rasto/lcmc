@@ -128,6 +128,7 @@ public class DrbdMC extends JPanel {
             boolean ultravnc = false;
             boolean realvnc = false;
             boolean vncportoffset = false;
+            float fps = 20.0f;
             for (final String arg : args) {
                 if (vncportoffset && Tools.isNumber(arg)) {
                     Tools.getConfigData().setVncPortOffset(
@@ -154,6 +155,9 @@ public class DrbdMC extends JPanel {
                     System.out.println("--realvnc enable real vnc viewer");
                     System.out.println(
                                 "--vnc-port-offset offset for port forwarding");
+                    System.out.println(
+                        "--slow specify this if you have slow computer. Can be"
+                        + " specified more times");
                     System.exit(0);
                 } else if ("--tightvnc".equals(arg)) {
                     tightvnc = true;
@@ -165,8 +169,14 @@ public class DrbdMC extends JPanel {
                     auto = true;
                 } else if ("--staging-drbd".equals(arg)) {
                     Tools.getConfigData().setStagingDrbd(true);
+                } else if ("--slow".equals(arg)) {
+                    fps = fps / 2;
+                } else if ("--fast".equals(arg)) {
+                    /* undocumented */
+                    fps = fps * 2;
                 }
             }
+            Tools.getConfigData().setAnimFPS(fps);
             if (!tightvnc && !ultravnc && !realvnc) {
                 if (Tools.isLinux()) {
                     tightvnc = true;

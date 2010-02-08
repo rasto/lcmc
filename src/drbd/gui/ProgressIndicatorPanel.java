@@ -105,7 +105,7 @@ public class ProgressIndicatorPanel extends JComponent
     /** List of failed commands. */
     private final List<String> failuresMap = new LinkedList<String>();
     /** Amount of frames per seconde. Lowers this to save CPU. */
-    private float fps        = 15.0f;
+    private final float fps = Tools.getConfigData().getAnimFPS();
     /** Rendering hints to set anti aliasing. */
     private RenderingHints hints = null;
     /** Lock for the animator. */
@@ -155,39 +155,21 @@ public class ProgressIndicatorPanel extends JComponent
      *                shield (or veil).
      */
     public ProgressIndicatorPanel(final float shieldA) {
-        this(shieldA, 15.0f);
-    }
-
-    /**
-     * Creates a new progress panel with default values:<br />
-     * <ul>
-     * <li>Fade in/out last 300 ms</li>
-     * </ul>.
-     * @param shieldA The alpha level between 0.0 and 1.0 of the colored
-     *                shield (or veil).
-     * @param fpsA The number of frames per second. Lower this value to
-     *             decrease CPU usage.
-     */
-    public ProgressIndicatorPanel(final float shieldA, final float fpsA) {
-        this(shieldA, fpsA, 300);
+        this(shieldA, 300);
     }
 
     /**
      * Creates a new progress panel.
      * @param shield The alpha level between 0.0 and 1.0 of the colored
      *               shield (or veil).
-     * @param fps The number of frames per second. Lower this value to
-     *            decrease CPU usage.
      * @param rampDelay The duration, in milli seconds, of the fade in and
      *                  the fade out of the veil.
      */
     public ProgressIndicatorPanel(final float shield,
-                                  final float fps,
                                   final int rampDelay) {
         super();
         this.rampDelay = rampDelay >= 0 ? rampDelay : 0;
         this.shield    = shield >= 0.0f ? shield : 0.0f;
-        this.fps       = fps > 0.0f ? fps : 15.0f;
 
         this.hints = new RenderingHints(RenderingHints.KEY_RENDERING,
                                         RenderingHints.VALUE_RENDER_QUALITY);

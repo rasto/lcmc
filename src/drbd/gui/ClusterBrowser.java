@@ -444,6 +444,7 @@ public class ClusterBrowser extends Browser {
      * Returns whether there is at least one drbddisk resource.
      */
     public final boolean atLeastOneDrbddisk() {
+        /* TODO: need to lock it. */
         for (final String id : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
             if (si.getResourceAgent().isDrbddisk()) {

@@ -103,6 +103,8 @@ public class ConfigData implements Serializable {
     private boolean realvnc = false;
     /** Whether the drbd packages should be downloaded from staging dir. */
     private boolean stagingDrbd = false;
+    /** Frames per second for animations. */
+    private float animFPS = 15;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -528,5 +530,19 @@ public class ConfigData implements Serializable {
      */
     public final boolean isRealvnc() {
         return realvnc;
+    }
+
+    /**
+     * Returns frames per second for animations.
+     */
+    public final float getAnimFPS() {
+        return animFPS;
+    }
+
+    /**
+     * Sets frames per second for animations.
+     */
+    public final void setAnimFPS(final float animFPS) {
+        this.animFPS = animFPS;
     }
 }
