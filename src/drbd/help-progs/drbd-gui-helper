@@ -107,6 +107,8 @@ if ($option eq "all") {
 	get_cluster_metadata();
 } elsif ($option eq "get-cluster-versions") {
 	print get_cluster_versions();
+} elsif ($option eq "get-vm-info") {
+	get_vm_info();
 } else {
 	die "unknown command";
 }
@@ -1237,6 +1239,28 @@ sub get_cluster_versions {
 	       ."drbd-loaded:$drbd_loaded\n"
 }
 
+sub get_vm_info {
+	print "<vms>\n";
+	for (sort `find /etc/libvirt/qemu/ -name '*.xml'`) {
+		my ($name) = /([^\/]+).xml/;
+		next if !$name;
+		chomp;
+		my $info = `/usr/bin/virsh dominfo $name 2>/dev/null` || "";
+		next if $?;
+		my $vncdisplay = `/usr/bin/virsh vncdisplay $name` || "";
+		my $config = `/usr/bin/virsh dumpxml $name` || "";
+		print "<vm name=\"$name\" config=\"$_\">\n";
+		print "<info>\n";
+		print $info;
+		print "</info>\n";
+		print "<vncdisplay>$vncdisplay</vncdisplay>\n";
+		print "<config>\n";
+		print $config;
+		print "</config>\n";
+		print "</vm>\n";
+	}
+	print "</vms>\n";
+}
 
 
 

@@ -24,12 +24,16 @@
 package drbd.data;
 
 import drbd.utilities.Tools;
+import drbd.utilities.ConvertCmdCallback;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -45,29 +49,39 @@ import java.util.regex.Matcher;
  *
  */
 public class VMSXML extends XML {
-    /** Domain name. */
-    private String name = null;
-    /** Remote port. */
-    private int remotePort = -1;
-    /** Autoport. */
-    private boolean autoport = false;
+    /** List of domain names. */
+    private final List<String> domainNames = new ArrayList<String>();
+    /** Map from configs to names. */
+    private final Map<String, String> configsMap =
+                                            new HashMap<String, String>();
+    /** Hash of domains and their remote ports. */
+    private final Map<String, Integer> remotePorts =
+                                                new HashMap<String, Integer>();
+    /** Hash of domains that use autoport. */
+    private final Map<String, Boolean> autoports =
+                                                new HashMap<String, Boolean>();
     /** Whether the domain is running. */
-    private boolean running = false;
+    private final Map<String, Boolean> runningMap =
+                                                new HashMap<String, Boolean>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
     /** Host on which the vm is defined. */
-    private Host host;
+    private final Host host;
     /**
      * Prepares a new <code>VMSXML</code> object.
      */
-    public VMSXML(final Host host, final String configFile) {
+    public VMSXML(final Host host) {
         super();
         this.host = host;
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@CONFIG@", configFile);
-        final String command = host.getDistCommand("VMSXML.GetConfig",
-                                                   replaceHash);
+    }
+
+    /**
+     * Updates data.
+     */
+    public void update() {
+        final String command = host.getDistCommand("VMSXML.GetData",
+                                                   (ConvertCmdCallback) null);
         final String output = Tools.execCommand(host,
                                                 command,
                                                 null,  /* ExecCallback */
@@ -75,28 +89,74 @@ public class VMSXML extends XML {
         if (output == null) {
             return;
         }
-        parseConfig(output);
-        updateData();
+        final Document document = getXMLDocument(output);
+        if (document == null) {
+            return;
+        }
+        final Node vmsNode = getChildNode(document, "vms");
+        final NodeList vms = vmsNode.getChildNodes();
+        for (int i = 0; i < vms.getLength(); i++) {
+            final Node vmNode = vms.item(i);
+            if ("vm".equals(vmNode.getNodeName())) {
+                updateVM(vmNode);
+            }
+        }
+    }
+
+    /**
+     * Updates one vm.
+     */
+    private void updateVM(final Node vmNode) {
+        /* one vm */
+        if (vmNode == null) {
+            return;
+        }
+        final Node infoNode = getChildNode(vmNode, "info");
+        final String name = getAttribute(vmNode, "name");
+        final String config = getAttribute(vmNode, "config");
+        configsMap.put(config, name);
+        if (infoNode != null) {
+            parseInfo(name, getText(infoNode));
+        }
+        final Node vncdisplayNode = getChildNode(vmNode, "vncdisplay");
+        remotePorts.put(name, -1);
+        if (vncdisplayNode != null) {
+            final String vncdisplay = getText(vncdisplayNode).trim();
+            final Matcher m = DISPLAY_PATTERN.matcher(vncdisplay);
+            if (m.matches()) {
+                remotePorts.put(name, Integer.parseInt(m.group(1)) + 5900);
+            }
+        }
+        parseConfig(getChildNode(vmNode, "config"), name);
     }
 
     /**
      * Parses the libvirt config file.
      */
-    private void parseConfig(final String xml) {
-        final Document document = getXMLDocument(xml);
-        if (document == null) {
+    private void parseConfig(final Node configNode,
+                             final String nameInFilename) {
+        if (configNode == null) {
             return;
         }
-        final Node domainNode = getChildNode(document, "domain");
+        final Node domainNode = getChildNode(configNode, "domain");
         if (domainNode == null) {
             return;
         }
         final NodeList options = domainNode.getChildNodes();
         boolean tabletOk = false;
+        String name = null;
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             if ("name".equals(option.getNodeName())) {
                 name = getText(option);
+                if (!domainNames.contains(name)) {
+                    domainNames.add(name);
+                }
+                if (!name.equals(nameInFilename)) {
+                    Tools.appWarning("unexpected name: " + name 
+                                     + " != " + nameInFilename);
+                    return;
+                }
             } else if ("devices".equals(option.getNodeName())) {
                 final NodeList devices = option.getChildNodes();
                 for (int j = 0; j < devices.getLength(); j++) {
@@ -113,13 +173,15 @@ public class VMSXML extends XML {
                         final String ap = getAttribute(device, "autoport");
                         Tools.debug(this, "type: " + type, 2);
                         Tools.debug(this, "port: " + port, 2);
-                        Tools.debug(this, "autoport: " + autoport, 2);
+                        Tools.debug(this, "autoport: " + ap, 2);
                         if ("vnc".equals(type)) {
                             if (port != null && Tools.isNumber(port)) {
-                                remotePort = Integer.parseInt(port);
+                                remotePorts.put(name, Integer.parseInt(port));
                             }
                             if ("yes".equals(ap)) {
-                                autoport = true;
+                                autoports.put(name, true);
+                            } else {
+                                autoports.put(name, false);
                             }
                         }
                     }
@@ -127,62 +189,54 @@ public class VMSXML extends XML {
             }
         }
         if (!tabletOk) {
-            Tools.appWarning("you should enable input type tablet");
+            Tools.appWarning("you should enable input type tablet for " + name);
         }
     }
 
     /**
      * Updates all data for this domain.
      */
-
-    public final void updateData() {
-        if (name != null) {
-            final Map<String, String> vncreplaceHash =
-                                                 new HashMap<String, String>();
-            vncreplaceHash.put("@NAME@", name);
-            final String vnccommand =
-                   host.getDistCommand("VMSXML.GetVncInfo", vncreplaceHash);
-            final String output = Tools.execCommand(host,
-                                                    vnccommand,
-                                                    null,  /* ExecCallback */
-                                                    false); /* outputVisible */
-            for (final String line : output.split("\n")) {
-                final String[] nameValue = line.split(":");
-                if (nameValue.length == 2) {
-                    final String name = nameValue[0].trim();
-                    final String value = nameValue[1].trim();
-                    if ("vncdisplay".equals(name)) {
-                        final Matcher m = DISPLAY_PATTERN.matcher(value);
-                        if (m.matches()) {
-                            remotePort = Integer.parseInt(m.group(1)) + 5900;
-                        }
-                    } else if ("State".equals(name)) {
-                        running = "running".equals(value);
+    public final void parseInfo(final String name, final String info) {
+        if (info != null) {
+            boolean running = false;
+            for (final String line : info.split("\n")) {
+                final String[] optionValue = line.split(":");
+                if (optionValue.length == 2) {
+                    final String option = optionValue[0].trim();
+                    final String value = optionValue[1].trim();
+                    if ("State".equals(option)
+                        && "running".equals(value)) {
+                        running = true;
                     }
                 }
             }
+            runningMap.put(name, running);
         }
+    }
+
+    /**
+     * Returns all domain names.
+     */
+    public final List<String> getDomainNames() {
+        return domainNames;
     }
 
     /**
      * Returns whether the domain is running.
      */
-    public final boolean isRunning() {
-        return running;
-    }
-
-    /**
-     * Returns domain name.
-     */
-    public final String getName() {
-        return name;
+    public final boolean isRunning(final String name) {
+        final Boolean r = runningMap.get(name);
+        if (r != null) {
+            return r;
+        }
+        return false;
     }
 
     /**
      * Returns remote port.
      */
-    public final int getRemotePort() {
-        return remotePort;
+    public final int getRemotePort(final String name) {
+        return remotePorts.get(name);
     }
 
     /**
@@ -190,5 +244,19 @@ public class VMSXML extends XML {
      */
     public final Host getHost() {
         return host;
+    }
+
+    /**
+     * Returns configs of all vms.
+     */
+    public final Set<String> getConfigs() {
+        return configsMap.keySet();
+    }
+
+    /**
+     * Returns domain name from config file.
+     */
+    public final String getNameFromConfig(final String config) {
+        return configsMap.get(config);
     }
 }

@@ -325,10 +325,7 @@ public class DistResource extends
         {"MakeKernelPanic", "echo c > /proc/sysrq-trigger"},
         {"MakeKernelReboot", "echo b > /proc/sysrq-trigger"},
 
-        {"VMSXML.GetConfig",
-         "cat @CONFIG@"},
-        {"VMSXML.GetVncInfo",
-         "echo -n 'vncdisplay:';virsh vncdisplay @NAME@;echo;"
-         + "virsh dominfo @NAME@"},
+        {"VMSXML.GetData",
+         "/usr/local/bin/drbd-gui-helper get-vm-info"},
     };
 }

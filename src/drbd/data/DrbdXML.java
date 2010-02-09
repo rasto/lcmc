@@ -216,7 +216,9 @@ public class DrbdXML extends XML {
      * a drbd event.
      */
     public final void update(final Host host) {
-
+        if (!host.isConnected()) {
+            return;
+        }
         final String command2 = host.getDistCommand("Drbd.getConfig",
                                                     (ConvertCmdCallback) null);
         final String configString =

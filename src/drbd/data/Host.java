@@ -40,6 +40,8 @@ import java.awt.Color;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -118,11 +120,11 @@ public class Host implements Serializable {
     private Map<String, NetInterface> netInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
     /** Available file systems. */
-    private final List<String> fileSystems = new ArrayList<String>();
+    private final Set<String> fileSystems = new TreeSet<String>();
     /** Available crypto modules. */
-    private final List<String> cryptoModules = new ArrayList<String>();
+    private final Set<String> cryptoModules = new TreeSet<String>();
     /** Mount points that exist in /mnt dir. */
-    private final List<String> mountPoints = new ArrayList<String>();
+    private final Set<String> mountPoints = new TreeSet<String>();
     /** List of block devices of this host. */
     private Map<String, BlockDevice> blockDevices =
                                       new LinkedHashMap<String, BlockDevice>();
@@ -524,7 +526,7 @@ public class Host implements Serializable {
     /**
      * Returns available file systems devices as a list of strings.
      */
-    public final List<String> getFileSystemsList() {
+    public final Set<String> getFileSystemsList() {
         return fileSystems;
     }
 
@@ -538,7 +540,7 @@ public class Host implements Serializable {
     /**
      * Returns available crypto modules as a list of strings.
      */
-    public final List<String> getCryptoModules() {
+    public final Set<String> getCryptoModules() {
         return cryptoModules;
     }
 
@@ -553,7 +555,7 @@ public class Host implements Serializable {
     /**
      * Returns mount points as a list of strings.
      */
-    public final List<String> getMountPointsList() {
+    public final Set<String> getMountPointsList() {
         return mountPoints;
     }
 

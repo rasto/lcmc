@@ -255,7 +255,7 @@ public class Cluster {
      * Gets filesystems that are common on all hosts in the cluster.
      */
     public final String[] getCommonFileSystems() {
-        List<String> intersection = null;
+        Set<String> intersection = null;
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getFileSystemsList(),
                                                  intersection);
@@ -267,7 +267,7 @@ public class Cluster {
      * Gets mount points that are common on all hosts in the cluster.
      */
     public final String[] getCommonMountPoints() {
-        List<String> intersection = null;
+        Set<String> intersection = null;
 
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getMountPointsList(),

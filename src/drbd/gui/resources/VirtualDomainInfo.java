@@ -22,6 +22,7 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
+import drbd.gui.GuiComboBox;
 import drbd.data.Host;
 import drbd.data.VMSXML;
 import drbd.data.ResourceAgent;
@@ -30,6 +31,8 @@ import drbd.utilities.MyMenuItem;
 import drbd.utilities.Tools;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -45,8 +48,6 @@ class VirtualDomainInfo extends ServiceInfo {
     /** pattern that captures a name from xml file name. */
     public static final Pattern LIBVIRT_CONF_PATTERN =
                                             Pattern.compile(".*?([^/]+).xml$");
-    /** Data from virsh. */
-    private VMSXML vmsxml = null;
 
     /**
      * Creates the VirtualDomainInfo object.
@@ -55,29 +56,27 @@ class VirtualDomainInfo extends ServiceInfo {
                              final ResourceAgent ra,
                              final Browser browser) {
         super(name, ra, browser);
-        addVirtualDomain();
     }
 
-    public final void setParameters(final Map<String, String> resourceNode) {
-        super.setParameters(resourceNode);
-        final String configFile = getComboBoxValue("config");
-        if (configFile != null) {
-            final List<String> nodes = getRunningOnNodes(false);
-            if (nodes != null
-                && !nodes.isEmpty()) {
-                final Host host = getBrowser().getCluster().getHostByName(
-                                                                    nodes.get(0));
-                final VMSXML newvmsxml = new VMSXML(host, configFile);
-                vmsxml = newvmsxml;
-            }
+    /**
+     * Returns the first on which this vm is running.
+     */
+    private final Host getRunningOnHost() {
+        final List<String> nodes = getRunningOnNodes(false);
+        if (nodes != null
+            && !nodes.isEmpty()) {
+            final Host host = getBrowser().getCluster().getHostByName(
+                                                                nodes.get(0));
+            return host;
         }
+        return null;
     }
 
     /**
      * Returns object with vm data.
      */
-    public final VMSXML getVMSXML() {
-        return vmsxml;
+    public final VMSXML getVMSXML(final Host host) {
+        return getBrowser().getVMSXML(host);
     }
 
     /**
@@ -89,7 +88,6 @@ class VirtualDomainInfo extends ServiceInfo {
                              final Map<String, String> resourceNode,
                              final Browser browser) {
         super(name, ra, hbId, resourceNode, browser);
-        addVirtualDomain();
     }
 
     /**
@@ -97,38 +95,23 @@ class VirtualDomainInfo extends ServiceInfo {
      */
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
-        if (!testOnly) {
-            removeVirtualDomain();
-        }
         super.removeMyselfNoConfirm(dcHost, testOnly);
     }
 
     /**
-     * Adds VirtualDomain panel in the VMs menu. */
-    public final void addVirtualDomain() {
-        getBrowser().addVMSNode();
-        vmsVirtualDomainInfo = new VMSVirtualDomainInfo(this, getBrowser());
-        final DefaultMutableTreeNode vmNode =
-                             new DefaultMutableTreeNode(vmsVirtualDomainInfo);
-        vmsVirtualDomainInfo.setNode(vmNode);
-        final DefaultMutableTreeNode vmsNode = getBrowser().getVMSNode();
-        vmsNode.add(vmNode);
-        getBrowser().reload(vmsNode);
-    }
-
-    /**
-     * Removes VirtualDomain panel from the VMS menu.
+     * Sets service parameters with values from resourceNode hash.
      */
-    public final void removeVirtualDomain() {
-        final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
-        if (vdi != null) {
-            final DefaultMutableTreeNode vmsNode = getBrowser().getVMSNode();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    vmsNode.remove(vdi.getNode());
-                    getBrowser().reload(vmsNode);
-                }
-            });
+    public void setParameters(final Map<String, String> resourceNode) {
+        super.setParameters(resourceNode);
+        final String config = getParamSaved("config");
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                final String name = vxml.getNameFromConfig(config);
+                vmsVirtualDomainInfo = getBrowser().findVMSVirtualDomainInfo(
+                                                                         name);
+                break;
+            }
         }
     }
 
@@ -147,10 +130,13 @@ class VirtualDomainInfo extends ServiceInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !getService().isNew()
-                           && vmsxml != null
-                           && vmsxml.isRunning()
-                           && isRunning(testOnly);
+                    final VMSXML vxml = getVMSXML(getRunningOnHost());
+                    if (vxml == null || vmsVirtualDomainInfo == null) {
+                        return false;
+                    }
+                    final int remotePort = vxml.getRemotePort(
+                                               vmsVirtualDomainInfo.getName());
+                    return remotePort > 0;
                 }
 
                 public void action() {
@@ -159,9 +145,11 @@ class VirtualDomainInfo extends ServiceInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    final VMSXML vxml = vmsxml;
-                    if (vxml != null) {
-                        final int remotePort = vxml.getRemotePort();
+                    final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
+                    final VMSXML vxml = getVMSXML(getRunningOnHost());
+                    if (vxml != null && vvdi != null) {
+                        final int remotePort = vxml.getRemotePort(
+                                                               vvdi.getName());
                         final Host host = vxml.getHost();
                         if (host != null && remotePort > 0) {
                             Tools.startTightVncViewer(host, remotePort);
@@ -183,10 +171,13 @@ class VirtualDomainInfo extends ServiceInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !getService().isNew()
-                           && vmsxml != null
-                           && vmsxml.isRunning()
-                           && isRunning(testOnly);
+                    final VMSXML vxml = getVMSXML(getRunningOnHost());
+                    if (vxml == null || vmsVirtualDomainInfo == null) {
+                        return false;
+                    }
+                    final int remotePort = vxml.getRemotePort(
+                                               vmsVirtualDomainInfo.getName());
+                    return remotePort > 0;
                 }
 
                 public void action() {
@@ -195,9 +186,11 @@ class VirtualDomainInfo extends ServiceInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    final VMSXML vxml = vmsxml;
-                    if (vxml != null) {
-                        final int remotePort = vxml.getRemotePort();
+                    final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
+                    final VMSXML vxml = getVMSXML(getRunningOnHost());
+                    if (vxml != null && vvdi != null) {
+                        final int remotePort = vxml.getRemotePort(
+                                                           vvdi.getName());
                         final Host host = vxml.getHost();
                         if (host != null && remotePort > 0) {
                             Tools.startUltraVncViewer(host, remotePort);
@@ -219,10 +212,13 @@ class VirtualDomainInfo extends ServiceInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
-                    return !getService().isNew()
-                           && vmsxml != null
-                           && vmsxml.isRunning()
-                           && isRunning(testOnly);
+                    final VMSXML vxml = getVMSXML(getRunningOnHost());
+                    if (vxml == null || vmsVirtualDomainInfo == null) {
+                        return false;
+                    }
+                    final int remotePort = vxml.getRemotePort(
+                                               vmsVirtualDomainInfo.getName());
+                    return remotePort > 0;
                 }
 
                 public void action() {
@@ -231,9 +227,11 @@ class VirtualDomainInfo extends ServiceInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    final VMSXML vxml = vmsxml;
-                    if (vxml != null) {
-                        final int remotePort = vxml.getRemotePort();
+                    final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
+                    final VMSXML vxml = getVMSXML(getRunningOnHost());
+                    if (vxml != null && vvdi != null) {
+                        final int remotePort = vxml.getRemotePort(
+                                                            vvdi.getName());
                         final Host host = vxml.getHost();
                         if (host != null && remotePort > 0) {
                             Tools.startRealVncViewer(host, remotePort);
@@ -243,6 +241,33 @@ class VirtualDomainInfo extends ServiceInfo {
             };
             registerMenuItem(realvncViewerMenu);
             items.add(realvncViewerMenu);
+        }
+    }
+
+    /**
+     * Returns editable element for the parameter.
+     */
+    protected final GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
+        return super.getParamComboBox(param, prefix, width);
+    }
+
+    /**
+     * Returns the possible values for the pulldown menus, if applicable.
+     */
+    protected final Object[] getParamPossibleChoices(final String param) {
+        if ("config".equals(param)) {
+            final Set<String> configs = new TreeSet<String>();
+            for (final Host host : getBrowser().getClusterHosts()) {
+                final VMSXML vxml = getBrowser().getVMSXML(host);
+                if (vxml != null) {
+                    configs.addAll(vxml.getConfigs());
+                }
+            }
+            return configs.toArray(new String[configs.size()]);
+        } else {
+            return super.getParamPossibleChoices(param);
         }
     }
 
@@ -292,6 +317,5 @@ class VirtualDomainInfo extends ServiceInfo {
      */
     public void apply(final Host dcHost, final boolean testOnly) {
         super.apply(dcHost, testOnly);
-        getBrowser().reload(getBrowser().getVMSNode());
     }
 }

@@ -45,7 +45,9 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.HashSet;
+import java.util.Collection;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -1258,9 +1260,9 @@ public final class Tools {
      * @return
      *          intersection of set A and B.
      */
-    public static List<String> getIntersection(final List<String> setA,
-                                               final List<String> setB) {
-        final List<String> resultSet = new ArrayList<String>();
+    public static Set<String> getIntersection(final Set<String> setA,
+                                              final Set<String> setB) {
+        final Set<String> resultSet = new TreeSet<String>();
         if (setB == null) {
             return setA;
         }
@@ -1830,6 +1832,9 @@ public final class Tools {
         if (remotePort < 0) {
             return -1;
         }
+        if (Tools.isLocalIp(host.getIp())) {
+            return remotePort;
+        }
         final int localPort = remotePort + getConfigData().getVncPortOffset();
         debug("start port forwarding " + remotePort + " -> " + localPort);
         try {
@@ -1846,6 +1851,9 @@ public final class Tools {
      */
     private static void cleanupVncViewer(final Host host,
                                          final int localPort) {
+        if (Tools.isLocalIp(host.getIp())) {
+            return;
+        }
         final int remotePort = localPort - getConfigData().getVncPortOffset();
         debug("stop port forwarding " + remotePort);
         try {
@@ -2079,5 +2087,12 @@ public final class Tools {
             s.append(chars[rand.nextInt(chars.length)]);
         }
         return s.toString();
+    }
+
+    /**
+     * Returns whether the ip is localhost.
+     */
+    public static boolean isLocalIp(final String ip) {
+        return ip == null || "127.0.0.1".equals(ip) || "127.0.1.1".equals(ip);
     }
 }

@@ -31,6 +31,7 @@ import drbd.data.Cluster;
 import drbd.data.ClusterStatus;
 import drbd.data.CRMXML;
 import drbd.data.DrbdXML;
+import drbd.data.VMSXML;
 import drbd.data.ConfigData;
 import drbd.utilities.NewOutputCallback;
 
@@ -55,6 +56,7 @@ import drbd.gui.resources.DrbdInfo;
 import drbd.gui.resources.AvailableServiceInfo;
 import drbd.gui.resources.CommonBlockDevInfo;
 import drbd.gui.resources.CRMInfo;
+import drbd.gui.resources.VMSVirtualDomainInfo;
 
 import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
@@ -75,6 +77,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Enumeration;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -146,8 +150,12 @@ public class ClusterBrowser extends Browser {
     private ClusterStatus clusterStatus;
     /** Object that holds hb ocf data. */
     private CRMXML crmXML;
-    /** Object that drbd status and data. */
+    /** Object that holds drbd status and data. */
     private DrbdXML drbdXML;
+    /** VMS lock. */
+    private final Mutex mVMSLock = new Mutex();
+    /** Object that hosts status of all VMs. */
+    private final Map<Host, VMSXML> vmsXML = new HashMap<Host, VMSXML>();
     /** Object that has drbd test data. */
     private DRBDtestData drbdtestData;
     /** Whether drbd status was canceled by user. */
@@ -483,13 +491,6 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
-     * Returns VMs node.
-     */
-    public final DefaultMutableTreeNode getVMSNode() {
-        return vmsNode;
-    }
-
-    /**
      * Initializes cluster resources for cluster view.
      */
     public final void initClusterBrowser() {
@@ -584,10 +585,7 @@ public class ClusterBrowser extends Browser {
         clusterHostsNode.removeAllChildren();
         for (Host clusterHost : clusterHosts) {
             final HostBrowser hostBrowser = clusterHost.getBrowser();
-            resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
-            setNode(resource);
-            clusterHostsNode.add(resource);
-            //drbdGraph.addHost(hostBrowser.getHostInfo());
+            clusterHostsNode.add(hostBrowser.getTreeTop());
             heartbeatGraph.addHost(hostBrowser.getHostInfo());
         }
 
@@ -719,6 +717,16 @@ public class ClusterBrowser extends Browser {
             host.getHWInfo();
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
+            final VMSXML newVMSXML = new VMSXML(host);
+            newVMSXML.update();
+            try {
+                mVMSLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            vmsXML.put(host, newVMSXML);
+            mVMSLock.release();
+            updateVMS();
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
@@ -726,7 +734,7 @@ public class ClusterBrowser extends Browser {
                     }
                 });
             try {
-                Thread.sleep(10000);
+                Thread.sleep(20000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -1181,6 +1189,71 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
+     * Updates VM nodes.
+     */
+    public final void updateVMS() {
+        DefaultMutableTreeNode resource;
+        
+        final Set<String> domainNames = new TreeSet<String>();
+        for (final Host host : getClusterHosts()) {
+            final VMSXML vxml = getVMSXML(host);
+            if (vxml != null) {
+                domainNames.addAll(vxml.getDomainNames());
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        if (domainNames.size() > 0) {
+            addVMSNode();
+            final Enumeration e = vmsNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                    (DefaultMutableTreeNode) e.nextElement();
+                final VMSVirtualDomainInfo vmsi =
+                                  (VMSVirtualDomainInfo) node.getUserObject();
+                if (domainNames.contains(vmsi.toString())) {
+                    /* keeping */
+                    domainNames.remove(vmsi.toString());
+                    vmsi.updateParameters(); /* update old */
+                } else {
+                    /* remove not existing vms */
+                    nodesToRemove.add(node);
+                }
+            }
+        }
+
+        /* remove nodes */
+        for (DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        final Enumeration e = vmsNode.children();
+        /* block devices */
+        int i = 0;
+        for (String domainName : domainNames) {
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                    (DefaultMutableTreeNode) e.nextElement();
+                final VMSVirtualDomainInfo vmsi =
+                                  (VMSVirtualDomainInfo) node.getUserObject();
+                if (domainName.compareTo(vmsi.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new block devices */
+            final VMSVirtualDomainInfo vmsi =
+                                   new VMSVirtualDomainInfo(domainName, this);
+            vmsi.updateParameters();
+            resource = new DefaultMutableTreeNode(vmsi);
+            setNode(resource);
+            vmsNode.insert(resource, i);
+            i++;
+        }
+        reload(vmsNode);
+    }
+
+    /**
      * Updates drbd resources.
      */
     private void updateDrbdResources() {
@@ -1286,7 +1359,7 @@ public class ClusterBrowser extends Browser {
         /* TODO: if none of the hosts is connected the null causes error during
          * loading. */
         final Host[] hosts = getClusterHosts();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             if (host.isConnected()) {
                 return host;
             }
@@ -2068,5 +2141,40 @@ public class ClusterBrowser extends Browser {
             }
         }
         mNameToServiceLock.release();
+    }
+
+    /**
+     * Returns object that holds data of all VMs.
+     */
+    public final VMSXML getVMSXML(final Host host) {
+        try {
+            mVMSLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final VMSXML vxml = vmsXML.get(host);
+        mVMSLock.release();
+        return vxml;
+    }
+
+    /**
+     * Finds VMSVirtualDomainInfo object that contains the VM specified by
+     * name.
+     */
+    public final VMSVirtualDomainInfo findVMSVirtualDomainInfo(
+                                                        final String name) {
+        if (vmsNode != null && name != null) {
+            final Enumeration e = vmsNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                    (DefaultMutableTreeNode) e.nextElement();
+                final VMSVirtualDomainInfo vmsi =
+                                  (VMSVirtualDomainInfo) node.getUserObject();
+                if (name.equals(vmsi.getName())) {
+                    return vmsi;
+                }
+            }
+        }
+        return null;
     }
 }
