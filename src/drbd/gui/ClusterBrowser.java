@@ -1227,6 +1227,10 @@ public class ClusterBrowser extends Browser {
             node.removeFromParent();
         }
 
+        if (vmsNode == null) {
+            return;
+        }
+
         final Enumeration e = vmsNode.children();
         /* block devices */
         int i = 0;

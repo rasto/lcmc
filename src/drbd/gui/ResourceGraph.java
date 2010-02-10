@@ -169,6 +169,8 @@ public abstract class ResourceGraph {
     private final Mutex mTestAnimationThreadLock = new Mutex();
     /** List of edges that are made only during test. */
     private final List<Edge> testEdges = new ArrayList<Edge>();
+    /** Lock for test edge list. */
+    private final Mutex mTestEdgeLock = new Mutex();
     /** Interval beetween two animation frames. */
     private final int animInterval =
                              (int)(1000 / Tools.getConfigData().getAnimFPS());
@@ -1666,24 +1668,43 @@ public abstract class ResourceGraph {
      * Removes test edges.
      */
     protected void removeTestEdges() {
+        try {
+            mTestEdgeLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         for (final Edge e : testEdges) {
             getGraph().removeEdge(e);
         }
         testEdges.clear();
+        mTestEdgeLock.release();
     }
 
     /**
      * Adds a test edges.
      */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
+        try {
+            mTestEdgeLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final Edge edge = getGraph().addEdge(new MyEdge(vP, v));
         testEdges.add(edge);
+        mTestEdgeLock.release();
     }
 
     /**
      * Returns whether the edge is a test edge.
      */
     protected final boolean isTestEdge(final Edge e) {
-        return testEdges.contains(e);
+        try {
+            mTestEdgeLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final boolean is = testEdges.contains(e);
+        mTestEdgeLock.release();
+        return is;
     }
 }

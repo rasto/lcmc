@@ -245,15 +245,6 @@ class VirtualDomainInfo extends ServiceInfo {
     }
 
     /**
-     * Returns editable element for the parameter.
-     */
-    protected final GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        return super.getParamComboBox(param, prefix, width);
-    }
-
-    /**
      * Returns the possible values for the pulldown menus, if applicable.
      */
     protected final Object[] getParamPossibleChoices(final String param) {

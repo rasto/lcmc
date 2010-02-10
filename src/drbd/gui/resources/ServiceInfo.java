@@ -115,8 +115,6 @@ public class ServiceInfo extends EditableInfo {
     private final Mutex mSavedOperationsLock = new Mutex();
     /** A map from operation to its combo box. */
     private final MultiKeyMap operationsComboBoxHash = new MultiKeyMap();
-    /** idField text field. */
-    protected GuiComboBox idField = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** Group info object of the group this service is in or null, if it is
@@ -128,8 +126,6 @@ public class ServiceInfo extends EditableInfo {
     /** ResourceAgent object of the service, with name, ocf informations
      * etc. */
     private final ResourceAgent resourceAgent;
-    /** Heartbeat id label. */
-    private JLabel heartbeatIdLabel = null;
     /** Radio buttons for clone/master/slave primitive resources. */
     private GuiComboBox typeRadioGroup;
     /** Extra options panel. */
@@ -299,14 +295,6 @@ public class ServiceInfo extends EditableInfo {
         if (!ret) {
             return false;
         }
-        if (idField == null) {
-            return false;
-        }
-        final String id = idField.getStringValue();
-        // TODO: check uniq id
-        if (id == null || id.equals("")) {
-            return false;
-        }
         return true;
     }
 
@@ -343,7 +331,7 @@ public class ServiceInfo extends EditableInfo {
                                            cloneInfo.getParametersFromXML())) {
             changed = true;
         }
-        final String id = idField.getStringValue();
+        final String id = getComboBoxValue("guiid");
         final String heartbeatId = getService().getHeartbeatId();
         if (ClusterBrowser.PM_GROUP_NAME.equals(getName())) {
             if (heartbeatId == null) {
@@ -489,6 +477,8 @@ public class ServiceInfo extends EditableInfo {
             if (refCRMId == null) {
                 refCRMId = getService().getHeartbeatId();
             }
+            resourceNode.put("crmid", getService().getHeartbeatId());
+            resourceNode.put("guiid", getService().getId());
             for (String param : params) {
                 String value;
                 if (isMetaAttr(param) && refCRMId != null) {
@@ -791,7 +781,7 @@ public class ServiceInfo extends EditableInfo {
     /**
      * Returns whether the service where was migrated or null.
      */
-    public final Host getMigratedTo(final boolean testOnly) {
+    public List<Host> getMigratedTo(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
@@ -806,7 +796,9 @@ public class ServiceInfo extends EditableInfo {
                 op = hostLocation.getOperation();
             }
             if (CRMXML.INFINITY_STRING.equals(score) && "eq".equals(op)) {
-                return host;
+                final List<Host> hosts = new ArrayList<Host>();
+                hosts.add(host);
+                return hosts;
             }
         }
         return null;
@@ -1170,113 +1162,27 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Creates id field with id as default value.
-     */
-    public final GuiComboBox createIdField(final int rightWidth) {
-        final String id = getService().getId();
-        final String regexp = "^[\\w-]+$";
-        idField = new GuiComboBox(id, null, null, regexp, rightWidth, null);
-        idField.setValue(id);
-        final String[] params = getParametersFromXML();
-        idField.getDocument().addDocumentListener(
-            new DocumentListener() {
-                private void check() {
-                    final Thread thread = new Thread(new Runnable() {
-                        public void run() {
-                            final boolean enable = checkResourceFields("id",
-                                                                       params);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    applyButton.setEnabled(enable);
-                                }
-                            });
-                        }
-                    });
-                    thread.start();
-                }
-
-                public void insertUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                public void removeUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                public void changedUpdate(final DocumentEvent e) {
-                    check();
-                }
-            }
-        );
-        paramComboBoxAdd("id", null, idField);
-        if (!getService().isNew()) {
-            idField.setEnabled(false);
-        }
-        return idField;
-    }
-
-    /**
-     * Creates id text field with label and adds it to the panel.
-     */
-    protected void addIdField(final JPanel optionsPanel,
-                              final int leftWidth,
-                              final int rightWidth) {
-        final JPanel panel = getParamPanel("ID");
-        final int rows = 1;
-        createIdField(rightWidth);
-        addField(panel, new JLabel("ID"), idField, leftWidth, rightWidth);
-        SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
-                                        1, 1,           /* initX, initY */
-                                        1, 1);          /* xPad, yPad */
-        optionsPanel.add(panel);
-    }
-
-    ///**
-    // * Sets value for id field.
-    // */
-    //protected void setIdField(final String id) {
-    //    idField.setValue(id);
-    //}
-
-    /**
      * Adds clone fields to the option pane.
      */
     protected void addCloneFields(final JPanel optionsPanel,
                                   final JPanel extraOptionsPanel,
                                   final int leftWidth,
                                   final int rightWidth) {
-        String title = "Clone Set";
-        if (cloneInfo.getService().isMaster()) {
-            title = "Master/Slave Set";
-        }
-        final JPanel panel = getParamPanel(title);
-        final GuiComboBox msIdField = cloneInfo.createIdField(rightWidth);
-        addField(panel,
-                 new JLabel("M/S Set ID"),
-                 msIdField,
-                 leftWidth,
-                 rightWidth);
-        cloneInfo.createNewHeartbeatIdLabel();
-        addField(panel,
-                 new JLabel(Tools.getString("ClusterBrowser.HeartbeatId")),
-                 cloneInfo.getHeartbeatIdLabel(),
-                 leftWidth,
-                 rightWidth);
-        SpringUtilities.makeCompactGrid(panel, 2, 2,  /* rows, cols */
-                                               1, 1,  /* initX, initY */
-                                               1, 1); /* xPad, yPad */
-        optionsPanel.add(panel);
-
         cloneInfo.paramComboBoxClear();
 
         final String[] params = cloneInfo.getParametersFromXML();
         final Info savedMAIdRef = cloneInfo.getSavedMetaAttrInfoRef();
+        cloneInfo.getResource().setValue("guiid",
+                                         cloneInfo.getService().getId());
         cloneInfo.addParams(optionsPanel,
                             extraOptionsPanel,
                             params,
                             ClusterBrowser.SERVICE_LABEL_WIDTH,
                             ClusterBrowser.SERVICE_FIELD_WIDTH,
                             cloneInfo.getSameAsFields(savedMAIdRef));
+        if (!cloneInfo.getService().isNew()) {
+            cloneInfo.paramComboBoxGet("guiid", null).setEnabled(false);
+        }
         for (final String param : params) {
             if (cloneInfo.isMetaAttr(param)) {
                 final GuiComboBox cb = cloneInfo.paramComboBoxGet(param, null);
@@ -1287,57 +1193,6 @@ public class ServiceInfo extends EditableInfo {
         cloneInfo.addHostLocations(optionsPanel,
                                    ClusterBrowser.SERVICE_LABEL_WIDTH,
                                    ClusterBrowser.SERVICE_FIELD_WIDTH);
-    }
-
-
-    /**
-     * Creates heartbeat id and group text field with label and adds them
-     * to the panel.
-     */
-    protected void addHeartbeatFields(final JPanel optionsPanel,
-                                      final int leftWidth,
-                                      final int rightWidth) {
-        /* heartbeat id */
-        createNewHeartbeatIdLabel();
-        final JPanel panel = getParamPanel("Heartbeat");
-        addField(panel,
-                 new JLabel(Tools.getString("ClusterBrowser.HeartbeatId")),
-                 heartbeatIdLabel,
-                 leftWidth,
-                 rightWidth);
-        /* heartbeat provider */
-        final JLabel heartbeatProviderLabel =
-                             new JLabel(resourceAgent.getProvider());
-        addField(panel,
-                 new JLabel(Tools.getString(
-                                      "ClusterBrowser.HeartbeatProvider")),
-                 heartbeatProviderLabel,
-                 leftWidth,
-                 rightWidth);
-        /* heartbeat class */
-        final JLabel resourceClassLabel =
-                             new JLabel(getService().getResourceClass());
-        addField(panel,
-                 new JLabel(Tools.getString("ClusterBrowser.ResourceClass")),
-                 resourceClassLabel,
-                 leftWidth,
-                 rightWidth);
-        int rows = 3;
-
-        if (groupInfo != null) {
-            final String groupId = groupInfo.getService().getHeartbeatId();
-            final JLabel groupLabel = new JLabel(groupId);
-            addField(panel,
-                     new JLabel(Tools.getString("ClusterBrowser.Group")),
-                     groupLabel,
-                     leftWidth,
-                     rightWidth);
-            rows++;
-        }
-        SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
-                                        1, 1,           /* initX, initY */
-                                        1, 1);          /* xPad, yPad */
-        optionsPanel.add(panel);
     }
 
     /**
@@ -1453,7 +1308,8 @@ public class ServiceInfo extends EditableInfo {
                      label,
                      cb,
                      leftWidth,
-                     rightWidth);
+                     rightWidth,
+                     0);
             rows++;
         }
 
@@ -1775,7 +1631,8 @@ public class ServiceInfo extends EditableInfo {
                  label,
                  sameAsOperationsCB,
                  leftWidth,
-                 rightWidth);
+                 rightWidth,
+                 0);
         rows++;
         boolean allAreDefaultValues = true;
         try {
@@ -1820,12 +1677,14 @@ public class ServiceInfo extends EditableInfo {
                 final JLabel cbLabel = new JLabel(Tools.ucfirst(op)
                                                   + " / "
                                                   + Tools.ucfirst(param));
+                int height = 0;
                 cb.setLabel(cbLabel);
                 addField(panel,
                          cbLabel,
                          cb,
                          leftWidth,
-                         rightWidth);
+                         rightWidth,
+                         0);
             }
         }
         mSavedOperationsLock.release();
@@ -2022,6 +1881,13 @@ public class ServiceInfo extends EditableInfo {
     protected String getParamType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getParamType(resourceAgent, param);
+    }
+
+    /**
+     * Returns the type of the parameter.
+     */
+    protected GuiComboBox.Type getFieldType(final String param) {
+        return resourceAgent.getFieldType(param);
     }
 
     /**
@@ -2449,23 +2315,7 @@ public class ServiceInfo extends EditableInfo {
                            ClusterBrowser.SERVICE_LABEL_WIDTH,
                            ClusterBrowser.SERVICE_FIELD_WIDTH);
         }
-
-        /* id textfield */
-        addIdField(optionsPanel,
-                   ClusterBrowser.SERVICE_LABEL_WIDTH,
-                   ClusterBrowser.SERVICE_FIELD_WIDTH);
-
-        /* heartbeat fields */
-        addHeartbeatFields(optionsPanel,
-                           ClusterBrowser.SERVICE_LABEL_WIDTH,
-                           ClusterBrowser.SERVICE_FIELD_WIDTH);
-
-        if (cloneInfo == null) {
-            /* score combo boxes */
-            addHostLocations(optionsPanel,
-                             ClusterBrowser.SERVICE_LABEL_WIDTH,
-                             ClusterBrowser.SERVICE_FIELD_WIDTH);
-        }
+        getResource().setValue("guiid", getService().getId());
 
         /* get dependent resources and create combo boxes for ones, that
          * need parameters */
@@ -2478,11 +2328,21 @@ public class ServiceInfo extends EditableInfo {
                   ClusterBrowser.SERVICE_LABEL_WIDTH,
                   ClusterBrowser.SERVICE_FIELD_WIDTH,
                   getSameAsFields(savedMAIdRef));
+        if (cloneInfo == null) {
+            /* score combo boxes */
+            addHostLocations(optionsPanel,
+                             ClusterBrowser.SERVICE_LABEL_WIDTH,
+                             ClusterBrowser.SERVICE_FIELD_WIDTH);
+        }
+
         for (final String param : params) {
             if (isMetaAttr(param)) {
                 final GuiComboBox cb = paramComboBoxGet(param, null);
                 cb.setEnabled(savedMAIdRef == null);
             }
+        }
+        if (!getService().isNew()) {
+            paramComboBoxGet("guiid", null).setEnabled(false);
         }
         if (!getResourceAgent().isGroup()
             && !getResourceAgent().isClone()) {
@@ -2662,27 +2522,6 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Creates new heartbeat id label.
-     */
-    protected void createNewHeartbeatIdLabel() {
-        heartbeatIdLabel = new JLabel(getService().getHeartbeatId());
-    }
-
-    /**
-     * Sets the visible heartbeat id.
-     */
-    protected void setHeartbeatIdLabel() {
-        heartbeatIdLabel.setText(getService().getHeartbeatId());
-    }
-
-    /**
-     * Returns pacemaker id label.
-     */
-    protected JLabel getHeartbeatIdLabel() {
-        return heartbeatIdLabel;
-    }
-
-    /**
      * Returns id of the meta attrs to which meta attrs of this service are
      * referring to.
      */
@@ -2749,9 +2588,10 @@ public class ServiceInfo extends EditableInfo {
                 public void run() {
                     applyButton.setEnabled(false);
                     applyButton.setToolTipText(null);
-                    idField.setEnabled(false);
+                    paramComboBoxGet("guiid", null).setEnabled(false);
                     if (clInfo != null) {
-                        clInfo.getIdField().setEnabled(false);
+                        clInfo.paramComboBoxGet("guiid", null).setEnabled(
+                                                                        false);
                     }
                 }
             });
@@ -2766,14 +2606,13 @@ public class ServiceInfo extends EditableInfo {
                 getBrowser().getHeartbeatIdList().remove(oldHeartbeatId);
             }
             if (getService().isNew()) {
-                final String id = idField.getStringValue();
+                final String id = getComboBoxValue("guiid");
                 getService().setIdAndCrmId(id);
                 if (typeRadioGroup != null) {
                     typeRadioGroup.setEnabled(false);
                 }
             }
             getBrowser().addToHeartbeatIdList(this);
-            setHeartbeatIdLabel();
             getBrowser().addNameToServiceInfoHash(this);
         }
         if (!testOnly) {
@@ -2806,14 +2645,6 @@ public class ServiceInfo extends EditableInfo {
                 gInfo.apply(dcHost, testOnly);
             }
             groupId = gInfo.getHeartbeatId(testOnly);
-            //if (cloneId == null) {
-            //    final CloneInfo gCloneInfo = gInfo.getCloneInfo();
-            //    if (gCloneInfo != null) {
-            //        cloneId = gCloneInfo.getHeartbeatId(testOnly);
-            //        master = gCloneInfo.getService().isMaster();
-            //        cloneParams = gCloneInfo.getParametersFromXML();
-            //    }
-            //}
         }
         String cloneMetaAttrsRefIds = null;
         if (clInfo != null) {
@@ -3020,7 +2851,8 @@ public class ServiceInfo extends EditableInfo {
     public final String getHeartbeatId(final boolean testOnly) {
         String heartbeatId = getService().getHeartbeatId();
         if (testOnly && heartbeatId == null) {
-            heartbeatId = getService().getCrmIdFromId(idField.getStringValue());
+            heartbeatId = getService().getCrmIdFromId(
+                                                getComboBoxValue("guiid"));
         }
         return heartbeatId;
     }
@@ -4239,13 +4071,6 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Returns the id field.
-     */
-    public GuiComboBox getIdField() {
-        return idField;
-    }
-
-    /**
      * Returns units.
      */
     protected final Unit[] getUnits() {
@@ -4271,13 +4096,21 @@ public class ServiceInfo extends EditableInfo {
             return "new...";
         } else if (isStarted(testOnly)) {
             if (isRunning(testOnly)) {
-                final Host migratedTo = getMigratedTo(testOnly);
+                final List<Host> migratedTo = getMigratedTo(testOnly);
                 if (migratedTo != null) {
                     final List<String> runningOnNodes =
                                                getRunningOnNodes(testOnly);
-                    if (runningOnNodes != null
-                        && !runningOnNodes.contains(migratedTo.getName())) {
-                        return Tools.getString("ClusterBrowser.Hb.Migrating");
+                    if (runningOnNodes != null) {
+                        boolean alreadyThere = false;
+                        for (final Host mto : migratedTo) {
+                            if (runningOnNodes.contains(mto.getName())) {
+                                alreadyThere = true;
+                            }
+                            if (!alreadyThere) {
+                                return Tools.getString(
+                                                "ClusterBrowser.Hb.Migrating");
+                            }
+                        }
                     }
                 }
                 return null;

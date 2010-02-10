@@ -73,6 +73,10 @@ public abstract class EditableInfo extends Info {
     /** Returns whether this parameter is of the check box type, like
      * boolean. */
     protected abstract boolean isCheckBox(String param);
+    /** Returns type of the field. */
+    protected GuiComboBox.Type getFieldType(final String param) {
+        return null;
+    }
     /** Returns the name of the type. */
     protected abstract String getParamType(String param);
     /** Returns the possible choices for pull down menus if applicable. */
@@ -140,12 +144,13 @@ public abstract class EditableInfo extends Info {
                                     final String left,
                                     final String right,
                                     final int leftWidth,
-                                    final int rightWidth) {
+                                    final int rightWidth,
+                                    final int height) {
         final JLabel leftLabel = new JLabel(left);
         leftLabel.setToolTipText(left);
         final JLabel rightLabel = new JLabel(right);
         rightLabel.setToolTipText(right);
-        addField(panel, leftLabel, rightLabel, leftWidth, rightWidth);
+        addField(panel, leftLabel, rightLabel, leftWidth, rightWidth, height);
     }
 
 
@@ -157,17 +162,21 @@ public abstract class EditableInfo extends Info {
                                final JComponent left,
                                final JComponent right,
                                final int leftWidth,
-                               final int rightWidth) {
+                               final int rightWidth,
+                               int height) {
         /* right component with fixed width. */
+        if (height == 0) {
+            height = Tools.getDefaultInt("Browser.FieldHeight");
+        }
         Tools.setSize(left,
                       leftWidth,
-                      Tools.getDefaultInt("Browser.FieldHeight"));
-
+                      height);
         panel.add(left);
         Tools.setSize(right,
                       rightWidth,
-                      Tools.getDefaultInt("Browser.FieldHeight"));
+                      height);
         panel.add(right);
+        left.setBackground(panel.getBackground());
     }
 
     /**
@@ -222,7 +231,11 @@ public abstract class EditableInfo extends Info {
                 }
             });
             final GuiComboBox realParamCb = paramComboBoxGet(param, null);
-            addField(panel, label, paramCb, leftWidth, rightWidth);
+            int height = 0;
+            if (realParamCb.getType() == GuiComboBox.Type.LABELFIELD) {
+                height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+            }
+            addField(panel, label, paramCb, leftWidth, rightWidth, height);
             realParamCb.setValue(paramCb.getValue());
             paramCb.addListeners(
                 new ItemListener() {
@@ -387,7 +400,8 @@ public abstract class EditableInfo extends Info {
                                  label,
                                  sameAsCombo,
                                  leftWidth,
-                                 rightWidth);
+                                 rightWidth,
+                                 0);
                         final int rows = sectionRowsMap.get(section);
                         sectionRowsMap.put(section, rows + 1);
                     }
@@ -407,7 +421,11 @@ public abstract class EditableInfo extends Info {
                     label.setToolTipText(longDesc);
                 }
             });
-            addField(panel, label, paramCb, leftWidth, rightWidth);
+            int height = 0;
+            if (paramCb.getType() == GuiComboBox.Type.LABELFIELD) {
+                height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+            }
+            addField(panel, label, paramCb, leftWidth, rightWidth, height);
         }
 
         for (final String param : params) {
@@ -574,7 +592,7 @@ public abstract class EditableInfo extends Info {
             abbreviations.put("i", CRMXML.INFINITY_STRING);
             abbreviations.put("I", CRMXML.INFINITY_STRING);
         }
-        GuiComboBox.Type type = null;
+        GuiComboBox.Type type = getFieldType(param);
         Unit[] units = null;
         if (isCheckBox(param)) {
             type = GuiComboBox.Type.CHECKBOX;
@@ -697,10 +715,7 @@ public abstract class EditableInfo extends Info {
      * from default value, default value will be returned.
      */
     protected final String getToolTipText(final String param) {
-        String defaultValue = getParamDefault(param);
-        if (defaultValue == null || defaultValue.equals("")) {
-            defaultValue = "\"\"";
-        }
+        final String defaultValue = getParamDefault(param);
         final StringBuffer ret = new StringBuffer(120);
         ret.append("<html>");
         final GuiComboBox cb = paramComboBoxGet(param, null);
@@ -710,12 +725,14 @@ public abstract class EditableInfo extends Info {
             ret.append(value);
             ret.append("</b>");
         }
-        ret.append("<table><tr><td><b>");
-        ret.append(Tools.getString("Browser.ParamDefault"));
-        ret.append("</b></td><td>");
-        ret.append(defaultValue);
-        ret.append("</td></tr>");
-        ret.append("</table></html>");
+        if (defaultValue != null && !defaultValue.equals("")) {
+            ret.append("<table><tr><td><b>");
+            ret.append(Tools.getString("Browser.ParamDefault"));
+            ret.append("</b></td><td>");
+            ret.append(defaultValue);
+            ret.append("</td></tr>");
+            ret.append("</table></html>");
+        }
         return ret.toString();
 
     }

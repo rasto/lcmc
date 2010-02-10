@@ -85,8 +85,8 @@ import java.util.regex.Matcher;
 public class GuiComboBox extends JPanel {
 
     /** Widget type. */
-    public enum Type { TEXTFIELD, PASSWDFIELD, COMBOBOX, RADIOGROUP, CHECKBOX,
-                       TEXTFIELDWITHUNIT };
+    public enum Type { LABELFIELD, TEXTFIELD, PASSWDFIELD, COMBOBOX,
+                       RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT };
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Component of this widget. */
@@ -176,6 +176,9 @@ public class GuiComboBox extends JPanel {
         }
 
         switch(this.type) {
+            case LABELFIELD:
+                component = getLabelField(selectedValue, regexp, abbreviations);
+                break;
             case TEXTFIELD:
                 component = getTextField(selectedValue, regexp, abbreviations);
                 break;
@@ -299,6 +302,15 @@ public class GuiComboBox extends JPanel {
                                     0);
         }
         return pf;
+    }
+
+    /**
+     * Returns new MTextField with default value.
+     */
+    private JComponent getLabelField(final String value,
+                                     final String regexp,
+                                     final Map<String, String> abbreviations) {
+        return new JLabel(value);
     }
 
     /**
@@ -544,6 +556,8 @@ public class GuiComboBox extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 switch(type) {
+                    case LABELFIELD:
+                        break;
                     case TEXTFIELD:
                         break;
                     case PASSWDFIELD:
@@ -603,6 +617,9 @@ public class GuiComboBox extends JPanel {
     public final Object getValue() {
         Object value = null;
         switch(type) {
+            case LABELFIELD:
+                value = ((JLabel) component).getText();
+                break;
             case TEXTFIELD:
                 value = ((MTextField) component).getText();
                 break;
@@ -691,6 +708,8 @@ public class GuiComboBox extends JPanel {
      */
     public final void clear() {
         switch(type) {
+            case LABELFIELD:
+                break;
             case TEXTFIELD:
                 break;
             case PASSWDFIELD:
@@ -739,6 +758,8 @@ public class GuiComboBox extends JPanel {
      */
     public final boolean isEditable() {
         switch(type) {
+            case LABELFIELD:
+                return false;
             case TEXTFIELD:
                 return true;
             case PASSWDFIELD:
@@ -760,6 +781,9 @@ public class GuiComboBox extends JPanel {
      */
     public final void setValueAndWait(final Object item) {
         switch(type) {
+            case LABELFIELD:
+                ((JLabel) component).setText((String) item);
+                break;
             case TEXTFIELD:
                 ((MTextField) component).setText((String) item);
                 break;
@@ -852,6 +876,8 @@ public class GuiComboBox extends JPanel {
      */
     public final void setSelectedIndex(final int index) {
         switch(type) {
+            case LABELFIELD:
+                break;
             case TEXTFIELD:
                 break;
             case PASSWDFIELD:
@@ -879,6 +905,8 @@ public class GuiComboBox extends JPanel {
      */
     public final Document getDocument() {
         switch(type) {
+            case LABELFIELD:
+                return null;
             case TEXTFIELD:
                 return ((MTextField) component).getDocument();
             case PASSWDFIELD:
@@ -910,6 +938,8 @@ public class GuiComboBox extends JPanel {
      */
     public final void selectSubnet() {
         switch(type) {
+            case LABELFIELD:
+                break;
             case TEXTFIELD:
                 break;
             case PASSWDFIELD:
@@ -941,6 +971,8 @@ public class GuiComboBox extends JPanel {
     public final void addListeners(final ItemListener il,
                              final DocumentListener dl) {
         switch(type) {
+            case LABELFIELD:
+                break;
             case TEXTFIELD:
                 if (dl != null) {
                     getDocument().addDocumentListener(dl);
@@ -1041,6 +1073,9 @@ public class GuiComboBox extends JPanel {
         }
         setBackground(backgroundColor);
         switch(type) {
+            case LABELFIELD:
+                component.setBackground(backgroundColor);
+                break;
             case TEXTFIELD:
                 /* change color possibly set by wrongValue() */
                 component.setBackground(compColor);
@@ -1172,6 +1207,8 @@ public class GuiComboBox extends JPanel {
     public final void requestFocus() {
 
         switch(type) {
+            case LABELFIELD:
+                break;
             case TEXTFIELD:
                 ((MTextField) component).requestFocus();
                 break;
@@ -1243,6 +1280,10 @@ public class GuiComboBox extends JPanel {
          return component;
      }
 
+    public final void setBackground(final Color bg) {
+        super.setBackground(bg);
+    }
+
     /**
      * Sets background color.
      */
@@ -1251,6 +1292,9 @@ public class GuiComboBox extends JPanel {
             public void run() {
                 setBackground(bg);
                 switch(type) {
+                    case LABELFIELD:
+                        component.setBackground(bg);
+                        break;
                     case TEXTFIELD:
                         component.setBackground(bg);
                         break;
@@ -1258,7 +1302,6 @@ public class GuiComboBox extends JPanel {
                         component.setBackground(bg);
                         break;
                     case COMBOBOX:
-                        setBackground(bg);
                         break;
                     case RADIOGROUP:
                         component.setBackground(bg);
@@ -1291,5 +1334,12 @@ public class GuiComboBox extends JPanel {
      */
     public final JLabel getLabel() {
         return label;
+    }
+
+    /**
+     * Returns type of this widget.
+     */
+    public final Type getType() {
+        return type;
     }
 }

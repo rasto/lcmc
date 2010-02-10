@@ -23,6 +23,7 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
+import drbd.gui.GuiComboBox;
 import drbd.data.ResourceAgent;
 import drbd.data.Host;
 import drbd.data.CRMXML;
@@ -59,13 +60,6 @@ public class GroupInfo extends ServiceInfo {
     }
 
     /**
-     * Returns all group parameters. (empty)
-     */
-    public final String[] getParametersFromXML() {
-        return new String[]{};
-    }
-
-    /**
      * Applies the changes to the group parameters.
      */
     public final void apply(final Host dcHost, final boolean testOnly) {
@@ -75,6 +69,7 @@ public class GroupInfo extends ServiceInfo {
                 public void run() {
                     applyButton.setEnabled(false);
                     applyButton.setToolTipText(null);
+                    final GuiComboBox idField = paramComboBoxGet("guiid", null);
                     idField.setEnabled(false);
                 }
             });
@@ -91,14 +86,13 @@ public class GroupInfo extends ServiceInfo {
                 getBrowser().getHeartbeatIdList().remove(oldHeartbeatId);
             }
             if (getService().isNew()) {
-                final String id = idField.getStringValue();
+                final String id = getComboBoxValue("guiid");
                 getService().setIdAndCrmId(id);
                 if (getTypeRadioGroup() != null) {
                     getTypeRadioGroup().setEnabled(false);
                 }
             }
             getBrowser().addToHeartbeatIdList(this);
-            setHeartbeatIdLabel();
             getBrowser().addNameToServiceInfoHash(this);
         }
 
@@ -647,8 +641,13 @@ public class GroupInfo extends ServiceInfo {
                         if (!si.isManaged(testOnly)) {
                             unmanaged = " / unmanaged";
                         }
+                        String migrated = "";
+                        if (si.getMigratedTo(testOnly) != null) {
+                            migrated = " / migrated";
+                        }
                         texts.add(new Subtext("   " + si.toString()
-                                              + unmanaged,
+                                              + unmanaged
+                                              + migrated,
                                               sSubtext.getColor()));
                         boolean skip = true;
                         for (final Subtext st : subtexts) {
@@ -667,7 +666,40 @@ public class GroupInfo extends ServiceInfo {
     }
 
     /**
-     * Returns whether all services are unmaneged.
+     * Returns whether all some services or the whole group is migrated.
+     */
+    public final List<Host> getMigratedTo(final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
+        List<Host> hosts = super.getMigratedTo(testOnly);
+        if (resources == null) {
+            return null;
+        } else {
+            if (resources.isEmpty()) {
+                return null;
+            }
+            for (final String hbId : resources) {
+                final ServiceInfo si =
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
+                if (si != null) {
+                    final List<Host> siHosts = si.getMigratedTo(testOnly);
+                    if (siHosts != null) {
+                        if (hosts == null) {
+                            hosts = new ArrayList<Host>();
+                        }
+                        hosts.addAll(siHosts);
+                    }
+                }
+            }
+        }
+        return hosts;
+    }
+
+
+    /**
+     * Returns whether at least one service is unmaneged.
      */
     public final boolean isManaged(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -683,12 +715,12 @@ public class GroupInfo extends ServiceInfo {
             for (final String hbId : resources) {
                 final ServiceInfo si =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null && si.isManaged(testOnly)) {
-                    return true;
+                if (si != null && !si.isManaged(testOnly)) {
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     /**

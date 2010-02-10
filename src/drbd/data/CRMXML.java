@@ -220,6 +220,7 @@ public class CRMXML extends XML {
             && Tools.compareVersions(hbV, "2.99.0") < 0) {
             setMetaAttributes(hbClone, "target_role", "is_managed");
         }
+
         /* clone-max */
         hbClone.addParameter("clone-max");
         hbClone.setParamIsMetaAttr("clone-max", true);
@@ -862,6 +863,10 @@ public class CRMXML extends XML {
      * displayed.
      */
     public final String getSection(final ResourceAgent ra, final String param) {
+        final String section = ra.getSection(param);
+        if (section != null) {
+            return section;
+        }
         if (isMetaAttr(ra, param)) {
             return Tools.getString("CRMXML.MetaAttrOptions");
         } else if (isRequired(ra, param)) {

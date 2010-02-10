@@ -22,6 +22,7 @@
 package drbd.data;
 
 import drbd.utilities.Tools;
+import drbd.gui.GuiComboBox;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -84,6 +85,11 @@ public class ResourceAgent {
     private final MultiKeyMap opToDefault = new MultiKeyMap();
     /** Whether the service is probably master/slave resource. */
     private boolean masterSlave = false;
+    /** Sections for some parameters. */
+    private Map<String, String> sectionMap = new HashMap<String, String>();
+    /** Map to field types for some parameters. */
+    private Map<String, GuiComboBox.Type> fieldType =
+                                       new HashMap<String, GuiComboBox.Type>();
 
     /**
      * Prepares a new <code>ResourceAgent</code> object.
@@ -101,6 +107,47 @@ public class ResourceAgent {
         } else {
             menuName = name;
         }
+        /* info fields */
+        String section = "Resource";
+        if (isClone()) {
+            section = "Clone Set";
+        } else if (isGroup()) {
+            section = "Group";
+        }
+        addParameter("guiid");
+        sectionMap.put("guiid", section);
+        paramRequired.add("guiid");
+        paramShortDesc.put("guiid", "Name");
+        paramLongDesc.put("guiid", "Name");
+
+        addInfoParameter(section, "crmid", "new...", "Id", "Id");
+        if (!isClone() && !isGroup()) {
+            addInfoParameter("Resource",
+                             "ra",
+                             getRAString(),
+                             "Resource Agent",
+                             "Resource Agent");
+        }
+
+    }
+
+    /** 
+     * Adds info paramter.
+     */
+    private void addInfoParameter(final String section,
+                                  final String name,
+                                  final String defaultValue,
+                                  final String shortName,
+                                  final String longName) {
+        addParameter(name);
+        if (defaultValue != null) {
+            paramDefault.put(name, defaultValue);
+        }
+        sectionMap.put(name, section);
+        paramRequired.add(name);
+        paramShortDesc.put(name, shortName);
+        paramLongDesc.put(name, longName);
+        fieldType.put(name, GuiComboBox.Type.LABELFIELD);
     }
 
     /**
@@ -491,5 +538,26 @@ public class ResourceAgent {
      */
     public final boolean isMasterSlave() {
         return masterSlave;
+    }
+
+    /**
+     * Returns section of some of the parameters.
+     */
+    public final String getSection(final String param) {
+        return sectionMap.get(param);
+    }
+
+    /**
+     * Returns field type of the param.
+     */
+    public final GuiComboBox.Type getFieldType(final String param) {
+        return fieldType.get(param);
+    }
+
+    /**
+     * Returns resource agent string like ocf:linbit:drbd.
+     */
+    public final String getRAString() {
+        return resourceClass + "::" + provider + ":" + name;
     }
 }

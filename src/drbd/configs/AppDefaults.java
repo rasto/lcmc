@@ -102,6 +102,7 @@ public class AppDefaults extends
         {"HostBrowser.ResourceInfoArea.Width",   300},
         {"HostBrowser.ResourceInfoArea.Height",  150},
         {"Browser.InfoPanelMinimalWidth",        440},
+        {"Browser.LabelFieldHeight",             25},
         {"Browser.FieldHeight",                  30},
 
         {"Dialog.DrbdConfig.Resource.LabelWidth", 150},

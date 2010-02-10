@@ -77,7 +77,7 @@ public class HbConnectionInfo extends EditableInfo {
     private final Map<String, HbOrderInfo> orderIds =
                                         new HashMap<String, HbOrderInfo>();
     /** Expert options panel. */
-    private final JPanel extraOptionsPanel = new JPanel();
+    private JPanel extraOptionsPanel = null;
 
     /**
      * Prepares a new <code>HbConnectionInfo</code> object.
@@ -360,6 +360,11 @@ public class HbConnectionInfo extends EditableInfo {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        if (extraOptionsPanel != null) {
+            Tools.unregisterExpertPanel(extraOptionsPanel);
+            extraOptionsPanel = new JPanel();
+        }
+        extraOptionsPanel = new JPanel();
         extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
         extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                                   BoxLayout.Y_AXIS));
@@ -375,6 +380,7 @@ public class HbConnectionInfo extends EditableInfo {
         buttonPanel.add(mb, BorderLayout.EAST);
 
         /* params */
+        final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
         for (final HbConstraintInterface c : constraints) {
             final String[] params = c.getParametersFromXML();
             /* heartbeat id */
@@ -384,17 +390,20 @@ public class HbConnectionInfo extends EditableInfo {
                             Tools.getString("ClusterBrowser.HeartbeatId"),
                             c.getService().getHeartbeatId(),
                             ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH);
+                            ClusterBrowser.SERVICE_FIELD_WIDTH,
+                            height);
             c.addLabelField(panel,
                             "rsc1",
                             c.getRsc1(),
                             ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH);
+                            ClusterBrowser.SERVICE_FIELD_WIDTH,
+                            height);
             c.addLabelField(panel,
                             "rsc2",
                             c.getRsc2(),
                             ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH);
+                            ClusterBrowser.SERVICE_FIELD_WIDTH,
+                            height);
             SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
                                             1, 1,        /* initX, initY */
                                             1, 1);       /* xPad, yPad */
@@ -635,6 +644,8 @@ public class HbConnectionInfo extends EditableInfo {
         for (final HbConstraintInterface c : constraintsToRemove) {
            constraints.remove(c);
         }
+        infoPanel = null;
+        selectMyself();
     }
 
     /**
@@ -680,6 +691,8 @@ public class HbConnectionInfo extends EditableInfo {
         oi.getService().setHeartbeatId(ordId);
         oi.setParameters();
         constraints.add(oi);
+        infoPanel = null;
+        selectMyself();
     }
 
     /**
@@ -711,6 +724,8 @@ public class HbConnectionInfo extends EditableInfo {
         ci.getService().setHeartbeatId(colId);
         ci.setParameters();
         constraints.add(ci);
+        infoPanel = null;
+        selectMyself();
     }
 
     /**
@@ -729,5 +744,13 @@ public class HbConnectionInfo extends EditableInfo {
     public final void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
         Tools.unregisterExpertPanel(extraOptionsPanel);
+    }
+
+    /**
+     * Selects the node in the menu and reloads everything underneath.
+     */
+    public void selectMyself() {
+        super.selectMyself();
+        getBrowser().setRightComponentInView(this);
     }
 }

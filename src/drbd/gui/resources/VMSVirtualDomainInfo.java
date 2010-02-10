@@ -45,6 +45,7 @@ import javax.swing.JLabel;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.ArrayList;
@@ -72,6 +73,24 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** All parameters. */
     private static final String[] parameters = new String[]{"name",
                                                             "status"};
+    private static final Map<String, String> sectionMap =
+                                                 new HashMap<String, String>();
+    /** Map of short param names with uppercased first character. */
+    private static final Map<String, String> shortNameMap =
+                                                 new HashMap<String, String>();
+    /** Types of some of the field. */
+    private static final Map<String, GuiComboBox.Type> fieldTypes =
+                                       new HashMap<String, GuiComboBox.Type>();
+    static {
+        sectionMap.put("name", "General Info");
+        sectionMap.put("status", "General Info");
+        for (final String p : parameters) {
+            shortNameMap.put(p, p.substring(0, 1).toUpperCase()
+                                + p.substring(1));
+        }
+        fieldTypes.put("name", GuiComboBox.Type.LABELFIELD);
+        fieldTypes.put("status", GuiComboBox.Type.LABELFIELD);
+    }
     /**
      * Creates the VMSVirtualDomainInfo object.
      */
@@ -334,14 +353,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns long description of the specified parameter.
      */
     protected final String getParamLongDesc(final String param) {
-        return "undef";
+        return shortNameMap.get(param);
     }
 
     /**
      * Returns short description of the specified parameter.
      */
     protected final String getParamShortDesc(final String param) {
-        return param;
+        return shortNameMap.get(param);
     }
 
     /**
@@ -384,14 +403,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns section to which the specified parameter belongs.
      */
     protected final String getSection(final String param) {
-        return "undef";
+        return sectionMap.get(param);
     }
 
     /**
      * Returns true if the specified parameter is required.
      */
     protected final boolean isRequired(final String param) {
-        return false;
+        return true;
     }
 
     /**
@@ -420,5 +439,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      */
     protected final String getParamType(final String param) {
         return "undef";
+    }
+
+    /**
+     * Returns type of the field.
+     */
+    protected GuiComboBox.Type getFieldType(String param) {
+        return fieldTypes.get(param);
     }
 }

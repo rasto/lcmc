@@ -76,7 +76,8 @@ public interface HbConstraintInterface {
                   final JComponent left,
                   final JComponent right,
                   final int leftWidth,
-                  final int rightWidth);
+                  final int rightWidth,
+                  final int height);
     /**
      * Adds label and field to the specified panel.
      */
@@ -84,7 +85,8 @@ public interface HbConstraintInterface {
                        final String left,
                        final String right,
                        final int leftWidth,
-                       final int rightWidth);
+                       final int rightWidth,
+                       final int height);
     /**
      * Returns name of this constraint: colocation or order.
      */

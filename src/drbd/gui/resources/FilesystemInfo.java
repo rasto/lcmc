@@ -104,15 +104,6 @@ class FilesystemInfo extends ServiceInfo {
     }
 
     /**
-     * Adds id field.
-     */
-    protected void addIdField(final JPanel panel,
-                              final int leftWidth,
-                              final int rightWidth) {
-        super.addIdField(panel, leftWidth, rightWidth);
-    }
-
-    /**
      * Returns whether all the parameters are correct. If param is null,
      * all paremeters will be checked, otherwise only the param, but other
      * parameters will be checked only in the cache. This is good if only
