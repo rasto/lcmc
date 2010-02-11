@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -54,6 +55,8 @@ public class VMSXML extends XML {
     /** Map from configs to names. */
     private final Map<String, String> configsMap =
                                             new HashMap<String, String>();
+    /** Map from names to vcpus. */
+    private final MultiKeyMap parameterValues = new MultiKeyMap();
     /** Hash of domains and their remote ports. */
     private final Map<String, Integer> remotePorts =
                                                 new HashMap<String, Integer>();
@@ -114,7 +117,12 @@ public class VMSXML extends XML {
         final Node infoNode = getChildNode(vmNode, "info");
         final String name = getAttribute(vmNode, "name");
         final String config = getAttribute(vmNode, "config");
-        configsMap.put(config, name);
+        final String autostart = getAttribute(vmNode, "autostart");
+        if (autostart == null) {
+            parameterValues.put(name, "autostart", "false");
+        } else {
+            parameterValues.put(name, "autostart", autostart);
+        }
         if (infoNode != null) {
             parseInfo(name, getText(infoNode));
         }
@@ -156,6 +164,22 @@ public class VMSXML extends XML {
                     Tools.appWarning("unexpected name: " + name 
                                      + " != " + nameInFilename);
                     return;
+                }
+            } else if ("vcpu".equals(option.getNodeName())) {
+                parameterValues.put(name, "vcpu", getText(option));
+            } else if ("memory".equals(option.getNodeName())) {
+                parameterValues.put(name, "memory", getText(option));
+            } else if ("currentMemory".equals(option.getNodeName())) {
+                parameterValues.put(name, "currentMemory", getText(option));
+            } else if ("os".equals(option.getNodeName())) {
+                final NodeList osOptions = option.getChildNodes();
+                for (int j = 0; j < osOptions.getLength(); j++) {
+                    final Node osOption = osOptions.item(j);
+                    if ("boot".equals(osOption.getNodeName())) {
+                        parameterValues.put(name,
+                                            "os-boot",
+                                            getAttribute(osOption, "dev"));
+                    }
                 }
             } else if ("devices".equals(option.getNodeName())) {
                 final NodeList devices = option.getChildNodes();
@@ -258,5 +282,12 @@ public class VMSXML extends XML {
      */
     public final String getNameFromConfig(final String config) {
         return configsMap.get(config);
+    }
+
+    /**
+     * Returns value.
+     */
+    public final String getValue(final String name, final String param) {
+        return (String) parameterValues.get(name, param);
     }
 }

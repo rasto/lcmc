@@ -176,7 +176,7 @@ public abstract class EditableInfo extends Info {
                       rightWidth,
                       height);
         panel.add(right);
-        left.setBackground(panel.getBackground());
+        right.setBackground(panel.getBackground());
     }
 
     /**
@@ -796,11 +796,16 @@ public abstract class EditableInfo extends Info {
                     if (check) {
                         if (isTimeType(otherParam)
                             || hasUnitPrefix(otherParam)) {
-                            cb.setBackground(Tools.extractUnit(
-                                                 getParamDefault(otherParam)),
-                                             Tools.extractUnit(
-                                                 getParamSaved(otherParam)),
-                                             isRequired(otherParam));
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    cb.setBackground(
+                                                Tools.extractUnit(
+                                                   getParamDefault(otherParam)),
+                                                Tools.extractUnit(
+                                                   getParamSaved(otherParam)),
+                                                isRequired(otherParam));
+                                }
+                            });
                             if (wizardCb != null) {
                                 wizardCb.setBackground(
                                     Tools.extractUnit(
@@ -810,15 +815,20 @@ public abstract class EditableInfo extends Info {
                                     isRequired(otherParam));
                             }
                         } else {
-                            cb.setBackground(getParamDefault(otherParam),
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    cb.setBackground(
+                                             getParamDefault(otherParam),
                                              getParamSaved(otherParam),
                                              isRequired(otherParam));
-                            if (wizardCb != null) {
-                                wizardCb.setBackground(
-                                                getParamDefault(otherParam),
-                                                getParamSaved(otherParam),
-                                                isRequired(otherParam));
-                            }
+                                    if (wizardCb != null) {
+                                        wizardCb.setBackground(
+                                                    getParamDefault(otherParam),
+                                                    getParamSaved(otherParam),
+                                                    isRequired(otherParam));
+                                    }
+                                }
+                            });
                         }
                     } else {
                         cb.wrongValue();

@@ -1754,6 +1754,9 @@ public class TextResource extends
         {"Error.Title",
          "Error"},
 
+        {"VIRSH.ExecutingCommand",
+         "Executing virsh command..."},
+
         {"VMSXML.GetConfig",
          "Parsing libvirt config..."},
 

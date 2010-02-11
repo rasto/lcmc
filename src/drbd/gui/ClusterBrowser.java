@@ -1203,6 +1203,7 @@ public class ClusterBrowser extends Browser {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
+        boolean nodeChanged = false;
         if (domainNames.size() > 0) {
             addVMSNode();
             final Enumeration e = vmsNode.children();
@@ -1218,6 +1219,7 @@ public class ClusterBrowser extends Browser {
                 } else {
                     /* remove not existing vms */
                     nodesToRemove.add(node);
+                    nodeChanged = true;
                 }
             }
         }
@@ -1253,8 +1255,11 @@ public class ClusterBrowser extends Browser {
             setNode(resource);
             vmsNode.insert(resource, i);
             i++;
+            nodeChanged = true;
         }
-        reload(vmsNode);
+        if (nodeChanged) {
+            reload(vmsNode);
+        }
     }
 
     /**

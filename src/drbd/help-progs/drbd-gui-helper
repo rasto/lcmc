@@ -1240,8 +1240,14 @@ sub get_cluster_versions {
 }
 
 sub get_vm_info {
+	my %autostart;
 	print "<vms>\n";
-	for (sort `find /etc/libvirt/qemu/ -name '*.xml'`) {
+	for (`ls /etc/libvirt/qemu/autostart/*.xml`) {
+		my ($name) = /([^\/]+).xml/;
+		next if !$name;
+		$autostart{$name}++;
+	}
+	for (`ls /etc/libvirt/qemu/*.xml`) {
 		my ($name) = /([^\/]+).xml/;
 		next if !$name;
 		chomp;
@@ -1249,7 +1255,13 @@ sub get_vm_info {
 		next if $?;
 		my $vncdisplay = `/usr/bin/virsh vncdisplay $name` || "";
 		my $config = `/usr/bin/virsh dumpxml $name` || "";
-		print "<vm name=\"$name\" config=\"$_\">\n";
+		print "<vm name=\"$name\" config=\"$_\"";
+		if ($autostart{$name}) {
+			print ' autostart="True"';
+		} else {
+			print ' autostart="False"';
+		}
+		print ">\n";
 		print "<info>\n";
 		print $info;
 		print "</info>\n";

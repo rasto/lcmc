@@ -636,16 +636,20 @@ public class HbConnectionInfo extends EditableInfo {
     private void removeOrdersOrColocations(final boolean isOrder) {
         final List<HbConstraintInterface> constraintsToRemove =
                                     new ArrayList<HbConstraintInterface>();
+        boolean changed = false;
         for (final HbConstraintInterface c : constraints) {
             if (c.isOrder() == isOrder) {
                 constraintsToRemove.add(c);
+                changed = true;
             }
         }
         for (final HbConstraintInterface c : constraintsToRemove) {
            constraints.remove(c);
         }
         infoPanel = null;
-        selectMyself();
+        if (changed) {
+            selectMyself();
+        }
     }
 
     /**
