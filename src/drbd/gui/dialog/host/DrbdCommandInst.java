@@ -85,7 +85,7 @@ public class DrbdCommandInst extends DialogHost {
     /**
      * Installs the drbd.
      */
-    private final void installDrbd() {
+    private void installDrbd() {
         String arch = getHost().getDistString("DrbdInst.install."
                                               + getHost().getArch());
         if (arch == null) {

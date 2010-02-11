@@ -30,7 +30,6 @@ import drbd.gui.Browser;
 import java.util.Map;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
-import javax.swing.JPanel;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -382,12 +381,5 @@ class FilesystemInfo extends ServiceInfo {
     public final void setDrbddiskIsPreferred(
                                            final boolean drbddiskIsPreferred) {
         this.drbddiskIsPreferred = drbddiskIsPreferred;
-    }
-
-    /**
-     * Reload filesystem combo boxes.
-     */
-    public void reloadComboBoxes() {
-        super.reloadComboBoxes();
     }
 }

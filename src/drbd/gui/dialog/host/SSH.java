@@ -57,7 +57,7 @@ public class SSH extends DialogHost {
     /**
      * Connects to all hosts.
      */
-    private final String connectHost() {
+    private String connectHost() {
         final String res = null;
         final SSHGui sshGui = new SSHGui(getDialogPanel(),
                                          getHost(),

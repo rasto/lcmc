@@ -64,7 +64,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-    /** Tooltip background color */
+    /** Tooltip background color. */
     private Color toolTipBackground = null;
 
     /**

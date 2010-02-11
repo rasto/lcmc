@@ -47,7 +47,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashSet;
-import java.util.Collection;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;

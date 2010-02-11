@@ -173,7 +173,7 @@ public abstract class ResourceGraph {
     private final Mutex mTestEdgeLock = new Mutex();
     /** Interval beetween two animation frames. */
     private final int animInterval =
-                             (int)(1000 / Tools.getConfigData().getAnimFPS());
+                             (int) (1000 / Tools.getConfigData().getAnimFPS());
 
     /**
      * Prepares a new <code>ResourceGraph</code> object.

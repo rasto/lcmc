@@ -44,7 +44,7 @@ public class DrbdLinbitInst extends drbd.gui.dialog.host.DrbdLinbitInst {
     }
 
     /**
-     * Returns the next dialog.cluster.InitForUpgrade
+     * Returns the next dialog.cluster.InitForUpgrade.
      */
     public WizardDialog nextDialog() {
         return new InitForUpgrade(null, getHost().getCluster());

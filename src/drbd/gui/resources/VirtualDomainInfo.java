@@ -22,7 +22,6 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
-import drbd.gui.GuiComboBox;
 import drbd.data.Host;
 import drbd.data.VMSXML;
 import drbd.data.ResourceAgent;
@@ -36,7 +35,6 @@ import java.util.TreeSet;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SwingUtilities;
 
 /**
@@ -61,7 +59,7 @@ class VirtualDomainInfo extends ServiceInfo {
     /**
      * Returns the first on which this vm is running.
      */
-    private final Host getRunningOnHost() {
+    private Host getRunningOnHost() {
         final List<String> nodes = getRunningOnNodes(false);
         if (nodes != null
             && !nodes.isEmpty()) {

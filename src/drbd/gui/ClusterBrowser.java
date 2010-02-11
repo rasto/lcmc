@@ -1193,7 +1193,7 @@ public class ClusterBrowser extends Browser {
      */
     public final void updateVMS() {
         DefaultMutableTreeNode resource;
-        
+
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
             final VMSXML vxml = getVMSXML(host);

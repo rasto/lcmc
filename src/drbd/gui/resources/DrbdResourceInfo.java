@@ -1353,7 +1353,7 @@ public class DrbdResourceInfo extends EditableInfo
                 }
                 if (rate > 0) {
                     s.append("\nremaining at least: ");
-                    double seconds = ((100 - sp) / 100 * bs) / rate;
+                    final double seconds = ((100 - sp) / 100 * bs) / rate;
                     if (seconds < 60*5) {
                         s.append((int) seconds);
                         s.append(" Seconds");

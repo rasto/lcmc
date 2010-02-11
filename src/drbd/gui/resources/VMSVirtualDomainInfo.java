@@ -23,7 +23,6 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
-import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.Host;
@@ -42,14 +41,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.JLabel;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Comparator;
-import java.util.regex.Matcher;
 import java.util.ArrayList;
 import java.awt.Dimension;
 import java.awt.Component;
@@ -77,55 +71,56 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         Tools.createImageIcon(
                 Tools.getDefault("VMSVirtualDomainInfo.VMStoppedIcon"));
     /** All parameters. */
-    private static final String[] parameters = new String[]{"name",
-                                                            "defined",
-                                                            "status",
-                                                            "vcpu",
-                                                            "currentMemory",
-                                                            "memory",
-                                                            "os-boot",
-                                                            "autostart"};
-    private static final Map<String, String> sectionMap =
+    private static final String[] VM_PARAMETERS = new String[]{"name",
+                                                               "defined",
+                                                               "status",
+                                                               "vcpu",
+                                                               "currentMemory",
+                                                               "memory",
+                                                               "os-boot",
+                                                               "autostart"};
+    /** Map of sections to which every param belongs. */
+    private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
     /** Map of short param names with uppercased first character. */
-    private static final Map<String, String> shortNameMap =
+    private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     /** Map of default values. */
-    private static final Map<String, String> defaultsMap =
+    private static final Map<String, String> DEFAULTS_MAP =
                                                  new HashMap<String, String>();
     /** Types of some of the field. */
-    private static final Map<String, GuiComboBox.Type> fieldTypes =
+    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
     /** Possible values for some fields. */
-    private static final Map<String, Object[]> possibleValues =
+    private static final Map<String, Object[]> POSSIBLE_VALUES =
                                           new HashMap<String, Object[]>();
     static {
-        sectionMap.put("name",          "General Info");
-        sectionMap.put("defined",       "General Info");
-        sectionMap.put("status",        "General Info");
-        sectionMap.put("vcpu",          "Virtual System");
-        sectionMap.put("currentMemory", "Virtual System");
-        sectionMap.put("memory",        "Virtual System");
-        sectionMap.put("os-boot",       "Virtual System");
-        sectionMap.put("autostart",     "Virtual System");
-        shortNameMap.put("name",          "Name");
-        shortNameMap.put("defined",       "Defined On");
-        shortNameMap.put("status",        "Status");
-        shortNameMap.put("vcpu",          "Number of CPUs");
-        shortNameMap.put("currentMemory", "Current Memory");
-        shortNameMap.put("memory",        "Max Memory");
-        shortNameMap.put("os-boot",       "Boot Device");
-        shortNameMap.put("autostart",     "Autostart");
-        fieldTypes.put("name",          GuiComboBox.Type.LABELFIELD);
-        fieldTypes.put("defined",       GuiComboBox.Type.LABELFIELD);
-        fieldTypes.put("status",        GuiComboBox.Type.LABELFIELD);
-        fieldTypes.put("currentMemory", GuiComboBox.Type.LABELFIELD);
-        fieldTypes.put("autostart",     GuiComboBox.Type.CHECKBOX);
-        defaultsMap.put("autostart", "False");
-        defaultsMap.put("os-boot",   "hd");
-        defaultsMap.put("vcpu",      "1");
+        SECTION_MAP.put("name",          "General Info");
+        SECTION_MAP.put("defined",       "General Info");
+        SECTION_MAP.put("status",        "General Info");
+        SECTION_MAP.put("vcpu",          "Virtual System");
+        SECTION_MAP.put("currentMemory", "Virtual System");
+        SECTION_MAP.put("memory",        "Virtual System");
+        SECTION_MAP.put("os-boot",       "Virtual System");
+        SECTION_MAP.put("autostart",     "Virtual System");
+        SHORTNAME_MAP.put("name",          "Name");
+        SHORTNAME_MAP.put("defined",       "Defined On");
+        SHORTNAME_MAP.put("status",        "Status");
+        SHORTNAME_MAP.put("vcpu",          "Number of CPUs");
+        SHORTNAME_MAP.put("currentMemory", "Current Memory");
+        SHORTNAME_MAP.put("memory",        "Max Memory");
+        SHORTNAME_MAP.put("os-boot",       "Boot Device");
+        SHORTNAME_MAP.put("autostart",     "Autostart");
+        FIELD_TYPES.put("name",          GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put("defined",       GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put("status",        GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put("currentMemory", GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put("autostart",     GuiComboBox.Type.CHECKBOX);
+        DEFAULTS_MAP.put("autostart", "False");
+        DEFAULTS_MAP.put("os-boot",   "hd");
+        DEFAULTS_MAP.put("vcpu",      "1");
         // TODO: no virsh command for os-boot
-        possibleValues.put("os-boot",
+        POSSIBLE_VALUES.put("os-boot",
                            new StringInfo[]{
                                       new StringInfo("Hard Disk",
                                                      "hd",
@@ -136,7 +131,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                       new StringInfo("CD-ROM",
                                                      "cdrom",
                                                      null)});
-        possibleValues.put("autostart", new String[]{"True", "False"});
+        POSSIBLE_VALUES.put("autostart", new String[]{"True", "False"});
     }
     /**
      * Creates the VMSVirtualDomainInfo object.
@@ -151,7 +146,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Returns browser object of this info.
      */
-    protected ClusterBrowser getBrowser() {
+    protected final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -165,7 +160,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Sets service parameters with values from resourceNode hash.
      */
-    public void updateParameters() {
+    public final void updateParameters() {
         for (final String param : getParametersFromXML()) {
             final String oldValue = getParamSaved(param);
             String value = getParamSaved(param);
@@ -175,7 +170,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 final List<String> definedhosts = new ArrayList<String>();
                 for (final Host h : getBrowser().getClusterHosts()) {
                     final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                    String hostName = h.getName();
+                    final String hostName = h.getName();
                     if (vmsxml != null
                         && vmsxml.getDomainNames().contains(toString())) {
                         if (vmsxml.isRunning(toString())) {
@@ -193,7 +188,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     + Tools.join(" ", definedhosts.toArray(
                                     new String[definedhosts.size()]))
                     + "</html>");
-                if (runningOnHosts.size() == 0) {
+                if (runningOnHosts.isEmpty()) {
                     getResource().setValue("status", "Stopped");
                     running = false;
                 } else {
@@ -224,16 +219,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
             if (!Tools.areEqual(value, oldValue)) {
-                if (!Tools.areEqual(value, oldValue)) {
-                    getResource().setValue(param, value);
-                    if (cb != null) {
-                        /* only if it is not changed by user. */
-                        cb.setValue(value);
-                    }
+                getResource().setValue(param, value);
+                if (cb != null) {
+                    /* only if it is not changed by user. */
+                    cb.setValue(value);
                 }
             }
         }
-    } 
+    }
 
     /**
      * Returns info panel.
@@ -375,7 +368,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     });
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
-                        final int remotePort = vxml.getRemotePort(      
+                        final int remotePort = vxml.getRemotePort(
                                                          thisClass.toString());
                         final Host host = vxml.getHost();
                         if (host != null && remotePort > 0) {
@@ -465,14 +458,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns long description of the specified parameter.
      */
     protected final String getParamLongDesc(final String param) {
-        return shortNameMap.get(param);
+        return SHORTNAME_MAP.get(param);
     }
 
     /**
      * Returns short description of the specified parameter.
      */
     protected final String getParamShortDesc(final String param) {
-        return shortNameMap.get(param);
+        return SHORTNAME_MAP.get(param);
     }
 
     /**
@@ -486,7 +479,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns default value for specified parameter.
      */
     protected final String getParamDefault(final String param) {
-        return defaultsMap.get(param);
+        return DEFAULTS_MAP.get(param);
     }
 
     /**
@@ -504,7 +497,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns parameters.
      */
     public final String[] getParametersFromXML() {
-        return parameters;
+        return VM_PARAMETERS;
     }
 
     /**
@@ -512,7 +505,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      */
     protected final Object[] getParamPossibleChoices(final String param) {
         if ("os-boot".equals(param)) {
-            return possibleValues.get(param);
+            return POSSIBLE_VALUES.get(param);
         }
         return null;
     }
@@ -521,7 +514,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns section to which the specified parameter belongs.
      */
     protected final String getSection(final String param) {
-        return sectionMap.get(param);
+        return SECTION_MAP.get(param);
     }
 
     /**
@@ -562,14 +555,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Returns type of the field.
      */
-    protected GuiComboBox.Type getFieldType(String param) {
-        return fieldTypes.get(param);
+    protected final GuiComboBox.Type getFieldType(final String param) {
+        return FIELD_TYPES.get(param);
     }
 
     /**
      * Applies the changes.
      */
-    public void apply(final boolean testOnly) {
+    public final void apply(final boolean testOnly) {
         if (testOnly) {
             return;
         }

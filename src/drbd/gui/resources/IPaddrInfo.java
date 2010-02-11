@@ -26,7 +26,6 @@ import drbd.gui.GuiComboBox;
 import drbd.data.ResourceAgent;
 import drbd.utilities.Tools;
 
-import javax.swing.JPanel;
 import java.util.Map;
 
 /**

@@ -45,7 +45,7 @@ public class LinbitLogin extends drbd.gui.dialog.host.LinbitLogin {
     }
 
     /**
-     * Returns the next dialog.drbdUpgrade.DrbdAvailFiles
+     * Returns the next dialog.drbdUpgrade.DrbdAvailFiles.
      */
     public final WizardDialog nextDialog() {
         return new DrbdAvailFiles(this, getHost());

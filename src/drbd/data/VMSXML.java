@@ -82,7 +82,7 @@ public class VMSXML extends XML {
     /**
      * Updates data.
      */
-    public void update() {
+    public final void update() {
         final String command = host.getDistCommand("VMSXML.GetData",
                                                    (ConvertCmdCallback) null);
         final String output = Tools.execCommand(host,
@@ -161,7 +161,7 @@ public class VMSXML extends XML {
                     domainNames.add(name);
                 }
                 if (!name.equals(nameInFilename)) {
-                    Tools.appWarning("unexpected name: " + name 
+                    Tools.appWarning("unexpected name: " + name
                                      + " != " + nameInFilename);
                     return;
                 }

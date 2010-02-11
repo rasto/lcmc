@@ -181,11 +181,10 @@ public class HeartbeatGraph extends ResourceGraph {
         if (p.equals(v)) {
             return true;
         }
-        System.out.println("Pre: " + p.getPredecessors().size());
         for (final Object pre : p.getPredecessors()) {
             if (list.contains((Vertex) pre)) {
                 return false;
-            } 
+            }
             list.add((Vertex) pre);
             if (isAncestor(v, (Vertex) pre, list)) {
                 return true;

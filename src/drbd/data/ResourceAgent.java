@@ -86,9 +86,10 @@ public class ResourceAgent {
     /** Whether the service is probably master/slave resource. */
     private boolean masterSlave = false;
     /** Sections for some parameters. */
-    private Map<String, String> sectionMap = new HashMap<String, String>();
+    private final Map<String, String> sectionMap =
+                                                new HashMap<String, String>();
     /** Map to field types for some parameters. */
-    private Map<String, GuiComboBox.Type> fieldType =
+    private final Map<String, GuiComboBox.Type> fieldType =
                                        new HashMap<String, GuiComboBox.Type>();
 
     /**
@@ -131,7 +132,7 @@ public class ResourceAgent {
 
     }
 
-    /** 
+    /**
      * Adds info paramter.
      */
     private void addInfoParameter(final String section,

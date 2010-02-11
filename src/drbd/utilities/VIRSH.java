@@ -33,14 +33,17 @@ import java.util.HashMap;
  *
  */
 public final class VIRSH {
-    /** Virsh command map */
-    private static Map<String, String> COMMANDS =
+    /** Virsh command map. */
+    private static final Map<String, String> VIRSH_COMMANDS =
                                                  new HashMap<String, String>();
     static {
-        COMMANDS.put("vcpu", "/usr/bin/virsh setvcpus @DOMAIN@ @VALUE@");
-        COMMANDS.put("memory", "/usr/bin/virsh setmaxmem @DOMAIN@ @VALUE@"
-                               + " && /usr/bin/virsh setmem @DOMAIN@ @VALUE@");
-        COMMANDS.put("autostart", "/usr/bin/virsh autostart @VALUE@ @DOMAIN@");
+        VIRSH_COMMANDS.put("vcpu",
+                           "/usr/bin/virsh setvcpus @DOMAIN@ @VALUE@");
+        VIRSH_COMMANDS.put("memory",
+                           "/usr/bin/virsh setmaxmem @DOMAIN@ @VALUE@"
+                           + " && /usr/bin/virsh setmem @DOMAIN@ @VALUE@");
+        VIRSH_COMMANDS.put("autostart",
+                           "/usr/bin/virsh autostart @VALUE@ @DOMAIN@");
     }
     /**
      * Private constructor, cannot be instantiated.
@@ -50,7 +53,7 @@ public final class VIRSH {
     }
 
     /**
-     * Executes the specified virsh commands on the specified hosts
+     * Executes the specified virsh commands on the specified hosts.
      */
     private static void execCommand(final Host[] hosts,
                                       final String commands,
@@ -77,7 +80,7 @@ public final class VIRSH {
                                      final Map<String, String> parameters) {
         final StringBuffer commands = new StringBuffer(100);
         for (final String param : parameters.keySet()) {
-            String command = COMMANDS.get(param); 
+            String command = VIRSH_COMMANDS.get(param);
             if (command == null) {
                 continue;
             }
