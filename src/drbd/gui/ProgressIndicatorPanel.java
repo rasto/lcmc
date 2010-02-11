@@ -105,7 +105,7 @@ public class ProgressIndicatorPanel extends JComponent
     /** List of failed commands. */
     private final List<String> failuresMap = new LinkedList<String>();
     /** Amount of frames per seconde. Lowers this to save CPU. */
-    private final float fps = Tools.getConfigData().getAnimFPS();
+    private static final float FPS = Tools.getConfigData().getAnimFPS();
     /** Rendering hints to set anti aliasing. */
     private RenderingHints hints = null;
     /** Lock for the animator. */
@@ -129,7 +129,9 @@ public class ProgressIndicatorPanel extends JComponent
     /** Old height of the whole frame. */
     private int oldHeight = getHeight();
     /** Beginning position of the bar. */
-    private int barPos = -15;
+    private double barPos = -1;
+    /** Width of the bar. */
+    private double barWidth = 10;
     /** Maximum alpha level. */
     private static final int MAX_ALPHA_LEVEL = 255;
 
@@ -323,20 +325,35 @@ public class ProgressIndicatorPanel extends JComponent
 
             g2.setColor(new Color(200, 221, 242,
                                   (int) (alphaLevel * shield)));
+            final int startAtHeight = 22;
             g2.fillRect(0,
-                        0,
-                        getWidth(),
-                        Tools.getGUIData().getTerminalPanelPos());
-            if (barPos < getWidth()) {
-                final int he = Tools.getGUIData().getTerminalPanelPos() - 25;
-                g2.setColor(new Color(250, 133, 34,
-                                      (int) (alphaLevel * shield * 0.05)));
-                g2.fillRect(barPos, 25, 30, he);
-                g2.fillRect(getWidth() - barPos, 25, 30, he);
+                        startAtHeight,
+                        width,
+                        Tools.getGUIData().getTerminalPanelPos()
+                            - startAtHeight);
+            if (barPos < 0) {
+                barPos = width / 2;
             }
-            barPos += 30;
-            if (barPos >= getWidth()) {
-                barPos = -15;
+            if (barPos < width) {
+                final int he = Tools.getGUIData().getTerminalPanelPos()
+                                    - startAtHeight;
+                g2.setColor(new Color(250, 133, 34,
+                                      (int) (alphaLevel * shield * 0.2)));
+                if (barPos < width / 2) {
+                    g2.fillRect((int) barPos,
+                                startAtHeight,
+                                (int) (width - barPos * 2),
+                                he);
+                } else {
+                    g2.fillRect((int) (width  - barPos),
+                                startAtHeight,
+                                (int) (barPos * 2 - width),
+                                he);
+                }
+            }
+            barPos += 5.0 * 20.0 / FPS;
+            if (barPos >= width / 2 + barWidth / 2) {
+                barPos = width / 2 - barWidth / 2;
             }
 
 
@@ -357,12 +374,6 @@ public class ProgressIndicatorPanel extends JComponent
                 for (String text : texts.keySet()) {
                     if (text == null || text.length() == 0) {
                         continue;
-                    }
-                    if ("OH MY GOD!!!".equals(text)) {
-                        /* unlikely */
-                        font = new Font(getFont().getName(),
-                                         getFont().getStyle(),
-                                         (getFont().getSize() * 8));
                     }
                     final int alpha = texts.get(text).intValue();
                     final TextLayout layout = new TextLayout(
@@ -387,6 +398,9 @@ public class ProgressIndicatorPanel extends JComponent
                                 (float) (maxY + layout.getLeading() + 2
                                 * layout.getAscent()) + y);
                     y = (int) (y + (((float) 27 / MAX_ALPHA_LEVEL) * alpha));
+                    if (bounds.getWidth() > barWidth) {
+                        barWidth = bounds.getWidth() + 30;
+                    }
                 }
             }
             mTextsLock.release();
@@ -503,7 +517,7 @@ public class ProgressIndicatorPanel extends JComponent
 
                 mTextsLock.release();
                 try {
-                    Thread.sleep((int) (1000 / fps));
+                    Thread.sleep((int) (1000 / FPS));
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
@@ -511,6 +525,7 @@ public class ProgressIndicatorPanel extends JComponent
                 Thread.yield();
             }
             started = false;
+            barWidth = 10;
         }
     }
 
