@@ -175,12 +175,19 @@ public class HeartbeatGraph extends ResourceGraph {
      * Returns true if vertex v is one of the ancestors or the same as
      * vertex p.
      */
-    private boolean isAncestor(final Vertex v, final Vertex p) {
+    private boolean isAncestor(final Vertex v,
+                               final Vertex p,
+                               final List<Vertex> list) {
         if (p.equals(v)) {
             return true;
         }
+        System.out.println("Pre: " + p.getPredecessors().size());
         for (final Object pre : p.getPredecessors()) {
-            if (isAncestor(v, (Vertex) pre)) {
+            if (list.contains((Vertex) pre)) {
+                return false;
+            } 
+            list.add((Vertex) pre);
+            if (isAncestor(v, (Vertex) pre, list)) {
                 return true;
             }
         }
@@ -207,7 +214,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (pv == null) {
             return false;
         }
-        if (v.isSuccessorOf(pv) || isAncestor(v, pv)) {
+        if (v.isSuccessorOf(pv) || isAncestor(v, pv, new ArrayList<Vertex>())) {
             return true;
         }
         return false;
