@@ -558,10 +558,14 @@ public class Info implements Comparable {
         menuList.add(m);
     }
 
+    protected Unit[] getUnits() {
+        return null;
+    }
+
     /**
      * Returns units.
      */
-    protected Unit[] getUnits() {
+    protected Unit[] getTimeUnits() {
         return new Unit[]{
                    //new Unit("", "", "", ""),
                    new Unit("", "s", "Second", "Seconds"), /* default unit */

@@ -31,6 +31,7 @@ import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.VIRSH;
+import drbd.utilities.Unit;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -94,6 +95,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Possible values for some fields. */
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                           new HashMap<String, Object[]>();
+    /** Returns whether this parameter has a unit prefix. */
+    private static final Map<String, Boolean> HAS_UNIT_PREFIX =
+                                               new HashMap<String, Boolean>();
+    /** Returns default unit. */
+    private static final Map<String, String> DEFAULT_UNIT =
+                                               new HashMap<String, String>();
     static {
         SECTION_MAP.put("name",          "General Info");
         SECTION_MAP.put("defined",       "General Info");
@@ -114,11 +121,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         FIELD_TYPES.put("name",          GuiComboBox.Type.LABELFIELD);
         FIELD_TYPES.put("defined",       GuiComboBox.Type.LABELFIELD);
         FIELD_TYPES.put("status",        GuiComboBox.Type.LABELFIELD);
-        FIELD_TYPES.put("currentMemory", GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put("currentMemory", GuiComboBox.Type.TEXTFIELDWITHUNIT);
+        FIELD_TYPES.put("memory",        GuiComboBox.Type.TEXTFIELDWITHUNIT);
         FIELD_TYPES.put("autostart",     GuiComboBox.Type.CHECKBOX);
         DEFAULTS_MAP.put("autostart", "False");
         DEFAULTS_MAP.put("os-boot",   "hd");
         DEFAULTS_MAP.put("vcpu",      "1");
+        HAS_UNIT_PREFIX.put("memory", true);
+        HAS_UNIT_PREFIX.put("currentMemory", true);
         // TODO: no virsh command for os-boot
         POSSIBLE_VALUES.put("os-boot",
                            new StringInfo[]{
@@ -202,9 +212,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             } else if ("name".equals(param)) {
             } else {
-                if ("vcpu".equals(param)) {
-                    if (cb != null) {
+                if (cb != null) {
+                    if ("vcpu".equals(param)) {
                         paramComboBoxGet(param, null).setEnabled(!running);
+                    } else if ("currentMemory".equals(param)) {
+                        paramComboBoxGet(param, null).setEnabled(false);
                     }
                 }
                 for (final Host h : getBrowser().getClusterHosts()) {
@@ -288,6 +300,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 paramComboBoxGet(param, null).setEnabled(false);
             } else if ("vcpu".equals(param)) {
                 paramComboBoxGet(param, null).setEnabled(!running);
+            } else if ("currentMemory".equals(param)) {
+                paramComboBoxGet(param, null).setEnabled(false);
             }
         }
         /* Actions */
@@ -584,5 +598,32 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             toString(),
                             parameters);
         checkResourceFields(null, params);
+    }
+
+    /**
+     * Returns whether this parameter has a unit prefix.
+     */
+    protected final boolean hasUnitPrefix(final String param) {
+        return HAS_UNIT_PREFIX.containsKey(param) && HAS_UNIT_PREFIX.get(param);
+    }
+
+    /**
+     * Returns units.
+     */
+    protected final Unit[] getUnits() {
+        return new Unit[]{
+                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
+                   new Unit("K", "K", "KiByte", "KiBytes"),
+                   new Unit("M", "M", "MiByte", "MiBytes"),
+                   new Unit("G",  "G",  "GiByte",      "GiBytes"),
+                   new Unit("T",  "T",  "TiByte",      "TiBytes")
+       };
+    }
+
+    /**
+     * Returns the default unit for the parameter.
+     */
+    protected final String getDefaultUnit(final String param) {
+        return DEFAULT_UNIT.get(param);
     }
 }

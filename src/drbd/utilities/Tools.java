@@ -2094,4 +2094,30 @@ public final class Tools {
     public static boolean isLocalIp(final String ip) {
         return ip == null || "127.0.0.1".equals(ip) || "127.0.1.1".equals(ip);
     }
+
+    /**
+     * Converts value in kilobytes.
+     */
+    public static String convertKilobytes(final String kb) {
+        if (isNumber(kb)) {
+            final double k = Integer.parseInt(kb);
+            if (k / 1024 != (int) (k / 1024)) {
+                return kb + "K";
+            }
+            final double m = k / 1024;
+            if (m / 1024 != (int) (m / 1024)) {
+                return Integer.toString((int) m) + "M";
+            }
+            final double g = m / 1024;
+            if (g / 1024 != (int) (g / 1024)) {
+                return Integer.toString((int) g) + "G";
+            }
+            final double t = g / 1024;
+            if (t / 1024 != (int) (t / 1024)) {
+                return Integer.toString((int) t) + "T";
+            }
+            return Integer.toString((int) g) + "G";
+        }
+        return kb;
+    }
 }

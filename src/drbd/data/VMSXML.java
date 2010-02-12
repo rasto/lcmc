@@ -167,10 +167,14 @@ public class VMSXML extends XML {
                 }
             } else if ("vcpu".equals(option.getNodeName())) {
                 parameterValues.put(name, "vcpu", getText(option));
-            } else if ("memory".equals(option.getNodeName())) {
-                parameterValues.put(name, "memory", getText(option));
             } else if ("currentMemory".equals(option.getNodeName())) {
-                parameterValues.put(name, "currentMemory", getText(option));
+                parameterValues.put(name,
+                                    "currentMemory",
+                                    Tools.convertKilobytes(getText(option)));
+            } else if ("memory".equals(option.getNodeName())) {
+                parameterValues.put(name,
+                                    "memory", 
+                                    Tools.convertKilobytes(getText(option)));
             } else if ("os".equals(option.getNodeName())) {
                 final NodeList osOptions = option.getChildNodes();
                 for (int j = 0; j < osOptions.getLength(); j++) {

@@ -603,8 +603,13 @@ public class GuiComboBox extends JPanel {
             return "";
         } else {
             if (type == Type.TEXTFIELDWITHUNIT) {
-                return ((Object[]) o)[0].toString()
-                       + ((Unit) ((Object[]) o)[1]).getShortName();
+                final Object o0 = ((Object[]) o)[0];
+                final Object o1 = ((Object[]) o)[1];
+                String v = o0.toString();
+                if (o1 != null) {
+                    v += ((Unit) o1).getShortName();
+                }
+                return v;
             } else {
                 return o.toString();
             }
@@ -840,7 +845,10 @@ public class GuiComboBox extends JPanel {
                     String unit = "";
                     if (m.matches()) {
                         number = m.group(1);
-                        unit = m.group(2);
+                        final String parsedUnit = m.group(2);
+                        if (!"".equals(parsedUnit)) {
+                            unit = parsedUnit;
+                        }
                     }
 
                     textFieldWithoutUnit.setText(number);

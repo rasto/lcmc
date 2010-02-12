@@ -594,11 +594,14 @@ public abstract class EditableInfo extends Info {
         }
         GuiComboBox.Type type = getFieldType(param);
         Unit[] units = null;
+        if (type == GuiComboBox.Type.TEXTFIELDWITHUNIT) {
+            units = getUnits();
+        }
         if (isCheckBox(param)) {
             type = GuiComboBox.Type.CHECKBOX;
         } else if (isTimeType(param)) {
             type = GuiComboBox.Type.TEXTFIELDWITHUNIT;
-            units = getUnits();
+            units = getTimeUnits();
         }
         final GuiComboBox paramCb = new GuiComboBox(initValue,
                                                     getPossibleChoices(param),
@@ -771,8 +774,12 @@ public abstract class EditableInfo extends Info {
                 if (Tools.isStringClass(o)) {
                     newValue = cb.getStringValue();
                 } else if (o instanceof Object[]) {
-                    newValue = ((Object[]) o)[0].toString()
-                               + ((Unit) ((Object[]) o)[1]).getShortName();
+                    final Object o0 = ((Object[]) o)[0];
+                    final Object o1 = ((Object[]) o)[1];
+                    newValue = o0.toString();
+                    if (o1 != null) {
+                        newValue += ((Unit) o1).getShortName();
+                    }
                 } else {
                     newValue = ((Info) o).getStringValue();
                 }
