@@ -66,6 +66,8 @@ public class Info implements Comparable {
     /** Resource object as found in data/resources associated with this
      * object. */
     private Resource resource;
+    /** Amount of frames per second. */
+    private static final float FPS = Tools.getConfigData().getAnimFPS();
 
     /**
      * Area with text info.
@@ -84,7 +86,7 @@ public class Info implements Comparable {
     /** Whether the info object is being updated. */
     private boolean updated = false;
     /** Animation index. */
-    private int animationIndex = 0;
+    private double animationIndex = 0;
     /** Cache with info text. */
     private String infoCache = "";
     /** Browser object. */
@@ -221,7 +223,7 @@ public class Info implements Comparable {
     /**
      * Returns the animation index.
      */
-    public final int getAnimationIndex() {
+    public final double getAnimationIndex() {
         return animationIndex;
     }
 
@@ -230,7 +232,7 @@ public class Info implements Comparable {
      * than 100.
      */
     public final void incAnimationIndex() {
-        animationIndex += 5;
+        animationIndex += 3.0 * 20.0 / FPS;
         if (animationIndex > 100) {
             animationIndex = 0;
         }

@@ -104,7 +104,7 @@ public class ProgressIndicatorPanel extends JComponent
                                         new LinkedHashMap<String, Integer>();
     /** List of failed commands. */
     private final List<String> failuresMap = new LinkedList<String>();
-    /** Amount of frames per seconde. Lowers this to save CPU. */
+    /** Amount of frames per second. */
     private static final float FPS = Tools.getConfigData().getAnimFPS();
     /** Rendering hints to set anti aliasing. */
     private RenderingHints hints = null;

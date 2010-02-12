@@ -1504,15 +1504,26 @@ public abstract class ResourceGraph {
             }
             if (animationList.contains(info)) {
                 /* update animation */
-                final int i = info.getAnimationIndex();
+                final double i = info.getAnimationIndex();
                 mAnimationListLock.release();
-                final int barPos = i * (shapeWidth - 7) / 100;
+                final int barPos =
+                           (int) (i * (shapeWidth) / 100);
                 g2d.setColor(new Color(250, 133, 34,
                                        50));
-                g2d.fillRect((int) (x + barPos), (int) y, 7, shapeHeight);
-                g2d.fillRect((int) (x + shapeWidth - barPos - 7),
-                             (int) y, 7,
-                             shapeHeight);
+                if (barPos > shapeWidth / 2) {
+                    g2d.fillRect((int) (x + (barPos / 2)),
+                                 (int) y,
+                                 shapeWidth - barPos,
+                                 shapeHeight);
+                } else {
+                    g2d.fillRect((int) (x + shapeWidth / 2 - barPos / 2),
+                                 (int) y,
+                                 barPos,
+                                 shapeHeight);
+                }
+                //g2d.fillRect((int) (x + shapeWidth - barPos - 7),
+                //             (int) y, 7,
+                //             shapeHeight);
             } else {
                 mAnimationListLock.release();
             }
