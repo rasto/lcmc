@@ -119,7 +119,7 @@ public class AppDefaults extends
         /*
          * Colors
          */
-        //{"ViewPanel.Background",             new Color(240, 240, 240) },
+        {"DrbdMC.TableHeader",               LINBIT_ORANGE},
         {"DefaultButton.Background",         LINBIT_ORANGE },
         {"ViewPanel.Background",             LINBIT_LIGHT_ORANGE },
         {"ViewPanel.Status.Background",      LINBIT_ORANGE },

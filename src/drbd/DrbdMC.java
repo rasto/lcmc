@@ -34,8 +34,10 @@ import drbd.utilities.Tools;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
+import java.awt.Color;
 
 /**
  * This is the central class with main function. It starts the DRBD GUI.
@@ -56,6 +58,10 @@ public class DrbdMC extends JPanel {
                                                     TOOLTIP_INITIAL_DELAY);
         ToolTipManager.sharedInstance().setDismissDelay(
                                                     TOOLTIP_DISMISS_DELAY);
+        UIManager.put("TableHeader.background",
+                      Tools.getDefaultColor("DrbdMC.TableHeader"));
+        UIManager.put("TableHeader.font",
+                      UIManager.getFont("Label.font"));
         /* Create and set up the window. */
         final JFrame mainFrame = new JFrame(
                Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());

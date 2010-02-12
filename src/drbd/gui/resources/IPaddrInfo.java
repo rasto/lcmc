@@ -95,10 +95,10 @@ class IPaddrInfo extends ServiceInfo {
             /* get networks */
             final String ip = getParamSaved("ip");
             Info defaultValue;
-            if (ip == null) {
+            if (ip == null || "".equals(ip)) {
                 defaultValue = new StringInfo(
                         Tools.getString("ClusterBrowser.SelectNetInterface"),
-                        null,
+                        ip,
                         getBrowser());
             } else {
                 defaultValue = new StringInfo(ip, ip, getBrowser());

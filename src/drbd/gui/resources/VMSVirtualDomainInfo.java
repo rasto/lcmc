@@ -63,6 +63,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private final JPanel extraOptionsPanel = new JPanel();
     /** Whether the vm is running on at least one host. */
     private boolean running = false;
+    /** HTML string on which hosts the vm is defined. */
+    private String definedOnString = "";
+    /** HTML string on which hosts the vm is running. */
+    private String runningOnString = "";
     /** Running VM icon. */
     private static final ImageIcon VM_RUNNING_ICON =
         Tools.createImageIcon(
@@ -192,24 +196,23 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                          + hostName + "</font>");
                     }
                 }
-                getResource().setValue(
-                    "defined",
-                    "<html>"
-                    + Tools.join(" ", definedhosts.toArray(
-                                    new String[definedhosts.size()]))
-                    + "</html>");
+                definedOnString = "<html>"
+                                  + Tools.join(" ", definedhosts.toArray(
+                                             new String[definedhosts.size()]))
+                                  + "</html>";
+                getResource().setValue("defined", definedOnString);
                 if (runningOnHosts.isEmpty()) {
-                    getResource().setValue("status", "Stopped");
                     running = false;
+                    runningOnString = "Stopped";
                 } else {
                     running = true;
-                    getResource().setValue(
-                        "status",
+                    runningOnString =
                         "<html>Running on: "
                         + Tools.join(", ", runningOnHosts.toArray(
                                             new String[runningOnHosts.size()]))
-                        + "</html>");
+                        + "</html>";
                 }
+                getResource().setValue("status", runningOnString);
             } else if ("name".equals(param)) {
             } else {
                 if (cb != null) {
@@ -504,6 +507,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
+        if ("memory".equals(param) && running) {
+            final int mem = Tools.convertToKilobytes(newValue);
+            final int curMem = Tools.convertToKilobytes(
+                                    getResource().getValue("currentMemory"));
+            if (mem < curMem) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -625,5 +636,19 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      */
     protected final String getDefaultUnit(final String param) {
         return DEFAULT_UNIT.get(param);
+    }
+
+    /**
+     * Returns HTML string on which hosts the vm is defined.
+     */
+    public final String getDefinedOnString() {
+        return definedOnString;
+    }
+
+    /**
+     * Returns HTML string on which hosts the vm is running.
+     */
+    public final String getRunningOnString() {
+        return runningOnString;
     }
 }

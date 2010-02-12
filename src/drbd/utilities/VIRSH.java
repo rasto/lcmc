@@ -96,26 +96,15 @@ public final class VIRSH {
                         value = "--disable";
                     }
                 } else if ("memory".equals(param)) {
-                    final Object[] v = Tools.extractUnit(value);
-                    if (v.length == 2 && Tools.isNumber((String) v[0])) {
-                        int num = Integer.parseInt((String) v[0]);
-                        final String unit = (String) v[1];
-                        if ("T".equals(unit)) {
-                            num = num * 1024 * 1024 * 1024;
-                        } else if ("G".equals(unit)) {
-                            num = num * 1024 * 1024;
-                        } else if ("M".equals(unit)) {
-                            num = num * 1024;
-                        } else if ("K".equals(unit)) {
-                        } else {
-                            Tools.appError("cannot parse: "
-                                           + param
-                                           + " = "
-                                           + value);
-                            continue;
-                        }
-                        value = Integer.toString(num);
+                    final int num = Tools.convertToKilobytes(value);
+                    if (num < 0) {
+                        Tools.appError("cannot parse: "
+                                       + param
+                                       + " = "
+                                       + value);
+                        continue;
                     }
+                    value = Integer.toString(num);
                 }
                 command = command.replaceAll("@VALUE@", value);
             }

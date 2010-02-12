@@ -211,18 +211,20 @@ class FilesystemInfo extends ServiceInfo {
                                            final int width) {
         GuiComboBox paramCb;
         if (FS_RES_PARAM_DEV.equals(param)) {
-            final DrbdResourceInfo selectedInfo =
+            DrbdResourceInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
             String selectedValue = null;
-            if (selectedInfo != null) {
+            if (selectedInfo == null) {
+                selectedValue = getParamSaved(FS_RES_PARAM_DEV);
+            } else {
                 selectedValue = selectedInfo.toString();
             }
             Info defaultValue = null;
-            if (selectedValue == null) {
+            if (selectedValue == null || "".equals(selectedValue)) {
                 defaultValue = new StringInfo(
                            Tools.getString("ClusterBrowser.SelectBlockDevice"),
-                           null,
+                           "",
                            getBrowser());
             }
             final Info[] commonBlockDevInfos =
@@ -240,7 +242,10 @@ class FilesystemInfo extends ServiceInfo {
         } else if ("fstype".equals(param)) {
             final String defaultValue =
                         Tools.getString("ClusterBrowser.SelectFilesystem");
-            final String selectedValue = getParamSaved("fstype");
+            String selectedValue = getParamSaved("fstype");
+            if (selectedValue == null || "".equals(selectedValue)) {
+                selectedValue = defaultValue;
+            }
             paramCb = new GuiComboBox(
                               selectedValue,
                               getBrowser().getCommonFileSystems(defaultValue),
@@ -260,12 +265,17 @@ class FilesystemInfo extends ServiceInfo {
                              items,
                              1,
                              cmp.length);
+            final String defaultValue =
+                           Tools.getString("ClusterBrowser.SelectMountPoint");
             items[0] = new StringInfo(
-                            Tools.getString("ClusterBrowser.SelectMountPoint"),
+                            defaultValue,
                             null,
                             getBrowser());
             getResource().setPossibleChoices(param, items);
-            final String selectedValue = getParamSaved("directory");
+            String selectedValue = getParamSaved("directory");
+            if (selectedValue == null || "".equals(selectedValue)) {
+                selectedValue = defaultValue;
+            }
             final String regexp = "^.+$";
             paramCb = new GuiComboBox(selectedValue,
                                       items,
@@ -366,7 +376,8 @@ class FilesystemInfo extends ServiceInfo {
                 return -1;
             }
             final Info item = (Info) value;
-            if (item.getStringValue() == null) {
+            final String sValue = item.getStringValue();
+            if (sValue == null || "".equals(sValue)) {
                 return -1;
             }
             final CommonDeviceInterface cdi = (CommonDeviceInterface) item;

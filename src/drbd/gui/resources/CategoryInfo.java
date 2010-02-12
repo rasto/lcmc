@@ -22,17 +22,45 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
+import drbd.gui.ClusterBrowser;
 import javax.swing.ImageIcon;
+import java.awt.Component;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.SwingConstants;
+import javax.swing.BoxLayout;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableRowSorter;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.Point;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * This class holds info data for a category.
- * Nothing is displayed.
  */
 public class CategoryInfo extends Info {
+    /** Info panel. */
+    private JComponent infoPanel = null;
+    /** Table. */
+    private JTable table = null;
+    /** Table model. */
+    private DefaultTableModel tableModel = null;
+    TableRowSorter sorter = null;
     /**
      * Prepares a new <code>CategoryInfo</code> object.
-     *
-     * @param name
-     *      name that will be shown in the tree
      */
     public CategoryInfo(final String name, final Browser browser) {
         super(name, browser);
@@ -51,5 +79,210 @@ public class CategoryInfo extends Info {
     public ImageIcon getMenuIcon(final boolean testOnly) {
         return Browser.CATEGORY_ICON;
     }
-}
 
+    /**
+     * Returns info panel for this resource.
+     */
+    public JComponent getInfoPanel() {
+        if (infoPanel != null) {
+            return infoPanel;
+        }
+        infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+
+        final String[] colNames = getColumnNames();
+        if (colNames != null) {
+            final Object[][] data = getTableData();
+            tableModel = new DefaultTableModel(data, colNames);
+            table = new JTable(tableModel) {
+                /** Serial version uid. */
+                private static final long serialVersionUID = 1L;
+                /**
+                 * Overriding so that jlabels show up.
+                 */
+                public Class getColumnClass(final int c) {
+                    return getValueAt(0, c).getClass();
+                }
+            };
+            //table.setAutoCreateRowSorter(true);
+            sorter = new TableRowSorter<DefaultTableModel>(tableModel);
+            for (int i = 0; i < colNames.length; i++) {
+                final Comparator c = getColComparator(i);
+                if (c != null) {
+                    sorter.setComparator(i, c);
+                }
+
+            }
+            table.setRowSorter(sorter);
+            sorter.setSortsOnUpdates(true);
+
+            //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            table.getTableHeader().setReorderingAllowed(true);
+
+            infoPanel.setBackground(Browser.PANEL_BACKGROUND);
+            //table.setIntercellSpacing(new Dimension(8, 1));
+            table.setBackground(Browser.PANEL_BACKGROUND);
+            table.setDefaultRenderer(Object.class,
+                                     new MyCellRenderer());
+            final int h = getRowHeight();
+            if (h >= 0) {
+                table.setRowHeight(h);
+            }
+            table.addMouseListener(new MouseAdapter() {
+                public final void mouseClicked(final MouseEvent e) {
+                    final JTable table = (JTable) e.getSource();
+                    final Point p = e.getPoint();
+                    final int row = table.rowAtPoint(p);
+                    final String key =
+                            ((JLabel) table.getValueAt(row, 0)).getText();
+                    rowClicked(key);
+                }
+            });
+            final JScrollPane sp = new JScrollPane(table);
+            sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);
+            sp.setBackground(Browser.PANEL_BACKGROUND);
+            infoPanel.add(sp);
+            resizeTable(table); 
+        }
+        return infoPanel;
+    }
+
+    /**
+     * Alignment for the specified column.
+     */
+    protected int getColumnAlignment(final int column) {
+        return SwingConstants.LEFT;
+    }
+
+    /**
+     * Returns columns for the table.
+     */
+    protected String[] getColumnNames() {
+        return null;
+    }
+
+    /**
+     * Returns data for the table.
+     */
+    protected Object[][] getTableData() {
+        return null;
+    }
+
+    /** 
+     * Updates data in the table.
+     */
+    public final void update() {
+        if (tableModel != null) {
+            final String[] colNames = getColumnNames();
+            if (colNames != null) {
+                final Object[][] data = getTableData();
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        System.out.println("table update");
+                        List sortKeys = sorter.getSortKeys();
+                        tableModel.setDataVector(data, colNames);
+                        sorter.setSortKeys(sortKeys);
+                        tableModel.fireTableDataChanged();
+                        resizeTable(table); 
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Execute when row in the table was clicked. 
+     */
+    protected void rowClicked(final String key) {
+        /* do nothing */
+    }
+
+    /**
+     * Returns row height for the table.
+     */
+    protected int getRowHeight() {
+        return -1;
+    }
+
+    /**
+     * Cells with jlabels, widths and colors.
+     */
+    private class MyCellRenderer extends JLabel
+                                 implements TableCellRenderer {
+        public MyCellRenderer() {
+            setOpaque(true);
+        }
+        public Component getTableCellRendererComponent(
+                                                final JTable table, 
+                                                final Object value,
+                                                final boolean isSelected,
+                                                final boolean hasFocus,
+                                                final int row,
+                                                final int column) {
+            JLabel ret;
+            if (value instanceof JLabel) {
+                ret  = (JLabel) value;
+            } else {
+                setText(value.toString());
+                ret = this;
+            }
+            final int al = getColumnAlignment(column);
+            ret.setHorizontalAlignment(al);
+            final String key =
+                            ((JLabel) table.getValueAt(row, 0)).getText();
+            final Color bg = getColorForRow(key);
+            ret.setBackground(bg);
+            return ret;
+        }
+    }
+
+    /**
+     * Retrurns color for some rows.
+     */
+    protected Color getColorForRow(final String key) {
+        return null;
+    }
+
+    public final void resizeTable(JTable table) {
+        int margin = 5;
+ 
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            int                     vColIndex = i;
+            DefaultTableColumnModel colModel  = (DefaultTableColumnModel) table.getColumnModel();
+            TableColumn             col       = colModel.getColumn(vColIndex);
+            int                     width     = 0;
+ 
+            TableCellRenderer renderer = col.getHeaderRenderer();
+ 
+            if (renderer == null) {
+                renderer = table.getTableHeader().getDefaultRenderer();
+            }
+ 
+            Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
+ 
+            width = comp.getPreferredSize().width;
+ 
+            for (int r = 0; r < table.getRowCount(); r++) {
+                renderer = table.getCellRenderer(r, vColIndex);
+                comp     = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex), false, false,
+                        r, vColIndex);
+                width = Math.max(width, comp.getPreferredSize().width);
+            }
+ 
+            width += 2 * margin;
+ 
+            col.setPreferredWidth(width);
+        }
+ 
+        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(
+            SwingConstants.LEFT);
+    }
+
+    /**
+     * Returns comparator for column.
+     */
+    protected Comparator getColComparator(final int col) {
+        return null;
+    }
+}

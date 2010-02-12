@@ -2120,4 +2120,27 @@ public final class Tools {
         }
         return kb;
     }
+
+    /**
+     * Converts value with unit to kilobites.
+     */
+    public static int convertToKilobytes(final String value) {
+        final Object[] v = Tools.extractUnit(value);
+        if (v.length == 2 && Tools.isNumber((String) v[0])) {
+            int num = Integer.parseInt((String) v[0]);
+            final String unit = (String) v[1];
+            if ("T".equals(unit)) {
+                num = num * 1024 * 1024 * 1024;
+            } else if ("G".equals(unit)) {
+                num = num * 1024 * 1024;
+            } else if ("M".equals(unit)) {
+                num = num * 1024;
+            } else if ("K".equals(unit)) {
+            } else {
+                return -1;
+            }
+            return num;
+        }
+        return -1;
+    }
 }

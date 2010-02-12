@@ -464,14 +464,8 @@ public class GuiComboBox extends JPanel {
                 comboList.add(items[i]);
             }
             if (selectedValueInfo == null && selectedValue != null) {
-                /* adds selected value to the list, if it is not there,
-                   but only for string class. */
-                if (items.length > 0 && Tools.isStringClass(items[0])) {
-                    comboList.add(0, selectedValue);
-                    selectedValueInfo = selectedValue;
-                } else {
-                    Tools.appWarning("cannot select: " + selectedValue);
-                }
+                comboList.add(selectedValue);
+                selectedValueInfo = selectedValue;
             }
         }
         return selectedValueInfo;
@@ -636,7 +630,10 @@ public class GuiComboBox extends JPanel {
                 if (cb.isEditable()) {
                     final JTextComponent editor =
                         (JTextComponent) cb.getEditor().getEditorComponent();
-                    final String text = editor.getText();
+                    String text = editor.getText();
+                    if (text == null) {
+                        text = "";
+                    }
                     value = cb.getSelectedItem();
                     if (value == null || !text.equals(value.toString())) {
                         value = text;

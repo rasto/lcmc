@@ -57,6 +57,7 @@ import drbd.gui.resources.AvailableServiceInfo;
 import drbd.gui.resources.CommonBlockDevInfo;
 import drbd.gui.resources.CRMInfo;
 import drbd.gui.resources.VMSVirtualDomainInfo;
+import drbd.gui.resources.VMSInfo;
 
 import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
@@ -482,8 +483,7 @@ public class ClusterBrowser extends Browser {
         /* VMs */
         if (vmsNode == null) {
             vmsNode = new DefaultMutableTreeNode(
-                     new CategoryInfo(Tools.getString("ClusterBrowser.VMs"),
-                                      this));
+                     new VMSInfo(Tools.getString("ClusterBrowser.VMs"), this));
             setNode(vmsNode);
             topAdd(vmsNode);
             reload(getTreeTop());
@@ -1210,12 +1210,12 @@ public class ClusterBrowser extends Browser {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) e.nextElement();
-                final VMSVirtualDomainInfo vmsi =
+                final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
-                if (domainNames.contains(vmsi.toString())) {
+                if (domainNames.contains(vmsvdi.toString())) {
                     /* keeping */
-                    domainNames.remove(vmsi.toString());
-                    vmsi.updateParameters(); /* update old */
+                    domainNames.remove(vmsvdi.toString());
+                    vmsvdi.updateParameters(); /* update old */
                 } else {
                     /* remove not existing vms */
                     nodesToRemove.add(node);
@@ -1240,18 +1240,18 @@ public class ClusterBrowser extends Browser {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) e.nextElement();
-                final VMSVirtualDomainInfo vmsi =
+                final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
-                if (domainName.compareTo(vmsi.getName()) < 0) {
+                if (domainName.compareTo(vmsvdi.getName()) < 0) {
                     break;
                 }
                 i++;
             }
             /* add new block devices */
-            final VMSVirtualDomainInfo vmsi =
+            final VMSVirtualDomainInfo vmsvdi =
                                    new VMSVirtualDomainInfo(domainName, this);
-            vmsi.updateParameters();
-            resource = new DefaultMutableTreeNode(vmsi);
+            vmsvdi.updateParameters();
+            resource = new DefaultMutableTreeNode(vmsvdi);
             setNode(resource);
             vmsNode.insert(resource, i);
             i++;
@@ -1259,6 +1259,10 @@ public class ClusterBrowser extends Browser {
         }
         if (nodeChanged) {
             reload(vmsNode);
+        }
+        final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
+        if (vmsi != null) {
+            vmsi.update();
         }
     }
 
@@ -2177,10 +2181,10 @@ public class ClusterBrowser extends Browser {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) e.nextElement();
-                final VMSVirtualDomainInfo vmsi =
+                final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
-                if (name.equals(vmsi.getName())) {
-                    return vmsi;
+                if (name.equals(vmsvdi.getName())) {
+                    return vmsvdi;
                 }
             }
         }
