@@ -228,6 +228,21 @@ public class BlockDevice extends Resource {
     }
 
     /**
+     * Returns whether the specified data are different than the stored data.
+     */
+    public final boolean isDifferent(final String connectionState,
+                                     final String nodeState,
+                                     final String diskState,
+                                     final String drbdFlags) {
+        return !Tools.areEqual(this.connectionState, connectionState)
+               || !Tools.areEqual(this.nodeState, nodeState)
+               || !Tools.areEqual(this.diskState, diskState)
+               || !Tools.areEqual(this.drbdFlags, drbdFlags);
+               
+    }
+
+
+    /**
      * Sets this device used by CRM flag.
      */
     public final void setUsedByCRM(final boolean isUsedByCRM) {

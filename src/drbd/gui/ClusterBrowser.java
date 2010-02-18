@@ -177,6 +177,9 @@ public class ClusterBrowser extends Browser {
     private Host realDcHost = null;
     /** Panel that holds this browser. */
     private ClusterViewPanel clusterViewPanel = null;
+    /** Previous drbd configs. */
+    private final Map<Host, String> oldDrbdConfigString =
+                                                new HashMap<Host, String>();
 
     /** Remove icon. */
     public static final ImageIcon REMOVE_ICON =
@@ -291,6 +294,8 @@ public class ClusterBrowser extends Browser {
     /** Cluster status error string. */
     private static final String CLUSTER_STATUS_ERROR =
                                   "---start---\r\nerror\r\n\r\n---done---\r\n";
+    /** Previous drbd status. */
+    private String oldDrbdStatus = null;
     /**
      * Prepares a new <code>CusterBrowser</code> object.
      */
@@ -651,7 +656,8 @@ public class ClusterBrowser extends Browser {
                 initOperations();
                 final DrbdXML newDrbdXML = new DrbdXML(cluster.getHostsArray());
                 for (final Host h : cluster.getHostsArray()) {
-                    newDrbdXML.update(h);
+                    final String configString = newDrbdXML.getConfig(h);
+                    newDrbdXML.update(configString);
                 }
                 drbdXML = newDrbdXML;
                 /* available services */
@@ -718,15 +724,16 @@ public class ClusterBrowser extends Browser {
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
             final VMSXML newVMSXML = new VMSXML(host);
-            newVMSXML.update();
-            try {
-                mVMSLock.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            if (newVMSXML.update()) {
+                try {
+                    mVMSLock.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                vmsXML.put(host, newVMSXML);
+                mVMSLock.release();
+                updateVMS();
             }
-            vmsXML.put(host, newVMSXML);
-            mVMSLock.release();
-            updateVMS();
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
@@ -734,7 +741,7 @@ public class ClusterBrowser extends Browser {
                     }
                 });
             try {
-                Thread.sleep(20000);
+                Thread.sleep(10000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -844,40 +851,61 @@ public class ClusterBrowser extends Browser {
                    new NewOutputCallback() {
                        public void output(final String output) {
                            firstTime.countDown();
+                           boolean updated = false;
                            if (output.indexOf(
                                     "No response from the DRBD driver") >= 0) {
-                               host.setDrbdStatus(false);
-                               drbdGraph.repaint();
+                               if (host.isDrbdStatus()) {
+                                   Tools.debug(this, "drbd status update: "
+                                                 + host.getName());
+                                   host.setDrbdStatus(false);
+                                   drbdGraph.repaint();
+                               }
                                return;
-                           } else {
+                           }
+                           if (!host.isDrbdStatus()) {
                                host.setDrbdStatus(true);
+                               updated = true;
                            }
                            final String[] lines = output.split("\n");
                            final DrbdXML newDrbdXML =
                                           new DrbdXML(cluster.getHostsArray());
-                           newDrbdXML.update(host);
-                           drbdXML = newDrbdXML;
-                           host.setDrbdStatus(true);
-                           drbdGraph.repaint();
-                           for (int i = 0; i < lines.length; i++) {
-                               parseDrbdEvent(host.getName(), lines[i]);
-                           }
 
-                           final Thread thread = new Thread(
-                               new Runnable() {
-                                   public void run() {
-                                       repaintSplitPane();
-                                       drbdGraph.updatePopupMenus();
-                                       SwingUtilities.invokeLater(
-                                           new Runnable() {
-                                               public void run() {
-                                                   repaintTree();
+                           final String configString =
+                                                   newDrbdXML.getConfig(host);
+                           newDrbdXML.update(configString);
+                           for (final String line : lines) {
+                               if (newDrbdXML.parseDrbdEvent(host.getName(),
+                                                             drbdGraph,
+                                                             line)) {
+                                   updated = true;
+                               }
+                           }
+                           if (updated) {
+                               if (!Tools.areEqual(configString,
+                                               oldDrbdConfigString.get(host))) {
+                                   oldDrbdConfigString.put(host, configString);
+                                   updated = true;
+                               }
+                               drbdXML = newDrbdXML;
+                               drbdGraph.repaint();
+                               Tools.debug(this, "drbd status update: "
+                                             + host.getName());
+                               final Thread thread = new Thread(
+                                   new Runnable() {
+                                       public void run() {
+                                           repaintSplitPane();
+                                           drbdGraph.updatePopupMenus();
+                                           SwingUtilities.invokeLater(
+                                               new Runnable() {
+                                                   public void run() {
+                                                       repaintTree();
+                                                   }
                                                }
-                                           }
-                                       );
-                                   }
-                               });
-                           thread.start();
+                                           );
+                                       }
+                                   });
+                               thread.start();
+                           }
                        }
                    });
             firstTime.countDown();
@@ -997,16 +1025,20 @@ public class ClusterBrowser extends Browser {
                                 }
                             } else {
                                 host.setClStatus(true);
-                                clusterStatus.parseStatus(status);
-                                final ServicesInfo ssi =
+                                if (clusterStatus.parseStatus(status)) {
+                                    Tools.debug(this,
+                                                "update cluster status: "
+                                                + host.getName());
+                                    final ServicesInfo ssi =
                                               heartbeatGraph.getServicesInfo();
-                                ssi.setGlobalConfig();
-                                ssi.setAllResources(testOnly);
-                                if (firstTime.getCount() == 1) {
-                                    /* one more time so that id-refs work. */
+                                    ssi.setGlobalConfig();
                                     ssi.setAllResources(testOnly);
+                                    if (firstTime.getCount() == 1) {
+                                        /* one more time so that id-refs work. */
+                                        ssi.setAllResources(testOnly);
+                                    }
+                                    repaintTree();
                                 }
-                                repaintTree();
                             }
                         }
                         firstTime.countDown();
@@ -1460,18 +1492,6 @@ public class ClusterBrowser extends Browser {
      */
     public final void clStatusUnlock() {
         mClStatusLock.release();
-    }
-
-    /**
-     * Parses drbd event from host.
-     */
-    public final void parseDrbdEvent(final String hostName,
-                                     final String output) {
-        final DrbdXML dxml = drbdXML;
-        if (dxml == null) {
-            return;
-        }
-        dxml.parseDrbdEvent(hostName, drbdGraph, output);
     }
 
     /**

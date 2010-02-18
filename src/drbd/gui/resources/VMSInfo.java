@@ -158,10 +158,10 @@ public class VMSInfo extends CategoryInfo {
     /**
      * Returns comparator for column.
      */
-    protected Comparator getColComparator(final int col) {
+    protected Comparator<String> getColComparator(final int col) {
         if (col == 3) {
             /* memory */
-            final Comparator c = new Comparator<String>() {
+            final Comparator<String> c = new Comparator<String>() {
                 public int compare(final String s1, final String s2) {
                     final int i1 = Tools.convertToKilobytes(s1);
                     final int i2 = Tools.convertToKilobytes(s2);

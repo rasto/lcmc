@@ -709,8 +709,12 @@ public class DrbdInfo extends EditableInfo {
                     getBrowser().updateCommonBlockDevices();
                     final DrbdXML newDrbdXML =
                         new DrbdXML(getBrowser().getCluster().getHostsArray());
-                    newDrbdXML.update(bd1.getHost());
-                    newDrbdXML.update(bd2.getHost());
+                    final String configString1 =
+                                    newDrbdXML.getConfig(bd1.getHost());
+                    newDrbdXML.update(configString1);
+                    final String configString2 =
+                                    newDrbdXML.getConfig(bd2.getHost());
+                    newDrbdXML.update(configString2);
                     getBrowser().setDrbdXML(newDrbdXML);
                     getBrowser().resetFilesystems();
                 }

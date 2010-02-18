@@ -82,7 +82,7 @@ public class VMSXML extends XML {
     /**
      * Updates data.
      */
-    public final void update() {
+    public final boolean update() {
         final String command = host.getDistCommand("VMSXML.GetData",
                                                    (ConvertCmdCallback) null);
         final String output = Tools.execCommand(host,
@@ -90,13 +90,19 @@ public class VMSXML extends XML {
                                                 null,  /* ExecCallback */
                                                 false); /* outputVisible */
         if (output == null) {
-            return;
+            return false;
         }
         final Document document = getXMLDocument(output);
         if (document == null) {
-            return;
+            return false;
         }
         final Node vmsNode = getChildNode(document, "vms");
+        final String md5 = getAttribute(vmsNode, "md5");
+        if (md5 == null
+            || md5.equals(host.getVMInfoMD5())) {
+            return false;
+        }
+        host.setVMInfoMD5(md5);
         final NodeList vms = vmsNode.getChildNodes();
         for (int i = 0; i < vms.getLength(); i++) {
             final Node vmNode = vms.item(i);
@@ -104,6 +110,7 @@ public class VMSXML extends XML {
                 updateVM(vmNode);
             }
         }
+        return true;
     }
 
     /**

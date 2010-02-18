@@ -3,7 +3,8 @@
 # This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH,
 # written by Rasto Levrinc.
 #
-# Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+# Copyright (C) 2009 - 2010, LINBIT HA-Solutions GmbH.
+# Copyright (C) 2010, Rastislav Levrinc.
 #
 # DRBD Management Console is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -25,6 +26,7 @@ $! = 1;
 
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use POSIX qw(:errno_h); # EAGAIN
+use Digest::MD5 "md5_hex";
 
 use Socket;
 
@@ -765,7 +767,7 @@ sub get_resource_status {
 		}
 	}
 	my $info = "";
-	for my $res (keys %resources) {
+	for my $res (sort keys %resources) {
 		my $running = "running";
 		if (keys %{$role{$res}} == 0) {
 			$running = "stopped";
@@ -1123,7 +1125,7 @@ if (/etc/init.d/$script status 2>&1|grep 'Usage:' >/dev/null); then \
 else \
 	out=`/etc/init.d/$script status 2>&1`; \
 	ret=\$?; \
-	if [ -z \$out ]; then exit 111; else exit \$ret; fi; \
+	if [ -z "\$out" ]; then exit 111; else exit \$ret; fi; \
 fi
 STATUS
 }
@@ -1241,36 +1243,42 @@ sub get_cluster_versions {
 
 sub get_vm_info {
 	my %autostart;
-	print "<vms>\n";
-	for (`ls /etc/libvirt/qemu/autostart/*.xml`) {
+	for (`ls /etc/libvirt/qemu/autostart/*.xml 2>/dev/null`) {
 		my ($name) = /([^\/]+).xml/;
 		next if !$name;
 		$autostart{$name}++;
 	}
-	for (`ls /etc/libvirt/qemu/*.xml`) {
+	my $out = "";
+	for (`ls /etc/libvirt/qemu/*.xml 2>/dev/null`) {
 		my ($name) = /([^\/]+).xml/;
 		next if !$name;
 		chomp;
-		my $info = `/usr/bin/virsh dominfo $name 2>/dev/null` || "";
-		next if $?;
-		my $vncdisplay = `/usr/bin/virsh vncdisplay $name` || "";
-		my $config = `/usr/bin/virsh dumpxml $name` || "";
-		print "<vm name=\"$name\" config=\"$_\"";
+		my $info =
+		  `/usr/bin/virsh dominfo $name 2>/dev/null|grep -v 'CPU time'`
+		  || "";
+		next if !$info;
+		my $vncdisplay = `/usr/bin/virsh vncdisplay $name 2>/dev/null`
+				 || "";
+		my $config = `/usr/bin/virsh dumpxml $name 2>/dev/null` || "";
+		$out.= "<vm name=\"$name\" config=\"$_\"";
 		if ($autostart{$name}) {
-			print ' autostart="True"';
+			$out.= ' autostart="True"';
 		} else {
-			print ' autostart="False"';
+			$out.= ' autostart="False"';
 		}
-		print ">\n";
-		print "<info>\n";
-		print $info;
-		print "</info>\n";
-		print "<vncdisplay>$vncdisplay</vncdisplay>\n";
-		print "<config>\n";
-		print $config;
-		print "</config>\n";
-		print "</vm>\n";
+		$out.= ">\n";
+		$out.= "<info>\n";
+		$out.= $info;
+		$out.= "</info>\n";
+		$out.= "<vncdisplay>$vncdisplay</vncdisplay>\n";
+		$out.= "<config>\n";
+		$out.= $config;
+		$out.= "</config>\n";
+		$out.= "</vm>\n";
 	}
+	my $md5 = md5_hex($out);
+	print "<vms md5=\"$md5\">\n";
+	print $out;
 	print "</vms>\n";
 }
 

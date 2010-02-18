@@ -23,6 +23,7 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
+import drbd.utilities.Tools;
 import javax.swing.ImageIcon;
 import java.awt.Component;
 import javax.swing.JComponent;
@@ -47,6 +48,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.RowSorter;
 
 /**
  * This class holds info data for a category.
@@ -83,6 +85,7 @@ public class CategoryInfo extends Info {
     /**
      * Returns info panel for this resource.
      */
+    @SuppressWarnings("unchecked")
     public JComponent getInfoPanel() {
         if (infoPanel != null) {
             return infoPanel;
@@ -107,13 +110,13 @@ public class CategoryInfo extends Info {
             //table.setAutoCreateRowSorter(true);
             sorter = new TableRowSorter<DefaultTableModel>(tableModel);
             for (int i = 0; i < colNames.length; i++) {
-                final Comparator c = getColComparator(i);
+                final Comparator<String> c = getColComparator(i);
                 if (c != null) {
                     sorter.setComparator(i, c);
                 }
 
             }
-            table.setRowSorter(sorter);
+            table.setRowSorter((RowSorter) sorter);
             sorter.setSortsOnUpdates(true);
 
             //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -171,16 +174,17 @@ public class CategoryInfo extends Info {
     /** 
      * Updates data in the table.
      */
+    @SuppressWarnings("unchecked")
     public final void update() {
         if (tableModel != null) {
             final String[] colNames = getColumnNames();
             if (colNames != null) {
                 final Object[][] data = getTableData();
+                Tools.debug(this, "update table in: " + getName());
 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        System.out.println("table update");
-                        List sortKeys = sorter.getSortKeys();
+                        final List sortKeys = sorter.getSortKeys();
                         tableModel.setDataVector(data, colNames);
                         sorter.setSortKeys(sortKeys);
                         tableModel.fireTableDataChanged();
@@ -210,6 +214,9 @@ public class CategoryInfo extends Info {
      */
     private class MyCellRenderer extends JLabel
                                  implements TableCellRenderer {
+        /** Serial version uid. */
+        private static final long serialVersionUID = 1L;
+
         public MyCellRenderer() {
             setOpaque(true);
         }
@@ -282,7 +289,7 @@ public class CategoryInfo extends Info {
     /**
      * Returns comparator for column.
      */
-    protected Comparator getColComparator(final int col) {
+    protected Comparator<String> getColComparator(final int col) {
         return null;
     }
 }

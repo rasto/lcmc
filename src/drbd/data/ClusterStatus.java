@@ -52,6 +52,12 @@ public class ClusterStatus {
     private volatile Map<String, ResStatus> resStateMap = null;
     /** Results from ptest. */
     private volatile PtestData ptestData = null;
+    /** Old status in string. */
+    private String oldStatus = null;
+    /** Old cib in string. */
+    private String oldCib = null;
+    /** Host. */
+    private final Host host;
 
     /**
      * Prepares a new <code>ClusterStatus</code> object.
@@ -59,6 +65,7 @@ public class ClusterStatus {
      */
     public ClusterStatus(final Host host,
                          final CRMXML crmXML) {
+        this.host = host;
         this.crmXML = crmXML;
         final String command =
                    host.getDistCommand("Heartbeat.getClusterMetadata",
@@ -607,29 +614,41 @@ public class ClusterStatus {
     /**
      * Parses the command with data.
      */
-    private void parseCommand(final String command,
-                                    final List<String> data) {
+    private final boolean parseCommand(final String command,
+                                       final List<String> data) {
         final String[] commands = command.split("<<<>>>");
         final String cmd = commands[0];
 
         if (commands.length == 1) {
             if ("res_status".equals(cmd)) {
-                parseResStatus(Tools.join("\n", data.toArray(
-                                                   new String[data.size()])));
-
+                final String status = Tools.join("\n", data.toArray(
+                                                     new String[data.size()]));
+                if (!status.equals(oldStatus)) {
+                    Tools.debug(this, "status update: " + host.getName());
+                    oldStatus = status;
+                    parseResStatus(status);
+                    return true;
+                }
             } else if ("cibadmin".equals(cmd)) {
-                parseCibQuery(Tools.join("\n", data.toArray(
-                                                   new String[data.size()])));
+                final String cib =
+                       Tools.join("\n", data.toArray(new String[data.size()]));
+                if (!cib.equals(oldCib)) {
+                    Tools.debug(this, "cib update: " + host.getName());
+                    oldCib = cib;
+                    parseCibQuery(cib);
+                    return true;
+                }
             }
         } else {
             Tools.appError("unknown command: " + command);
         }
+        return false;
     }
 
     /**
      * Parses status.
      */
-    public final void parseStatus(final String status) {
+    public final boolean parseStatus(final String status) {
         final String[] lines = status.split("\n");
         String command    = null;
         List<String> data = null;
@@ -637,6 +656,7 @@ public class ClusterStatus {
         boolean failed = false;
 
         /* remove all hashes */
+        boolean updated = false;
         for (String line : lines) {
             line = line.trim();
             if ("---start---".equals(line)
@@ -654,7 +674,9 @@ public class ClusterStatus {
             }
             if (line.equals(">>>" + command)) { /* end of command */
                 if (!failed) {
-                    parseCommand(command, data);
+                    if (parseCommand(command, data)) {
+                        updated = true;
+                    }
                 }
                 command = null;
                 continue;
@@ -678,6 +700,7 @@ public class ClusterStatus {
                                  + status);
             }
         }
+        return updated;
     }
 
     /**

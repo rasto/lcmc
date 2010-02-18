@@ -197,9 +197,13 @@ public class Host implements Serializable {
     private String hbPmInstallMethod;
     /** Drbd installation method index. */
     private String drbdInstallMethod;
+    /** MD5 checksum of VM Info from server. */
+    private String vmInfoMD5 = null;
     /** Default timeout for SSH commands. */
     private static final int SSH_COMMAND_TIMEOUT =
                                     Tools.getDefaultInt("SSH.Command.Timeout");
+    /** Previous hw info output. */
+    private String oldHwInfo = null;
 
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
@@ -1605,7 +1609,10 @@ public class Host implements Serializable {
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
                              public void done(final String ans) {
-                                 parseHostInfo(ans);
+                                 if (!ans.equals(oldHwInfo)) {
+                                    parseHostInfo(ans);
+                                    oldHwInfo = ans;
+                                 }
                                  setLoadingDone();
                              }
 
@@ -1739,6 +1746,7 @@ public class Host implements Serializable {
      * Parses the host info.
      */
     public final void parseHostInfo(final String ans) {
+        Tools.debug(this, "updating host info: " + getName());
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
         final List<String> versionLines = new ArrayList<String>();
@@ -2194,5 +2202,19 @@ public class Host implements Serializable {
      */
     public final boolean isDrbdLoaded() {
        return drbdLoaded != null && drbdLoaded.equals("on");
+    }
+
+    /**
+     * Returns MD5 checksum of VM Info from server.
+     */
+    public final String getVMInfoMD5() {
+        return vmInfoMD5;
+    }
+
+    /**
+     * Sets MD5 checksum of VM Info from server.
+     */
+    public final void setVMInfoMD5(final String vmInfoMD5) {
+        this.vmInfoMD5 = vmInfoMD5;
     }
 }

@@ -211,13 +211,11 @@ public class DrbdXML extends XML {
         return configFile;
     }
 
-    /**
-     * Retrieves and updates all the data. This should be called if there is
-     * a drbd event.
-     */
-    public final void update(final Host host) {
+    /** 
+     * Returns config from server. */
+    public final String getConfig(final Host host) {
         if (!host.isConnected()) {
-            return;
+            return null;
         }
         final String command2 = host.getDistCommand("Drbd.getConfig",
                                                     (ConvertCmdCallback) null);
@@ -227,7 +225,14 @@ public class DrbdXML extends XML {
                                         null,  /* ExecCallback */
                                         false, /* outputVisible */
                                         Tools.getString("DrbdXML.GetConfig"));
+        return configString;
+    }
 
+    /**
+     * Retrieves and updates all the data. This should be called if there is
+     * a drbd event.
+     */
+    public final void update(final String configString) {
         if (configString != null && !configString.equals("")) {
             parseConfig(configString);
         }
@@ -986,20 +991,25 @@ public class DrbdXML extends XML {
      * Parses events from drbd kernel module obtained via drbdsetup .. events
      * command and stores the values in the BlockDevice object.
      */
-    public final void parseDrbdEvent(final String hostName,
-                               final DrbdGraph drbdGraph,
-                               final String rawOutput) {
+    public final boolean parseDrbdEvent(final String hostName,
+                                        final DrbdGraph drbdGraph,
+                                        final String rawOutput) {
         if (rawOutput == null) {
-            return;
+            return false;
         }
 
         final String output = rawOutput.trim();
         if ("".equals(output)) {
-            return;
+            return false;
         }
         if ("No response from the DRBD driver! Is the module loaded?".equals(
                 output)) {
-            hostDrbdLoadedMap.put(hostName, false);
+            if (hostDrbdLoadedMap.get(hostName)) {
+                hostDrbdLoadedMap.put(hostName, false);
+                return true;
+            } else {
+                return false;
+            }
         } else {
             hostDrbdLoadedMap.put(hostName, true);
         }
@@ -1023,13 +1033,18 @@ public class DrbdXML extends XML {
             final BlockDevInfo bdi =
                                   getBlockDevInfo(devNr, hostName, drbdGraph);
             if (bdi != null) {
-                bdi.getBlockDevice().setConnectionState(cs);
-                bdi.getBlockDevice().setNodeState(ro1);
-                bdi.getBlockDevice().setDiskState(ds1);
-                bdi.getBlockDevice().setDrbdFlags(flags);
-                bdi.updateInfo();
+                if (bdi.getBlockDevice().isDifferent(cs, ro1, ds1, flags)) {
+                    bdi.getBlockDevice().setConnectionState(cs);
+                    bdi.getBlockDevice().setNodeState(ro1);
+                    bdi.getBlockDevice().setDiskState(ds1);
+                    bdi.getBlockDevice().setDrbdFlags(flags);
+                    bdi.updateInfo();
+                    return true;
+                } else {
+                    return false;
+                }
             }
-            return;
+            return false;
         }
         /* 19 SP 0 16.9 */
         p = Pattern.compile("^(\\d+)\\s+SP\\s+(\\d+)\\s(\\d+\\.\\d+).*");
@@ -1041,10 +1056,16 @@ public class DrbdXML extends XML {
             final BlockDevInfo bdi =
                                    getBlockDevInfo(devNr, hostName, drbdGraph);
             if (bdi != null && bdi.getBlockDevice().isDrbd()) {
-                bdi.getBlockDevice().setSyncedProgress(synced);
-                bdi.updateInfo();
+                if (Tools.areEqual(bdi.getBlockDevice().getSyncedProgress(),
+                                   synced)) {
+                    return false;
+                } else {
+                    bdi.getBlockDevice().setSyncedProgress(synced);
+                    bdi.updateInfo();
+                    return true;
+                }
             }
-            return;
+            return false;
         }
         /* 19 UH 1 split-brain */
         p = Pattern.compile("^(\\d+)\\s+UH\\s+(\\d+)\\s([a-z-]+).*");
@@ -1060,11 +1081,17 @@ public class DrbdXML extends XML {
                                                        drbdGraph);
 
                 if (bdi != null && bdi.getBlockDevice().isDrbd()) {
-                    bdi.getBlockDevice().setSplitBrain(true);
-                    bdi.updateInfo();
+                    if (bdi.getBlockDevice().isSplitBrain()) {
+                        return false;
+                    } else {
+                        bdi.getBlockDevice().setSplitBrain(true);
+                        bdi.updateInfo();
+                        return true;
+                    }
                 }
             }
-            return;
+            return false;
         }
+        return false;
     }
 }

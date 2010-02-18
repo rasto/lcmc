@@ -176,7 +176,8 @@ class FilesystemInfo extends ServiceInfo {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 final Info item = (Info) e.getItem();
-                                if (item.getStringValue() == null) {
+                                if (item.getStringValue() == null
+                                    || "".equals(item.getStringValue())) {
                                     return;
                                 }
                                 final String selectedValue =

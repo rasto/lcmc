@@ -497,8 +497,8 @@ public class BlockDevInfo extends EditableInfo {
                         null,
                         getBrowser());
                 netInterfaceString = defaultNetInterface.toString();
-                getBlockDevice().setDefaultValue(DRBD_NI_PARAM,
-                                                 netInterfaceString);
+                getBlockDevice().setDefaultValue(DRBD_NI_PARAM, null);
+//                                                 netInterfaceString);
             }
             return getNetInterfaces(defaultNetInterface,
                                 getBrowser().getNetInterfacesNode().children());
