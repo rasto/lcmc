@@ -30,6 +30,7 @@ import drbd.utilities.Tools;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.ImageIcon;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -86,19 +87,20 @@ public class VMSInfo extends CategoryInfo {
                                    new HashMap<String, VMSVirtualDomainInfo>();
         final Map<String, Color> dtc = new HashMap<String, Color>();
         for (final String domainName : domainNames) {
+            ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
             for (final Host host : getBrowser().getClusterHosts()) {
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && vxml.isRunning(domainName)) {
                     final Color bgColor = host.getPmColors()[0];
                     dtc.put(domainName, bgColor);
+                    hostIcon = HostBrowser.HOST_ON_ICON_LARGE;
                     break;
                 }
             }
             final VMSVirtualDomainInfo vmsvdi =
                         getBrowser().findVMSVirtualDomainInfo(domainName);
             dti.put(domainName, vmsvdi);
-            final JLabel domainNameLabel =
-                               new JLabel(HostBrowser.HOST_ICON_LARGE);
+            final JLabel domainNameLabel = new JLabel(hostIcon);
             domainNameLabel.setOpaque(true);
             domainNameLabel.setText(domainName);
             rows.add(new Object[]{domainNameLabel,

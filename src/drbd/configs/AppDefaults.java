@@ -252,8 +252,10 @@ public class AppDefaults extends
         {"ClusterBrowser.RemoveIcon",  "Icons/tango/32x32/cancel_32x32.png"},
         {"HostViewPanel.HostIcon",     "Icons/tango/32x32/host_32x32.png"},
         {"HostTab.HostIcon",           "Icons/tango/32x32/host_32x32.png"},
-        {"HostBrowser.HostIcon",        "Icons/tango/32x32/host_32x32.png"},
-        {"EmptyBrowser.HostIcon",        "Icons/tango/32x32/host_32x32.png"},
+        {"HostBrowser.HostIcon",       "Icons/tango/32x32/host_32x32.png"},
+        {"HostBrowser.HostOnIcon",     "Icons/tango/32x32/host_on_32x32.png"},
+        {"HostBrowser.HostOffIcon",    "Icons/tango/32x32/host_off_32x32.png"},
+        {"EmptyBrowser.HostIcon",      "Icons/tango/32x32/host_32x32.png"},
 
         {"MainMenu.ClusterIcon",       "Icons/tango/16x16/cluster_16x16.png"},
         {"MainMenu.HostIcon",          "Icons/tango/16x16/host_16x16.png"},
@@ -269,7 +271,6 @@ public class AppDefaults extends
          "Icons/tango/32x32/blockdevice_32x32.png"},
 
         {"DrbdGraph.NoHarddiscIcon",    "Icons/tango/32x32/noharddisc.png"},
-        {"DrbdGraph.HostIcon",          "Icons/tango/32x32/host_32x32.png"},
 
         {"HeartbeatGraph.ServiceIcon",  "Icons/tango/32x32/service1_32x32.png"},
         {"HeartbeatGraph.StartIcon",     "Icons/tango/32x32/ok_32x32.png"},

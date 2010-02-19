@@ -80,6 +80,12 @@ public class HostBrowser extends Browser {
     /** Host icon. */
     public static final ImageIcon HOST_ICON = Tools.createImageIcon(
                                   Tools.getDefault("ClusterBrowser.HostIcon"));
+    /** Large host icon (turned on). */
+    public static final ImageIcon HOST_ON_ICON_LARGE = Tools.createImageIcon(
+                                  Tools.getDefault("HostBrowser.HostOnIcon"));
+    /** Large host icon (turned on). */
+    public static final ImageIcon HOST_OFF_ICON_LARGE = Tools.createImageIcon(
+                                  Tools.getDefault("HostBrowser.HostOffIcon"));
     /** Large host icon. */
     public static final ImageIcon HOST_ICON_LARGE = Tools.createImageIcon(
                                   Tools.getDefault("HostBrowser.HostIcon"));

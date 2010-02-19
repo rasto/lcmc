@@ -99,9 +99,6 @@ public class DrbdGraph extends ResourceGraph {
     /** No hard disc icon. (detached) */
     private static final ImageIcon NO_HARDDISC_ICON = Tools.createImageIcon(
                                 Tools.getDefault("DrbdGraph.NoHarddiscIcon"));
-    /** Host icon. */
-    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
-                                    Tools.getDefault("DrbdGraph.HostIcon"));
     /** Horizontal step in pixels by which the block devices are drawn in
      * the graph. */
     private static final int BD_STEP_Y = 55;
@@ -286,7 +283,13 @@ public class DrbdGraph extends ResourceGraph {
                 return icons;
             }
         } else {
-            icons.add(HOST_ICON);
+            final HostDrbdInfo hi = vertexToHostMap.get(v);
+            if (hi.getHost().isDrbdStatus()
+                && hi.getHost().isDrbdLoaded()) {
+                icons.add(HostBrowser.HOST_ON_ICON_LARGE);
+            } else {
+                icons.add(HostBrowser.HOST_ICON_LARGE);
+            }
             return icons;
         }
     }

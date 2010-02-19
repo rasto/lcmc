@@ -118,9 +118,6 @@ public class HeartbeatGraph extends ResourceGraph {
     private static final int MAX_Y_POS = 2600;
     /** Height of the vertices. */
     private static final int VERTEX_HEIGHT = 50;
-    /** Host icon. */
-    private static final ImageIcon HOST_ICON =
-                Tools.createImageIcon(Tools.getDefault("DrbdGraph.HostIcon"));
     /** Host standby icon. */
     private static final ImageIcon HOST_STANDBY_ICON =
      Tools.createImageIcon(Tools.getDefault("HeartbeatGraph.HostStandbyIcon"));
@@ -1070,7 +1067,11 @@ public class HeartbeatGraph extends ResourceGraph {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         final HostInfo hi = vertexToHostMap.get(v);
         if (hi != null) {
-            icons.add(HOST_ICON);
+            if (hi.getHost().isClStatus()) {
+                icons.add(HostBrowser.HOST_ON_ICON_LARGE);
+            } else {
+                icons.add(HostBrowser.HOST_ICON_LARGE);
+            }
             if (hi.isStandby(testOnly)) {
                 icons.add(HOST_STANDBY_ICON);
             }
