@@ -579,8 +579,10 @@ public class DrbdXML extends XML {
                 if ("fence-peer".equals(name)) {
                     final List<Object> l = new ArrayList<Object>();
                     l.add("");
-                    l.add(host.getHeartbeatLibPath()
-                          + "/drbd-peer-outdater -t 5");
+                    if (!"".equals(host.getArch())) {
+                        l.add(host.getHeartbeatLibPath()
+                              + "/drbd-peer-outdater -t 5");
+                    }
                     l.add("/usr/lib/drbd/crm-fence-peer.sh");
                     paramItemsMap.put(name, l);
                 } else if ("after-resync-target".equals(name)) {

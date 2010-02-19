@@ -905,7 +905,7 @@ public class Host implements Serializable {
      */
     public final String getHeartbeatLibPath() {
         if ("".equals(arch)) {
-            Tools.appError(
+            Tools.appWarning(
                         "getHeartbeatLibPath() called to soon: unknown arch");
         } else if ("x86_64".equals(arch)) {
             return "/usr/lib64/heartbeat";
