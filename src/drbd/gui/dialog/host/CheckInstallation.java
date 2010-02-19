@@ -281,7 +281,8 @@ public class CheckInstallation extends DialogHost {
                         drbdButton.setText(Tools.getString(
                      "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"
                         ));
-                        if (drbdInstallMethodsAvailable) {
+                        if (false && drbdInstallMethodsAvailable) {
+                            // TODO: disabled
                             drbdButton.setEnabled(true);
                             drbdInstMethodCB.setEnabled(true);
                         }
