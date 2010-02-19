@@ -22,6 +22,7 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
+import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
@@ -67,14 +68,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private String definedOnString = "";
     /** HTML string on which hosts the vm is running. */
     private String runningOnString = "";
-    /** Running VM icon. */
-    private static final ImageIcon VM_RUNNING_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("VMSVirtualDomainInfo.VMRunningIcon"));
-    /** Stopped VM icon. */
-    private static final ImageIcon VM_STOPPED_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("VMSVirtualDomainInfo.VMStoppedIcon"));
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                                VMSXML.VM_PARAM_NAME,
@@ -388,10 +381,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null && vmsxml.isRunning(toString())) {
-                return VM_RUNNING_ICON;
+                return HostBrowser.HOST_ON_ICON;
             }
         }
-        return VM_STOPPED_ICON;
+        return HostBrowser.HOST_OFF_ICON;
     }
 
     /**

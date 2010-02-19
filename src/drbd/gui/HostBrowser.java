@@ -79,7 +79,13 @@ public class HostBrowser extends Browser {
                               Tools.getDefault("HostBrowser.BlockDeviceIcon"));
     /** Host icon. */
     public static final ImageIcon HOST_ICON = Tools.createImageIcon(
-                                  Tools.getDefault("ClusterBrowser.HostIcon"));
+                              Tools.getDefault("HostBrowser.HostIconSmall"));
+    /** Host icon (turned on). */
+    public static final ImageIcon HOST_ON_ICON = Tools.createImageIcon(
+                              Tools.getDefault("HostBrowser.HostOnIconSmall"));
+    /** Host icon (turned off). */
+    public static final ImageIcon HOST_OFF_ICON = Tools.createImageIcon(
+                              Tools.getDefault("HostBrowser.HostOffIconSmall"));
     /** Large host icon (turned on). */
     public static final ImageIcon HOST_ON_ICON_LARGE = Tools.createImageIcon(
                                   Tools.getDefault("HostBrowser.HostOnIcon"));
