@@ -23,6 +23,7 @@ package drbd.gui.resources;
 
 import drbd.AddHostDialog;
 import drbd.gui.Browser;
+import drbd.gui.EmptyBrowser;
 import drbd.data.Cluster;
 import drbd.data.Host;
 import drbd.utilities.UpdatableItem;
@@ -283,13 +284,15 @@ public class AllHostsInfo extends Info {
         if (Tools.getConfigData().getAutoHosts().isEmpty()
             && !Tools.getConfigData().getAutoClusters().isEmpty()) {
             for (final Cluster cl : allLoadButtons.keySet()) {
-                if (Tools.getConfigData().getAutoClusters().contains(
-                                                           cl.getName())) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            allLoadButtons.get(cl).pressButton();
-                        }
-                    });
+                if (cl.getClusterTab() == null) {
+                    if (Tools.getConfigData().getAutoClusters().contains(
+                                                               cl.getName())) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                allLoadButtons.get(cl).pressButton();
+                            }
+                        });
+                    }
                 }
             }
         }
