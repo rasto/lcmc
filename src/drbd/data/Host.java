@@ -1191,7 +1191,7 @@ public class Host implements Serializable {
                                     outputCallback,
                                     false,
                                     false,
-                                    28000);
+                                    45000);
         } else {
             Tools.appWarning("trying to start started drbd status");
         }

@@ -23,42 +23,162 @@ package drbd.gui.resources;
 
 import drbd.AddHostDialog;
 import drbd.gui.Browser;
-import drbd.gui.HostBrowser;
-import drbd.gui.ClusterBrowser;
+import drbd.data.Cluster;
+import drbd.data.Host;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.MyButton;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
+import javax.swing.JScrollPane;
+import javax.swing.ImageIcon;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
  * hosts in a cluster.
  */
 public class AllHostsInfo extends Info {
+    /** Possibly selected host or null. */
+    private final Host host;
     /** infoPanel cache. */
     private JPanel infoPanel = null;
-
+    /** Checkboxes in the cluster boxes. */
+    private final Map<Cluster, JCheckBox> allCheckboxes =
+                                         new HashMap<Cluster, JCheckBox>();
+    /** Start/Load buttons. */
+    private final Map<Cluster, MyButton> allLoadButtons =
+                                         new HashMap<Cluster, MyButton>();
+    /** Backgrounds of the small boxes with clusters. */
+    private final Map<Cluster, JPanel> clusterBackgrounds =
+                                         new HashMap<Cluster, JPanel>();
+    /** Main panel. */
+    private final JPanel mainPanel = new JPanel(new GridBagLayout());
+    /** Constraints. */
+    private final GridBagConstraints c = new GridBagConstraints();
+    /** Cluster icon. */
+    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
+                                   Tools.getDefault("ClusterTab.ClusterIcon"));
+    /** Start marked clusters button. */
+    private final MyButton loadMarkedClustersBtn = new MyButton(
+              Tools.getString("EmptyBrowser.LoadMarkedClusters"),
+              CLUSTER_ICON,
+              Tools.getString("EmptyBrowser.LoadMarkedClusters.ToolTip"));
+    /** Stop marked clusters button. */
+    private final MyButton unloadMarkedClustersBtn = new MyButton(
+                  Tools.getString("EmptyBrowser.UnloadMarkedClusters"),
+                  CLUSTER_ICON,
+                  Tools.getString(
+                             "EmptyBrowser.UnloadMarkedClusters.ToolTip"));
+    /** Remove marked clusters button. */
+    private final MyButton removeMarkedClustersBtn = new MyButton(
+                  Tools.getString("EmptyBrowser.RemoveMarkedClusters"),
+                  CLUSTER_ICON,
+                  Tools.getString(
+                             "EmptyBrowser.RemoveMarkedClusters.ToolTip"));
+    /** Host icon. */
+    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
+                                Tools.getDefault("EmptyBrowser.HostIcon"));
     /**
      * Creates a new AllHostsInfo instance.
      */
     public AllHostsInfo(final Browser browser) {
         super(Tools.getString("ClusterBrowser.AllHosts"), browser);
+        host = null;
     }
 
     /**
-     * Returns browser object of this info.
+     * Remove marked clusters.
      */
-    protected final ClusterBrowser getBrowser() {
-        return (ClusterBrowser) super.getBrowser();
+    private void removeMarkedClusters() {
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                final List<Cluster> selectedRunningClusters =
+                                              new ArrayList<Cluster>();
+                final List<Cluster> selectedClusters =
+                                              new ArrayList<Cluster>();
+                final List<String> clusterNames = new ArrayList<String>();
+                final Set<Cluster> clusters =
+                     Tools.getConfigData().getClusters().getClusterSet();
+                for (final Cluster cluster : clusters) {
+                    final JCheckBox cb = allCheckboxes.get(cluster);
+                    if (cb.isSelected()) {
+                        selectedClusters.add(cluster);
+                        clusterNames.add(cluster.getName());
+                        if (cluster.getClusterTab() != null) {
+                            selectedRunningClusters.add(cluster);
+                        }
+                    }
+                }
+                final String clustersString =
+                  Tools.join(", ", clusterNames.toArray(
+                                     new String[clusterNames.size()]));
+                if (!Tools.confirmDialog(
+                     Tools.getString(
+                         "EmptyBrowser.confirmRemoveMarkedClusters.Title"),
+                     Tools.getString(
+                         "EmptyBrowser.confirmRemoveMarkedClusters.Desc").
+                         replaceAll("@CLUSTERS@", clustersString),
+                     Tools.getString(
+                         "EmptyBrowser.confirmRemoveMarkedClusters.Yes"),
+                     Tools.getString(
+                         "EmptyBrowser.confirmRemoveMarkedClusters.No"))) {
+                    return;
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeMarkedClustersBtn.setEnabled(false);
+                        loadMarkedClustersBtn.setEnabled(false);
+                        unloadMarkedClustersBtn.setEnabled(false);
+                    }
+                });
+                Tools.stopClusters(selectedRunningClusters);
+                Tools.removeClusters(selectedClusters);
+                final String saveFile = Tools.getConfigData().getSaveFile();
+                Tools.save(saveFile);
+                mainPanel.repaint();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (final Cluster cluster : selectedClusters) {
+                            final JPanel p = clusterBackgrounds.get(
+                                                                  cluster);
+                            if (p != null) {
+                                clusterBackgrounds.remove(cluster);
+                                allCheckboxes.remove(cluster);
+                                allLoadButtons.remove(cluster);
+                                mainPanel.remove(p);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        t.start();
     }
 
     /**
@@ -69,22 +189,349 @@ public class AllHostsInfo extends Info {
         if (infoPanel != null) {
             return infoPanel;
         }
-        final JPanel newPanel = new JPanel();
+        infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
-        newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        final JPanel bPanel = new JPanel(new BorderLayout());
-        bPanel.setMaximumSize(new Dimension(10000, 60));
-        bPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        final JMenu actionsMenu = getActionsMenu();
-        updateMenus(null);
-        mb.add(actionsMenu);
-        bPanel.add(mb, BorderLayout.EAST);
-        newPanel.add(bPanel);
-        infoPanel = newPanel;
+        infoPanel.setBackground(Browser.PANEL_BACKGROUND);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.insets = new Insets(3, 3, 0, 0);
+
+        mainPanel.setBackground(Browser.PANEL_BACKGROUND);
+
+        final Set<Cluster> clusters =
+                Tools.getConfigData().getClusters().getClusterSet();
+        if (clusters != null) {
+            final JPanel bPanel =
+                           new JPanel(new BorderLayout());
+            bPanel.setMaximumSize(new Dimension(10000, 60));
+            final JPanel markedPanel = new JPanel(
+                                        new FlowLayout(FlowLayout.LEFT));
+            markedPanel.setBackground(Browser.STATUS_BACKGROUND);
+            /* start marked clusters */
+            loadMarkedClustersBtn.setEnabled(false);
+            markedPanel.add(loadMarkedClustersBtn);
+
+            /* stop marked clusters */
+            unloadMarkedClustersBtn.setEnabled(false);
+            markedPanel.add(unloadMarkedClustersBtn);
+            /* remove marked clusters */
+            removeMarkedClustersBtn.setEnabled(false);
+            markedPanel.add(removeMarkedClustersBtn);
+
+            bPanel.add(markedPanel, BorderLayout.CENTER);
+            /* actions menu */
+            final JMenuBar mb = new JMenuBar();
+            mb.setBackground(Browser.PANEL_BACKGROUND);
+            final JMenu actionsMenu = getActionsMenu();
+            updateMenus(null);
+            mb.add(actionsMenu);
+            bPanel.add(mb, BorderLayout.EAST);
+            infoPanel.add(bPanel);
+            for (final Cluster cluster : clusters) {
+                addClusterBox(cluster);
+            }
+
+            /* start marked clusters action listener */
+            loadMarkedClustersBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            loadMarkedClusters(clusters);
+                        }
+                    });
+                    t.start();
+                }
+            });
+
+            /* stop marked clusters action listener */
+            unloadMarkedClustersBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            unloadMarkedClusters(clusters);
+                        }
+                    });
+                    t.start();
+                }
+            });
+
+            /* remove marked clusters action listener */
+            removeMarkedClustersBtn.addActionListener(
+                                                new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    removeMarkedClusters();
+                }
+            });
+
+            /* mark checkbox item listeners */
+            for (final Cluster cluster : clusters) {
+                addCheckboxListener(cluster);
+            }
+        }
+
+        final JPanel mPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mPanel.add(mainPanel);
+        mPanel.setBackground(Browser.PANEL_BACKGROUND);
+        final JScrollPane clustersPane =
+                    new JScrollPane(
+                            mPanel,
+                            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        infoPanel.add(clustersPane);
+        if (Tools.getConfigData().getAutoHosts().isEmpty()
+            && !Tools.getConfigData().getAutoClusters().isEmpty()) {
+            for (final Cluster cl : allLoadButtons.keySet()) {
+                if (Tools.getConfigData().getAutoClusters().contains(
+                                                           cl.getName())) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            allLoadButtons.get(cl).pressButton();
+                        }
+                    });
+                }
+            }
+        }
         return infoPanel;
+    }
+
+    /**
+     * adds one cluster box to the main cluster.
+     */
+    public final void addClusterBox(final Cluster cluster) {
+        final JPanel label = new JPanel();
+        label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
+        label.add(new JLabel(cluster.getName()));
+        for (final Host host : cluster.getHosts()) {
+            final JLabel nl = new JLabel("   " + host.getName());
+            final Font font = nl.getFont();
+            final Font newFont = font.deriveFont(
+                                           Font.PLAIN,
+                                           (float) (font.getSize() / 1.2));
+            nl.setFont(newFont);
+            label.add(nl);
+        }
+        final JPanel startPanel = new JPanel(new BorderLayout());
+        startPanel.setBackground(Color.WHITE);
+        clusterBackgrounds.put(cluster, startPanel);
+        startPanel.setBorder(new LineBorder(Tools.getDefaultColor(
+                                   "EmptyBrowser.StartPanelTitleBorder")));
+        final JPanel left = new JPanel();
+        final JCheckBox markCB = new JCheckBox();
+        allCheckboxes.put(cluster, markCB);
+        left.add(markCB);
+        left.add(label);
+        startPanel.add(left, BorderLayout.LINE_START);
+        /* Load cluster button */
+        final MyButton loadClusterBtn = new MyButton(
+           Tools.getString("EmptyBrowser.LoadClusterButton"));
+        loadClusterBtn.setEnabled(cluster.getClusterTab() == null);
+        allLoadButtons.put(cluster, loadClusterBtn);
+        loadClusterBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                loadClusterBtn.setEnabled(false);
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        List<Cluster> selectedClusters =
+                                                 new ArrayList<Cluster>();
+                        selectedClusters.add(cluster);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                clusterBackgrounds.get(cluster)
+                                               .setBackground(Color.GREEN);
+                                markCB.setSelected(false);
+                            }
+                        });
+                        Tools.startClusters(selectedClusters);
+                    }
+                });
+                t.start();
+            }
+        });
+        startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        mainPanel.add(startPanel, c);
+        c.gridx++;
+        if (c.gridx > 2) {
+            c.gridx = 0;
+            c.gridy++;
+        }
+    }
+
+    /**
+     * Sets this cluster as started. It is called after user enters a
+     * cluster through the dialogs.
+     */
+    public final void setAsStarted(final Cluster cluster) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                allLoadButtons.get(cluster).setEnabled(false);
+                clusterBackgrounds.get(cluster).setBackground(
+                                                   Color.GREEN);
+            }
+        });
+    }
+
+    /**
+     * Adds checkbox listener for this cluster's checkbox.
+     */
+    public final void addCheckboxListener(final Cluster cluster) {
+        final JCheckBox cb = allCheckboxes.get(cluster);
+        cb.addItemListener(new ItemListener() {
+            public void itemStateChanged(final ItemEvent e) {
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        final Set<Cluster> clusters =
+                                Tools.getConfigData()
+                                .getClusters()
+                                .getClusterSet();
+
+                        allCheckboxesListener(
+                                        clusters,
+                                        cb);
+                    }
+                });
+                thread.start();
+            }
+
+        });
+    }
+
+    /**
+     * Starts marked clusters.
+     */
+    private void loadMarkedClusters(final Set<Cluster> clusters) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                loadMarkedClustersBtn.setEnabled(false);
+            }
+        });
+        final List<Cluster> selectedClusters = new ArrayList<Cluster>();
+        for (final Cluster cluster : clusters) {
+            if (cluster.getClusterTab() == null) {
+                final JCheckBox cb = allCheckboxes.get(cluster);
+                if (cb.isSelected()) {
+                    selectedClusters.add(cluster);
+                    setAsStarted(cluster);
+                } else if (cluster.getClusterTab() == null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            allLoadButtons.get(cluster).setEnabled(true);
+                        }
+                    });
+                }
+            }
+        }
+        Tools.startClusters(selectedClusters);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (final Cluster cluster : clusters) {
+                    if (selectedClusters.contains(cluster)) {
+                        allCheckboxes.get(cluster).setSelected(false);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Stops marked clusters.
+     */
+    private void unloadMarkedClusters(final Set<Cluster> clusters) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                unloadMarkedClustersBtn.setEnabled(false);
+            }
+        });
+        final List<Cluster> selectedClusters = new ArrayList<Cluster>();
+        for (final Cluster cluster : clusters) {
+            if (cluster.getClusterTab() != null) {
+                final JCheckBox cb = allCheckboxes.get(cluster);
+                if (cb.isSelected()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            clusterBackgrounds.get(cluster).setBackground(
+                                                               Color.WHITE);
+                            allCheckboxes.get(cluster).setSelected(false);
+                        }
+                    });
+                    selectedClusters.add(cluster);
+                }
+            }
+        }
+        Tools.stopClusters(selectedClusters);
+    }
+
+    /**
+     * Listener for checkboxes that is called from thread.
+     */
+    private void allCheckboxesListener(final Set<Cluster> clusters,
+                                       final JCheckBox cb) {
+        int rc = 0;
+        int nrc = 0;
+        int ac = 0;
+        for (final Cluster cluster : clusters) {
+            ac++;
+            if (allCheckboxes.get(cluster).isSelected()) {
+                if (cluster.getClusterTab() == null) {
+                    /* not running */
+                    nrc++;
+                } else {
+                    rc++;
+                }
+            }
+        }
+        final int runningCount = rc;
+        final int notRunningCount = nrc;
+        final int allCount = ac;
+        if (cb.isSelected()) {
+            /* disable all start cluster buttons */
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (notRunningCount >= 1) {
+                        for (final Cluster cluster : clusters) {
+                            allLoadButtons.get(cluster).setEnabled(false);
+                        }
+                        /* enable start etc marked clusters button */
+                        loadMarkedClustersBtn.setEnabled(runningCount == 0);
+                    }
+                    if (runningCount >= 1) {
+                        unloadMarkedClustersBtn.setEnabled(
+                                                 notRunningCount == 0);
+                    }
+                    //TODO: still not working
+                    removeMarkedClustersBtn.setEnabled(true);
+                }
+            });
+        } else {
+            /* deselecting */
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (notRunningCount == 0) {
+                        for (final Cluster cluster : clusters) {
+                            if (cluster.getClusterTab() == null) {
+                                allLoadButtons.get(cluster).setEnabled(
+                                                                    true);
+                            }
+                        }
+                        loadMarkedClustersBtn.setEnabled(false);
+                        if (runningCount > 0) {
+                            unloadMarkedClustersBtn.setEnabled(true);
+                        }
+                    }
+                    if (runningCount == 0) {
+                        unloadMarkedClustersBtn.setEnabled(false);
+                        if (notRunningCount > 0) {
+                            loadMarkedClustersBtn.setEnabled(true);
+                        }
+                    }
+                    if (runningCount + notRunningCount == 0) {
+                        removeMarkedClustersBtn.setEnabled(false);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -96,7 +543,7 @@ public class AllHostsInfo extends Info {
         /* host wizard */
         final MyMenuItem newHostWizardItem =
             new MyMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"),
-                           HostBrowser.HOST_ICON,
+                           HOST_ICON,
                            null) {
                 private static final long serialVersionUID = 1L;
 

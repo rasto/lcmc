@@ -294,8 +294,6 @@ public class ClusterBrowser extends Browser {
     /** Cluster status error string. */
     private static final String CLUSTER_STATUS_ERROR =
                                   "---start---\r\nerror\r\n\r\n---done---\r\n";
-    /** Previous drbd status. */
-    private String oldDrbdStatus = null;
     /**
      * Prepares a new <code>CusterBrowser</code> object.
      */
@@ -500,7 +498,10 @@ public class ClusterBrowser extends Browser {
      */
     public final void initClusterBrowser() {
         /* all hosts */
-        allHostsNode = new DefaultMutableTreeNode(new AllHostsInfo(this));
+        //allHostsNode = new DefaultMutableTreeNode(new AllHostsInfo(this));
+        allHostsNode = new DefaultMutableTreeNode(
+                                new AllHostsInfo(
+                                        Tools.getGUIData().getEmptyBrowser()));
         setNode(allHostsNode);
         topAdd(allHostsNode);
         /* hosts */
@@ -1236,7 +1237,7 @@ public class ClusterBrowser extends Browser {
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        if (domainNames.size() > 0) {
+        if (!domainNames.isEmpty()) {
             addVMSNode();
             final Enumeration e = vmsNode.children();
             while (e.hasMoreElements()) {
