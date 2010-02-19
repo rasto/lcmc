@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -211,7 +212,8 @@ public class DrbdGuiXML extends XML {
         }
         /* get root <drbdgui> */
         final Node rootNode = getChildNode(document, "drbdgui");
-        final Map<String, Host> hostMap = new LinkedHashMap<String, Host>();
+        final Map<String, List<Host>> hostMap =
+                                       new LinkedHashMap<String, List<Host>>();
         if (rootNode != null) {
             final String downloadUser = getAttribute(rootNode,
                                                      DOWNLOAD_USER_ATTR);
@@ -251,7 +253,12 @@ public class DrbdGuiXML extends XML {
                             new TerminalPanel(host);
                             host.setIp(ip);
                             host.setUsername(username);
-                            hostMap.put(nodeName, host);
+                            List<Host> hostList = hostMap.get(nodeName);
+                            if (hostList == null) {
+                                hostList = new ArrayList<Host>();
+                                hostMap.put(nodeName, hostList);
+                            }
+                            hostList.add(host);
                         }
                     }
                 }
@@ -285,15 +292,20 @@ public class DrbdGuiXML extends XML {
      */
     private void loadClusterHosts(final Node clusterNode,
                                   final Cluster cluster,
-                                  final Map<String, Host> hostMap) {
+                                  final Map<String, List<Host>> hostMap) {
         final NodeList hosts = clusterNode.getChildNodes();
         if (hosts != null) {
             for (int i = 0; i < hosts.getLength(); i++) {
                 final Node hostNode = hosts.item(i);
                 if (hostNode.getNodeName().equals(HOST_NODE_STRING)) {
                     final String nodeName = getText(hostNode);
-                    final Host host = hostMap.get(nodeName);
-                    if (host != null) {
+                    final List<Host> hostList = hostMap.get(nodeName);
+                    if (hostList == null || hostList.isEmpty()) {
+                        continue;
+                    }
+                    final Host host = hostList.get(0);
+                    hostList.remove(0);
+                    if (host != null && host.getCluster() == null) {
                         host.setCluster(cluster);
                         cluster.addHost(host);
                     }
