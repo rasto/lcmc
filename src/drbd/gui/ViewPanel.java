@@ -203,7 +203,9 @@ public class ViewPanel extends JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     final JComponent p = browser.getInfoPanel(nodeInfo);
+                    final int loc = viewSP.getDividerLocation();
                     viewSP.setRightComponent(p);
+                    viewSP.setDividerLocation(loc);
                 }
             });
         }
@@ -219,7 +221,9 @@ public class ViewPanel extends JPanel {
                 public void run() {
                     final JComponent p = browser.getInfoPanel(i);
                     if (p != null) {
+                        final int loc = viewSP.getDividerLocation();
                         viewSP.setRightComponent(p);
+                        viewSP.setDividerLocation(loc);
                     }
                 }
             });
