@@ -1035,7 +1035,7 @@ public class ClusterBrowser extends Browser {
                                     ssi.setGlobalConfig();
                                     ssi.setAllResources(testOnly);
                                     if (firstTime.getCount() == 1) {
-                                        /* one more time so that id-refs work. */
+                                        /* one more time so that id-refs work.*/
                                         ssi.setAllResources(testOnly);
                                     }
                                     repaintTree();
@@ -1783,7 +1783,6 @@ public class ClusterBrowser extends Browser {
            Tools.getString("ClusterBrowser.confirmHbDrbd.Yes"),
            Tools.getString("ClusterBrowser.confirmHbDrbd.No"));
     }
-
 
     /**
      * Returns true if user wants the linbit:drbd even, for old version of

@@ -22,7 +22,6 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
-import drbd.gui.ClusterBrowser;
 import drbd.utilities.Tools;
 import javax.swing.ImageIcon;
 import java.awt.Component;
@@ -40,15 +39,18 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
+import javax.swing.border.EmptyBorder;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Point;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Insets;
+
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.RowSorter;
+
 
 /**
  * This class holds info data for a category.
@@ -60,7 +62,13 @@ public class CategoryInfo extends Info {
     private JTable table = null;
     /** Table model. */
     private DefaultTableModel tableModel = null;
-    TableRowSorter sorter = null;
+    /** Sorter for the table. */
+    private TableRowSorter sorter = null;
+
+    /** Border for jlabel so, that there is spacing in the table. Table spacing
+     * cannot be used because of row colors. */
+    private static final EmptyBorder EMPTY_BORDER =
+                                    new EmptyBorder(new Insets(0, 4, 0, 4));
     /**
      * Prepares a new <code>CategoryInfo</code> object.
      */
@@ -119,14 +127,11 @@ public class CategoryInfo extends Info {
             table.setRowSorter((RowSorter) sorter);
             sorter.setSortsOnUpdates(true);
 
-            //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
             table.getTableHeader().setReorderingAllowed(true);
 
             infoPanel.setBackground(Browser.PANEL_BACKGROUND);
-            //table.setIntercellSpacing(new Dimension(8, 1));
             table.setBackground(Browser.PANEL_BACKGROUND);
-            table.setDefaultRenderer(Object.class,
-                                     new MyCellRenderer());
+            table.setDefaultRenderer(Object.class, new MyCellRenderer());
             final int h = getRowHeight();
             if (h >= 0) {
                 table.setRowHeight(h);
@@ -145,7 +150,7 @@ public class CategoryInfo extends Info {
             sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);
             sp.setBackground(Browser.PANEL_BACKGROUND);
             infoPanel.add(sp);
-            resizeTable(table); 
+            resizeTable(table);
         }
         return infoPanel;
     }
@@ -171,7 +176,7 @@ public class CategoryInfo extends Info {
         return null;
     }
 
-    /** 
+    /**
      * Updates data in the table.
      */
     @SuppressWarnings("unchecked")
@@ -188,7 +193,7 @@ public class CategoryInfo extends Info {
                         tableModel.setDataVector(data, colNames);
                         sorter.setSortKeys(sortKeys);
                         tableModel.fireTableDataChanged();
-                        resizeTable(table); 
+                        resizeTable(table);
                     }
                 });
             }
@@ -196,7 +201,7 @@ public class CategoryInfo extends Info {
     }
 
     /**
-     * Execute when row in the table was clicked. 
+     * Execute when row in the table was clicked.
      */
     protected void rowClicked(final String key) {
         /* do nothing */
@@ -217,11 +222,19 @@ public class CategoryInfo extends Info {
         /** Serial version uid. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Creates a new MyCellRenderer object.
+         */
         public MyCellRenderer() {
+            super();
             setOpaque(true);
         }
+
+        /**
+         * Sets background color and padding in jlabels for every cell.
+         */
         public Component getTableCellRendererComponent(
-                                                final JTable table, 
+                                                final JTable table,
                                                 final Object value,
                                                 final boolean isSelected,
                                                 final boolean hasFocus,
@@ -240,6 +253,7 @@ public class CategoryInfo extends Info {
                             ((JLabel) table.getValueAt(row, 0)).getText();
             final Color bg = getColorForRow(key);
             ret.setBackground(bg);
+            ret.setBorder(EMPTY_BORDER);
             return ret;
         }
     }
@@ -251,39 +265,46 @@ public class CategoryInfo extends Info {
         return null;
     }
 
-    public final void resizeTable(JTable table) {
-        int margin = 5;
- 
+    /**
+     * Resize table.
+     */
+    public final void resizeTable(final JTable table) {
+        final int margin = 5;
+
         for (int i = 0; i < table.getColumnCount(); i++) {
-            int                     vColIndex = i;
-            DefaultTableColumnModel colModel  = (DefaultTableColumnModel) table.getColumnModel();
-            TableColumn             col       = colModel.getColumn(vColIndex);
-            int                     width     = 0;
- 
+            final int vColIndex = i;
+            final DefaultTableColumnModel colModel =
+                            (DefaultTableColumnModel) table.getColumnModel();
+            final TableColumn col = colModel.getColumn(vColIndex);
+            int width = 0;
             TableCellRenderer renderer = col.getHeaderRenderer();
- 
+
             if (renderer == null) {
                 renderer = table.getTableHeader().getDefaultRenderer();
             }
- 
-            Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
- 
+            Component comp = renderer.getTableCellRendererComponent(
+                                                        table,
+                                                        col.getHeaderValue(),
+                                                        false,
+                                                        false,
+                                                        0,
+                                                        0);
             width = comp.getPreferredSize().width;
- 
             for (int r = 0; r < table.getRowCount(); r++) {
                 renderer = table.getCellRenderer(r, vColIndex);
-                comp     = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex), false, false,
+                comp = renderer.getTableCellRendererComponent(
+                                              table,
+                                              table.getValueAt(r, vColIndex),
+                                              false,
+                                              false,
                         r, vColIndex);
                 width = Math.max(width, comp.getPreferredSize().width);
             }
- 
             width += 2 * margin;
- 
             col.setPreferredWidth(width);
         }
- 
-        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(
-            SwingConstants.LEFT);
+        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
+                            .setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     /**

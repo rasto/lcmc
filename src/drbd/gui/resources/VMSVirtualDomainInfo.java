@@ -76,14 +76,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         Tools.createImageIcon(
                 Tools.getDefault("VMSVirtualDomainInfo.VMStoppedIcon"));
     /** All parameters. */
-    private static final String[] VM_PARAMETERS = new String[]{"name",
-                                                               "defined",
-                                                               "status",
-                                                               "vcpu",
-                                                               "currentMemory",
-                                                               "memory",
-                                                               "os-boot",
-                                                               "autostart"};
+    private static final String[] VM_PARAMETERS = new String[]{
+                                               VMSXML.VM_PARAM_NAME,
+                                               VMSXML.VM_PARAM_DEFINED,
+                                               VMSXML.VM_PARAM_STATUS,
+                                               VMSXML.VM_PARAM_VCPU,
+                                               VMSXML.VM_PARAM_CURRENTMEMORY,
+                                               VMSXML.VM_PARAM_MEMORY,
+                                               VMSXML.VM_PARAM_BOOT,
+                                               VMSXML.VM_PARAM_AUTOSTART};
     /** Map of sections to which every param belongs. */
     private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
@@ -105,36 +106,63 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns default unit. */
     private static final Map<String, String> DEFAULT_UNIT =
                                                new HashMap<String, String>();
+    /** General Info header. */
+    private static final String GENERAL_INFO_STRING =
+                Tools.getString("VMSVirtualDomainInfo.Section.GeneralInfo");
+    /** Virtual System header. */
+    private static final String VIRTUAL_SYSTEM_STRING =
+                Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
+
     static {
-        SECTION_MAP.put("name",          "General Info");
-        SECTION_MAP.put("defined",       "General Info");
-        SECTION_MAP.put("status",        "General Info");
-        SECTION_MAP.put("vcpu",          "Virtual System");
-        SECTION_MAP.put("currentMemory", "Virtual System");
-        SECTION_MAP.put("memory",        "Virtual System");
-        SECTION_MAP.put("os-boot",       "Virtual System");
-        SECTION_MAP.put("autostart",     "Virtual System");
-        SHORTNAME_MAP.put("name",          "Name");
-        SHORTNAME_MAP.put("defined",       "Defined On");
-        SHORTNAME_MAP.put("status",        "Status");
-        SHORTNAME_MAP.put("vcpu",          "Number of CPUs");
-        SHORTNAME_MAP.put("currentMemory", "Current Memory");
-        SHORTNAME_MAP.put("memory",        "Max Memory");
-        SHORTNAME_MAP.put("os-boot",       "Boot Device");
-        SHORTNAME_MAP.put("autostart",     "Autostart");
-        FIELD_TYPES.put("name",          GuiComboBox.Type.LABELFIELD);
-        FIELD_TYPES.put("defined",       GuiComboBox.Type.LABELFIELD);
-        FIELD_TYPES.put("status",        GuiComboBox.Type.LABELFIELD);
-        FIELD_TYPES.put("currentMemory", GuiComboBox.Type.TEXTFIELDWITHUNIT);
-        FIELD_TYPES.put("memory",        GuiComboBox.Type.TEXTFIELDWITHUNIT);
-        FIELD_TYPES.put("autostart",     GuiComboBox.Type.CHECKBOX);
-        DEFAULTS_MAP.put("autostart", "False");
-        DEFAULTS_MAP.put("os-boot",   "hd");
-        DEFAULTS_MAP.put("vcpu",      "1");
-        HAS_UNIT_PREFIX.put("memory", true);
-        HAS_UNIT_PREFIX.put("currentMemory", true);
+        SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          GENERAL_INFO_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_DEFINED,       GENERAL_INFO_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_STATUS,        GENERAL_INFO_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
+
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_NAME,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Name"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_DEFINED,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Defined"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_STATUS,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Status"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_VCPU,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Vcpu"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_CURRENTMEMORY,
+                   Tools.getString("VMSVirtualDomainInfo.Short.CurrentMemory"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_MEMORY,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Memory"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_BOOT,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Os.Boot"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_AUTOSTART,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Autostart"));
+
+        FIELD_TYPES.put(VMSXML.VM_PARAM_NAME, GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_DEFINED, GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_STATUS, GuiComboBox.Type.LABELFIELD);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_CURRENTMEMORY,
+                        GuiComboBox.Type.TEXTFIELDWITHUNIT);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_MEMORY,
+                        GuiComboBox.Type.TEXTFIELDWITHUNIT);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_AUTOSTART, GuiComboBox.Type.CHECKBOX);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, "False");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT,   "hd");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU,      "1");
+        HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_MEMORY, true);
+        HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_CURRENTMEMORY, true);
         // TODO: no virsh command for os-boot
-        POSSIBLE_VALUES.put("os-boot",
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOT,
                            new StringInfo[]{
                                       new StringInfo("Hard Disk",
                                                      "hd",
@@ -145,7 +173,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                       new StringInfo("CD-ROM",
                                                      "cdrom",
                                                      null)});
-        POSSIBLE_VALUES.put("autostart", new String[]{"True", "False"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_AUTOSTART,
+                            new String[]{"True", "False"});
     }
     /**
      * Creates the VMSVirtualDomainInfo object.
@@ -154,7 +183,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Browser browser) {
         super(name, browser);
         setResource(new Resource(name));
-        getResource().setValue("name", name);
+        getResource().setValue(VMSXML.VM_PARAM_NAME, name);
     }
 
     /**
@@ -179,7 +208,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final String oldValue = getParamSaved(param);
             String value = getParamSaved(param);
             final GuiComboBox cb = paramComboBoxGet(param, null);
-            if ("status".equals(param)) {
+            if (VMSXML.VM_PARAM_STATUS.equals(param)) {
                 final List<String> runningOnHosts = new ArrayList<String>();
                 final List<String> definedhosts = new ArrayList<String>();
                 for (final Host h : getBrowser().getClusterHosts()) {
@@ -200,7 +229,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                   + Tools.join(" ", definedhosts.toArray(
                                              new String[definedhosts.size()]))
                                   + "</html>";
-                getResource().setValue("defined", definedOnString);
+                getResource().setValue(VMSXML.VM_PARAM_DEFINED,
+                                       definedOnString);
                 if (runningOnHosts.isEmpty()) {
                     running = false;
                     runningOnString = "Stopped";
@@ -212,13 +242,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                             new String[runningOnHosts.size()]))
                         + "</html>";
                 }
-                getResource().setValue("status", runningOnString);
-            } else if ("name".equals(param)) {
-            } else {
+                getResource().setValue(VMSXML.VM_PARAM_STATUS, runningOnString);
+            } else if (!VMSXML.VM_PARAM_NAME.equals(param)) {
                 if (cb != null) {
-                    if ("vcpu".equals(param)) {
+                    if (VMSXML.VM_PARAM_VCPU.equals(param)) {
                         paramComboBoxGet(param, null).setEnabled(!running);
-                    } else if ("currentMemory".equals(param)) {
+                    } else if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)) {
                         paramComboBoxGet(param, null).setEnabled(false);
                     }
                 }
@@ -242,6 +271,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
     }
+
+    /**
+     * Returns menu item for VNC different viewers.
+     */
+    private String getVNCMenuString(final String viewer, final Host host) {
+        return Tools.getString("VMSVirtualDomainInfo.StartVNCViewerOn")
+                            .replaceAll("@VIEWER@", viewer)
+               + host.getName();
+    }
+
 
     /**
      * Returns info panel.
@@ -298,12 +337,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                   ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                   null); // TODO: same as?
         for (final String param : params) {
-            if ("os-boot".equals(param)) {
+            if (VMSXML.VM_PARAM_BOOT.equals(param)) {
                 /* no virsh command for os-boot */
                 paramComboBoxGet(param, null).setEnabled(false);
-            } else if ("vcpu".equals(param)) {
+            } else if (VMSXML.VM_PARAM_VCPU.equals(param)) {
                 paramComboBoxGet(param, null).setEnabled(!running);
-            } else if ("currentMemory".equals(param)) {
+            } else if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)) {
                 paramComboBoxGet(param, null).setEnabled(false);
             }
         }
@@ -365,7 +404,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (Tools.getConfigData().isTightvnc()) {
             /* tight vnc test menu */
             final MyMenuItem tightvncViewerMenu = new MyMenuItem(
-                                "start TIGHT VNC viewer on " + host.getName(),
+                                getVNCMenuString("TIGHT", host),
                                 null,
                                 null) {
 
@@ -401,7 +440,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (Tools.getConfigData().isUltravnc()) {
             /* ultra vnc test menu */
             final MyMenuItem ultravncViewerMenu = new MyMenuItem(
-                                "start ULTRA VNC viewer on " + host.getName(),
+                                getVNCMenuString("ULTRA", host),
                                 null,
                                 null) {
 
@@ -437,7 +476,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (Tools.getConfigData().isRealvnc()) {
             /* real vnc test menu */
             final MyMenuItem realvncViewerMenu = new MyMenuItem(
-                                    "start REAL VNC test on " + host.getName(),
+                                    getVNCMenuString("REAL", host),
                                     null,
                                     null) {
 
@@ -507,10 +546,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
-        if ("memory".equals(param) && running) {
+        if (VMSXML.VM_PARAM_MEMORY.equals(param) && running) {
             final int mem = Tools.convertToKilobytes(newValue);
             final int curMem = Tools.convertToKilobytes(
-                                    getResource().getValue("currentMemory"));
+                        getResource().getValue(VMSXML.VM_PARAM_CURRENTMEMORY));
             if (mem < curMem) {
                 return false;
             }
@@ -529,7 +568,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns possible choices for drop down lists.
      */
     protected final Object[] getParamPossibleChoices(final String param) {
-        if ("os-boot".equals(param)) {
+        if (VMSXML.VM_PARAM_BOOT.equals(param)) {
             return POSSIBLE_VALUES.get(param);
         }
         return null;

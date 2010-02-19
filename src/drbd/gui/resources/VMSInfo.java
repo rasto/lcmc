@@ -88,12 +88,10 @@ public class VMSInfo extends CategoryInfo {
         for (final String domainName : domainNames) {
             for (final Host host : getBrowser().getClusterHosts()) {
                 final VMSXML vxml = getBrowser().getVMSXML(host);
-                if (vxml != null) {
-                    if (vxml.isRunning(domainName)) {
-                        final Color bgColor = host.getPmColors()[0];
-                        dtc.put(domainName, bgColor);
-                        break;
-                    }
+                if (vxml != null && vxml.isRunning(domainName)) {
+                    final Color bgColor = host.getPmColors()[0];
+                    dtc.put(domainName, bgColor);
+                    break;
                 }
             }
             final VMSVirtualDomainInfo vmsvdi =
@@ -158,7 +156,7 @@ public class VMSInfo extends CategoryInfo {
     /**
      * Returns comparator for column.
      */
-    protected Comparator<String> getColComparator(final int col) {
+    protected final Comparator<String> getColComparator(final int col) {
         if (col == 3) {
             /* memory */
             final Comparator<String> c = new Comparator<String>() {

@@ -71,6 +71,22 @@ public class VMSXML extends XML {
                                                  Pattern.compile(".*:(\\d+)$");
     /** Host on which the vm is defined. */
     private final Host host;
+    /** VM field: name. */
+    public static final String VM_PARAM_NAME = "name";
+    /** VM field: defined. */
+    public static final String VM_PARAM_DEFINED = "defined";
+    /** VM field: status. */
+    public static final String VM_PARAM_STATUS = "status";
+    /** VM field: vcpu. */
+    public static final String VM_PARAM_VCPU = "vcpu";
+    /** VM field: currentMemory. */
+    public static final String VM_PARAM_CURRENTMEMORY = "currentMemory";
+    /** VM field: memory. */
+    public static final String VM_PARAM_MEMORY = "memory";
+    /** VM field: os-boot. */
+    public static final String VM_PARAM_BOOT = "boot";
+    /** VM field: autostart. */
+    public static final String VM_PARAM_AUTOSTART = "autostart";
     /**
      * Prepares a new <code>VMSXML</code> object.
      */
@@ -122,13 +138,13 @@ public class VMSXML extends XML {
             return;
         }
         final Node infoNode = getChildNode(vmNode, "info");
-        final String name = getAttribute(vmNode, "name");
+        final String name = getAttribute(vmNode, VM_PARAM_NAME);
         final String config = getAttribute(vmNode, "config");
-        final String autostart = getAttribute(vmNode, "autostart");
+        final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
         if (autostart == null) {
-            parameterValues.put(name, "autostart", "false");
+            parameterValues.put(name, VM_PARAM_AUTOSTART, "false");
         } else {
-            parameterValues.put(name, "autostart", autostart);
+            parameterValues.put(name, VM_PARAM_AUTOSTART, autostart);
         }
         if (infoNode != null) {
             parseInfo(name, getText(infoNode));
@@ -162,7 +178,7 @@ public class VMSXML extends XML {
         String name = null;
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
-            if ("name".equals(option.getNodeName())) {
+            if (VM_PARAM_NAME.equals(option.getNodeName())) {
                 name = getText(option);
                 if (!domainNames.contains(name)) {
                     domainNames.add(name);
@@ -172,23 +188,23 @@ public class VMSXML extends XML {
                                      + " != " + nameInFilename);
                     return;
                 }
-            } else if ("vcpu".equals(option.getNodeName())) {
-                parameterValues.put(name, "vcpu", getText(option));
-            } else if ("currentMemory".equals(option.getNodeName())) {
+            } else if (VM_PARAM_VCPU.equals(option.getNodeName())) {
+                parameterValues.put(name, VM_PARAM_VCPU, getText(option));
+            } else if (VM_PARAM_CURRENTMEMORY.equals(option.getNodeName())) {
                 parameterValues.put(name,
-                                    "currentMemory",
+                                    VM_PARAM_CURRENTMEMORY,
                                     Tools.convertKilobytes(getText(option)));
-            } else if ("memory".equals(option.getNodeName())) {
+            } else if (VM_PARAM_MEMORY.equals(option.getNodeName())) {
                 parameterValues.put(name,
-                                    "memory", 
+                                    VM_PARAM_MEMORY,
                                     Tools.convertKilobytes(getText(option)));
             } else if ("os".equals(option.getNodeName())) {
                 final NodeList osOptions = option.getChildNodes();
                 for (int j = 0; j < osOptions.getLength(); j++) {
                     final Node osOption = osOptions.item(j);
-                    if ("boot".equals(osOption.getNodeName())) {
+                    if (VM_PARAM_BOOT.equals(osOption.getNodeName())) {
                         parameterValues.put(name,
-                                            "os-boot",
+                                            VM_PARAM_BOOT,
                                             getAttribute(osOption, "dev"));
                     }
                 }
