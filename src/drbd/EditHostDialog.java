@@ -25,7 +25,7 @@ package drbd;
 import drbd.data.Host;
 
 import drbd.gui.dialog.host.DialogHost;
-import drbd.gui.dialog.host.NewHost;
+import drbd.gui.dialog.host.SSH;
 
 /**
  * EditHostDialog.
@@ -51,8 +51,7 @@ public class EditHostDialog {
      * Shows step by step dialogs that configure a host.
      */
     public final void showDialogs() {
-        host.setHostnameEntered(host.getHostname());
-        DialogHost dialog = new NewHost(null, host);
+        DialogHost dialog = new SSH(null, host);
         while (true) {
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
