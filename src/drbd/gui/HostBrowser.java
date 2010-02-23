@@ -99,6 +99,14 @@ public class HostBrowser extends Browser {
     public static final ImageIcon HOST_REMOVE_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("HostBrowser.RemoveIcon"));
+    /** Small host in cluster icon (right side). */
+    public static final ImageIcon HOST_IN_CLUSTER_ICON_RIGHT_SMALL =
+            Tools.createImageIcon(
+               Tools.getDefault("HostBrowser.HostInClusterIconRightSmall"));
+    /** Small host in cluster icon (left side). */
+    public static final ImageIcon HOST_IN_CLUSTER_ICON_LEFT_SMALL =
+            Tools.createImageIcon(
+               Tools.getDefault("HostBrowser.HostInClusterIconLeftSmall"));
     /** Block device infos lock. */
     private final Mutex mBlockDevInfosLock = new Mutex();
     /** Net Interface infos lock. */

@@ -29,6 +29,7 @@ import drbd.gui.ClusterBrowser;
 import drbd.gui.HeartbeatGraph;
 import drbd.gui.SpringUtilities;
 import drbd.data.Host;
+import drbd.data.Cluster;
 import drbd.utilities.UpdatableItem;
 import drbd.data.Subtext;
 import drbd.data.ClusterStatus;
@@ -100,6 +101,10 @@ public class HostInfo extends Info {
      * Returns a host icon for the menu.
      */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
+        final Cluster cl = host.getCluster();
+        if (cl != null) {
+            return HostBrowser.HOST_IN_CLUSTER_ICON_RIGHT_SMALL;
+        }
         return HostBrowser.HOST_ICON;
     }
 

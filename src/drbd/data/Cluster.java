@@ -116,6 +116,7 @@ public class Cluster {
      */
     public final void addHost(final Host host) {
         final int id = hosts.size();
+        host.setIndex(id);
         if (id < hostColors.length) {
             host.setColor(hostColors[id]);
         }

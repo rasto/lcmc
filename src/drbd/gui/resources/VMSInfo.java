@@ -27,8 +27,8 @@ import drbd.gui.ClusterBrowser;
 import drbd.data.VMSXML;
 import drbd.data.Host;
 import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
 
-import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
 import java.util.List;
@@ -100,9 +100,8 @@ public class VMSInfo extends CategoryInfo {
             final VMSVirtualDomainInfo vmsvdi =
                         getBrowser().findVMSVirtualDomainInfo(domainName);
             dti.put(domainName, vmsvdi);
-            final JLabel domainNameLabel = new JLabel(hostIcon);
-            domainNameLabel.setOpaque(true);
-            domainNameLabel.setText(domainName);
+            final MyButton domainNameLabel = new MyButton(domainName,
+                                                          hostIcon);
             rows.add(new Object[]{domainNameLabel,
                                   vmsvdi.getDefinedOnString(),
                                   vmsvdi.getRunningOnString(),
@@ -111,6 +110,14 @@ public class VMSInfo extends CategoryInfo {
         domainToInfo = dti;
         domainToColor = dtc;
         return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /**
+     * Returns info object for the key.
+     */
+    protected final Info getTableInfo(final String tableName,
+                                      final String key) {
+        return domainToInfo.get(key);
     }
 
     /**
@@ -143,13 +150,6 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /**
-     * Returns row height for the table.
-     */
-    protected final int getRowHeight() {
-        return 32;
-    }
-
-    /**
      * Returns comparator for column.
      */
     protected final Comparator<Object> getColComparator(final int col) {
@@ -157,8 +157,8 @@ public class VMSInfo extends CategoryInfo {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
                 public int compare(final Object l1, final Object l2) {
-                    return ((JLabel) l1).getText().compareToIgnoreCase(
-                                                      ((JLabel) l2).getText());
+                    return ((MyButton) l1).getText().compareToIgnoreCase(
+                                                    ((MyButton) l2).getText());
                 }
             };
             return c;
@@ -187,6 +187,11 @@ public class VMSInfo extends CategoryInfo {
      */
     protected final Color getTableRowColor(final String tableName,
                                            final String key) {
-        return domainToColor.get(key);
+        final Color c = domainToColor.get(key);
+        if (c == null) {
+            return Browser.PANEL_BACKGROUND;
+        } else {
+            return c;
+        }
     }
 }

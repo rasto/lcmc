@@ -70,10 +70,6 @@ public class MainMenu extends JPanel implements ActionListener {
     /** Host icon. */
     private static final ImageIcon HOST_ICON =
                 Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
-    /** Cluster icon. */
-    private static final ImageIcon CLUSTER_ICON =
-            Tools.createImageIcon(Tools.getDefault("MainMenu.ClusterIcon"));
-
 
     /**
      * Prepares a new <code>MainMenu</code> object with main menu.
@@ -100,7 +96,7 @@ public class MainMenu extends JPanel implements ActionListener {
                                           KeyEvent.VK_C,
                                           KeyEvent.VK_C,
                                           newClusterActionListener(),
-                                          CLUSTER_ICON);
+                                          ClusterBrowser.CLUSTER_ICON_SMALL);
 
         Tools.getGUIData().registerAddClusterButton(cmi);
         Tools.getGUIData().checkAddClusterButtons();

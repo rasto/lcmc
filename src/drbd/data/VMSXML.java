@@ -66,6 +66,20 @@ public class VMSXML extends XML {
     /** Whether the domain is running. */
     private final Map<String, Boolean> runningMap =
                                                 new HashMap<String, Boolean>();
+    private final List<String> disks = new ArrayList<String>();
+    private final Map<String, String> diskType = new HashMap<String, String>();
+    private final Map<String, String> diskSourceFile =
+                                                new HashMap<String, String>();
+    private final Map<String, String> diskSourceDev =
+                                                new HashMap<String, String>();
+    private final Map<String, String> diskTargetBus =
+                                                new HashMap<String, String>();
+    private final Map<String, Boolean> diskReadonly =
+                                                new HashMap<String, Boolean>();
+    private final List<String> nics = new ArrayList<String>();
+    private final Map<String, String> nicType = new HashMap<String, String>();
+    private final Map<String, String> nicSourceBridge =
+                                                new HashMap<String, String>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
@@ -211,17 +225,17 @@ public class VMSXML extends XML {
             } else if ("devices".equals(option.getNodeName())) {
                 final NodeList devices = option.getChildNodes();
                 for (int j = 0; j < devices.getLength(); j++) {
-                    final Node device = devices.item(j);
-                    if ("input".equals(device.getNodeName())) {
-                        final String type = getAttribute(device, "type");
+                    final Node deviceNode = devices.item(j);
+                    if ("input".equals(deviceNode.getNodeName())) {
+                        final String type = getAttribute(deviceNode, "type");
                         if ("tablet".equals(type)) {
                             tabletOk = true;
                         }
-                    } else if ("graphics".equals(device.getNodeName())) {
+                    } else if ("graphics".equals(deviceNode.getNodeName())) {
                         /** remotePort will be overwritten with virsh output */
-                        final String type = getAttribute(device, "type");
-                        final String port = getAttribute(device, "port");
-                        final String ap = getAttribute(device, "autoport");
+                        final String type = getAttribute(deviceNode, "type");
+                        final String port = getAttribute(deviceNode, "port");
+                        final String ap = getAttribute(deviceNode, "autoport");
                         Tools.debug(this, "type: " + type, 2);
                         Tools.debug(this, "port: " + port, 2);
                         Tools.debug(this, "autoport: " + ap, 2);
@@ -234,6 +248,58 @@ public class VMSXML extends XML {
                             } else {
                                 autoports.put(name, false);
                             }
+                        }
+                    } else if ("disk".equals(deviceNode.getNodeName())) {
+                        final String type = getAttribute(deviceNode, "type");
+                        final String device = getAttribute(deviceNode,
+                                                           "device");
+                        final NodeList opts = deviceNode.getChildNodes();
+                        String sourceFile = null;
+                        String sourceDev = null;
+                        String targetDev = null;
+                        String targetBus = null;
+                        boolean readonly = false;
+                        for (int k = 0; k < opts.getLength(); k++) {
+                            final Node optionNode = opts.item(k);
+                            if ("source".equals(optionNode.getNodeName())) {
+                                sourceFile = getAttribute(optionNode, "file");
+                                sourceDev = getAttribute(optionNode, "dev");
+                            } else if ("target".equals(
+                                                  optionNode.getNodeName())) {
+                                targetDev = getAttribute(optionNode, "dev");
+                                targetBus = getAttribute(optionNode, "bus");
+                            } else if ("readonly".equals(
+                                                   optionNode.getNodeName())) {
+                                readonly = true;
+                            }
+                        }
+                        if (targetDev != null) {
+                            disks.add(targetDev);
+                            diskType.put(targetDev, type);
+                            diskSourceFile.put(targetDev, sourceFile);
+                            diskSourceDev.put(targetDev, sourceDev);
+                            diskTargetBus.put(targetDev, targetBus);
+                            diskReadonly.put(targetDev, readonly);
+                        }
+                    } else if ("interface".equals(deviceNode.getNodeName())) {
+                        final String type = getAttribute(deviceNode, "type");
+                        final NodeList opts = deviceNode.getChildNodes();
+                        String macAddress = null;
+                        String sourceBridge = null;
+                        for (int k = 0; k < opts.getLength(); k++) {
+                            final Node optionNode = opts.item(k);
+                            if ("source".equals(optionNode.getNodeName())) {
+                                 sourceBridge = getAttribute(optionNode,
+                                                             "bridge");
+                            } else if ("mac".equals(optionNode)) {
+                                macAddress = getAttribute(optionNode,
+                                                          "address");
+                            }
+                        }
+                        if (macAddress != null) {
+                            nics.add(macAddress);
+                            nicType.put(macAddress, type);
+                            nicSourceBridge.put(macAddress, sourceBridge);
                         }
                     }
                 }

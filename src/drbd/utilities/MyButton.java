@@ -199,7 +199,12 @@ public class MyButton extends JButton implements ComponentWithTest {
      * Sets background of the button.
      */
     public final void setBackground(final Color c) {
-        this.color2 = c;
+        if (c == null) {
+            color2 = Tools.getDefaultColor("DefaultButton.Background");
+        } else {
+            color2 = c;
+        }
+        super.setBackground(c);
         repaint();
     }
 
@@ -214,7 +219,7 @@ public class MyButton extends JButton implements ComponentWithTest {
      * Overloaded in order to paint the background.
      */
     protected final void paintComponent(final Graphics g) {
-        if (!isEnabled()) {
+        if (!isEnabled() || getModel().isPressed()) {
             super.paintComponent(g);
             return;
         }
@@ -224,11 +229,17 @@ public class MyButton extends JButton implements ComponentWithTest {
         final Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
-        gp1 = new GradientPaint(1.0f, (float) getHeight(),
-            color2, 1.0f,
-            (float) getHeight() * 0.3f, color1);
-        gp2 = new GradientPaint(1.0f, 0.0f, color2,
-            1.0f, (float) getHeight() * 0.3f, color1);
+        gp1 = new GradientPaint(1.0f,
+                                (float) getHeight(),
+                                color2,
+                                1.0f,
+                                (float) getHeight() * 0.3f,
+                                color1);
+        gp2 = new GradientPaint(1.0f,
+                                0.0f,
+                                color2,
+                                1.0f,
+                                (float) getHeight() * 0.3f, color1);
         rf1 = new Rectangle2D.Float(0.0f, (float) getHeight() * 0.3f,
             (float) getWidth(), (float) getHeight());
         rf2 = new Rectangle2D.Float(0.0f, 0.0f, (float) getWidth(),

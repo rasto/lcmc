@@ -60,7 +60,6 @@ public class CategoryInfo extends Info {
     /**
      * Returns info panel for this resource.
      */
-    //@SuppressWarnings("unchecked")
     public JComponent getInfoPanel() {
         if (infoPanel != null) {
             return infoPanel;
@@ -68,7 +67,7 @@ public class CategoryInfo extends Info {
         infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Browser.PANEL_BACKGROUND);
-        final JComponent table = getTable("maintable");
+        final JComponent table = getTable("main");
         if (table != null) {
             final JScrollPane sp = new JScrollPane(table);
             sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);

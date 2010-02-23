@@ -107,7 +107,7 @@ public class Browser {
     /**
      * Repaints the menu tree.
      */
-    protected final void repaintTree() {
+    public final void repaintTree() {
         tree.repaint();
     }
 

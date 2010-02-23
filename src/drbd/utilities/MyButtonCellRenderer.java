@@ -22,33 +22,26 @@
 
 package drbd.utilities;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.JComponent;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
 import javax.swing.SwingConstants;
 import java.awt.Color;
-import java.awt.Insets;
+import java.awt.Dimension;
 
 /**
  * Cells with jlabels, widths and colors.
  */
-public class MyCellRenderer extends JLabel
-                            implements TableCellRenderer {
+public class MyButtonCellRenderer extends MyButton
+                                  implements TableCellRenderer {
     /** Serial version uid. */
     private static final long serialVersionUID = 1L;
-    /** Border for jlabel so, that there is spacing in the table. Table spacing
-     * cannot be used because of row colors. */
-    private static final EmptyBorder EMPTY_BORDER =
-                                       new EmptyBorder(new Insets(0, 4, 0, 4));
     /**
-     * Creates a new MyCellRenderer object.
+     * Creates a new MyButtonCellRenderer object.
      */
-    public MyCellRenderer() {
+    public MyButtonCellRenderer() {
         super();
-        setOpaque(true);
+        final Dimension s = getPreferredSize();
     }
 
     /**
@@ -61,20 +54,31 @@ public class MyCellRenderer extends JLabel
                                                       final boolean hasFocus,
                                                       final int row,
                                                       final int column) {
-        JComponent ret;
-        final int al = getColumnAlignment(column);
-        if (value instanceof JLabel) {
-            ret  = (JLabel) value;
+        final MyButton button = (MyButton) value;
+        if (button == null) {
+            setText("");
+            getModel().setPressed(false);
+            getModel().setArmed(false);
+            getModel().setRollover(false);
         } else {
-            setText(value.toString());
-            ret = this;
+            if (button.getModel().isPressed()) {
+                setOpaque(true);
+            } else {
+                setOpaque(false);
+            }
+            setText(button.getText());
+            setIcon(button.getIcon());
+            getModel().setPressed(button.getModel().isPressed());
+            getModel().setArmed(button.getModel().isArmed());
+            getModel().setRollover(button.getModel().isRollover());
         }
-        ((JLabel) ret).setHorizontalAlignment(al);
+
+        final int al = getColumnAlignment(column);
+        setHorizontalAlignment(al);
         final String key = ((MyButton) table.getValueAt(row, 0)).getText();
         final Color bg = getRowColor(key);
-        ret.setBackground(bg);
-        ret.setBorder(EMPTY_BORDER);
-        return ret;
+        setBackground(bg);
+        return this;
     }
 
     /**

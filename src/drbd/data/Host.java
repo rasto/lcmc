@@ -204,6 +204,8 @@ public class Host implements Serializable {
                                     Tools.getDefaultInt("SSH.Command.Timeout");
     /** Previous hw info output. */
     private String oldHwInfo = null;
+    /** Index of this host in its cluster. */
+    private int index = 0;
 
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
@@ -2216,5 +2218,19 @@ public class Host implements Serializable {
      */
     public final void setVMInfoMD5(final String vmInfoMD5) {
         this.vmInfoMD5 = vmInfoMD5;
+    }
+
+    /**
+     * Sets index of this host in cluster.
+     */
+    public final void setIndex(final int index) {
+        this.index = index;
+    }
+
+    /**
+     * Returns index of this host in cluster.
+     */
+    public final int getIndex() {
+        return index;
     }
 }

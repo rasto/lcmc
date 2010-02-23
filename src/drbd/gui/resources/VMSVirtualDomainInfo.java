@@ -33,6 +33,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.VIRSH;
 import drbd.utilities.Unit;
+import drbd.utilities.MyButton;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -43,7 +44,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import java.util.Map;
@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.BorderLayout;
@@ -73,7 +74,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** HTML string on which hosts the vm is running. */
     private String runningOnString = "";
     /** Row color, that is color of host on which is it running or null. */
-    private Color rowColor = null;
+    private Color rowColor = Browser.PANEL_BACKGROUND;
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                                VMSXML.VM_PARAM_VCPU,
@@ -241,7 +242,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         }
-        updateTable("maintable");
+        updateTable("main");
     }
 
     /**
@@ -266,6 +267,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        final JTable table = getTable("main");
+        if (table != null) {
+            mainPanel.add(table.getTableHeader());
+            mainPanel.add(table);
+        }
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
@@ -301,7 +307,19 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             );
         }
+        final JPanel extraButtonPanel =
+                           new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        extraButtonPanel.setBackground(Browser.STATUS_BACKGROUND);
+        buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
+        final MyButton overviewButton = new MyButton("Overview");
+        overviewButton.setPreferredSize(new Dimension(100, 50));
+        overviewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                getBrowser().getVMSInfo().selectMyself();
+            }
+        });
+        extraButtonPanel.add(overviewButton);
         addParams(optionsPanel,
                   extraOptionsPanel,
                   params,
@@ -333,11 +351,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
-        final JTable table = getTable("maintable");
-        if (table != null) {
-            newPanel.add(table.getTableHeader());
-            newPanel.add(table);
-        }
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
         newPanel.add(Box.createVerticalGlue());
@@ -679,32 +692,35 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns data for the table.
      */
     protected final Object[][] getTableData(final String tableName) {
+        if ("main".equals(tableName)) {
+            return getMainTableData();
+        }
+        return null;
+    }
+
+    /**
+     * Returns data for the main table.
+     */
+    private Object[][] getMainTableData() {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final String domainName = toString();
         ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
+        Color newColor = Browser.PANEL_BACKGROUND;
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null && vxml.isRunning(domainName)) {
-                rowColor = host.getPmColors()[0];
+                newColor = host.getPmColors()[0];
                 hostIcon = HostBrowser.HOST_ON_ICON_LARGE;
                 break;
             }
         }
-        final JLabel domainNameLabel = new JLabel(hostIcon);
-        domainNameLabel.setOpaque(true);
-        domainNameLabel.setText(domainName);
+        rowColor = newColor;
+        final MyButton domainNameLabel = new MyButton(domainName, hostIcon);
         rows.add(new Object[]{domainNameLabel,
                               getDefinedOnString(),
                               getRunningOnString(),
                               getResource().getValue("memory")});
         return rows.toArray(new Object[rows.size()][]);
-    }
-
-    /**
-     * Returns row height for the table.
-     */
-    protected final int getRowHeight() {
-        return 32;
     }
 
     /**
@@ -731,5 +747,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return SwingConstants.RIGHT;
         }
         return SwingConstants.LEFT;
+    }
+
+    /**
+     * Returns info object for this row.
+     */
+    protected final Info getTableInfo(final String tableName,
+                                      final String key) {
+        if ("main".equals(tableName)) {
+            return this;
+        }
+        return null;
     }
 }

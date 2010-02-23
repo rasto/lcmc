@@ -294,6 +294,9 @@ public class ClusterBrowser extends Browser {
     /** Cluster status error string. */
     private static final String CLUSTER_STATUS_ERROR =
                                   "---start---\r\nerror\r\n\r\n---done---\r\n";
+    /** Small cluster icon. */
+    public static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
+                          Tools.getDefault("ClusterBrowser.ClusterIconSmall"));
     /**
      * Prepares a new <code>CusterBrowser</code> object.
      */
@@ -1295,7 +1298,7 @@ public class ClusterBrowser extends Browser {
         }
         final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
         if (vmsi != null) {
-            vmsi.updateTable("maintable");
+            vmsi.updateTable("main");
         }
     }
 

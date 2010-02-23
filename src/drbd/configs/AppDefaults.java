@@ -250,6 +250,10 @@ public class AppDefaults extends
         {"ClusterBrowser.ServiceIcon", "Icons/tango/16x16/service1_16x16.png"},
         {"ClusterBrowser.NetworkIcon", "Icons/tango/16x16/netzwk_16x16.png"},
         {"ClusterBrowser.RemoveIcon",  "Icons/tango/32x32/cancel_32x32.png"},
+
+        {"ClusterBrowser.ClusterIconSmall",
+         "Icons/tango/16x16/cluster_16x16.png"},
+
         {"HostViewPanel.HostIcon",     "Icons/tango/32x32/host_32x32.png"},
         {"HostTab.HostIcon",           "Icons/tango/32x32/host_32x32.png"},
         {"HostBrowser.HostIconSmall",    "Icons/tango/16x16/host_16x16.png"},
@@ -260,16 +264,22 @@ public class AppDefaults extends
         {"HostBrowser.HostIcon",       "Icons/tango/32x32/host_32x32.png"},
         {"HostBrowser.HostOnIcon",     "Icons/tango/32x32/host_on_32x32.png"},
         {"HostBrowser.HostOffIcon",    "Icons/tango/32x32/host_off_32x32.png"},
+
+        {"HostBrowser.HostInClusterIconRightSmall",
+         "Icons/tango/16x16/host_in_cluster_right_16x16.png"},
+
+        {"HostBrowser.HostInClusterIconLeftSmall",
+         "Icons/tango/16x16/host_in_cluster_left_16x16.png"},
+
         {"EmptyBrowser.HostIcon",      "Icons/tango/32x32/host_32x32.png"},
 
-        {"MainMenu.ClusterIcon",       "Icons/tango/16x16/cluster_16x16.png"},
         {"MainMenu.HostIcon",          "Icons/tango/16x16/host_16x16.png"},
 
-        {"MainPanel.ClustersIcon",     "Icons/tango/16x16/cluster_16x16.png"},
         {"MainPanel.HostsIcon",        "Icons/tango/16x16/host_16x16.png"},
 
         {"ClustersPanel.ClusterIcon",    "Icons/tango/32x32/cluster_32x32.png"},
         {"ClusterViewPanel.ClusterIcon", "Icons/tango/32x32/cluster_32x32.png"},
+
         {"HostsPanel.HostIcon",          "Icons/tango/32x32/host_32x32.png"},
 
         {"DrbdGraph.HarddiscIcon",

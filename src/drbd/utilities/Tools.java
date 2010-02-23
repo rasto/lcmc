@@ -95,6 +95,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
+import java.net.InetAddress;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 
@@ -802,6 +803,9 @@ public final class Tools {
     public static void removeClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
             getConfigData().removeClusterFromClusters(cluster);
+            for (final Host host : cluster.getHosts()) {
+                host.setCluster(null);
+            }
         }
     }
 
@@ -2098,7 +2102,17 @@ public final class Tools {
      * Returns whether the ip is localhost.
      */
     public static boolean isLocalIp(final String ip) {
-        return ip == null || "127.0.0.1".equals(ip) || "127.0.1.1".equals(ip);
+        if (ip == null
+            || "127.0.0.1".equals(ip)
+            || "127.0.1.1".equals(ip)) {
+            return true;
+        }
+        try {
+            final String localIp = InetAddress.getLocalHost().getHostAddress();
+            return ip.equals(localIp);
+        } catch (java.net.UnknownHostException e) {
+            return false;
+        }
     }
 
     /**
