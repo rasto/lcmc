@@ -364,9 +364,9 @@ public class ProgressIndicatorPanel extends JComponent
             }
             if (!texts.isEmpty()) {
                 final FontRenderContext context = g2.getFontRenderContext();
-                Font font = new Font(getFont().getName(),
-                                     getFont().getStyle(),
-                                     (int) (getFont().getSize() * 1.75));
+                final Font font = new Font(getFont().getName(),
+                                           getFont().getStyle(),
+                                           (int) (getFont().getSize() * 1.75));
 
                 maxY = getHeight() / 2 - 30;
 

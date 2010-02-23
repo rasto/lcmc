@@ -1760,20 +1760,8 @@ public class TextResource extends
         {"VMSXML.GetConfig",
          "Parsing libvirt config..."},
 
-        {"VMSVirtualDomainInfo.Section.GeneralInfo",
-         "General Info"},
-
         {"VMSVirtualDomainInfo.Section.VirtualSystem",
          "Virtual System"},
-
-        {"VMSVirtualDomainInfo.Short.Name",
-         "Name"},
-
-        {"VMSVirtualDomainInfo.Short.Defined",
-         "Defined On"},
-
-        {"VMSVirtualDomainInfo.Short.Status",
-         "Status"},
 
         {"VMSVirtualDomainInfo.Short.Vcpu",
          "Number of CPUs"},

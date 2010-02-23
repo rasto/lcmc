@@ -37,12 +37,11 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
-import java.awt.Color;
 
 /**
  * This is the central class with main function. It starts the DRBD GUI.
  */
-public class DrbdMC extends JPanel {
+public final class DrbdMC extends JPanel {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -50,6 +49,12 @@ public class DrbdMC extends JPanel {
     private static final int TOOLTIP_INITIAL_DELAY = 200;
     /** Dismiss delay for showing any tool tip in milliseconds. */
     private static final int TOOLTIP_DISMISS_DELAY = 100000;
+    /**
+     * Private constructor.
+     */
+    private DrbdMC() {
+        /* no instantiation possible. */
+    }
     /**
      * Create the GUI and show it.
      */

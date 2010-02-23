@@ -61,7 +61,13 @@ import javax.swing.JTextArea;
 import javax.swing.DefaultListModel;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.UIManager;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.DefaultTableColumnModel;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -2142,5 +2148,47 @@ public final class Tools {
             return num;
         }
         return -1;
+    }
+
+    /**
+     * Resize table.
+     */
+    public static void resizeTable(final JTable table) {
+        final int margin = 5;
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            final int vColIndex = i;
+            final DefaultTableColumnModel colModel =
+                            (DefaultTableColumnModel) table.getColumnModel();
+            final TableColumn col = colModel.getColumn(vColIndex);
+            int width = 0;
+            TableCellRenderer renderer = col.getHeaderRenderer();
+
+            if (renderer == null) {
+                renderer = table.getTableHeader().getDefaultRenderer();
+            }
+            Component comp = renderer.getTableCellRendererComponent(
+                                                        table,
+                                                        col.getHeaderValue(),
+                                                        false,
+                                                        false,
+                                                        0,
+                                                        0);
+            width = comp.getPreferredSize().width;
+            for (int r = 0; r < table.getRowCount(); r++) {
+                renderer = table.getCellRenderer(r, vColIndex);
+                comp = renderer.getTableCellRendererComponent(
+                                              table,
+                                              table.getValueAt(r, vColIndex),
+                                              false,
+                                              false,
+                        r, vColIndex);
+                width = Math.max(width, comp.getPreferredSize().width);
+            }
+            width += 2 * margin;
+            col.setPreferredWidth(width);
+        }
+        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
+                            .setHorizontalAlignment(SwingConstants.CENTER);
     }
 }

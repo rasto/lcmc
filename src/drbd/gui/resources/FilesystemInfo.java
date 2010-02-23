@@ -212,7 +212,7 @@ class FilesystemInfo extends ServiceInfo {
                                            final int width) {
         GuiComboBox paramCb;
         if (FS_RES_PARAM_DEV.equals(param)) {
-            DrbdResourceInfo selectedInfo =
+            final DrbdResourceInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
             String selectedValue = null;

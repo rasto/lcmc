@@ -43,10 +43,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.BorderLayout;
@@ -68,11 +72,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private String definedOnString = "";
     /** HTML string on which hosts the vm is running. */
     private String runningOnString = "";
+    /** Row color, that is color of host on which is it running or null. */
+    private Color rowColor = null;
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
-                                               VMSXML.VM_PARAM_NAME,
-                                               VMSXML.VM_PARAM_DEFINED,
-                                               VMSXML.VM_PARAM_STATUS,
                                                VMSXML.VM_PARAM_VCPU,
                                                VMSXML.VM_PARAM_CURRENTMEMORY,
                                                VMSXML.VM_PARAM_MEMORY,
@@ -99,32 +102,17 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns default unit. */
     private static final Map<String, String> DEFAULT_UNIT =
                                                new HashMap<String, String>();
-    /** General Info header. */
-    private static final String GENERAL_INFO_STRING =
-                Tools.getString("VMSVirtualDomainInfo.Section.GeneralInfo");
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
 
     static {
-        SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          GENERAL_INFO_STRING);
-        SECTION_MAP.put(VMSXML.VM_PARAM_DEFINED,       GENERAL_INFO_STRING);
-        SECTION_MAP.put(VMSXML.VM_PARAM_STATUS,        GENERAL_INFO_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
 
-        SHORTNAME_MAP.put(
-                   VMSXML.VM_PARAM_NAME,
-                   Tools.getString("VMSVirtualDomainInfo.Short.Name"));
-        SHORTNAME_MAP.put(
-                   VMSXML.VM_PARAM_DEFINED,
-                   Tools.getString("VMSVirtualDomainInfo.Short.Defined"));
-        SHORTNAME_MAP.put(
-                   VMSXML.VM_PARAM_STATUS,
-                   Tools.getString("VMSVirtualDomainInfo.Short.Status"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_VCPU,
                    Tools.getString("VMSVirtualDomainInfo.Short.Vcpu"));
@@ -141,9 +129,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    VMSXML.VM_PARAM_AUTOSTART,
                    Tools.getString("VMSVirtualDomainInfo.Short.Autostart"));
 
-        FIELD_TYPES.put(VMSXML.VM_PARAM_NAME, GuiComboBox.Type.LABELFIELD);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_DEFINED, GuiComboBox.Type.LABELFIELD);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_STATUS, GuiComboBox.Type.LABELFIELD);
         FIELD_TYPES.put(VMSXML.VM_PARAM_CURRENTMEMORY,
                         GuiComboBox.Type.TEXTFIELDWITHUNIT);
         FIELD_TYPES.put(VMSXML.VM_PARAM_MEMORY,
@@ -176,7 +161,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Browser browser) {
         super(name, browser);
         setResource(new Resource(name));
-        getResource().setValue(VMSXML.VM_PARAM_NAME, name);
     }
 
     /**
@@ -197,61 +181,55 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Sets service parameters with values from resourceNode hash.
      */
     public final void updateParameters() {
+        final List<String> runningOnHosts = new ArrayList<String>();
+        final List<String> definedhosts = new ArrayList<String>();
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            final String hostName = h.getName();
+            if (vmsxml != null
+                && vmsxml.getDomainNames().contains(toString())) {
+                if (vmsxml.isRunning(toString())) {
+                    runningOnHosts.add(hostName);
+                }
+                definedhosts.add(hostName);
+            } else {
+                definedhosts.add("<font color=\"#A3A3A3\">"
+                                 + hostName + "</font>");
+            }
+        }
+        definedOnString = "<html>"
+                          + Tools.join(" ", definedhosts.toArray(
+                                     new String[definedhosts.size()]))
+                          + "</html>";
+        if (runningOnHosts.isEmpty()) {
+            running = false;
+            runningOnString = "Stopped";
+        } else {
+            running = true;
+            runningOnString =
+                "<html>Running on: "
+                + Tools.join(", ", runningOnHosts.toArray(
+                                    new String[runningOnHosts.size()]))
+                + "</html>";
+        }
         for (final String param : getParametersFromXML()) {
             final String oldValue = getParamSaved(param);
             String value = getParamSaved(param);
             final GuiComboBox cb = paramComboBoxGet(param, null);
-            if (VMSXML.VM_PARAM_STATUS.equals(param)) {
-                final List<String> runningOnHosts = new ArrayList<String>();
-                final List<String> definedhosts = new ArrayList<String>();
-                for (final Host h : getBrowser().getClusterHosts()) {
-                    final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                    final String hostName = h.getName();
-                    if (vmsxml != null
-                        && vmsxml.getDomainNames().contains(toString())) {
-                        if (vmsxml.isRunning(toString())) {
-                            runningOnHosts.add(hostName);
-                        }
-                        definedhosts.add(hostName);
-                    } else {
-                        definedhosts.add("<font color=\"#A3A3A3\">"
-                                         + hostName + "</font>");
-                    }
+            if (cb != null) {
+                if (VMSXML.VM_PARAM_VCPU.equals(param)) {
+                    paramComboBoxGet(param, null).setEnabled(!running);
+                } else if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)) {
+                    paramComboBoxGet(param, null).setEnabled(false);
                 }
-                definedOnString = "<html>"
-                                  + Tools.join(" ", definedhosts.toArray(
-                                             new String[definedhosts.size()]))
-                                  + "</html>";
-                getResource().setValue(VMSXML.VM_PARAM_DEFINED,
-                                       definedOnString);
-                if (runningOnHosts.isEmpty()) {
-                    running = false;
-                    runningOnString = "Stopped";
-                } else {
-                    running = true;
-                    runningOnString =
-                        "<html>Running on: "
-                        + Tools.join(", ", runningOnHosts.toArray(
-                                            new String[runningOnHosts.size()]))
-                        + "</html>";
-                }
-                getResource().setValue(VMSXML.VM_PARAM_STATUS, runningOnString);
-            } else if (!VMSXML.VM_PARAM_NAME.equals(param)) {
-                if (cb != null) {
-                    if (VMSXML.VM_PARAM_VCPU.equals(param)) {
-                        paramComboBoxGet(param, null).setEnabled(!running);
-                    } else if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)) {
-                        paramComboBoxGet(param, null).setEnabled(false);
-                    }
-                }
-                for (final Host h : getBrowser().getClusterHosts()) {
-                    final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                    if (vmsxml != null) {
-                        final String savedValue =
-                                        vmsxml.getValue(toString(), param);
-                        if (savedValue != null) {
-                            value = savedValue;
-                        }
+            }
+            for (final Host h : getBrowser().getClusterHosts()) {
+                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                if (vmsxml != null) {
+                    final String savedValue =
+                                    vmsxml.getValue(toString(), param);
+                    if (savedValue != null) {
+                        value = savedValue;
                     }
                 }
             }
@@ -263,6 +241,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         }
+        updateTable("maintable");
     }
 
     /**
@@ -354,6 +333,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        final JTable table = getTable("maintable");
+        if (table != null) {
+            newPanel.add(table.getTableHeader());
+            newPanel.add(table);
+        }
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
         newPanel.add(Box.createVerticalGlue());
@@ -682,5 +666,70 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      */
     public final String getRunningOnString() {
         return runningOnString;
+    }
+
+    /**
+     * Returns columns for the table.
+     */
+    protected final String[] getColumnNames(final String tableName) {
+        return new String[]{"Name", "Defined on", "Status", "Memory"};
+    }
+
+    /**
+     * Returns data for the table.
+     */
+    protected final Object[][] getTableData(final String tableName) {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final String domainName = toString();
+        ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null && vxml.isRunning(domainName)) {
+                rowColor = host.getPmColors()[0];
+                hostIcon = HostBrowser.HOST_ON_ICON_LARGE;
+                break;
+            }
+        }
+        final JLabel domainNameLabel = new JLabel(hostIcon);
+        domainNameLabel.setOpaque(true);
+        domainNameLabel.setText(domainName);
+        rows.add(new Object[]{domainNameLabel,
+                              getDefinedOnString(),
+                              getRunningOnString(),
+                              getResource().getValue("memory")});
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /**
+     * Returns row height for the table.
+     */
+    protected final int getRowHeight() {
+        return 32;
+    }
+
+    /**
+     * Execute when row in the table was clicked.
+     */
+    protected final void rowClicked(final String tableName, final String key) {
+        getBrowser().getVMSInfo().selectMyself();
+    }
+
+    /**
+     * Retrurns color for some rows.
+     */
+    protected final Color getTableRowColor(final String tableName,
+                                           final String key) {
+        return rowColor;
+    }
+
+    /**
+     * Alignment for the specified column.
+     */
+    protected final int getTableColumnAlignment(final String tableName,
+                                                final int column) {
+        if (column == 3) {
+            return SwingConstants.RIGHT;
+        }
+        return SwingConstants.LEFT;
     }
 }

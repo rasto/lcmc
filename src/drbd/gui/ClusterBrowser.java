@@ -1272,7 +1272,7 @@ public class ClusterBrowser extends Browser {
         for (String domainName : domainNames) {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) e.nextElement();
+                                     (DefaultMutableTreeNode) e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 if (domainName.compareTo(vmsvdi.getName()) < 0) {
@@ -1295,8 +1295,15 @@ public class ClusterBrowser extends Browser {
         }
         final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
         if (vmsi != null) {
-            vmsi.update();
+            vmsi.updateTable("maintable");
         }
+    }
+
+    /**
+     * Returns vmsinfo object.
+     */
+    public final VMSInfo getVMSInfo() {
+        return (VMSInfo) vmsNode.getUserObject();
     }
 
     /**

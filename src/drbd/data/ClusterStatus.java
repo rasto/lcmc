@@ -614,8 +614,8 @@ public class ClusterStatus {
     /**
      * Parses the command with data.
      */
-    private final boolean parseCommand(final String command,
-                                       final List<String> data) {
+    private boolean parseCommand(final String command,
+                                 final List<String> data) {
         final String[] commands = command.split("<<<>>>");
         final String cmd = commands[0];
 
@@ -673,10 +673,8 @@ public class ClusterStatus {
                 continue;
             }
             if (line.equals(">>>" + command)) { /* end of command */
-                if (!failed) {
-                    if (parseCommand(command, data)) {
-                        updated = true;
-                    }
+                if (!failed  && parseCommand(command, data)) {
+                    updated = true;
                 }
                 command = null;
                 continue;

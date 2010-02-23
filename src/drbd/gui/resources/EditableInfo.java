@@ -45,6 +45,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.Color;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
@@ -645,7 +646,11 @@ public abstract class EditableInfo extends Info {
         if (!paramCorrectValueMap.containsKey(param)) {
             return false;
         }
-        return paramCorrectValueMap.get(param);
+        final Boolean ret = paramCorrectValueMap.get(param);
+        if (ret == null) {
+            return false;
+        }
+        return ret;
     }
 
     /**
@@ -707,6 +712,7 @@ public abstract class EditableInfo extends Info {
     protected final JPanel getParamPanel(final String title,
                                          final Color background) {
         final JPanel panel = new JPanel(new SpringLayout());
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBackground(background);
         final TitledBorder titleBorder = Tools.getBorder(title);
         panel.setBorder(titleBorder);
@@ -733,8 +739,7 @@ public abstract class EditableInfo extends Info {
             ret.append(Tools.getString("Browser.ParamDefault"));
             ret.append("</b></td><td>");
             ret.append(defaultValue);
-            ret.append("</td></tr>");
-            ret.append("</table></html>");
+            ret.append("</td></tr></table></html>");
         }
         return ret.toString();
 

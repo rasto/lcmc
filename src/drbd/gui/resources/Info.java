@@ -29,6 +29,7 @@ import drbd.utilities.ButtonCallback;
 import drbd.utilities.Unit;
 import drbd.utilities.Tools;
 import drbd.utilities.UpdatableItem;
+import drbd.utilities.MyCellRenderer;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -40,6 +41,14 @@ import javax.swing.JMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.JMenuItem;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+import javax.swing.SwingConstants;
+import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.JLabel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.Font;
 import java.awt.Component;
 import java.awt.geom.Point2D;
@@ -47,7 +56,9 @@ import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
+import java.awt.Point;
+import java.awt.Color;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -91,6 +102,11 @@ public class Info implements Comparable {
     private String infoCache = "";
     /** Browser object. */
     private final Browser browser;
+    /** Table. */
+    private final Map<String, JTable> tables = new HashMap<String, JTable>();
+    /** Table models. */
+    private final Map<String, DefaultTableModel> tableModels =
+                                    new HashMap<String, DefaultTableModel>();
 
     /**
      * Prepares a new <code>Info</code> object.
@@ -626,5 +642,157 @@ public class Info implements Comparable {
      */
     public final int compareTo(final Object o) {
         return toString().compareToIgnoreCase(o.toString());
+    }
+
+    /**
+     * Returns table. The table name can be whatever but should be unique if
+     * more tables are used.
+     */
+    @SuppressWarnings("unchecked")
+    protected final JTable getTable(final String tableName) {
+        final String[] colNames = getColumnNames(tableName);
+        if (colNames != null && colNames.length > 0) {
+            final Object[][] data = getTableData(tableName);
+            final DefaultTableModel mainTableModel =
+                                        new DefaultTableModel(data, colNames);
+            tableModels.put(tableName, mainTableModel);
+            final JTable table = new JTable(mainTableModel) {
+                /** Serial version uid. */
+                private static final long serialVersionUID = 1L;
+                /**
+                 * Overriding so that jlabels show up.
+                 */
+                public Class getColumnClass(final int c) {
+                    return getValueAt(0, c).getClass();
+                }
+            };
+            tables.put(tableName, table);
+            final TableRowSorter sorter =
+                        new TableRowSorter<DefaultTableModel>(mainTableModel);
+            for (int i = 0; i < colNames.length; i++) {
+                final Comparator<Object> c = getColComparator(i);
+                if (c != null) {
+                    sorter.setComparator(i, c);
+                }
+
+            }
+            table.setRowSorter((RowSorter) sorter);
+            sorter.setSortsOnUpdates(true);
+
+            table.getTableHeader().setReorderingAllowed(true);
+
+            table.setBackground(Browser.PANEL_BACKGROUND);
+            table.setDefaultRenderer(
+                     Object.class,
+                     new MyCellRenderer() {
+                         /** Serial version uid. */
+                         private static final long serialVersionUID = 1L;
+
+                         /** Returns row color. */
+                         public final Color getRowColor(final String key) {
+                             return getTableRowColor(tableName, key);
+                         }
+
+                         /** Returns alignment of the column. */
+                         public final int getColumnAlignment(final int column) {
+                             return getTableColumnAlignment(tableName, column);
+                         }
+                     });
+            final int h = getRowHeight();
+            if (h >= 0) {
+                table.setRowHeight(h);
+            }
+            table.addMouseListener(new MouseAdapter() {
+                public final void mouseClicked(final MouseEvent e) {
+                    final JTable table = (JTable) e.getSource();
+                    final Point p = e.getPoint();
+                    final int row = table.rowAtPoint(p);
+                    final String key =
+                            ((JLabel) table.getValueAt(row, 0)).getText();
+                    rowClicked(tableName, key);
+                }
+            });
+            Tools.resizeTable(table);
+            return table;
+        }
+        return null;
+    }
+
+
+    /**
+     * Alignment for the specified column.
+     */
+    protected int getTableColumnAlignment(final String tableName,       
+                                          final int column) {
+        return SwingConstants.LEFT;
+    }
+
+    /**
+     * Returns columns for the table.
+     */
+    protected String[] getColumnNames(final String tableName) {
+        return new String[]{};
+    }
+
+    /**
+     * Returns data for the table.
+     */
+    protected Object[][] getTableData(final String tableName) {
+        return new Object[][]{};
+    }
+
+    /**
+     * Updates data in the table.
+     */
+    @SuppressWarnings("unchecked")
+    public final void updateTable(final String tableName) {
+        final JTable table = tables.get(tableName);
+        final DefaultTableModel mainTableModel = tableModels.get(tableName);
+        if (mainTableModel != null) {
+            final String[] colNames = getColumnNames(tableName);
+            if (colNames != null && colNames.length > 0) {
+                final Object[][] data = getTableData(tableName);
+                Tools.debug(this, "update table in: " + getName());
+                final TableRowSorter sorter =
+                                        (TableRowSorter) table.getRowSorter();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        final List sortKeys = sorter.getSortKeys();
+                        mainTableModel.setDataVector(data, colNames);
+                        sorter.setSortKeys(sortKeys);
+                        mainTableModel.fireTableDataChanged();
+                        Tools.resizeTable(tables.get(tableName));
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Execute when row in the table was clicked.
+     */
+    protected void rowClicked(final String tableName, final String key) {
+        /* do nothing */
+    }
+
+    /**
+     * Returns row height for the table.
+     */
+    protected int getRowHeight() {
+        return -1;
+    }
+
+    /**
+     * Retrurns color for some rows.
+     */
+    protected Color getTableRowColor(final String tableName, final String key) {
+        return null;
+    }
+
+    /**
+     * Returns comparator for column.
+     */
+    protected Comparator<Object> getColComparator(final int col) {
+        return null;
     }
 }

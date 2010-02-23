@@ -1677,7 +1677,6 @@ public class ServiceInfo extends EditableInfo {
                 final JLabel cbLabel = new JLabel(Tools.ucfirst(op)
                                                   + " / "
                                                   + Tools.ucfirst(param));
-                int height = 0;
                 cb.setLabel(cbLabel);
                 addField(panel,
                          cbLabel,

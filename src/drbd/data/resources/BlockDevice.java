@@ -238,7 +238,6 @@ public class BlockDevice extends Resource {
                || !Tools.areEqual(this.nodeState, nodeState)
                || !Tools.areEqual(this.diskState, diskState)
                || !Tools.areEqual(this.drbdFlags, drbdFlags);
-               
     }
 
 

@@ -1326,7 +1326,7 @@ public class DrbdResourceInfo extends EditableInfo
      * Returns tool tip when mouse is over the resource edge.
      */
     public String getToolTipForGraph(final boolean testOnly) {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuffer s = new StringBuffer(50);
         s.append("<html><b>");
         s.append(getName());
         s.append("</b><br>");

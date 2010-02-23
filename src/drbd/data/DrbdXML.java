@@ -211,8 +211,9 @@ public class DrbdXML extends XML {
         return configFile;
     }
 
-    /** 
-     * Returns config from server. */
+    /**
+     * Returns config from server.
+     */
     public final String getConfig(final Host host) {
         if (!host.isConnected()) {
             return null;

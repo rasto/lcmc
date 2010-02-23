@@ -67,14 +67,14 @@ public class VMSInfo extends CategoryInfo {
     /**
      * Returns columns for the table.
      */
-    protected final String[] getColumnNames() {
+    protected final String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Defined on", "Status", "Memory"};
     }
 
     /**
      * Returns data for the table.
      */
-    protected final Object[][] getTableData() {
+    protected final Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -116,7 +116,7 @@ public class VMSInfo extends CategoryInfo {
     /**
      * Execute when row in the table was clicked.
      */
-    protected final void rowClicked(final String key) {
+    protected final void rowClicked(final String tableName, final String key) {
         final VMSVirtualDomainInfo vmsvdi = domainToInfo.get(key);
         if (vmsvdi != null) {
             vmsvdi.selectMyself();
@@ -126,7 +126,8 @@ public class VMSInfo extends CategoryInfo {
     /**
      * Alignment for the specified column.
      */
-    protected final int getColumnAlignment(final int column) {
+    protected final int getTableColumnAlignment(final String tableName,
+                                                final int column) {
         if (column == 3) {
             return SwingConstants.RIGHT;
         }
@@ -149,22 +150,24 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /**
-     * Retrurns color for some rows.
-     */
-    protected final Color getColorForRow(final String key) {
-        return domainToColor.get(key);
-    }
-
-    /**
      * Returns comparator for column.
      */
-    protected final Comparator<String> getColComparator(final int col) {
-        if (col == 3) {
+    protected final Comparator<Object> getColComparator(final int col) {
+        if (col == 0) {
             /* memory */
-            final Comparator<String> c = new Comparator<String>() {
-                public int compare(final String s1, final String s2) {
-                    final int i1 = Tools.convertToKilobytes(s1);
-                    final int i2 = Tools.convertToKilobytes(s2);
+            final Comparator<Object> c = new Comparator<Object>() {
+                public int compare(final Object l1, final Object l2) {
+                    return ((JLabel) l1).getText().compareToIgnoreCase(
+                                                      ((JLabel) l2).getText());
+                }
+            };
+            return c;
+        } else if (col == 3) {
+            /* memory */
+            final Comparator<Object> c = new Comparator<Object>() {
+                public int compare(final Object s1, final Object s2) {
+                    final int i1 = Tools.convertToKilobytes((String) s1);
+                    final int i2 = Tools.convertToKilobytes((String) s2);
                     if (i1 < i2) {
                         return -1;
                     } else if (i1 > i2) {
@@ -177,5 +180,13 @@ public class VMSInfo extends CategoryInfo {
             return c;
         }
         return null;
+    }
+
+    /**
+     * Retrurns color for some rows.
+     */
+    protected final Color getTableRowColor(final String tableName,
+                                           final String key) {
+        return domainToColor.get(key);
     }
 }

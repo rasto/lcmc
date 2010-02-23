@@ -23,7 +23,6 @@ package drbd.gui.resources;
 
 import drbd.AddHostDialog;
 import drbd.gui.Browser;
-import drbd.gui.EmptyBrowser;
 import drbd.data.Cluster;
 import drbd.data.Host;
 import drbd.utilities.UpdatableItem;
