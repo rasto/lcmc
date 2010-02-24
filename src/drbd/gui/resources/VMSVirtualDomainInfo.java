@@ -103,6 +103,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns default unit. */
     private static final Map<String, String> DEFAULT_UNIT =
                                                new HashMap<String, String>();
+    /** Back to overview icon. */
+    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
+                                            Tools.getDefault("BackIcon"));
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
@@ -312,8 +315,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         extraButtonPanel.setBackground(Browser.STATUS_BACKGROUND);
         buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
-        final MyButton overviewButton = new MyButton("Overview");
-        overviewButton.setPreferredSize(new Dimension(100, 50));
+        final MyButton overviewButton = new MyButton("VMs Overview",
+                                                     BACK_ICON);
+        overviewButton.setPreferredSize(new Dimension(150, 50));
         overviewButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 getBrowser().getVMSInfo().selectMyself();
@@ -716,6 +720,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         rowColor = newColor;
         final MyButton domainNameLabel = new MyButton(domainName, hostIcon);
+        domainNameLabel.setOpaque(true);
         rows.add(new Object[]{domainNameLabel,
                               getDefinedOnString(),
                               getRunningOnString(),

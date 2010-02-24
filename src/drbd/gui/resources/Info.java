@@ -50,11 +50,16 @@ import javax.swing.SwingConstants;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
 
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Font;
 import java.awt.Component;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -530,8 +535,64 @@ public class Info implements Comparable {
      */
     public final JMenu getMenu(final String name) {
         if (menu == null) {
-            menu = new JMenu(name);
+            menu = new JMenu(name) {
+                /**
+                 * Overloaded in order to paint the background.
+                 */
+                protected final void paintComponent(final Graphics g) {
+                    final Color color1 = Color.WHITE;
+                    final Color color2 = Browser.STATUS_BACKGROUND;
+                    if (!isEnabled() || getModel().isPressed()) {
+                        super.paintComponent(g);
+                        return;
+                    }
+
+                    final Graphics2D g2 = (Graphics2D) g;
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                        RenderingHints.VALUE_ANTIALIAS_ON);
+                    final GradientPaint gp1 = new GradientPaint(
+                                                   1.0f,
+                                                   (float) getHeight(),
+                                                   color2,
+                                                   1.0f,
+                                                   (float) getHeight() * 0.3f,
+                                                   color1);
+                    final GradientPaint gp2 = new GradientPaint(
+                                                   1.0f,
+                                                   0.0f,
+                                                   color2,
+                                                   1.0f,
+                                                   (float) getHeight() * 0.3f,
+                                                   color1);
+                    final Rectangle2D.Float rf = new Rectangle2D.Float(
+                                                   0.0f,
+                                                   0.0f,
+                                                   (float) getWidth() - 1,
+                                                   (float) getHeight() - 1);
+                    final Rectangle2D.Float rf1 = new Rectangle2D.Float(
+                                                   0.0f,
+                                                   (float) getHeight() * 0.3f,
+                                                   (float) getWidth(),
+                                                   (float) getHeight());
+                    final Rectangle2D.Float rf2 = new Rectangle2D.Float(
+                                                   0.0f,
+                                                   0.0f,
+                                                   (float) getWidth(),
+                                                   (float) getHeight() * 0.3f);
+                    g2.setPaint(gp1);
+                    g2.fill(rf1);
+                    g2.setPaint(gp2);
+                    g2.fill(rf2);
+                    final Color c = g2.getColor();
+                    g2.setColor(Color.GRAY);
+                    g2.draw(rf);
+                    g2.setColor(c);
+
+                    super.paintComponent(g);
+                }
+            };
             menu.setIcon(Browser.ACTIONS_ICON);
+            menu.setBackground(Browser.STATUS_BACKGROUND);
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
                 for (final UpdatableItem u : items) {

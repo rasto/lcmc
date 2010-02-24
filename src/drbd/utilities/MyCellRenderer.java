@@ -74,6 +74,7 @@ public class MyCellRenderer extends JLabel
         final Color bg = getRowColor(key);
         ret.setBackground(bg);
         ret.setBorder(EMPTY_BORDER);
+        ret.setToolTipText(value.toString());
         return ret;
     }
 

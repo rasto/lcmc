@@ -64,7 +64,7 @@ public class MyButtonCellRenderer extends MyButton
             if (button.getModel().isPressed()) {
                 setOpaque(true);
             } else {
-                setOpaque(false);
+                setOpaque(button.isOpaque());
             }
             setText(button.getText());
             setIcon(button.getIcon());
@@ -78,6 +78,7 @@ public class MyButtonCellRenderer extends MyButton
         final String key = ((MyButton) table.getValueAt(row, 0)).getText();
         final Color bg = getRowColor(key);
         setBackground(bg);
+        setToolTipText(button.getText());
         return this;
     }
 

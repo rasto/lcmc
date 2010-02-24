@@ -218,6 +218,7 @@ public class AppDefaults extends
         {"Browser.ResourceIcon", "Icons/16X16/crab.png"},
         {"Browser.CategoryIcon", "Icons/tango/16x16/folder_16x16.png"},
         {"Browser.ApplyIcon",    "Icons/tango/16x16/ok_16x16.png"},
+        {"Browser.ApplyIconLarge", "Icons/tango/32x32/ok_32x32.png"},
         {"Browser.ActionsIcon",  "Icons/32X32/Arrow-down.png"},
 
         {"HostBrowser.BlockDeviceIcon",
@@ -310,6 +311,8 @@ public class AppDefaults extends
         {"Dialog.Dialog.NextIcon",     "Icons/tango/16x16/next2_16x16.png"},
         {"Dialog.Dialog.CancelIcon",   "Icons/tango/16x16/cancel_16x16.png"},
         {"Dialog.Dialog.FinishIcon",   "Icons/tango/16x16/finish2_16x16.png"},
+        {"BackIcon",                   "Icons/tango/16x16/back2_16x16.png"},
+        {"BackIconLarge",              "Icons/tango/32x32/back2_32x32.png"},
 
         {"Dialog.Host.CheckInstallation.CheckingIcon",
          "Icons/32X32/dialog-information.png"},
