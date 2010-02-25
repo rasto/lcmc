@@ -58,6 +58,8 @@ import drbd.gui.resources.CommonBlockDevInfo;
 import drbd.gui.resources.CRMInfo;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.resources.VMSInfo;
+import drbd.gui.resources.AvailableServicesInfo;
+import drbd.gui.resources.ResourceAgentClassInfo;
 
 import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
@@ -179,7 +181,10 @@ public class ClusterBrowser extends Browser {
     private ClusterViewPanel clusterViewPanel = null;
     /** Previous drbd configs. */
     private final Map<Host, String> oldDrbdConfigString =
-                                                new HashMap<Host, String>();
+                                                  new HashMap<Host, String>();
+    /** Map to ResourceAgentClassInfo. */
+    private final Map<String, ResourceAgentClassInfo> classInfoMap =
+                                new HashMap<String, ResourceAgentClassInfo>();
 
     /** Remove icon. */
     public static final ImageIcon REMOVE_ICON =
@@ -199,10 +204,10 @@ public class ClusterBrowser extends Browser {
     public static final Map<String, String> HB_CLASS_MENU =
                                                 new HashMap<String, String>();
     static {
-        HB_CLASS_MENU.put(HB_OCF_CLASS,       "heartbeat 2 (ocf)");
-        HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "heartbeat 1 (hb)");
-        HB_CLASS_MENU.put(HB_LSB_CLASS,       "lsb (init.d)");
-        HB_CLASS_MENU.put(HB_STONITH_CLASS,   "stonith");
+        HB_CLASS_MENU.put(HB_OCF_CLASS,       "OCF Resource Agents");
+        HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "Heartbeat 1 RAs (depricated)");
+        HB_CLASS_MENU.put(HB_LSB_CLASS,       "LSB init scripts");
+        HB_CLASS_MENU.put(HB_STONITH_CLASS,   "Stonith Devices");
     }
     /** Width of the label in the info panel. */
     public static final int SERVICE_LABEL_WIDTH =
@@ -539,7 +544,7 @@ public class ClusterBrowser extends Browser {
 
         /* available services */
         availableServicesNode = new DefaultMutableTreeNode(
-            new HbCategoryInfo(
+            new AvailableServicesInfo(
                 Tools.getString("ClusterBrowser.availableServices"),
                 this));
         setNode(availableServicesNode);
@@ -1208,17 +1213,21 @@ public class ClusterBrowser extends Browser {
      */
     private void updateAvailableServices() {
         DefaultMutableTreeNode resource;
+        Tools.debug(this, "update available services");
         availableServicesNode.removeAllChildren();
         for (final String cl : HB_CLASSES) {
+            final ResourceAgentClassInfo raci =
+                                          new ResourceAgentClassInfo(cl, this);
+            classInfoMap.put(cl, raci);
             final DefaultMutableTreeNode classNode =
-                    new DefaultMutableTreeNode(
-                        new HbCategoryInfo(cl.toUpperCase(), this));
+                    new DefaultMutableTreeNode(raci);
             for (final ResourceAgent ra : crmXML.getServices(cl)) {
                 resource = new DefaultMutableTreeNode(
                                     new AvailableServiceInfo(ra, this));
                 setNode(resource);
                 classNode.add(resource);
             }
+            setNode(classNode);
             availableServicesNode.add(classNode);
         }
         //reload(availableServicesNode);
@@ -2220,5 +2229,12 @@ public class ClusterBrowser extends Browser {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns map to ResourceAgentClassInfo.
+     */
+    public final ResourceAgentClassInfo getClassInfoMap(final String cl) {
+        return classInfoMap.get(cl);
     }
 }

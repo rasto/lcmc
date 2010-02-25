@@ -85,7 +85,10 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         s.append(crmXML.getLongDesc(resourceAgent));
         final String[] params = crmXML.getParameters(resourceAgent);
         for (final String param : params) {
-            s.append(crmXML.getParamLongDesc(resourceAgent, param));
+            s.append("<b>");
+            s.append(param);
+            s.append("</b><br>");
+            s.append(crmXML.getParamShortDesc(resourceAgent, param));
             s.append("<br>");
         }
         return s.toString();

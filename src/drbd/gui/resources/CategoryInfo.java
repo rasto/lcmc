@@ -66,16 +66,26 @@ public class CategoryInfo extends Info {
         if (infoPanel != null) {
             return infoPanel;
         }
-        infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.setBackground(Browser.PANEL_BACKGROUND);
         final JComponent table = getTable(MAIN_TABLE);
         if (table != null) {
+            infoPanel = new JPanel();
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setBackground(Browser.PANEL_BACKGROUND);
             final JScrollPane sp = new JScrollPane(table);
             sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);
             sp.setBackground(Browser.PANEL_BACKGROUND);
             infoPanel.add(sp);
+        } else {
+            infoPanel = super.getInfoPanel();
         }
         return infoPanel;
+    }
+
+    /**
+     * Selects the node in the menu and reloads everything underneath.
+     */
+    public void selectMyself() {
+        super.selectMyself();
+        getBrowser().nodeChanged(getNode());
     }
 }

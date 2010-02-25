@@ -477,7 +477,7 @@ public class GuiComboBox extends JPanel {
     private JComponent getRadioGroup(final String selectedValue,
                                      final Object[] items) {
         final ButtonGroup group = new ButtonGroup();
-        final JPanel radioPanel = new JPanel(new GridLayout(1, 0));
+        final JPanel radioPanel = new JPanel(new GridLayout(1, 1));
         componentsHash.clear();
         for (int i = 0; i < items.length; i++) {
             final String item = items[i].toString();

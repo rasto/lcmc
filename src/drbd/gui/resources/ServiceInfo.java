@@ -2236,7 +2236,6 @@ public class ServiceInfo extends EditableInfo {
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
@@ -2305,7 +2304,10 @@ public class ServiceInfo extends EditableInfo {
                     thread.start();
                 }
             }, null);
-            optionsPanel.add(typeRadioGroup);
+            final JPanel tp = new JPanel();
+            tp.setLayout(new BoxLayout(tp, BoxLayout.Y_AXIS));
+            tp.add(typeRadioGroup);
+            optionsPanel.add(tp);
         }
         if (cloneInfo != null) {
             /* add clone fields */

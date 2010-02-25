@@ -53,12 +53,6 @@ public class HbCategoryInfo extends CategoryInfo {
     protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
-    /**
-     * Returns info for the category.
-     */
-    public String getInfo() {
-        return "<h2>" + getName() + "</h2>";
-    }
 
     /**
      * Returns heartbeat graph.

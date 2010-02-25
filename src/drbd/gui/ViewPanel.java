@@ -164,22 +164,22 @@ public class ViewPanel extends JPanel {
                 public void treeStructureChanged(final TreeModelEvent e) {
                     final Object[] path = e.getPath();
                     /* expand the tree if an item was added */
-                    if ((path.length > 2
-                         && path[2].toString().equals(
-                                    Tools.getString("ClusterBrowser.Services")))
-                        || (path.length > 1
-                            && path[1].toString().equals(
-                                    Tools.getString("ClusterBrowser.AllHosts")))
-                        || (path.length > 1
-                            && path[1].toString().equals(
-                                    Tools.getString("ClusterBrowser.VMs")))
-                        || (path.length > 1
-                            && path[1].toString().equals(
-                                    Tools.getString("ClusterBrowser.Drbd")))) {
+                    //if ((path.length > 2
+                    //     && path[2].toString().equals(
+                    //                Tools.getString("ClusterBrowser.Services")))
+                    //    || (path.length > 1
+                    //        && path[1].toString().equals(
+                    //                Tools.getString("ClusterBrowser.AllHosts")))
+                    //    || (path.length > 1
+                    //        && path[1].toString().equals(
+                    //                Tools.getString("ClusterBrowser.VMs")))
+                    //    || (path.length > 1
+                    //        && path[1].toString().equals(
+                    //                Tools.getString("ClusterBrowser.Drbd")))) {
                         final TreePath tp = new TreePath(path);
                         tree.expandPath(tp);
                         tree.setSelectionPath(tp);
-                    }
+                    //}
                 }
             }
         );

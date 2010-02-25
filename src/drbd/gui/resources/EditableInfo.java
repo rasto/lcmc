@@ -712,7 +712,6 @@ public abstract class EditableInfo extends Info {
     protected final JPanel getParamPanel(final String title,
                                          final Color background) {
         final JPanel panel = new JPanel(new SpringLayout());
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setBackground(background);
         final TitledBorder titleBorder = Tools.getBorder(title);
         panel.setBorder(titleBorder);
