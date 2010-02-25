@@ -404,7 +404,8 @@ public class CRMXML extends XML {
         paramGlobalPossibleChoices.put("no-quorum-policy",
                                        new String[]{"ignore",
                                                     "stop",
-                                                    "freeze"});
+                                                    "freeze",
+                                                    "suicide"});
         globalRequiredParams.add("no-quorum-policy");
 
         /* resource failure stickiness */
