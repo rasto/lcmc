@@ -184,11 +184,8 @@ public class Browser {
         } else {
             final int width = ClusterBrowser.SERVICE_LABEL_WIDTH
                               + ClusterBrowser.SERVICE_FIELD_WIDTH
-                              + 20;
+                              + 36;
             final Dimension d = iPanel.getPreferredSize();
-            /* + 20 scrollbar */
-            //iPanel.setMinimumSize(new Dimension((int) d.getWidth() + 20,
-            //                                    (int) d.getHeight()));
             iPanel.setMinimumSize(new Dimension(width, (int) d.getHeight()));
             iPanel.setMaximumSize(new Dimension(width, (int) Short.MAX_VALUE));
             final JSplitPane newSplitPane =

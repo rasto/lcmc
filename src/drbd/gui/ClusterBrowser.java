@@ -205,8 +205,8 @@ public class ClusterBrowser extends Browser {
                                                 new HashMap<String, String>();
     static {
         HB_CLASS_MENU.put(HB_OCF_CLASS,       "OCF Resource Agents");
-        HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "Heartbeat 1 RAs (depricated)");
-        HB_CLASS_MENU.put(HB_LSB_CLASS,       "LSB init scripts");
+        HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "Heartbeat 1 RAs (deprecated)");
+        HB_CLASS_MENU.put(HB_LSB_CLASS,       "LSB Init Scripts");
         HB_CLASS_MENU.put(HB_STONITH_CLASS,   "Stonith Devices");
     }
     /** Width of the label in the info panel. */

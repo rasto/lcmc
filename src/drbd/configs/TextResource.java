@@ -1170,7 +1170,7 @@ public class TextResource extends
          "Create"},
 
         {"ClusterBrowser.CreateDir.No",
-         "Cancel"},
+         "Don't Create"},
 
         /* Cluster Resource View */
         {"ClusterBrowser.AllHosts",

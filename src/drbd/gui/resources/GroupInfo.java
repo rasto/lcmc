@@ -390,7 +390,7 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
         };
-        items.add(1, (UpdatableItem) addGroupServiceMenuItem);
+        items.add(0, (UpdatableItem) addGroupServiceMenuItem);
         registerMenuItem((UpdatableItem) addGroupServiceMenuItem);
 
         /* group services */

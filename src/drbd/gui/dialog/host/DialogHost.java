@@ -154,7 +154,7 @@ public abstract class DialogHost extends WizardDialog {
 
     /**
      * Cancels the dialog. It removes the host tab.
-     * TODO: depricated?
+     * TODO: deprecated?
      */
     public final void cancelDialog() {
     //    Tools.getGUIData().removeSelectedHostTab();
