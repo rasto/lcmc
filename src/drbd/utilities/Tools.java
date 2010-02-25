@@ -1791,7 +1791,7 @@ public final class Tools {
     public static String getLatestVersion() {
         String version = null;
         final Pattern vp = Pattern.compile(
-                                    ".*<a\\s+href=\"drbd-mc-(.*?)\\.tar\\..*");
+                                    ".*<a\\s+href=\"drbd-mc-([0-9.]*?)\\.tar\\..*");
         try {
             final String url = "http://oss.linbit.com/drbd-mc/?drbd-mc-check-"
                                + getRelease();
