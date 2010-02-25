@@ -228,6 +228,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /**
+     * Returns whether the item should be visible or not.
+     */
+    public boolean visiblePredicate() {
+        return true;
+    }
+
+    /**
      * Updates the menu item, checking the predicate and enablePredicate.
      */
     public final void update() {
@@ -250,6 +257,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         }
 
         setEnabled(enablePredicate());
+        setVisible(visiblePredicate());
     }
 
     /**

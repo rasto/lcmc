@@ -436,6 +436,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
+                    return visiblePredicate();
+                }
+                
+                public boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
                            && vmsxml.isRunning(thisClass.toString());
@@ -472,6 +476,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
+                    return visiblePredicate();
+                }
+
+                public boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
                            && vmsxml.isRunning(thisClass.toString());
@@ -508,6 +516,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
+                    return visiblePredicate();
+                }
+
+                public boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
                            && vmsxml.isRunning(thisClass.toString());
