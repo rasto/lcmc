@@ -421,8 +421,14 @@ public class ClusterBrowser extends Browser {
         if (drbdGraph != null) {
             drbdGraph.getPositions(positions);
         }
+        if (positions.isEmpty()) {
+            return;
+        }
         if (heartbeatGraph != null) {
             heartbeatGraph.getPositions(positions);
+        }
+        if (positions.isEmpty()) {
+            return;
         }
 
         final Host[] hosts = getClusterHosts();

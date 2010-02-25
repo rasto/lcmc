@@ -1557,7 +1557,8 @@ public abstract class ResourceGraph {
             final Point2D p = new Point2D.Double();
             final Point2D loc = layout.getLocation((Vertex) v);
             if (loc == null) {
-                continue;
+                positions.clear();
+                return;
             }
             p.setLocation(loc);
             p.setLocation(p.getX() + (getDefaultVertexWidth((Vertex) v)
