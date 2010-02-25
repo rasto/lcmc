@@ -862,7 +862,7 @@ public class ClusterBrowser extends Browser {
                            firstTime.countDown();
                            boolean updated = false;
                            if (output.indexOf(
-                                    "No response from the DRBD driver") >= 0) {
+                                    "modprobe drbd") >= 0) {
                                if (host.isDrbdStatus()) {
                                    Tools.debug(this, "drbd status update: "
                                                  + host.getName());
@@ -870,10 +870,6 @@ public class ClusterBrowser extends Browser {
                                    drbdGraph.repaint();
                                }
                                return;
-                           }
-                           if (!host.isDrbdStatus()) {
-                               host.setDrbdStatus(true);
-                               updated = true;
                            }
                            final String[] lines = output.split("\n");
                            final DrbdXML newDrbdXML =
@@ -887,6 +883,7 @@ public class ClusterBrowser extends Browser {
                                                              drbdGraph,
                                                              line)) {
                                    updated = true;
+                                   host.setDrbdStatus(true);
                                }
                            }
                            if (updated) {
