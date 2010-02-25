@@ -536,6 +536,8 @@ public class Info implements Comparable {
     public final JMenu getMenu(final String name) {
         if (menu == null) {
             menu = new JMenu(name) {
+                /** Serial version uid. */
+                private static final long serialVersionUID = 1L;
                 /**
                  * Overloaded in order to paint the background.
                  */
@@ -721,7 +723,7 @@ public class Info implements Comparable {
         final String[] colNames = getColumnNames(tableName);
         if (colNames != null && colNames.length > 0) {
             final Object[][] data = getTableData(tableName);
-            final DefaultTableModel mainTableModel =
+            final DefaultTableModel tableModel =
                 new DefaultTableModel(data, colNames) {
                     /** Serial version uid. */
                     private static final long serialVersionUID = 1L;
@@ -730,6 +732,7 @@ public class Info implements Comparable {
                         return false;
                     }
                 };
+            tableModels.put(tableName, tableModel);
             final MyButtonCellRenderer bcr = new MyButtonCellRenderer() {
                          /** Serial version uid. */
                          private static final long serialVersionUID = 1L;
@@ -744,7 +747,7 @@ public class Info implements Comparable {
                              return getTableColumnAlignment(tableName, column);
                          }
                      };
-            final JTable table = new JTable(mainTableModel) {
+            final JTable table = new JTable(tableModel) {
                 /** Serial version uid. */
                 private static final long serialVersionUID = 1L;
                 /**
@@ -765,7 +768,7 @@ public class Info implements Comparable {
             };
             tables.put(tableName, table);
             final TableRowSorter sorter =
-                        new TableRowSorter<DefaultTableModel>(mainTableModel);
+                        new TableRowSorter<DefaultTableModel>(tableModel);
             for (int i = 0; i < colNames.length; i++) {
                 final Comparator<Object> c = getColComparator(i);
                 if (c != null) {
@@ -927,9 +930,10 @@ public class Info implements Comparable {
      */
     @SuppressWarnings("unchecked")
     public final void updateTable(final String tableName) {
+        Tools.debug(this, "update table: " + tableName, 2);
         final JTable table = tables.get(tableName);
-        final DefaultTableModel mainTableModel = tableModels.get(tableName);
-        if (mainTableModel != null) {
+        final DefaultTableModel tableModel = tableModels.get(tableName);
+        if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
                 final Object[][] data = getTableData(tableName);
@@ -939,9 +943,9 @@ public class Info implements Comparable {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         final List sortKeys = sorter.getSortKeys();
-                        mainTableModel.setDataVector(data, colNames);
+                        tableModel.setDataVector(data, colNames);
                         sorter.setSortKeys(sortKeys);
-                        mainTableModel.fireTableDataChanged();
+                        tableModel.fireTableDataChanged();
                         Tools.resizeTable(tables.get(tableName));
                     }
                 });

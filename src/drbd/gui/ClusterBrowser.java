@@ -1229,6 +1229,7 @@ public class ClusterBrowser extends Browser {
      */
     public final void updateVMS() {
         DefaultMutableTreeNode resource;
+        Tools.debug(this, "VM status update");
 
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
@@ -1298,7 +1299,7 @@ public class ClusterBrowser extends Browser {
         }
         final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
         if (vmsi != null) {
-            vmsi.updateTable("main");
+            vmsi.updateTable(VMSInfo.MAIN_TABLE);
         }
     }
 

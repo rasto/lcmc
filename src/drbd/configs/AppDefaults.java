@@ -225,6 +225,10 @@ public class AppDefaults extends
                                     "Icons/tango/16x16/blockdevice_16x16.png"},
 
         {"HostBrowser.NetIntIcon", "Icons/tango/16x16/netzwk_16x16.png"},
+
+        {"HostBrowser.NetIntIconLarge",
+         "Icons/tango/32x32/netzwk_32x32.png"},
+
         {"HostBrowser.FileSystemIcon", "Icons/tango/16x16/filesys_16x16.png"},
         {"HostBrowser.RemoveIcon", "Icons/tango/32x32/cancel_32x32.png"},
         {"ClusterBrowser.CommonBlockDeviceIcon",

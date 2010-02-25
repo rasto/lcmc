@@ -36,6 +36,9 @@ public class NetInfo extends Info {
     /** Net interface icon. */
     private static final ImageIcon NET_I_ICON = Tools.createImageIcon(
                                    Tools.getDefault("HostBrowser.NetIntIcon"));
+    /** Net interface icon. */
+    public static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
+                              Tools.getDefault("HostBrowser.NetIntIconLarge"));
     /**
      * Prepares a new <code>NetInfo</code> object.
      */

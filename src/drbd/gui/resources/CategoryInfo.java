@@ -36,6 +36,8 @@ import javax.swing.BoxLayout;
 public class CategoryInfo extends Info {
     /** Info panel. */
     private JComponent infoPanel = null;
+    /** Main table. */
+    public static final String MAIN_TABLE = "main";
     /**
      * Prepares a new <code>CategoryInfo</code> object.
      */
@@ -67,7 +69,7 @@ public class CategoryInfo extends Info {
         infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(Browser.PANEL_BACKGROUND);
-        final JComponent table = getTable("main");
+        final JComponent table = getTable(MAIN_TABLE);
         if (table != null) {
             final JScrollPane sp = new JScrollPane(table);
             sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);

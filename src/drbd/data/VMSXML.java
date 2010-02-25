@@ -31,6 +31,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
@@ -66,20 +67,12 @@ public class VMSXML extends XML {
     /** Whether the domain is running. */
     private final Map<String, Boolean> runningMap =
                                                 new HashMap<String, Boolean>();
-    private final List<String> disks = new ArrayList<String>();
-    private final Map<String, String> diskType = new HashMap<String, String>();
-    private final Map<String, String> diskSourceFile =
-                                                new HashMap<String, String>();
-    private final Map<String, String> diskSourceDev =
-                                                new HashMap<String, String>();
-    private final Map<String, String> diskTargetBus =
-                                                new HashMap<String, String>();
-    private final Map<String, Boolean> diskReadonly =
-                                                new HashMap<String, Boolean>();
-    private final List<String> nics = new ArrayList<String>();
-    private final Map<String, String> nicType = new HashMap<String, String>();
-    private final Map<String, String> nicSourceBridge =
-                                                new HashMap<String, String>();
+    /** Map from domain name and target device to the disk data. */
+    private final Map<String, Map<String, DiskData>> disksMap =
+                             new HashMap<String, Map<String, DiskData>>();
+    /** Map from domain name and mac address to the interface data. */
+    private final Map<String, Map<String, InterfaceData>> interfacesMap =
+                             new HashMap<String, Map<String, InterfaceData>>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
@@ -223,6 +216,10 @@ public class VMSXML extends XML {
                     }
                 }
             } else if ("devices".equals(option.getNodeName())) {
+                final Map<String, DiskData> devMap =
+                                    new LinkedHashMap<String, DiskData>();
+                final Map<String, InterfaceData> macMap =
+                                    new LinkedHashMap<String, InterfaceData>();
                 final NodeList devices = option.getChildNodes();
                 for (int j = 0; j < devices.getLength(); j++) {
                     final Node deviceNode = devices.item(j);
@@ -261,48 +258,68 @@ public class VMSXML extends XML {
                         boolean readonly = false;
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
-                            if ("source".equals(optionNode.getNodeName())) {
+                            final String nodeName = optionNode.getNodeName();
+                            if ("source".equals(nodeName)) {
                                 sourceFile = getAttribute(optionNode, "file");
                                 sourceDev = getAttribute(optionNode, "dev");
-                            } else if ("target".equals(
-                                                  optionNode.getNodeName())) {
+                            } else if ("target".equals(nodeName)) {
                                 targetDev = getAttribute(optionNode, "dev");
                                 targetBus = getAttribute(optionNode, "bus");
-                            } else if ("readonly".equals(
-                                                   optionNode.getNodeName())) {
+                            } else if ("readonly".equals(nodeName)) {
                                 readonly = true;
+                            } else if (!"#text".equals(nodeName)) {
+                                Tools.appWarning("unknown disk option: "
+                                                 + nodeName);
                             }
                         }
                         if (targetDev != null) {
-                            disks.add(targetDev);
-                            diskType.put(targetDev, type);
-                            diskSourceFile.put(targetDev, sourceFile);
-                            diskSourceDev.put(targetDev, sourceDev);
-                            diskTargetBus.put(targetDev, targetBus);
-                            diskReadonly.put(targetDev, readonly);
+                            final DiskData diskData = new DiskData(type,
+                                                                   device,
+                                                                   targetDev,
+                                                                   sourceFile,
+                                                                   sourceDev,
+                                                                   targetBus,
+                                                                   readonly);
+                            devMap.put(targetDev, diskData);
                         }
                     } else if ("interface".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
-                        final NodeList opts = deviceNode.getChildNodes();
                         String macAddress = null;
                         String sourceBridge = null;
+                        String targetDev = null;
+                        String modelType = null;
+                        final NodeList opts = deviceNode.getChildNodes();
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
-                            if ("source".equals(optionNode.getNodeName())) {
-                                 sourceBridge = getAttribute(optionNode,
-                                                             "bridge");
-                            } else if ("mac".equals(optionNode)) {
+                            final String nodeName = optionNode.getNodeName();
+                            if ("source".equals(nodeName)) {
+                                sourceBridge = getAttribute(optionNode,
+                                                            "bridge");
+                            } else if ("target".equals(nodeName)) {
+                                targetDev = getAttribute(optionNode, "dev");
+                            } else if ("mac".equals(nodeName)) {
                                 macAddress = getAttribute(optionNode,
                                                           "address");
+                            } else if ("model".equals(nodeName)) {
+                                modelType = getAttribute(optionNode, "type");
+                            } else if (!"#text".equals(nodeName)) {
+                                Tools.appWarning("unknown interface option: "
+                                                 + nodeName);
                             }
                         }
                         if (macAddress != null) {
-                            nics.add(macAddress);
-                            nicType.put(macAddress, type);
-                            nicSourceBridge.put(macAddress, sourceBridge);
+                            final InterfaceData interfaceData =
+                                              new InterfaceData(type,
+                                                                macAddress,
+                                                                sourceBridge,
+                                                                targetDev,
+                                                                modelType);
+                            macMap.put(macAddress, interfaceData);
                         }
                     }
                 }
+                disksMap.put(name, devMap);
+                interfacesMap.put(name, macMap);
             }
         }
         if (!tabletOk) {
@@ -382,5 +399,149 @@ public class VMSXML extends XML {
      */
     public final String getValue(final String name, final String param) {
         return (String) parameterValues.get(name, param);
+    }
+
+    /**
+     * Returns disk data.
+     */
+    public final Map<String, DiskData> getDisks(final String name) {
+        return disksMap.get(name);
+    }
+
+    /**
+     * Returns interface data.
+     */
+    public final Map<String, InterfaceData> getInterfaces(final String name) {
+        return interfacesMap.get(name);
+    }
+
+    /**
+     * Class that holds data about virtual disks.
+     */
+    public class DiskData {
+        /** Type: file, block... */
+        private final String type;
+        /** Device: disk, cdrom... */
+        private final String device;
+        /** Target device: hda, hdb, hdc, sda... */
+        private final String targetDev;
+        /** Source file. */
+        private final String sourceFile;
+        /** Source device: /dev/drbd0... */
+        private final String sourceDev;
+        /** Target bus: ide. */
+        private final String targetBus;
+        /** Whether the disk is read only. */
+        private final boolean readonly;
+
+        /**
+         * Creates new DiskData object.
+         */
+        public DiskData(final String type,
+                        final String device,
+                        final String targetDev,
+                        final String sourceFile,
+                        final String sourceDev,
+                        final String targetBus,
+                        final boolean readonly) {
+            this.type = type;
+            this.device = device;
+            this.targetDev = targetDev;
+            this.sourceFile = sourceFile;
+            this.sourceDev = sourceDev;
+            this.targetBus = targetBus;
+            this.readonly = readonly;
+        }
+
+        /** Returns type. */
+        public final String getType() {
+            return type;
+        }
+
+        /** Returns device. */
+        public final String getDevice() {
+            return device;
+        }
+
+        /** Returns target device. */
+        public final String getTargetDev() {
+            return targetDev;
+        }
+
+        /** Returns source file. */
+        public final String getSourceFile() {
+            return sourceFile;
+        }
+
+        /** Returns source device. */
+        public final String getSourceDev() {
+            return sourceDev;
+        }
+
+        /** Returns target bus. */
+        public final String getTargetBus() {
+            return targetBus;
+        }
+
+        /** Returns whether the disk is read only. */
+        public final boolean isReadonly() {
+            return readonly;
+        }
+    }
+
+    /**
+     * Class that holds data about virtual interfaces.
+     */
+    public class InterfaceData {
+        /** Type: bridge... */
+        private final String type;
+        /** Mac address. */
+        private final String macAddress;
+        /** Source bridge: br0... */
+        private final String sourceBridge;
+        /** Target dev: vnet0... */
+        private final String targetDev;
+        /** Model type: virtio... */
+        private final String modelType;
+
+        /**
+         * Creates new InterfaceData object.
+         */
+        public InterfaceData(final String type,
+                             final String macAddress,
+                             final String sourceBridge,
+                             final String targetDev,
+                             final String modelType) {
+            this.type = type;
+            this.macAddress = macAddress;
+            this.sourceBridge = sourceBridge;
+            this.targetDev = targetDev;
+            this.modelType = modelType;
+        }
+
+        /** Returns type. */
+        public final String getType() {
+            return type;
+        }
+
+        /** Returns mac address. */
+        public final String getMacAddress() {
+            return macAddress;
+        }
+
+        /** Returns source bridge. */
+        public final String getSourceBridge() {
+            return sourceBridge;
+        }
+
+        /** Returns target dev. */
+        public final String getTargetDev() {
+            return targetDev;
+        }
+
+        /** Returns model type. */
+        public final String getModelType() {
+            return modelType;
+        }
     }
 }

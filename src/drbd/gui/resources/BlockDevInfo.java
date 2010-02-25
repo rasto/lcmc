@@ -91,11 +91,11 @@ public class BlockDevInfo extends EditableInfo {
     private static final String DRBD_NI_PARAM         = "DrbdNetInterface";
     /** Internal parameter name of drbd network interface port. */
     private static final String DRBD_NI_PORT_PARAM    = "DrbdNetInterfacePort";
-    /** Harddisc icon. */
-    private static final ImageIcon HARDDISC_ICON = Tools.createImageIcon(
+    /** Harddisk icon. */
+    public static final ImageIcon HARDDISK_ICON = Tools.createImageIcon(
                                    Tools.getDefault("DrbdGraph.HarddiscIcon"));
-    /** No harddisc icon. */
-    private static final ImageIcon NO_HARDDISC_ICON = Tools.createImageIcon(
+    /** No harddisk icon. */
+    private static final ImageIcon NO_HARDDISK_ICON = Tools.createImageIcon(
                                  Tools.getDefault("DrbdGraph.NoHarddiscIcon"));
     /** Meta-disk subtext. */
     private static final Subtext METADISK_SUBTEXT =
@@ -1048,11 +1048,11 @@ public class BlockDevInfo extends EditableInfo {
         /* attach / detach */
         final MyMenuItem attachMenu =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
-                           NO_HARDDISC_ICON,
+                           NO_HARDDISK_ICON,
                            Tools.getString("HostBrowser.Drbd.Detach.ToolTip"),
 
                            Tools.getString("HostBrowser.Drbd.Attach"),
-                           HARDDISC_ICON,
+                           HARDDISK_ICON,
                            Tools.getString("HostBrowser.Drbd.Attach.ToolTip")) {
                 private static final long serialVersionUID = 1L;
 

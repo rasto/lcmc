@@ -26,6 +26,8 @@ import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
+import drbd.data.VMSXML.DiskData;
+import drbd.data.VMSXML.InterfaceData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.utilities.UpdatableItem;
@@ -46,6 +48,7 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -106,6 +109,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
+    /** Header table. */
+    private static final String HEADER_TABLE = "header";
+    /** Disk table. */
+    protected static final String DISK_TABLE = "disks";
+    /** Interface table. */
+    protected static final String INTERFACES_TABLE = "interfaces";
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
@@ -231,7 +240,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
                     final String savedValue =
-                                    vmsxml.getValue(toString(), param);
+                                       vmsxml.getValue(toString(), param);
                     if (savedValue != null) {
                         value = savedValue;
                     }
@@ -245,7 +254,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         }
-        updateTable("main");
+        updateTable(HEADER_TABLE);
+        updateTable(DISK_TABLE);
+        updateTable(INTERFACES_TABLE);
     }
 
     /**
@@ -270,7 +281,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JTable table = getTable("main");
+        final JTable table = getTable(HEADER_TABLE);
         if (table != null) {
             mainPanel.add(table.getTableHeader());
             mainPanel.add(table);
@@ -282,10 +293,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
 
-        final JPanel optionsPanel = new JPanel();
+        final JPanel optionsPanel = new JPanel(
+                                        new FlowLayout(FlowLayout.LEFT, 0, 20));
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
         extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
@@ -348,9 +358,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         updateMenus(null);
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
-        Tools.registerExpertPanel(extraOptionsPanel);
 
+        Tools.registerExpertPanel(extraOptionsPanel);
         mainPanel.add(optionsPanel);
+        mainPanel.add(getTablePanel("Disks", DISK_TABLE));
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(getTablePanel("Interfaces", INTERFACES_TABLE));
         mainPanel.add(extraOptionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -361,6 +374,24 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         applyButton.setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;
         return infoPanel;
+    }
+
+    /**
+     * Retruns panel with table and border.
+     */
+    private JComponent getTablePanel(final String title,
+                                     final String tableName) {
+        final JPanel p = new JPanel();
+        p.setBackground(Browser.PANEL_BACKGROUND);
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        final TitledBorder titleBorder = Tools.getBorder(title);
+        p.setBorder(titleBorder);
+        final JTable table = getTable(tableName);
+        if (table != null) {
+            p.add(table.getTableHeader());
+            p.add(table);
+        }
+        return p;
     }
 
     /**
@@ -689,17 +720,28 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns columns for the table.
      */
     protected final String[] getColumnNames(final String tableName) {
-        return new String[]{"Name", "Defined on", "Status", "Memory"};
+        if (HEADER_TABLE.equals(tableName)) {
+            return new String[]{"Name", "Defined on", "Status", "Memory"};
+        } else if (DISK_TABLE.equals(tableName)) {
+            return new String[]{"Virtual Device", "Source"};
+        } else if (INTERFACES_TABLE.equals(tableName)) {
+            return new String[]{"Virtual Interface", "Source"};
+        }
+        return new String[]{};
     }
 
     /**
      * Returns data for the table.
      */
     protected final Object[][] getTableData(final String tableName) {
-        if ("main".equals(tableName)) {
+        if (HEADER_TABLE.equals(tableName)) {
             return getMainTableData();
+        } else if (DISK_TABLE.equals(tableName)) {
+            return getDiskTableData();
+        } else if (INTERFACES_TABLE.equals(tableName)) {
+            return getInterfaceTableData();
         }
-        return null;
+        return new Object[][]{};
     }
 
     /**
@@ -729,10 +771,95 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /**
+     * Returns data for the disk table.
+     */
+    private Object[][] getDiskTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        Map<String, DiskData> disks = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                disks = vxml.getDisks(toString());
+                break;
+            }
+        }
+        if (disks != null) {
+            for (final String targetDev : disks.keySet()) {
+                final DiskData diskData = disks.get(targetDev);
+                final StringBuffer target = new StringBuffer(10);
+                target.append(diskData.getTargetBus());
+                target.append(' ');
+                target.append(diskData.getDevice());
+                target.append(" : /dev/");
+                target.append(targetDev);
+                final MyButton targetDevLabel = new MyButton(
+                                                    target.toString(),
+                                                    BlockDevInfo.HARDDISK_ICON);
+                targetDevLabel.setOpaque(true);
+                final StringBuffer source = new StringBuffer(20);
+                String s = diskData.getSourceDev();
+                if (s == null) {
+                    s = diskData.getSourceFile();
+                }
+                if (s != null) {
+                    source.append(diskData.getType());
+                    source.append(" : ");
+                    source.append(s);
+                }
+                rows.add(new Object[]{targetDevLabel,
+                                      source.toString()});
+            }
+        }
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /**
+     * Returns data for the interface table.
+     */
+    private Object[][] getInterfaceTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        Map<String, InterfaceData> interfaces = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                interfaces = vxml.getInterfaces(toString());
+                break;
+            }
+        }
+        if (interfaces != null) {
+            for (final String mac : interfaces.keySet()) {
+                final InterfaceData interfaceData = interfaces.get(mac);
+                final StringBuffer interf = new StringBuffer(20);
+                interf.append(mac);
+                final String dev = interfaceData.getTargetDev();
+                if (dev != null) {
+                    interf.append(' ');
+                    interf.append(dev);
+                }
+                final MyButton iLabel = new MyButton(interf.toString(),
+                                                     NetInfo.NET_I_ICON_LARGE);
+                iLabel.setOpaque(true);
+                final StringBuffer source = new StringBuffer(20);
+                final String s = interfaceData.getSourceBridge();
+                if (s != null) {
+                    source.append(interfaceData.getType());
+                    source.append(" : ");
+                    source.append(s);
+                }
+                rows.add(new Object[]{iLabel,
+                                      source.toString()});
+            }
+        }
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /**
      * Execute when row in the table was clicked.
      */
     protected final void rowClicked(final String tableName, final String key) {
-        getBrowser().getVMSInfo().selectMyself();
+        if (HEADER_TABLE.equals(tableName)) {
+            getBrowser().getVMSInfo().selectMyself();
+        }
     }
 
     /**
@@ -740,7 +867,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      */
     protected final Color getTableRowColor(final String tableName,
                                            final String key) {
-        return rowColor;
+        if (HEADER_TABLE.equals(tableName)) {
+            return rowColor;
+        }
+        return Browser.PANEL_BACKGROUND;
     }
 
     /**
@@ -748,7 +878,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      */
     protected final int getTableColumnAlignment(final String tableName,
                                                 final int column) {
-        if (column == 3) {
+
+        if (column == 3 && HEADER_TABLE.equals(tableName)) {
             return SwingConstants.RIGHT;
         }
         return SwingConstants.LEFT;
@@ -759,7 +890,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      */
     protected final Info getTableInfo(final String tableName,
                                       final String key) {
-        if ("main".equals(tableName)) {
+        if (HEADER_TABLE.equals(tableName)) {
             return this;
         }
         return null;
