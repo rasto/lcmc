@@ -55,7 +55,9 @@ public class ResourceAgent {
     private String shortDesc;
     /** Hash code. */
     private final int hash;
-    /** List of parameters. */
+    /** List of master/slave parameters. */
+    private final List<String> masterParameters = new ArrayList<String>();
+    /** List of clone parameters. */
     private final List<String> parameters = new ArrayList<String>();
     /** List of required parameters. */
     private final List<String> paramRequired = new ArrayList<String>();
@@ -249,15 +251,27 @@ public class ResourceAgent {
     /**
      * Adds parameter of this service.
      */
+    public final void addMasterParameter(final String param) {
+        masterParameters.add(param);
+    }
+
+    /**
+     * Adds parameter of this service.
+     */
     public final void addParameter(final String param) {
+        masterParameters.add(param);
         parameters.add(param);
     }
 
     /**
      * Returns an array of all service parameters.
      */
-    public final String[] getParameters() {
-        return parameters.toArray(new String[parameters.size()]);
+    public final String[] getParameters(final boolean master) {
+        if (master) {
+            return masterParameters.toArray(new String[parameters.size()]);
+        } else {
+            return parameters.toArray(new String[parameters.size()]);
+        }
     }
 
     /**
@@ -273,7 +287,7 @@ public class ResourceAgent {
      */
     public final void setParamRequired(final String param,
                                        final boolean required) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }
@@ -296,7 +310,7 @@ public class ResourceAgent {
      */
     public final void setParamLongDesc(final String param,
                                        final String longDesc) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }
@@ -308,7 +322,7 @@ public class ResourceAgent {
      */
     public final void setParamShortDesc(final String param,
                                         final String shortDesc) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }
@@ -319,7 +333,7 @@ public class ResourceAgent {
      * Sets the parameter type.
      */
     public final void setParamType(final String param, final String type) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }
@@ -338,7 +352,7 @@ public class ResourceAgent {
      */
     public final void setParamDefault(final String param,
                                       final String defaultValue) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }
@@ -358,7 +372,7 @@ public class ResourceAgent {
      */
     public final void setParamPreferred(final String param,
                                         final String preferredValue) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }
@@ -377,7 +391,7 @@ public class ResourceAgent {
      */
     public final void setParamPossibleChoices(final String param,
                                               final String[] choices) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }
@@ -439,7 +453,7 @@ public class ResourceAgent {
      */
     public final void setParamIsMetaAttr(final String param,
                                          final boolean isMetaAttr) {
-        if (!parameters.contains(param)) {
+        if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
         }

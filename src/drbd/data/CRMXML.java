@@ -221,10 +221,24 @@ public class CRMXML extends XML {
             setMetaAttributes(hbClone, "target_role", "is_managed");
         }
 
+        /* master-max */
+        hbClone.addMasterParameter("master-max");
+        hbClone.setParamIsMetaAttr("master-max", true);
+        hbClone.setParamShortDesc("master-max", "M/S Master-Max");
+        hbClone.setParamDefault("master-max", "1");
+        hbClone.setParamType("master-max", PARAM_TYPE_INTEGER);
+        hbClone.setParamPossibleChoices("master-max", integerValues);
+        /* master-node-max */
+        hbClone.addMasterParameter("master-node-max");
+        hbClone.setParamIsMetaAttr("master-node-max", true);
+        hbClone.setParamShortDesc("master-node-max", "M/S Master-Node-Max");
+        hbClone.setParamDefault("master-node-max", "1");
+        hbClone.setParamType("master-node-max", PARAM_TYPE_INTEGER);
+        hbClone.setParamPossibleChoices("master-node-max", integerValues);
         /* clone-max */
         hbClone.addParameter("clone-max");
         hbClone.setParamIsMetaAttr("clone-max", true);
-        hbClone.setParamShortDesc("clone-max", "M/S Clone Max");
+        hbClone.setParamShortDesc("clone-max", "Clone Max");
         hbClone.setParamDefault("clone-max", "");
         hbClone.setParamPreferred("clone-max", "2");
         hbClone.setParamType("clone-max", PARAM_TYPE_INTEGER);
@@ -233,7 +247,7 @@ public class CRMXML extends XML {
         /* clone-node-max */
         hbClone.addParameter("clone-node-max");
         hbClone.setParamIsMetaAttr("clone-node-max", true);
-        hbClone.setParamShortDesc("clone-node-max", "M/S Clone Node Max");
+        hbClone.setParamShortDesc("clone-node-max", "Clone Node Max");
         hbClone.setParamDefault("clone-node-max", "1");
         hbClone.setParamType("clone-node-max", PARAM_TYPE_INTEGER);
         hbClone.setParamPossibleChoices("clone-node-max", integerValues);
@@ -241,26 +255,26 @@ public class CRMXML extends XML {
         /* notify */
         hbClone.addParameter("notify");
         hbClone.setParamIsMetaAttr("notify", true);
-        hbClone.setParamShortDesc("notify", "M/S Notify");
+        hbClone.setParamShortDesc("notify", "Notify");
         hbClone.setParamDefault("notify", hbBooleanFalse);
         hbClone.setParamPreferred("notify", hbBooleanTrue);
         hbClone.setParamPossibleChoices("notify", booleanValues);
         /* globally-unique */
         hbClone.addParameter("globally-unique");
         hbClone.setParamIsMetaAttr("globally-unique", true);
-        hbClone.setParamShortDesc("globally-unique", "M/S Globally-Unique");
+        hbClone.setParamShortDesc("globally-unique", "Globally-Unique");
         hbClone.setParamDefault("globally-unique", hbBooleanFalse);
         hbClone.setParamPossibleChoices("globally-unique", booleanValues);
         /* ordered */
         hbClone.addParameter("ordered");
         hbClone.setParamIsMetaAttr("ordered", true);
-        hbClone.setParamShortDesc("ordered", "M/S Ordered");
+        hbClone.setParamShortDesc("ordered", "Ordered");
         hbClone.setParamDefault("ordered", hbBooleanFalse);
         hbClone.setParamPossibleChoices("ordered", booleanValues);
         /* interleave */
         hbClone.addParameter("interleave");
         hbClone.setParamIsMetaAttr("interleave", true);
-        hbClone.setParamShortDesc("interleave", "M/S Interleave");
+        hbClone.setParamShortDesc("interleave", "Interleave");
         hbClone.setParamDefault("interleave", hbBooleanFalse);
         hbClone.setParamPossibleChoices("interleave", booleanValues);
 
@@ -642,9 +656,10 @@ public class CRMXML extends XML {
      * Returns parameters for service. Parameters are obtained from
      * ocf meta-data.
      */
-    public final String[] getParameters(final ResourceAgent ra) {
+    public final String[] getParameters(final ResourceAgent ra,
+                                        final boolean master) {
         /* return cached values */
-        return ra.getParameters();
+        return ra.getParameters(master);
     }
 
     /**

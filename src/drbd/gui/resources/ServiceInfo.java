@@ -129,7 +129,7 @@ public class ServiceInfo extends EditableInfo {
     /** Radio buttons for clone/master/slave primitive resources. */
     private GuiComboBox typeRadioGroup;
     /** Extra options panel. */
-    private final JPanel extraOptionsPanel = new JPanel();
+    private JPanel extraOptionsPanel = null;
     /** Default values item in the "same as" scrolling list in meta
         attributes.*/
     private static final String META_ATTRS_DEFAULT_VALUES_TEXT =
@@ -456,7 +456,8 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         /* Attributes */
-        final String[] params = crmXML.getParameters(resourceAgent);
+        final String[] params = crmXML.getParameters(resourceAgent,
+                                                     getService().isMaster());
         final ClusterStatus cs = getBrowser().getClusterStatus();
         if (params != null) {
             boolean allMetaAttrsAreDefaultValues = true;
@@ -1731,7 +1732,7 @@ public class ServiceInfo extends EditableInfo {
      */
     public String[] getParametersFromXML() {
         final CRMXML crmXML = getBrowser().getCRMXML();
-        return crmXML.getParameters(resourceAgent);
+        return crmXML.getParameters(resourceAgent, getService().isMaster());
     }
 
     /**
@@ -1938,6 +1939,8 @@ public class ServiceInfo extends EditableInfo {
                                                                      oldCI);
             }
             cloneInfo.setCloneServicePanel(this);
+            Tools.unregisterExpertPanel(extraOptionsPanel);
+            extraOptionsPanel = null;
             infoPanel = null;
             selectMyself();
         } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
@@ -2252,6 +2255,9 @@ public class ServiceInfo extends EditableInfo {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        if (extraOptionsPanel == null) {
+            extraOptionsPanel = new JPanel();
+        }
         extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
         extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
                                     BoxLayout.Y_AXIS));
