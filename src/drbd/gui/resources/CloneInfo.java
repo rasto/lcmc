@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JMenuItem;
@@ -566,5 +567,16 @@ public class CloneInfo extends ServiceInfo {
             return cs.isInfoPanelOk();
         }
         return false;
+    }
+
+    /**
+     * Update menus with positions and calles their update methods.
+     */
+    public final void updateMenus(final Point2D pos) {
+        super.updateMenus(pos);
+        final ServiceInfo cs = containedService;
+        if (cs != null) {
+            cs.updateMenus(pos);
+        }
     }
 }

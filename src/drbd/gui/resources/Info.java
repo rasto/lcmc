@@ -643,7 +643,7 @@ public class Info implements Comparable {
     /**
      * Update menus with positions and calles their update methods.
      */
-    public final void updateMenus(final Point2D pos) {
+    public void updateMenus(final Point2D pos) {
         for (UpdatableItem i : menuList) {
             i.setPos(pos);
             i.update();

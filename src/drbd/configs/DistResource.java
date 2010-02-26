@@ -190,6 +190,9 @@ public class DistResource extends
          "crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
 
         {"CRM.migrateResource",   "crm_resource -r @ID@ -H @HOST@ --migrate"},
+        {"CRM.forceMigrateResource",
+         "crm_resource -f -r @ID@ -H @HOST@ --migrate"},
+        {"CRM.migrateFromResource", "crm_resource -r @ID@ --migrate"},
         {"CRM.unmigrateResource", "crm_resource -r @ID@ --un-migrate"},
 
         /* gets all ocf resources and theirs meta-data */

@@ -46,6 +46,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JScrollPane;
+import java.awt.geom.Point2D;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
@@ -796,4 +797,23 @@ public class GroupInfo extends ServiceInfo {
         }
         return super.checkResourceFieldsChanged(param, params);
     }
+
+    /**
+     * Update menus with positions and calles their update methods.
+     */
+    public final void updateMenus(final Point2D pos) {
+        super.updateMenus(pos);
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                 getHeartbeatId(false),
+                                                 false);
+        if (resources != null) {
+            for (final String hbId : resources) {
+                final ServiceInfo si =
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
+                si.updateMenus(pos);
+            }
+        }
+    }
+
 }

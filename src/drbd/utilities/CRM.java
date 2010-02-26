@@ -674,6 +674,36 @@ public final class CRM {
     }
 
     /**
+     * Migrates resource from where it is running.
+     */
+    public static void migrateFromResource(final Host host,
+                                           final String heartbeatId,
+                                           final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
+        final String command = host.getDistCommand("CRM.migrateFromResource",
+                                                   replaceHash);
+
+        execCommand(host, command, true, testOnly);
+    }
+
+    /**
+     * Migrates resource to the specified host.
+     */
+    public static void forceMigrateResource(final Host host,
+                                            final String heartbeatId,
+                                            final String onHost,
+                                            final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@HOST@", onHost);
+        final String command = host.getDistCommand("CRM.forceMigrateResource",
+                                                   replaceHash);
+
+        execCommand(host, command, true, testOnly);
+    }
+
+    /**
      * Unmigrates resource that was previously migrated.
      */
     public static void unmigrateResource(final Host host,

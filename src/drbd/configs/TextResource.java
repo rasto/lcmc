@@ -1077,6 +1077,9 @@ public class TextResource extends
         {"ClusterBrowser.Host.Disconnected",
          "Disconnected"},
 
+        {"ClusterBrowser.ExpertSubmenu",
+         "More Options"},
+
         {"ClusterBrowser.Host.Offline",
          "Offline"},
 
@@ -1287,6 +1290,13 @@ public class TextResource extends
 
         {"ClusterBrowser.Hb.MigrateResource",
          "Migrate To"},
+
+        {"ClusterBrowser.Hb.ForceMigrateResource",
+         "Force Migrate To"},
+
+        {"ClusterBrowser.Hb.MigrateFromResource",
+         "Migrate FROM"},
+
 
         {"ClusterBrowser.Hb.UnmigrateResource",
          "Unmigrate"},
@@ -1588,7 +1598,7 @@ public class TextResource extends
          "no info available"},
 
         {"HostBrowser.ExpertSubmenu",
-         "Expert Options"},
+         "More Options"},
 
         {"HostBrowser.MakeKernelPanic",
          "make kernel panic on "},

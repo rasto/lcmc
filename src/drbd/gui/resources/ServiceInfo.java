@@ -797,7 +797,9 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if (CRMXML.INFINITY_STRING.equals(score) && "eq".equals(op)) {
+            if ((CRMXML.INFINITY_STRING.equals(score) 
+                 || CRMXML.MINUS_INFINITY_STRING.equals(score))
+                && "eq".equals(op)) {
                 final List<Host> hosts = new ArrayList<Host>();
                 hosts.add(host);
                 return hosts;
@@ -3093,7 +3095,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Migrates resource in heartbeat from current location.
+     * Migrates resource in cluster from current location.
      */
     public void migrateResource(final String onHost,
                                 final Host dcHost,
@@ -3105,6 +3107,34 @@ public class ServiceInfo extends EditableInfo {
                             getHeartbeatId(testOnly),
                             onHost,
                             testOnly);
+    }
+
+    /**
+     * Migrates resource in heartbeat from current location.
+     */
+    public void migrateFromResource(final Host dcHost,
+                                    final boolean testOnly) {
+        if (!testOnly) {
+            setUpdated(true);
+        }
+        CRM.migrateFromResource(dcHost,
+                                getHeartbeatId(testOnly),
+                                testOnly);
+    }
+
+    /**
+     * Migrates resource in cluster from current location with --force option.
+     */
+    public void forceMigrateResource(final String onHost,
+                                     final Host dcHost,
+                                     final boolean testOnly) {
+        if (!testOnly) {
+            setUpdated(true);
+        }
+        CRM.forceMigrateResource(dcHost,
+                                 getHeartbeatId(testOnly),
+                                 onHost,
+                                 testOnly);
     }
 
     /**
@@ -3855,6 +3885,17 @@ public class ServiceInfo extends EditableInfo {
         };
         registerMenuItem(viewLogMenu);
         items.add(viewLogMenu);
+        /* expert options */
+        final MyMenu expertSubmenu = new MyMenu(
+                        Tools.getString("ClusterBrowser.ExpertSubmenu")) {
+            private static final long serialVersionUID = 1L;
+            public boolean enablePredicate() {
+                return true;
+            }
+        };
+        items.add(expertSubmenu);
+        addExpertMenu(expertSubmenu);
+        registerMenuItem(expertSubmenu);
         return items;
     }
 
@@ -3883,6 +3924,11 @@ public class ServiceInfo extends EditableInfo {
 
                     public boolean predicate() {
                         return host.isClStatus();
+                    }
+
+                    public boolean visiblePredicate() {
+                        return !host.isClStatus()
+                               || enablePredicate();
                     }
 
                     public boolean enablePredicate() {
@@ -3931,6 +3977,10 @@ public class ServiceInfo extends EditableInfo {
                     ClusterBrowser.STARTING_PTEST_TOOLTIP) {
                 private static final long serialVersionUID = 1L;
 
+                public boolean visiblePredicate() {
+                    return enablePredicate();
+                }
+
                 public boolean enablePredicate() {
                     // TODO: if it was migrated
                     return !getBrowser().clStatusFailed()
@@ -3957,6 +4007,145 @@ public class ServiceInfo extends EditableInfo {
         items.add((UpdatableItem) unmigrateMenuItem);
         registerMenuItem((UpdatableItem) unmigrateMenuItem);
     }
+
+    /**
+     * Adds expert submenu.
+     */
+    public final void addExpertMenu(final MyMenu submenu) {
+        if (submenu.getItemCount() > 0) {
+            return;
+        }
+        final boolean testOnly = false;
+        final ServiceInfo thisClass = this;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final String hostName = host.getName();
+            final MyMenuItem migrateFromMenuItem =
+                new MyMenuItem(Tools.getString(
+                                    "ClusterBrowser.Hb.MigrateFromResource")
+                                    + " " + hostName,
+                               MIGRATE_ICON,
+                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                               Tools.getString(
+                                    "ClusterBrowser.Hb.MigrateFromResource")
+                                    + " " + hostName + " (offline)",
+                               MIGRATE_ICON,
+                               ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean predicate() {
+                        return host.isClStatus();
+                    }
+
+                    public boolean visiblePredicate() {
+                        return !host.isClStatus()
+                               || enablePredicate();
+                    }
+
+                    public boolean enablePredicate() {
+                        final List<String> runningOnNodes =
+                                               getRunningOnNodes(testOnly);
+                        if (runningOnNodes == null
+                            || runningOnNodes.size() != 1) {
+                            return false;
+                        }
+                        final String runningOnNode =
+                                    runningOnNodes.get(0).toLowerCase();
+                        return !getBrowser().clStatusFailed()
+                               && getService().isAvailable()
+                               && hostName.toLowerCase().equals(
+                                         runningOnNode)
+                               && host.isClStatus();
+                    }
+
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        migrateFromResource(getBrowser().getDCHost(),
+                                            testOnly);
+                    }
+                };
+            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
+                 getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
+                public void action(final Host dcHost) {
+                    migrateFromResource(dcHost, true); /* testOnly */
+                }
+            };
+            addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
+            submenu.add(migrateFromMenuItem);
+            registerMenuItem((UpdatableItem) migrateFromMenuItem);
+        }
+
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final String hostName = host.getName();
+
+            final MyMenuItem forceMigrateMenuItem =
+                new MyMenuItem(Tools.getString(
+                                    "ClusterBrowser.Hb.ForceMigrateResource")
+                                    + " " + hostName,
+                               MIGRATE_ICON,
+                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                               Tools.getString(
+                                    "ClusterBrowser.Hb.ForceMigrateResource")
+                                    + " " + hostName + " (offline)",
+                               MIGRATE_ICON,
+                               ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean predicate() {
+                        return host.isClStatus();
+                    }
+
+                    public boolean visiblePredicate() {
+                        return !host.isClStatus()
+                               || enablePredicate();
+                    }
+
+                    public boolean enablePredicate() {
+                        final List<String> runningOnNodes =
+                                               getRunningOnNodes(testOnly);
+                        if (runningOnNodes == null
+                            || runningOnNodes.isEmpty()) {
+                            return false;
+                        }
+                        final String runningOnNode =
+                                    runningOnNodes.get(0).toLowerCase();
+                        return !getBrowser().clStatusFailed()
+                               && getService().isAvailable()
+                               && !hostName.toLowerCase().equals(
+                                         runningOnNode)
+                               && host.isClStatus();
+                    }
+
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        forceMigrateResource(hostName,
+                                             getBrowser().getDCHost(),
+                                             testOnly);
+                    }
+                };
+            final ClusterBrowser.ClMenuItemCallback forceMigrateItemCallback =
+                 getBrowser().new ClMenuItemCallback(forceMigrateMenuItem,
+                                                     null) {
+                public void action(final Host dcHost) {
+                    forceMigrateResource(hostName, dcHost, true); /* testOnly */
+                }
+            };
+            addMouseOverListener(forceMigrateMenuItem,
+                                 forceMigrateItemCallback);
+            submenu.add(forceMigrateMenuItem);
+            registerMenuItem((UpdatableItem) forceMigrateMenuItem);
+        }
+    }
+
 
     /**
      * Returns tool tip for the hearbeat service.
