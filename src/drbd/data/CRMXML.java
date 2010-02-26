@@ -1056,8 +1056,12 @@ public class CRMXML extends XML {
                         // Workaround, default is "0" and should be false
                         defaultValue = "false";
                     }
-
-                    ra.setParamType(param, type);
+                    if ("pingd".equals(ra.getName())
+                        || "ping".equals(ra.getName())) {
+                        // workaround: all types are integer in this ras.
+                    } else {
+                        ra.setParamType(param, type);
+                    }
                     ra.setParamDefault(param, defaultValue);
                 }
             }
