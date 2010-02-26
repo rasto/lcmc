@@ -46,8 +46,7 @@ public class BlockDevice extends Resource {
     private String fsType;
     /** Whether this device is drbd device. */
     private boolean drbd = false;
-    /** Whether this block device is used by crm in Filesystem service.
-     */
+    /** Whether this block device is used by crm in Filesystem service. */
     private boolean isUsedByCRM;
     /** Drbd net interface of this block device. */
     private NetInterface netInterface;

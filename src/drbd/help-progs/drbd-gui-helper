@@ -359,6 +359,16 @@ sub get_disk_info {
 	my @partitions;
 	my @info;
 	my $device_mapper_major = get_device_mapper_major();
+	my $dir = "/dev/disk/by-uuid";
+	my %by_uuids;
+	if (opendir(DIR, $dir)) {
+		for (grep { $_ !~ /^\./ && -l "$dir/$_" } readdir(DIR)) {
+			my $dev = `readlink -f "$dir/$_"`;
+			chomp $dev;
+			$by_uuids{$dev} = "$dir/$_";
+		}
+		closedir DIR;
+	}
 	while (<PT>) {
 		next if /^major / || /^$/; # skip header
 		chomp;
@@ -395,8 +405,10 @@ sub get_disk_info {
 			disk_info_warning("unknown partition: $_");
 			$device = "/dev/$name";
 		}
-		my $readlink = readlink $device || $device;
-		my $info = "$device $readlink $blocks";
+		my $readlink = `readlink -f $device`;
+		chomp $readlink;
+		my $dev_sec = $by_uuids{$readlink} || $readlink || $device;
+		my $info = "$device $dev_sec $blocks";
 		$info.= " ".$$dev_to_mount{$device} if $$dev_to_mount{$device};
 		$info.= " swap swap" if $$dev_to_swap{$device};
 		$info.= " ".$$dev_to_used{$device} if defined $$dev_to_used{$device};
@@ -1281,6 +1293,7 @@ sub get_vm_info {
 	print $out;
 	print "</vms>\n";
 }
+
 
 
 
