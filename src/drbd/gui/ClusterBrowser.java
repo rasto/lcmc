@@ -60,6 +60,7 @@ import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.resources.VMSInfo;
 import drbd.gui.resources.AvailableServicesInfo;
 import drbd.gui.resources.ResourceAgentClassInfo;
+import drbd.gui.resources.ClusterHostsInfo;
 
 import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
@@ -189,6 +190,8 @@ public class ClusterBrowser extends Browser {
     private final Map<ResourceAgent, AvailableServiceInfo>
                     availableServiceMap =
                            new HashMap<ResourceAgent, AvailableServiceInfo>();
+    /** Cluster hosts info object. */
+    private ClusterHostsInfo clusterHostsInfo;
 
     /** Remove icon. */
     public static final ImageIcon REMOVE_ICON =
@@ -523,9 +526,10 @@ public class ClusterBrowser extends Browser {
         setNode(allHostsNode);
         topAdd(allHostsNode);
         /* hosts */
-        clusterHostsNode = new DefaultMutableTreeNode(
-            new CategoryInfo(Tools.getString("ClusterBrowser.ClusterHosts"),
-                             this));
+        clusterHostsInfo =
+           new ClusterHostsInfo(Tools.getString("ClusterBrowser.ClusterHosts"),
+                                this);
+        clusterHostsNode = new DefaultMutableTreeNode(clusterHostsInfo);
         setNode(clusterHostsNode);
         topAdd(clusterHostsNode);
 
@@ -609,7 +613,9 @@ public class ClusterBrowser extends Browser {
         clusterHostsNode.removeAllChildren();
         for (Host clusterHost : clusterHosts) {
             final HostBrowser hostBrowser = clusterHost.getBrowser();
-            clusterHostsNode.add(hostBrowser.getTreeTop());
+            resource = hostBrowser.getTreeTop();
+            setNode(resource);
+            clusterHostsNode.add(resource);
             heartbeatGraph.addHost(hostBrowser.getHostInfo());
         }
 
@@ -737,9 +743,11 @@ public class ClusterBrowser extends Browser {
      */
     public final void startServerStatus(final Host host) {
         final String hostName = host.getName();
+        final CategoryInfo[] infosToUpdate =
+                                        new CategoryInfo[]{clusterHostsInfo};
         while (true) {
             host.setIsLoading();
-            host.getHWInfo();
+            host.getHWInfo(infosToUpdate);
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
             final VMSXML newVMSXML = new VMSXML(host);
@@ -839,8 +847,14 @@ public class ClusterBrowser extends Browser {
             host.execDrbdStatusCommand(
                   new ExecCallback() {
                        public void done(final String ans) {
-                           host.setDrbdStatus(true);
-                           drbdGraph.repaint();
+                           if (!host.isDrbdStatus()) {
+                               host.setDrbdStatus(true);
+                               drbdGraph.repaint();
+                               Tools.debug(this, "drbd status update: "
+                                                     + host.getName());
+                               clusterHostsInfo.updateTable(
+                                                ClusterHostsInfo.MAIN_TABLE);
+                           }
                        }
 
                        public void doneError(final String ans,
@@ -852,8 +866,14 @@ public class ClusterBrowser extends Browser {
                                        2);
                            if (exitCode != 143) {
                                /* was killed intentionally */
-                               host.setDrbdStatus(false);
-                               drbdGraph.repaint();
+                               if (host.isDrbdStatus()) {
+                                   host.setDrbdStatus(false);
+                                   Tools.debug(this, "drbd status update: "
+                                                     + host.getName());
+                                   drbdGraph.repaint();
+                                   clusterHostsInfo.updateTable(
+                                                ClusterHostsInfo.MAIN_TABLE);
+                               }
                                if (exitCode == 255) {
                                    /* looks like connection was lost */
                                    host.getSSH().forceReconnect();
@@ -878,6 +898,8 @@ public class ClusterBrowser extends Browser {
                                                  + host.getName());
                                    host.setDrbdStatus(false);
                                    drbdGraph.repaint();
+                                   clusterHostsInfo.updateTable(
+                                                ClusterHostsInfo.MAIN_TABLE);
                                }
                                return;
                            }
@@ -906,6 +928,8 @@ public class ClusterBrowser extends Browser {
                                drbdGraph.repaint();
                                Tools.debug(this, "drbd status update: "
                                              + host.getName());
+                               clusterHostsInfo.updateTable(
+                                                ClusterHostsInfo.MAIN_TABLE);
                                final Thread thread = new Thread(
                                    new Runnable() {
                                        public void run() {
@@ -1054,6 +1078,8 @@ public class ClusterBrowser extends Browser {
                                         ssi.setAllResources(testOnly);
                                     }
                                     repaintTree();
+                                    clusterHostsInfo.updateTable(
+                                                ClusterHostsInfo.MAIN_TABLE);
                                 }
                             }
                         }

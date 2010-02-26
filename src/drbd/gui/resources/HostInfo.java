@@ -495,4 +495,12 @@ public class HostInfo extends Info {
         }
         return null;
     }
+
+    /**
+     * Selects the node in the menu and reloads everything underneath.
+     */
+    public void selectMyself() {
+        super.selectMyself();
+        getBrowser().nodeChanged(getNode());
+    }
 }

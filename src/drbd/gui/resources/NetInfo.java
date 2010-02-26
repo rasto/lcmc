@@ -67,7 +67,7 @@ public class NetInfo extends Info {
                                                 + getName(),
                                                 null,   /* ExecCallback */
                                                 false); /* outputVisible */
-                ep.setText("<html><pre>" + text + "</html></pre>");
+                ep.setText(text);
             }
         };
         final Thread thread = new Thread(runnable);

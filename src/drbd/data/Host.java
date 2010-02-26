@@ -32,6 +32,7 @@ import drbd.gui.ProgressBar;
 import drbd.gui.TerminalPanel;
 import drbd.gui.SSHGui;
 import drbd.gui.HostBrowser;
+import drbd.gui.resources.CategoryInfo;
 import drbd.data.resources.NetInterface;
 import drbd.data.resources.BlockDevice;
 import java.awt.geom.Point2D;
@@ -1607,13 +1608,17 @@ public class Host implements Serializable {
     /**
      * Gets and stores hardware info about the host.
      */
-    public final void getHWInfo() {
+    public final void getHWInfo(final CategoryInfo[] infosToUpdate) {
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
                              public void done(final String ans) {
                                  if (!ans.equals(oldHwInfo)) {
                                     parseHostInfo(ans);
                                     oldHwInfo = ans;
+                                    for (final CategoryInfo ci
+                                                        : infosToUpdate) {
+                                        ci.updateTable(CategoryInfo.MAIN_TABLE);
+                                    }
                                  }
                                  setLoadingDone();
                              }

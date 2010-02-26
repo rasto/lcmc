@@ -421,25 +421,12 @@ public class HostBrowser extends Browser {
         Tools.getGUIData().addToEnabledInGodMode(rebootMenuItem);
         submenu.add(rebootMenuItem);
     }
-
+   
     /**
-     * Returns tooltip for host.
+     * Returns info string about DRBD installation.
      */
-    public final String getHostToolTip(final Host host) {
-        final StringBuffer tt = new StringBuffer(80);
-        tt.append("<b>" + host.getName() + "</b>");
-        final ClusterBrowser b = getClusterBrowser();
-        if (b != null && b.isRealDcHost(host)) {
-            tt.append(" (designated co-ordinator)");
-        }
-        if (!host.isConnected()) {
-            tt.append('\n');
-            tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
-        } else if (!host.isDrbdStatus() && !host.isClStatus()) {
-            tt.append('\n');
-            tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
-        }
-        /* DRBD */
+    public final String getDrbdInfo() {
+        final StringBuffer tt = new StringBuffer(40);
         final String drbdV = host.getDrbdVersion();
         final String drbdModuleV = host.getDrbdModuleVersion();
         String drbdS = null;
@@ -466,7 +453,14 @@ public class HostBrowser extends Browser {
         } else {
             tt.append(" (not loaded)");
         }
-        /* Pacemaker */
+        return tt.toString();
+    }
+
+    /**
+     * Returns info string about Pacemaker installation.
+     */
+    public final String getPacemakerInfo() {
+        final StringBuffer tt = new StringBuffer(40);
         final String pmV = host.getPacemakerVersion();
         final String hbV = host.getHeartbeatVersion();
         final StringBuffer hbRunning = new StringBuffer(20);
@@ -483,7 +477,7 @@ public class HostBrowser extends Browser {
         }
         if (pmV == null) {
             if (hbV != null) {
-                tt.append("\nHeartbeat ");
+                tt.append(" \nHeartbeat ");
                 tt.append(hbV);
                 tt.append(" (");
                 tt.append(hbRunning.toString());
@@ -496,7 +490,7 @@ public class HostBrowser extends Browser {
             } else {
                 pmRunning = "not running";
             }
-            tt.append("\nPacemaker ");
+            tt.append(" \nPacemaker ");
             tt.append(pmV);
             tt.append(" (");
             tt.append(pmRunning);
@@ -511,14 +505,14 @@ public class HostBrowser extends Browser {
             }
 
             if (hbV != null && host.isHeartbeatRunning()) {
-                tt.append("\nHeartbeat ");
+                tt.append(" \nHeartbeat ");
                 tt.append(hbV);
                 tt.append(" (");
                 tt.append(hbRunning.toString());
                 tt.append(')');
             }
             if (corOrAis != null) {
-                tt.append('\n');
+                tt.append(" \n");
                 tt.append(corOrAis);
                 tt.append(" (");
                 if (host.isCsAisRunning()) {
@@ -535,13 +529,37 @@ public class HostBrowser extends Browser {
                 tt.append(')');
             }
             if (hbV != null && !host.isHeartbeatRunning()) {
-                tt.append("\nHeartbeat ");
+                tt.append(" \nHeartbeat ");
                 tt.append(hbV);
                 tt.append(" (");
                 tt.append(hbRunning.toString());
                 tt.append(')');
             }
         }
+        return tt.toString();
+    }
+
+    /**
+     * Returns tooltip for host.
+     */
+    public final String getHostToolTip(final Host host) {
+        final StringBuffer tt = new StringBuffer(80);
+        tt.append("<b>" + host.getName() + "</b>");
+        final ClusterBrowser b = getClusterBrowser();
+        if (b != null && b.isRealDcHost(host)) {
+            tt.append(" (designated co-ordinator)");
+        }
+        if (!host.isConnected()) {
+            tt.append('\n');
+            tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
+        } else if (!host.isDrbdStatus() && !host.isClStatus()) {
+            tt.append('\n');
+            tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
+        }
+        /* DRBD */
+        tt.append(getDrbdInfo());
+        /* Pacemaker */
+        tt.append(getPacemakerInfo());
         return tt.toString();
     }
 
