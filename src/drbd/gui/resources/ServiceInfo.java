@@ -505,7 +505,8 @@ public class ServiceInfo extends EditableInfo {
                 if (infoPanelOk) {
                     final GuiComboBox cb = paramComboBoxGet(param, null);
                     final boolean haveChanged =
-                                        !Tools.areEqual(value, oldValue);
+                           !Tools.areEqual(value, oldValue)
+                           || !Tools.areEqual(value, getComboBoxValue(param));
                     if (haveChanged
                         || (metaAttrInfoRef != null && isMetaAttr(param))) {
                         getResource().setValue(param, value);
@@ -1751,6 +1752,10 @@ public class ServiceInfo extends EditableInfo {
      * Returns default value for specified parameter.
      */
     protected String getParamDefault(final String param) {
+        if (isMetaAttr(param) && "resource-stickiness".equals(param)) {
+            return getBrowser().getHeartbeatGraph().getServicesInfo()
+                    .getResource().getValue("default-resource-stickiness");
+        }
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getParamDefault(resourceAgent, param);
     }

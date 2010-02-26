@@ -1612,13 +1612,43 @@ public class TextResource extends
          "Target Role"},
 
         {"CRMXML.TargetRole.LongDesc",
-         "Select whether the service should be started or should be stopped."},
+         "Select whether the service should be started, stopped or promoted."},
 
         {"CRMXML.IsManaged.ShortDesc",
-         "Is Managed By HB"},
+         "Is Managed By Cluster"},
 
         {"CRMXML.IsManaged.LongDesc",
-         "Select whether the service should be managed by CRM or not."},
+         "Select whether the service should be managed by Cluster."},
+
+        {"CRMXML.Priority.ShortDesc",
+         "Priority"},
+
+        {"CRMXML.Priority.LongDesc",
+         "Priority to stay active."},
+
+        {"CRMXML.ResourceStickiness.ShortDesc",
+         "Resource-Stickiness"},
+
+        {"CRMXML.ResourceStickiness.LongDesc",
+         "Score how much the resource should stay where it is."},
+
+        {"CRMXML.MigrationThreshold.ShortDesc",
+         "Migration-Threshold"},
+
+        {"CRMXML.MigrationThreshold.LongDesc",
+         "Migrate after migration-threshold failures."},
+
+        {"CRMXML.FailureTimeout.ShortDesc",
+         "Failure-Timeout"},
+
+        {"CRMXML.FailureTimeout.LongDesc",
+         "How many seconds to ignore failure."},
+
+        {"CRMXML.MultipleActive.ShortDesc",
+         "Multiple-Active"},
+
+        {"CRMXML.MultipleActive.LongDesc",
+         "What to do if resource is wrongfully active on more than one node."},
 
         {"CRMXML.ColocationSectionParams",
          "Colocation Parameters"},
