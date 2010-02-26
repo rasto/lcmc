@@ -23,11 +23,7 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
-import drbd.data.CRMXML;
-import drbd.data.ResourceAgent;
-import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import javax.swing.ImageIcon;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -55,7 +51,7 @@ public class AvailableServicesInfo extends HbCategoryInfo {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final String cl : ClusterBrowser.HB_CLASSES) {
-            final MyButton className = new MyButton(cl);
+            final MyButton className = new MyButton(cl.toUpperCase());
             rows.add(new Object[]{className,
                                   ClusterBrowser.HB_CLASS_MENU.get(cl)});
         }
@@ -66,9 +62,9 @@ public class AvailableServicesInfo extends HbCategoryInfo {
      * Execute when row in the table was clicked.
      */
     protected final void rowClicked(final String tableName, final String key) {
-        final ResourceAgentClassInfo raci = getBrowser().getClassInfoMap(key);
+        final ResourceAgentClassInfo raci =
+                               getBrowser().getClassInfoMap(key.toLowerCase());
         if (raci != null) {
-            System.out.println(raci.getName() + " select myself");
             raci.selectMyself();
         }
     }

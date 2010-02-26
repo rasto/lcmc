@@ -49,11 +49,11 @@ import java.awt.geom.Point2D;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 

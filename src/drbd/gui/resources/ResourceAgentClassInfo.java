@@ -23,24 +23,42 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
-import drbd.data.CRMXML;
 import drbd.data.ResourceAgent;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.JComponent;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.awt.FlowLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * This class holds the information about resource agent class and its
  * services.
  */
 public class ResourceAgentClassInfo extends HbCategoryInfo {
+    /** Map from ResourceAgent name to its object. It is possible only within
+     * a class. */
+    private final Map<String, ResourceAgent> raMap =
+                                         new HashMap<String, ResourceAgent>();
+    /** Back to overview icon. */
+    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
+                                            Tools.getDefault("BackIcon"));
     /**
      * Prepares a new <code>ResourceAgentClassInfo</code> object.
      */
     public ResourceAgentClassInfo(final String name, final Browser browser) {
         super(name, browser);
+        for (final ResourceAgent ra : getBrowser().getCRMXML().getServices(
+                                                                      name)) {
+            raMap.put(ra.getName(), ra);
+        }
     }
 
     /**
@@ -64,7 +82,47 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
+    /**
+     * Returns name as it appears in the menu.
+     */
     public final String toString() {
         return getName().toUpperCase();
+    }
+
+    /**
+     * Execute when row in the table was clicked.
+     */
+    protected final void rowClicked(final String tableName, final String key) {
+        final ResourceAgent ra = raMap.get(key);
+        if (ra != null) {
+            final AvailableServiceInfo asi =
+                                  getBrowser().getAvailableServiceInfoMap(ra);
+            if (asi != null) {
+                asi.selectMyself();
+            }
+        }
+    }
+
+    /**
+     * Returns back button.
+     */
+    protected final JComponent getBackButton() {
+        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,
+                                                             0,
+                                                             0));
+        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        buttonPanel.setMinimumSize(new Dimension(0, 50));
+        buttonPanel.setPreferredSize(new Dimension(0, 50));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+        final MyButton overviewButton = new MyButton("Classes Overview",
+                                                     BACK_ICON);
+        overviewButton.setPreferredSize(new Dimension(180, 50));
+        overviewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                getBrowser().getAvailableServicesInfo().selectMyself();
+            }
+        });
+        buttonPanel.add(overviewButton);
+        return buttonPanel;
     }
 }

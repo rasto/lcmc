@@ -185,6 +185,10 @@ public class ClusterBrowser extends Browser {
     /** Map to ResourceAgentClassInfo. */
     private final Map<String, ResourceAgentClassInfo> classInfoMap =
                                 new HashMap<String, ResourceAgentClassInfo>();
+    /** Map from ResourceAgent to AvailableServicesInfo. */
+    private final Map<ResourceAgent, AvailableServiceInfo>
+                    availableServiceMap =
+                           new HashMap<ResourceAgent, AvailableServiceInfo>();
 
     /** Remove icon. */
     public static final ImageIcon REMOVE_ICON =
@@ -1225,8 +1229,10 @@ public class ClusterBrowser extends Browser {
             final DefaultMutableTreeNode classNode =
                     new DefaultMutableTreeNode(raci);
             for (final ResourceAgent ra : crmXML.getServices(cl)) {
-                resource = new DefaultMutableTreeNode(
-                                    new AvailableServiceInfo(ra, this));
+                final AvailableServiceInfo asi =
+                                            new AvailableServiceInfo(ra, this);
+                availableServiceMap.put(ra, asi);
+                resource = new DefaultMutableTreeNode(asi);
                 setNode(resource);
                 classNode.add(resource);
             }
@@ -2239,5 +2245,20 @@ public class ClusterBrowser extends Browser {
      */
     public final ResourceAgentClassInfo getClassInfoMap(final String cl) {
         return classInfoMap.get(cl);
+    }
+
+    /**
+     * Returns map to AvailableServiceInfo.
+     */
+    public final AvailableServiceInfo getAvailableServiceInfoMap(
+                                                     final ResourceAgent ra) {
+        return availableServiceMap.get(ra);
+    }
+
+    /**
+     * Returns available services info object.
+     */
+    public final AvailableServicesInfo getAvailableServicesInfo() {
+        return (AvailableServicesInfo) availableServicesNode.getUserObject();
     }
 }

@@ -22,10 +22,25 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
+import drbd.gui.ClusterBrowser;
 import drbd.data.CRMXML;
 import drbd.data.ResourceAgent;
 import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
+import drbd.utilities.MyMenuItem;
+import drbd.utilities.UpdatableItem;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.BorderLayout;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This class holds the information about heartbeat service from the ocfs,
@@ -38,6 +53,9 @@ public class AvailableServiceInfo extends HbCategoryInfo {
     private static final ImageIcon AVAIL_SERVICES_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.ServiceStoppedIcon"));
+    /** Back to overview icon. */
+    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
+                                            Tools.getDefault("BackIcon"));
 
     /**
      * Prepares a new <code>AvailableServiceInfo</code> object.
@@ -73,7 +91,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
      * Returns the info about the service.
      */
     public final String getInfo() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuffer s = new StringBuffer(80);
         final CRMXML crmXML = getBrowser().getCRMXML();
         s.append("<h2>");
         s.append(getName());
@@ -83,8 +101,15 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         s.append(crmXML.getShortDesc(resourceAgent));
         s.append("</h3>");
         s.append(crmXML.getLongDesc(resourceAgent));
+        s.append("<br><br>");
         final String[] params = crmXML.getParameters(resourceAgent);
         for (final String param : params) {
+            if (crmXML.isMetaAttr(resourceAgent, param)
+                || "ra".equals(param)
+                || "crmid".equals(param)
+                || "guiid".equals(param)) {
+                continue;
+            }
             s.append("<b>");
             s.append(param);
             s.append("</b><br>");
@@ -92,5 +117,78 @@ public class AvailableServiceInfo extends HbCategoryInfo {
             s.append("<br>");
         }
         return s.toString();
+    }
+
+    /**
+     * Returns back button.
+     */
+    protected final JComponent getBackButton() {
+        final JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        buttonPanel.setMinimumSize(new Dimension(0, 50));
+        buttonPanel.setPreferredSize(new Dimension(0, 50));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+        final MyButton overviewButton = new MyButton("RAs Overview",
+                                                     BACK_ICON);
+        overviewButton.setPreferredSize(new Dimension(180, 50));
+        overviewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final ResourceAgentClassInfo raci =
+                        getBrowser().getClassInfoMap(
+                                            resourceAgent.getResourceClass());
+                if (raci != null) {
+                    raci.selectMyself();
+                }
+            }
+        });
+        buttonPanel.add(overviewButton, BorderLayout.WEST);
+
+        /* Actions */
+        final JMenuBar mb = new JMenuBar();
+        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        JMenu serviceCombo;
+        serviceCombo = getActionsMenu();
+        updateMenus(null);
+        mb.add(serviceCombo);
+        buttonPanel.add(mb, BorderLayout.EAST);
+        return buttonPanel;
+    }
+
+    /**
+     * Returns list of menu items.
+     */
+    public final List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final MyMenuItem addServiceMenu = new MyMenuItem(
+                            "Add Service To Cluster",
+                            null,
+                            null) {
+
+            private static final long serialVersionUID = 1L;
+
+            public boolean enablePredicate() {
+                return !getBrowser().clStatusFailed();
+            }
+
+            public void action() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getPopup().setVisible(false);
+                    }
+                });
+                final ServicesInfo si =
+                            getBrowser().getHeartbeatGraph().getServicesInfo();
+                final boolean testOnly = false;
+                si.addServicePanel(resourceAgent,
+                                   null, /* pos */
+                                   true,
+                                   null,
+                                   null,
+                                   testOnly);
+            }
+        };
+        registerMenuItem(addServiceMenu);
+        items.add(addServiceMenu);
+        return items;
     }
 }

@@ -49,6 +49,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
+import javax.swing.BoxLayout;
 
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -330,6 +331,13 @@ public class Info implements Comparable {
     }
 
     /**
+     * Returns back button.
+     */
+    protected JComponent getBackButton() {
+        return null;
+    }
+
+    /**
      * Returns info panel for this resource.
      */
     public JComponent getInfoPanel() {
@@ -354,10 +362,16 @@ public class Info implements Comparable {
             resourceInfoArea.setBackground(Browser.PANEL_BACKGROUND);
             updateInfo(resourceInfoArea);
         }
-
-        return new JScrollPane(resourceInfoArea);
+        final JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(Browser.PANEL_BACKGROUND);
+        final JComponent backButton = getBackButton();
+        if (backButton != null) {
+            infoPanel.add(backButton);
+        }
+        infoPanel.add(new JScrollPane(resourceInfoArea));
+        return infoPanel;
     }
-
 
     /**
      * TODO: clears info panel cache most of the time.

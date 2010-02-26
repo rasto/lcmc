@@ -71,6 +71,10 @@ public class CategoryInfo extends Info {
             infoPanel = new JPanel();
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             infoPanel.setBackground(Browser.PANEL_BACKGROUND);
+            final JComponent backButton = getBackButton();
+            if (backButton != null) {
+                infoPanel.add(backButton);
+            }
             final JScrollPane sp = new JScrollPane(table);
             sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);
             sp.setBackground(Browser.PANEL_BACKGROUND);
