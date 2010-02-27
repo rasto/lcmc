@@ -1628,7 +1628,7 @@ public class TextResource extends
          "Is Managed By Cluster"},
 
         {"CRMXML.IsManaged.LongDesc",
-         "Select whether the service should be managed by Cluster."},
+         "Select whether the service should be managed by cluster."},
 
         {"CRMXML.Priority.ShortDesc",
          "Priority"},
@@ -1637,25 +1637,25 @@ public class TextResource extends
          "Priority to stay active."},
 
         {"CRMXML.ResourceStickiness.ShortDesc",
-         "Resource-Stickiness"},
+         "Resource Stickiness"},
 
         {"CRMXML.ResourceStickiness.LongDesc",
-         "Score how much the resource should stay where it is."},
+         "Score, how much the resource should stay where it is."},
 
         {"CRMXML.MigrationThreshold.ShortDesc",
-         "Migration-Threshold"},
+         "Migration Threshold"},
 
         {"CRMXML.MigrationThreshold.LongDesc",
          "Migrate after migration-threshold failures."},
 
         {"CRMXML.FailureTimeout.ShortDesc",
-         "Failure-Timeout"},
+         "Failure Timeout"},
 
         {"CRMXML.FailureTimeout.LongDesc",
-         "How many seconds to ignore failure."},
+         "How many seconds to wait to ignore failure."},
 
         {"CRMXML.MultipleActive.ShortDesc",
-         "Multiple-Active"},
+         "Multiple Active"},
 
         {"CRMXML.MultipleActive.LongDesc",
          "What to do if resource is wrongfully active on more than one node."},

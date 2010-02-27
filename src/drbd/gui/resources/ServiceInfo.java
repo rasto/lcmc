@@ -506,11 +506,13 @@ public class ServiceInfo extends EditableInfo {
                 if (infoPanelOk) {
                     final GuiComboBox cb = paramComboBoxGet(param, null);
                     final boolean haveChanged =
-                           !Tools.areEqual(value, oldValue)
-                           || !Tools.areEqual(value, getComboBoxValue(param));
+                       !Tools.areEqual(value, oldValue)
+                       || !Tools.areEqual(defaultValue,
+                                          getResource().getDefaultValue(param));
                     if (haveChanged
                         || (metaAttrInfoRef != null && isMetaAttr(param))) {
                         getResource().setValue(param, value);
+                        getResource().setDefaultValue(param, defaultValue);
                         if (cb != null) {
                             cb.setValue(value);
                             if (haveChanged) {
