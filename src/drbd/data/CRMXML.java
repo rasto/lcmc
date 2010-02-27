@@ -1033,18 +1033,22 @@ public class CRMXML extends XML {
                             Tools.getString("CRMXML.Priority.LongDesc"));
         ra.setParamDefault(priorityParam, "0");
 
+        final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
         /* resource-stickiness */
-        final String rsParam = "resource-stickiness";
-        ra.addParameter(rsParam);
-        ra.setParamPossibleChoices(rsParam, getIntegerValues());
-        ra.setParamIsMetaAttr(rsParam, true);
-        ra.setParamRequired(rsParam, false);
-        ra.setParamShortDesc(
-                      rsParam,
-                      Tools.getString("CRMXML.ResourceStickiness.ShortDesc"));
-        ra.setParamLongDesc(rsParam,
-                      Tools.getString("CRMXML.ResourceStickiness.LongDesc"));
-        ra.setParamDefault(rsParam, "0");
+        if (pmV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
+            final String rsParam = "resource-stickiness";
+            ra.addParameter(rsParam);
+            ra.setParamPossibleChoices(rsParam, getIntegerValues());
+            ra.setParamIsMetaAttr(rsParam, true);
+            ra.setParamRequired(rsParam, false);
+            ra.setParamShortDesc(
+                          rsParam,
+                          Tools.getString("CRMXML.ResourceStickiness.ShortDesc"));
+            ra.setParamLongDesc(rsParam,
+                          Tools.getString("CRMXML.ResourceStickiness.LongDesc"));
+            ra.setParamDefault(rsParam, "0");
+        }
         /* migration-threshold */
         final String mtParam = "migration-threshold";
         ra.addParameter(mtParam);
@@ -1059,19 +1063,20 @@ public class CRMXML extends XML {
                       Tools.getString("CRMXML.MigrationThreshold.LongDesc"));
         ra.setParamDefault(mtParam, "disabled");
         /* failure-timeout */
-        final String ftParam = "failure-timeout";
-        ra.addParameter(ftParam);
-        ra.setParamPossibleChoices(ftParam,
-                                   new String[]{"disabled", "0", "5", "60"});
-        ra.setParamIsMetaAttr(ftParam, true);
-        ra.setParamRequired(ftParam, false);
-        ra.setParamShortDesc(
-                      ftParam,
-                      Tools.getString("CRMXML.FailureTimeout.ShortDesc"));
-        ra.setParamLongDesc(ftParam,
-                      Tools.getString("CRMXML.FailureTimeout.LongDesc"));
-        ra.setParamDefault(ftParam, "disabled");
-
+        if (pmV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
+            final String ftParam = "failure-timeout";
+            ra.addParameter(ftParam);
+            ra.setParamPossibleChoices(ftParam,
+                                       new String[]{"disabled", "0", "5", "60"});
+            ra.setParamIsMetaAttr(ftParam, true);
+            ra.setParamRequired(ftParam, false);
+            ra.setParamShortDesc(
+                          ftParam,
+                          Tools.getString("CRMXML.FailureTimeout.ShortDesc"));
+            ra.setParamLongDesc(ftParam,
+                          Tools.getString("CRMXML.FailureTimeout.LongDesc"));
+            ra.setParamDefault(ftParam, "disabled");
+        }
         /* multiple-active */
         final String maParam = "multiple-active";
         ra.addParameter(maParam);
