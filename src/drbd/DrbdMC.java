@@ -105,8 +105,15 @@ public final class DrbdMC extends JPanel {
         public final void windowClosing(final WindowEvent event) {
             final Thread t = new Thread(new Runnable() {
                 public void run() {
-                    Tools.sleep(10000);
-                    System.out.println("force exit");
+                    // TODO: don't try to reconnect when exiting
+                    System.out.println("saving...");
+                    for (int i = 0; i < 10; i++) {
+                        System.out.println(".");
+                        System.out.flush();
+                        Tools.sleep(2000);
+                    }
+                    System.out.println();
+                    System.out.println("force exit.");
                     System.exit(5);
                 }
             });
