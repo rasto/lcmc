@@ -57,20 +57,20 @@ public class DistResource_fedora_12 extends
          + " && /sbin/chkconfig --level 016 corosync off)"},
 
         /* Corosync/Openais/Pacemaker clusterlabs */
-        //{"PmInst.install.text.1",
-        // "clusterlabs repo: 1.0.x/1.2.x" },
+        {"PmInst.install.text.2",
+         "clusterlabs repo: 1.0.x/1.2.x" },
 
-        //{"PmInst.install.1",
-        // "wget -N -nd -P /etc/yum.repos.d/"
-        // + " http://www.clusterlabs.org/rpm/fedora-12/clusterlabs.repo && "
-        // + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-        // + " -x heartbeat-2.1* install pacemaker corosync"
-        // + " && if [ -e /etc/corosync/corosync.conf ]; then"
-        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-        // + " fi)"
-        // + " && (/sbin/chkconfig --del heartbeat;"
-        // + " /sbin/chkconfig --level 2345 corosync on"
-        // + " && /sbin/chkconfig --level 016 corosync off)"},
+        {"PmInst.install.2",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/fedora-12/clusterlabs.repo && "
+         + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"},
 
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.1",
@@ -79,18 +79,18 @@ public class DistResource_fedora_12 extends
         {"HbPmInst.install.1",
          "yum -y install pacemaker heartbeat"},
 
-        ///* Heartbeat/Pacemaker clusterlabs*/
-        //{"HbPmInst.install.text.1",
-        // "clusterlabs repo: 1.0.x/3.0.x" },
+        /* Heartbeat/Pacemaker clusterlabs*/
+        {"HbPmInst.install.text.2",
+         "clusterlabs repo: 1.0.x/3.0.x" },
 
-        //{"HbPmInst.install.1",
-        // "wget -N -nd -P /etc/yum.repos.d/"
-        // + " http://www.clusterlabs.org/rpm/fedora-12/clusterlabs.repo && "
-        // + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-        // + " -x heartbeat-2.1* install pacemaker heartbeat"
-        // + " && /sbin/chkconfig --del corosync;"
-        // + " /sbin/chkconfig --level 2345 heartbeat on"
-        // + " && /sbin/chkconfig --level 016 heartbeat off"},
+        {"HbPmInst.install.2",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/fedora-12/clusterlabs.repo && "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker heartbeat"
+         + " && /sbin/chkconfig --del corosync;"
+         + " /sbin/chkconfig --level 2345 heartbeat on"
+         + " && /sbin/chkconfig --level 016 heartbeat off"},
 
 
         /* Drbd install method 2 */

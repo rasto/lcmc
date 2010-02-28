@@ -48,10 +48,10 @@ public class DistResource_fedora extends
         {"DrbdInst.install",
          "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
-        {"HbPmInst.install.text.3",
+        {"HbPmInst.install.text.2",
          "the fedora way: HB 2.1.x (obsolete)" },
 
-        {"HbPmInst.install.3",
+        {"HbPmInst.install.2",
          "/usr/bin/yum -y install heartbeat"},
         /* at least fedora 10 and fedora11 in version 2.1.3 and 2.14 has different
            ocf path. */

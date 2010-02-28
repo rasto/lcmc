@@ -43,38 +43,38 @@ public class DistResource_suse_SLES10 extends
         {"distributiondir", "sles10"},
         {"Support", "suse-SLES10"},
 
-        /* Corosync/Openais/Pacemaker Opensuse*/
-        {"PmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+        ///* Corosync/Openais/Pacemaker Opensuse*/
+        //{"PmInst.install.text.1",
+        // "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
-        {"PmInst.install.1",
-         "rug service-delete ha-clustering; "
-         + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>'"
-         + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
-         + " && rug key-add 'server\\x3aha-clustering OBS Project <server\\x3aha-clustering@build.opensuse.org>'"
-         + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
-         + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
-         + " && /usr/bin/zypper -n --no-gpg-checks install pacemaker"
-         + " && (/sbin/chkconfig --add corosync"
-         + " || /sbin/chkconfig --add openais)"
-         + " && if [ -e /etc/ais/openais.conf ];then"
-         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
-         + " && if [ -e /etc/corosync/corosync.conf ];then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
+        //{"PmInst.install.1",
+        // "rug service-delete ha-clustering; "
+        // + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>'"
+        // + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
+        // + " && rug key-add 'server\\x3aha-clustering OBS Project <server\\x3aha-clustering@build.opensuse.org>'"
+        // + " 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
+        // + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
+        // + " && /usr/bin/zypper -n --no-gpg-checks install pacemaker"
+        // + " && (/sbin/chkconfig --add corosync"
+        // + " || /sbin/chkconfig --add openais)"
+        // + " && if [ -e /etc/ais/openais.conf ];then"
+        // + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+        // + " && if [ -e /etc/corosync/corosync.conf ];then"
+        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
 
-        /* Heartbeat/Pacemaker Opensuse*/
-        {"HbPmInst.install.text.1",
-         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
-        {"HbPmInst.install.1",
-         "rug service-delete ha-clustering; "
-         + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>' 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
-         + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
-         + " && /usr/bin/zypper -n --no-gpg-checks install heartbeat pacemaker"
-         + " && /sbin/chkconfig --add heartbeat"},
+        ///* Heartbeat/Pacemaker Opensuse*/
+        //{"HbPmInst.install.text.1",
+        // "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+        //{"HbPmInst.install.1",
+        // "rug service-delete ha-clustering; "
+        // + "rug key-add 'server:ha-clustering OBS Project <server:ha-clustering@build.opensuse.org>' 083814151D362AEB E4A6B602AB088B3173853924083814151D362AEB"
+        // + " && rug service-add -t zypp http://download.opensuse.org/repositories/server:/ha-clustering/SLES_10 ha-clustering"
+        // + " && /usr/bin/zypper -n --no-gpg-checks install heartbeat pacemaker"
+        // + " && /sbin/chkconfig --add heartbeat"},
 
         /* Heartbeat */
-        {"HbPmInst.install.text.2", "the suse way: 2.1.x (obsolete)"},
-        {"HbPmInst.install.2",
+        {"HbPmInst.install.text.1", "the suse way: 2.1.x (obsolete)"},
+        {"HbPmInst.install.1",
          "/usr/bin/zypper -n --no-gpg-checks install heartbeat &&"
          + "/sbin/chkconfig --add heartbeat"},
 

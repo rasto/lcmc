@@ -64,20 +64,20 @@ public class DistResource_redhat_5 extends
          + " /sbin/chkconfig --level 2345 corosync on"
          + " && /sbin/chkconfig --level 016 corosync off)"},
 
-        /* Corosync/Openais/Pacemaker Opensuse */
-        {"PmInst.install.text.2",
-         "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
+        ///* Corosync/Openais/Pacemaker Opensuse */
+        //{"PmInst.install.text.2",
+        // "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
 
-        {"PmInst.install.2",
-         "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
-         + "yum -y install OpenIPMI-libs lm_sensors "
-         + "&& yum -y -x openais-0.80.6 install openais pacemaker resource-agents"
-         + " && (/sbin/chkconfig --add corosync"
-         + " || /sbin/chkconfig --add openais)"
-         + " && if [ -e /etc/ais/openais.conf ];then"
-         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
-         + " && if [ -e /etc/corosync/corosync.conf ];then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+        //{"PmInst.install.2",
+        // "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
+        // + "yum -y install OpenIPMI-libs lm_sensors "
+        // + "&& yum -y -x openais-0.80.6 install openais pacemaker resource-agents"
+        // + " && (/sbin/chkconfig --add corosync"
+        // + " || /sbin/chkconfig --add openais)"
+        // + " && if [ -e /etc/ais/openais.conf ];then"
+        // + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+        // + " && if [ -e /etc/corosync/corosync.conf ];then"
+        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         /* Heartbeat/Pacemaker clusterlabs */
         {"HbPmInst.install.text.1",
@@ -92,20 +92,20 @@ public class DistResource_redhat_5 extends
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
          + " && /sbin/chkconfig --add heartbeat"},
 
-        /* Heartbeat/Pacemaker Opensuse */
-        {"HbPmInst.install.text.2",
-         "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+        ///* Heartbeat/Pacemaker Opensuse */
+        //{"HbPmInst.install.text.2",
+        // "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
+
+        //{"HbPmInst.install.2",
+        // "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
+        // + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+        // + " -x heartbeat-2.1* "
+        // + " install heartbeat pacemaker resource-agents "
+        // + "&& /sbin/chkconfig --add heartbeat"},
+
+        {"HbPmInst.install.text.2", "the centos way: HB 2.1.3 (obsolete)" },
 
         {"HbPmInst.install.2",
-         "wget -N -nd -P /etc/yum.repos.d/ http://download.opensuse.org/repositories/server:/ha-clustering/CentOS_5/server:ha-clustering.repo && "
-         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* "
-         + " install heartbeat pacemaker resource-agents "
-         + "&& /sbin/chkconfig --add heartbeat"},
-
-        {"HbPmInst.install.text.3", "the centos way: HB 2.1.3 (obsolete)" },
-
-        {"HbPmInst.install.3",
          "/usr/sbin/useradd hacluster 2>/dev/null; "
          + "/usr/bin/yum -y install heartbeat "
          + "&& /sbin/chkconfig --add heartbeat"},
