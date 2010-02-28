@@ -105,6 +105,13 @@ public class Browser {
     }
 
     /**
+     * Returns the tree object.
+     */
+    public final JTree getTree() {
+        return tree;
+    }
+
+    /**
      * Repaints the menu tree.
      */
     public final void repaintTree() {

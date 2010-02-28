@@ -41,6 +41,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.Box;
 import javax.swing.JScrollPane;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -755,6 +756,11 @@ public class HbConnectionInfo extends EditableInfo {
      */
     public void selectMyself() {
         super.selectMyself();
-        getBrowser().setRightComponentInView(this);
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+                        getBrowser().getTree().getLastSelectedPathComponent();
+        final Info prev = (Info) node.getUserObject();
+        // TODO: do this differently, don't need to select it, only reload
+        getBrowser().setRightComponentInView(this); /* just to reload */
+        getBrowser().setRightComponentInView(prev); /* back were we were */
     }
 }

@@ -717,6 +717,7 @@ public class DrbdInfo extends EditableInfo {
                     newDrbdXML.update(configString2);
                     getBrowser().setDrbdXML(newDrbdXML);
                     getBrowser().resetFilesystems();
+                    driF.selectMyself();
                 }
             });
             thread.start();

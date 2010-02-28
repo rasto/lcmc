@@ -646,6 +646,7 @@ public class SSH {
             final StringBuffer ans = new StringBuffer("");
             for (int i = 0; i < commands.length; i++) {
                 try {
+                    // TODO: it may hang here if we lost connection
                     sess = conn.openSession();
                 } catch (java.io.IOException e) {
                     try {
