@@ -187,6 +187,8 @@ public class ServiceInfo extends EditableInfo {
     private static final String CLONE_TYPE_STRING = "Clone";
     /** Primitive type string. */
     private static final String PRIMITIVE_TYPE_STRING = "Primitive";
+    /** Gui ID parameter. */
+    public static final String GUI_ID = "guiid";
 
 
     /**
@@ -331,7 +333,7 @@ public class ServiceInfo extends EditableInfo {
                                            cloneInfo.getParametersFromXML())) {
             changed = true;
         }
-        final String id = getComboBoxValue("guiid");
+        final String id = getComboBoxValue(GUI_ID);
         final String heartbeatId = getService().getHeartbeatId();
         if (ClusterBrowser.PM_GROUP_NAME.equals(getName())) {
             if (heartbeatId == null) {
@@ -479,7 +481,7 @@ public class ServiceInfo extends EditableInfo {
                 refCRMId = getService().getHeartbeatId();
             }
             resourceNode.put("crmid", getService().getHeartbeatId());
-            resourceNode.put("guiid", getService().getId());
+            resourceNode.put(GUI_ID, getService().getId());
             for (String param : params) {
                 String value;
                 if (isMetaAttr(param) && refCRMId != null) {
@@ -1178,7 +1180,7 @@ public class ServiceInfo extends EditableInfo {
 
         final String[] params = cloneInfo.getParametersFromXML();
         final Info savedMAIdRef = cloneInfo.getSavedMetaAttrInfoRef();
-        cloneInfo.getResource().setValue("guiid",
+        cloneInfo.getResource().setValue(GUI_ID,
                                          cloneInfo.getService().getId());
         cloneInfo.addParams(optionsPanel,
                             extraOptionsPanel,
@@ -1187,7 +1189,7 @@ public class ServiceInfo extends EditableInfo {
                             ClusterBrowser.SERVICE_FIELD_WIDTH,
                             cloneInfo.getSameAsFields(savedMAIdRef));
         if (!cloneInfo.getService().isNew()) {
-            cloneInfo.paramComboBoxGet("guiid", null).setEnabled(false);
+            cloneInfo.paramComboBoxGet(GUI_ID, null).setEnabled(false);
         }
         for (final String param : params) {
             if (cloneInfo.isMetaAttr(param)) {
@@ -2331,7 +2333,7 @@ public class ServiceInfo extends EditableInfo {
                            ClusterBrowser.SERVICE_LABEL_WIDTH,
                            ClusterBrowser.SERVICE_FIELD_WIDTH);
         }
-        getResource().setValue("guiid", getService().getId());
+        getResource().setValue(GUI_ID, getService().getId());
 
         /* get dependent resources and create combo boxes for ones, that
          * need parameters */
@@ -2358,7 +2360,7 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (!getService().isNew()) {
-            paramComboBoxGet("guiid", null).setEnabled(false);
+            paramComboBoxGet(GUI_ID, null).setEnabled(false);
         }
         if (!getResourceAgent().isGroup()
             && !getResourceAgent().isClone()) {
@@ -2604,9 +2606,9 @@ public class ServiceInfo extends EditableInfo {
                 public void run() {
                     applyButton.setEnabled(false);
                     applyButton.setToolTipText(null);
-                    paramComboBoxGet("guiid", null).setEnabled(false);
+                    paramComboBoxGet(GUI_ID, null).setEnabled(false);
                     if (clInfo != null) {
-                        clInfo.paramComboBoxGet("guiid", null).setEnabled(
+                        clInfo.paramComboBoxGet(GUI_ID, null).setEnabled(
                                                                         false);
                     }
                 }
@@ -2622,7 +2624,7 @@ public class ServiceInfo extends EditableInfo {
                 getBrowser().getHeartbeatIdList().remove(oldHeartbeatId);
             }
             if (getService().isNew()) {
-                final String id = getComboBoxValue("guiid");
+                final String id = getComboBoxValue(GUI_ID);
                 getService().setIdAndCrmId(id);
                 if (typeRadioGroup != null) {
                     typeRadioGroup.setEnabled(false);
@@ -2675,7 +2677,7 @@ public class ServiceInfo extends EditableInfo {
                     if (value.equals(clInfo.getParamDefault(param))) {
                             continue;
                     }
-                    if (!"".equals(value)) {
+                    if (!GUI_ID.equals(param) && !"".equals(value)) {
                         cloneMetaArgs.put(param, value);
                     }
                 }
@@ -2690,7 +2692,9 @@ public class ServiceInfo extends EditableInfo {
                     if (isMetaAttr(param)) {
                         pacemakerMetaArgs.put(param, value);
                     } else {
-                        pacemakerResArgs.put(param, value);
+                        if (!GUI_ID.equals(param)) {
+                            pacemakerResArgs.put(param, value);
+                        }
                     }
                 }
             }
@@ -2778,7 +2782,9 @@ public class ServiceInfo extends EditableInfo {
                     if (isMetaAttr(param)) {
                         pacemakerMetaArgs.put(param, value);
                     } else {
-                        pacemakerResArgs.put(param, value);
+                        if (!GUI_ID.equals(param)) {
+                            pacemakerResArgs.put(param, value);
+                        }
                     }
                 }
             }
@@ -2867,8 +2873,7 @@ public class ServiceInfo extends EditableInfo {
     public final String getHeartbeatId(final boolean testOnly) {
         String heartbeatId = getService().getHeartbeatId();
         if (testOnly && heartbeatId == null) {
-            heartbeatId = getService().getCrmIdFromId(
-                                                getComboBoxValue("guiid"));
+            heartbeatId = getService().getCrmIdFromId(getComboBoxValue(GUI_ID));
         }
         return heartbeatId;
     }

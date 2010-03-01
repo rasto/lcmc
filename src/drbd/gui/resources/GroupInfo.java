@@ -70,7 +70,7 @@ public class GroupInfo extends ServiceInfo {
                 public void run() {
                     applyButton.setEnabled(false);
                     applyButton.setToolTipText(null);
-                    final GuiComboBox idField = paramComboBoxGet("guiid", null);
+                    final GuiComboBox idField = paramComboBoxGet(GUI_ID, null);
                     idField.setEnabled(false);
                 }
             });
@@ -87,7 +87,7 @@ public class GroupInfo extends ServiceInfo {
                 getBrowser().getHeartbeatIdList().remove(oldHeartbeatId);
             }
             if (getService().isNew()) {
-                final String id = getComboBoxValue("guiid");
+                final String id = getComboBoxValue(GUI_ID);
                 getService().setIdAndCrmId(id);
                 if (getTypeRadioGroup() != null) {
                     getTypeRadioGroup().setEnabled(false);
@@ -791,7 +791,11 @@ public class GroupInfo extends ServiceInfo {
      */
     public final boolean checkResourceFieldsChanged(final String param,
                                                     final String[] params) {
-        final Enumeration e = getNode().children();
+        final DefaultMutableTreeNode n = getNode();
+        if (n == null) {
+            return false;
+        }
+        final Enumeration e = n.children();
         if (!e.hasMoreElements()) {
             return false;
         }

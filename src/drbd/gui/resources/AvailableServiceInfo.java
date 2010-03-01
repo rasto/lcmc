@@ -107,7 +107,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
             if (crmXML.isMetaAttr(resourceAgent, param)
                 || "ra".equals(param)
                 || "crmid".equals(param)
-                || "guiid".equals(param)) {
+                || ServiceInfo.GUI_ID.equals(param)) {
                 continue;
             }
             s.append("<b>");

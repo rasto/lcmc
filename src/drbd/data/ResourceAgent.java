@@ -23,6 +23,7 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.gui.GuiComboBox;
+import drbd.gui.resources.ServiceInfo;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -117,11 +118,11 @@ public class ResourceAgent {
         } else if (isGroup()) {
             section = "Group";
         }
-        addParameter("guiid");
-        sectionMap.put("guiid", section);
-        paramRequired.add("guiid");
-        paramShortDesc.put("guiid", "Name");
-        paramLongDesc.put("guiid", "Name");
+        addParameter(ServiceInfo.GUI_ID);
+        sectionMap.put(ServiceInfo.GUI_ID, section);
+        paramRequired.add(ServiceInfo.GUI_ID);
+        paramShortDesc.put(ServiceInfo.GUI_ID, "Name");
+        paramLongDesc.put(ServiceInfo.GUI_ID, "Name");
 
         addInfoParameter(section, "crmid", "new...", "Id", "Id");
         if (!isClone() && !isGroup()) {
