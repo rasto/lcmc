@@ -415,7 +415,7 @@ public class ServicesInfo extends EditableInfo {
                  * the heartbeat script of this service or the we look
                  * in the wrong places.
                  */
-                Tools.appWarning(hbId + ": could not find hb script");
+                Tools.appWarning(hbId + ": could not find resource agent");
                 continue;
             }
             /* continue of creating/updating of the

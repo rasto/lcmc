@@ -1361,9 +1361,16 @@ public class CRMXML extends XML {
     public final ResourceAgent getResourceAgent(final String serviceName,
                                                 final String provider,
                                                 final String raClass) {
-        return (ResourceAgent) serviceToResourceAgentMap.get(serviceName,
+        final ResourceAgent ra =
+               (ResourceAgent) serviceToResourceAgentMap.get(serviceName,
                                                              provider,
                                                              raClass);
+        if (ra == null) {
+            Tools.appWarning(raClass + ":" + provider + ":" + serviceName
+                             + " RA does not exist");
+
+        }
+        return ra;
     }
 
     /**
