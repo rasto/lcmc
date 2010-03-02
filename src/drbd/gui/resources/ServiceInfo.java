@@ -2275,10 +2275,8 @@ public class ServiceInfo extends EditableInfo {
         JMenu serviceCombo;
         if (cloneInfo == null) {
             serviceCombo = getActionsMenu();
-            updateMenus(null);
         } else {
             serviceCombo = cloneInfo.getActionsMenu();
-            cloneInfo.updateMenus(null);
         }
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);

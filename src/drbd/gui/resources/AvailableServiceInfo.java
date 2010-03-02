@@ -148,7 +148,6 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         JMenu serviceCombo;
         serviceCombo = getActionsMenu();
-        updateMenus(null);
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
         return buttonPanel;

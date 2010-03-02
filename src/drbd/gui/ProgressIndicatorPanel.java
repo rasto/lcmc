@@ -460,7 +460,6 @@ public class ProgressIndicatorPanel extends JComponent
                     oldHeight = getHeight();
                 }
 
-                repaint();
                 final long time = System.currentTimeMillis();
                 if (lRampUp) {
                     alphaLevel +=
@@ -522,6 +521,7 @@ public class ProgressIndicatorPanel extends JComponent
                     Thread.currentThread().interrupt();
                 }
                 start = time;
+                repaint();
                 Thread.yield();
             }
             started = false;

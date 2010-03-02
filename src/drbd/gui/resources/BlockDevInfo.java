@@ -838,7 +838,6 @@ public class BlockDevInfo extends EditableInfo {
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(HostBrowser.PANEL_BACKGROUND);
         final JMenu serviceCombo = getActionsMenu();
-        updateMenus(null);
         mb.add(serviceCombo);
 
         if (getBlockDevice().isDrbd()) {

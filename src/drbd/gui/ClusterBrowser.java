@@ -764,7 +764,7 @@ public class ClusterBrowser extends Browser {
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
-                         drbdGraph.scale();
+                        drbdGraph.scale();
                     }
                 });
             try {
@@ -832,8 +832,8 @@ public class ClusterBrowser extends Browser {
                 }
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                         drbdGraph.scale();
-                         drbdGraph.getDrbdInfo().selectMyself();
+                        drbdGraph.scale();
+                        drbdGraph.getDrbdInfo().selectMyself();
                     }
                 });
                 Tools.stopProgressIndicator(hostName,

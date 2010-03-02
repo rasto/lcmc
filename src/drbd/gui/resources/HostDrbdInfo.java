@@ -176,7 +176,6 @@ public class HostDrbdInfo extends Info {
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(HostBrowser.PANEL_BACKGROUND);
         final JMenu serviceCombo = getActionsMenu();
-        updateMenus(null);
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
         final JPanel p = new JPanel(new SpringLayout());

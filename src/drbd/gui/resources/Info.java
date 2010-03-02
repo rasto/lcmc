@@ -73,6 +73,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class holds info data for resources, services, hosts, clusters
@@ -102,6 +103,8 @@ public class Info implements Comparable {
     private JPopupMenu popup;
     /** menu of this object. */
     private JMenu menu;
+    /** Menu list lock. */
+    private final Mutex mMenuListLock = new Mutex();
     /** list of items in the menu for this object. */
     private final List<UpdatableItem> menuList = new ArrayList<UpdatableItem>();
     /** Whether the info object is being updated. */
@@ -515,6 +518,7 @@ public class Info implements Comparable {
                     popup.add((JMenuItem) u);
                 }
             }
+            updateMenus(null);
         }
         if (popup != null) {
             updateMenus(null);
@@ -607,29 +611,41 @@ public class Info implements Comparable {
                     super.paintComponent(g);
                 }
             };
-            menu.setIcon(Browser.ACTIONS_ICON);
-            menu.setBackground(Browser.STATUS_BACKGROUND);
-            final List<UpdatableItem> items = createPopup();
-            if (items != null) {
-                for (final UpdatableItem u : items) {
-                    menu.add((JMenuItem) u);
-                }
-            }
-            menu.addItemListener(
-                new ItemListener() {
-                    public void itemStateChanged(final ItemEvent e) {
-                        if (e.getStateChange() == ItemEvent.SELECTED) {
-                            final Thread thread = new Thread(new Runnable() {
-                                public void run() {
-                                    updateMenus(null);
-                                }
-                            });
-                            thread.start();
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    menu.setIcon(Browser.ACTIONS_ICON);
+                    menu.setBackground(Browser.STATUS_BACKGROUND);
+                    final List<UpdatableItem> items = createPopup();
+                    if (items != null) {
+                        for (final UpdatableItem u : items) {
+                            menu.add((JMenuItem) u);
                         }
                     }
-                });
+                    menu.addItemListener(
+                        new ItemListener() {
+                            public void itemStateChanged(final ItemEvent e) {
+                                if (e.getStateChange() == ItemEvent.SELECTED) {
+                                    final Thread t = new Thread(new Runnable() {
+                                        public void run() {
+                                            updateMenus(null);
+                                        }
+                                    });
+                                    t.start();
+                                }
+                            }
+                        });
+                    updateMenus(null);
+                }
+            });
+            thread.start();
+        } else {
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    updateMenus(null);
+                }
+            });
+            thread.start();
         }
-        updateMenus(null);
         return menu;
     }
 
@@ -644,7 +660,14 @@ public class Info implements Comparable {
      * Update menus with positions and calles their update methods.
      */
     public void updateMenus(final Point2D pos) {
-        for (UpdatableItem i : menuList) {
+        try {
+            mMenuListLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        List<UpdatableItem> copy = new ArrayList<UpdatableItem>(menuList);
+        mMenuListLock.release();
+        for (final UpdatableItem i : copy) {
             i.setPos(pos);
             i.update();
         }
@@ -654,7 +677,13 @@ public class Info implements Comparable {
      * Registers a menu item.
      */
     public final void registerMenuItem(final UpdatableItem m) {
+        try {
+            mMenuListLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         menuList.add(m);
+        mMenuListLock.release();
     }
 
     /**

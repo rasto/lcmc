@@ -226,7 +226,6 @@ public class AllHostsInfo extends Info {
             final JMenuBar mb = new JMenuBar();
             mb.setBackground(Browser.PANEL_BACKGROUND);
             final JMenu actionsMenu = getActionsMenu();
-            updateMenus(null);
             mb.add(actionsMenu);
             bPanel.add(mb, BorderLayout.EAST);
             infoPanel.add(bPanel);

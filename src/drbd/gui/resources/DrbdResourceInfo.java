@@ -798,7 +798,6 @@ public class DrbdResourceInfo extends EditableInfo
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         final JMenu serviceCombo = getActionsMenu();
-        updateMenus(null);
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
 

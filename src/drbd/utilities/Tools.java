@@ -43,6 +43,7 @@ import java.util.Properties;
 import java.util.Locale;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -121,6 +122,8 @@ public final class Tools {
     private static Set<String> appWarningHash = new HashSet<String>();
     /** Map with all errors, so that they don't appear more than once. */
     private static Set<String> appErrorHash = new HashSet<String>();
+    private static Map<String, ImageIcon> imageIcons =
+                                              new HashMap<String, ImageIcon>();
 
     /** Locales. */
     private static String localeLang = "";
@@ -196,13 +199,19 @@ public final class Tools {
      * return image icon object.
      */
     public static ImageIcon createImageIcon(final String imageFilename) {
+        final ImageIcon imageIcon = imageIcons.get(imageFilename);
+        if (imageIcon != null) {
+            return imageIcon;
+        }
         final java.net.URL imgURL =
                         Tools.class.getResource("/images/" + imageFilename);
         if (imgURL == null) {
             Tools.appWarning("Couldn't find image: " + imageFilename);
             return null;
         } else {
-            return new ImageIcon(imgURL);
+            final ImageIcon newIcon = new ImageIcon(imgURL);
+            imageIcons.put(imageFilename, newIcon);
+            return newIcon;
         }
     }
 
