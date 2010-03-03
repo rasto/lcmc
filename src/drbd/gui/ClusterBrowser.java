@@ -919,6 +919,15 @@ public class ClusterBrowser extends Browser {
                                                 ClusterHostsInfo.MAIN_TABLE);
                                }
                                return;
+                           } else {
+                               if (!host.isDrbdStatus()) {
+                                   Tools.debug(this, "drbd status update: "
+                                                 + host.getName());
+                                   host.setDrbdStatus(true);
+                                   drbdGraph.repaint();
+                                   clusterHostsInfo.updateTable(
+                                                ClusterHostsInfo.MAIN_TABLE);
+                               }
                            }
                            final String[] lines = output.split("\n");
                            final DrbdXML newDrbdXML =
