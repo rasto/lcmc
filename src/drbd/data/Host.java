@@ -1726,6 +1726,11 @@ public class Host implements Serializable {
         if (command.indexOf("@DRBDDIR@") > -1) {
             command = command.replaceAll("@DRBDDIR@", drbdDir);
         }
+        if (command.indexOf("@GUI-HELPER@") > -1) {
+            command = command.replaceAll("@GUI-HELPER@",
+                                         "/usr/local/bin/drbd-gui-helper-"
+                                         + Tools.getRelease());
+        }
         return command;
     }
 

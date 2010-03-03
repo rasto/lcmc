@@ -81,7 +81,7 @@ public class DistResource_redhat extends
          "/usr/bin/yum -y install kmod-drbd83 drbd83"},
 
         {"HbCheck.version",
-         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 

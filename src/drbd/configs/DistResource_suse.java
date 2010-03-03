@@ -92,7 +92,7 @@ public class DistResource_suse extends
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",
-         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 

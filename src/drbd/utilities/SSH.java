@@ -1486,7 +1486,7 @@ public class SSH {
     }
 
     /**
-     * Installs drbd-gui-helper on the remote host.
+     * Installs gui-helper on the remote host.
      */
     public final void installGuiHelper() {
         if (!Tools.getConfigData().getKeepHelper()) {
@@ -1494,7 +1494,7 @@ public class SSH {
             final String file = Tools.getFile(fileName);
             if (file != null) {
                 scp(file,
-                    "/usr/local/bin/drbd-gui-helper",
+                    "@GUI-HELPER@",
                     "0700",
                     false);
             }

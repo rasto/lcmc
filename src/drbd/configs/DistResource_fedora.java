@@ -68,8 +68,8 @@ public class DistResource_fedora extends
          + "done;"
          + "echo 'provider:heartbeat';"
          + "echo 'master:';"
-         + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
-         + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
+         + "@GUI-HELPER@ get-old-style-resources;"
+         + "@GUI-HELPER@ get-lsb-resources"},
 
         /* corosync/pacemaker from source */
         {"PmInst.install.text.9",
@@ -142,7 +142,7 @@ public class DistResource_fedora extends
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         {"HbCheck.version",
-         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/';"
          + "/bin/rpm -q -i corosync|perl -lne"

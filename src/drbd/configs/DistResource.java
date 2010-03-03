@@ -64,7 +64,7 @@ public class DistResource extends
          "echo|drbdadm help | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
 
         {"HbCheck.version",
-         "/usr/local/bin/drbd-gui-helper get-cluster-versions"},
+         "@GUI-HELPER@ get-cluster-versions"},
         /* DrbdAvailableVersions returns available versions of drbd in the download area. One
          * version per line.
          *
@@ -157,9 +157,9 @@ public class DistResource extends
 
         {"installGuiHelper", "installGuiHelper"}, // is treated specially by ssh class.
 
-        {"GetHostAllInfo", "/usr/local/bin/drbd-gui-helper all"},
-        {"GetHostHWInfo", "/usr/local/bin/drbd-gui-helper hw-info"},
-        {"GetNetInfo",  "/usr/local/bin/drbd-gui-helper get-net-info"},
+        {"GetHostAllInfo", "@GUI-HELPER@ all"},
+        {"GetHostHWInfo", "@GUI-HELPER@ hw-info"},
+        {"GetNetInfo",  "@GUI-HELPER@ get-net-info"},
 
         /* heartbeat crm commands */
         {"CRM.cleanupResource",    "crm_resource -C -r @ID@ -H @HOST@"},
@@ -216,15 +216,15 @@ public class DistResource extends
          + "done;"
          + "echo 'provider:heartbeat';"
          + "echo 'master:';"
-         + "/usr/local/bin/drbd-gui-helper get-stonith-devices;"
-         + "/usr/local/bin/drbd-gui-helper get-old-style-resources;"
-         + "/usr/local/bin/drbd-gui-helper get-lsb-resources"},
+         + "@GUI-HELPER@ get-stonith-devices;"
+         + "@GUI-HELPER@ get-old-style-resources;"
+         + "@GUI-HELPER@ get-lsb-resources"},
         /* vmxpath env is needed so that vmware meta-data does not hang */
         {"Heartbeat.getClusterMetadata",
-         "/usr/local/bin/drbd-gui-helper get-cluster-metadata"},
+         "@GUI-HELPER@ get-cluster-metadata"},
 
         {"Heartbeat.getClStatus",
-         "/usr/local/bin/drbd-gui-helper get-cluster-events"},
+         "@GUI-HELPER@ get-cluster-events"},
 
         {"Heartbeat.startHeartbeat", "/etc/init.d/heartbeat start"},
         {"Heartbeat.stopHeartbeat",  "/etc/init.d/heartbeat stop"},
@@ -258,11 +258,11 @@ public class DistResource extends
         {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
 
         {"Cluster.Init.getInstallationInfo",
-         "/usr/local/bin/drbd-gui-helper installation-info"},
+         "@GUI-HELPER@ installation-info"},
 
 
         /* drbd commands */
-        {"Drbd.getParameters", "/usr/local/bin/drbd-gui-helper get-drbd-xml"},
+        {"Drbd.getParameters", "@GUI-HELPER@ get-drbd-xml"},
         {"Drbd.getConfig",     "echo|/sbin/drbdadm dump-xml"},
 
         {"DRBD.attach",        "echo|/sbin/drbdadm @DRYRUN@ attach @RESOURCE@"},
@@ -290,7 +290,7 @@ public class DistResource extends
         {"DRBD.verify",        "echo|/sbin/drbdadm @DRYRUN@ verify @RESOURCE@"},
 
         {"DRBD.getDrbdStatus",
-         "/usr/local/bin/drbd-gui-helper get-drbd-events"},
+         "@GUI-HELPER@ get-drbd-events"},
 
         {"DRBD.adjust",
          "if [ -e /proc/drbd ]; then echo|/sbin/drbdadm @DRYRUN@ @DRYRUNCONF@ adjust @RESOURCE@; fi"},
@@ -329,6 +329,6 @@ public class DistResource extends
         {"MakeKernelReboot", "echo b > /proc/sysrq-trigger"},
 
         {"VMSXML.GetData",
-         "/usr/local/bin/drbd-gui-helper get-vm-info"},
+         "@GUI-HELPER@ get-vm-info"},
     };
 }

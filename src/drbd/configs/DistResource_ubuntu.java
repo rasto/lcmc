@@ -105,7 +105,7 @@ public class DistResource_ubuntu extends
          + " linux-headers-`uname -r` drbd8-utils"},
 
         {"HbCheck.version",
-         "/usr/local/bin/drbd-gui-helper get-cluster-versions;"
+         "@GUI-HELPER@ get-cluster-versions;"
          + "/usr/bin/dpkg-query -f='${Status} ais:${Version}\n' -W openais 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"
          + "|sed 's/-.*//'"},
 
