@@ -159,7 +159,8 @@ public class GroupInfo extends ServiceInfo {
      * @param newServiceInfo
      *      service info object of the new service
      */
-    public final void addGroupServicePanel(final ServiceInfo newServiceInfo) {
+    public final void addGroupServicePanel(final ServiceInfo newServiceInfo,
+                                           final boolean reloadNode) {
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
@@ -168,14 +169,17 @@ public class GroupInfo extends ServiceInfo {
                                 new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
         getNode().add(newServiceNode);
-        getBrowser().reload(getNode());
-        getBrowser().reload(newServiceNode);
+        if (reloadNode) {
+            getBrowser().reload(getNode());
+            getBrowser().reload(newServiceNode);
+        }
     }
 
     /**
      * Adds service to this group and creates new service info object.
      */
-    public final void addGroupServicePanel(final ResourceAgent newRA) {
+    public final void addGroupServicePanel(final ResourceAgent newRA,
+                                           final boolean reloadNode) {
         ServiceInfo newServiceInfo;
 
         final String name = newRA.getName();
@@ -195,7 +199,7 @@ public class GroupInfo extends ServiceInfo {
         } else {
             newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
         }
-        addGroupServicePanel(newServiceInfo);
+        addGroupServicePanel(newServiceInfo, reloadNode);
     }
 
     /**
@@ -371,7 +375,7 @@ public class GroupInfo extends ServiceInfo {
                                                 .linbitDrbdConfirmDialog()) {
                                     return;
                                 }
-                                addGroupServicePanel(ra);
+                                addGroupServicePanel(ra, true);
                                 repaint();
                             }
                         };

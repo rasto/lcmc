@@ -303,7 +303,7 @@ public class ServicesInfo extends EditableInfo {
                (CloneInfo) hg.getServicesInfo().addServicePanel(
                                         getBrowser().getCRMXML().getHbClone(),
                                         p,
-                                        true,
+                                        false,
                                         cloneId,
                                         null,
                                         testOnly);
@@ -342,7 +342,7 @@ public class ServicesInfo extends EditableInfo {
               (GroupInfo) hg.getServicesInfo().addServicePanel(
                                      getBrowser().getCRMXML().getHbGroup(),
                                      p,
-                                     true,
+                                     false,
                                      group,
                                      newCi,
                                      testOnly);
@@ -468,13 +468,13 @@ public class ServicesInfo extends EditableInfo {
                 getBrowser().addToHeartbeatIdList(newSi);
                 final Point2D p = null;
                 if (newGi != null) {
-                    newGi.addGroupServicePanel(newSi);
+                    newGi.addGroupServicePanel(newSi, false);
                 } else if (newCi != null) {
                     newCi.addCloneServicePanel(newSi);
                 } else {
                     hg.getServicesInfo().addServicePanel(newSi,
                                                          p,
-                                                         true,
+                                                         false,
                                                          false,
                                                          testOnly);
                 }
@@ -493,9 +493,9 @@ public class ServicesInfo extends EditableInfo {
             newSi.setParameters(setParametersHash.get(newSi));
             if (!testOnly) {
                 newSi.setUpdated(false);
-                hg.repaint();
             }
         }
+        hg.repaint();
     }
 
     /**

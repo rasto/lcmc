@@ -132,11 +132,11 @@ public class Browser {
 
     /** Reloads the node. */
     public final void reload(final DefaultMutableTreeNode node) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+        //SwingUtilities.invokeLater(new Runnable() {
+        //    public void run() {
                 treeModel.reload(node);
-            }
-        });
+        //    }
+        //});
     }
 
     /** Sets the node change for the node. */
