@@ -188,7 +188,7 @@ public class ServiceInfo extends EditableInfo {
     /** Primitive type string. */
     private static final String PRIMITIVE_TYPE_STRING = "Primitive";
     /** Gui ID parameter. */
-    public static final String GUI_ID = "guiid";
+    public static final String GUI_ID = "__guiid";
 
 
     /**
