@@ -745,11 +745,23 @@ public class ClusterBrowser extends Browser {
         final String hostName = host.getName();
         final CategoryInfo[] infosToUpdate =
                                         new CategoryInfo[]{clusterHostsInfo};
+        boolean firstTime = true;
         while (true) {
+            if (firstTime) {
+                Tools.startProgressIndicator(hostName,
+                                             ": updating server info...");
+            }
+
             host.setIsLoading();
             host.getHWInfo(infosToUpdate);
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
+            if (firstTime) {
+                Tools.stopProgressIndicator(hostName,
+                                             ": updating server info...");
+                Tools.startProgressIndicator(hostName,
+                                             ": updating VMs status...");
+            }
             final VMSXML newVMSXML = new VMSXML(host);
             if (newVMSXML.update()) {
                 try {
@@ -760,6 +772,10 @@ public class ClusterBrowser extends Browser {
                 vmsXML.put(host, newVMSXML);
                 mVMSLock.release();
                 updateVMS();
+            }
+            if (firstTime) {
+                Tools.stopProgressIndicator(hostName,
+                                             ": updating VMs status...");
             }
             SwingUtilities.invokeLater(
                 new Runnable() {
@@ -772,6 +788,7 @@ public class ClusterBrowser extends Browser {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
+            firstTime = false;
             if (!serverStatus) {
                 break;
             }
