@@ -59,6 +59,12 @@ public final class DrbdMC extends JPanel {
      * Create the GUI and show it.
      */
     private static void createAndShowGUI() {
+        try {
+            /* Metal */
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+        } catch (final Exception e) {
+            /* ignore it then */
+        }
         ToolTipManager.sharedInstance().setInitialDelay(
                                                     TOOLTIP_INITIAL_DELAY);
         ToolTipManager.sharedInstance().setDismissDelay(
