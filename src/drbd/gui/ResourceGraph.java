@@ -107,14 +107,14 @@ public abstract class ResourceGraph {
     /** Pluggable renderer. */
     private final PluggableRenderer pr = new MyPluggableRenderer();
     /** Vertex to resource info object map. */
-    private final Map<Vertex, Info>vertexToInfoMap =
+    private final Map<Vertex, Info> vertexToInfoMap =
                                         new LinkedHashMap<Vertex, Info>();
     /** Resource info object to vertex map. */
-    private final Map<Info, Vertex>infoToVertexMap =
+    private final Map<Info, Vertex> infoToVertexMap =
                                         new LinkedHashMap<Info, Vertex>();
     /** Edge to popup menu map. */
-    private final Map<Edge, JPopupMenu>edgeToPopupMap =
-                                        new LinkedHashMap<Edge, JPopupMenu>();
+    private final Map<Edge, JPopupMenu> edgeToPopupMap =
+                                         new LinkedHashMap<Edge, JPopupMenu>();
     /** Vertex to menus map. */
     private final Map<Vertex, List<MyMenuItem>> vertexToMenus =
                                 new LinkedHashMap<Vertex, List<MyMenuItem>>();
@@ -151,10 +151,10 @@ public abstract class ResourceGraph {
     /** This mutex is for protecting the animation thread. */
     private final Mutex mAnimationThreadLock = new Mutex();
     /** Map from vertex to its width. */
-    private final Map<Vertex, Integer>vertexWidth =
+    private final Map<Vertex, Integer> vertexWidth =
                                                new HashMap<Vertex, Integer>();
     /** Map from vertex to its height. */
-    private final Map<Vertex, Integer>vertexHeight =
+    private final Map<Vertex, Integer> vertexHeight =
                                                new HashMap<Vertex, Integer>();
     /** Whether something in the graph changed that requires vv to restart. */
     private volatile boolean changed = false;
@@ -391,7 +391,6 @@ public abstract class ResourceGraph {
 
         vertexLocations = new DefaultSettableVertexLocationFunction();
         layout = new StaticLayout(graph);
-        //final PluggableRenderer pr = new MyPluggableRenderer();
         pr.setEdgeStringer(new MyEdgeStringer());
         pr.setVertexShapeFunction(new MyVertexShapeSize());
         pr.setVertexPaintFunction(new MyPickableVertexPaintFunction(
@@ -966,7 +965,7 @@ public abstract class ResourceGraph {
                 if (vertexPopup != null) {
                     vertexPopup.show(vv, posX, posY);
                 }
-                oneVertexPressed(v); // select this vertex
+                oneVertexPressed(v); /* select this vertex */
             }
         }
     }
@@ -1059,6 +1058,7 @@ public abstract class ResourceGraph {
         public void graphReleased(final Vertex v, final MouseEvent me) {
             final PickedState ps = visualizationViewer.getPickedState();
             for (final Object vertex : ps.getPickedVertices()) {
+                // TODO: if vertex is removed a race condition can be here
                 final Point2D p = layout.getLocation((Vertex) vertex);
                 vertexReleased((Vertex) vertex, p);
             }
@@ -1412,7 +1412,6 @@ public abstract class ResourceGraph {
             final Point2D loc = visualizationViewer.layoutTransform(
                                                     layout.getLocation(v));
             final double x = loc.getX() - getVertexWidth(v) / 2;
-            //final double height = shape.getBounds().getHeight();
             final double height = getDefaultVertexHeight(v);
             final double y = loc.getY() - getVertexHeight(v) / 2;
             drawInside(v, g2d, x, y, shape);
@@ -1459,7 +1458,6 @@ public abstract class ResourceGraph {
                    rightCornerText.getColor(),
                    255);
             }
-            //shapeHeight = (int) height;
             if (subtextLayouts != null) {
                 int i = 0;
                 for (final TextLayout l : subtextLayouts) {
@@ -1491,9 +1489,7 @@ public abstract class ResourceGraph {
                                new Color(0, 0, 0),
                                alpha);
                     i++;
-                    //shapeHeight += 8;
                 }
-                //shapeHeight -= 8;
             }
 
             final Info info = getInfo(v);
@@ -1521,9 +1517,6 @@ public abstract class ResourceGraph {
                                  barPos,
                                  shapeHeight);
                 }
-                //g2d.fillRect((int) (x + shapeWidth - barPos - 7),
-                //             (int) y, 7,
-                //             shapeHeight);
             } else {
                 mAnimationListLock.release();
             }

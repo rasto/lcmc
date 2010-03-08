@@ -106,7 +106,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         for (final String param : params) {
             if (crmXML.isMetaAttr(resourceAgent, param)
                 || "ra".equals(param)
-                || "crmid".equals(param)
+                || ServiceInfo.PCMK_ID.equals(param)
                 || ServiceInfo.GUI_ID.equals(param)) {
                 continue;
             }
@@ -175,8 +175,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
                         getPopup().setVisible(false);
                     }
                 });
-                final ServicesInfo si =
-                            getBrowser().getHeartbeatGraph().getServicesInfo();
+                final ServicesInfo si = getBrowser().getServicesInfo();
                 final boolean testOnly = false;
                 si.addServicePanel(resourceAgent,
                                    null, /* pos */

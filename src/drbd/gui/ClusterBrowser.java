@@ -61,6 +61,7 @@ import drbd.gui.resources.VMSInfo;
 import drbd.gui.resources.AvailableServicesInfo;
 import drbd.gui.resources.ResourceAgentClassInfo;
 import drbd.gui.resources.ClusterHostsInfo;
+import drbd.gui.resources.RscDefaultsInfo;
 
 import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
@@ -192,7 +193,10 @@ public class ClusterBrowser extends Browser {
                            new HashMap<ResourceAgent, AvailableServiceInfo>();
     /** Cluster hosts info object. */
     private ClusterHostsInfo clusterHostsInfo;
-
+    /** Services info object. */
+    private ServicesInfo servicesInfo = null;
+    /** Rsc defaults info object. */
+    private RscDefaultsInfo rscDefaultsInfo = null;
     /** Remove icon. */
     public static final ImageIcon REMOVE_ICON =
         Tools.createImageIcon(
@@ -519,7 +523,6 @@ public class ClusterBrowser extends Browser {
      */
     public final void initClusterBrowser() {
         /* all hosts */
-        //allHostsNode = new DefaultMutableTreeNode(new AllHostsInfo(this));
         allHostsNode = new DefaultMutableTreeNode(
                                 new AllHostsInfo(
                                         Tools.getGUIData().getEmptyBrowser()));
@@ -571,8 +574,10 @@ public class ClusterBrowser extends Browser {
         setNode(commonBlockDevicesNode);
         /* heartbeatNode.add(commonBlockDevicesNode); */
 
+        /* resource defaults */
+        rscDefaultsInfo = new RscDefaultsInfo("rsc_defaults", this);
         /* services */
-        final ServicesInfo servicesInfo =
+        servicesInfo =
                 new ServicesInfo(Tools.getString("ClusterBrowser.Services"),
                                  this);
         servicesNode = new DefaultMutableTreeNode(servicesInfo);
@@ -1095,9 +1100,10 @@ public class ClusterBrowser extends Browser {
                                     Tools.debug(this,
                                                 "update cluster status: "
                                                 + host.getName());
-                                    final ServicesInfo ssi =
-                                              heartbeatGraph.getServicesInfo();
+                                    final ServicesInfo ssi = servicesInfo;
                                     ssi.setGlobalConfig();
+                                    rscDefaultsInfo.setParameters(
+                                      clusterStatus.getRscDefaultsValuePairs());
                                     ssi.setAllResources(testOnly);
                                     if (firstTime.getCount() == 1) {
                                         /* one more time so that id-refs work.*/
@@ -1291,7 +1297,6 @@ public class ClusterBrowser extends Browser {
             setNode(classNode);
             availableServicesNode.add(classNode);
         }
-        //reload(availableServicesNode);
     }
 
     /**
@@ -1411,9 +1416,6 @@ public class ClusterBrowser extends Browser {
                         continue;
                     }
                 }
-                //if (bdi.getBlockDevice().isDrbd()) {
-                //    continue;
-                //}
                 bdi.getBlockDevice().setValue(
                                       "DrbdNetInterfacePort",
                                       dxml.getVirtualInterfacePort(hostName,
@@ -1445,8 +1447,6 @@ public class ClusterBrowser extends Browser {
             }
             if (bd1 != null
                 && bd2 != null) {
-//                && !bd1.getBlockDevice().isDrbd()
-//                && !bd2.getBlockDevice().isDrbd()) {
                 drbdGraph.getDrbdInfo().addDrbdResource(resName,
                                                         drbdDev,
                                                         bd1,
@@ -2312,5 +2312,19 @@ public class ClusterBrowser extends Browser {
      */
     public final AvailableServicesInfo getAvailableServicesInfo() {
         return (AvailableServicesInfo) availableServicesNode.getUserObject();
+    }
+
+    /**
+     * Returns the services info object.
+     */
+    public final ServicesInfo getServicesInfo() {
+        return servicesInfo;
+    }
+
+    /**
+     * Returns rsc defaults info object.
+     */
+    public final RscDefaultsInfo getRscDefaultsInfo() {
+        return rscDefaultsInfo;
     }
 }

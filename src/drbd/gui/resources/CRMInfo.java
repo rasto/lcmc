@@ -56,7 +56,7 @@ public class CRMInfo extends HbCategoryInfo {
      */
     public final JComponent getInfoPanel() {
         return
-             getBrowser().getHeartbeatGraph().getServicesInfo().getInfoPanel();
+             getBrowser().getServicesInfo().getInfoPanel();
     }
 }
 

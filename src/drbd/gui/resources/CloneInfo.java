@@ -579,4 +579,21 @@ public class CloneInfo extends ServiceInfo {
             cs.updateMenus(pos);
         }
     }
+
+    /**
+     * Returns section to which the specified parameter belongs.
+     */
+    protected final String getSection(final String param) {
+        final ServiceInfo cs = containedService;
+        if (cs != null) {
+            String name;
+            if (getService().isMaster()) {
+                name = MASTER_SLAVE_TYPE_STRING;
+            } else {
+                name = CLONE_TYPE_STRING;
+            }
+            return name + " " + super.getSection(param);
+        }
+        return super.getSection(param);
+    }
 }

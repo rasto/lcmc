@@ -52,6 +52,7 @@ import java.awt.Component;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ArrayList;
@@ -85,7 +86,6 @@ public class ServicesInfo extends EditableInfo {
     public ServicesInfo(final String name, final Browser browser) {
         super(name, browser);
         setResource(new Resource(name));
-        ((ClusterBrowser) browser).getHeartbeatGraph().setServicesInfo(this);
     }
 
     /**
@@ -219,9 +219,9 @@ public class ServicesInfo extends EditableInfo {
             });
         }
 
-        /* update heartbeat */
+        /* update pacemaker */
         final Map<String, String> args = new HashMap<String, String>();
-        for (String param : params) {
+        for (final String param : params) {
             final String value = getComboBoxValue(param);
             if (value.equals(getParamDefault(param))) {
                 continue;
@@ -232,9 +232,23 @@ public class ServicesInfo extends EditableInfo {
             }
             args.put(param, value);
         }
-        CRM.setGlobalParameters(dcHost, args, testOnly);
+        final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
+        final String[] rdiParams = rdi.getParametersFromXML();
+        final Map<String, String> rdiMetaArgs =
+                                           new LinkedHashMap<String, String>();
+        for (final String param : rdiParams) {
+            final String value = rdi.getComboBoxValue(param);
+            if (value.equals(rdi.getParamDefault(param))) {
+                    continue;
+            }
+            if (!"".equals(value)) {
+                rdiMetaArgs.put(param, value);
+            }
+        }
+        CRM.setGlobalParameters(dcHost, args, rdiMetaArgs, testOnly);
         if (!testOnly) {
             storeComboBoxValues(params);
+            rdi.storeComboBoxValues(rdiParams);
             checkResourceFields(null, params);
         }
     }
@@ -300,7 +314,7 @@ public class ServicesInfo extends EditableInfo {
         if (newCi == null) {
             final Point2D p = null;
             newCi =
-               (CloneInfo) hg.getServicesInfo().addServicePanel(
+               (CloneInfo) addServicePanel(
                                         getBrowser().getCRMXML().getHbClone(),
                                         p,
                                         false,
@@ -339,7 +353,7 @@ public class ServicesInfo extends EditableInfo {
         if (newGi == null) {
             final Point2D p = null;
             newGi =
-              (GroupInfo) hg.getServicesInfo().addServicePanel(
+              (GroupInfo) addServicePanel(
                                      getBrowser().getCRMXML().getHbGroup(),
                                      p,
                                      false,
@@ -472,17 +486,12 @@ public class ServicesInfo extends EditableInfo {
                 } else if (newCi != null) {
                     newCi.addCloneServicePanel(newSi);
                 } else {
-                    hg.getServicesInfo().addServicePanel(newSi,
-                                                         p,
-                                                         false,
-                                                         false,
-                                                         testOnly);
+                    addServicePanel(newSi, p, false, false, testOnly);
                 }
             } else {
                 setParametersHash.put(newSi, resourceNode);
             }
             newSi.getService().setNew(false);
-            //newSi.getTypeRadioGroup().setEnabled(false);
             hg.setVertexIsPresent(newSi);
             if (newGi != null || newCi != null) {
                 groupServiceIsPresent.add(newSi);
@@ -638,6 +647,24 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /**
+     * Creates rsc_defaults panel.
+     */
+    private void addRscDefaultsPanel(final JPanel optionsPanel,
+                                     final JPanel extraOptionsPanel,
+                                     final int leftWidth,
+                                     final int rightWidth) {
+        final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
+        rdi.paramComboBoxClear();
+        final String[] params = rdi.getParametersFromXML();
+        rdi.addParams(optionsPanel,
+                      extraOptionsPanel,
+                      params,
+                      leftWidth,
+                      rightWidth,
+                      null);
+    }
+
+    /**
      * Returns editable info panel for global crm config.
      */
     public final JComponent getInfoPanel() {
@@ -717,6 +744,7 @@ public class ServicesInfo extends EditableInfo {
             }
         };
         initApplyButton(buttonCallback);
+        getBrowser().getRscDefaultsInfo().applyButton = applyButton;
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -750,6 +778,11 @@ public class ServicesInfo extends EditableInfo {
                   Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
                   Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"));
 
+        addRscDefaultsPanel(
+                      optionsPanel,
+                      extraOptionsPanel,
+                      Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
+                      Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"));
         applyButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -865,7 +898,7 @@ public class ServicesInfo extends EditableInfo {
             newServiceInfo.setNode(newServiceNode);
             getBrowser().getServicesNode().add(newServiceNode);
             if (interactive
-                && newServiceInfo.getResourceAgent().isMasterSlave()) {
+                && newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
                 /* only if it was added manually. */
                 newServiceInfo.changeType(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
             }
@@ -1178,4 +1211,44 @@ public class ServicesInfo extends EditableInfo {
         super.removeMyself(testOnly);
         Tools.unregisterExpertPanel(extraOptionsPanel);
     }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public final boolean checkResourceFieldsCorrect(final String param,
+                                                    final String[] params) {
+        final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
+        boolean ret = true;
+        if (!rdi.checkResourceFieldsCorrect(param,
+                                            rdi.getParametersFromXML())) {
+            ret = false;
+        }
+        if (!super.checkResourceFieldsCorrect(param, params)) {
+            ret = false;
+        }
+        return ret;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
+        boolean changed = false;
+        final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
+        if (super.checkResourceFieldsChanged(param, params)) {
+            changed = true;
+        }
+        if (rdi.checkResourceFieldsChanged(param,
+                                           rdi.getParametersFromXML())) {
+            changed = true;
+        }
+        return changed;
+    }
+
 }

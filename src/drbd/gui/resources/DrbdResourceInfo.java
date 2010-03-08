@@ -964,7 +964,7 @@ public class DrbdResourceInfo extends EditableInfo
         final Point2D p = null;
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         final DrbddiskInfo di =
-            (DrbddiskInfo) hg.getServicesInfo().addServicePanel(
+            (DrbddiskInfo) getBrowser().getServicesInfo().addServicePanel(
                                     getBrowser().getCRMXML().getHbDrbddisk(),
                                     p,
                                     true,
@@ -993,7 +993,7 @@ public class DrbdResourceInfo extends EditableInfo
         final Point2D p = null;
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         final LinbitDrbdInfo ldi =
-         (LinbitDrbdInfo) hg.getServicesInfo().addServicePanel(
+         (LinbitDrbdInfo) getBrowser().getServicesInfo().addServicePanel(
                                      getBrowser().getCRMXML().getHbLinbitDrbd(),
                                      p,
                                      true,

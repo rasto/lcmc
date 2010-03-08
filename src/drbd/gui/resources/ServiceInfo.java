@@ -184,11 +184,13 @@ public class ServiceInfo extends EditableInfo {
     private static final Subtext MIGRATED_SUBTEXT =
                                          new Subtext("(migrated)", Color.RED);
     /** Clone type string. */
-    private static final String CLONE_TYPE_STRING = "Clone";
+    protected static final String CLONE_TYPE_STRING = "Clone";
     /** Primitive type string. */
     private static final String PRIMITIVE_TYPE_STRING = "Primitive";
     /** Gui ID parameter. */
     public static final String GUI_ID = "__drbdmcid";
+    /** PCMK ID parameter. */
+    public static final String PCMK_ID = "__pckmkid";
 
 
     /**
@@ -480,7 +482,7 @@ public class ServiceInfo extends EditableInfo {
             if (refCRMId == null) {
                 refCRMId = getService().getHeartbeatId();
             }
-            resourceNode.put("crmid", getService().getHeartbeatId());
+            resourceNode.put(PCMK_ID, getService().getHeartbeatId());
             resourceNode.put(GUI_ID, getService().getId());
             for (String param : params) {
                 String value;
@@ -801,7 +803,7 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if ((CRMXML.INFINITY_STRING.equals(score) 
+            if ((CRMXML.INFINITY_STRING.equals(score)
                  || CRMXML.MINUS_INFINITY_STRING.equals(score))
                 && "eq".equals(op)) {
                 final List<Host> hosts = new ArrayList<Host>();
@@ -1285,10 +1287,13 @@ public class ServiceInfo extends EditableInfo {
             final String notOnText = getHostLocationLabel(hi.getName(), "ne");
             label.addMouseListener(new MouseListener() {
                 public final void mouseClicked(final MouseEvent e) {
+                    /* do nothing */
                 }
                 public final void mouseEntered(final MouseEvent e) {
+                    /* do nothing */
                 }
                 public final void mouseExited(final MouseEvent e) {
+                    /* do nothing */
                 }
                 public final void mousePressed(final MouseEvent e) {
                     final String currentText = label.getText();
@@ -1309,6 +1314,7 @@ public class ServiceInfo extends EditableInfo {
                     });
                 }
                 public final void mouseReleased(final MouseEvent e) {
+                    /* do nothing */
                 }
             });
             cb.setLabel(label);
@@ -1759,9 +1765,12 @@ public class ServiceInfo extends EditableInfo {
      * Returns default value for specified parameter.
      */
     protected String getParamDefault(final String param) {
-        if (isMetaAttr(param) && "resource-stickiness".equals(param)) {
-            return getBrowser().getHeartbeatGraph().getServicesInfo()
-                    .getResource().getValue("default-resource-stickiness");
+        if (isMetaAttr(param)) {
+            final String paramDefault = getBrowser().getRscDefaultsInfo()
+                                                 .getResource().getValue(param);
+            if (paramDefault != null) {
+                return paramDefault;
+            }
         }
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getParamDefault(resourceAgent, param);
@@ -2671,6 +2680,10 @@ public class ServiceInfo extends EditableInfo {
             /* TODO: there are more attributes. */
             if (clInfo != null) {
                 for (String param : cloneParams) {
+                    if (GUI_ID.equals(param)
+                        || PCMK_ID.equals(param)) {
+                        continue;
+                    }
                     final String value = clInfo.getComboBoxValue(param);
                     if (value.equals(clInfo.getParamDefault(param))) {
                             continue;
@@ -2681,6 +2694,10 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             for (final String param : params) {
+                if (GUI_ID.equals(param)
+                    || PCMK_ID.equals(param)) {
+                    continue;
+                }
                 final String value = getComboBoxValue(param);
                 if (value.equals(getParamDefault(param))) {
                     continue;
@@ -2690,9 +2707,7 @@ public class ServiceInfo extends EditableInfo {
                     if (isMetaAttr(param)) {
                         pacemakerMetaArgs.put(param, value);
                     } else {
-                        if (!GUI_ID.equals(param)) {
-                            pacemakerResArgs.put(param, value);
-                        }
+                        pacemakerResArgs.put(param, value);
                     }
                 }
             }
@@ -2759,6 +2774,10 @@ public class ServiceInfo extends EditableInfo {
         } else {
             if (clInfo != null) {
                 for (String param : cloneParams) {
+                    if (GUI_ID.equals(param)
+                        || PCMK_ID.equals(param)) {
+                        continue;
+                    }
                     final String value = clInfo.getComboBoxValue(param);
                     if (value.equals(clInfo.getParamDefault(param))) {
                             continue;
@@ -2771,6 +2790,10 @@ public class ServiceInfo extends EditableInfo {
             /* update parameters */
             final StringBuffer args = new StringBuffer("");
             for (String param : params) {
+                if (GUI_ID.equals(param)
+                    || PCMK_ID.equals(param)) {
+                    continue;
+                }
                 final String value = getComboBoxValue(param);
                 if (value.equals(getParamDefault(param))) {
                     continue;
@@ -2780,9 +2803,7 @@ public class ServiceInfo extends EditableInfo {
                     if (isMetaAttr(param)) {
                         pacemakerMetaArgs.put(param, value);
                     } else {
-                        if (!GUI_ID.equals(param)) {
-                            pacemakerResArgs.put(param, value);
-                        }
+                        pacemakerResArgs.put(param, value);
                     }
                 }
             }
@@ -3059,7 +3080,8 @@ public class ServiceInfo extends EditableInfo {
             }
             getBrowser().reloadAllComboBoxes(serviceInfo);
         }
-        if (reloadNode && serviceInfo.getResourceAgent().isMasterSlave()) {
+        if (reloadNode
+            && serviceInfo.getResourceAgent().isProbablyMasterSlave()) {
             serviceInfo.changeType(MASTER_SLAVE_TYPE_STRING);
         }
         getBrowser().getHeartbeatGraph().reloadServiceMenus();
@@ -4074,7 +4096,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
-                 getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
+               getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
                 public void action(final Host dcHost) {
                     migrateFromResource(dcHost, true); /* testOnly */
                 }

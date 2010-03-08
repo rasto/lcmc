@@ -84,7 +84,7 @@ public final class CRM {
             final String testCmd =
                           "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
                           + "if [ ! -e $file ]; then cibadmin -Ql > $file;fi;"
-                          + "CIB_file=$file ";
+                          + "export CIB_file=$file; ";
             Tools.execCommand(host, testCmd + command, null, false);
         } else {
             Tools.execCommandProgressIndicator(
@@ -720,9 +720,11 @@ public final class CRM {
     /**
      * Sets global heartbeat parameters.
      */
-    public static void setGlobalParameters(final Host host,
-                                           final Map<String, String> args,
-                                           final boolean testOnly) {
+    public static void setGlobalParameters(
+                                        final Host host,
+                                        final Map<String, String> args,
+                                        final Map<String, String> rdiMetaArgs,
+                                        final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append(
             "'<crm_config><cluster_property_set id=\"cib-bootstrap-options\">");
@@ -734,7 +736,7 @@ public final class CRM {
             /* 2.1.4 */
             xml.append("<attributes>");
         }
-        for (String arg : args.keySet()) {
+        for (final String arg : args.keySet()) {
             final String id = "cib-bootstrap-options-" + arg;
             xml.append("<nvpair id=\"");
             xml.append(id);
@@ -751,10 +753,35 @@ public final class CRM {
             xml.append("</attributes>");
         }
         xml.append("</cluster_property_set></crm_config>'");
-        final String command = getCibCommand("-R",
-                                             "crm_config",
-                                             xml.toString());
-        execCommand(host, command, true, testOnly);
+        final StringBuffer command = new StringBuffer(getCibCommand(
+                                                               "-R",
+                                                               "crm_config",
+                                                               xml.toString()));
+
+        if (rdiMetaArgs != null) {
+            final StringBuffer rscdXML = new StringBuffer(360);
+            final String rscDefaultsId = "rsc-options";
+            rscdXML.append("'<rsc_defaults><meta_attributes id=\"");
+            rscdXML.append(rscDefaultsId);
+            rscdXML.append("\">");
+            for (final String arg : rdiMetaArgs.keySet()) {
+                final String id = "rsc-options-" + arg;
+                rscdXML.append("<nvpair id=\"");
+                rscdXML.append(id);
+                rscdXML.append("\" name=\"");
+                rscdXML.append(arg);
+                rscdXML.append("\" value=\"");
+                rscdXML.append(rdiMetaArgs.get(arg));
+                rscdXML.append("\"/>");
+            }
+            rscdXML.append("</meta_attributes></rsc_defaults>'");
+
+            command.append(';');
+            command.append(getCibCommand("-R",
+                                         "rsc_defaults",
+                                         rscdXML.toString()));
+        }
+        execCommand(host, command.toString(), true, testOnly);
     }
 
     /**

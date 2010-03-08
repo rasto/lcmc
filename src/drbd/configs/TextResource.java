@@ -1606,6 +1606,15 @@ public class TextResource extends
         {"HostBrowser.MakeKernelReboot",
          "make instant reboot on "},
 
+        {"CRMXML.GlobalRequiredOptions",
+         "Global Required Options"},
+
+        {"CRMXML.GlobalOptionalOptions",
+         "Global Advanced Options"},
+
+        {"CRMXML.RscDefaultsSection",
+         "Global Resource Defaults"},
+
         {"CRMXML.RequiredOptions",
          "Required Options"},
 
@@ -1727,18 +1736,6 @@ public class TextResource extends
          "True"},
 
         {"Boolean.False",
-         "False"},
-
-        {"Heartbeat.2.1.3.Boolean.True",
-         "true"},
-
-        {"Heartbeat.2.1.3.Boolean.False",
-         "false"},
-
-        {"Heartbeat.Boolean.True",
-         "True"},
-
-        {"Heartbeat.Boolean.False",
          "False"},
 
         {"Heartbeat.getClusterMetadata",

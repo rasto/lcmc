@@ -25,7 +25,6 @@ import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.ServiceInfo;
-import drbd.gui.resources.ServicesInfo;
 import drbd.gui.resources.GroupInfo;
 import drbd.gui.resources.HbConnectionInfo;
 import drbd.gui.resources.HostInfo;
@@ -75,8 +74,6 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  *
  */
 public class HeartbeatGraph extends ResourceGraph {
-    /** Services info object. */
-    private ServicesInfo servicesInfo;
     /** List with edges that are order constraints. */
     private final List<Edge> edgeIsOrderList = new ArrayList<Edge>();
     /** List with edges that are colocation constraints. */
@@ -90,17 +87,17 @@ public class HeartbeatGraph extends ResourceGraph {
     private final Map<Vertex, JMenu> vertexToAddExistingServiceMap =
                                                 new HashMap<Vertex, JMenu>();
     /** Map from edge to the hb connection info of this constraint. */
-    private final Map<Edge, HbConnectionInfo>edgeToHbconnectionMap =
+    private final Map<Edge, HbConnectionInfo> edgeToHbconnectionMap =
                                 new LinkedHashMap<Edge, HbConnectionInfo>();
     /** Map from hb connection info to the edge. */
-    private final Map<HbConnectionInfo, Edge>hbconnectionToEdgeMap =
+    private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
                                 new LinkedHashMap<HbConnectionInfo, Edge>();
     /** Map from the vertex to the host. */
-    private final Map<Vertex, HostInfo>vertexToHostMap =
-                                        new LinkedHashMap<Vertex, HostInfo>();
+    private final Map<Vertex, HostInfo> vertexToHostMap =
+                                         new LinkedHashMap<Vertex, HostInfo>();
     /** Map from the host to the vertex. */
-    private final Map<HostInfo, Vertex>hostToVertexMap =
-                                        new LinkedHashMap<HostInfo, Vertex>();
+    private final Map<HostInfo, Vertex> hostToVertexMap =
+                                         new LinkedHashMap<HostInfo, Vertex>();
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
@@ -145,20 +142,6 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public HeartbeatGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);
-    }
-
-    /**
-     * Sets servicesInfo object.
-     */
-    public final void setServicesInfo(final ServicesInfo servicesInfo) {
-        this.servicesInfo = servicesInfo;
-    }
-
-    /**
-     * Gets services info object.
-     */
-    public final ServicesInfo getServicesInfo() {
-        return servicesInfo;
     }
 
     /**
@@ -677,7 +660,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * Handles right click on the background and creates popup menu.
      */
     protected final JPopupMenu handlePopupBackground(final Point2D pos) {
-        return servicesInfo.getPopup(pos);
+        return getClusterBrowser().getServicesInfo().getPopup(pos);
     }
 
     /**
@@ -721,7 +704,7 @@ public class HeartbeatGraph extends ResourceGraph {
      * selected node.
      */
     protected final void backgroundClicked() {
-        servicesInfo.selectMyself();
+        getClusterBrowser().getServicesInfo().selectMyself();
     }
 
     /**

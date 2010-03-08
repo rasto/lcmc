@@ -87,7 +87,7 @@ public class ResourceAgent {
      * parameter. */
     private final MultiKeyMap opToDefault = new MultiKeyMap();
     /** Whether the service is probably master/slave resource. */
-    private boolean masterSlave = false;
+    private boolean probablyMasterSlave = false;
     /** Sections for some parameters. */
     private final Map<String, String> sectionMap =
                                                 new HashMap<String, String>();
@@ -114,7 +114,7 @@ public class ResourceAgent {
         /* info fields */
         String section = "Resource";
         if (isClone()) {
-            section = "Clone Set";
+            section = "Set";
         } else if (isGroup()) {
             section = "Group";
         }
@@ -124,7 +124,7 @@ public class ResourceAgent {
         paramShortDesc.put(ServiceInfo.GUI_ID, "Name");
         paramLongDesc.put(ServiceInfo.GUI_ID, "Name");
 
-        addInfoParameter(section, "crmid", "new...", "Id", "Id");
+        addInfoParameter(section, ServiceInfo.PCMK_ID, "new...", "Id", "Id");
         if (!isClone() && !isGroup()) {
             addInfoParameter("Resource",
                              "ra",
@@ -545,15 +545,16 @@ public class ResourceAgent {
     /**
      * Sets if this service is master/slave service (with certain probability).
      */
-    public final void setMasterSlave(final boolean masterSlave) {
-        this.masterSlave = masterSlave;
+    public final void setProbablyMasterSlave(
+                                           final boolean probablyMasterSlave) {
+        this.probablyMasterSlave = probablyMasterSlave;
     }
 
     /**
      * Returns whether the service is probably master/slave resource.
      */
-    public final boolean isMasterSlave() {
-        return masterSlave;
+    public final boolean isProbablyMasterSlave() {
+        return probablyMasterSlave;
     }
 
     /**

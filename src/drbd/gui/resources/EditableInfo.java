@@ -45,7 +45,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.Color;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
@@ -588,10 +587,13 @@ public abstract class EditableInfo extends Info {
         Map<String, String> abbreviations = new HashMap<String, String>();
         if (isInteger(param)) {
             regexp = "^(-?(\\d*|" + CRMXML.INFINITY_STRING
+                     + "|" + CRMXML.DISABLED_STRING
                      + "))|@NOTHING_SELECTED@$";
             abbreviations = new HashMap<String, String>();
             abbreviations.put("i", CRMXML.INFINITY_STRING);
             abbreviations.put("I", CRMXML.INFINITY_STRING);
+            abbreviations.put("d", CRMXML.DISABLED_STRING);
+            abbreviations.put("D", CRMXML.DISABLED_STRING);
         }
         GuiComboBox.Type type = getFieldType(param);
         Unit[] units = null;
@@ -613,20 +615,6 @@ public abstract class EditableInfo extends Info {
                                                     abbreviations);
         paramComboBoxAdd(param, prefix, paramCb);
         paramCb.setEditable(true);
-        //addMouseOverListener(
-        //    paramCb,
-        //    new ButtonCallback() {
-        //        public final boolean isEnabled() {
-        //            return true;
-        //        }
-        //        public final void mouseOut() {
-        //            /* do nothing */
-        //        }
-        //        public final void mouseOver() {
-        //            System.out.println("set tool tip: " + param);
-        //            paramCb.setToolTipText(getToolTipText(param));
-        //        }
-        //    });
         return paramCb;
     }
 

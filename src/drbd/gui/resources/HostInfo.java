@@ -26,7 +26,6 @@ import drbd.EditHostDialog;
 import drbd.gui.Browser;
 import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
-import drbd.gui.HeartbeatGraph;
 import drbd.gui.SpringUtilities;
 import drbd.data.Host;
 import drbd.data.Cluster;
@@ -131,8 +130,6 @@ public class HostInfo extends Info {
 
     /**
      * Returns info panel.
-     *
-     * @return info panel
      */
     public final JComponent getInfoPanel() {
         Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
@@ -207,14 +204,11 @@ public class HostInfo extends Info {
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
         mainPanel.add(new JScrollPane(ta));
-        //mainPanel.add(panel);
         return mainPanel;
     }
 
     /**
      * Gets host.
-     *
-     * @return host of this info
      */
     public final Host getHost() {
         return host;
@@ -252,7 +246,7 @@ public class HostInfo extends Info {
      * Creates the popup for the host.
      */
     public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem>items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
         /* host wizard */
         final MyMenuItem hostWizardItem =
@@ -402,25 +396,14 @@ public class HostInfo extends Info {
     }
 
     /**
-     * Returns Cluster graph.
+     * Returns grahical view if there is any.
      */
-    private HeartbeatGraph getHeartbeatGraph() {
+    public final JPanel getGraphicalView() {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
             return null;
         }
-        return b.getHeartbeatGraph();
-    }
-
-    /**
-     * Returns grahical view if there is any.
-     */
-    public final JPanel getGraphicalView() {
-        final HeartbeatGraph hg = getHeartbeatGraph();
-        if (hg == null) {
-            return null;
-        }
-        return hg.getServicesInfo().getGraphicalView();
+        return b.getServicesInfo().getGraphicalView();
     }
 
     /**
@@ -498,7 +481,7 @@ public class HostInfo extends Info {
     /**
      * Selects the node in the menu and reloads everything underneath.
      */
-    public void selectMyself() {
+    public final void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
     }

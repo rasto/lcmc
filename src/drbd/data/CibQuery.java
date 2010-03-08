@@ -115,6 +115,14 @@ public class CibQuery {
     private String dc = null;
     /** Map from nodename and resource to the fail-count. */
     private MultiKeyMap failed = new MultiKeyMap();
+    /** rsc_defaults meta attributes id. */
+    private String rscDefaultsMetaAttrsId = null;
+    /** rsc_defaults parameters with values. */
+    private Map<String, String> rscDefaultsParams =
+                                                 new HashMap<String, String>();
+    /** rsc_defaults parameters with ids. */
+    private Map<String, String> rscDefaultsParamsNvpairIds =
+                                                 new HashMap<String, String>();
 
     /**
      * Sets crm config map.
@@ -620,4 +628,37 @@ public class CibQuery {
      public final String getFailCount(final String node, final String res) {
          return (String) failed.get(node, res);
      }
+
+    /** Sets rsc_defaults meta attributes id. */
+    public final void setRscDefaultsMetaAttrsId(
+                                        final String rscDefaultsMetaAttrsId) {
+        this.rscDefaultsMetaAttrsId = rscDefaultsMetaAttrsId;
+    }
+
+    /** Gets rsc_defaults meta attributes id. */
+    public final String getRscDefaultsMetaAttrsId() {
+        return rscDefaultsMetaAttrsId;
+    }
+
+    /** Sets rsc_defaults parameters with values. */
+    public final void setRscDefaultsParams(
+                                final Map<String, String> rscDefaultsParams) {
+        this.rscDefaultsParams = rscDefaultsParams;
+    }
+
+    /** Gets rsc_defaults parameters with values. */
+    public final Map<String, String> getRscDefaultsParams() {
+        return rscDefaultsParams;
+    }
+
+    /** Sets rsc_defaults parameters with ids. */
+    public final void setRscDefaultsParamsNvpairIds(
+                        final Map<String, String> rscDefaultsParamsNvpairIds) {
+        this.rscDefaultsParamsNvpairIds = rscDefaultsParamsNvpairIds;
+    }
+
+    /** Gets rsc_defaults parameters with ids. */
+    public final Map<String, String> getRscDefaultsParamsNvpairIds() {
+        return rscDefaultsParamsNvpairIds;
+    }
 }

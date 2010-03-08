@@ -103,6 +103,18 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns value of meta attribute  parameter.
+     */
+    public final String getRscDefaultsParameter(final String param,
+                                                final boolean testOnly) {
+        if (testOnly && ptestData != null) {
+            return shadowCibQueryMap.getRscDefaultsParams().get(param);
+        } else {
+            return cibQueryMap.getRscDefaultsParams().get(param);
+        }
+    }
+
+    /**
      * Returns value of parameter.
      */
     public final String getParameter(final String hbId,
@@ -140,6 +152,13 @@ public class ClusterStatus {
      */
     public final void setDC(final String dc) {
         cibQueryMap.setDC(dc);
+    }
+
+    /**
+     * Returns a map from parameter to its values for rsc defaults.
+     */
+    public final Map<String, String> getRscDefaultsValuePairs() {
+        return cibQueryMap.getRscDefaultsParams();
     }
 
     /**

@@ -19,7 +19,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.data;
 
 import drbd.utilities.Tools;
@@ -138,8 +137,8 @@ public class CRMXML extends XML {
                       new ResourceAgent(Tools.getConfigData().PM_GROUP_NAME,
                                         "",
                                         "group");
-    /** Predefined clone as heartbeat service. */
-    private final ResourceAgent hbClone;
+    /** Predefined clone as pacemaker service. */
+    private final ResourceAgent pcmkClone;
     /** Predefined drbddisk as heartbeat service. */
     private final ResourceAgent hbDrbddisk =
                         new ResourceAgent("drbddisk", "heartbeat", "heartbeat");
@@ -155,6 +154,12 @@ public class CRMXML extends XML {
     /** Whether linbit::drbd ra is present. */
     private boolean linbitDrbdPresent = false;
 
+    /** Pacemaker "true" string. */
+    public static final String PCMK_TRUE = "true";
+    /** Pacemaker "false" string. */
+    public static final String PCMK_FALSE = "false";
+    /** Disabled string. */
+    public static final String DISABLED_STRING = "disabled";
     /** Boolean parameter type. */
     private static final String PARAM_TYPE_BOOLEAN = "boolean";
     /** Integer parameter type. */
@@ -197,8 +202,201 @@ public class CRMXML extends XML {
     public static final String INFINITY_STRING = "INFINITY";
     /** -INFINITY keyword. */
     public static final String MINUS_INFINITY_STRING = "-INFINITY";
+    /** Choices for integer fields. */
+    private static final String[] INTEGER_VALUES = {null,
+                                                    "0",
+                                                    "2",
+                                                    "100",
+                                                    INFINITY_STRING,
+                                                    MINUS_INFINITY_STRING};
     /** Constraint score keyword. */
     public static final String SCORE_STRING = "score";
+    /** Meta attributes for primitives. Cannot be static because it changes
+     * with versions. */
+    private Map<String, String> metaAttrParams = null;
+    /** Meta attributes for rsc defaults meta attributes. */
+    private Map<String, String> rscDefaultsParams = null;
+    /** Name of the priority meta attribute. */
+    private static final String PRIORITY_META_ATTR = "priority";
+    /** Name of the resource-stickiness meta attribute. */
+    private static final String RESOURCE_STICKINESS_META_ATTR =
+                                                         "resource-stickiness";
+    /** Name of the migration-threshold meta attribute. */
+    private static final String MIGRATION_THRESHOLD_META_ATTR =
+                                                         "migration-threshold";
+    /** Name of the failure-timeout meta attribute. */
+    private static final String FAILURE_TIMEOUT_META_ATTR = "failure-timeout";
+    /** Name of the multiple-timeout meta attribute. */
+    private static final String MULTIPLE_ACTIVE_META_ATTR = "multiple-active";
+    /** Name of the target-role meta attribute. */
+    private static final String TARGET_ROLE_META_ATTR = "target-role";
+    /** Name of the is-managed meta attribute. */
+    private static final String IS_MANAGED_META_ATTR = "is-managed";
+    /** Name of the master-max clone meta attribute. */
+    private static final String MASTER_MAX_META_ATTR = "master-max";
+    /** Name of the master-node-max clone meta attribute. */
+    private static final String MASTER_NODE_MAX_META_ATTR = "master-node-max";
+    /** Name of the clone-max clone meta attribute. */
+    private static final String CLONE_MAX_META_ATTR = "clone-max";
+    /** Name of the clone-node-max clone meta attribute. */
+    private static final String CLONE_NODE_MAX_META_ATTR = "clone-node-max";
+    /** Name of the notify clone meta attribute. */
+    private static final String NOTIFY_META_ATTR = "notify";
+    /** Name of the globally-unique clone meta attribute. */
+    private static final String GLOBALLY_UNIQUE_META_ATTR = "globally-unique";
+    /** Name of the ordered clone meta attribute. */
+    private static final String ORDERED_META_ATTR = "ordered";
+    /** Name of the interleave clone meta attribute. */
+    private static final String INTERLEAVE_META_ATTR = "interleave";
+
+    /** Section for meta attributes in rsc_defaults. */
+    private static final Map<String, String> M_A_SECTION =
+                                                 new HashMap<String, String>();
+    /** Possible choices for meta attributes. */
+    private static final Map<String, String[]> M_A_POSSIBLE_CHOICES =
+                                                new HashMap<String, String[]>();
+    /** Short descriptions for meta attributes. */
+    private static final Map<String, String> M_A_SHORT_DESC =
+                                                new HashMap<String, String>();
+    /** Long descriptions for meta attributes. */
+    private static final Map<String, String> M_A_LONG_DESC =
+                                                new HashMap<String, String>();
+    /** Defaults for meta attributes. */
+    private static final Map<String, String> M_A_DEFAULT =
+                                                new HashMap<String, String>();
+    /** Types for meta attributes. */
+    private static final Map<String, String> M_A_TYPE =
+                                                new HashMap<String, String>();
+    /** Preferred values for meta attributes. */
+    private static final Map<String, String> M_A_PREFERRED =
+                                                new HashMap<String, String>();
+    /** Array of boolean values names in the cluster manager. */
+    private static final String[] PCMK_BOOLEAN_VALUES = {PCMK_TRUE, PCMK_FALSE};
+    static {
+        /* target-role */
+        M_A_POSSIBLE_CHOICES.put(
+                       TARGET_ROLE_META_ATTR,
+                       new String[]{TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
+        M_A_SHORT_DESC.put(TARGET_ROLE_META_ATTR,
+                           Tools.getString("CRMXML.TargetRole.ShortDesc"));
+        M_A_LONG_DESC.put(TARGET_ROLE_META_ATTR,
+                          Tools.getString("CRMXML.TargetRole.LongDesc"));
+        M_A_DEFAULT.put(TARGET_ROLE_META_ATTR, TARGET_ROLE_STARTED);
+
+        /* is-managed */
+        M_A_POSSIBLE_CHOICES.put(IS_MANAGED_META_ATTR, PCMK_BOOLEAN_VALUES);
+        M_A_SHORT_DESC.put(IS_MANAGED_META_ATTR,
+                           Tools.getString("CRMXML.IsManaged.ShortDesc"));
+        M_A_LONG_DESC.put(IS_MANAGED_META_ATTR,
+                          Tools.getString("CRMXML.IsManaged.LongDesc"));
+        M_A_DEFAULT.put(IS_MANAGED_META_ATTR, PCMK_TRUE);
+        M_A_TYPE.put(IS_MANAGED_META_ATTR, PARAM_TYPE_BOOLEAN);
+
+        /* priority */
+        M_A_POSSIBLE_CHOICES.put(PRIORITY_META_ATTR,
+                                 new String[]{"0", "5", "10"});
+        M_A_SHORT_DESC.put(PRIORITY_META_ATTR,
+                           Tools.getString("CRMXML.Priority.ShortDesc"));
+        M_A_LONG_DESC.put(PRIORITY_META_ATTR,
+                          Tools.getString("CRMXML.Priority.LongDesc"));
+        M_A_DEFAULT.put(PRIORITY_META_ATTR, "0");
+        M_A_TYPE.put(PRIORITY_META_ATTR, PARAM_TYPE_INTEGER);
+
+        /* resource-stickiness since 2.1.4 */
+        M_A_POSSIBLE_CHOICES.put(RESOURCE_STICKINESS_META_ATTR,
+                                 INTEGER_VALUES);
+        M_A_SHORT_DESC.put(
+                      RESOURCE_STICKINESS_META_ATTR,
+                      Tools.getString("CRMXML.ResourceStickiness.ShortDesc"));
+        M_A_LONG_DESC.put(
+                        RESOURCE_STICKINESS_META_ATTR,
+                        Tools.getString("CRMXML.ResourceStickiness.LongDesc"));
+        M_A_DEFAULT.put(RESOURCE_STICKINESS_META_ATTR, "0");
+        M_A_TYPE.put(RESOURCE_STICKINESS_META_ATTR, PARAM_TYPE_INTEGER);
+
+        /* migration-threshold */
+        M_A_POSSIBLE_CHOICES.put(MIGRATION_THRESHOLD_META_ATTR,
+                                 new String[]{DISABLED_STRING, "0", "5", "10"});
+        M_A_SHORT_DESC.put(
+                      MIGRATION_THRESHOLD_META_ATTR,
+                      Tools.getString("CRMXML.MigrationThreshold.ShortDesc"));
+        M_A_LONG_DESC.put(
+                      MIGRATION_THRESHOLD_META_ATTR,
+                      Tools.getString("CRMXML.MigrationThreshold.LongDesc"));
+        M_A_DEFAULT.put(MIGRATION_THRESHOLD_META_ATTR, DISABLED_STRING);
+        M_A_TYPE.put(MIGRATION_THRESHOLD_META_ATTR, PARAM_TYPE_INTEGER);
+
+        /* failure-timeout since 2.1.4 */
+        M_A_POSSIBLE_CHOICES.put(FAILURE_TIMEOUT_META_ATTR,
+                                 new String[]{DISABLED_STRING, "0", "5", "60"});
+        M_A_SHORT_DESC.put(FAILURE_TIMEOUT_META_ATTR,
+                           Tools.getString("CRMXML.FailureTimeout.ShortDesc"));
+        M_A_LONG_DESC.put(FAILURE_TIMEOUT_META_ATTR,
+                          Tools.getString("CRMXML.FailureTimeout.LongDesc"));
+        M_A_DEFAULT.put(FAILURE_TIMEOUT_META_ATTR, DISABLED_STRING);
+        M_A_TYPE.put(FAILURE_TIMEOUT_META_ATTR, PARAM_TYPE_INTEGER);
+
+        /* multiple-active */
+        M_A_POSSIBLE_CHOICES.put(MULTIPLE_ACTIVE_META_ATTR,
+                                 new String[]{"stop_start",
+                                              "stop_only",
+                                              "block"});
+        M_A_SHORT_DESC.put(MULTIPLE_ACTIVE_META_ATTR,
+                           Tools.getString("CRMXML.MultipleActive.ShortDesc"));
+        M_A_LONG_DESC.put(MULTIPLE_ACTIVE_META_ATTR,
+                          Tools.getString("CRMXML.MultipleActive.LongDesc"));
+        M_A_DEFAULT.put(MULTIPLE_ACTIVE_META_ATTR, "stop_start");
+
+        /* master-max */
+        M_A_SHORT_DESC.put(MASTER_MAX_META_ATTR, "M/S Master-Max");
+        M_A_DEFAULT.put(MASTER_MAX_META_ATTR, "1");
+        M_A_TYPE.put(MASTER_MAX_META_ATTR, PARAM_TYPE_INTEGER);
+        M_A_POSSIBLE_CHOICES.put(MASTER_MAX_META_ATTR, INTEGER_VALUES);
+        M_A_SECTION.put(MASTER_MAX_META_ATTR,
+                        "Master / Slave Resource Defaults");
+        /* master-node-max */
+        M_A_SHORT_DESC.put(MASTER_NODE_MAX_META_ATTR, "M/S Master-Node-Max");
+        M_A_DEFAULT.put(MASTER_NODE_MAX_META_ATTR, "1");
+        M_A_TYPE.put(MASTER_NODE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
+        M_A_POSSIBLE_CHOICES.put(MASTER_NODE_MAX_META_ATTR, INTEGER_VALUES);
+        M_A_SECTION.put(MASTER_NODE_MAX_META_ATTR,
+                        "Master / Slave Resource Defaults");
+        /* clone-max */
+        M_A_SHORT_DESC.put(CLONE_MAX_META_ATTR, "Clone Max");
+        M_A_DEFAULT.put(CLONE_MAX_META_ATTR, "");
+        M_A_PREFERRED.put(CLONE_MAX_META_ATTR, "2");
+        M_A_TYPE.put(CLONE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
+        M_A_POSSIBLE_CHOICES.put(CLONE_MAX_META_ATTR, INTEGER_VALUES);
+        M_A_SECTION.put(CLONE_MAX_META_ATTR, "Clone Resource Defaults");
+        /* clone-node-max */
+        M_A_SHORT_DESC.put(CLONE_NODE_MAX_META_ATTR, "Clone Node Max");
+        M_A_DEFAULT.put(CLONE_NODE_MAX_META_ATTR, "1");
+        M_A_TYPE.put(CLONE_NODE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
+        M_A_POSSIBLE_CHOICES.put(CLONE_NODE_MAX_META_ATTR, INTEGER_VALUES);
+        M_A_SECTION.put(CLONE_NODE_MAX_META_ATTR, "Clone Resource Defaults");
+        /* notify */
+        M_A_SHORT_DESC.put(NOTIFY_META_ATTR, "Notify");
+        M_A_DEFAULT.put(NOTIFY_META_ATTR, PCMK_FALSE);
+        M_A_PREFERRED.put(NOTIFY_META_ATTR, PCMK_TRUE);
+        M_A_POSSIBLE_CHOICES.put(NOTIFY_META_ATTR, PCMK_BOOLEAN_VALUES);
+        M_A_SECTION.put(NOTIFY_META_ATTR, "Clone Resource Defaults");
+        /* globally-unique */
+        M_A_SHORT_DESC.put(GLOBALLY_UNIQUE_META_ATTR, "Globally-Unique");
+        M_A_DEFAULT.put(GLOBALLY_UNIQUE_META_ATTR, PCMK_FALSE);
+        M_A_POSSIBLE_CHOICES.put(GLOBALLY_UNIQUE_META_ATTR,
+                                 PCMK_BOOLEAN_VALUES);
+        M_A_SECTION.put(GLOBALLY_UNIQUE_META_ATTR, "Clone Resource Defaults");
+        /* ordered */
+        M_A_SHORT_DESC.put(ORDERED_META_ATTR, "Ordered");
+        M_A_DEFAULT.put(ORDERED_META_ATTR, PCMK_FALSE);
+        M_A_POSSIBLE_CHOICES.put(ORDERED_META_ATTR, PCMK_BOOLEAN_VALUES);
+        M_A_SECTION.put(ORDERED_META_ATTR, "Clone Resource Defaults");
+        /* interleave */
+        M_A_SHORT_DESC.put(INTERLEAVE_META_ATTR, "Interleave");
+        M_A_DEFAULT.put(INTERLEAVE_META_ATTR, PCMK_FALSE);
+        M_A_POSSIBLE_CHOICES.put(INTERLEAVE_META_ATTR, PCMK_BOOLEAN_VALUES);
+        M_A_SECTION.put(INTERLEAVE_META_ATTR, "Clone Resource Defaults");
+    }
     /**
      * Prepares a new <code>CRMXML</code> object.
      */
@@ -207,84 +405,40 @@ public class CRMXML extends XML {
         this.host = host;
         String command = null;
         final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        final String[] booleanValues = getGlobalCheckBoxChoices();
-        final String[] integerValues = getIntegerValues();
+        final String pcmkV = host.getPacemakerVersion();
+        final String[] booleanValues = PCMK_BOOLEAN_VALUES;
         final String hbBooleanTrue = booleanValues[0];
         final String hbBooleanFalse = booleanValues[1];
-        hbClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
-                                    "",
-                                    "clone");
-        if (pmV == null
+        pcmkClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
+                                      "",
+                                      "clone");
+        if (pcmkV == null
             && hbV != null
             && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            setMetaAttributes(hbClone, "target_role", "is_managed");
+            addMetaAttribute(pcmkClone,
+                             "target_role",
+                             TARGET_ROLE_META_ATTR,
+                             false);
+            addMetaAttribute(pcmkClone,
+                             "is_managed",
+                             IS_MANAGED_META_ATTR,
+                             false);
         }
+        addMetaAttribute(pcmkClone, MASTER_MAX_META_ATTR,      null, true);
+        addMetaAttribute(pcmkClone, MASTER_NODE_MAX_META_ATTR, null, true);
+        addMetaAttribute(pcmkClone, CLONE_MAX_META_ATTR,       null, false);
+        addMetaAttribute(pcmkClone, NOTIFY_META_ATTR,          null, false);
+        addMetaAttribute(pcmkClone, GLOBALLY_UNIQUE_META_ATTR, null, false);
+        addMetaAttribute(pcmkClone, ORDERED_META_ATTR,         null, false);
+        addMetaAttribute(pcmkClone, INTERLEAVE_META_ATTR,      null, false);
 
-        /* master-max */
-        hbClone.addMasterParameter("master-max");
-        hbClone.setParamIsMetaAttr("master-max", true);
-        hbClone.setParamShortDesc("master-max", "M/S Master-Max");
-        hbClone.setParamDefault("master-max", "1");
-        hbClone.setParamType("master-max", PARAM_TYPE_INTEGER);
-        hbClone.setParamPossibleChoices("master-max", integerValues);
-        /* master-node-max */
-        hbClone.addMasterParameter("master-node-max");
-        hbClone.setParamIsMetaAttr("master-node-max", true);
-        hbClone.setParamShortDesc("master-node-max", "M/S Master-Node-Max");
-        hbClone.setParamDefault("master-node-max", "1");
-        hbClone.setParamType("master-node-max", PARAM_TYPE_INTEGER);
-        hbClone.setParamPossibleChoices("master-node-max", integerValues);
-        /* clone-max */
-        hbClone.addParameter("clone-max");
-        hbClone.setParamIsMetaAttr("clone-max", true);
-        hbClone.setParamShortDesc("clone-max", "Clone Max");
-        hbClone.setParamDefault("clone-max", "");
-        hbClone.setParamPreferred("clone-max", "2");
-        hbClone.setParamType("clone-max", PARAM_TYPE_INTEGER);
-        hbClone.setParamPossibleChoices("clone-max", integerValues);
-
-        /* clone-node-max */
-        hbClone.addParameter("clone-node-max");
-        hbClone.setParamIsMetaAttr("clone-node-max", true);
-        hbClone.setParamShortDesc("clone-node-max", "Clone Node Max");
-        hbClone.setParamDefault("clone-node-max", "1");
-        hbClone.setParamType("clone-node-max", PARAM_TYPE_INTEGER);
-        hbClone.setParamPossibleChoices("clone-node-max", integerValues);
-
-        /* notify */
-        hbClone.addParameter("notify");
-        hbClone.setParamIsMetaAttr("notify", true);
-        hbClone.setParamShortDesc("notify", "Notify");
-        hbClone.setParamDefault("notify", hbBooleanFalse);
-        hbClone.setParamPreferred("notify", hbBooleanTrue);
-        hbClone.setParamPossibleChoices("notify", booleanValues);
-        /* globally-unique */
-        hbClone.addParameter("globally-unique");
-        hbClone.setParamIsMetaAttr("globally-unique", true);
-        hbClone.setParamShortDesc("globally-unique", "Globally-Unique");
-        hbClone.setParamDefault("globally-unique", hbBooleanFalse);
-        hbClone.setParamPossibleChoices("globally-unique", booleanValues);
-        /* ordered */
-        hbClone.addParameter("ordered");
-        hbClone.setParamIsMetaAttr("ordered", true);
-        hbClone.setParamShortDesc("ordered", "Ordered");
-        hbClone.setParamDefault("ordered", hbBooleanFalse);
-        hbClone.setParamPossibleChoices("ordered", booleanValues);
-        /* interleave */
-        hbClone.addParameter("interleave");
-        hbClone.setParamIsMetaAttr("interleave", true);
-        hbClone.setParamShortDesc("interleave", "Interleave");
-        hbClone.setParamDefault("interleave", hbBooleanFalse);
-        hbClone.setParamPossibleChoices("interleave", booleanValues);
-
-        if (pmV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
+        if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
                                           (ConvertCmdCallback) null);
         }
 
         if (command == null
-            && pmV == null
+            && pcmkV == null
             && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
                                           (ConvertCmdCallback) null);
@@ -315,9 +469,11 @@ public class CRMXML extends XML {
         String serviceName = null;
         boolean masterSlave = false; /* is probably m/s ...*/
         for (int i = 0; i < lines.length; i++) {
-            //<resource-agent name="AudibleAlarm">
-            // ...
-            //</resource-agent>
+            /*
+            <resource-agent name="AudibleAlarm">
+             ...
+            </resource-agent>
+            */
             final Matcher pm = pp.matcher(lines[i]);
             if (pm.matches()) {
                 provider = pm.group(1);
@@ -391,7 +547,8 @@ public class CRMXML extends XML {
                                 "Transition Timeout");
         paramGlobalTypeMap.put("default-action-timeout", PARAM_TYPE_INTEGER);
         paramGlobalDefaultMap.put("default-action-timeout", "20s");
-        paramGlobalPossibleChoices.put("default-action-timeout", integerValues);
+        paramGlobalPossibleChoices.put("default-action-timeout",
+                                       INTEGER_VALUES);
         globalRequiredParams.add("default-action-timeout");
 
         /* resource stickiness */
@@ -403,7 +560,7 @@ public class CRMXML extends XML {
         paramGlobalTypeMap.put("default-resource-stickiness",
                                PARAM_TYPE_INTEGER);
         paramGlobalPossibleChoices.put("default-resource-stickiness",
-                                       integerValues);
+                                       INTEGER_VALUES);
         paramGlobalDefaultMap.put("default-resource-stickiness", "0");
         //paramGlobalPreferredMap.put("default-resource-stickiness", "100");
         globalRequiredParams.add("default-resource-stickiness");
@@ -412,7 +569,6 @@ public class CRMXML extends XML {
         globalParams.add("no-quorum-policy");
         paramGlobalShortDescMap.put("no-quorum-policy", "No Quorum Policy");
         paramGlobalLongDescMap.put("no-quorum-policy", "No Quorum Policy");
-        // TODO: ignore, stop, freeze, there is more
         paramGlobalTypeMap.put("no-quorum-policy", PARAM_TYPE_STRING);
         paramGlobalDefaultMap.put("no-quorum-policy", "stop");
         paramGlobalPossibleChoices.put("no-quorum-policy",
@@ -431,12 +587,12 @@ public class CRMXML extends XML {
         paramGlobalTypeMap.put("default-resource-failure-stickiness",
                                PARAM_TYPE_INTEGER);
         paramGlobalPossibleChoices.put("default-resource-failure-stickiness",
-                                       integerValues);
+                                       INTEGER_VALUES);
         paramGlobalDefaultMap.put("default-resource-failure-stickiness", "0");
         globalRequiredParams.add("default-resource-failure-stickiness");
 
 
-        if (pmV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
+        if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
             final String[] params = {
                 "stonith-action",
                 "is-managed-default",
@@ -532,8 +688,7 @@ public class CRMXML extends XML {
         paramColLongDescMap.put(SCORE_STRING, "Score");
         paramColTypeMap.put(SCORE_STRING, PARAM_TYPE_INTEGER);
         paramColDefaultMap.put(SCORE_STRING, null);
-        //paramColPreferredMap.put(SCORE_STRING, INFINITY_STRING);
-        paramColPossibleChoices.put(SCORE_STRING, integerValues);
+        paramColPossibleChoices.put(SCORE_STRING, INTEGER_VALUES);
         /* Hardcoding order params */
         ordParams.add("first-action");
         paramOrdShortDescMap.put("first-action", "rsc1 order action");
@@ -562,74 +717,42 @@ public class CRMXML extends XML {
         paramOrdShortDescMap.put(SCORE_STRING, "Score");
         paramOrdLongDescMap.put(SCORE_STRING, "Score");
         paramOrdTypeMap.put(SCORE_STRING, PARAM_TYPE_INTEGER);
-        //paramOrdPreferredMap.put(SCORE_STRING, INFINITY_STRING);
-        paramOrdPossibleChoices.put(SCORE_STRING, integerValues);
+        paramOrdPossibleChoices.put(SCORE_STRING, INTEGER_VALUES);
         paramOrdDefaultMap.put(SCORE_STRING, null);
     }
 
     /**
-     * Returns choices for check boxes in the global config. (True, False).
+     * Returns choices for check box. (True, False).
      */
-    public final String[] getGlobalCheckBoxChoices() {
-        final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        if (pmV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
-            return new String[]{
-                Tools.getString("Heartbeat.2.1.3.Boolean.True"),
-                Tools.getString("Heartbeat.2.1.3.Boolean.False")};
-        } else {
-            return new String[]{
-                Tools.getString("Heartbeat.Boolean.True"),
-                Tools.getString("Heartbeat.Boolean.False")};
-        }
+    public final String[] getCheckBoxChoices(final ResourceAgent ra,
+                                             final String param) {
+        final String paramDefault = getParamDefault(ra, param);
+        return getCheckBoxChoices(paramDefault);
     }
-
-    /**
-     * Returns choices for integer fields.
-     */
-    public final String[] getIntegerValues() {
-        return new String[]{null,
-                            "0",
-                            "2",
-                            "100",
-                            INFINITY_STRING,
-                            MINUS_INFINITY_STRING};
-    }
-
 
     /**
      * Returns choices for check box. (True, False).
      * The problem is, that heartbeat kept changing the lower and upper case in
      * the true and false values.
      */
-    public final String[] getCheckBoxChoices(final ResourceAgent ra,
-                                             final String param) {
-        final String paramDefault = getParamDefault(ra, param);
+    private String[] getCheckBoxChoices(final String paramDefault) {
         if (paramDefault != null) {
             if ("yes".equals(paramDefault) || "no".equals(paramDefault)) {
                 return new String[]{"yes", "no"};
             } else if ("Yes".equals(paramDefault)
                        || "No".equals(paramDefault)) {
                 return new String[]{"Yes", "No"};
-            } else if ("true".equals(paramDefault)
-                       || "false".equals(paramDefault)) {
-                return new String[]{"true", "false"};
+            } else if (PCMK_TRUE.equals(paramDefault)
+                       || PCMK_FALSE.equals(paramDefault)) {
+                return PCMK_BOOLEAN_VALUES;
             } else if ("True".equals(paramDefault)
                        || "False".equals(paramDefault)) {
                 return new String[]{"True", "False"};
             }
         }
         final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        if (pmV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
-            return new String[]{
-                Tools.getString("Heartbeat.2.1.3.Boolean.True"),
-                Tools.getString("Heartbeat.2.1.3.Boolean.False")};
-        } else {
-            return new String[]{
-                Tools.getString("Heartbeat.Boolean.True"),
-                Tools.getString("Heartbeat.Boolean.False")};
-        }
+        final String pcmkV = host.getPacemakerVersion();
+        return PCMK_BOOLEAN_VALUES;
     }
 
     /**
@@ -873,7 +996,6 @@ public class CRMXML extends XML {
         return PARAM_TYPE_TIME.equals(type);
     }
 
-
     /**
      * Returns name of the section for service and parameter that will be
      * displayed.
@@ -898,29 +1020,151 @@ public class CRMXML extends XML {
      */
     public final String getGlobalSection(final String param) {
         if (isGlobalRequired(param)) {
-            return Tools.getString("CRMXML.RequiredOptions");
+            return Tools.getString("CRMXML.GlobalRequiredOptions");
         } else {
-            return Tools.getString("CRMXML.OptionalOptions");
+            return Tools.getString("CRMXML.GlobalOptionalOptions");
         }
+    }
+
+    /**
+     * Checks meta attribute param.
+     */
+    public final boolean checkMetaAttrParam(final String param,
+                                            final String value) {
+        final String type = M_A_TYPE.get(param);
+        final boolean required = isRscDefaultsRequired(param);
+        final boolean metaAttr = true;
+        return checkParam(type, required, metaAttr, param, value);
+    }
+
+    /**
+     * Returns section of the rsc defaults meta attribute.
+     */
+    public final String getRscDefaultsSection(final String param) {
+        final String section = M_A_SECTION.get(param);
+        if (section == null) {
+            return Tools.getString("CRMXML.RscDefaultsSection");
+        }
+        return section;
+    }
+
+    /**
+     * Returns default of the meta attribute.
+     */
+    public final String getRscDefaultsDefault(final String param) {
+        return M_A_DEFAULT.get(param);
+    }
+
+    /**
+     * Returns preferred of the meta attribute.
+     */
+    public final String getRscDefaultsPreferred(final String param) {
+        return M_A_PREFERRED.get(param);
+    }
+
+    /**
+     * Returns preferred of the meta attribute.
+     */
+    public final String[] getRscDefaultsPossibleChoices(final String param) {
+        return M_A_POSSIBLE_CHOICES.get(param);
+    }
+
+    /**
+     * Returns choices for check box. (True, False).
+     */
+    public final String[] getRscDefaultsCheckBoxChoices(final String param) {
+        final String paramDefault = getRscDefaultsDefault(param);
+        return getCheckBoxChoices(paramDefault);
+    }
+
+    /**
+     * Returns short description of the default meta attr parameter.
+     */
+    public final String getRscDefaultsShortDesc(final String param) {
+        return M_A_SHORT_DESC.get(param);
+    }
+
+    /**
+     * Return long description of the default meta attr parameter.
+     */
+    public final String getRscDefaultsLongDesc(final String param) {
+        return M_A_LONG_DESC.get(param);
+    }
+
+    /**
+     * Returns type of the meta attribute.
+     * It can be string, integer, boolean...
+     */
+    public final String getRscDefaultsType(final String param) {
+        return M_A_TYPE.get(param);
+    }
+
+    /**
+     * Checks if parameter is required or not.
+     */
+    public final boolean isRscDefaultsRequired(final String param) {
+        return false;
+    }
+
+    /**
+     * Checks if the meta attr parameter is integer.
+     */
+    public final boolean isRscDefaultsInteger(final String param) {
+        final String type = getRscDefaultsType(param);
+        return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /**
+     * Checks if the meta attr parameter is boolean.
+     */
+    public final boolean isRscDefaultsBoolean(final String param) {
+        final String type = getRscDefaultsType(param);
+        return PARAM_TYPE_BOOLEAN.equals(type);
+    }
+
+    /**
+     * Whether the rsc default parameter is of the time type.
+     */
+    public final boolean isRscDefaultsTimeType(final String param) {
+        final String type = getRscDefaultsType(param);
+        return PARAM_TYPE_TIME.equals(type);
+    }
+
+
+    /**
+     * Checks parameter of the specified ra according to its type.
+     * Returns false if value does not fit the type.
+     */
+    public final boolean checkParam(final ResourceAgent ra,
+                                    final String param,
+                                    final String value) {
+        final String type = getParamType(ra, param);
+        final boolean required = isRequired(ra, param);
+        final boolean metaAttr = isMetaAttr(ra, param);
+        return checkParam(type, required, metaAttr, param, value);
     }
 
     /**
      * Checks parameter according to its type. Returns false if value does
      * not fit the type.
      */
-    public final boolean checkParam(final ResourceAgent ra,
-                                    final String param,
-                                    final String value) {
-        final String type = getParamType(ra, param);
+    private boolean checkParam(final String type,
+                               final boolean required,
+                               final boolean metaAttr,
+                               final String param,
+                               String value) {
+        if (metaAttr
+            && isRscDefaultsInteger(param)
+            && DISABLED_STRING.equals(value)) {
+            value = "";
+        }
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
-                && !Tools.getString("Heartbeat.Boolean.False").equals(value)
-                && !Tools.getString(
-                                "Heartbeat.2.1.3.Boolean.True").equals(value)
-                && !Tools.getString(
-                            "Heartbeat.2.1.3.Boolean.False").equals(value)) {
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !"True".equals(value)
+                && !"False".equals(value)) {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
@@ -937,8 +1181,7 @@ public class CRMXML extends XML {
             if (!m.matches()) {
                 correctValue = false;
             }
-        } else if ((value == null || "".equals(value))
-                   && isRequired(ra, param)) {
+        } else if ((value == null || "".equals(value)) && required) {
             correctValue = false;
         }
         return correctValue;
@@ -954,12 +1197,10 @@ public class CRMXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
-                && !Tools.getString("Heartbeat.Boolean.False").equals(value)
-                && !Tools.getString(
-                                "Heartbeat.2.1.3.Boolean.True").equals(value)
-                && !Tools.getString(
-                              "Heartbeat.2.1.3.Boolean.False").equals(value)) {
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !"True".equals(value)
+                && !"False".equals(value)) {
 
                 correctValue = false;
             }
@@ -985,113 +1226,82 @@ public class CRMXML extends XML {
     }
 
     /**
-     * Sets meta attributes for resource agent.
+     * Adds meta attribute to the resource agent.
      */
-    private void setMetaAttributes(final ResourceAgent ra,
-                                   final String targetRoleParam,
-                                   final String isManagedParam) {
-        ra.addParameter(targetRoleParam);
-        // TODO: Master, Slave
-        ra.setParamPossibleChoices(targetRoleParam,
-                      new String[]{TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
-        ra.setParamIsMetaAttr(targetRoleParam, true);
-        ra.setParamRequired(targetRoleParam, false);
-        ra.setParamShortDesc(targetRoleParam,
-                             Tools.getString("CRMXML.TargetRole.ShortDesc"));
-        ra.setParamLongDesc(targetRoleParam,
-                            Tools.getString("CRMXML.TargetRole.LongDesc"));
-        // TODO: default is different in some prev hb */
-        ra.setParamDefault(targetRoleParam, TARGET_ROLE_STARTED);
-
-        ra.addParameter(isManagedParam);
-        ra.setParamPossibleChoices(isManagedParam,
-                                   new String[]{"true", "false"});
-        ra.setParamIsMetaAttr(isManagedParam, true);
-        ra.setParamRequired(isManagedParam, true);
-        ra.setParamShortDesc(isManagedParam,
-                             Tools.getString("CRMXML.IsManaged.ShortDesc"));
-        ra.setParamLongDesc(isManagedParam,
-                            Tools.getString("CRMXML.IsManaged.LongDesc"));
-        ra.setParamDefault(isManagedParam, "true");
-
+    private void addMetaAttribute(final ResourceAgent ra,
+                                  final String name,
+                                  String newName,
+                                  final boolean masterSlave) {
+        if (newName == null) {
+            newName = name;
+        }
+        if (masterSlave) {
+            ra.addMasterParameter(name);
+        } else {
+            ra.addParameter(name);
+        }
+        ra.setParamIsMetaAttr(name, true);
+        ra.setParamRequired(name, false);
+        ra.setParamPossibleChoices(name, M_A_POSSIBLE_CHOICES.get(newName));
+        ra.setParamShortDesc(name, M_A_SHORT_DESC.get(newName));
+        ra.setParamLongDesc(name, M_A_LONG_DESC.get(newName));
+        ra.setParamDefault(name, M_A_DEFAULT.get(newName));
+        ra.setParamType(name, M_A_TYPE.get(newName));
+        ra.setParamPreferred(name, M_A_PREFERRED.get(newName));
     }
 
     /**
-     * Add more obscure meta attributes.
+     * Returns meta attribute parameters. The key is always, how the parameter
+     * is called in the cluster manager and value how it is stored in the GUI.
      */
-    private void addMetaAttributesRest(final ResourceAgent ra) {
-        /* priority */
-        final String priorityParam = "priority";
-        ra.addParameter(priorityParam);
-        ra.setParamPossibleChoices(priorityParam,
-                                   new String[]{"0", "5", "10"});
-        ra.setParamIsMetaAttr(priorityParam, true);
-        ra.setParamRequired(priorityParam, false);
-        ra.setParamShortDesc(priorityParam,
-                             Tools.getString("CRMXML.Priority.ShortDesc"));
-        ra.setParamLongDesc(priorityParam,
-                            Tools.getString("CRMXML.Priority.LongDesc"));
-        ra.setParamDefault(priorityParam, "0");
-
+    private Map<String, String> getMetaAttrParameters() {
+        if (metaAttrParams != null) {
+            return metaAttrParams;
+        }
+        metaAttrParams = new LinkedHashMap<String, String>();
         final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        /* resource-stickiness */
-        if (pmV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
-            final String rsParam = "resource-stickiness";
-            ra.addParameter(rsParam);
-            ra.setParamPossibleChoices(rsParam, getIntegerValues());
-            ra.setParamIsMetaAttr(rsParam, true);
-            ra.setParamRequired(rsParam, false);
-            ra.setParamShortDesc(
-                          rsParam,
-                          Tools.getString("CRMXML.ResourceStickiness.ShortDesc"));
-            ra.setParamLongDesc(rsParam,
-                          Tools.getString("CRMXML.ResourceStickiness.LongDesc"));
-            ra.setParamDefault(rsParam, "0");
+        final String pcmkV = host.getPacemakerVersion();
+        if (pcmkV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            metaAttrParams.put("target_role", TARGET_ROLE_META_ATTR);
+            metaAttrParams.put("is_managed", IS_MANAGED_META_ATTR);
+        } else {
+            metaAttrParams.put(TARGET_ROLE_META_ATTR, null);
+            metaAttrParams.put(IS_MANAGED_META_ATTR, null);
         }
-        /* migration-threshold */
-        final String mtParam = "migration-threshold";
-        ra.addParameter(mtParam);
-        ra.setParamPossibleChoices(mtParam,
-                                   new String[]{"disabled", "0", "5", "10"});
-        ra.setParamIsMetaAttr(mtParam, true);
-        ra.setParamRequired(mtParam, false);
-        ra.setParamShortDesc(
-                      mtParam,
-                      Tools.getString("CRMXML.MigrationThreshold.ShortDesc"));
-        ra.setParamLongDesc(mtParam,
-                      Tools.getString("CRMXML.MigrationThreshold.LongDesc"));
-        ra.setParamDefault(mtParam, "disabled");
-        /* failure-timeout */
-        if (pmV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
-            final String ftParam = "failure-timeout";
-            ra.addParameter(ftParam);
-            ra.setParamPossibleChoices(ftParam,
-                                       new String[]{"disabled", "0", "5", "60"});
-            ra.setParamIsMetaAttr(ftParam, true);
-            ra.setParamRequired(ftParam, false);
-            ra.setParamShortDesc(
-                          ftParam,
-                          Tools.getString("CRMXML.FailureTimeout.ShortDesc"));
-            ra.setParamLongDesc(ftParam,
-                          Tools.getString("CRMXML.FailureTimeout.LongDesc"));
-            ra.setParamDefault(ftParam, "disabled");
+        metaAttrParams.put(MIGRATION_THRESHOLD_META_ATTR, null);
+        metaAttrParams.put(PRIORITY_META_ATTR, null);
+        metaAttrParams.put(MULTIPLE_ACTIVE_META_ATTR, null);
+        if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
+            metaAttrParams.put(RESOURCE_STICKINESS_META_ATTR, null);
+            metaAttrParams.put(FAILURE_TIMEOUT_META_ATTR, null);
         }
-        /* multiple-active */
-        final String maParam = "multiple-active";
-        ra.addParameter(maParam);
-        ra.setParamPossibleChoices(maParam,
-                                   new String[]{"stop_start",
-                                                "stop_only",
-                                                "block"});
-        ra.setParamIsMetaAttr(maParam, true);
-        ra.setParamRequired(maParam, false);
-        ra.setParamShortDesc(
-                      maParam,
-                      Tools.getString("CRMXML.MultipleActive.ShortDesc"));
-        ra.setParamLongDesc(maParam,
-                      Tools.getString("CRMXML.MultipleActive.LongDesc"));
-        ra.setParamDefault(maParam, "stop_start");
+        return metaAttrParams;
+    }
+
+    /**
+     * Returns meta attribute parameters. The key is always, how the parameter
+     * is called in the cluster manager and value how it is stored in the GUI.
+     */
+    public final Map<String, String> getRscDefaultsParameters() {
+        if (rscDefaultsParams != null) {
+            return rscDefaultsParams;
+        }
+        rscDefaultsParams = new LinkedHashMap<String, String>();
+        for (final String param : getMetaAttrParameters().keySet()) {
+            rscDefaultsParams.put(param, getMetaAttrParameters().get(param));
+        }
+        /* Master / Slave */
+        rscDefaultsParams.put(MASTER_MAX_META_ATTR,      null);
+        rscDefaultsParams.put(MASTER_NODE_MAX_META_ATTR, null);
+        /* Clone */
+        rscDefaultsParams.put(CLONE_MAX_META_ATTR,       null);
+        rscDefaultsParams.put(NOTIFY_META_ATTR,          null);
+        rscDefaultsParams.put(GLOBALLY_UNIQUE_META_ATTR, null);
+        rscDefaultsParams.put(ORDERED_META_ATTR,         null);
+        rscDefaultsParams.put(INTERLEAVE_META_ATTR,      null);
+        return rscDefaultsParams;
     }
 
     /**
@@ -1100,15 +1310,12 @@ public class CRMXML extends XML {
     private void parseParameters(final ResourceAgent ra,
                                  final Node parametersNode) {
         final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            setMetaAttributes(ra, "target_role", "is_managed");
-        } else {
-            setMetaAttributes(ra, "target-role", "is-managed");
+        final String pcmkV = host.getPacemakerVersion();
+        final Map<String, String> metaAttrParams = getMetaAttrParameters();
+        for (final String metaAttr : metaAttrParams.keySet()) {
+            addMetaAttribute(ra, metaAttr, metaAttrParams.get(metaAttr), false);
         }
-        addMetaAttributesRest(ra);
+
         final NodeList parameters = parametersNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); i++) {
             final Node parameterNode = parameters.item(i);
@@ -1151,7 +1358,7 @@ public class CRMXML extends XML {
                     }
                     if ("pingd".equals(ra.getName())
                         || "ping".equals(ra.getName())) {
-                        // workaround: all types are integer in this ras.
+                        /* workaround: all types are integer in this ras. */
                     } else {
                         ra.setParamType(param, type);
                     }
@@ -1260,7 +1467,7 @@ public class CRMXML extends XML {
         if (actionsNode != null) {
             parseActions(ra, actionsNode);
         }
-        ra.setMasterSlave(masterSlave);
+        ra.setProbablyMasterSlave(masterSlave);
     }
 
     /**
@@ -1284,8 +1491,7 @@ public class CRMXML extends XML {
 
         /* get <resource-agent> */
         final NodeList resAgents = metadataNode.getChildNodes();
-        final String[] booleanValues = getGlobalCheckBoxChoices();
-        final String[] integerValues = getIntegerValues();
+        final String[] booleanValues = PCMK_BOOLEAN_VALUES;
         for (int i = 0; i < resAgents.getLength(); i++) {
             final Node resAgentNode = resAgents.item(i);
             if (!resAgentNode.getNodeName().equals("resource-agent")) {
@@ -1342,7 +1548,7 @@ public class CRMXML extends XML {
                         }
                         if (PARAM_TYPE_INTEGER.equals(type)) {
                             paramGlobalPossibleChoices.put(param,
-                                                           integerValues);
+                                                           INTEGER_VALUES);
                         }
                     }
                 }
@@ -1398,10 +1604,51 @@ public class CRMXML extends XML {
      * Returns the heartbeat service object of the hearbeat clone set.
      */
     public final ResourceAgent getHbClone() {
-        return hbClone;
+        return pcmkClone;
     }
 
     /**
+     * Parse resource defaults.
+     */
+    public final String parseRscDefaults(
+                    final Node rscDefaultsNode,
+                    final Map<String, String> rscDefaultsParams,
+                    final Map<String, String> rscDefaultsParamsNvpairIds) {
+
+        final Map<String, String> nvpairIds =
+                                        new HashMap<String, String>();
+        /* <meta_attributtes> */
+        final Node metaAttrsNode = getChildNode(rscDefaultsNode,
+                                                "meta_attributes");
+        String metaAttrsId = null;
+        if (metaAttrsNode != null) {
+            metaAttrsId = getAttribute(metaAttrsNode, "id");
+            /* <attributtes> only til 2.1.4 */
+            NodeList nvpairsMA;
+            final String hbV = host.getHeartbeatVersion();
+            final String pcmkV = host.getPacemakerVersion();
+            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                final Node attrsNode =
+                                  getChildNode(metaAttrsNode, "attributes");
+                nvpairsMA = attrsNode.getChildNodes();
+            } else {
+                nvpairsMA = metaAttrsNode.getChildNodes();
+            }
+            /* <nvpair...> */
+            /* target-role and is-managed */
+            for (int l = 0; l < nvpairsMA.getLength(); l++) {
+                final Node maNode = nvpairsMA.item(l);
+                if (maNode.getNodeName().equals("nvpair")) {
+                    final String nvpairId = getAttribute(maNode, "id");
+                    final String name = getAttribute(maNode, "name");
+                    final String value = getAttribute(maNode, "value");
+                    rscDefaultsParams.put(name, value);
+                    rscDefaultsParamsNvpairIds.put(name, nvpairId);
+                }
+            }
+        }
+        return metaAttrsId;
+    }
 
     /**
      * Parses attributes, operations etc. from primitives and clones.
@@ -1427,7 +1674,7 @@ public class CRMXML extends XML {
                                         new HashMap<String, String>();
         parametersNvpairsIdsMap.put(crmId, nvpairIds);
         final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
+        final String pcmkV = host.getPacemakerVersion();
         /* <instance_attributes> */
         final Node instanceAttrNode =
                                    getChildNode(resourceNode,
@@ -1437,7 +1684,7 @@ public class CRMXML extends XML {
             final String iAId = getAttribute(instanceAttrNode, "id");
             resourceInstanceAttrIdMap.put(crmId, iAId);
             NodeList nvpairsRes;
-            if (pmV == null
+            if (pcmkV == null
                 && hbV != null
                 && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
@@ -1704,11 +1951,6 @@ public class CRMXML extends XML {
             if (resourceNode.getNodeName().equals("resource")) {
                 final String id = getAttribute(resourceNode, "id");
                 final String isManaged = getAttribute(resourceNode, "managed");
-                //if (runningOn != null && !"".equals(runningOn)) {
-                //    final List<String> rList = new ArrayList<String>();
-                //    rList.add(runningOn);
-                //    resStatusMap.put(id, new ResStatus(rList, null));
-                //}
                 final NodeList statusList = resourceNode.getChildNodes();
                 List<String> runningOnList = null;
                 List<String> masterOnList = null;
@@ -1806,8 +2048,8 @@ public class CRMXML extends XML {
         if (instanceAttrNode != null) {
             NodeList nvpairsRes;
             final String hbV = host.getHeartbeatVersion();
-            final String pmV = host.getPacemakerVersion();
-            if (pmV == null
+            final String pcmkV = host.getPacemakerVersion();
+            if (pcmkV == null
                 && hbV != null
                 && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 /* <attributtes> only til 2.1.4 */
@@ -1856,12 +2098,27 @@ public class CRMXML extends XML {
             return cibQueryData;
         }
 
+        /* <rsc_defaults> */
+        final Node rscDefaultsNode = getChildNode(confNode, "rsc_defaults");
+        String rscDefaultsMetaAttrsId = null;
+        final Map<String, String> rscDefaultsParams =
+                                                new HashMap<String, String>();
+        final Map<String, String> rscDefaultsParamsNvpairIds =
+                                                new HashMap<String, String>();
+        if (rscDefaultsNode != null) {
+            rscDefaultsMetaAttrsId = parseRscDefaults(
+                                                   rscDefaultsNode,
+                                                   rscDefaultsParams,
+                                                   rscDefaultsParamsNvpairIds);
+        }
+
         /* <crm_config> */
         final Node crmConfNode = getChildNode(confNode, "crm_config");
         if (crmConfNode == null) {
             Tools.appWarning("there is no crm_config node");
             return cibQueryData;
         }
+
         /*      <cluster_property_set> */
         final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
         if (cpsNode == null) {
@@ -1870,8 +2127,8 @@ public class CRMXML extends XML {
         }
         NodeList nvpairs;
         final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        if (pmV == null
+        final String pcmkV = host.getPacemakerVersion();
+        if (pcmkV == null
             && hbV != null
             && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <attributtes> only til 2.1.4 */
@@ -1925,7 +2182,6 @@ public class CRMXML extends XML {
             return cibQueryData;
         }
         /*      <primitive> */
-        //Map<String,String> resourceItemTypeMap = new HashMap<String,String>();
         final Map<String, Map<String, String>> parametersMap =
                                     new HashMap<String, Map<String, String>>();
         final Map<String, Map<String, String>> parametersNvpairsIdsMap =
@@ -2001,7 +2257,6 @@ public class CRMXML extends XML {
                        || "clone".equals(nodeName)) {
                 final NodeList primitives = primitiveGroupNode.getChildNodes();
                 final String cloneId = getAttribute(primitiveGroupNode, "id");
-                //parametersMap.put(cloneId, new HashMap<String, String>());
                 List<String> resList = groupsToResourcesMap.get(cloneId);
                 if (resList == null) {
                     resList = new ArrayList<String>();
@@ -2247,14 +2502,6 @@ public class CRMXML extends XML {
                     final String ha = getAttribute(nodeStateNode, "ha");
                     final String join = getAttribute(nodeStateNode, "join");
                     final String inCCM = getAttribute(nodeStateNode, "in_ccm");
-                    //final String id = getAttribute(nodeStateNode, "id");
-                    //final String crmd = getAttribute(nodeStateNode, "crmd");
-                    //final String shutdown =
-                    //                 getAttribute(nodeStateNode, "shutdown");
-                    //final String inCcm =
-                    //                   getAttribute(nodeStateNode, "in_ccm");
-                    //final String expected =
-                    //                getAttribute(nodeStateNode, "expected");
                     /* TODO: check and use other stuff too. */
                     if ("active".equals(ha)
                         && "member".equals(join)
@@ -2312,6 +2559,9 @@ public class CRMXML extends XML {
         cibQueryData.setCloneToResource(cloneToResourceMap);
         cibQueryData.setMasterList(masterList);
         cibQueryData.setFailed(failedMap);
+        cibQueryData.setRscDefaultsMetaAttrsId(rscDefaultsMetaAttrsId);
+        cibQueryData.setRscDefaultsParams(rscDefaultsParams);
+        cibQueryData.setRscDefaultsParamsNvpairIds(rscDefaultsParamsNvpairIds);
         return cibQueryData;
     }
 
@@ -2431,12 +2681,10 @@ public class CRMXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
-                && !Tools.getString("Heartbeat.Boolean.False").equals(value)
-                && !Tools.getString(
-                                "Heartbeat.2.1.3.Boolean.True").equals(value)
-                && !Tools.getString(
-                              "Heartbeat.2.1.3.Boolean.False").equals(value)) {
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !"True".equals(value)
+                && !"False".equals(value)) {
 
                 correctValue = false;
             }
@@ -2577,12 +2825,10 @@ public class CRMXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !Tools.getString("Heartbeat.Boolean.True").equals(value)
-                && !Tools.getString("Heartbeat.Boolean.False").equals(value)
-                && !Tools.getString(
-                                "Heartbeat.2.1.3.Boolean.True").equals(value)
-                && !Tools.getString(
-                              "Heartbeat.2.1.3.Boolean.False").equals(value)) {
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !"True".equals(value)
+                && !"False".equals(value)) {
 
                 correctValue = false;
             }
@@ -2611,6 +2857,7 @@ public class CRMXML extends XML {
     public final boolean isDrbddiskPresent() {
         return drbddiskPresent;
     }
+
     /** Returns whether linbit::drbd ra is present. */
     public final boolean isLinbitDrbdPresent() {
         return linbitDrbdPresent;
