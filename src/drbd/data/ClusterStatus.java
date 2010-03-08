@@ -162,6 +162,14 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns op defaults value pairs.
+     */
+    public final Map<String, String> getOpDefaultsValuePairs() {
+        return cibQueryMap.getOpDefaultsParams();
+    }
+
+
+    /**
      * Returns a map from parameter to its values.
      */
     public final Map<String, String> getParamValuePairs(final String hbId) {

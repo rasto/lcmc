@@ -1651,6 +1651,43 @@ public class CRMXML extends XML {
     }
 
     /**
+     * Parse op defaults.
+     */
+    public final void parseOpDefaults(
+                                final Node opDefaultsNode,
+                                final Map<String, String> opDefaultsParams) {
+
+        final Map<String, String> nvpairIds =
+                                        new HashMap<String, String>();
+        /* <meta_attributtes> */
+        final Node metaAttrsNode = getChildNode(opDefaultsNode,
+                                                "meta_attributes");
+        if (metaAttrsNode != null) {
+            /* <attributtes> only til 2.1.4 */
+            NodeList nvpairsMA;
+            final String hbV = host.getHeartbeatVersion();
+            final String pcmkV = host.getPacemakerVersion();
+            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                final Node attrsNode =
+                                  getChildNode(metaAttrsNode, "attributes");
+                nvpairsMA = attrsNode.getChildNodes();
+            } else {
+                nvpairsMA = metaAttrsNode.getChildNodes();
+            }
+            /* <nvpair...> */
+            /* target-role and is-managed */
+            for (int l = 0; l < nvpairsMA.getLength(); l++) {
+                final Node maNode = nvpairsMA.item(l);
+                if (maNode.getNodeName().equals("nvpair")) {
+                    final String name = getAttribute(maNode, "name");
+                    final String value = getAttribute(maNode, "value");
+                    opDefaultsParams.put(name, value);
+                }
+            }
+        }
+    }
+
+    /**
      * Parses attributes, operations etc. from primitives and clones.
      */
     private void parseAttributes(
@@ -2112,6 +2149,15 @@ public class CRMXML extends XML {
                                                    rscDefaultsParamsNvpairIds);
         }
 
+        /* <op_defaults> */
+        final Node opDefaultsNode = getChildNode(confNode, "op_defaults");
+        final Map<String, String> opDefaultsParams =
+                                                new HashMap<String, String>();
+        if (opDefaultsNode != null) {
+            parseOpDefaults(opDefaultsNode, opDefaultsParams);
+        }
+
+
         /* <crm_config> */
         final Node crmConfNode = getChildNode(confNode, "crm_config");
         if (crmConfNode == null) {
@@ -2562,6 +2608,7 @@ public class CRMXML extends XML {
         cibQueryData.setRscDefaultsMetaAttrsId(rscDefaultsMetaAttrsId);
         cibQueryData.setRscDefaultsParams(rscDefaultsParams);
         cibQueryData.setRscDefaultsParamsNvpairIds(rscDefaultsParamsNvpairIds);
+        cibQueryData.setOpDefaultsParams(opDefaultsParams);
         return cibQueryData;
     }
 

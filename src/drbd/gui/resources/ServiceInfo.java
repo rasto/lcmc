@@ -450,6 +450,18 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
+     * Returns operation default for parameter.
+     */
+    private String getOpDefaultsDefault(final String param) {
+        /* if op_defaults is set... It cannot be set in the GUI  */
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        if (cs != null) {
+            return cs.getOpDefaultsValuePairs().get(param);
+        }
+        return null;
+    }
+
+    /**
      * Sets service parameters with values from resourceNode hash.
      */
     public void setParameters(final Map<String, String> resourceNode) {
@@ -609,11 +621,14 @@ public class ServiceInfo extends EditableInfo {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                           op)) {
                 final String defaultValue =
-                              resourceAgent.getOperationDefault(op, param);
+                                resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
                     continue;
                 }
                 String value = cs.getOperation(refCRMId, op, param);
+                if (value == null || "".equals(value)) {
+                    value = getOpDefaultsDefault(param);
+                }
                 if (value == null) {
                     value = "";
                 }
@@ -1017,7 +1032,7 @@ public class ServiceInfo extends EditableInfo {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                           op)) {
                 final String defaultValue =
-                                 resourceAgent.getOperationDefault(op, param);
+                                resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
                     continue;
                 }
@@ -1028,7 +1043,10 @@ public class ServiceInfo extends EditableInfo {
                     continue;
                 }
                 final Object[] defaultValueE = Tools.extractUnit(defaultValue);
-                final Object value = cb.getValue();
+                Object value = cb.getValue();
+                if (Tools.areEqual(value, new Object[]{"", ""})) {
+                    value = new Object[]{getOpDefaultsDefault(param), null};
+                }
                 if (!Tools.areEqual(value, defaultValueE)) {
                     allAreDefaultValues = false;
                 }
@@ -1581,7 +1599,7 @@ public class ServiceInfo extends EditableInfo {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                          op)) {
                 String defaultValue =
-                          resourceAgent.getOperationDefault(op, param);
+                                resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
                     continue;
                 }
@@ -1658,7 +1676,7 @@ public class ServiceInfo extends EditableInfo {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                           op)) {
                 String defaultValue =
-                                 resourceAgent.getOperationDefault(op, param);
+                                resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
                     continue;
                 }
@@ -1669,8 +1687,14 @@ public class ServiceInfo extends EditableInfo {
                 if (defaultValue == null) {
                     defaultValue = "0";
                 }
-                final String savedValue =
-                                       (String) savedOperation.get(op, param);
+                String savedValue = (String) savedOperation.get(op, param);
+                if (!getService().isNew()
+                    && (savedValue == null || "".equals(savedValue))) {
+                    savedValue = getOpDefaultsDefault(param);
+                    if (savedValue == null) {
+                        savedValue = "";
+                    }
+                }
                 if (!defaultValue.equals(savedValue)) {
                     allAreDefaultValues = false;
                 }

@@ -123,6 +123,9 @@ public class CibQuery {
     /** rsc_defaults parameters with ids. */
     private Map<String, String> rscDefaultsParamsNvpairIds =
                                                  new HashMap<String, String>();
+    /** op_defaults parameters with values. */
+    private Map<String, String> opDefaultsParams =
+                                                 new HashMap<String, String>();
 
     /**
      * Sets crm config map.
@@ -660,5 +663,16 @@ public class CibQuery {
     /** Gets rsc_defaults parameters with ids. */
     public final Map<String, String> getRscDefaultsParamsNvpairIds() {
         return rscDefaultsParamsNvpairIds;
+    }
+
+    /** Sets op_defaults parameters with values. */
+    public final void setOpDefaultsParams(
+                                final Map<String, String> opDefaultsParams) {
+        this.opDefaultsParams = opDefaultsParams;
+    }
+
+    /** Gets op_defaults parameters with values. */
+    public final Map<String, String> getOpDefaultsParams() {
+        return opDefaultsParams;
     }
 }
