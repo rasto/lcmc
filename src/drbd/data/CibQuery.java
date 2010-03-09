@@ -116,7 +116,7 @@ public class CibQuery {
     /** Map from nodename and resource to the fail-count. */
     private MultiKeyMap failed = new MultiKeyMap();
     /** rsc_defaults meta attributes id. */
-    private String rscDefaultsMetaAttrsId = null;
+    private String rscDefaultsId = null;
     /** rsc_defaults parameters with values. */
     private Map<String, String> rscDefaultsParams =
                                                  new HashMap<String, String>();
@@ -633,14 +633,13 @@ public class CibQuery {
      }
 
     /** Sets rsc_defaults meta attributes id. */
-    public final void setRscDefaultsMetaAttrsId(
-                                        final String rscDefaultsMetaAttrsId) {
-        this.rscDefaultsMetaAttrsId = rscDefaultsMetaAttrsId;
+    public final void setRscDefaultsId(final String rscDefaultsId) {
+        this.rscDefaultsId = rscDefaultsId;
     }
 
     /** Gets rsc_defaults meta attributes id. */
-    public final String getRscDefaultsMetaAttrsId() {
-        return rscDefaultsMetaAttrsId;
+    public final String getRscDefaultsId() {
+        return rscDefaultsId;
     }
 
     /** Sets rsc_defaults parameters with values. */

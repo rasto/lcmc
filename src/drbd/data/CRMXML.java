@@ -1620,9 +1620,9 @@ public class CRMXML extends XML {
         /* <meta_attributtes> */
         final Node metaAttrsNode = getChildNode(rscDefaultsNode,
                                                 "meta_attributes");
-        String metaAttrsId = null;
+        String rscDefaultsId = null;
         if (metaAttrsNode != null) {
-            metaAttrsId = getAttribute(metaAttrsNode, "id");
+            rscDefaultsId = getAttribute(metaAttrsNode, "id");
             /* <attributtes> only til 2.1.4 */
             NodeList nvpairsMA;
             final String hbV = host.getHeartbeatVersion();
@@ -1647,7 +1647,7 @@ public class CRMXML extends XML {
                 }
             }
         }
-        return metaAttrsId;
+        return rscDefaultsId;
     }
 
     /**
@@ -2137,16 +2137,15 @@ public class CRMXML extends XML {
 
         /* <rsc_defaults> */
         final Node rscDefaultsNode = getChildNode(confNode, "rsc_defaults");
-        String rscDefaultsMetaAttrsId = null;
+        String rscDefaultsId = null;
         final Map<String, String> rscDefaultsParams =
                                                 new HashMap<String, String>();
         final Map<String, String> rscDefaultsParamsNvpairIds =
                                                 new HashMap<String, String>();
         if (rscDefaultsNode != null) {
-            rscDefaultsMetaAttrsId = parseRscDefaults(
-                                                   rscDefaultsNode,
-                                                   rscDefaultsParams,
-                                                   rscDefaultsParamsNvpairIds);
+            rscDefaultsId = parseRscDefaults(rscDefaultsNode,
+                                             rscDefaultsParams,
+                                             rscDefaultsParamsNvpairIds);
         }
 
         /* <op_defaults> */
@@ -2605,7 +2604,7 @@ public class CRMXML extends XML {
         cibQueryData.setCloneToResource(cloneToResourceMap);
         cibQueryData.setMasterList(masterList);
         cibQueryData.setFailed(failedMap);
-        cibQueryData.setRscDefaultsMetaAttrsId(rscDefaultsMetaAttrsId);
+        cibQueryData.setRscDefaultsId(rscDefaultsId);
         cibQueryData.setRscDefaultsParams(rscDefaultsParams);
         cibQueryData.setRscDefaultsParamsNvpairIds(rscDefaultsParamsNvpairIds);
         cibQueryData.setOpDefaultsParams(opDefaultsParams);

@@ -724,6 +724,7 @@ public final class CRM {
                                         final Host host,
                                         final Map<String, String> args,
                                         final Map<String, String> rdiMetaArgs,
+                                        String rscDefaultsId,
                                         final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append(
@@ -759,8 +760,12 @@ public final class CRM {
                                                                xml.toString()));
 
         if (rdiMetaArgs != null) {
+            String updateOrReplace = "-R";
+            if (rscDefaultsId == null) {
+                rscDefaultsId = "rsc-options";
+                updateOrReplace = "-U";
+            }
             final StringBuffer rscdXML = new StringBuffer(360);
-            final String rscDefaultsId = "rsc-options";
             rscdXML.append("'<rsc_defaults><meta_attributes id=\"");
             rscdXML.append(rscDefaultsId);
             rscdXML.append("\">");
@@ -777,7 +782,7 @@ public final class CRM {
             rscdXML.append("</meta_attributes></rsc_defaults>'");
 
             command.append(';');
-            command.append(getCibCommand("-R",
+            command.append(getCibCommand(updateOrReplace,
                                          "rsc_defaults",
                                          rscdXML.toString()));
         }

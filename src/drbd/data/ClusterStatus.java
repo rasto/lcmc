@@ -115,6 +115,17 @@ public class ClusterStatus {
     }
 
     /**
+     * Returns value of the rsc defaults id.
+     */
+    public final String getRscDefaultsId(final boolean testOnly) {
+        if (testOnly && ptestData != null) {
+            return shadowCibQueryMap.getRscDefaultsId();
+        } else {
+            return cibQueryMap.getRscDefaultsId();
+        }
+    }
+
+    /**
      * Returns value of parameter.
      */
     public final String getParameter(final String hbId,
