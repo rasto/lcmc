@@ -27,6 +27,7 @@ import drbd.gui.SpringUtilities;
 import drbd.data.Host;
 import drbd.data.PtestData;
 import drbd.data.ClusterStatus;
+import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.Tools;
@@ -470,7 +471,9 @@ public class HbConnectionInfo extends EditableInfo {
         final MyMenuItem removeEdgeItem = new MyMenuItem(
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge"),
                      ClusterBrowser.REMOVE_ICON,
-                     Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip")) {
+                     Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
+                     ConfigData.AccessType.ADMIN1,
+                     ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -505,7 +508,9 @@ public class HbConnectionInfo extends EditableInfo {
 
                 Tools.getString("ClusterBrowser.Hb.AddOrder"),
                 null,
-                Tools.getString("ClusterBrowser.Hb.AddOrder.ToolTip")) {
+                Tools.getString("ClusterBrowser.Hb.AddOrder.ToolTip"),
+                ConfigData.AccessType.ADMIN1,
+                ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {
@@ -571,7 +576,9 @@ public class HbConnectionInfo extends EditableInfo {
                     Tools.getString("ClusterBrowser.Hb.AddColocation"),
                     null,
                     Tools.getString(
-                            "ClusterBrowser.Hb.AddColocation.ToolTip")) {
+                            "ClusterBrowser.Hb.AddColocation.ToolTip"),
+                    ConfigData.AccessType.ADMIN1,
+                    ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {

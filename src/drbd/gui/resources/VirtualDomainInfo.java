@@ -25,6 +25,7 @@ import drbd.gui.Browser;
 import drbd.data.Host;
 import drbd.data.VMSXML;
 import drbd.data.ResourceAgent;
+import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.Tools;
@@ -123,7 +124,9 @@ class VirtualDomainInfo extends ServiceInfo {
             final MyMenuItem tightvncViewerMenu = new MyMenuItem(
                                                     "start TIGHT VNC viewer",
                                                     null,
-                                                    null) {
+                                                    null,
+                                                    ConfigData.AccessType.RO,
+                                                    ConfigData.AccessType.RO) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -164,7 +167,9 @@ class VirtualDomainInfo extends ServiceInfo {
             final MyMenuItem ultravncViewerMenu = new MyMenuItem(
                                                     "start ULTRA VNC viewer",
                                                     null,
-                                                    null) {
+                                                    null,
+                                                    ConfigData.AccessType.RO,
+                                                    ConfigData.AccessType.RO) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -203,9 +208,11 @@ class VirtualDomainInfo extends ServiceInfo {
         if (Tools.getConfigData().isRealvnc()) {
             /* real vnc test menu */
             final MyMenuItem realvncViewerMenu = new MyMenuItem(
-                                                        "start REAL VNC test",
-                                                        null,
-                                                        null) {
+                                                    "start REAL VNC test",
+                                                    null,
+                                                    null,
+                                                    ConfigData.AccessType.RO,
+                                                    ConfigData.AccessType.RO) {
 
                 private static final long serialVersionUID = 1L;
 

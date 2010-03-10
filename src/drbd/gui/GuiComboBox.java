@@ -25,6 +25,7 @@ package drbd.gui;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.PatternDocument;
+import drbd.data.ConfigData;
 import drbd.gui.resources.Info;
 
 import javax.swing.JPanel;
@@ -83,7 +84,6 @@ import java.util.regex.Matcher;
  *
  */
 public class GuiComboBox extends JPanel {
-
     /** Widget type. */
     public enum Type { LABELFIELD, TEXTFIELD, PASSWDFIELD, COMBOBOX,
                        RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT };
@@ -137,6 +137,28 @@ public class GuiComboBox extends JPanel {
                                 Tools.getString("GuiComboBox.NothingSelected");
     /** Label of this component. */
     private JLabel label = null;
+    /** Whether the component should be enabled */
+    private boolean enablePredicate = true;
+    /** Whether the component should be visible */
+    private boolean visiblePredicate = true;
+    /** Access Type for this component to become enabled */
+    ConfigData.AccessType enableAccessType = ConfigData.AccessType.RO;
+    /** Access Type for this component to become visible */
+    ConfigData.AccessType visibleAccessType = ConfigData.AccessType.RO;
+
+    public GuiComboBox(final String selectedValue,
+                       final Object[] items,
+                       final Type type,
+                       String regexp,
+                       final int width,
+                       final Map<String, String> abbreviations,
+                       final ConfigData.AccessType enableAccessType,
+                       final ConfigData.AccessType visibleAccessType) {
+        this(selectedValue, items, type, regexp, width, abbreviations);
+        this.enableAccessType = enableAccessType;
+        this.visibleAccessType = visibleAccessType;
+        processAccessType();
+    }
     /**
      * Prepares a new <code>GuiComboBox</code> object with specified units.
      */
@@ -507,8 +529,20 @@ public class GuiComboBox extends JPanel {
      * specified string. This works only with RADIOGROUP in a moment.
      */
     public final void setEnabled(final String s, final boolean enabled) {
+        enablePredicate = enabled;
         if (componentsHash.containsKey(s)) {
             componentsHash.get(s).setEnabled(enabled);
+        }
+    }
+
+    /**
+     * Sets visible/invisible a component in a group of components identified
+     * by specified string. This works only with RADIOGROUP in a moment.
+     */
+    public final void setVisible(final String s, final boolean visible) {
+        visiblePredicate = visible;
+        if (componentsHash.containsKey(s)) {
+            componentsHash.get(s).setVisible(visible);
         }
     }
 
@@ -736,9 +770,42 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
-     * Sets component editable or unsets.
+     * Sets component visible or invisible.
+     */
+    public final void setVisible(final boolean visible) {
+        visiblePredicate = visible;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (!visible) {
+                    setMinimumSize(new Dimension(0, 0));
+                    setPreferredSize(new Dimension(0, 0));
+                    setMaximumSize(new Dimension(0, 0));
+                }
+                setVisible(visible);
+                if (label != null) {
+                    label.setVisible(visible);
+                }
+                component.setVisible(visible);
+                for (final JComponent c : componentsHash.values()) {
+                    c.setVisible(visible);
+                }
+                switch(type) {
+                    case TEXTFIELDWITHUNIT:
+                        textFieldWithoutUnit.setVisible(visible);
+                        unitComboBox.setVisible(visible);
+                    break;
+                }
+                repaint();
+            }
+        });
+    }
+
+
+    /**
+     * Sets component enabled or disabled.
      */
     public final void setEnabled(final boolean enabled) {
+        enablePredicate = enabled;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 component.setEnabled(enabled);
@@ -1041,6 +1108,9 @@ public class GuiComboBox extends JPanel {
      * Sets background of the component depending if the value is the same
      * as its default value and if it is a required argument.
      * Must be called after combo box was already added to some panel.
+     * 
+     * It also disables, hides the component depending on the access type.
+     * TODO: rename the function
      */
     public final void setBackground(final String defaultLabel,
                                     final Object defaultValue,
@@ -1106,6 +1176,7 @@ public class GuiComboBox extends JPanel {
             default:
                 /* error */
         }
+        processAccessType();
     }
 
     /**
@@ -1346,5 +1417,13 @@ public class GuiComboBox extends JPanel {
      */
     public final Type getType() {
         return type;
+    }
+
+    /** Sets this item enabled and visible according to its access type. */
+    private void processAccessType() {
+        setEnabled(enablePredicate
+                   && Tools.getConfigData().isAccessible(enableAccessType));
+        setVisible(visiblePredicate
+                   && Tools.getConfigData().isAccessible(visibleAccessType));
     }
 }

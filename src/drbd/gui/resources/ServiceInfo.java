@@ -1654,7 +1654,9 @@ public class ServiceInfo extends EditableInfo {
                                              null,
                                              null,
                                              rightWidth,
-                                             null);
+                                             null,
+                                             ConfigData.AccessType.OP1,
+                                             ConfigData.AccessType.ADMIN1);
         sameAsOperationsCB.setToolTipText(defaultOpIdRef);
         final JLabel label = new JLabel(Tools.getString(
                                            "ClusterBrowser.OperationsSameAs"));
@@ -3401,7 +3403,9 @@ public class ServiceInfo extends EditableInfo {
      */
     private MyMenu getExistingServiceMenuItem(final boolean testOnly) {
         final ServiceInfo thisClass = this;
-        return new MyMenu(Tools.getString("ClusterBrowser.Hb.AddStartBefore")) {
+        return new MyMenu(Tools.getString("ClusterBrowser.Hb.AddStartBefore"),
+                          ConfigData.AccessType.ADMIN1,
+                          ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -3425,7 +3429,12 @@ public class ServiceInfo extends EditableInfo {
                         /* skip services that are in group. */
                         continue;
                     }
-                    final MyMenuItem mmi = new MyMenuItem(asi.toString()) {
+                    final MyMenuItem mmi = new MyMenuItem(
+                                              asi.toString(),
+                                              null,
+                                              null,
+                                              ConfigData.AccessType.ADMIN1,
+                                              ConfigData.AccessType.ADMIN1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             final Thread thread = new Thread(new Runnable() {
@@ -3481,7 +3490,9 @@ public class ServiceInfo extends EditableInfo {
      * Adds new Service and dependence.
      */
     private MyMenu getAddServiceMenuItem(final boolean testOnly) {
-        return new MyMenu(Tools.getString("ClusterBrowser.Hb.AddDependency")) {
+        return new MyMenu(Tools.getString("ClusterBrowser.Hb.AddDependency"),
+                          ConfigData.AccessType.ADMIN1,
+                          ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -3504,7 +3515,11 @@ public class ServiceInfo extends EditableInfo {
                     final ResourceAgent linbitDrbdService =
                                                   crmXML.getHbLinbitDrbd();
                     final MyMenuItem ldMenuItem = new MyMenuItem(
-                       Tools.getString("ClusterBrowser.linbitDrbdMenuName")) {
+                       Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
+                       null,
+                       null,
+                       ConfigData.AccessType.ADMIN1,
+                       ConfigData.AccessType.ADMIN1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -3539,7 +3554,11 @@ public class ServiceInfo extends EditableInfo {
                     final ResourceAgent drbddiskService =
                                                    crmXML.getHbDrbddisk();
                     final MyMenuItem ddMenuItem = new MyMenuItem(
-                     Tools.getString("ClusterBrowser.DrbddiskMenuName")) {
+                     Tools.getString("ClusterBrowser.DrbddiskMenuName"),
+                     null,
+                     null,
+                     ConfigData.AccessType.ADMIN1,
+                     ConfigData.AccessType.ADMIN1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -3571,7 +3590,11 @@ public class ServiceInfo extends EditableInfo {
                                                      "ocf");
                 if (ipService != null) { /* just skip it, if it is not*/
                     final MyMenuItem ipMenuItem =
-                               new MyMenuItem(ipService.getMenuName()) {
+                               new MyMenuItem(ipService.getMenuName(),
+                                              null,
+                                              null,
+                                              ConfigData.AccessType.ADMIN1,
+                                              ConfigData.AccessType.ADMIN1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -3592,7 +3615,11 @@ public class ServiceInfo extends EditableInfo {
                 }
                 if (fsService != null) { /* just skip it, if it is not*/
                     final MyMenuItem fsMenuItem =
-                           new MyMenuItem(fsService.getMenuName()) {
+                           new MyMenuItem(fsService.getMenuName(),
+                                          null,
+                                          null,
+                                          ConfigData.AccessType.ADMIN1,
+                                          ConfigData.AccessType.ADMIN1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -3613,11 +3640,17 @@ public class ServiceInfo extends EditableInfo {
                 }
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem = new MyMenu(
-                                        ClusterBrowser.HB_CLASS_MENU.get(cl));
+                                        ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        ConfigData.AccessType.ADMIN1,
+                                        ConfigData.AccessType.OP1);
                     final DefaultListModel dlm = new DefaultListModel();
                     for (final ResourceAgent ra : getAddServiceList(cl)) {
                         final MyMenuItem mmi =
-                                       new MyMenuItem(ra.getMenuName()) {
+                               new MyMenuItem(ra.getMenuName(),
+                                              null,
+                                              null,
+                                              ConfigData.AccessType.ADMIN1,
+                                              ConfigData.AccessType.ADMIN1) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -3674,7 +3707,9 @@ public class ServiceInfo extends EditableInfo {
                 new MyMenuItem(Tools.getString(
                                     "ClusterBrowser.Hb.AddDependentGroup"),
                                null,
-                               null) {
+                               null,
+                               ConfigData.AccessType.ADMIN1,
+                               ConfigData.AccessType.ADMIN1) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {
@@ -3720,7 +3755,9 @@ public class ServiceInfo extends EditableInfo {
         final MyMenuItem startMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StartResource"),
                            START_ICON,
-                           ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                           ConfigData.AccessType.OP1,
+                           ConfigData.AccessType.OP1) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -3752,7 +3789,9 @@ public class ServiceInfo extends EditableInfo {
         final MyMenuItem stopMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StopResource"),
                            STOP_ICON,
-                           ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                           ConfigData.AccessType.OP1,
+                           ConfigData.AccessType.OP2) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -3789,7 +3828,9 @@ public class ServiceInfo extends EditableInfo {
 
                Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
                SERVICE_RUNNING_ICON,
-               ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+               ClusterBrowser.STARTING_PTEST_TOOLTIP,
+               ConfigData.AccessType.OP1,
+               ConfigData.AccessType.OP2) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -3826,7 +3867,10 @@ public class ServiceInfo extends EditableInfo {
 
                   Tools.getString("ClusterBrowser.Hb.UnmanageResource"),
                   UNMANAGE_ICON,
-                  ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                  ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                  
+                  ConfigData.AccessType.OP1,
+                  ConfigData.AccessType.OP1) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -3867,7 +3911,9 @@ public class ServiceInfo extends EditableInfo {
             final MyMenuItem removeMenuItem = new MyMenuItem(
                         Tools.getString("ClusterBrowser.Hb.RemoveService"),
                         ClusterBrowser.REMOVE_ICON,
-                        ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        ConfigData.AccessType.ADMIN1,
+                        ConfigData.AccessType.OP1) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -3915,7 +3961,9 @@ public class ServiceInfo extends EditableInfo {
         final MyMenuItem viewLogMenu = new MyMenuItem(
                         Tools.getString("ClusterBrowser.Hb.ViewServiceLog"),
                         null,
-                        null) {
+                        null,
+                        ConfigData.AccessType.RO,
+                        ConfigData.AccessType.RO) {
 
             private static final long serialVersionUID = 1L;
 
@@ -3938,7 +3986,9 @@ public class ServiceInfo extends EditableInfo {
         items.add(viewLogMenu);
         /* expert options */
         final MyMenu expertSubmenu = new MyMenu(
-                        Tools.getString("ClusterBrowser.ExpertSubmenu")) {
+                        Tools.getString("ClusterBrowser.ExpertSubmenu"),
+                        ConfigData.AccessType.OP1,
+                        ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
             public boolean enablePredicate() {
                 return true;
@@ -3970,7 +4020,9 @@ public class ServiceInfo extends EditableInfo {
                                     "ClusterBrowser.Hb.MigrateResource")
                                     + " " + hostName + " (offline)",
                                MIGRATE_ICON,
-                               ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                               ConfigData.AccessType.OP1,
+                               ConfigData.AccessType.OP1) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
@@ -4025,7 +4077,9 @@ public class ServiceInfo extends EditableInfo {
             new MyMenuItem(
                     Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
                     UNMIGRATE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    ConfigData.AccessType.OP1,
+                    ConfigData.AccessType.OP2) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean visiblePredicate() {
@@ -4081,7 +4135,9 @@ public class ServiceInfo extends EditableInfo {
                                     "ClusterBrowser.Hb.MigrateFromResource")
                                     + " " + hostName + " (offline)",
                                MIGRATE_ICON,
-                               ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                               ConfigData.AccessType.OP1,
+                               ConfigData.AccessType.OP1) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {
@@ -4144,7 +4200,9 @@ public class ServiceInfo extends EditableInfo {
                                     "ClusterBrowser.Hb.ForceMigrateResource")
                                     + " " + hostName + " (offline)",
                                MIGRATE_ICON,
-                               ClusterBrowser.STARTING_PTEST_TOOLTIP) {
+                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                               ConfigData.AccessType.OP1,
+                               ConfigData.AccessType.OP1) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean predicate() {

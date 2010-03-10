@@ -32,6 +32,7 @@ import drbd.data.Cluster;
 import drbd.utilities.UpdatableItem;
 import drbd.data.Subtext;
 import drbd.data.ClusterStatus;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.ExecCallback;
@@ -252,7 +253,9 @@ public class HostInfo extends Info {
         final MyMenuItem hostWizardItem =
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
-                           null) {
+                           null,
+                           ConfigData.AccessType.RO,
+                           ConfigData.AccessType.RO) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -276,7 +279,9 @@ public class HostInfo extends Info {
 
                            Tools.getString("HostBrowser.CRM.StandByOff"),
                            HOST_STANDBY_OFF_ICON,
-                           null) {
+                           null,
+                           ConfigData.AccessType.OP1,
+                           ConfigData.AccessType.OP1) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -315,7 +320,9 @@ public class HostInfo extends Info {
         final MyMenuItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            null,
-                           null) {
+                           null,
+                           ConfigData.AccessType.RO,
+                           ConfigData.AccessType.RO) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -340,7 +347,9 @@ public class HostInfo extends Info {
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            null,
-                           null) {
+                           null,
+                           ConfigData.AccessType.RO,
+                           ConfigData.AccessType.RO) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -357,7 +366,9 @@ public class HostInfo extends Info {
         registerMenuItem(viewLogsItem);
         /* expert options */
         final MyMenu hostExpertSubmenu = new MyMenu(
-                        Tools.getString("HostBrowser.ExpertSubmenu")) {
+                        Tools.getString("HostBrowser.ExpertSubmenu"),
+                        ConfigData.AccessType.OP1,
+                        ConfigData.AccessType.OP2) {
             private static final long serialVersionUID = 1L;
             public boolean enablePredicate() {
                 return host.isConnected();
@@ -375,7 +386,9 @@ public class HostInfo extends Info {
         final MyMenuItem removeHostItem =
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
-                           null) {
+                           null,
+                           ConfigData.AccessType.RO,
+                           ConfigData.AccessType.RO) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

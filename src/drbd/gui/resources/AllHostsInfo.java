@@ -25,6 +25,7 @@ import drbd.AddHostDialog;
 import drbd.gui.Browser;
 import drbd.data.Cluster;
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
@@ -547,7 +548,9 @@ public class AllHostsInfo extends Info {
         final MyMenuItem newHostWizardItem =
             new MyMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"),
                            HOST_ICON,
-                           null) {
+                           null,
+                           ConfigData.AccessType.RO,
+                           ConfigData.AccessType.RO) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

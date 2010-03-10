@@ -21,6 +21,7 @@
 
 package drbd.utilities;
 
+import drbd.data.ConfigData;
 import javax.swing.JMenu;
 import java.awt.geom.Point2D;
 
@@ -32,12 +33,21 @@ public class MyMenu extends JMenu implements UpdatableItem {
     private static final long serialVersionUID = 1L;
     /** Position of the menu that can be stored and retrieved. */
     private Point2D pos = null;
+    /** Access Type for this component to become enabled */
+    final ConfigData.AccessType enableAccessType;
+    /** Access Type for this component to become visible */
+    final ConfigData.AccessType visibleAccessType;
 
     /**
      * Prepares a new <code>MyMenu</code> object.
      */
-    public MyMenu(final String text) {
+    public MyMenu(final String text,
+                  final ConfigData.AccessType enableAccessType,
+                  final ConfigData.AccessType visibleAccessType) {
         super(text);
+        this.enableAccessType = enableAccessType;
+        this.visibleAccessType = visibleAccessType;
+        processAccessType();
     }
 
     /**
@@ -69,10 +79,25 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /**
+     * Returns whether the item should be visible or not.
+     */
+    public boolean visiblePredicate() {
+        return true;
+    }
+
+    /**
      * This function is usually overriden and is called when the menu and its
      * items are to be updated.
      */
     public void update() {
-        setEnabled(enablePredicate());
+        processAccessType();
+    }
+
+    /** Sets this item enabled and visible according to its access type. */
+    private void processAccessType() {
+        setEnabled(enablePredicate()
+                   && Tools.getConfigData().isAccessible(enableAccessType));
+        setVisible(visiblePredicate()
+                   && Tools.getConfigData().isAccessible(visibleAccessType));
     }
 }

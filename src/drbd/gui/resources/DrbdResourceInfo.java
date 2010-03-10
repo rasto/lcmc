@@ -33,6 +33,7 @@ import drbd.data.resources.DrbdResource;
 import drbd.data.Host;
 import drbd.data.DrbdXML;
 import drbd.data.DRBDtestData;
+import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
@@ -1112,7 +1113,9 @@ public class DrbdResourceInfo extends EditableInfo
 
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect"),
             null,
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip")) {
+            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
+            ConfigData.AccessType.OP1,
+            ConfigData.AccessType.OP1) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1177,7 +1180,9 @@ public class DrbdResourceInfo extends EditableInfo
 
            Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
            null,
-           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip")) {
+           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
+           ConfigData.AccessType.OP1,
+           ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {
@@ -1214,7 +1219,9 @@ public class DrbdResourceInfo extends EditableInfo
                 Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain"),
                 null,
                 Tools.getString(
-                            "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip")) {
+                            "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
+                ConfigData.AccessType.OP1,
+                ConfigData.AccessType.OP1) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1233,8 +1240,9 @@ public class DrbdResourceInfo extends EditableInfo
         final MyMenuItem verifyMenu = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Drbd.Verify"),
                 null,
-                Tools.getString(
-                            "ClusterBrowser.Drbd.Verify.ToolTip")) {
+                Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
+                ConfigData.AccessType.OP1,
+                ConfigData.AccessType.OP1) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1255,7 +1263,9 @@ public class DrbdResourceInfo extends EditableInfo
                         Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
                         ClusterBrowser.REMOVE_ICON,
                         Tools.getString(
-                                "ClusterBrowser.Drbd.RemoveEdge.ToolTip")) {
+                                "ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
+                        ConfigData.AccessType.ADMIN1,
+                        ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
             public void action() {
                 /* this drbdResourceInfo remove myself and this calls
@@ -1275,7 +1285,9 @@ public class DrbdResourceInfo extends EditableInfo
         final MyMenuItem viewLogMenu = new MyMenuItem(
                                Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
                                null,
-                               null) {
+                               null,
+                               ConfigData.AccessType.RO,
+                               ConfigData.AccessType.RO) {
 
             private static final long serialVersionUID = 1L;
 

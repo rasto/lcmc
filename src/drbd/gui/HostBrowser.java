@@ -27,6 +27,7 @@ import drbd.data.resources.NetInterface;
 import drbd.data.resources.BlockDevice;
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.data.ConfigData;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.FSInfo;
 import drbd.gui.resources.HostDrbdInfo;
@@ -375,7 +376,9 @@ public class HostBrowser extends Browser {
         final MyMenuItem panicMenuItem = new MyMenuItem(
                     Tools.getString("HostBrowser.MakeKernelPanic")
                     + host.getName(),
-                    null) {
+                    null,
+                    ConfigData.AccessType.GOD,
+                    ConfigData.AccessType.ADMIN1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -400,7 +403,9 @@ public class HostBrowser extends Browser {
         final MyMenuItem rebootMenuItem = new MyMenuItem(
                     Tools.getString("HostBrowser.MakeKernelReboot")
                     + host.getName(),
-                    null) {
+                    null,
+                    ConfigData.AccessType.GOD,
+                    ConfigData.AccessType.ADMIN1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {

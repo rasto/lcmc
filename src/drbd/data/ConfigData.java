@@ -42,6 +42,8 @@ import java.util.ArrayList;
 public class ConfigData implements Serializable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** access type. */
+    public static enum AccessType { RO, OP1, OP2, ADMIN1, ADMIN2, GOD };
     /** All hosts object. */
     private final Hosts hosts;
     /** All clusters object. */
@@ -105,6 +107,8 @@ public class ConfigData implements Serializable {
     private boolean stagingDrbd = false;
     /** Frames per second for animations. */
     private float animFPS = 15;
+    /** Access Type of the application at the moment. */
+    private AccessType accessType = AccessType.RO;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -544,5 +548,27 @@ public class ConfigData implements Serializable {
      */
     public final void setAnimFPS(final float animFPS) {
         this.animFPS = animFPS;
+    }
+
+    /**
+     * Sets access type.
+     */
+    public final void setAccessType(final AccessType accessType) {
+        this.accessType = accessType;
+    }
+
+    /**
+     * Returns access type.
+     */
+    public final AccessType getAccessType() {
+        return accessType;
+    }
+
+    /**
+     * Returns true if the access type is greater than the one that is
+     * required.
+     */
+    public final boolean isAccessible(final AccessType required) {
+        return getAccessType().compareTo(required) >= 0;
     }
 }

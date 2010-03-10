@@ -941,7 +941,9 @@ public class ServicesInfo extends EditableInfo {
         final MyMenuItem addGroupMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.AddGroup"),
                            null,
-                           null) {
+                           null,
+                           ConfigData.AccessType.ADMIN1,
+                           ConfigData.AccessType.OP1) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -972,7 +974,9 @@ public class ServicesInfo extends EditableInfo {
 
         /* add service */
         final MyMenu addServiceMenuItem = new MyMenu(
-                        Tools.getString("ClusterBrowser.Hb.AddService")) {
+                        Tools.getString("ClusterBrowser.Hb.AddService"),
+                        ConfigData.AccessType.OP1,
+                        ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -993,7 +997,11 @@ public class ServicesInfo extends EditableInfo {
                     final ResourceAgent linbitDrbdService =
                                                    crmXML.getHbLinbitDrbd();
                     final MyMenuItem ldMenuItem = new MyMenuItem(
-                     Tools.getString("ClusterBrowser.linbitDrbdMenuName")) {
+                     Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
+                     null,
+                     null,
+                     ConfigData.AccessType.ADMIN1,
+                     ConfigData.AccessType.OP1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -1029,7 +1037,11 @@ public class ServicesInfo extends EditableInfo {
                     final ResourceAgent drbddiskService =
                                                 crmXML.getHbDrbddisk();
                     final MyMenuItem ddMenuItem = new MyMenuItem(
-                     Tools.getString("ClusterBrowser.DrbddiskMenuName")) {
+                     Tools.getString("ClusterBrowser.DrbddiskMenuName"),
+                     null,
+                     null,
+                     ConfigData.AccessType.ADMIN1,
+                     ConfigData.AccessType.OP1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -1062,7 +1074,11 @@ public class ServicesInfo extends EditableInfo {
                                          "ocf");
                 if (ipService != null) { /* just skip it, if it is not*/
                     final MyMenuItem ipMenuItem =
-                           new MyMenuItem(ipService.getMenuName()) {
+                           new MyMenuItem(ipService.getMenuName(),
+                                          null,
+                                          null,
+                                          ConfigData.AccessType.ADMIN1,
+                                          ConfigData.AccessType.OP1) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -1084,11 +1100,17 @@ public class ServicesInfo extends EditableInfo {
                 }
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
-                            new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl));
+                            new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                       ConfigData.AccessType.ADMIN1,
+                                       ConfigData.AccessType.OP1);
                     DefaultListModel dlm = new DefaultListModel();
                     for (final ResourceAgent ra : getAddServiceList(cl)) {
                         final MyMenuItem mmi =
-                                new MyMenuItem(ra.getMenuName()) {
+                                new MyMenuItem(ra.getMenuName(),
+                                               null,
+                                               null,
+                                               ConfigData.AccessType.ADMIN1,
+                                               ConfigData.AccessType.OP1) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -1136,7 +1158,9 @@ public class ServicesInfo extends EditableInfo {
         /* remove all services. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),
-                ClusterBrowser.REMOVE_ICON) {
+                ClusterBrowser.REMOVE_ICON,
+                ConfigData.AccessType.ADMIN2,
+                ConfigData.AccessType.ADMIN1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -1178,7 +1202,9 @@ public class ServicesInfo extends EditableInfo {
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ViewLogs"),
                            null,
-                           null) {
+                           null,
+                           ConfigData.AccessType.RO,
+                           ConfigData.AccessType.RO) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

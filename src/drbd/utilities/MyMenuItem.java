@@ -21,6 +21,7 @@
 
 package drbd.utilities;
 
+import drbd.data.ConfigData;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
@@ -66,25 +67,10 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Tooltip background color. */
     private Color toolTipBackground = null;
-
-    /**
-     * Prepares a new <code>MyMenuItem</code> object.
-     *
-     * @param text
-     *          text of the item
-     */
-    public MyMenuItem(final String text) { // TODO: remove this later
-        super(text);
-        this.text1 = text;
-        toolTip = createToolTip();
-        setNormalFont();
-        addActionListener(this);
-        try {
-            robot = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
-        }
-    }
+    /** Access Type for this component to become enabled */
+    final ConfigData.AccessType enableAccessType;
+    /** Access Type for this component to become visible */
+    final ConfigData.AccessType visibleAccessType;
 
     /**
      * Prepares a new <code>MyMenuItem</code> object with icon but without
@@ -96,10 +82,14 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      *          icon of the item
      */
     public MyMenuItem(final String text,
-                      final ImageIcon icon) {
+                      final ImageIcon icon,
+                      final ConfigData.AccessType enableAccessType,
+                      final ConfigData.AccessType visibleAccessType) {
         super(text);
         this.text1 = text;
         this.icon1 = icon;
+        this.enableAccessType = enableAccessType;
+        this.visibleAccessType = visibleAccessType;
         toolTip = createToolTip();
         setNormalFont();
         addActionListener(this);
@@ -108,6 +98,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        processAccessType();
     }
 
 
@@ -123,19 +114,24 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      */
     public MyMenuItem(final String text,
                       final ImageIcon icon,
-                      final String shortDesc) {
+                      final String shortDesc,
+                      final ConfigData.AccessType enableAccessType,
+                      final ConfigData.AccessType visibleAccessType) {
         super(text);
         toolTip = createToolTip();
         setNormalFont();
         this.text1 = text;
         this.icon1 = icon;
         this.shortDesc1 = shortDesc;
+        this.enableAccessType = enableAccessType;
+        this.visibleAccessType = visibleAccessType;
         addActionListener(this);
         try {
             robot = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        processAccessType();
     }
 
     /**
@@ -160,8 +156,10 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                       final String shortDesc1a,
                       final String text2,
                       final ImageIcon icon2,
-                      final String shortDesc2) {
-        this(text1a, icon1a, shortDesc1a);
+                      final String shortDesc2,
+                      final ConfigData.AccessType enableAccessType,
+                      final ConfigData.AccessType visibleAccessType) {
+        this(text1a, icon1a, shortDesc1a, enableAccessType, visibleAccessType);
         this.text2 = text2;
         this.icon2 = icon2;
         this.shortDesc2 = shortDesc2;
@@ -224,7 +222,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * Returns whether the item should be enabled or not.
      */
     public boolean enablePredicate() {
-        return false;
+        return true;
     }
 
     /**
@@ -255,9 +253,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                 toolTip.setTipText(shortDesc2);
             }
         }
+        processAccessType();
+    }
 
-        setEnabled(enablePredicate());
-        setVisible(visiblePredicate());
+    /** Sets this item enabled and visible according to its access type. */
+    private void processAccessType() {
+        setEnabled(enablePredicate()
+                   && Tools.getConfigData().isAccessible(enableAccessType));
+        setVisible(visiblePredicate()
+                   && Tools.getConfigData().isAccessible(visibleAccessType));
     }
 
     /**

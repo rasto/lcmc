@@ -29,6 +29,7 @@ import drbd.data.Host;
 import drbd.data.CRMXML;
 import drbd.data.ClusterStatus;
 import drbd.data.Subtext;
+import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.CRM;
 import drbd.utilities.MyMenu;
@@ -341,7 +342,9 @@ public class GroupInfo extends ServiceInfo {
         final boolean testOnly = false;
         /* add group service */
         final MyMenu addGroupServiceMenuItem = new MyMenu(
-                        Tools.getString("ClusterBrowser.Hb.AddGroupService")) {
+                        Tools.getString("ClusterBrowser.Hb.AddGroupService"),
+                        ConfigData.AccessType.ADMIN1,
+                        ConfigData.AccessType.OP1) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -354,11 +357,17 @@ public class GroupInfo extends ServiceInfo {
                 removeAll();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
-                            new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl));
+                            new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                       ConfigData.AccessType.ADMIN1,
+                                       ConfigData.AccessType.OP1);
                     DefaultListModel dlm = new DefaultListModel();
                     for (final ResourceAgent ra : getAddGroupServiceList(cl)) {
                         final MyMenuItem mmi =
-                                    new MyMenuItem(ra.getMenuName()) {
+                                    new MyMenuItem(ra.getMenuName(),
+                                                   null,
+                                                   null,
+                                                   ConfigData.AccessType.ADMIN1,
+                                                   ConfigData.AccessType.OP1) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -407,7 +416,10 @@ public class GroupInfo extends ServiceInfo {
             for (final String hbId : resources) {
                 final ServiceInfo gsi =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
-                final MyMenu groupServicesMenu = new MyMenu(gsi.toString()) {
+                final MyMenu groupServicesMenu = new MyMenu(
+                                                    gsi.toString(),
+                                                    ConfigData.AccessType.RO,
+                                                    ConfigData.AccessType.RO) {
                     private static final long serialVersionUID = 1L;
 
                     public boolean enablePredicate() {

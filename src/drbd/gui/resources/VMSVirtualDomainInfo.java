@@ -30,6 +30,7 @@ import drbd.data.VMSXML.DiskData;
 import drbd.data.VMSXML.InterfaceData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
+import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
@@ -430,7 +431,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final MyMenuItem tightvncViewerMenu = new MyMenuItem(
                                 getVNCMenuString("TIGHT", host),
                                 null,
-                                null) {
+                                null,
+                                ConfigData.AccessType.RO,
+                                ConfigData.AccessType.RO) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -470,7 +473,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final MyMenuItem ultravncViewerMenu = new MyMenuItem(
                                 getVNCMenuString("ULTRA", host),
                                 null,
-                                null) {
+                                null,
+                                ConfigData.AccessType.RO,
+                                ConfigData.AccessType.RO) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -510,7 +515,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final MyMenuItem realvncViewerMenu = new MyMenuItem(
                                     getVNCMenuString("REAL", host),
                                     null,
-                                    null) {
+                                    null,
+                                    ConfigData.AccessType.RO,
+                                    ConfigData.AccessType.RO) {
 
                 private static final long serialVersionUID = 1L;
 

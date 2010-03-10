@@ -30,6 +30,7 @@ import drbd.gui.resources.HbConnectionInfo;
 import drbd.gui.resources.HostInfo;
 import drbd.data.Subtext;
 import drbd.data.Host;
+import drbd.data.ConfigData;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -620,7 +621,11 @@ public class HeartbeatGraph extends ResourceGraph {
         final boolean tOnly = isTestOnly();
         for (final ServiceInfo asi
                             : getClusterBrowser().getExistingServiceList(si)) {
-            final MyMenuItem mmi = new MyMenuItem(asi.toString()) {
+            final MyMenuItem mmi = new MyMenuItem(asi.toString(),
+                                                  null,
+                                                  null,
+                                                  ConfigData.AccessType.ADMIN1,
+                                                  ConfigData.AccessType.OP1) {
                 private static final long serialVersionUID = 1L;
                 public void action() {
                     si.addServicePanel(asi, null, true, tOnly);
