@@ -136,8 +136,6 @@ public class ViewPanel extends JPanel {
         resourceInfo.setMinimumSize(INFO_PANEL_MIN_SIZE);
         viewSP.setDividerLocation(DIVIDER_LOCATION);
         viewSP.setPreferredSize(MENU_TREE_SIZE);
-
-
         add(viewSP);
 
         // Listen for when the selection changes.
@@ -166,16 +164,16 @@ public class ViewPanel extends JPanel {
                     /* expand the tree if an item was added */
                     //if ((path.length > 2
                     //     && path[2].toString().equals(
-                    //                Tools.getString("ClusterBrowser.Services")))
+                    //             Tools.getString("ClusterBrowser.Services")))
                     //    || (path.length > 1
                     //        && path[1].toString().equals(
-                    //                Tools.getString("ClusterBrowser.AllHosts")))
+                    //             Tools.getString("ClusterBrowser.AllHosts")))
                     //    || (path.length > 1
                     //        && path[1].toString().equals(
-                    //                Tools.getString("ClusterBrowser.VMs")))
+                    //                  Tools.getString("ClusterBrowser.VMs")))
                     //    || (path.length > 1
                     //        && path[1].toString().equals(
-                    //                Tools.getString("ClusterBrowser.Drbd")))) {
+                    //              Tools.getString("ClusterBrowser.Drbd")))) {
                         final TreePath tp = new TreePath(path);
                         tree.expandPath(tp);
                         tree.setSelectionPath(tp);
@@ -188,6 +186,7 @@ public class ViewPanel extends JPanel {
 
     /**
      * Sets the right component in the view.
+     * TODO: there is something wrong in these functions
      */
     private void setRightComponentInView(final JTree tree,
                                          final JSplitPane viewSP,
@@ -215,11 +214,11 @@ public class ViewPanel extends JPanel {
      * Sets the right component in the view.
      */
     public final void setRightComponentInView(final Browser browser,
-                                              final Info i) {
+                                              final Info nodeInfo) {
         if (viewSP != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    final JComponent p = browser.getInfoPanel(i);
+                    final JComponent p = browser.getInfoPanel(nodeInfo);
                     if (p != null) {
                         final int loc = viewSP.getDividerLocation();
                         viewSP.setRightComponent(p);

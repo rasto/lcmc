@@ -19,7 +19,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.gui;
 
 import drbd.utilities.Tools;
@@ -189,18 +188,26 @@ public class Browser {
         if (gView == null) {
             return iPanel;
         } else {
-            final int width = ClusterBrowser.SERVICE_LABEL_WIDTH
-                              + ClusterBrowser.SERVICE_FIELD_WIDTH
-                              + 36;
+            final int maxWidth = ClusterBrowser.SERVICE_LABEL_WIDTH
+                                 + ClusterBrowser.SERVICE_FIELD_WIDTH
+                                 + 36;
             final Dimension d = iPanel.getPreferredSize();
-            iPanel.setMinimumSize(new Dimension(width, (int) d.getHeight()));
-            iPanel.setMaximumSize(new Dimension(width, (int) Short.MAX_VALUE));
+            iPanel.setMinimumSize(new Dimension(maxWidth, 0));
+            iPanel.setMaximumSize(new Dimension(maxWidth,
+                                                (int) Short.MAX_VALUE));
+            if (infoPanelSplitPane != null) {
+                final int loc = infoPanelSplitPane.getDividerLocation();
+                infoPanelSplitPane.setLeftComponent(gView);
+                infoPanelSplitPane.setRightComponent(iPanel);
+                infoPanelSplitPane.setDividerLocation(loc);
+                return infoPanelSplitPane;
+            }
             final JSplitPane newSplitPane =
                                     new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                                    gView,
                                                    iPanel);
-            newSplitPane.setDividerSize(0);
             newSplitPane.setResizeWeight(1);
+            newSplitPane.setOneTouchExpandable(true);
             infoPanelSplitPane = newSplitPane;
             infoPanelSplitPane.repaint();
             return infoPanelSplitPane;

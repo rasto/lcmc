@@ -245,7 +245,13 @@ public class ServicesInfo extends EditableInfo {
                 rdiMetaArgs.put(param, value);
             }
         }
-        CRM.setGlobalParameters(dcHost, args, rdiMetaArgs, testOnly);
+        final String rscDefaultsId =
+                    getBrowser().getClusterStatus().getRscDefaultsId(testOnly);
+        CRM.setGlobalParameters(dcHost,
+                                args,
+                                rdiMetaArgs,
+                                rscDefaultsId,
+                                testOnly);
         if (!testOnly) {
             storeComboBoxValues(params);
             rdi.storeComboBoxValues(rdiParams);
@@ -1250,5 +1256,4 @@ public class ServicesInfo extends EditableInfo {
         }
         return changed;
     }
-
 }

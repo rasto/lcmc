@@ -27,8 +27,13 @@ import drbd.data.Host;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import java.awt.event.HierarchyEvent;
+
+
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.HierarchyListener;
 
 /**
  * @author rasto
@@ -48,16 +53,28 @@ public class MainPanel extends JPanel {
         super(new BorderLayout());
         // TODO: not new Host() but null
         final TerminalPanel terminalPanel = new TerminalPanel(new Host());
+        terminalPanel.setPreferredSize(new Dimension(
+                    Short.MAX_VALUE,
+                    Tools.getDefaultInt("MainPanel.TerminalPanelHeight")));
+        terminalPanel.setMinimumSize(terminalPanel.getPreferredSize());
+        terminalPanel.setMaximumSize(terminalPanel.getPreferredSize());
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                                     new ClustersPanel(),
                                                     terminalPanel);
-
-        splitPane.setDividerLocation(
-                    Tools.getDefaultInt("MainPanel.TerminalPanelDivider"));
-        splitPane.setContinuousLayout(true);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(1);
         Tools.getGUIData().setTerminalSplitPane(splitPane);
+
+        splitPane.setContinuousLayout(true);
+        splitPane.setResizeWeight(1);
+        splitPane.setOneTouchExpandable(true);
+
+        splitPane.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(final HierarchyEvent e) {
+                if ((e.getChangeFlags()
+                     & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    Tools.getGUIData().expandTerminalSplitPane(1);
+                }
+            }
+        });
         add(splitPane, BorderLayout.CENTER);
     }
 }

@@ -676,6 +676,9 @@ public class SSH {
                 // don't execute after error
                 if (exitCode != 0) {
                     if (execCallback != null) {
+                        if (outputVisible && commandVisible) {
+                            Tools.getGUIData().expandTerminalSplitPane(0);
+                        }
                         execCallback.doneError(ans.toString(), exitCode);
                     }
                     return;

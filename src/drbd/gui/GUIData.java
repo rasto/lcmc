@@ -30,10 +30,13 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.JButton;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.List;
 import java.util.ArrayList;
-
 
 /**
  * GUIData
@@ -151,15 +154,20 @@ public class GUIData  {
         final Component oldTerminalPanel =
                                 terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
-            terminalSplitPane.setOneTouchExpandable(false);
-            final int dl = terminalSplitPane.getDividerLocation();
-            /* this changes divider location */
-            if (oldTerminalPanel != null) {
-                terminalPanel.setSize(oldTerminalPanel.getSize());
-            }
-            terminalSplitPane.setBottomComponent(terminalPanel);
-            terminalSplitPane.setDividerLocation(dl);
-            terminalSplitPane.setOneTouchExpandable(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    terminalPanel.setPreferredSize(new Dimension(
+                        Short.MAX_VALUE,
+                        Tools.getDefaultInt("MainPanel.TerminalPanelHeight")));
+                    terminalPanel.setMinimumSize(
+                                             terminalPanel.getPreferredSize());
+                    terminalPanel.setMaximumSize(
+                                             terminalPanel.getPreferredSize());
+                    final int loc = terminalSplitPane.getDividerLocation();
+                    terminalSplitPane.setBottomComponent(terminalPanel);
+                    terminalSplitPane.setDividerLocation(loc);
+                }
+            });
         }
     }
 
@@ -172,6 +180,27 @@ public class GUIData  {
         } else {
             return mainFrame.getContentPane().getY()
                    + terminalSplitPane.getBottomComponent().getY();
+        }
+    }
+
+    /**
+     * Expands the terminal split pane.
+     */
+    public final void expandTerminalSplitPane(final int buttonNo) {
+        final int height =
+            (int) terminalSplitPane.getBottomComponent().getSize().getHeight();
+        if ((buttonNo == 0 && height == 0)
+            || (buttonNo == 1 && height > 0)) {
+            Tools.debug(this, "expand terminal split pane");
+            final BasicSplitPaneUI ui =
+                                  (BasicSplitPaneUI) terminalSplitPane.getUI();
+            final BasicSplitPaneDivider divider = ui.getDivider();
+            final JButton button = (JButton) divider.getComponent(buttonNo);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    button.doClick();
+                }
+            });
         }
     }
 
@@ -348,8 +377,8 @@ public class GUIData  {
         for (final JComponent c : enabledInGodModeList) {
             c.setEnabled(godMode);
         }
-        Tools.startProgressIndicator("OH MY GOD!!!");
-        Tools.stopProgressIndicator("OH MY GOD!!!");
+        Tools.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        Tools.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
     }
 
     /**
@@ -376,7 +405,7 @@ public class GUIData  {
      * Calls allHostsUpdate method on all registered components.
      */
     public final void allHostsUpdate() {
-        for (AllHostsUpdatable component : allHostsUpdateList) {
+        for (final AllHostsUpdatable component : allHostsUpdateList) {
             component.allHostsUpdate();
         }
         checkAddClusterButtons();

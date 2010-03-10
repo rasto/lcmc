@@ -195,7 +195,6 @@ public class TerminalPanel extends JScrollPane {
 
         append(prompt(), promptColor);
         terminalArea.setEditable(true);
-
         getViewport().add(terminalArea, BorderLayout.PAGE_END);
 
     }
