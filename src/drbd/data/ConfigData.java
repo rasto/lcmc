@@ -29,6 +29,9 @@ import com.trilead.ssh2.KnownHosts;
 import org.apache.commons.collections.map.MultiKeyMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import javax.swing.JComponent;
 
 /**
  * ConfigData
@@ -43,7 +46,39 @@ public class ConfigData implements Serializable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** access type. */
-    public static enum AccessType { RO, OP1, OP2, ADMIN1, ADMIN2, GOD };
+    public static enum AccessType { RO, OP, ADMIN, GOD };
+    /** Read only operating mode. */
+    private static final String OP_MODE_RO =
+                                        Tools.getString("ConfigData.OpMode.RO");
+
+    /** Operator Level 1 operating mode. */
+    private static final String OP_MODE_OP =
+                                       Tools.getString("ConfigData.OpMode.OP");
+
+    /** Administrator Level 1 operating mode. */
+    private static final String OP_MODE_ADMIN =
+                                    Tools.getString("ConfigData.OpMode.ADMIN");
+
+    /** Developer Level 10 operating mode. */
+    private static final String OP_MODE_GOD =
+                                       Tools.getString("ConfigData.OpMode.GOD");
+    /** Map from access type to its string representation. */
+    public static final Map<AccessType, String> OP_NODES_MAP =
+                                       new LinkedHashMap<AccessType, String>();
+    /** String representation to its access type. */
+    public static final Map<String, AccessType> ACCESS_TYPE_MAP =
+                                       new LinkedHashMap<String, AccessType>();
+    static {
+        OP_NODES_MAP.put(AccessType.RO, OP_MODE_RO);
+        OP_NODES_MAP.put(AccessType.OP, OP_MODE_OP);
+        OP_NODES_MAP.put(AccessType.ADMIN, OP_MODE_ADMIN);
+        OP_NODES_MAP.put(AccessType.GOD, OP_MODE_GOD);
+
+        ACCESS_TYPE_MAP.put(OP_MODE_RO, AccessType.RO);
+        ACCESS_TYPE_MAP.put(OP_MODE_OP, AccessType.OP);
+        ACCESS_TYPE_MAP.put(OP_MODE_ADMIN, AccessType.ADMIN);
+        ACCESS_TYPE_MAP.put(OP_MODE_GOD, AccessType.GOD);
+    }
     /** All hosts object. */
     private final Hosts hosts;
     /** All clusters object. */
@@ -108,7 +143,7 @@ public class ConfigData implements Serializable {
     /** Frames per second for animations. */
     private float animFPS = 15;
     /** Access Type of the application at the moment. */
-    private AccessType accessType = AccessType.RO;
+    private AccessType accessType = AccessType.ADMIN;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -570,5 +605,13 @@ public class ConfigData implements Serializable {
      */
     public final boolean isAccessible(final AccessType required) {
         return getAccessType().compareTo(required) >= 0;
+    }
+
+    /**
+     * Enabled the component if it is accessible.
+     */
+    public final void setAccessible(final JComponent c,
+                                       final AccessType required) {
+        c.setEnabled(getAccessType().compareTo(required) >= 0);
     }
 }

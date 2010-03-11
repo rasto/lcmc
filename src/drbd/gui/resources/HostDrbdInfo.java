@@ -269,8 +269,8 @@ public class HostDrbdInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
                            null,
                            null,
-                           ConfigData.AccessType.OP1,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -290,8 +290,8 @@ public class HostDrbdInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.UpAll"),
                            null,
                            null,
-                           ConfigData.AccessType.ADMIN1,
-                           ConfigData.AccessType.ADMIN1) {
+                           ConfigData.AccessType.ADMIN,
+                           ConfigData.AccessType.ADMIN) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -318,7 +318,7 @@ public class HostDrbdInfo extends Info {
                            null,
                            null,
                            ConfigData.AccessType.GOD, // TODO: does not work yet
-                           ConfigData.AccessType.ADMIN1) {
+                           ConfigData.AccessType.ADMIN) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -386,8 +386,8 @@ public class HostDrbdInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ConnectAll"),
                            null,
                            null,
-                           ConfigData.AccessType.OP1,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -412,8 +412,8 @@ public class HostDrbdInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.DisconnectAll"),
                            null,
                            null,
-                           ConfigData.AccessType.ADMIN1,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.ADMIN,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -438,8 +438,8 @@ public class HostDrbdInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.AttachAll"),
                            null,
                            null,
-                           ConfigData.AccessType.ADMIN1,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.ADMIN,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -464,8 +464,8 @@ public class HostDrbdInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
                                            null,
                                            null,
-                                           ConfigData.AccessType.ADMIN1,
-                                           ConfigData.AccessType.OP1) {
+                                           ConfigData.AccessType.ADMIN,
+                                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -490,8 +490,8 @@ public class HostDrbdInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
                            null,
                            null,
-                           ConfigData.AccessType.ADMIN1,
-                           ConfigData.AccessType.ADMIN1) {
+                           ConfigData.AccessType.ADMIN,
+                           ConfigData.AccessType.ADMIN) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -536,8 +536,8 @@ public class HostDrbdInfo extends Info {
         /* expert options */
         final MyMenu hostExpertSubmenu = new MyMenu(
                                 Tools.getString("HostBrowser.ExpertSubmenu"),
-                                ConfigData.AccessType.OP1,
-                                ConfigData.AccessType.OP1) {
+                                ConfigData.AccessType.OP,
+                                ConfigData.AccessType.OP) {
             private static final long serialVersionUID = 1L;
             public boolean enablePredicate() {
                 return host.isConnected();

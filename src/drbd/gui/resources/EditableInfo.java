@@ -28,6 +28,7 @@ import drbd.utilities.MyButton;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.data.CRMXML;
+import drbd.data.ConfigData;
 import drbd.gui.SpringUtilities;
 
 import javax.swing.JLabel;
@@ -606,13 +607,15 @@ public abstract class EditableInfo extends Info {
             type = GuiComboBox.Type.TEXTFIELDWITHUNIT;
             units = getTimeUnits();
         }
-        final GuiComboBox paramCb = new GuiComboBox(initValue,
-                                                    getPossibleChoices(param),
-                                                    units,
-                                                    type,
-                                                    regexp,
-                                                    width,
-                                                    abbreviations);
+        final GuiComboBox paramCb = new GuiComboBox(
+                                                initValue,
+                                                getPossibleChoices(param),
+                                                units,
+                                                type,
+                                                regexp,
+                                                width,
+                                                abbreviations,
+                                                ConfigData.AccessType.ADMIN);
         paramComboBoxAdd(param, prefix, paramCb);
         paramCb.setEditable(true);
         return paramCb;

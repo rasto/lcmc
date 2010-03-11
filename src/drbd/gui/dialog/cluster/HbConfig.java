@@ -26,6 +26,7 @@ import drbd.utilities.MyButton;
 import drbd.utilities.Heartbeat;
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.data.ConfigData;
 import drbd.data.CastAddress;
 import drbd.data.resources.NetInterface;
 import drbd.data.resources.UcastLink;
@@ -600,7 +601,13 @@ public class HbConfig extends DialogCluster {
                 configPanel.revalidate();
                 configPanel.repaint();
                 if (configChanged) {
-                    makeConfigButton.setEnabled(!castAddresses.isEmpty());
+                    if (castAddresses.isEmpty()) {
+                        makeConfigButton.setEnabled(false);
+                    } else {
+                        Tools.getConfigData().setAccessible(
+                                            makeConfigButton,
+                                            ConfigData.AccessType.ADMIN);
+                    }
                     if (!Tools.getConfigData().getAutoClusters().isEmpty()
                         && !castAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -803,18 +810,22 @@ public class HbConfig extends DialogCluster {
 
         typeCB = new GuiComboBox(MCAST_TYPE,
                                  types,
-                                 null,
-                                 null,
+                                 null, /* units */
+                                 null, /* type */
+                                 null, /* regexp */
                                  TYPE_COMBOBOX_WIDTH,
-                                 null);
+                                 null, /* abbrv */
+                                 ConfigData.AccessType.RO);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        ifaceCB = new GuiComboBox(null,
+        ifaceCB = new GuiComboBox(null, /* selected value */
                                   ni,
-                                  null,
-                                  null,
+                                  null, /* units */
+                                  null, /* type */
+                                  null, /* regexp */
                                   INTF_COMBOBOX_WIDTH,
-                                  null);
+                                  null, /* abbrv */
+                                  ConfigData.AccessType.RO);
 
         /* ucast links */
         final List<UcastLink> ulList = new ArrayList<UcastLink>();
@@ -827,18 +838,22 @@ public class HbConfig extends DialogCluster {
         final UcastLink[] ucastLinks =
                                 ulList.toArray(new UcastLink[ulList.size()]);
 
-        ucastLink1CB = new GuiComboBox(null,
+        ucastLink1CB = new GuiComboBox(null, /* selected value */
                                        ucastLinks,
-                                       null,
-                                       null,
+                                       null, /* units */
+                                       null, /* type */
+                                       null, /* regexp */
                                        LINK_COMBOBOX_WIDTH,
-                                       null);
-        ucastLink2CB = new GuiComboBox(null,
+                                       null, /* abbrv */
+                                       ConfigData.AccessType.RO);
+        ucastLink2CB = new GuiComboBox(null, /* selected value */
                                        ucastLinks,
-                                       null,
-                                       null,
+                                       null, /* units */
+                                       null, /* type */
+                                       null, /* regexp */
                                        LINK_COMBOBOX_WIDTH,
-                                       null);
+                                       null, /* abbrv */
+                                       ConfigData.AccessType.RO);
 
         /* serial links */
         final String[] serialDevs = {"/dev/ttyS0",
@@ -846,22 +861,31 @@ public class HbConfig extends DialogCluster {
                                      "/dev/ttyS2",
                                      "/dev/ttyS3"};
 
-        serialCB = new GuiComboBox(null,
+        serialCB = new GuiComboBox(null, /* selected value */
                                    serialDevs,
-                                   null,
-                                   null,
+                                   null, /* units */
+                                   null, /* type */
+                                   null, /* regexp */
                                    LINK_COMBOBOX_WIDTH,
-                                   null);
+                                   null, /* abbrv */
+                                   ConfigData.AccessType.RO);
 
         /* this matches something like this: 225.0.0.43 694 1 0
          * if you think that the regexp is too complicated for that, consider,
          * that it must match also during the thing is written.
+         * TODO: it does not work very good anyway
          */
         final String regexp = "^\\d{1,3}(\\.\\d{0,3}(\\d\\.\\d{0,3}"
                               + "(\\d\\.\\d{0,3})( \\d{0,3}(\\d \\d{0,3}"
                               + "(\\d \\d{0,3})?)?)?)?)?$";
         addrCB = new GuiComboBox("239.192.0.0 694 1 0",
-                                 null, null, regexp, ADDR_COMBOBOX_WIDTH, null);
+                                 null, /* items */
+                                 null, /* units */
+                                 null, /* type */
+                                 regexp,
+                                 ADDR_COMBOBOX_WIDTH,
+                                 null, /* abbrv */
+                                 ConfigData.AccessType.RO);
 
         final ItemListener typeL = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
@@ -1008,6 +1032,8 @@ public class HbConfig extends DialogCluster {
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
+        Tools.getConfigData().setAccessible(configCheckbox,
+                                            ConfigData.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 final String text = configCheckbox.getText();

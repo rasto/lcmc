@@ -2327,4 +2327,29 @@ public class ClusterBrowser extends Browser {
     public final RscDefaultsInfo getRscDefaultsInfo() {
         return rscDefaultsInfo;
     }
+
+    /** Checks all fields in the application. */
+    public final void checkEverything() {
+        servicesInfo.checkResourceFields(null,
+                                         servicesInfo.getParametersFromXML());
+        for (final ServiceInfo si : getExistingServiceList(null)) {
+            si.checkResourceFields(null, si.getParametersFromXML());
+        }
+
+        drbdGraph.getDrbdInfo().checkResourceFields(
+                                null,
+                                drbdGraph.getDrbdInfo().getParametersFromXML());
+        for (final DrbdResourceInfo dri : drbdResHash.values()) {
+            System.out.println("recheck: " + dri.toString());
+            dri.checkResourceFields(null, dri.getParametersFromXML());
+            final BlockDevInfo bdi1 = dri.getFirstBlockDevInfo();
+            if (bdi1 != null) {
+                bdi1.checkResourceFields(null, bdi1.getParametersFromXML());
+            }
+            final BlockDevInfo bdi2 = dri.getSecondBlockDevInfo();
+            if (bdi2 != null) {
+                bdi2.checkResourceFields(null, bdi2.getParametersFromXML());
+            }
+        }
+    }
 }

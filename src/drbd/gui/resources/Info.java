@@ -719,8 +719,7 @@ public class Info implements Comparable {
             }
 
             public void mouseEntered(final MouseEvent e) {
-                if (c.isShowing()
-                    && c.isEnabled()) {
+                if (c.isShowing() && c.isEnabled()) {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
                             bc.mouseOver();

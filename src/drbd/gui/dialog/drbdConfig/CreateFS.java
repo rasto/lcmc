@@ -24,6 +24,7 @@ package drbd.gui.dialog.drbdConfig;
 
 import drbd.utilities.Tools;
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.gui.SpringUtilities;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.DrbdResourceInfo;
@@ -250,10 +251,12 @@ public class CreateFS extends DrbdConfig {
         }
         hostCB = new GuiComboBox(defaultHost,
                                  hostNames,
+                                 null, /* units */
                                  GuiComboBox.Type.COMBOBOX,
-                                 null,
+                                 null, /* regexp */
                                  COMBOBOX_WIDTH,
-                                 null);
+                                 null, /* abbrv */
+                                 ConfigData.AccessType.RO);
         hostCB.addListeners(
             new  ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -284,10 +287,12 @@ public class CreateFS extends DrbdConfig {
 
         filesystemCB = new GuiComboBox(defaultValue,
                                        filesystems,
+                                       null, /* units */
                                        GuiComboBox.Type.COMBOBOX,
-                                       null,
+                                       null, /* regexp */
                                        COMBOBOX_WIDTH,
-                                       null);
+                                       null, /* abbrv */
+                                       ConfigData.AccessType.RO);
         inputPane.add(filesystemLabel);
         inputPane.add(filesystemCB);
         filesystemCB.addListeners(

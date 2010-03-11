@@ -25,6 +25,7 @@ package drbd.gui.dialog.drbd;
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.gui.SpringUtilities;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.GuiComboBox;
@@ -152,12 +153,14 @@ public class SplitBrain extends DrbdConfig {
         final Host[] hosts = getDrbdResourceInfo().getHosts();
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
-        hostCB = new GuiComboBox(null,
+        hostCB = new GuiComboBox(null, /* selected value */
                                  hosts,
+                                 null, /* units */
                                  GuiComboBox.Type.COMBOBOX,
-                                 null,
+                                 null, /* regexp */
                                  COMBOBOX_WIDTH,
-                                 null);
+                                 null, /* abbrv */
+                                 ConfigData.AccessType.RO);
         inputPane.add(hostLabel);
         inputPane.add(hostCB);
         resolveButton.addActionListener(new ActionListener() {

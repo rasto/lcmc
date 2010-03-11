@@ -19,11 +19,11 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.gui.dialog.cluster;
 
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.SSH.ExecCommandThread;
@@ -234,11 +234,12 @@ public class CommStack extends DialogCluster {
         chooseStackCombo = new GuiComboBox(defaultValue,
                                            new String[]{HEARTBEAT_NAME,
                                                         COROSYNC_NAME},
-                                           null,
+                                           null, /* units */
                                            GuiComboBox.Type.RADIOGROUP,
-                                           null,
+                                           null, /* regexp */
                                            500,
-                                           null);
+                                           null, /* abbrv */
+                                           ConfigData.AccessType.ADMIN);
         chooseStackCombo.setEnabled(COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);

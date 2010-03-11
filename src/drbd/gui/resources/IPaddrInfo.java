@@ -112,12 +112,12 @@ class IPaddrInfo extends ServiceInfo {
             final String regexp = "^[\\d.*]*|Select\\.\\.\\.$";
             paramCb = new GuiComboBox(ip,
                                       networks,
+                                      null, /* units */
                                       GuiComboBox.Type.COMBOBOX,
                                       regexp,
                                       width,
-                                      null,
-                                      ConfigData.AccessType.ADMIN1,
-                                      ConfigData.AccessType.OP1);
+                                      null, /* abbrv */
+                                      ConfigData.AccessType.ADMIN);
 
             paramCb.setAlwaysEditable(true);
             paramComboBoxAdd(param, prefix, paramCb);

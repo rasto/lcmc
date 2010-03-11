@@ -22,6 +22,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.ExecCallback;
@@ -623,10 +624,12 @@ public class CheckInstallation extends DialogHost {
                    pmDefaultValue,
                    (Object[]) pmMethods.toArray(
                                       new InstallMethods[pmMethods.size()]),
+                   null, /* units */
                    GuiComboBox.Type.COMBOBOX,
-                   null,
-                   0,
-                   null);
+                   null, /* regexp */
+                   0,    /* width */
+                   null, /* abbrv */
+                   ConfigData.AccessType.RO);
         if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -687,10 +690,12 @@ public class CheckInstallation extends DialogHost {
                    hbPmDefaultValue,
                    (Object[]) hbPmMethods.toArray(
                                         new InstallMethods[hbPmMethods.size()]),
+                   null, /* units */
                    GuiComboBox.Type.COMBOBOX,
-                   null,
-                   0,
-                   null);
+                   null, /* regexp */
+                   0,    /* width */
+                   null, /* abbrv */
+                   ConfigData.AccessType.RO);
         if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -759,10 +764,12 @@ public class CheckInstallation extends DialogHost {
                        drbdDefaultValue,
                        (Object[]) drbdMethods.toArray(
                                         new InstallMethods[drbdMethods.size()]),
+                       null, /* units */
                        GuiComboBox.Type.COMBOBOX,
-                       null,
-                       0,
-                       null);
+                       null, /* regexp */
+                       0,    /* width */
+                       null, /* abbrv */
+                       ConfigData.AccessType.RO);
             drbdInstMethodCB.addListeners(
                 new ItemListener() {
                     public void itemStateChanged(final ItemEvent e) {
@@ -790,11 +797,13 @@ public class CheckInstallation extends DialogHost {
                 }, null);
         } else {
             drbdInstMethodCB = new GuiComboBox("",
-                                               null,
+                                               null, /* items */
+                                               null, /* units */
                                                GuiComboBox.Type.COMBOBOX,
-                                               null,
-                                               0,
-                                               null);
+                                               null, /* regexp */
+                                               0,    /* width */
+                                               null, /* abbrv */
+                                               ConfigData.AccessType.RO);
             drbdInstMethodCB.setEnabled(false);
         }
         if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {

@@ -384,10 +384,12 @@ public class BlockDevInfo extends EditableInfo {
             gcb = new GuiComboBox(
                        defaultPort,
                        drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
-                       null,
+                       null, /* units */
+                       null, /* type */
                        regexp,
                        width,
-                       null);
+                       null, /* abbrv */
+                       ConfigData.AccessType.ADMIN);
             gcb.setValue(defaultPort);
             paramComboBoxAdd(param, prefix, gcb);
             gcb.setEnabled(true);
@@ -957,8 +959,8 @@ public class BlockDevInfo extends EditableInfo {
         return new MyMenuItem(oBdi.toString(),
                               null,
                               null,
-                              ConfigData.AccessType.ADMIN1,
-                              ConfigData.AccessType.OP1) {
+                              ConfigData.AccessType.ADMIN,
+                              ConfigData.AccessType.OP) {
             private static final long serialVersionUID = 1L;
             public void action() {
                 final DrbdInfo drbdInfo =
@@ -988,8 +990,8 @@ public class BlockDevInfo extends EditableInfo {
         final boolean testOnly = false;
         final MyMenu repMenuItem = new MyMenu(
                         Tools.getString("HostBrowser.Drbd.AddDrbdResource"),
-                        ConfigData.AccessType.ADMIN1,
-                        ConfigData.AccessType.OP1) {
+                        ConfigData.AccessType.ADMIN,
+                        ConfigData.AccessType.OP) {
             private static final long serialVersionUID = 1L;
 
             public final boolean enablePredicate() {
@@ -1008,8 +1010,8 @@ public class BlockDevInfo extends EditableInfo {
                         continue;
                     }
                     MyMenu hostMenu = new MyMenu(oHost.getName(),
-                                                 ConfigData.AccessType.ADMIN1,
-                                                 ConfigData.AccessType.OP1) {
+                                                 ConfigData.AccessType.ADMIN,
+                                                 ConfigData.AccessType.OP) {
                         private static final long serialVersionUID = 1L;
 
                         public final boolean enablePredicate() {
@@ -1063,8 +1065,8 @@ public class BlockDevInfo extends EditableInfo {
                            HARDDISK_ICON,
                            Tools.getString("HostBrowser.Drbd.Attach.ToolTip"),
                            
-                           ConfigData.AccessType.OP2,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1114,8 +1116,8 @@ public class BlockDevInfo extends EditableInfo {
                            null,
                            null,
                            
-                           ConfigData.AccessType.OP2,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1170,8 +1172,8 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.SetPrimary"),
                            null,
                            null,
-                           ConfigData.AccessType.OP2,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1206,8 +1208,8 @@ public class BlockDevInfo extends EditableInfo {
                            null,
                            Tools.getString(
                                 "HostBrowser.Drbd.SetSecondary.ToolTip"),
-                           ConfigData.AccessType.OP2,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -1230,8 +1232,8 @@ public class BlockDevInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ForcePrimary"),
                            null,
                            null,
-                           ConfigData.AccessType.OP2,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -1254,8 +1256,8 @@ public class BlockDevInfo extends EditableInfo {
                    Tools.getString("HostBrowser.Drbd.Invalidate"),
                    null,
                    Tools.getString("HostBrowser.Drbd.Invalidate.ToolTip"),
-                   ConfigData.AccessType.ADMIN1,
-                   ConfigData.AccessType.OP1) {
+                   ConfigData.AccessType.ADMIN,
+                   ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -1283,8 +1285,8 @@ public class BlockDevInfo extends EditableInfo {
                        Tools.getString("HostBrowser.Drbd.PauseSync"),
                        null,
                        Tools.getString("HostBrowser.Drbd.PauseSync.ToolTip"),
-                       ConfigData.AccessType.OP1,
-                       ConfigData.AccessType.OP1) {
+                       ConfigData.AccessType.OP,
+                       ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1316,8 +1318,8 @@ public class BlockDevInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Resize"),
                            null,
                            Tools.getString("HostBrowser.Drbd.Resize.ToolTip"),
-                           ConfigData.AccessType.ADMIN1,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.ADMIN,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -1340,8 +1342,8 @@ public class BlockDevInfo extends EditableInfo {
                            null,
                            Tools.getString(
                                      "HostBrowser.Drbd.DiscardData.ToolTip"),
-                           ConfigData.AccessType.ADMIN1,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.ADMIN,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

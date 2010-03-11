@@ -164,7 +164,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.icon2 = icon2;
         this.shortDesc2 = shortDesc2;
     }
-
     /**
      * Sets the pos of the click that can be used in the overriden action
      * method.
@@ -258,10 +257,18 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessType() {
-        setEnabled(enablePredicate()
-                   && Tools.getConfigData().isAccessible(enableAccessType));
+        final boolean accessible = 
+                   Tools.getConfigData().isAccessible(enableAccessType);
+        setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
                    && Tools.getConfigData().isAccessible(visibleAccessType));
+        if (isVisible() && !accessible) {
+            setToolTipText("<html><b>"
+                           + getText()
+                           + " (disabled)</b><br>available in \""
+                           + ConfigData.OP_NODES_MAP.get(enableAccessType)
+                           + "\" mode</html>");
+        }
     }
 
     /**

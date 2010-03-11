@@ -163,8 +163,8 @@ public class AvailableServiceInfo extends HbCategoryInfo {
                             "Add Service To Cluster",
                             null,
                             null,
-                            ConfigData.AccessType.ADMIN1,
-                            ConfigData.AccessType.OP1) {
+                            ConfigData.AccessType.ADMIN,
+                            ConfigData.AccessType.OP) {
 
             private static final long serialVersionUID = 1L;
 

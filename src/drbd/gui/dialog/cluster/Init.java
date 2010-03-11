@@ -24,6 +24,7 @@ package drbd.gui.dialog.cluster;
 
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
 import drbd.utilities.Heartbeat;
@@ -446,8 +447,13 @@ public class Init extends DialogCluster {
                                 pmStartedInfo.setText(
                                    initScript + Tools.getString(
                                         "Dialog.Cluster.Init.CsAisIsStopped"));
-                                csAisStartButton.setEnabled(
-                                                          !heartbeatIsRunning);
+                                if (heartbeatIsRunning) {
+                                    csAisStartButton.setEnabled(false);
+                                } else {
+                                    Tools.getConfigData().setAccessible(
+                                                    csAisStartButton,
+                                                    ConfigData.AccessType.OP);
+                                }
                             }
                             csAisStartButton.setVisible(true);
                             pmStartedInfo.setForeground(Color.RED);
@@ -503,7 +509,13 @@ public class Init extends DialogCluster {
                             } else {
                                 hbStartedInfo.setText(Tools.getString(
                                             "Dialog.Cluster.Init.HbIsStopped"));
-                                hbStartButton.setEnabled(!csAisRunning);
+                                if (csAisRunning) {
+                                    hbStartButton.setEnabled(false);
+                                } else {
+                                    Tools.getConfigData().setAccessible(
+                                                    hbStartButton,
+                                                    ConfigData.AccessType.OP);
+                                }
                             }
                             hbStartButton.setVisible(true);
                             hbStartedInfo.setForeground(Color.RED);

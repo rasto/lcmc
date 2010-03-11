@@ -22,6 +22,7 @@
 
 package drbd.gui;
 import drbd.data.Cluster;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.AllHostsUpdatable;
@@ -31,6 +32,7 @@ import drbd.EditClusterDialog;
 import javax.swing.JTree;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JComboBox;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -39,6 +41,8 @@ import java.awt.Dimension;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 import javax.swing.border.TitledBorder;
 
@@ -72,10 +76,10 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         tree = getTree(cluster.getBrowser());
         cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
-
         /* wizard buttons */
         final JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBackground(STATUS_BACKGROUND);
+
         /* cluster wizard */
         final MyButton clusterWizardButton = new MyButton(
                             Tools.getString("ClusterViewPanel.ClusterWizard"));
@@ -100,8 +104,42 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         clusterButtonsPanel.setBorder(titledBorder);
 
         clusterButtonsPanel.add(clusterWizardButton);
-        clusterButtonsPanel.add(Tools.expertModeButton());
         buttonPanel.add(clusterButtonsPanel);
+
+        /* Operating mode */
+        final JPanel opModePanel = new JPanel();
+        opModePanel.setBackground(STATUS_BACKGROUND);
+        final TitledBorder vmBorder = Tools.getBorder("Operating Mode");
+        opModePanel.setBorder(vmBorder);
+        final String[] modes = ConfigData.ACCESS_TYPE_MAP.keySet().toArray(
+                                 new String[ConfigData.ACCESS_TYPE_MAP.size()]);
+        final JComboBox opModeCB = new JComboBox(modes);
+        opModeCB.addItemListener(new ItemListener() {
+            public void itemStateChanged(final ItemEvent e) {
+                final String opMode = (String) e.getItem();
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            ConfigData.AccessType type =
+                                         ConfigData.ACCESS_TYPE_MAP.get(opMode);
+
+                            if (type == null) {
+                                Tools.appError("unknown mode: " + opMode);
+                                type = ConfigData.AccessType.RO;
+                            }
+                            Tools.getConfigData().setAccessType(type);
+                            cluster.getBrowser().checkEverything();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        });
+        opModePanel.add(opModeCB);
+        opModePanel.add(Tools.expertModeButton());
+        buttonPanel.add(opModePanel);
+
+
         /* upgrade field */
         buttonPanel.add(
             Tools.getGUIData().getClustersPanel().registerUpgradeTextField());

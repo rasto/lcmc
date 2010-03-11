@@ -280,8 +280,8 @@ public class HostInfo extends Info {
                            Tools.getString("HostBrowser.CRM.StandByOff"),
                            HOST_STANDBY_OFF_ICON,
                            null,
-                           ConfigData.AccessType.OP1,
-                           ConfigData.AccessType.OP1) {
+                           ConfigData.AccessType.OP,
+                           ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -367,8 +367,8 @@ public class HostInfo extends Info {
         /* expert options */
         final MyMenu hostExpertSubmenu = new MyMenu(
                         Tools.getString("HostBrowser.ExpertSubmenu"),
-                        ConfigData.AccessType.OP1,
-                        ConfigData.AccessType.OP2) {
+                        ConfigData.AccessType.OP,
+                        ConfigData.AccessType.OP) {
             private static final long serialVersionUID = 1L;
             public boolean enablePredicate() {
                 return host.isConnected();

@@ -22,6 +22,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.TerminalPanel;
@@ -237,7 +238,13 @@ public class NewHost extends DialogHost {
         inputPane.add(hostLabel);
         final String regexp = "^[,\\w.-]+$";
         hostField = new GuiComboBox(getHost().getHostnameEntered(),
-                                    null, null, regexp, FIELD_WIDTH, null);
+                                    null, /* items */
+                                    null, /* units */
+                                    null, /* type */
+                                    regexp,
+                                    FIELD_WIDTH,
+                                    null, /* abbrv */
+                                    ConfigData.AccessType.RO);
 
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField);
@@ -252,11 +259,13 @@ public class NewHost extends DialogHost {
 
         inputPane.add(sshPortLabel);
         sshPortField = new GuiComboBox(getHost().getSSHPort(),
-                                        null,
-                                        null,
-                                        "^\\d+$",
-                                        50,
-                                        null);
+                                       null, /* items */
+                                       null, /* units */
+                                       null, /* type */
+                                       "^\\d+$",
+                                       50,
+                                       null, /* abbrv */
+                                       ConfigData.AccessType.RO);
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField);
         inputPane.add(sshPortField);
@@ -271,7 +280,13 @@ public class NewHost extends DialogHost {
 
         inputPane.add(usernameLabel);
         usernameField = new GuiComboBox(getHost().getUsername(),
-                                        null, null, regexp, FIELD_WIDTH, null);
+                                        null, /* items */
+                                        null, /* units */
+                                        null, /* type */
+                                        regexp,
+                                        FIELD_WIDTH,
+                                        null, /* abbrv */
+                                        ConfigData.AccessType.RO);
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField);
         inputPane.add(usernameField);

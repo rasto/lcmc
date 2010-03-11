@@ -22,6 +22,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.gui.SpringUtilities;
@@ -189,12 +190,14 @@ public class DrbdAvailSourceFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* build combo box */
-        drbdTarballCombo = new GuiComboBox(null,
-                                           null,
+        drbdTarballCombo = new GuiComboBox(null, /* selected value */
+                                           null, /* items */
+                                           null, /* units */
                                            GuiComboBox.Type.COMBOBOX,
-                                           null,
-                                           0,
-                                           null);
+                                           null, /* regexp */
+                                           0,    /* width */
+                                           null, /* abbrv */
+                                           ConfigData.AccessType.RO);
 
         //drbdTarballCombo.setEnabled(false);
         pane.add(drbdTarballCombo);

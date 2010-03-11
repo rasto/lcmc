@@ -21,6 +21,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
@@ -157,11 +158,13 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(userLabel);
         downloadUserField = new GuiComboBox(
                                         Tools.getConfigData().getDownloadUser(),
-                                        null,
-                                        null,
+                                        null, /* items */
+                                        null, /* units */
+                                        null, /* type */
                                         "^[,\\w.-]+$",
                                         CHECKBOX_WIDTH,
-                                        null);
+                                        null, /* abbrv */
+                                        ConfigData.AccessType.RO);
 
         addCheckField(downloadUserField);
         userLabel.setLabelFor(downloadUserField);
@@ -174,11 +177,13 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(passwordLabel);
         downloadPasswordField = new GuiComboBox(
                                 Tools.getConfigData().getDownloadPassword(),
-                                null,
+                                null, /* items */
+                                null, /* units */
                                 GuiComboBox.Type.PASSWDFIELD,
-                                null,
+                                null, /* type */
                                 CHECKBOX_WIDTH,
-                                null);
+                                null, /* abbrv */
+                                ConfigData.AccessType.RO);
 
         addCheckField(downloadPasswordField);
         passwordLabel.setLabelFor(downloadPasswordField);

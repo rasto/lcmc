@@ -22,6 +22,7 @@
 package drbd.gui.dialog.cluster;
 
 import drbd.data.Cluster;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
@@ -157,7 +158,13 @@ public class Name extends DialogCluster {
         getCluster().setName(name);
         final String regexp = "^[ ,\\w.-]+$";
         nameField = new GuiComboBox(getCluster().getName(),
-                                    null, null, regexp, NAME_FIELD_WIDTH, null);
+                                    null, /* items */
+                                    null, /* units */
+                                    null, /* type */
+                                    regexp,
+                                    NAME_FIELD_WIDTH,
+                                    null, /* abbrv */
+                                    ConfigData.AccessType.RO);
         addCheckField(nameField);
         nameLabel.setLabelFor(nameField);
         pane.add(nameField);

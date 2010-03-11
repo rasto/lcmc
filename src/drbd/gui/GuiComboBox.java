@@ -143,22 +143,7 @@ public class GuiComboBox extends JPanel {
     private boolean visiblePredicate = true;
     /** Access Type for this component to become enabled */
     ConfigData.AccessType enableAccessType = ConfigData.AccessType.RO;
-    /** Access Type for this component to become visible */
-    ConfigData.AccessType visibleAccessType = ConfigData.AccessType.RO;
 
-    public GuiComboBox(final String selectedValue,
-                       final Object[] items,
-                       final Type type,
-                       String regexp,
-                       final int width,
-                       final Map<String, String> abbreviations,
-                       final ConfigData.AccessType enableAccessType,
-                       final ConfigData.AccessType visibleAccessType) {
-        this(selectedValue, items, type, regexp, width, abbreviations);
-        this.enableAccessType = enableAccessType;
-        this.visibleAccessType = visibleAccessType;
-        processAccessType();
-    }
     /**
      * Prepares a new <code>GuiComboBox</code> object with specified units.
      */
@@ -168,9 +153,11 @@ public class GuiComboBox extends JPanel {
                        final Type type,
                        String regexp,
                        final int width,
-                       final Map<String, String> abbreviations) {
+                       final Map<String, String> abbreviations,
+                       final ConfigData.AccessType enableAccessType) {
         super();
         this.units = units;
+        this.enableAccessType = enableAccessType;
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
             regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
@@ -283,25 +270,30 @@ public class GuiComboBox extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 1)), BorderLayout.PAGE_START);
         add(component, BorderLayout.CENTER);
         add(Box.createRigidArea(new Dimension(0, 1)), BorderLayout.PAGE_END);
+        processAccessType();
     }
 
-    /**
-     * Prepares a new <code>GuiComboBox</code> object.
-     */
-    public GuiComboBox(final String selectedValue,
-                       final Object[] items,
-                       final Type typeOfBox,
-                       final String regexp,
-                       final int width,
-                       final Map<String, String> abbreviations) {
-        this(selectedValue,
-             items,
-             null,
-             typeOfBox,
-             regexp,
-             width,
-             abbreviations);
-    }
+    ///**
+    // * Prepares a new <code>GuiComboBox</code> object.
+    // */
+    //public GuiComboBox(final String selectedValue,
+    //                   final Object[] items,
+    //                   final Type typeOfBox,
+    //                   final String regexp,
+    //                   final int width,
+    //                   final Map<String, String> abbreviations,
+    //                   final ConfigData.AccessType enableAccessType,
+    //                   final ConfigData.AccessType visibleAccessType) {
+    //    this(selectedValue,
+    //         items,
+    //         null,
+    //         typeOfBox,
+    //         regexp,
+    //         width,
+    //         abbreviations,
+    //         enableAccessType,
+    //         visibleAccessType);
+    //}
 
     /**
      * Returns whether this field is a check box.
@@ -530,8 +522,10 @@ public class GuiComboBox extends JPanel {
      */
     public final void setEnabled(final String s, final boolean enabled) {
         enablePredicate = enabled;
+        final boolean accessible =
+                           Tools.getConfigData().isAccessible(enableAccessType);
         if (componentsHash.containsKey(s)) {
-            componentsHash.get(s).setEnabled(enabled);
+            componentsHash.get(s).setEnabled(enabled && accessible);
         }
     }
 
@@ -703,6 +697,8 @@ public class GuiComboBox extends JPanel {
                         u.setPlural(!"1".equals(text));
                         unitComboBox.repaint();
                     }
+                    final boolean accessible = 
+                         Tools.getConfigData().isAccessible(enableAccessType);
                     if ("".equals(text)) {
                         if (!u.isEmpty()) {
                             u.setEmpty(true);
@@ -720,7 +716,7 @@ public class GuiComboBox extends JPanel {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         unitComboBox.repaint();
-                                        unitComboBox.setEnabled(true);
+                                        unitComboBox.setEnabled(accessible);
                                     }
                                 });
                             }
@@ -770,17 +766,24 @@ public class GuiComboBox extends JPanel {
     }
 
     /**
-     * Sets component visible or invisible.
+     * Sets component visible or invisible and remembers this state.
      */
     public final void setVisible(final boolean visible) {
         visiblePredicate = visible;
+        __setVisible(visible);
+    }
+
+    /**
+     * Sets component visible or invisible.
+     */
+    private void __setVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (!visible) {
-                    setMinimumSize(new Dimension(0, 0));
-                    setPreferredSize(new Dimension(0, 0));
-                    setMaximumSize(new Dimension(0, 0));
-                }
+                //if (!visible) {
+                //    setMinimumSize(new Dimension(0, 0));
+                //    setPreferredSize(new Dimension(0, 0));
+                //    setMaximumSize(new Dimension(0, 0));
+                //}
                 setVisible(visible);
                 if (label != null) {
                     label.setVisible(visible);
@@ -802,10 +805,18 @@ public class GuiComboBox extends JPanel {
 
 
     /**
-     * Sets component enabled or disabled.
+     * Sets component enabled or disabled and remembers this state.
      */
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
+        __setEnabled(enabled
+                     && Tools.getConfigData().isAccessible(enableAccessType));
+    }
+
+    /**
+     * Sets component enabled or disabled.
+     */
+    private void __setEnabled(final boolean enabled) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 component.setEnabled(enabled);
@@ -821,6 +832,7 @@ public class GuiComboBox extends JPanel {
             }
         });
     }
+
 
     /**
      * Returns whether component is editable or not.
@@ -1421,9 +1433,14 @@ public class GuiComboBox extends JPanel {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessType() {
-        setEnabled(enablePredicate
-                   && Tools.getConfigData().isAccessible(enableAccessType));
-        setVisible(visiblePredicate
-                   && Tools.getConfigData().isAccessible(visibleAccessType));
+        final boolean accessible = 
+                         Tools.getConfigData().isAccessible(enableAccessType);
+        __setEnabled(enablePredicate && accessible);
+        if (!accessible) {
+            setToolTipText("<html><b>"
+                           + "Disabled</b><br>available in \""
+                           + ConfigData.OP_NODES_MAP.get(enableAccessType)
+                           + "\" mode</html>");
+        }
     }
 }

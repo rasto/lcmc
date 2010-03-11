@@ -378,7 +378,7 @@ public class HostBrowser extends Browser {
                     + host.getName(),
                     null,
                     ConfigData.AccessType.GOD,
-                    ConfigData.AccessType.ADMIN1) {
+                    ConfigData.AccessType.ADMIN) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -405,7 +405,7 @@ public class HostBrowser extends Browser {
                     + host.getName(),
                     null,
                     ConfigData.AccessType.GOD,
-                    ConfigData.AccessType.ADMIN1) {
+                    ConfigData.AccessType.ADMIN) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {

@@ -31,6 +31,7 @@ import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.MyButton;
 import drbd.utilities.DRBD;
+import drbd.data.ConfigData;
 
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
@@ -250,10 +251,12 @@ public class CreateMD extends DrbdConfig {
             final String metadataDefault = createNewMetadata;
             metadataCB = new GuiComboBox(metadataDefault,
                                          choices,
+                                         null, /* units */
                                          GuiComboBox.Type.COMBOBOX,
-                                         null,
+                                         null, /* regexp */
                                          COMBOBOX_WIDTH,
-                                         null);
+                                         null, /* abbrv */
+                                         ConfigData.AccessType.RO);
         } else {
             final String[] choices = {useExistingMetadata,
                                       createNewMetadata,
@@ -268,10 +271,12 @@ public class CreateMD extends DrbdConfig {
             }
             metadataCB = new GuiComboBox(metadataDefault,
                                          choices,
+                                         null, /* units */
                                          GuiComboBox.Type.COMBOBOX,
-                                         null,
+                                         null, /* regexp */
                                          COMBOBOX_WIDTH,
-                                         null);
+                                         null, /* abbrv */
+                                         ConfigData.AccessType.RO);
         }
 
         inputPane.add(metadataLabel);

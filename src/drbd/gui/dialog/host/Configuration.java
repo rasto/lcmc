@@ -23,6 +23,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
@@ -367,11 +368,13 @@ public class Configuration extends DialogHost {
             name = "";
         }
         nameField = new GuiComboBox(name,
-                                    null,
-                                    null,
+                                    null, /* items */
+                                    null, /* units */
+                                    null, /* type */
                                     regexp,
                                     COMBO_BOX_WIDTH,
-                                    null);
+                                    null, /* abbrv */
+                                    ConfigData.AccessType.RO);
         inputPane.add(nameField);
         nameField.setBackground(getHost().getName(),
                                 getHost().getName(),
@@ -392,11 +395,13 @@ public class Configuration extends DialogHost {
         }
         for (int i = 0; i < hops; i++) {
             hostnameField[i] = new GuiComboBox(hostnames[i],
-                                               null,
-                                               null,
-                                               null,
+                                               null, /* items */
+                                               null, /* units */
+                                               null, /* type*/
+                                               null, /* regexp*/
                                                COMBO_BOX_WIDTH,
-                                               null);
+                                               null, /* abbrv */
+                                               ConfigData.AccessType.RO);
 
             inputPane.add(hostnameField[i]);
         }
@@ -411,10 +416,12 @@ public class Configuration extends DialogHost {
             }
             ipCombo[i] = new GuiComboBox(getHost().getIp(i),
                                          getHost().getIps(i),
+                                         null, /* units */
                                          GuiComboBox.Type.COMBOBOX,
-                                         null,
+                                         null, /* regexp */
                                          COMBO_BOX_WIDTH,
-                                         null);
+                                         null, /* abbrv */
+                                         ConfigData.AccessType.RO);
 
             inputPane.add(ipCombo[i]);
             ipCombo[i].setEnabled(false);

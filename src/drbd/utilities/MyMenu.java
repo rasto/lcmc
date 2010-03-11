@@ -95,9 +95,17 @@ public class MyMenu extends JMenu implements UpdatableItem {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessType() {
-        setEnabled(enablePredicate()
-                   && Tools.getConfigData().isAccessible(enableAccessType));
+        final boolean accessible = 
+                   Tools.getConfigData().isAccessible(enableAccessType);
+        setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
                    && Tools.getConfigData().isAccessible(visibleAccessType));
+        if (isVisible() && !accessible) {
+            setToolTipText("<html><b>"
+                           + getText()
+                           + " (disabled)</b><br>available in \""
+                           + ConfigData.OP_NODES_MAP.get(enableAccessType)
+                           + "\" mode</html>");
+        }
     }
 }

@@ -23,6 +23,7 @@ package drbd.gui.resources;
 
 import drbd.data.ResourceAgent;
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.gui.GuiComboBox;
 import drbd.gui.Browser;
@@ -233,10 +234,12 @@ class FilesystemInfo extends ServiceInfo {
                                                                getName());
             paramCb = new GuiComboBox(selectedValue,
                                       commonBlockDevInfos,
-                                      null,
-                                      null,
+                                      null, /* units */
+                                      null, /* type */
+                                      null, /* regexp */
                                       width,
-                                      null);
+                                      null, /* abbrv */
+                                      ConfigData.AccessType.ADMIN);
             blockDeviceParamCb = paramCb;
             addParamComboListeners(paramCb);
             paramComboBoxAdd(param, prefix, paramCb);
@@ -250,10 +253,12 @@ class FilesystemInfo extends ServiceInfo {
             paramCb = new GuiComboBox(
                               selectedValue,
                               getBrowser().getCommonFileSystems(defaultValue),
-                              null,
-                              null,
+                              null, /* units */
+                              null, /* type */
+                              null, /* regexp */
                               width,
-                              null);
+                              null, /* abbrv */
+                              ConfigData.AccessType.ADMIN);
             fstypeParamCb = paramCb;
 
             paramComboBoxAdd(param, prefix, paramCb);
@@ -280,10 +285,12 @@ class FilesystemInfo extends ServiceInfo {
             final String regexp = "^.+$";
             paramCb = new GuiComboBox(selectedValue,
                                       items,
-                                      null,
+                                      null, /* units */
+                                      null, /* type */
                                       regexp,
                                       width,
-                                      null);
+                                      null, /* abbrv */
+                                      ConfigData.AccessType.ADMIN);
             paramComboBoxAdd(param, prefix, paramCb);
             paramCb.setAlwaysEditable(true);
         } else {

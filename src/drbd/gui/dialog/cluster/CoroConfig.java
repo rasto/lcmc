@@ -26,6 +26,7 @@ import drbd.utilities.MyButton;
 import drbd.utilities.Openais;
 import drbd.utilities.Corosync;
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.data.Cluster;
 import drbd.data.AisCastAddress;
 import drbd.data.resources.NetInterface;
@@ -630,7 +631,13 @@ public class CoroConfig extends DialogCluster {
                 configPanel.revalidate();
                 configPanel.repaint();
                 if (configChanged) {
-                    makeConfigButton.setEnabled(!aisCastAddresses.isEmpty());
+                    if (aisCastAddresses.isEmpty()) {
+                        makeConfigButton.setEnabled(false);
+                    } else {
+                        Tools.getConfigData().setAccessible(
+                                            makeConfigButton,
+                                            ConfigData.AccessType.ADMIN);
+                    }
                     if (!Tools.getConfigData().getAutoClusters().isEmpty()
                         && !aisCastAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -825,19 +832,23 @@ public class CoroConfig extends DialogCluster {
 
         typeCB = new GuiComboBox(MCAST_TYPE,
                                  types,
-                                 null,
-                                 null,
+                                 null, /* units */
+                                 null, /* type */
+                                 null, /* regexp */
                                  TYPE_COMBOBOX_WIDTH,
-                                 null);
+                                 null, /* abbrv */
+                                 ConfigData.AccessType.RO);
         typeCB.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        ifaceCB = new GuiComboBox(null,
+        ifaceCB = new GuiComboBox(null, /* selected value */
                                   ni,
-                                  null,
-                                  null,
+                                  null, /* units */
+                                  null, /* type */
+                                  null, /* regexp */
                                   INTF_COMBOBOX_WIDTH,
-                                  null);
+                                  null, /* abbrv */
+                                  ConfigData.AccessType.RO);
 
         /* this matches something like this: 225.0.0.43 694 1 0
          * if you think that the regexp is too complicated for that, consider,
@@ -846,11 +857,13 @@ public class CoroConfig extends DialogCluster {
         final String regexp = "^[\\d.]+$";
         addrCB = new GuiComboBox(
               Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastAddress"),
-              null,
-              null,
+              null, /* items */
+              null, /* units */
+              null, /* type */
               regexp,
               ADDR_COMBOBOX_WIDTH,
-              null);
+              null, /* abbrv */
+              ConfigData.AccessType.RO);
 
         final ItemListener typeL = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
@@ -901,11 +914,13 @@ public class CoroConfig extends DialogCluster {
         final String portRegexp = "^\\d+$";
         portCB = new GuiComboBox(
                 Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastPort"),
-                null,
-                null,
+                null, /* items */
+                null, /* units */
+                null, /* type */
                 portRegexp,
                 PORT_COMBOBOX_WIDTH,
-                null);
+                null, /* abbrv */
+                ConfigData.AccessType.RO);
         portCB.addListeners(portL, null);
 
         final DocumentListener addrL = new DocumentListener() {
@@ -956,6 +971,8 @@ public class CoroConfig extends DialogCluster {
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
+        Tools.getConfigData().setAccessible(configCheckbox,
+                                            ConfigData.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 final String text = configCheckbox.getText();

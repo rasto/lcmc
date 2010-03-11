@@ -472,8 +472,8 @@ public class HbConnectionInfo extends EditableInfo {
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge"),
                      ClusterBrowser.REMOVE_ICON,
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
-                     ConfigData.AccessType.ADMIN1,
-                     ConfigData.AccessType.OP1) {
+                     ConfigData.AccessType.ADMIN,
+                     ConfigData.AccessType.OP) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -509,8 +509,8 @@ public class HbConnectionInfo extends EditableInfo {
                 Tools.getString("ClusterBrowser.Hb.AddOrder"),
                 null,
                 Tools.getString("ClusterBrowser.Hb.AddOrder.ToolTip"),
-                ConfigData.AccessType.ADMIN1,
-                ConfigData.AccessType.OP1) {
+                ConfigData.AccessType.ADMIN,
+                ConfigData.AccessType.OP) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {
@@ -577,8 +577,8 @@ public class HbConnectionInfo extends EditableInfo {
                     null,
                     Tools.getString(
                             "ClusterBrowser.Hb.AddColocation.ToolTip"),
-                    ConfigData.AccessType.ADMIN1,
-                    ConfigData.AccessType.OP1) {
+                    ConfigData.AccessType.ADMIN,
+                    ConfigData.AccessType.OP) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {

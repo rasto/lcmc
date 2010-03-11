@@ -22,6 +22,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
@@ -392,30 +393,36 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         pane.setMaximumSize(new Dimension(maxX, CHOICE_BOX_HEIGHT));
 
         /* combo boxes */
-        drbdDistCombo = new GuiComboBox(null,
-                                        null,
+        drbdDistCombo = new GuiComboBox(null, /* selected value */
+                                        null, /* items */
+                                        null, /* units */
                                         GuiComboBox.Type.COMBOBOX,
-                                        null,
-                                        0,
-                                        null);
+                                        null, /* regexp */
+                                        0,    /* width */
+                                        null, /* abbrv */
+                                        ConfigData.AccessType.RO);
 
         drbdDistCombo.setEnabled(false);
         pane.add(drbdDistCombo);
-        drbdKernelDirCombo = new GuiComboBox(null,
-                                             null,
+        drbdKernelDirCombo = new GuiComboBox(null, /* selected value */
+                                             null, /* items */
+                                             null, /* units */
                                              GuiComboBox.Type.COMBOBOX,
-                                             null,
-                                             0,
-                                             null);
+                                             null, /* regexp */
+                                             0,    /* width */
+                                             null, /* abbrv */
+                                             ConfigData.AccessType.RO);
 
         drbdKernelDirCombo.setEnabled(false);
         pane.add(drbdKernelDirCombo);
-        drbdArchCombo = new GuiComboBox(null,
-                                        null,
+        drbdArchCombo = new GuiComboBox(null, /* selected value */
+                                        null, /* items */
+                                        null, /* units */
                                         GuiComboBox.Type.COMBOBOX,
-                                        null,
-                                        0,
-                                        null);
+                                        null, /* regexp */
+                                        0,    /* width */
+                                        null, /* abbrv */
+                                        ConfigData.AccessType.RO);
 
         drbdArchCombo.setEnabled(false);
         pane.add(drbdArchCombo);

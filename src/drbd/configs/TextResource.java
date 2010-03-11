@@ -1069,7 +1069,7 @@ public class TextResource extends
          "Type: "},
 
         {"Browser.ExpertMode",
-         "Advanced Mode"},
+         "Advanced"},
 
         {"Browser.ApplyResource",
          "Apply"},
@@ -1817,6 +1817,18 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.StartVNCViewerOn",
          "start @VIEWER@ VNC viewer on "},
+
+        {"ConfigData.OpMode.RO",
+         "Read-Only"},
+
+        {"ConfigData.OpMode.OP",
+         "Operator"},
+
+        {"ConfigData.OpMode.ADMIN",
+         "Administrator"},
+
+        {"ConfigData.OpMode.GOD",
+         "Developer Level 10"},
 
         {"EmptyViewPanel.HelpButton",
          "I am new here"},

@@ -22,6 +22,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.gui.SpringUtilities;
@@ -250,22 +251,26 @@ public class DrbdAvailFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* drbd version combo box */
-        drbdVersionCombo = new GuiComboBox(null,
-                                           null,
+        drbdVersionCombo = new GuiComboBox(null, /* selected value */
+                                           null, /* items */
+                                           null, /* units */
                                            GuiComboBox.Type.COMBOBOX,
-                                           null,
-                                           0,
-                                           null);
+                                           null, /* regexp */
+                                           0,    /* width */
+                                           null, /* abbrv */
+                                           ConfigData.AccessType.RO);
         //drbdVersionCombo.setEnabled(false);
         pane.add(drbdVersionCombo);
 
         /* build combo box */
-        drbdBuildCombo = new GuiComboBox(null,
-                                         null,
+        drbdBuildCombo = new GuiComboBox(null, /* selected value */
+                                         null, /* items */
+                                         null, /* units */
                                          GuiComboBox.Type.COMBOBOX,
-                                         null,
-                                         0,
-                                         null);
+                                         null, /* regexp */
+                                         0,    /* width */
+                                         null, /* abbrv */
+                                         ConfigData.AccessType.RO);
 
         //drbdBuildCombo.setEnabled(false);
         pane.add(drbdBuildCombo);

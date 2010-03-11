@@ -30,6 +30,7 @@ import drbd.gui.MainPanel;
 import drbd.gui.MainMenu;
 import drbd.gui.ProgressIndicatorPanel;
 import drbd.utilities.Tools;
+import drbd.data.ConfigData;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -152,6 +153,7 @@ public final class DrbdMC extends JPanel {
             boolean ultravnc = false;
             boolean realvnc = false;
             boolean vncportoffset = false;
+            boolean opMode = false;
             float fps = 20.0f;
             for (final String arg : args) {
                 if (vncportoffset && Tools.isNumber(arg)) {
@@ -164,6 +166,29 @@ public final class DrbdMC extends JPanel {
                 } else {
                     vncportoffset = false;
                 }
+
+                if (opMode) {
+                    if ("ro".equals(arg)) {
+                        Tools.getConfigData().setAccessType(
+                                                  ConfigData.AccessType.RO);
+                    } else if ("op".equals(arg)) {
+                        Tools.getConfigData().setAccessType(
+                                                  ConfigData.AccessType.OP);
+                    } else if ("admin".equals(arg)) {
+                        Tools.getConfigData().setAccessType(
+                                                  ConfigData.AccessType.ADMIN);
+                    } else {
+                        Tools.appWarning("unknown operating mode: " + arg);
+                    }
+                }
+                if ("--op-mode".equals(arg)
+                    || "--operating-mode".equals(arg)) {
+                    opMode = true;
+                    continue;
+                } else {
+                    opMode = false;
+                }
+                    
                 if (auto) {
                     Tools.parseAutoArgs(arg);
                 } else if ("--keep-helper".equals(arg)) {
