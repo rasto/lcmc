@@ -397,6 +397,7 @@ public abstract class EditableInfo extends Info {
                     final GuiComboBox sameAsCombo = sameAsFields.get(section);
                     if (sameAsCombo != null) {
                         final JLabel label = new JLabel("Same As");
+                        sameAsCombo.setLabel(label);
                         addField(panel,
                                  label,
                                  sameAsCombo,

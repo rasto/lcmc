@@ -2340,7 +2340,6 @@ public class ClusterBrowser extends Browser {
                                 null,
                                 drbdGraph.getDrbdInfo().getParametersFromXML());
         for (final DrbdResourceInfo dri : drbdResHash.values()) {
-            System.out.println("recheck: " + dri.toString());
             dri.checkResourceFields(null, dri.getParametersFromXML());
             final BlockDevInfo bdi1 = dri.getFirstBlockDevInfo();
             if (bdi1 != null) {

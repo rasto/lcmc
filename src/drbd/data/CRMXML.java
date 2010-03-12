@@ -606,10 +606,10 @@ public class CRMXML extends XML {
                 "pe-input-series-max",
                 "startup-fencing",
                 "start-failure-is-fatal",
-                "dc_deadtime",
-                "cluster_recheck_interval",
-                "election_timeout",
-                "shutdown_escalation",
+                "dc-deadtime",
+                "cluster-recheck-interval",
+                "election-timeout",
+                "shutdown-escalation",
                 "crmd-integration-timeout",
                 "crmd-finalization-timeout"
             };

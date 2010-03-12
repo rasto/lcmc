@@ -167,19 +167,26 @@ public final class DrbdMC extends JPanel {
                     vncportoffset = false;
                 }
 
-                if (opMode) {
-                    if ("ro".equals(arg)) {
-                        Tools.getConfigData().setAccessType(
-                                                  ConfigData.AccessType.RO);
-                    } else if ("op".equals(arg)) {
-                        Tools.getConfigData().setAccessType(
-                                                  ConfigData.AccessType.OP);
-                    } else if ("admin".equals(arg)) {
-                        Tools.getConfigData().setAccessType(
-                                                  ConfigData.AccessType.ADMIN);
-                    } else {
-                        Tools.appWarning("unknown operating mode: " + arg);
-                    }
+                if ("--ro".equals(arg)
+                    || opMode && "ro".equals(arg)) {
+                    Tools.getConfigData().setAccessType(
+                                              ConfigData.AccessType.RO);
+                    Tools.getConfigData().setMaxAccessType(
+                                              ConfigData.AccessType.RO);
+                } else if ("--op".equals(arg)
+                           || opMode && "op".equals(arg)) {
+                    Tools.getConfigData().setAccessType(
+                                              ConfigData.AccessType.OP);
+                    Tools.getConfigData().setMaxAccessType(
+                                              ConfigData.AccessType.OP);
+                } else if ("--admin".equals(arg)
+                           || opMode && "admin".equals(arg)) {
+                    Tools.getConfigData().setAccessType(
+                                              ConfigData.AccessType.ADMIN);
+                    Tools.getConfigData().setMaxAccessType(
+                                              ConfigData.AccessType.ADMIN);
+                } else if (opMode) {
+                    Tools.appWarning("unknown operating mode: " + arg);
                 }
                 if ("--op-mode".equals(arg)
                     || "--operating-mode".equals(arg)) {
@@ -195,18 +202,27 @@ public final class DrbdMC extends JPanel {
                     Tools.debug(null, "--keep-helper option specified");
                     Tools.getConfigData().setKeepHelper(true);
                 } else if ("--help".equals(arg)) {
-                    System.out.println("--help print this help.");
-                    System.out.println("--keep-helper do not overwrite "
+                    System.out.println("--help, print this help.");
+                    System.out.println("--keep-helper, do not overwrite "
                                        + "the drbd-gui-helper program.");
                     System.out.println("--auto for testing");
-                    System.out.println("--tightvnc enable tight vnc viewer");
-                    System.out.println("--ultravnc enable ultra vnc viewer");
-                    System.out.println("--realvnc enable real vnc viewer");
+                    System.out.println("--tightvnc, enable tight vnc viewer");
+                    System.out.println("--ultravnc, enable ultra vnc viewer");
+                    System.out.println("--realvnc, enable real vnc viewer");
                     System.out.println(
-                                "--vnc-port-offset offset for port forwarding");
+                               "--vnc-port-offset OFFSET, for port forwarding");
                     System.out.println(
-                        "--slow specify this if you have slow computer. Can be"
-                        + " specified more times");
+                       "--slow, specify this if you have slow computer. Can be"
+                       + " specified more times");
+                    System.out.print(
+                              "--op-mode MODE, operating mode. MODE can be: ");
+                    System.out.println("ro - read only");
+                    System.out.print(
+                              "                                             ");
+                    System.out.println("op - operator");
+                    System.out.print(
+                              "                                             ");
+                    System.out.println("admin - administrator");
                     System.exit(0);
                 } else if ("--tightvnc".equals(arg)) {
                     tightvnc = true;

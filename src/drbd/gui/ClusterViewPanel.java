@@ -33,6 +33,7 @@ import javax.swing.JTree;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -89,7 +90,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                 final Thread t = new Thread(new Runnable() {
                     public void run() {
                         final EditClusterDialog dialog =
-                                        new EditClusterDialog(cluster);
+                                               new EditClusterDialog(cluster);
                         dialog.showDialogs();
                     }
                 });
@@ -100,7 +101,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         final JPanel clusterButtonsPanel = new JPanel();
         clusterButtonsPanel.setBackground(STATUS_BACKGROUND);
         final TitledBorder titledBorder = Tools.getBorder(
-                        Tools.getString("ClusterViewPanel.ClusterButtons"));
+                          Tools.getString("ClusterViewPanel.ClusterButtons"));
         clusterButtonsPanel.setBorder(titledBorder);
 
         clusterButtonsPanel.add(clusterWizardButton);
@@ -111,9 +112,12 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         opModePanel.setBackground(STATUS_BACKGROUND);
         final TitledBorder vmBorder = Tools.getBorder("Operating Mode");
         opModePanel.setBorder(vmBorder);
-        final String[] modes = ConfigData.ACCESS_TYPE_MAP.keySet().toArray(
-                                 new String[ConfigData.ACCESS_TYPE_MAP.size()]);
+        final String[] modes = Tools.getConfigData().getOperatingModes();
         final JComboBox opModeCB = new JComboBox(modes);
+        final JCheckBox expertButton = Tools.expertModeButton();
+        final ConfigData.AccessType accessType = 
+                                        Tools.getConfigData().getAccessType();
+        opModeCB.setSelectedItem(ConfigData.OP_NODES_MAP.get(accessType));
         opModeCB.addItemListener(new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 final String opMode = (String) e.getItem();
@@ -121,7 +125,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
                             ConfigData.AccessType type =
-                                         ConfigData.ACCESS_TYPE_MAP.get(opMode);
+                                        ConfigData.ACCESS_TYPE_MAP.get(opMode);
 
                             if (type == null) {
                                 Tools.appError("unknown mode: " + opMode);
@@ -129,6 +133,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                             }
                             Tools.getConfigData().setAccessType(type);
                             cluster.getBrowser().checkEverything();
+                            expertButton.setEnabled(
+                                             type != ConfigData.AccessType.RO);
                         }
                     });
                     thread.start();
@@ -136,9 +142,11 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
             }
         });
         opModePanel.add(opModeCB);
-        opModePanel.add(Tools.expertModeButton());
+        if (accessType == ConfigData.AccessType.RO) {
+            expertButton.setEnabled(false);
+        }
+        opModePanel.add(expertButton);
         buttonPanel.add(opModePanel);
-
 
         /* upgrade field */
         buttonPanel.add(

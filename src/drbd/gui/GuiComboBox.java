@@ -527,6 +527,9 @@ public class GuiComboBox extends JPanel {
         if (componentsHash.containsKey(s)) {
             componentsHash.get(s).setEnabled(enabled && accessible);
         }
+        if (label != null) {
+            label.setEnabled(accessible);
+        }
     }
 
     /**
@@ -1129,20 +1132,22 @@ public class GuiComboBox extends JPanel {
                                     final String savedLabel,
                                     final Object savedValue,
                                     final boolean required) {
+        if (getParent() == null) {
+            return;
+        }
         final Object value = getValue();
         String labelText = null;
         if (savedLabel != null) {
             labelText = label.getText();
         }
 
-        if (getParent() == null) {
-            Tools.appError("wrong call to setBackground");
-        }
         final Color backgroundColor = getParent().getBackground();
         final Color compColor = Color.WHITE;
         if (!Tools.areEqual(value, savedValue)
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
+                //System.out.println("changed label: " + labelText + " != "
+                //                    + savedLabel);
                 //Tools.printStackTrace("changed: " + value + " != "
                 //                      + savedValue);
                 label.setForeground(CHANGED_VALUE_COLOR);
@@ -1432,7 +1437,7 @@ public class GuiComboBox extends JPanel {
     }
 
     /** Sets this item enabled and visible according to its access type. */
-    private void processAccessType() {
+    public void processAccessType() {
         final boolean accessible = 
                          Tools.getConfigData().isAccessible(enableAccessType);
         __setEnabled(enablePredicate && accessible);
@@ -1441,6 +1446,20 @@ public class GuiComboBox extends JPanel {
                            + "Disabled</b><br>available in \""
                            + ConfigData.OP_NODES_MAP.get(enableAccessType)
                            + "\" mode</html>");
+        }
+        if (label != null) {
+            label.setEnabled(accessible);
+        }
+    }
+
+    /**
+     * Returns item at the specified index.
+     */
+    public final Object getItemAt(final int i) {
+        if (type == Type.COMBOBOX) {
+            return ((JComboBox) component).getItemAt(i);
+        } else {
+            return component;
         }
     }
 }

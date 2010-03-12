@@ -445,6 +445,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
+            sameAsMetaAttrsCB.processAccessType();
         }
         return changed;
     }
@@ -1098,6 +1099,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
+            sameAsOperationsCB.processAccessType();
         }
         mSavedOperationsLock.release();
         return changed;

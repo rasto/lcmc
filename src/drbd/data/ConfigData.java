@@ -142,8 +142,10 @@ public class ConfigData implements Serializable {
     private boolean stagingDrbd = false;
     /** Frames per second for animations. */
     private float animFPS = 15;
-    /** Access Type of the application at the moment. */
+    /** Access type of the application at the moment. */
     private AccessType accessType = AccessType.ADMIN;
+    /** Maximum allowed access type of the application. */
+    private AccessType maxAccessType = AccessType.ADMIN;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -600,6 +602,20 @@ public class ConfigData implements Serializable {
     }
 
     /**
+     * Sets maximum allowed access type of the application.
+     */
+    public final void setMaxAccessType(final AccessType maxAccessType) {
+        this.maxAccessType = maxAccessType;
+    }
+
+    /**
+     * Gets maximum allowed access type of the application.
+     */
+    public final AccessType getMaxAccessType() {
+        return maxAccessType;
+    }
+
+    /**
      * Returns true if the access type is greater than the one that is
      * required.
      */
@@ -613,5 +629,19 @@ public class ConfigData implements Serializable {
     public final void setAccessible(final JComponent c,
                                        final AccessType required) {
         c.setEnabled(getAccessType().compareTo(required) >= 0);
+    }
+
+    /**
+     * Returns available operating modes.
+     */
+    public final String[] getOperatingModes() {
+        final List<String> modes = new ArrayList<String>();
+        for (final AccessType at : ConfigData.OP_NODES_MAP.keySet()) {
+            modes.add(OP_NODES_MAP.get(at));
+            if (at.equals(maxAccessType)) {
+                break;
+            }
+        }
+        return modes.toArray(new String[modes.size()]);
     }
 }
