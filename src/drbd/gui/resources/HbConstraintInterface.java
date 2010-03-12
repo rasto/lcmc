@@ -23,6 +23,8 @@ package drbd.gui.resources;
 
 import drbd.data.Host;
 import drbd.data.resources.Service;
+import drbd.gui.GuiComboBox;
+import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -41,10 +43,10 @@ public interface HbConstraintInterface {
      * advanced options.
      */
     void addParams(final JPanel optionsPanel,
-                   final JPanel extraOptionsPanel,
                    final String[] params,
                    final int leftWidth,
-                   final int rightWidth);
+                   final int rightWidth,
+                   final Map<String, GuiComboBox> sameAsFields);
     /**
      * Check fields and return true if all are correct and at least one have
      * changed.

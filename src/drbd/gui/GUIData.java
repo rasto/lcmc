@@ -23,6 +23,7 @@
 package drbd.gui;
 
 import drbd.data.Cluster;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.AllHostsUpdatable;
 
@@ -35,6 +36,8 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -67,20 +70,18 @@ public class GUIData  {
     private final List<JComponent> addHostButtonList =
                                                    new ArrayList<JComponent>();
     /** Components that can be made visible in the god mode. */
-    private final List<JComponent> visibleInGodModeList =
-                                                   new ArrayList<JComponent>();
-    /** Components that can be enabled and disabled in and out of the god mode.
-     */
-    private final List<JComponent> enabledInGodModeList =
-                                                   new ArrayList<JComponent>();
+    private final Map<JComponent, ConfigData.AccessType> visibleInAccessType =
+                              new HashMap<JComponent, ConfigData.AccessType>();
+    /** Global elements like menus, that are enabled, disabled according to
+     * their access type. */
+    private final Map<JComponent, ConfigData.AccessType> enabledInAccessType =
+                            new HashMap<JComponent, ConfigData.AccessType>();
     /**
      * List of components that have allHostsUpdate method that must be called
      * when a host is added.
      */
     private final List<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
-    /** Whether we are in god mode or not. */
-    private boolean godMode = false;
 
     /**
      * Sets main frame of this application.
@@ -187,21 +188,22 @@ public class GUIData  {
      * Expands the terminal split pane.
      */
     public final void expandTerminalSplitPane(final int buttonNo) {
-        final int height =
-            (int) terminalSplitPane.getBottomComponent().getSize().getHeight();
-        if ((buttonNo == 0 && height == 0)
-            || (buttonNo == 1 && height > 0)) {
-            Tools.debug(this, "expand terminal split pane");
-            final BasicSplitPaneUI ui =
-                                  (BasicSplitPaneUI) terminalSplitPane.getUI();
-            final BasicSplitPaneDivider divider = ui.getDivider();
-            final JButton button = (JButton) divider.getComponent(buttonNo);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                final int height = (int)
+                    terminalSplitPane.getBottomComponent().getSize().getHeight();
+                if ((buttonNo == 0 && height == 0)
+                    || (buttonNo == 1 && height > 0)) {
+                    Tools.debug(this, "expand terminal split pane");
+                    final BasicSplitPaneUI ui =
+                                   (BasicSplitPaneUI) terminalSplitPane.getUI();
+                    final BasicSplitPaneDivider divider = ui.getDivider();
+                    final JButton button = (JButton) divider.getComponent(
+                                                                      buttonNo);
                     button.doClick();
                 }
-            });
-        }
+            }
+        });
     }
 
     /**
@@ -352,33 +354,80 @@ public class GUIData  {
     /**
      * Add to the list of components that are visible only in god mode.
      */
-    public final void addToVisibleInGodMode(final JComponent c) {
-        c.setVisible(godMode);
-        visibleInGodModeList.add(c);
+    public final void addToVisibleInAccessType(
+                                    final JComponent c,
+                                    final ConfigData.AccessType accessType) {
+        c.setVisible(Tools.getConfigData().isAccessible(accessType));
+        visibleInAccessType.put(c, accessType);
     }
 
     /**
      * Add to the list of components that are visible only in god mode.
      */
-    public final void addToEnabledInGodMode(final JComponent c) {
-        c.setEnabled(godMode);
-        enabledInGodModeList.add(c);
+    public final void addToEnabledInAccessType(
+                                    final JComponent c,
+                                    final ConfigData.AccessType accessType) {
+        c.setEnabled(Tools.getConfigData().isAccessible(accessType));
+        enabledInAccessType.put(c, accessType);
     }
 
     /**
      * Do gui actions when we are in the god mode.
-     * - enable/disable look and feel menu
+     * - enable/disable look and feel menu etc
      */
     public final void godModeChanged(final boolean godMode) {
-        this.godMode = godMode;
-        for (final JComponent c : visibleInGodModeList) {
-            c.setVisible(godMode);
-        }
-        for (final JComponent c : enabledInGodModeList) {
-            c.setEnabled(godMode);
-        }
         Tools.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
         Tools.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        for (final Cluster cluster
+                        : Tools.getConfigData().getClusters().getClusterSet()) {
+            final ClusterBrowser cb = cluster.getBrowser();
+            if (cb != null) {
+                cb.getClusterViewPanel().resetOperatingModes(godMode);
+            }
+        }
+        updateGlobalItems();
+    }
+
+    /** Sets operating mode in every cluster view. */
+    public final void setOperatingModeGlobally(final Cluster fromCluster,
+                                               final String opMode) {
+        for (final Cluster cluster
+                        : Tools.getConfigData().getClusters().getClusterSet()) {
+            if (cluster == fromCluster) {
+                continue;
+            }
+            final ClusterBrowser cb = cluster.getBrowser();
+            if (cb != null) {
+                cb.getClusterViewPanel().setOperatingMode(opMode);
+            }
+        }
+    }
+
+    /** Sets expert mode in every cluster view. */
+    public final void setExpertModeGlobally(final Cluster fromCluster,
+                                            final boolean expertMode) {
+        for (final Cluster cluster
+                        : Tools.getConfigData().getClusters().getClusterSet()) {
+            if (cluster == fromCluster) {
+                continue;
+            }
+            final ClusterBrowser cb = cluster.getBrowser();
+            if (cb != null) {
+                cb.getClusterViewPanel().setExpertMode(expertMode);
+            }
+        }
+    }
+
+    /** Updates access of the item according of their access type. */
+    public final void updateGlobalItems() {
+        for (final JComponent c : visibleInAccessType.keySet()) {
+            c.setVisible(Tools.getConfigData().isAccessible(
+                                                visibleInAccessType.get(c)));
+        }
+        for (final JComponent c : enabledInAccessType.keySet()) {
+            c.setEnabled(Tools.getConfigData().isAccessible(
+                                                enabledInAccessType.get(c)));
+        }
     }
 
     /**
@@ -410,4 +459,14 @@ public class GUIData  {
         }
         checkAddClusterButtons();
     }
+
+    /**
+     * Enabled the component if it is accessible.
+     */
+    public final void setAccessible(final JComponent c,
+                                    final ConfigData.AccessType required) {
+        c.setEnabled(Tools.getConfigData().getAccessType().compareTo(
+                                                                required) >= 0);
+    }
+
 }

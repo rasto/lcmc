@@ -30,6 +30,7 @@ import drbd.data.Host;
 import drbd.data.DrbdXML;
 import drbd.data.resources.Resource;
 import drbd.data.DRBDtestData;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
@@ -55,7 +56,6 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.Box;
 import javax.swing.JScrollPane;
 
 /**
@@ -68,8 +68,6 @@ public class DrbdInfo extends EditableInfo {
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-    /** Extra options panel. */
-    private final JPanel extraOptionsPanel = new JPanel();
 
     /**
      * Prepares a new <code>DrbdInfo</code> object.
@@ -440,11 +438,6 @@ public class DrbdInfo extends EditableInfo {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                                  BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         mainPanel.add(buttonPanel);
 
         /* Actions */
@@ -456,10 +449,10 @@ public class DrbdInfo extends EditableInfo {
 
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
-                  extraOptionsPanel,
                   params,
                   Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"));
+                  Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"),
+                  null);
 
         applyButton.addActionListener(
             new ActionListener() {
@@ -490,18 +483,14 @@ public class DrbdInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         applyButton.setEnabled(checkResourceFields(null, params));
-        /* expert mode */
-        Tools.registerExpertPanel(extraOptionsPanel);
 
         mainPanel.add(optionsPanel);
-        mainPanel.add(extraOptionsPanel);
 
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
-        newPanel.add(Box.createVerticalGlue());
         infoPanel = newPanel;
         return infoPanel;
     }
@@ -731,6 +720,14 @@ public class DrbdInfo extends EditableInfo {
      */
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
-        Tools.unregisterExpertPanel(extraOptionsPanel);
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(String param) {
+        return false;
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(String param) {
+        return ConfigData.AccessType.ADMIN;
     }
 }

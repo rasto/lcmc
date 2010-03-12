@@ -62,7 +62,6 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -80,8 +79,6 @@ public class BlockDevInfo extends EditableInfo {
                                             new HashMap<String, Boolean>();
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-    /** Extra options panel. */
-    private final JPanel extraOptionsPanel = new JPanel();
     /** Keyword that denotes flexible meta-disk. */
     private static final String DRBD_MD_TYPE_FLEXIBLE = "Flexible";
     /** Internal parameter name of drbd meta-disk. */
@@ -151,7 +148,6 @@ public class BlockDevInfo extends EditableInfo {
         getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
         super.removeMyself(testOnly);
         infoPanel = null;
-        Tools.unregisterExpertPanel(extraOptionsPanel);
     }
 
     /**
@@ -832,11 +828,6 @@ public class BlockDevInfo extends EditableInfo {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        extraOptionsPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                                  BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         /* Actions */
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(HostBrowser.PANEL_BACKGROUND);
@@ -848,10 +839,10 @@ public class BlockDevInfo extends EditableInfo {
             final String[] params = getParametersFromXML();
 
             addParams(optionsPanel,
-                      extraOptionsPanel,
                       params,
                       Tools.getDefaultInt("HostBrowser.DrbdDevLabelWidth"),
-                      Tools.getDefaultInt("HostBrowser.DrbdDevFieldWidth"));
+                      Tools.getDefaultInt("HostBrowser.DrbdDevFieldWidth"),
+                      null);
 
 
             /* apply button */
@@ -874,9 +865,6 @@ public class BlockDevInfo extends EditableInfo {
             addApplyButton(buttonPanel);
 
             applyButton.setEnabled(checkResourceFields(null, params));
-
-            /* expert mode */
-            Tools.registerExpertPanel(extraOptionsPanel);
         }
 
         /* info */
@@ -888,13 +876,11 @@ public class BlockDevInfo extends EditableInfo {
         mainPanel.add(riaPanel);
 
         mainPanel.add(optionsPanel);
-        mainPanel.add(extraOptionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
-        newPanel.add(Box.createVerticalGlue());
         infoPanel = newPanel;
         return infoPanel;
     }
@@ -1064,7 +1050,7 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.Attach"),
                            HARDDISK_ICON,
                            Tools.getString("HostBrowser.Drbd.Attach.ToolTip"),
-                           
+
                            ConfigData.AccessType.OP,
                            ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
@@ -1115,7 +1101,7 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.Connect"),
                            null,
                            null,
-                           
+
                            ConfigData.AccessType.OP,
                            ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;
@@ -1521,5 +1507,14 @@ public class BlockDevInfo extends EditableInfo {
             return;
         }
         b.setDRBDtestData(drbdtestData);
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(final String param) {
+        return false;
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(final String param) {
+        return ConfigData.AccessType.ADMIN;
     }
 }

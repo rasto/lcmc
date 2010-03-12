@@ -1610,7 +1610,7 @@ public class TextResource extends
          "Global Required Options"},
 
         {"CRMXML.GlobalOptionalOptions",
-         "Global Advanced Options"},
+         "Global Options"},
 
         {"CRMXML.RscDefaultsSection",
          "Global Resource Defaults"},
@@ -1829,6 +1829,9 @@ public class TextResource extends
 
         {"ConfigData.OpMode.GOD",
          "Developer Level 10"},
+
+        {"EditableInfo.MoreOptions",
+         "more options are available in advanced mode..."},
 
         {"EmptyViewPanel.HelpButton",
          "I am new here"},

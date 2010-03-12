@@ -634,9 +634,9 @@ public class CoroConfig extends DialogCluster {
                     if (aisCastAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        Tools.getConfigData().setAccessible(
-                                            makeConfigButton,
-                                            ConfigData.AccessType.ADMIN);
+                        Tools.getGUIData().setAccessible(
+                                                makeConfigButton,
+                                                ConfigData.AccessType.ADMIN);
                     }
                     if (!Tools.getConfigData().getAutoClusters().isEmpty()
                         && !aisCastAddresses.isEmpty()) {
@@ -971,8 +971,8 @@ public class CoroConfig extends DialogCluster {
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
-        Tools.getConfigData().setAccessible(configCheckbox,
-                                            ConfigData.AccessType.ADMIN);
+        Tools.getGUIData().setAccessible(configCheckbox,
+                                         ConfigData.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 final String text = configCheckbox.getText();

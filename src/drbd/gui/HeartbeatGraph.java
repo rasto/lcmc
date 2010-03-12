@@ -1450,4 +1450,22 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final int getDefaultVertexHeight(final Vertex v) {
         return VERTEX_HEIGHT;
     }
+
+    /**
+     * Returns all crm connections.
+     */
+    public final List<HbConnectionInfo> getAllHbConnections() {
+        final List<HbConnectionInfo> allConnections =
+                                            new ArrayList<HbConnectionInfo>();
+        try {
+            mEdgeLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        for (final HbConnectionInfo hbci : hbconnectionToEdgeMap.keySet()) {
+            allConnections.add(hbci);
+        }
+        mEdgeLock.release();
+        return allConnections;
+    }
 }

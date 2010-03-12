@@ -195,7 +195,7 @@ public final class DrbdMC extends JPanel {
                 } else {
                     opMode = false;
                 }
-                    
+
                 if (auto) {
                     Tools.parseAutoArgs(arg);
                 } else if ("--keep-helper".equals(arg)) {

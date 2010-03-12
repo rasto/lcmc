@@ -166,26 +166,18 @@ public class BlockDev extends DrbdConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        final JPanel extraOptionsPanel = new JPanel();
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                                  BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         final String[] params = blockDevInfo.getParametersFromXML();
         blockDevInfo.selectMyself();
         blockDevInfo.addWizardParams(
                  optionsPanel,
-                 extraOptionsPanel,
                  params,
                  (MyButton) buttonClass(nextButton()),
                  Tools.getDefaultInt("Dialog.DrbdConfig.BlockDev.LabelWidth"),
-                 Tools.getDefaultInt("Dialog.DrbdConfig.BlockDev.FieldWidth"));
+                 Tools.getDefaultInt("Dialog.DrbdConfig.BlockDev.FieldWidth"),
+                 null);
 
         inputPane.add(new JLabel(blockDevInfo.getHost().getName()));
-
         inputPane.add(optionsPanel);
-        inputPane.add(extraOptionsPanel);
-
         return inputPane;
     }
 }

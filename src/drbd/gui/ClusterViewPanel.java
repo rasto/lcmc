@@ -46,6 +46,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
 import javax.swing.border.TitledBorder;
+import javax.swing.SwingUtilities;
 
 
 
@@ -63,9 +64,13 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private final Cluster cluster;
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
-                        Tools.getDefaultColor("ViewPanel.Status.Background");
+                          Tools.getDefaultColor("ViewPanel.Status.Background");
     /** Menu tree object. */
     private final JTree tree;
+    /** Combo box with operating modes. */
+    private final JComboBox operatingModesCB;
+    /** Expert mode button. */
+    private final JCheckBox expertModeCB;
 
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.
@@ -107,6 +112,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         clusterButtonsPanel.add(clusterWizardButton);
         buttonPanel.add(clusterButtonsPanel);
 
+        /* expert mode button */
+        expertModeCB = createExpertModeButton();
         /* Operating mode */
         final JPanel opModePanel = new JPanel();
         opModePanel.setBackground(STATUS_BACKGROUND);
@@ -114,10 +121,10 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         opModePanel.setBorder(vmBorder);
         final String[] modes = Tools.getConfigData().getOperatingModes();
         final JComboBox opModeCB = new JComboBox(modes);
-        final JCheckBox expertButton = Tools.expertModeButton();
-        final ConfigData.AccessType accessType = 
+
+        final ConfigData.AccessType accessType =
                                         Tools.getConfigData().getAccessType();
-        opModeCB.setSelectedItem(ConfigData.OP_NODES_MAP.get(accessType));
+        opModeCB.setSelectedItem(ConfigData.OP_MODES_MAP.get(accessType));
         opModeCB.addItemListener(new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 final String opMode = (String) e.getItem();
@@ -126,15 +133,14 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                         public void run() {
                             ConfigData.AccessType type =
                                         ConfigData.ACCESS_TYPE_MAP.get(opMode);
-
                             if (type == null) {
                                 Tools.appError("unknown mode: " + opMode);
                                 type = ConfigData.AccessType.RO;
                             }
                             Tools.getConfigData().setAccessType(type);
-                            cluster.getBrowser().checkEverything();
-                            expertButton.setEnabled(
-                                             type != ConfigData.AccessType.RO);
+                            Tools.getGUIData().setOperatingModeGlobally(cluster,
+                                                                        opMode);
+                            cluster.getBrowser().checkAccessOfEverything();
                         }
                     });
                     thread.start();
@@ -142,11 +148,9 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
             }
         });
         opModePanel.add(opModeCB);
-        if (accessType == ConfigData.AccessType.RO) {
-            expertButton.setEnabled(false);
-        }
-        opModePanel.add(expertButton);
+        opModePanel.add(expertModeCB);
         buttonPanel.add(opModePanel);
+        operatingModesCB = opModeCB;
 
         /* upgrade field */
         buttonPanel.add(
@@ -168,9 +172,34 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         Tools.getGUIData().registerAllHostsUpdate(this);
     }
 
-    /**
-     * This is called when there was added a new host.
-     */
+    /** Returns expert mode check box. That hides expert options. */
+    public final JCheckBox createExpertModeButton() {
+        final JCheckBox emCB = new JCheckBox(Tools.getString(
+                                                        "Browser.ExpertMode"));
+        emCB.setBackground(Tools.getDefaultColor(
+                                            "ViewPanel.Status.Background"));
+        emCB.setSelected(Tools.getConfigData().getExpertMode());
+        emCB.addItemListener(new ItemListener() {
+            public void itemStateChanged(final ItemEvent e) {
+                final boolean selected =
+                                    e.getStateChange() == ItemEvent.SELECTED;
+                if (selected != Tools.getConfigData().getExpertMode()) {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            Tools.getConfigData().setExpertMode(selected);
+                            Tools.getGUIData().setExpertModeGlobally(cluster,
+                                                                     selected);
+                            cluster.getBrowser().checkAccessOfEverything();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        });
+        return emCB;
+    }
+
+    /** This is called when there was added a new host. */
     public final void allHostsUpdate() {
         cluster.getBrowser().updateClusterResources(
                                                 cluster.getHostsArray(),
@@ -178,17 +207,45 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                                                 cluster.getCommonMountPoints());
     }
 
-    /**
-     * Refreshes the cluster data in the view.
-     */
+    /** Refreshes the cluster data in the view. */
     public final void refresh() {
         cluster.getBrowser().getTreeModel().reload();
     }
 
-    /**
-     * Gets cluster object.
-     */
+    /** Gets cluster object. */
     public final Cluster getCluster() {
         return cluster;
+    }
+
+    /** Modify the operating modes combo box according to the godmode. */
+    public final void resetOperatingModes(final boolean godMode) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (godMode) {
+                    operatingModesCB.addItem(ConfigData.OP_MODE_GOD);
+                    operatingModesCB.setSelectedItem(ConfigData.OP_MODE_GOD);
+                } else {
+                    operatingModesCB.removeItem(ConfigData.OP_MODE_GOD);
+                }
+            }
+        });
+    }
+
+    /** Sets operating mode. */
+    public final void setOperatingMode(final String opMode) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                operatingModesCB.setSelectedItem(opMode);
+            }
+        });
+    }
+
+    /** Sets expert mode. */
+    public final void setExpertMode(final boolean expertMode) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                expertModeCB.setSelected(expertMode);
+            }
+        });
     }
 }

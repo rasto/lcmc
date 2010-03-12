@@ -604,7 +604,7 @@ public class HbConfig extends DialogCluster {
                     if (castAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        Tools.getConfigData().setAccessible(
+                        Tools.getGUIData().setAccessible(
                                             makeConfigButton,
                                             ConfigData.AccessType.ADMIN);
                     }
@@ -1032,8 +1032,8 @@ public class HbConfig extends DialogCluster {
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
-        Tools.getConfigData().setAccessible(configCheckbox,
-                                            ConfigData.AccessType.ADMIN);
+        Tools.getGUIData().setAccessible(configCheckbox,
+                                         ConfigData.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 final String text = configCheckbox.getText();

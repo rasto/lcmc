@@ -28,6 +28,7 @@ import drbd.data.Host;
 import drbd.data.resources.Service;
 import drbd.data.ClusterStatus;
 import drbd.data.CRMXML;
+import drbd.data.ConfigData;
 import drbd.utilities.CRM;
 
 import java.util.Map;
@@ -298,5 +299,14 @@ public class HbColocationInfo extends EditableInfo
             return -1000000;
         }
         return Integer.parseInt(score);
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(String param) {
+        return true;
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(String param) {
+        return ConfigData.AccessType.ADMIN;
     }
 }

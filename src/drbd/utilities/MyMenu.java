@@ -33,10 +33,10 @@ public class MyMenu extends JMenu implements UpdatableItem {
     private static final long serialVersionUID = 1L;
     /** Position of the menu that can be stored and retrieved. */
     private Point2D pos = null;
-    /** Access Type for this component to become enabled */
-    final ConfigData.AccessType enableAccessType;
-    /** Access Type for this component to become visible */
-    final ConfigData.AccessType visibleAccessType;
+    /** Access Type for this component to become enabled. */
+    private final ConfigData.AccessType enableAccessType;
+    /** Access Type for this component to become visible. */
+    private final ConfigData.AccessType visibleAccessType;
 
     /**
      * Prepares a new <code>MyMenu</code> object.
@@ -47,7 +47,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
         super(text);
         this.enableAccessType = enableAccessType;
         this.visibleAccessType = visibleAccessType;
-        processAccessType();
+        processAccessType(); //TODO: should not be called here
     }
 
     /**
@@ -95,7 +95,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessType() {
-        final boolean accessible = 
+        final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessType);
         setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
@@ -104,7 +104,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
             setToolTipText("<html><b>"
                            + getText()
                            + " (disabled)</b><br>available in \""
-                           + ConfigData.OP_NODES_MAP.get(enableAccessType)
+                           + ConfigData.OP_MODES_MAP.get(enableAccessType)
                            + "\" mode</html>");
         }
     }

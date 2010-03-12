@@ -396,7 +396,6 @@ public class HostBrowser extends Browser {
                                             host.getDistString(command));
             }
         };
-        Tools.getGUIData().addToEnabledInGodMode(panicMenuItem);
         submenu.add(panicMenuItem);
 
         /* reboot */
@@ -423,10 +422,9 @@ public class HostBrowser extends Browser {
                                             host.getDistString(command));
             }
         };
-        Tools.getGUIData().addToEnabledInGodMode(rebootMenuItem);
         submenu.add(rebootMenuItem);
     }
-   
+
     /**
      * Returns info string about DRBD installation.
      */

@@ -28,6 +28,7 @@ import drbd.gui.GuiComboBox;
 import drbd.data.resources.Resource;
 import drbd.data.CRMXML;
 import drbd.data.ClusterStatus;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 
 import java.util.Collection;
@@ -187,9 +188,18 @@ public class RscDefaultsInfo extends EditableInfo {
         return crmXML.getRscDefaultsSection(param);
     }
 
-    /**
-     * Returns true if the specified parameter is required.
-     */
+    /** Returns true if the specified parameter is advanced. */
+    protected final boolean isAdvanced(final String param) {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        return crmXML.isRscDefaultsAdvanced(param);
+    }
+
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(String param) {
+        return getBrowser().getCRMXML().getRscDefaultsAccessType(param);
+    }
+
+    /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsRequired(param);

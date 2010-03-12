@@ -60,19 +60,19 @@ public class ConfigData implements Serializable {
                                     Tools.getString("ConfigData.OpMode.ADMIN");
 
     /** Developer Level 10 operating mode. */
-    private static final String OP_MODE_GOD =
+    public static final String OP_MODE_GOD =
                                        Tools.getString("ConfigData.OpMode.GOD");
     /** Map from access type to its string representation. */
-    public static final Map<AccessType, String> OP_NODES_MAP =
+    public static final Map<AccessType, String> OP_MODES_MAP =
                                        new LinkedHashMap<AccessType, String>();
     /** String representation to its access type. */
     public static final Map<String, AccessType> ACCESS_TYPE_MAP =
                                        new LinkedHashMap<String, AccessType>();
     static {
-        OP_NODES_MAP.put(AccessType.RO, OP_MODE_RO);
-        OP_NODES_MAP.put(AccessType.OP, OP_MODE_OP);
-        OP_NODES_MAP.put(AccessType.ADMIN, OP_MODE_ADMIN);
-        OP_NODES_MAP.put(AccessType.GOD, OP_MODE_GOD);
+        OP_MODES_MAP.put(AccessType.RO, OP_MODE_RO);
+        OP_MODES_MAP.put(AccessType.OP, OP_MODE_OP);
+        OP_MODES_MAP.put(AccessType.ADMIN, OP_MODE_ADMIN);
+        OP_MODES_MAP.put(AccessType.GOD, OP_MODE_GOD);
 
         ACCESS_TYPE_MAP.put(OP_MODE_RO, AccessType.RO);
         ACCESS_TYPE_MAP.put(OP_MODE_OP, AccessType.OP);
@@ -95,7 +95,7 @@ public class ConfigData implements Serializable {
     /** If set to true user and password will be saved. */
     private boolean loginSave = true;
     /** Whether it is an expert mode. */
-    private boolean expertMode = true;
+    private boolean expertMode = false;
     /** Default save file. */
     private String saveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
     /** Known hosts object. */
@@ -624,20 +624,12 @@ public class ConfigData implements Serializable {
     }
 
     /**
-     * Enabled the component if it is accessible.
-     */
-    public final void setAccessible(final JComponent c,
-                                       final AccessType required) {
-        c.setEnabled(getAccessType().compareTo(required) >= 0);
-    }
-
-    /**
      * Returns available operating modes.
      */
     public final String[] getOperatingModes() {
         final List<String> modes = new ArrayList<String>();
-        for (final AccessType at : ConfigData.OP_NODES_MAP.keySet()) {
-            modes.add(OP_NODES_MAP.get(at));
+        for (final AccessType at : ConfigData.OP_MODES_MAP.keySet()) {
+            modes.add(OP_MODES_MAP.get(at));
             if (at.equals(maxAccessType)) {
                 break;
             }

@@ -68,7 +68,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -79,10 +78,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.DefaultListModel;
 import javax.swing.JRadioButton;
+import javax.swing.SpringLayout;
 
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
-
 
 /**
  * This class holds info data for one hearteat service and allows to enter
@@ -128,8 +127,6 @@ public class ServiceInfo extends EditableInfo {
     private final ResourceAgent resourceAgent;
     /** Radio buttons for clone/master/slave primitive resources. */
     private GuiComboBox typeRadioGroup;
-    /** Extra options panel. */
-    private JPanel extraOptionsPanel = null;
     /** Default values item in the "same as" scrolling list in meta
         attributes.*/
     private static final String META_ATTRS_DEFAULT_VALUES_TEXT =
@@ -1195,7 +1192,6 @@ public class ServiceInfo extends EditableInfo {
      * Adds clone fields to the option pane.
      */
     protected void addCloneFields(final JPanel optionsPanel,
-                                  final JPanel extraOptionsPanel,
                                   final int leftWidth,
                                   final int rightWidth) {
         cloneInfo.paramComboBoxClear();
@@ -1205,7 +1201,6 @@ public class ServiceInfo extends EditableInfo {
         cloneInfo.getResource().setValue(GUI_ID,
                                          cloneInfo.getService().getId());
         cloneInfo.addParams(optionsPanel,
-                            extraOptionsPanel,
                             params,
                             ClusterBrowser.SERVICE_LABEL_WIDTH,
                             ClusterBrowser.SERVICE_FIELD_WIDTH,
@@ -1255,6 +1250,7 @@ public class ServiceInfo extends EditableInfo {
 
         final JPanel panel =
              getParamPanel(Tools.getString("ClusterBrowser.HostLocations"));
+        panel.setLayout(new SpringLayout());
 
         for (Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
@@ -1638,7 +1634,6 @@ public class ServiceInfo extends EditableInfo {
      * Creates operations combo boxes with labels.
      */
     protected void addOperations(final JPanel optionsPanel,
-                                 final JPanel extraOptionsPanel,
                                  final int leftWidth,
                                  final int rightWidth) {
         int rows = 0;
@@ -1647,6 +1642,7 @@ public class ServiceInfo extends EditableInfo {
 
         final JPanel panel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
+        panel.setLayout(new SpringLayout());
         String defaultOpIdRef = null;
         final Info savedOpIdRef = getSameServiceOpIdRef();
         if (savedOpIdRef != null) {
@@ -1886,12 +1882,22 @@ public class ServiceInfo extends EditableInfo {
         return crmXML.getSection(resourceAgent, param);
     }
 
-    /**
-     * Returns true if the specified parameter is required.
-     */
+    /** Returns true if the specified parameter is required. */
     protected boolean isRequired(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRequired(resourceAgent, param);
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(final String param) {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        return crmXML.isAdvanced(resourceAgent, param);
+    }
+
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(final String param) {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        return crmXML.getAccessType(resourceAgent, param);
     }
 
     /**
@@ -1985,8 +1991,6 @@ public class ServiceInfo extends EditableInfo {
                                                                      oldCI);
             }
             cloneInfo.setCloneServicePanel(this);
-            Tools.unregisterExpertPanel(extraOptionsPanel);
-            extraOptionsPanel = null;
             infoPanel = null;
             selectMyself();
         } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
@@ -2303,14 +2307,6 @@ public class ServiceInfo extends EditableInfo {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        if (extraOptionsPanel == null) {
-            extraOptionsPanel = new JPanel();
-        }
-        extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                    BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         /* Actions */
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -2343,7 +2339,6 @@ public class ServiceInfo extends EditableInfo {
                                      + ClusterBrowser.SERVICE_FIELD_WIDTH,
                                      null, /* abbrv */
                                      ConfigData.AccessType.ADMIN);
-            typeRadioGroup.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
 
             if (!getService().isNew()) {
                 typeRadioGroup.setEnabled(false);
@@ -2363,14 +2358,15 @@ public class ServiceInfo extends EditableInfo {
                 }
             }, null);
             final JPanel tp = new JPanel();
+            tp.setBackground(ClusterBrowser.PANEL_BACKGROUND);
             tp.setLayout(new BoxLayout(tp, BoxLayout.Y_AXIS));
             tp.add(typeRadioGroup);
+            typeRadioGroup.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
             optionsPanel.add(tp);
         }
         if (cloneInfo != null) {
             /* add clone fields */
             addCloneFields(optionsPanel,
-                           extraOptionsPanel,
                            ClusterBrowser.SERVICE_LABEL_WIDTH,
                            ClusterBrowser.SERVICE_FIELD_WIDTH);
         }
@@ -2382,7 +2378,6 @@ public class ServiceInfo extends EditableInfo {
         final String[] params = getParametersFromXML();
         final Info savedMAIdRef = savedMetaAttrInfoRef;
         addParams(optionsPanel,
-                  extraOptionsPanel,
                   params,
                   ClusterBrowser.SERVICE_LABEL_WIDTH,
                   ClusterBrowser.SERVICE_FIELD_WIDTH,
@@ -2407,7 +2402,6 @@ public class ServiceInfo extends EditableInfo {
             && !getResourceAgent().isClone()) {
             /* Operations */
             addOperations(optionsPanel,
-                          extraOptionsPanel,
                           ClusterBrowser.SERVICE_LABEL_WIDTH,
                           ClusterBrowser.SERVICE_FIELD_WIDTH);
             /* add item listeners to the operations combos */
@@ -2427,17 +2421,13 @@ public class ServiceInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         applyButton.setEnabled(checkResourceFields(null, params));
-        /* expert mode */
-        Tools.registerExpertPanel(extraOptionsPanel);
 
         mainPanel.add(optionsPanel);
-        mainPanel.add(extraOptionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
-        newPanel.add(Box.createVerticalGlue());
         /* if id textfield was changed and this id is not used,
          * enable apply button */
         infoPanel = newPanel;
@@ -3337,7 +3327,6 @@ public class ServiceInfo extends EditableInfo {
             getBrowser().removeFromServiceInfoHash(this);
             infoPanel = null;
             getService().doneRemoving();
-            Tools.unregisterExpertPanel(extraOptionsPanel);
             getBrowser().reloadAllComboBoxes(this);
         }
     }
@@ -3876,7 +3865,7 @@ public class ServiceInfo extends EditableInfo {
                   Tools.getString("ClusterBrowser.Hb.UnmanageResource"),
                   UNMANAGE_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                  
+
                   ConfigData.AccessType.OP,
                   ConfigData.AccessType.OP) {
                 private static final long serialVersionUID = 1L;

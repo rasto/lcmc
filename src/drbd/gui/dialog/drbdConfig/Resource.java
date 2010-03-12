@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
+import javax.swing.JScrollPane;
 
 import java.awt.Component;
 
@@ -123,11 +124,6 @@ public class Resource extends DrbdConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        final JPanel extraOptionsPanel = new JPanel();
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                                  BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-
         getDrbdResourceInfo().getResource().setValue("cram-hmac-alg", "sha1");
         getDrbdResourceInfo().getResource().setValue("shared-secret",
                                                      getRandomSecret());
@@ -135,18 +131,16 @@ public class Resource extends DrbdConfig {
 
         getDrbdResourceInfo().addWizardParams(
                   optionsPanel,
-                  extraOptionsPanel,
                   PARAMS,
                   (MyButton) buttonClass(nextButton()),
                   Tools.getDefaultInt("Dialog.DrbdConfig.Resource.LabelWidth"),
-                  Tools.getDefaultInt("Dialog.DrbdConfig.Resource.FieldWidth")
-                  );
+                  Tools.getDefaultInt("Dialog.DrbdConfig.Resource.FieldWidth"),
+                  null);
 
         inputPane.add(optionsPanel);
-        inputPane.add(extraOptionsPanel);
 
         ((MyButton) buttonClass(nextButton())).setEnabled(
                 getDrbdResourceInfo().checkResourceFields(null, PARAMS));
-        return inputPane;
+        return new JScrollPane(inputPane);
     }
 }

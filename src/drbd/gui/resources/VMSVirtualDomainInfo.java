@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
-import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -69,8 +68,6 @@ import java.awt.event.ActionEvent;
 public class VMSVirtualDomainInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-    /** Extra options panel. */
-    private final JPanel extraOptionsPanel = new JPanel();
     /** Whether the vm is running on at least one host. */
     private boolean running = false;
     /** HTML string on which hosts the vm is defined. */
@@ -298,10 +295,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                         new FlowLayout(FlowLayout.LEFT, 0, 20));
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
 
-        extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                    BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         final String[] params = getParametersFromXML();
         initApplyButton(null);
         /* add item listeners to the apply button. */
@@ -336,7 +329,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         });
         extraButtonPanel.add(overviewButton);
         addParams(optionsPanel,
-                  extraOptionsPanel,
                   params,
                   ClusterBrowser.SERVICE_LABEL_WIDTH,
                   ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
@@ -359,18 +351,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
 
-        Tools.registerExpertPanel(extraOptionsPanel);
         mainPanel.add(optionsPanel);
         mainPanel.add(getTablePanel("Disks", DISK_TABLE));
         mainPanel.add(Box.createVerticalStrut(20));
         mainPanel.add(getTablePanel("Interfaces", INTERFACES_TABLE));
-        mainPanel.add(extraOptionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
-        newPanel.add(Box.createVerticalGlue());
         applyButton.setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;
         return infoPanel;
@@ -440,7 +429,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 public boolean enablePredicate() {
                     return visiblePredicate();
                 }
-                
+
                 public boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
@@ -903,14 +892,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return SwingConstants.LEFT;
     }
 
-    /**
-     * Returns info object for this row.
-     */
+    /** Returns info object for this row. */
     protected final Info getTableInfo(final String tableName,
                                       final String key) {
         if (HEADER_TABLE.equals(tableName)) {
             return this;
         }
         return null;
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(final String param) {
+        return false;
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(final String param) {
+        return ConfigData.AccessType.ADMIN;
     }
 }

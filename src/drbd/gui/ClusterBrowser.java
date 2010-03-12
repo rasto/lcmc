@@ -2329,16 +2329,21 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Checks all fields in the application. */
-    public final void checkEverything() {
+    public final void checkAccessOfEverything() {
         servicesInfo.checkResourceFields(null,
                                          servicesInfo.getParametersFromXML());
+        servicesInfo.updateAdvancedPanels();
+        rscDefaultsInfo.updateAdvancedPanels();
+        Tools.getGUIData().updateGlobalItems();
         for (final ServiceInfo si : getExistingServiceList(null)) {
             si.checkResourceFields(null, si.getParametersFromXML());
+            si.updateAdvancedPanels();
         }
 
         drbdGraph.getDrbdInfo().checkResourceFields(
                                 null,
                                 drbdGraph.getDrbdInfo().getParametersFromXML());
+        drbdGraph.getDrbdInfo().updateAdvancedPanels();
         for (final DrbdResourceInfo dri : drbdResHash.values()) {
             dri.checkResourceFields(null, dri.getParametersFromXML());
             final BlockDevInfo bdi1 = dri.getFirstBlockDevInfo();
@@ -2348,6 +2353,23 @@ public class ClusterBrowser extends Browser {
             final BlockDevInfo bdi2 = dri.getSecondBlockDevInfo();
             if (bdi2 != null) {
                 bdi2.checkResourceFields(null, bdi2.getParametersFromXML());
+            }
+        }
+
+        if (vmsNode != null) {
+            final Enumeration e = vmsNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                    (DefaultMutableTreeNode) e.nextElement();
+                final VMSVirtualDomainInfo vmsvdi =
+                                  (VMSVirtualDomainInfo) node.getUserObject();
+                vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
+            }
+
+            for (final HbConnectionInfo hbci
+                                        : heartbeatGraph.getAllHbConnections()) {
+                hbci.checkResourceFields(null, hbci.getParametersFromXML());
+                hbci.updateAdvancedPanels();
             }
         }
     }

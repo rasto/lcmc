@@ -67,10 +67,10 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Tooltip background color. */
     private Color toolTipBackground = null;
-    /** Access Type for this component to become enabled */
-    final ConfigData.AccessType enableAccessType;
-    /** Access Type for this component to become visible */
-    final ConfigData.AccessType visibleAccessType;
+    /** Access Type for this component to become enabled. */
+    private final ConfigData.AccessType enableAccessType;
+    /** Access Type for this component to become visible. */
+    private final ConfigData.AccessType visibleAccessType;
 
     /**
      * Prepares a new <code>MyMenuItem</code> object with icon but without
@@ -98,7 +98,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        processAccessType();
+        processAccessType(); //TODO: should not be called here
     }
 
 
@@ -131,7 +131,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        processAccessType();
+        processAccessType(); //TODO: should not be called here
     }
 
     /**
@@ -257,7 +257,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessType() {
-        final boolean accessible = 
+        final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessType);
         setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
@@ -266,7 +266,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             setToolTipText("<html><b>"
                            + getText()
                            + " (disabled)</b><br>available in \""
-                           + ConfigData.OP_NODES_MAP.get(enableAccessType)
+                           + ConfigData.OP_MODES_MAP.get(enableAccessType)
                            + "\" mode</html>");
         }
     }

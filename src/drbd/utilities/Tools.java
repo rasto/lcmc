@@ -53,8 +53,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JList;
@@ -74,8 +72,6 @@ import java.awt.Component;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -97,7 +93,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 
 /**
@@ -151,10 +146,10 @@ public final class Tools {
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(
                                                           DIALOG_PANEL_WIDTH,
                                                           DIALOG_PANEL_HEIGHT);
-    /** Array of expert pannels. */
-    private static final List<JPanel> expertPanels = new ArrayList<JPanel>();
-    /** Expert panel mutex. */
-    private static final Mutex mExpertPanels = new Mutex();
+    ///** Array of expert pannels. */
+    //private static final List<JPanel> expertPanels = new ArrayList<JPanel>();
+    ///** Expert panel mutex. */
+    //private static final Mutex mExpertPanels = new Mutex();
 
     /** Previous index in the scrolling menu. */
     private static volatile int prevScrollingMenuIndex = -1;
@@ -1349,90 +1344,48 @@ public final class Tools {
         return false;
     }
 
-    /**
-     * Hides panel with expert options if not in an expert mode.
-     *
-     * @param extraOptionsPanel
-     *          panel with extra options
-     */
-    public static void hideExpertModePanel(final JPanel extraOptionsPanel) {
-        if (!Tools.getConfigData().getExpertMode()) {
-            extraOptionsPanel.setVisible(false);
-        }
-    }
+    ///**
+    // * Hides panel with expert options if not in an expert mode.
+    // *
+    // * @param extraOptionsPanel
+    // *          panel with extra options
+    // */
+    //public static void hideExpertModePanel(final JPanel extraOptionsPanel) {
+    //    if (!Tools.getConfigData().getExpertMode()) {
+    //        extraOptionsPanel.setVisible(false);
+    //    }
+    //}
 
-    /**
-     * Register expert panel.
-     */
-    public static void registerExpertPanel(final JPanel extraOptionsPanel) {
-        try {
-            mExpertPanels.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        //System.out.println("register expert panel: " + expertPanels.size());
-        if (!expertPanels.contains(extraOptionsPanel)) {
-            expertPanels.add(extraOptionsPanel);
-        }
-        mExpertPanels.release();
-    }
+    ///**
+    // * Register expert panel.
+    // */
+    //public static void registerExpertPanel(final JPanel extraOptionsPanel) {
+    //    try {
+    //        mExpertPanels.acquire();
+    //    } catch (InterruptedException e) {
+    //        Thread.currentThread().interrupt();
+    //    }
+    //    //System.out.println("register expert panel: " + expertPanels.size());
+    //    if (!expertPanels.contains(extraOptionsPanel)) {
+    //        expertPanels.add(extraOptionsPanel);
+    //    }
+    //    mExpertPanels.release();
+    //}
 
-    /**
-     * Unregister expert panel.
-     */
-    public static void unregisterExpertPanel(final JPanel extraOptionsPanel) {
-        try {
-            mExpertPanels.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        expertPanels.remove(extraOptionsPanel);
-        //System.out.println("unregister expert panel: " + expertPanels.size());
-        mExpertPanels.release();
-    }
+    ///**
+    // * Unregister expert panel.
+    // */
+    //public static void unregisterExpertPanel(final JPanel extraOptionsPanel) {
+    //    try {
+    //        mExpertPanels.acquire();
+    //    } catch (InterruptedException e) {
+    //        Thread.currentThread().interrupt();
+    //    }
+    //    expertPanels.remove(extraOptionsPanel);
+    //    //System.out.println("unregister expert panel: " + expertPanels.size());
+    //    mExpertPanels.release();
+    //}
 
-    /**
-     * Returns expert mode check box. That hides extraOptionsPanel if expert
-     * mode was deactivated.
-     *
-     * @param extraOptionsPanel
-     *          panel with extra options
-     *
-     * @return expert mode checkbox
-     */
-    public static JCheckBox expertModeButton() {
-        final JCheckBox expertCB = new JCheckBox(Tools.getString(
-                                                    "Browser.ExpertMode"));
-        expertCB.setBackground(Tools.getDefaultColor(
-                                            "ViewPanel.Status.Background"));
-        expertCB.setSelected(Tools.getConfigData().getExpertMode());
-        expertCB.addItemListener(new ItemListener() {
-            public void itemStateChanged(final ItemEvent e) {
-                final boolean selected =
-                                    e.getStateChange() == ItemEvent.SELECTED;
-                if (selected != Tools.getConfigData().getExpertMode()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            try {
-                                mExpertPanels.acquire();
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                            }
-                            for (final JPanel panel : expertPanels) {
-                                Tools.getConfigData().setExpertMode(selected);
-                                panel.setVisible(selected);
-                                panel.invalidate();
-                                panel.validate();
-                                panel.repaint();
-                            }
-                            mExpertPanels.release();
-                        }
-                    });
-                }
-            }
-        });
-        return expertCB;
-    }
 
     /**
      * Escapes for config file.

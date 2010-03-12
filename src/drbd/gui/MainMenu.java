@@ -23,6 +23,7 @@
 package drbd.gui;
 
 import drbd.utilities.Tools;
+import drbd.data.ConfigData;
 import drbd.AddHostDialog;
 import drbd.AddClusterDialog;
 
@@ -110,7 +111,8 @@ public class MainMenu extends JPanel implements ActionListener {
                                                KeyEvent.VK_L,
                                                loadActionListener(),
                                                null);
-        Tools.getGUIData().addToEnabledInGodMode(loadItem);
+        Tools.getGUIData().addToEnabledInAccessType(loadItem,
+                                                    ConfigData.AccessType.GOD);
 
         final JMenuItem item = addMenuItem(
                                 Tools.getString("MainMenu.RemoveEverything"),
@@ -119,7 +121,8 @@ public class MainMenu extends JPanel implements ActionListener {
                                 0,
                                 removeEverythingActionListener(),
                                 null);
-        Tools.getGUIData().addToVisibleInGodMode(item);
+        Tools.getGUIData().addToVisibleInAccessType(item,
+                                                    ConfigData.AccessType.GOD);
 
         addMenuItem(Tools.getString("MainMenu.Save"),
                     submenu,
@@ -148,7 +151,8 @@ public class MainMenu extends JPanel implements ActionListener {
 
         /* settings */
         submenu = addMenu(Tools.getString("MainMenu.Settings"), 0);
-        Tools.getGUIData().addToVisibleInGodMode(submenu);
+        Tools.getGUIData().addToVisibleInAccessType(submenu,
+                                                    ConfigData.AccessType.GOD);
         menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
         final UIManager.LookAndFeelInfo[] lookAndFeels =
                                         UIManager.getInstalledLookAndFeels();

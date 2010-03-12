@@ -55,6 +55,12 @@ public class CRMXML extends XML {
     private final Host host;
     /** List of global parameters. */
     private final List<String> globalParams = new ArrayList<String>();
+    /** List of not advanced global parameters. */
+    private final List<String> globalNotAdvancedParams =
+                                                     new ArrayList<String>();
+    /** Map from global parameter to its access type. */
+    private final Map<String, ConfigData.AccessType> paramGlobalAccessTypes =
+                                  new HashMap<String, ConfigData.AccessType>();
     /** List of required global parameters. */
     private final List<String> globalRequiredParams = new ArrayList<String>();
     /** Map from class to the list of all crm services. */
@@ -252,6 +258,12 @@ public class CRMXML extends XML {
     /** Section for meta attributes in rsc_defaults. */
     private static final Map<String, String> M_A_SECTION =
                                                  new HashMap<String, String>();
+    /** List of meta attributes that are not advanced. */
+    private static final List<String> M_A_NOT_ADVANCED =
+                                                       new ArrayList<String>();
+    /** Access type of meta attributes. */
+    private static final Map<String, ConfigData.AccessType> M_A_ACCESS_TYPE =
+                                  new HashMap<String, ConfigData.AccessType>();
     /** Possible choices for meta attributes. */
     private static final Map<String, String[]> M_A_POSSIBLE_CHOICES =
                                                 new HashMap<String, String[]>();
@@ -282,6 +294,7 @@ public class CRMXML extends XML {
         M_A_LONG_DESC.put(TARGET_ROLE_META_ATTR,
                           Tools.getString("CRMXML.TargetRole.LongDesc"));
         M_A_DEFAULT.put(TARGET_ROLE_META_ATTR, TARGET_ROLE_STARTED);
+        M_A_NOT_ADVANCED.add(TARGET_ROLE_META_ATTR);
 
         /* is-managed */
         M_A_POSSIBLE_CHOICES.put(IS_MANAGED_META_ATTR, PCMK_BOOLEAN_VALUES);
@@ -291,6 +304,7 @@ public class CRMXML extends XML {
                           Tools.getString("CRMXML.IsManaged.LongDesc"));
         M_A_DEFAULT.put(IS_MANAGED_META_ATTR, PCMK_TRUE);
         M_A_TYPE.put(IS_MANAGED_META_ATTR, PARAM_TYPE_BOOLEAN);
+        M_A_NOT_ADVANCED.add(IS_MANAGED_META_ATTR);
 
         /* priority */
         M_A_POSSIBLE_CHOICES.put(PRIORITY_META_ATTR,
@@ -313,6 +327,7 @@ public class CRMXML extends XML {
                         Tools.getString("CRMXML.ResourceStickiness.LongDesc"));
         M_A_DEFAULT.put(RESOURCE_STICKINESS_META_ATTR, "0");
         M_A_TYPE.put(RESOURCE_STICKINESS_META_ATTR, PARAM_TYPE_INTEGER);
+        M_A_NOT_ADVANCED.add(RESOURCE_STICKINESS_META_ATTR);
 
         /* migration-threshold */
         M_A_POSSIBLE_CHOICES.put(MIGRATION_THRESHOLD_META_ATTR,
@@ -528,6 +543,7 @@ public class CRMXML extends XML {
         paramGlobalDefaultMap.put("symmetric-cluster", hbBooleanFalse);
         paramGlobalPossibleChoices.put("symmetric-cluster", booleanValues);
         globalRequiredParams.add("symmetric-cluster");
+        globalNotAdvancedParams.add("symmetric-cluster");
 
         /* stonith enabled */
         globalParams.add("stonith-enabled");
@@ -538,6 +554,7 @@ public class CRMXML extends XML {
         //paramGlobalPreferredMap.put("stonith-enabled", hbBooleanFalse);
         paramGlobalPossibleChoices.put("stonith-enabled", booleanValues);
         globalRequiredParams.add("stonith-enabled");
+        globalNotAdvancedParams.add("stonith-enabled");
 
         /* transition timeout */
         globalParams.add("default-action-timeout");
@@ -552,6 +569,7 @@ public class CRMXML extends XML {
         globalRequiredParams.add("default-action-timeout");
 
         /* resource stickiness */
+        /* special case: is advanced parameter if not set. */
         globalParams.add("default-resource-stickiness");
         paramGlobalShortDescMap.put("default-resource-stickiness",
                                     "Resource Stickiness");
@@ -577,6 +595,7 @@ public class CRMXML extends XML {
                                                     "freeze",
                                                     "suicide"});
         globalRequiredParams.add("no-quorum-policy");
+        globalNotAdvancedParams.add("no-quorum-policy");
 
         /* resource failure stickiness */
         globalParams.add("default-resource-failure-stickiness");
@@ -613,6 +632,11 @@ public class CRMXML extends XML {
                 "crmd-integration-timeout",
                 "crmd-finalization-timeout"
             };
+            globalNotAdvancedParams.add("no-quorum-policy");
+            globalNotAdvancedParams.add("maintenance-mode");
+            paramGlobalAccessTypes.put("maintenance-mode",
+                                       ConfigData.AccessType.OP);
+            globalNotAdvancedParams.add("cluster-recheck-interval");
 
             for (String param : params) {
                 globalParams.add(param);
@@ -923,10 +947,48 @@ public class CRMXML extends XML {
     }
 
     /**
+     * Checks if the global parameter is advanced.
+     */
+    public final boolean isGlobalAdvanced(final String param) {
+        return !globalNotAdvancedParams.contains(param);
+    }
+
+    /**
+     * Returns the global parameter's access type.
+     */
+    public final ConfigData.AccessType getGlobalAccessType(final String param) {
+        final ConfigData.AccessType at = paramGlobalAccessTypes.get(param);
+        if (at == null) {
+            return ConfigData.AccessType.ADMIN; /* default access type */
+        }
+        return at;
+    }
+
+    /**
      * Checks if parameter is required or not.
      */
     public final boolean isGlobalRequired(final String param) {
         return globalRequiredParams.contains(param);
+    }
+
+    /**
+     * Checks if parameter is advanced or not.
+     */
+    public final boolean isAdvanced(final ResourceAgent ra,
+                                    final String param) {
+        return ra.isAdvanced(param);
+    }
+
+    /**
+     * Returns access type of the parameter.
+     */
+    public final ConfigData.AccessType getAccessType(final ResourceAgent ra,
+                                                     final String param) {
+        final ConfigData.AccessType at = ra.getAccessType(param);
+        if (at == null) {
+            return ConfigData.AccessType.ADMIN;
+        }
+        return at;
     }
 
     /**
@@ -1099,6 +1161,21 @@ public class CRMXML extends XML {
         return M_A_TYPE.get(param);
     }
 
+    /** Checks if parameter is advanced. */
+    public final boolean isRscDefaultsAdvanced(final String param) {
+        return !M_A_NOT_ADVANCED.contains(param);
+    }
+
+    /** Returns access type of the meta attribute. */
+    public final ConfigData.AccessType getRscDefaultsAccessType(
+                                                         final String param) {
+        final ConfigData.AccessType at = M_A_ACCESS_TYPE.get(param);
+        if (at == null) {
+            return ConfigData.AccessType.ADMIN;
+        }
+        return at;
+    }
+
     /**
      * Checks if parameter is required or not.
      */
@@ -1240,6 +1317,13 @@ public class CRMXML extends XML {
         } else {
             ra.addParameter(name);
         }
+        final boolean advanced = !M_A_NOT_ADVANCED.contains(newName);
+        ra.setParamAdvanced(name, advanced);
+        ConfigData.AccessType accessType = M_A_ACCESS_TYPE.get(newName);
+        if (accessType == null) {
+            accessType = ConfigData.AccessType.ADMIN;
+        }
+        ra.setParamAccessType(name, accessType);
         ra.setParamIsMetaAttr(name, true);
         ra.setParamRequired(name, false);
         ra.setParamPossibleChoices(name, M_A_POSSIBLE_CHOICES.get(newName));

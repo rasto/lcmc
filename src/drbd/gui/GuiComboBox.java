@@ -137,12 +137,13 @@ public class GuiComboBox extends JPanel {
                                 Tools.getString("GuiComboBox.NothingSelected");
     /** Label of this component. */
     private JLabel label = null;
-    /** Whether the component should be enabled */
+    /** Whether the component should be enabled. */
     private boolean enablePredicate = true;
-    /** Whether the component should be visible */
-    private boolean visiblePredicate = true;
-    /** Access Type for this component to become enabled */
-    ConfigData.AccessType enableAccessType = ConfigData.AccessType.RO;
+    /** Access Type for this component to become enabled. */
+    private ConfigData.AccessType enableAccessType =
+                                                     ConfigData.AccessType.RO;
+    /** Tooltip if element is enabled. */
+    private String toolTipText = null;
 
     /**
      * Prepares a new <code>GuiComboBox</code> object with specified units.
@@ -186,7 +187,7 @@ public class GuiComboBox extends JPanel {
 
         switch(this.type) {
             case LABELFIELD:
-                component = getLabelField(selectedValue, regexp, abbreviations);
+                component = getLabelField(selectedValue);
                 break;
             case TEXTFIELD:
                 component = getTextField(selectedValue, regexp, abbreviations);
@@ -273,28 +274,6 @@ public class GuiComboBox extends JPanel {
         processAccessType();
     }
 
-    ///**
-    // * Prepares a new <code>GuiComboBox</code> object.
-    // */
-    //public GuiComboBox(final String selectedValue,
-    //                   final Object[] items,
-    //                   final Type typeOfBox,
-    //                   final String regexp,
-    //                   final int width,
-    //                   final Map<String, String> abbreviations,
-    //                   final ConfigData.AccessType enableAccessType,
-    //                   final ConfigData.AccessType visibleAccessType) {
-    //    this(selectedValue,
-    //         items,
-    //         null,
-    //         typeOfBox,
-    //         regexp,
-    //         width,
-    //         abbreviations,
-    //         enableAccessType,
-    //         visibleAccessType);
-    //}
-
     /**
      * Returns whether this field is a check box.
      */
@@ -321,9 +300,7 @@ public class GuiComboBox extends JPanel {
     /**
      * Returns new MTextField with default value.
      */
-    private JComponent getLabelField(final String value,
-                                     final String regexp,
-                                     final Map<String, String> abbreviations) {
+    private JComponent getLabelField(final String value) {
         return new JLabel(value);
     }
 
@@ -537,7 +514,6 @@ public class GuiComboBox extends JPanel {
      * by specified string. This works only with RADIOGROUP in a moment.
      */
     public final void setVisible(final String s, final boolean visible) {
-        visiblePredicate = visible;
         if (componentsHash.containsKey(s)) {
             componentsHash.get(s).setVisible(visible);
         }
@@ -557,13 +533,28 @@ public class GuiComboBox extends JPanel {
     /**
      * Sets the tooltip text.
      */
-    public final void setToolTipText(final String text) {
-        if (type == Type.TEXTFIELDWITHUNIT) {
-            textFieldWithoutUnit.setToolTipText(text);
-            unitComboBox.setToolTipText(text);
-        } else {
-            component.setToolTipText(text);
+    public final void setToolTipText(String text) {
+        toolTipText = text;
+        final boolean accessible =
+                         Tools.getConfigData().isAccessible(enableAccessType);
+        if (!accessible) {
+            text = text + getDisabledTooltip();
         }
+        if (type == Type.TEXTFIELDWITHUNIT) {
+            textFieldWithoutUnit.setToolTipText("<html>" + text + "</html>");
+            unitComboBox.setToolTipText("<html>" + text + "</html>");
+        } else {
+            component.setToolTipText("<html>" + text + "</html>");
+        }
+    }
+
+    /**
+     * Returns tooltip for disabled element.
+     */
+    private String getDisabledTooltip() {
+        return "<br>available in \""
+               + ConfigData.OP_MODES_MAP.get(enableAccessType)
+               + "\" mode";
     }
 
     /**
@@ -700,7 +691,7 @@ public class GuiComboBox extends JPanel {
                         u.setPlural(!"1".equals(text));
                         unitComboBox.repaint();
                     }
-                    final boolean accessible = 
+                    final boolean accessible =
                          Tools.getConfigData().isAccessible(enableAccessType);
                     if ("".equals(text)) {
                         if (!u.isEmpty()) {
@@ -724,7 +715,6 @@ public class GuiComboBox extends JPanel {
                                 });
                             }
                         }
-                        //unitText = u.getShortName();
                     }
                 }
                 value = new Object[]{text, unit};
@@ -772,21 +762,15 @@ public class GuiComboBox extends JPanel {
      * Sets component visible or invisible and remembers this state.
      */
     public final void setVisible(final boolean visible) {
-        visiblePredicate = visible;
-        __setVisible(visible);
+        setComponentsVisible(visible);
     }
 
     /**
      * Sets component visible or invisible.
      */
-    private void __setVisible(final boolean visible) {
+    private void setComponentsVisible(final boolean visible) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                //if (!visible) {
-                //    setMinimumSize(new Dimension(0, 0));
-                //    setPreferredSize(new Dimension(0, 0));
-                //    setMaximumSize(new Dimension(0, 0));
-                //}
                 setVisible(visible);
                 if (label != null) {
                     label.setVisible(visible);
@@ -812,14 +796,14 @@ public class GuiComboBox extends JPanel {
      */
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
-        __setEnabled(enabled
+        setComponentsEnabled(enabled
                      && Tools.getConfigData().isAccessible(enableAccessType));
     }
 
     /**
      * Sets component enabled or disabled.
      */
-    private void __setEnabled(final boolean enabled) {
+    private void setComponentsEnabled(final boolean enabled) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 component.setEnabled(enabled);
@@ -1123,7 +1107,7 @@ public class GuiComboBox extends JPanel {
      * Sets background of the component depending if the value is the same
      * as its default value and if it is a required argument.
      * Must be called after combo box was already added to some panel.
-     * 
+     *
      * It also disables, hides the component depending on the access type.
      * TODO: rename the function
      */
@@ -1146,10 +1130,12 @@ public class GuiComboBox extends JPanel {
         if (!Tools.areEqual(value, savedValue)
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
-                //System.out.println("changed label: " + labelText + " != "
-                //                    + savedLabel);
-                //Tools.printStackTrace("changed: " + value + " != "
-                //                      + savedValue);
+                /*
+                   System.out.println("changed label: " + labelText + " != "
+                                      + savedLabel);
+                   Tools.printStackTrace("changed: " + value + " != "
+                                         + savedValue);
+                */
                 label.setForeground(CHANGED_VALUE_COLOR);
             }
         } else if (Tools.areEqual(value, defaultValue)
@@ -1373,6 +1359,7 @@ public class GuiComboBox extends JPanel {
          return component;
      }
 
+    /** Sets backbround. TODO: useless? */
     public final void setBackground(final Color bg) {
         super.setBackground(bg);
     }
@@ -1437,15 +1424,12 @@ public class GuiComboBox extends JPanel {
     }
 
     /** Sets this item enabled and visible according to its access type. */
-    public void processAccessType() {
-        final boolean accessible = 
+    public final void processAccessType() {
+        final boolean accessible =
                          Tools.getConfigData().isAccessible(enableAccessType);
-        __setEnabled(enablePredicate && accessible);
-        if (!accessible) {
-            setToolTipText("<html><b>"
-                           + "Disabled</b><br>available in \""
-                           + ConfigData.OP_NODES_MAP.get(enableAccessType)
-                           + "\" mode</html>");
+        setComponentsEnabled(enablePredicate && accessible);
+        if (toolTipText != null) {
+            setToolTipText(toolTipText);
         }
         if (label != null) {
             label.setEnabled(accessible);

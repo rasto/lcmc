@@ -40,9 +40,9 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.SpringLayout;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -78,8 +78,6 @@ public class HbConnectionInfo extends EditableInfo {
     /** List of order ids. */
     private final Map<String, HbOrderInfo> orderIds =
                                         new HashMap<String, HbOrderInfo>();
-    /** Expert options panel. */
-    private JPanel extraOptionsPanel = null;
 
     /**
      * Prepares a new <code>HbConnectionInfo</code> object.
@@ -362,15 +360,6 @@ public class HbConnectionInfo extends EditableInfo {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        if (extraOptionsPanel != null) {
-            Tools.unregisterExpertPanel(extraOptionsPanel);
-            extraOptionsPanel = new JPanel();
-        }
-        extraOptionsPanel = new JPanel();
-        extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                                  BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(buttonPanel);
 
         /* Actions */
@@ -386,6 +375,7 @@ public class HbConnectionInfo extends EditableInfo {
             final String[] params = c.getParametersFromXML();
             /* heartbeat id */
             final JPanel panel = getParamPanel(c.getName());
+            panel.setLayout(new SpringLayout());
             final int rows = 3;
             c.addLabelField(panel,
                             Tools.getString("ClusterBrowser.HeartbeatId"),
@@ -409,12 +399,12 @@ public class HbConnectionInfo extends EditableInfo {
                                             1, 1,        /* initX, initY */
                                             1, 1);       /* xPad, yPad */
 
-            extraOptionsPanel.add(panel);
+            optionsPanel.add(panel);
             c.addParams(optionsPanel,
-                        extraOptionsPanel,
                         params,
                         ClusterBrowser.SERVICE_LABEL_WIDTH,
-                        ClusterBrowser.SERVICE_FIELD_WIDTH);
+                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        null);
         }
 
         applyButton.addActionListener(
@@ -435,18 +425,13 @@ public class HbConnectionInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         applyButton.setEnabled(checkResourceFields(null, null));
-        /* expert mode */
-        Tools.registerExpertPanel(extraOptionsPanel);
-
         mainPanel.add(optionsPanel);
-        mainPanel.add(extraOptionsPanel);
 
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
-        newPanel.add(Box.createVerticalGlue());
         newPanel.setMinimumSize(new Dimension(
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
@@ -754,7 +739,6 @@ public class HbConnectionInfo extends EditableInfo {
      */
     public final void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
-        Tools.unregisterExpertPanel(extraOptionsPanel);
     }
 
     /**
@@ -768,5 +752,14 @@ public class HbConnectionInfo extends EditableInfo {
         // TODO: do this differently, don't need to select it, only reload
         getBrowser().setRightComponentInView(this); /* just to reload */
         getBrowser().setRightComponentInView(prev); /* back were we were */
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(String param) {
+        return false;
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(String param) {
+        return ConfigData.AccessType.ADMIN;
     }
 }

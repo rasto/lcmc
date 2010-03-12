@@ -66,7 +66,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.BoxLayout;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.DefaultListModel;
 
@@ -77,8 +76,6 @@ import javax.swing.DefaultListModel;
 public class ServicesInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-    /** Extra options panel. */
-    private final JPanel extraOptionsPanel = new JPanel();
 
     /**
      * Prepares a new <code>ServicesInfo</code> object.
@@ -174,6 +171,16 @@ public class ServicesInfo extends EditableInfo {
      */
     protected final boolean isTimeType(final String param) {
         return getBrowser().getCRMXML().isGlobalTimeType(param);
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(final String param) {
+        return getBrowser().getCRMXML().isGlobalAdvanced(param);
+    }
+
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(final String param) {
+        return getBrowser().getCRMXML().getGlobalAccessType(param);
     }
 
     /**
@@ -656,14 +663,12 @@ public class ServicesInfo extends EditableInfo {
      * Creates rsc_defaults panel.
      */
     private void addRscDefaultsPanel(final JPanel optionsPanel,
-                                     final JPanel extraOptionsPanel,
                                      final int leftWidth,
                                      final int rightWidth) {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         rdi.paramComboBoxClear();
         final String[] params = rdi.getParametersFromXML();
         rdi.addParams(optionsPanel,
-                      extraOptionsPanel,
                       params,
                       leftWidth,
                       rightWidth,
@@ -759,11 +764,6 @@ public class ServicesInfo extends EditableInfo {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        extraOptionsPanel.setBackground(ClusterBrowser.EXTRA_PANEL_BACKGROUND);
-        extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel,
-                                                  BoxLayout.Y_AXIS));
-        extraOptionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
@@ -779,14 +779,13 @@ public class ServicesInfo extends EditableInfo {
 
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
-                  extraOptionsPanel,
                   params,
                   Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"));
+                  Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"),
+                  null);
 
         addRscDefaultsPanel(
                       optionsPanel,
-                      extraOptionsPanel,
                       Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
                       Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"));
         applyButton.addActionListener(
@@ -809,14 +808,10 @@ public class ServicesInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         applyButton.setEnabled(checkResourceFields(null, params));
-        /* expert mode */
-        Tools.registerExpertPanel(extraOptionsPanel);
 
         mainPanel.add(optionsPanel);
-        mainPanel.add(extraOptionsPanel);
 
         newPanel.add(new JScrollPane(mainPanel));
-        newPanel.add(Box.createVerticalGlue());
 
         hg.pickBackground();
         infoPanel = newPanel;
@@ -1241,7 +1236,6 @@ public class ServicesInfo extends EditableInfo {
      */
     public final void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
-        Tools.unregisterExpertPanel(extraOptionsPanel);
     }
 
     /**
@@ -1282,5 +1276,4 @@ public class ServicesInfo extends EditableInfo {
         }
         return changed;
     }
-
 }

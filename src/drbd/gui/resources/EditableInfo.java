@@ -37,17 +37,24 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
+import javax.swing.BoxLayout;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info
@@ -63,6 +70,10 @@ public abstract class EditableInfo extends Info {
     protected abstract String getSection(String param);
     /** Returns whether this parameter is required. */
     protected abstract boolean isRequired(String param);
+    /** Returns whether this parameter is advanced. */
+    protected abstract boolean isAdvanced(String param);
+    /** Returns access type of this parameter. */
+    protected abstract ConfigData.AccessType getAccessType(String param);
     /** Returns whether this parameter is of the integer type. */
     protected abstract boolean isInteger(String param);
     /** Returns whether this parameter is of the time type. */
@@ -93,6 +104,14 @@ public abstract class EditableInfo extends Info {
     protected MyButton applyButton;
     /** Is counted down, first time the info panel is initialized. */
     private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
+    /** List of advanced panels */
+    private final List<JPanel> advancedPanelList = new ArrayList<JPanel>();
+    /** List of messages if advanced panels are hidden. */
+    private final List<JPanel> advancedOnlySectionList =
+                                                      new ArrayList<JPanel>();
+    /** List of messages if advanced panels are hidden. */
+    private final List<JPanel> messageList = new ArrayList<JPanel>();
+
     /** How much of the info is used. */
     public int getUsed() {
         return -1;
@@ -154,7 +173,6 @@ public abstract class EditableInfo extends Info {
         addField(panel, leftLabel, rightLabel, leftWidth, rightWidth, height);
     }
 
-
     /**
      * Adds field with left and right component to the panel. Use panel
      * with spring layout for this.
@@ -184,230 +202,115 @@ public abstract class EditableInfo extends Info {
      * Adds parameters to the panel in a wizard.
      * Returns number of rows.
      */
-    public final void addWizardParams(final JPanel optionsPanel,
-                                      final JPanel extraOptionsPanel,
-                                      final String[] params,
-                                      final MyButton wizardApplyButton,
-                                      final int leftWidth,
-                                      final int rightWidth) {
-        if (params == null) {
-            return;
-        }
-        final Map<String, JPanel>  sectionPanelMap =
-                                        new LinkedHashMap<String, JPanel>();
-        final Map<String, Integer> sectionRowsMap =
-                                        new HashMap<String, Integer>();
-        final Map<String, Boolean> sectionIsRequiredMap =
-                                        new HashMap<String, Boolean>();
-        // TODO: parts of this are the same as in addParams
-        for (final String param : params) {
-            final GuiComboBox paramCb = getParamComboBox(param,
-                                                         "wizard",
-                                                         rightWidth);
-            /* sub panel */
-            final String section = getSection(param);
-            final boolean isRequired = isRequired(param);
-            JPanel panel;
-            if (sectionPanelMap.containsKey(section)) {
-                panel = sectionPanelMap.get(section);
-                sectionRowsMap.put(section, sectionRowsMap.get(section) + 1);
-            } else {
-                panel = getParamPanel(section);
-                sectionPanelMap.put(section, panel);
-                sectionRowsMap.put(section, 1);
-                sectionIsRequiredMap.put(section, isRequired);
-            }
-
-            /* label */
-            final JLabel label = new JLabel(getParamShortDesc(param));
-            paramCb.setLabel(label);
-            labelMap.put(paramCb, label);
-
-            /* tool tip */
-            final String longDesc = getParamLongDesc(param);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    label.setToolTipText(longDesc);
-                    paramCb.setToolTipText(getToolTipText(param));
-                }
-            });
-            final GuiComboBox realParamCb = paramComboBoxGet(param, null);
-            int height = 0;
-            if (realParamCb.getType() == GuiComboBox.Type.LABELFIELD) {
-                height = Tools.getDefaultInt("Browser.LabelFieldHeight");
-            }
-            addField(panel, label, paramCb, leftWidth, rightWidth, height);
-            realParamCb.setValue(paramCb.getValue());
-            paramCb.addListeners(
-                new ItemListener() {
-                    public void itemStateChanged(final ItemEvent e) {
-                        if (paramCb.isCheckBox()
-                            || e.getStateChange() == ItemEvent.SELECTED) {
-                            final Thread thread = new Thread(new Runnable() {
-                                public void run() {
-                                    paramCb.setEditable();
-                                    realParamCb.setValue(paramCb.getValue());
-                                    final boolean enable =
-                                      checkResourceFieldsCorrect(param, params);
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        public void run() {
-                                            wizardApplyButton.setEnabled(
-                                                                       enable);
-                                            paramCb.setToolTipText(
-                                                        getToolTipText(param));
-                                        }
-                                    });
-                                }
-                            });
-                            thread.start();
-                        }
-                    }
-                },
-
-                new DocumentListener() {
-                    public void insertUpdate(final DocumentEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                final boolean check =
-                                        checkResourceFieldsCorrect(param,
-                                                                   params);
-                                realParamCb.setValue(paramCb.getValue());
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        wizardApplyButton.setEnabled(check);
-                                        paramCb.setToolTipText(
-                                                        getToolTipText(param));
-                                    }
-                                });
-                            }
-                        });
-                        thread.start();
-                    }
-
-                    public void removeUpdate(final DocumentEvent e) {
-                        final boolean check =
-                                checkResourceFieldsCorrect(param, params);
-                        final Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                wizardApplyButton.setEnabled(check);
-                                realParamCb.setValue(paramCb.getValue());
-                                paramCb.setToolTipText(getToolTipText(param));
-                            }
-                        });
-                        thread.start();
-                    }
-
-                    public void changedUpdate(final DocumentEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                final boolean check =
-                                    checkResourceFieldsCorrect(param, params);
-                                realParamCb.setValue(paramCb.getValue());
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        wizardApplyButton.setEnabled(check);
-                                        paramCb.setToolTipText(
-                                                        getToolTipText(param));
-                                    }
-                                });
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
-        }
-
-        /* add sub panels to the option panel */
-        for (final String section : sectionPanelMap.keySet()) {
-            final JPanel panel = sectionPanelMap.get(section);
-            final int rows = sectionRowsMap.get(section);
-            final int columns = 2;
-            SpringUtilities.makeCompactGrid(panel, rows, columns,
-                                            1, 1,  // initX, initY
-                                            1, 1); // xPad, yPad
-            final boolean isRequired =
-                            sectionIsRequiredMap.get(section).booleanValue();
-
-            if (isRequired) {
-                optionsPanel.add(panel);
-            } else {
-                extraOptionsPanel.add(panel);
-            }
-        }
-    }
-
-    /**
-     * Adds parameters to the panel.
-     */
-    public final void addParams(final JPanel optionsPanel,
-                                final JPanel extraOptionsPanel,
-                                final String[] params,
-                                final int leftWidth,
-                                final int rightWidth) {
+    public final void addWizardParams(
+                              final JPanel optionsPanel,
+                              final String[] params,
+                              final MyButton wizardApplyButton,
+                              final int leftWidth,
+                              final int rightWidth,
+                              final Map<String, GuiComboBox> sameAsFields) {
         addParams(optionsPanel,
-                  extraOptionsPanel,
+                  "wizard",
                   params,
+                  wizardApplyButton,
                   leftWidth,
                   rightWidth,
-                  null);
+                  sameAsFields);
+    }
+
+    /**
+     * This class holds a part of the panel within the same section, access
+     * type and advanced mode setting.
+     */
+    private class PanelPart {
+        private final String section;
+        private final ConfigData.AccessType accessType;
+        private final boolean advanced;
+
+        public PanelPart(final String section,
+                         final ConfigData.AccessType accessType,
+                         final boolean advanced) {
+            this.section = section;
+            this.accessType = accessType;
+            this.advanced = advanced;
+        }
+
+        public final String getSection() {
+            return section;
+        }
+
+        public final ConfigData.AccessType getAccessType() {
+            return accessType;
+        }
+
+        public final boolean isAdvanced() {
+            return advanced;
+        }
     }
 
     /**
      * Adds parameters to the panel.
      */
     public final void addParams(final JPanel optionsPanel,
-                                final JPanel extraOptionsPanel,
                                 final String[] params,
                                 final int leftWidth,
                                 final int rightWidth,
                                 final Map<String, GuiComboBox> sameAsFields) {
+        addParams(optionsPanel,
+                  null,
+                  params,
+                  applyButton,
+                  leftWidth,
+                  rightWidth,
+                  sameAsFields);
+    }
+
+    /**
+     * Adds parameters to the panel.
+     */
+    private void addParams(final JPanel optionsPanel,
+                           final String prefix,
+                           final String[] params,
+                           final MyButton thisApplyButton,
+                           final int leftWidth,
+                           final int rightWidth,
+                           final Map<String, GuiComboBox> sameAsFields) {
         if (params == null) {
             return;
         }
-        final Map<String, JPanel>  sectionPanelMap =
-                                        new LinkedHashMap<String, JPanel>();
-        final Map<String, Integer> sectionRowsMap =
-                                        new HashMap<String, Integer>();
-        final Map<String, Boolean> sectionIsRequiredMap =
-                                        new HashMap<String, Boolean>();
+        final MultiKeyMap panelPartsMap = new MultiKeyMap();
+        final List<PanelPart> panelPartsList = new ArrayList<PanelPart>();
+        final MultiKeyMap panelPartRowsMap = new MultiKeyMap();
 
         for (final String param : params) {
             final GuiComboBox paramCb = getParamComboBox(param,
-                                                         null,
+                                                         prefix,
                                                          rightWidth);
             /* sub panel */
             final String section = getSection(param);
-            final boolean isRequired = isRequired(param);
             JPanel panel;
-            if (sectionPanelMap.containsKey(section)) {
-                panel = sectionPanelMap.get(section);
-                sectionRowsMap.put(section, sectionRowsMap.get(section) + 1);
+            final boolean advanced = isAdvanced(param);
+            final ConfigData.AccessType accessType = getAccessType(param);
+            if (panelPartsMap.containsKey(section, accessType, advanced)) {
+                panel = (JPanel) panelPartsMap.get(section,
+                                                   accessType,
+                                                   advanced);
+                panelPartRowsMap.put(section, accessType, advanced,
+                                 (Integer) panelPartRowsMap.get(section,
+                                                                accessType,
+                                                                advanced) + 1);
             } else {
-                if (isRequired) {
-                    panel = getParamPanel(section);
-                } else {
-                    panel = getParamPanel(section,
-                                          Browser.EXTRA_PANEL_BACKGROUND);
+                panel = new JPanel(new SpringLayout());
+                panel.setBackground(Browser.PANEL_BACKGROUND);
+                if (advanced) {
+                    advancedPanelList.add(panel);
+                    panel.setVisible(Tools.getConfigData().getExpertMode());
                 }
-                sectionPanelMap.put(section, panel);
-                sectionRowsMap.put(section, 1);
-                sectionIsRequiredMap.put(section, isRequired);
-                if (sameAsFields != null) {
-                    final GuiComboBox sameAsCombo = sameAsFields.get(section);
-                    if (sameAsCombo != null) {
-                        final JLabel label = new JLabel("Same As");
-                        sameAsCombo.setLabel(label);
-                        addField(panel,
-                                 label,
-                                 sameAsCombo,
-                                 leftWidth,
-                                 rightWidth,
-                                 0);
-                        final int rows = sectionRowsMap.get(section);
-                        sectionRowsMap.put(section, rows + 1);
-                    }
-                }
+                panelPartsMap.put(section, accessType, advanced, panel);
+                panelPartsList.add(new PanelPart(section,
+                                                 accessType,
+                                                 advanced));
+                panelPartRowsMap.put(section, accessType, advanced, 1);
             }
 
             /* label */
@@ -429,106 +332,174 @@ public abstract class EditableInfo extends Info {
             }
             addField(panel, label, paramCb, leftWidth, rightWidth, height);
         }
-
         for (final String param : params) {
-            final GuiComboBox paramCb = paramComboBoxGet(param, null);
+            final GuiComboBox paramCb = paramComboBoxGet(param, prefix);
+            GuiComboBox rpcb = null;
+            if ("wizard".equals(prefix)) {
+                rpcb = paramComboBoxGet(param, null);
+                int height = 0;
+                if (rpcb.getType() == GuiComboBox.Type.LABELFIELD) {
+                    height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+                }
+                rpcb.setValue(paramCb.getValue());
+            }
+            final GuiComboBox realParamCb = rpcb;
             paramCb.addListeners(new ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
                     if (paramCb.isCheckBox()
                         || e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
-                                public void run() {
-                                    paramCb.setEditable();
-                                    final boolean check =
-                                            checkResourceFields(param, params);
-                                    SwingUtilities.invokeLater(
-                                        new Runnable() {
-                                            public void run() {
-                                                applyButton.setEnabled(check);
-                                                paramCb.setToolTipText(
-                                                        getToolTipText(param));
-                                            }
-                                        });
-                                }
-                            });
-                        thread.start();
+                        checkParameterFields(paramCb,
+                                             realParamCb,
+                                             param,
+                                             params,
+                                             thisApplyButton);
                     }
                 }
             },
 
             new DocumentListener() {
                 public void insertUpdate(final DocumentEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        public void run() {
-                            final boolean check = checkResourceFields(param,
-                                                                      params);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    applyButton.setEnabled(check);
-                                    paramCb.setToolTipText(
-                                                        getToolTipText(param));
-                                }
-                            });
-                        }
-                    });
-                    thread.start();
+                    checkParameterFields(paramCb,
+                                         realParamCb,
+                                         param,
+                                         params,
+                                         thisApplyButton);
                 }
 
                 public void removeUpdate(final DocumentEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        public void run() {
-                            final boolean check =
-                                      checkResourceFields(param, params);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    applyButton.setEnabled(check);
-                                    paramCb.setToolTipText(
-                                                getToolTipText(param));
-                                }
-                            });
-                        }
-                    });
-                    thread.start();
+                    checkParameterFields(paramCb,
+                                         realParamCb,
+                                         param,
+                                         params,
+                                         thisApplyButton);
                 }
 
                 public void changedUpdate(final DocumentEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        public void run() {
-                            final boolean check = checkResourceFields(param,
-                                                                      params);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    applyButton.setEnabled(check);
-                                    paramCb.setToolTipText(
-                                                getToolTipText(param));
-                                }
-                            });
-                        }
-                    });
-                    thread.start();
+                    checkParameterFields(paramCb,
+                                         realParamCb,
+                                         param,
+                                         params,
+                                         thisApplyButton);
                 }
             });
         }
 
         /* add sub panels to the option panel */
-        for (final String section : sectionPanelMap.keySet()) {
-            final JPanel panel = sectionPanelMap.get(section);
-            final int rows = sectionRowsMap.get(section);
+        final Map<String, JPanel> sectionMap = new HashMap<String, JPanel>();
+        final Set<JPanel> notAdvancedSections = new HashSet<JPanel>();
+        final Set<JPanel> advancedSections = new HashSet<JPanel>();
+        for (final PanelPart panelPart : panelPartsList) {
+            final String section = panelPart.getSection();
+            final ConfigData.AccessType accessType = panelPart.getAccessType();
+            final boolean advanced = panelPart.isAdvanced();
+
+            final JPanel panel = (JPanel) panelPartsMap.get(section,
+                                                            accessType,
+                                                            advanced);
+            final int rows = (Integer) panelPartRowsMap.get(section,
+                                                            accessType,
+                                                            advanced);
             final int columns = 2;
             SpringUtilities.makeCompactGrid(panel, rows, columns,
                                             1, 1,  // initX, initY
                                             1, 1); // xPad, yPad
-            final boolean isRequired =
-                        sectionIsRequiredMap.get(section).booleanValue();
-
-            if (isRequired) {
-                optionsPanel.add(panel);
+            JPanel sectionPanel;
+            if (sectionMap.containsKey(section)) {
+                sectionPanel = sectionMap.get(section);
             } else {
-                extraOptionsPanel.add(panel);
+                sectionPanel = getParamPanel(section);
+                sectionMap.put(section, sectionPanel);
+                optionsPanel.add(sectionPanel);
+                if (sameAsFields != null) {
+                    final GuiComboBox sameAsCombo = sameAsFields.get(section);
+                    if (sameAsCombo != null) {
+                        final JPanel saPanel = new JPanel(new SpringLayout());
+                        saPanel.setBackground(Browser.STATUS_BACKGROUND);
+                        final JLabel label = new JLabel("Same As");
+                        sameAsCombo.setLabel(label);
+                        addField(saPanel,
+                                 label,
+                                 sameAsCombo,
+                                 leftWidth,
+                                 rightWidth,
+                                 0);
+                        SpringUtilities.makeCompactGrid(saPanel, 1, 2,
+                                                        1, 1,  // initX, initY
+                                                        1, 1); // xPad, yPad
+                        sectionPanel.add(saPanel);
+                    }
+                }
+            }
+            sectionPanel.add(panel);
+            if (!advanced) {
+                notAdvancedSections.add(sectionPanel);
+            } else {
+                advancedSections.add(sectionPanel);
             }
         }
-        Tools.hideExpertModePanel(extraOptionsPanel);
+
+        for (final JPanel sectionPanel : sectionMap.values()) {
+            final JLabel l = new JLabel(
+                                  Tools.getString("EditableInfo.MoreOptions"));
+            final Font font = l.getFont();
+            final String name = font.getFontName();
+            final int style = font.ITALIC;
+            final int size = font.getSize();
+            l.setFont(new Font(name, style, size - 3));
+
+            if (advancedSections.contains(sectionPanel)) {
+                final JPanel moreOptionsPanel = new JPanel();
+                moreOptionsPanel.setBackground(Browser.PANEL_BACKGROUND);
+                moreOptionsPanel.add(l);
+                final Dimension d = moreOptionsPanel.getPreferredSize();
+                d.width = leftWidth + rightWidth + 4;
+                moreOptionsPanel.setMaximumSize(d);
+                moreOptionsPanel.setVisible(
+                                        !Tools.getConfigData().getExpertMode());
+                messageList.add(moreOptionsPanel);
+                sectionPanel.add(moreOptionsPanel);
+            }
+            if (!notAdvancedSections.contains(sectionPanel)) {
+                advancedOnlySectionList.add(sectionPanel);
+                sectionPanel.setVisible(Tools.getConfigData().getExpertMode());
+            }
+        }
+    }
+
+    /**
+     * Checks ands sets paramter fields.
+     */
+    private void checkParameterFields(final GuiComboBox paramCb,
+                                      final GuiComboBox realParamCb,
+                                      final String param,
+                                      final String[] params,
+                                      final MyButton thisApplyButton) {
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                paramCb.setEditable();
+                boolean c;
+                if (realParamCb != null) {
+                    realParamCb.setValue(paramCb.getValue());
+                    c = checkResourceFieldsCorrect(param,
+                                                   params);
+                } else {
+                    c = checkResourceFields(param, params);
+                }
+                final boolean check = c;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        thisApplyButton.setEnabled(check);
+                        paramCb.setToolTipText(
+                                getToolTipText(param));
+                        if (realParamCb != null) {
+                            realParamCb.setToolTipText(
+                                    getToolTipText(param));
+                        }
+                    }
+                });
+            }
+        });
+        thread.start();
     }
 
     /**
@@ -616,7 +587,7 @@ public abstract class EditableInfo extends Info {
                                                 regexp,
                                                 width,
                                                 abbreviations,
-                                                ConfigData.AccessType.ADMIN);
+                                                getAccessType(param));
         paramComboBoxAdd(param, prefix, paramCb);
         paramCb.setEditable(true);
         return paramCb;
@@ -703,7 +674,8 @@ public abstract class EditableInfo extends Info {
      */
     protected final JPanel getParamPanel(final String title,
                                          final Color background) {
-        final JPanel panel = new JPanel(new SpringLayout());
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(background);
         final TitledBorder titleBorder = Tools.getBorder(title);
         panel.setBorder(titleBorder);
@@ -717,7 +689,6 @@ public abstract class EditableInfo extends Info {
     protected final String getToolTipText(final String param) {
         final String defaultValue = getParamDefault(param);
         final StringBuffer ret = new StringBuffer(120);
-        ret.append("<html>");
         final GuiComboBox cb = paramComboBoxGet(param, null);
         if (cb != null) {
             final Object value = cb.getStringValue();
@@ -730,7 +701,7 @@ public abstract class EditableInfo extends Info {
             ret.append(Tools.getString("Browser.ParamDefault"));
             ret.append("</b></td><td>");
             ret.append(defaultValue);
-            ret.append("</td></tr></table></html>");
+            ret.append("</td></tr></table>");
         }
         return ret.toString();
 
@@ -914,5 +885,21 @@ public abstract class EditableInfo extends Info {
      */
     public final void infoPanelDone() {
         infoPanelLatch.countDown();
+    }
+
+    /**
+     * Hide/Show advanced panels.
+     */
+    public final void updateAdvancedPanels() {
+        final boolean expertMode = Tools.getConfigData().getExpertMode();
+        for (final JPanel apl : advancedPanelList) {
+            apl.setVisible(expertMode);
+        }
+        for (final JPanel ml : messageList) {
+            ml.setVisible(!expertMode);
+        }
+        for (final JPanel p : advancedOnlySectionList) {
+            p.setVisible(expertMode);
+        }
     }
 }

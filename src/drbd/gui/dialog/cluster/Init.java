@@ -450,7 +450,7 @@ public class Init extends DialogCluster {
                                 if (heartbeatIsRunning) {
                                     csAisStartButton.setEnabled(false);
                                 } else {
-                                    Tools.getConfigData().setAccessible(
+                                    Tools.getGUIData().setAccessible(
                                                     csAisStartButton,
                                                     ConfigData.AccessType.OP);
                                 }
@@ -512,7 +512,7 @@ public class Init extends DialogCluster {
                                 if (csAisRunning) {
                                     hbStartButton.setEnabled(false);
                                 } else {
-                                    Tools.getConfigData().setAccessible(
+                                    Tools.getGUIData().setAccessible(
                                                     hbStartButton,
                                                     ConfigData.AccessType.OP);
                                 }
