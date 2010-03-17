@@ -2660,8 +2660,10 @@ public class ServiceInfo extends EditableInfo {
         boolean master = false;
         final GroupInfo gInfo = groupInfo;
         CloneInfo ci = cloneInfo;
+        String[] groupParams = null;
         if (gInfo != null) {
             ci = gInfo.getCloneInfo();
+            groupParams = gInfo.getParametersFromXML();
         }
         final CloneInfo clInfo = ci;
         if (clInfo != null) {
@@ -2706,13 +2708,16 @@ public class ServiceInfo extends EditableInfo {
             addResourceBefore(dcHost, testOnly);
         }
 
-        final Map<String, String> cloneMetaArgs = new HashMap<String, String>();
+        final Map<String, String> cloneMetaArgs =
+                                            new LinkedHashMap<String, String>();
+        final Map<String, String> groupMetaArgs =
+                                            new LinkedHashMap<String, String>();
         final Map<String, String> pacemakerResAttrs =
-                                               new HashMap<String, String>();
+                                            new LinkedHashMap<String, String>();
         final Map<String, String> pacemakerResArgs =
-                                               new HashMap<String, String>();
+                                            new LinkedHashMap<String, String>();
         final Map<String, String> pacemakerMetaArgs =
-                                              new HashMap<String, String>();
+                                            new LinkedHashMap<String, String>();
         final String raClass = getService().getResourceClass();
         final String type = getName();
         final String provider = resourceAgent.getProvider();
@@ -2737,9 +2742,12 @@ public class ServiceInfo extends EditableInfo {
         if (clInfo != null) {
             cloneMetaAttrsRefIds = clInfo.getMetaAttrsRefId();
         }
+        String groupMetaAttrsRefIds = null;
+        if (gInfo != null) {
+            groupMetaAttrsRefIds = gInfo.getMetaAttrsRefId();
+        }
 
         if (getService().isNew()) {
-            /* TODO: there are more attributes. */
             if (clInfo != null) {
                 for (String param : cloneParams) {
                     if (GUI_ID.equals(param)
@@ -2752,6 +2760,21 @@ public class ServiceInfo extends EditableInfo {
                     }
                     if (!GUI_ID.equals(param) && !"".equals(value)) {
                         cloneMetaArgs.put(param, value);
+                    }
+                }
+            }
+            if (gInfo != null) {
+                for (String param : groupParams) {
+                    if (GUI_ID.equals(param)
+                        || PCMK_ID.equals(param)) {
+                        continue;
+                    }
+                    final String value = gInfo.getComboBoxValue(param);
+                    if (value.equals(gInfo.getParamDefault(param))) {
+                            continue;
+                    }
+                    if (!GUI_ID.equals(param) && !"".equals(value)) {
+                        groupMetaArgs.put(param, value);
                     }
                 }
             }
@@ -2784,6 +2807,7 @@ public class ServiceInfo extends EditableInfo {
                               cloneId,
                               master,
                               cloneMetaArgs,
+                              groupMetaArgs,
                               groupId,
                               pacemakerResAttrs,
                               pacemakerResArgs,
@@ -2794,6 +2818,7 @@ public class ServiceInfo extends EditableInfo {
                               null,
                               getMetaAttrsRefId(),
                               cloneMetaAttrsRefIds,
+                              groupMetaAttrsRefIds,
                               getOperationsRefId(),
                               testOnly);
             if (gInfo == null) {
@@ -2849,6 +2874,21 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
+            if (gInfo != null) {
+                for (String param : groupParams) {
+                    if (GUI_ID.equals(param)
+                        || PCMK_ID.equals(param)) {
+                        continue;
+                    }
+                    final String value = gInfo.getComboBoxValue(param);
+                    if (value.equals(gInfo.getParamDefault(param))) {
+                        continue;
+                    }
+                    if (!"".equals(value)) {
+                        groupMetaArgs.put(param, value);
+                    }
+                }
+            }
             /* update parameters */
             final StringBuffer args = new StringBuffer("");
             for (String param : params) {
@@ -2881,6 +2921,7 @@ public class ServiceInfo extends EditableInfo {
                         cloneId,
                         master,
                         cloneMetaArgs,
+                        groupMetaArgs,
                         groupId,
                         pacemakerResAttrs,
                         pacemakerResArgs,
@@ -2891,6 +2932,7 @@ public class ServiceInfo extends EditableInfo {
                         cs.getOperationsId(heartbeatId),
                         getMetaAttrsRefId(),
                         cloneMetaAttrsRefIds,
+                        groupMetaAttrsRefIds,
                         getOperationsRefId(),
                         testOnly);
             if (isFailed(testOnly)) {

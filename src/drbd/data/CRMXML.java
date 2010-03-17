@@ -424,6 +424,7 @@ public class CRMXML extends XML {
         final String[] booleanValues = PCMK_BOOLEAN_VALUES;
         final String hbBooleanTrue = booleanValues[0];
         final String hbBooleanFalse = booleanValues[1];
+        /* clones */
         pcmkClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
                                       "",
                                       "clone");
@@ -446,6 +447,15 @@ public class CRMXML extends XML {
         addMetaAttribute(pcmkClone, GLOBALLY_UNIQUE_META_ATTR, null, false);
         addMetaAttribute(pcmkClone, ORDERED_META_ATTR,         null, false);
         addMetaAttribute(pcmkClone, INTERLEAVE_META_ATTR,      null, false);
+
+        /* groups */
+        final Map<String, String> metaAttrParams = getMetaAttrParameters();
+        for (final String metaAttr : metaAttrParams.keySet()) {
+            addMetaAttribute(hbGroup,
+                             metaAttr,
+                             metaAttrParams.get(metaAttr),
+                             false);
+        }
 
         if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
@@ -977,6 +987,9 @@ public class CRMXML extends XML {
     public final boolean isAdvanced(final ResourceAgent ra,
                                     final String param) {
         if (isMetaAttr(ra, param)) {
+            if (ra == hbGroup) {
+                return true;
+            }
             return !M_A_NOT_ADVANCED.contains(param);
         }
         return !isRequired(ra, param);
@@ -1395,10 +1408,6 @@ public class CRMXML extends XML {
                                  final Node parametersNode) {
         final String hbV = host.getHeartbeatVersion();
         final String pcmkV = host.getPacemakerVersion();
-        final Map<String, String> metaAttrParams = getMetaAttrParameters();
-        for (final String metaAttr : metaAttrParams.keySet()) {
-            addMetaAttribute(ra, metaAttr, metaAttrParams.get(metaAttr), false);
-        }
 
         final NodeList parameters = parametersNode.getChildNodes();
         for (int i = 0; i < parameters.getLength(); i++) {
@@ -1449,6 +1458,10 @@ public class CRMXML extends XML {
                     ra.setParamDefault(param, defaultValue);
                 }
             }
+        }
+        final Map<String, String> metaAttrParams = getMetaAttrParameters();
+        for (final String metaAttr : metaAttrParams.keySet()) {
+            addMetaAttribute(ra, metaAttr, metaAttrParams.get(metaAttr), false);
         }
     }
 
@@ -1921,10 +1934,17 @@ public class CRMXML extends XML {
                 final Map<String, String> metaAttrsIdToCRMId) {
         final NodeList primitives = groupNode.getChildNodes();
         final String groupId = getAttribute(groupNode, "id");
+        final String hbV = host.getHeartbeatVersion();
+        final String pcmkV = host.getPacemakerVersion();
+        final Map<String, String> params =
+                                        new HashMap<String, String>();
+        parametersMap.put(groupId, params);
+        final Map<String, String> nvpairIds =
+                                        new HashMap<String, String>();
+        parametersNvpairsIdsMap.put(groupId, nvpairIds);
         if (resList != null) {
             resList.add(groupId);
         }
-        parametersMap.put(groupId, new HashMap<String, String>());
         List<String> groupResList = groupsToResourcesMap.get(groupId);
         if (groupResList == null) {
             groupResList = new ArrayList<String>();
@@ -1948,6 +1968,41 @@ public class CRMXML extends XML {
                                operationsIdtoCRMId,
                                metaAttrsIdRefs,
                                metaAttrsIdToCRMId);
+            }
+        }
+
+        /* <meta_attributtes> */
+        final Node metaAttrsNode = getChildNode(groupNode,
+                                                "meta_attributes");
+        if (metaAttrsNode != null) {
+            final String metaAttrsIdRef = getAttribute(metaAttrsNode, "id-ref");
+            if (metaAttrsIdRef != null) {
+                metaAttrsIdRefs.put(groupId, metaAttrsIdRef);
+            } else {
+                final String metaAttrsId = getAttribute(metaAttrsNode, "id");
+                metaAttrsIdMap.put(groupId, metaAttrsId);
+                metaAttrsIdToCRMId.put(metaAttrsId, groupId);
+                /* <attributtes> only til 2.1.4 */
+                NodeList nvpairsMA;
+                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    final Node attrsNode =
+                                      getChildNode(metaAttrsNode, "attributes");
+                    nvpairsMA = attrsNode.getChildNodes();
+                } else {
+                    nvpairsMA = metaAttrsNode.getChildNodes();
+                }
+                /* <nvpair...> */
+                /* target-role and is-managed */
+                for (int l = 0; l < nvpairsMA.getLength(); l++) {
+                    final Node maNode = nvpairsMA.item(l);
+                    if (maNode.getNodeName().equals("nvpair")) {
+                        final String nvpairId = getAttribute(maNode, "id");
+                        final String name = getAttribute(maNode, "name");
+                        final String value = getAttribute(maNode, "value");
+                        params.put(name, value);
+                        nvpairIds.put(name, nvpairId);
+                    }
+                }
             }
         }
     }

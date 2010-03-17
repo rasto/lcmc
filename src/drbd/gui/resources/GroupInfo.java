@@ -39,6 +39,7 @@ import drbd.utilities.MyMenuItem;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -136,6 +137,43 @@ public class GroupInfo extends ServiceInfo {
                                       colAttrsList,
                                       ordAttrsList,
                                       testOnly);
+        } else {
+            final Map<String, String> groupMetaArgs =
+                                            new LinkedHashMap<String, String>();
+            for (String param : params) {
+                if (GUI_ID.equals(param)
+                    || PCMK_ID.equals(param)) {
+                    continue;
+                }
+                final String value = getComboBoxValue(param);
+                if (value.equals(getParamDefault(param))) {
+                    continue;
+                }
+                if (!"".equals(value)) {
+                    groupMetaArgs.put(param, value);
+                }
+            }
+            CRM.setParameters(
+                        dcHost,
+                        "-R",
+                        null,   /* crm id */
+                        null,   /* TODO: clone id */
+                        false, /* master */
+                        null, /* cloneMetaArgs, */
+                        groupMetaArgs,
+                        heartbeatId, /* group id */
+                        null, /* pacemakerResAttrs, */
+                        null, /* pacemakerResArgs, */
+                        null, /* pacemakerMetaArgs, */
+                        null, /* cs.getResourceInstanceAttrId(heartbeatId), */
+                        null, /* cs.getParametersNvpairsIds(heartbeatId), */
+                        null, /* getOperations(heartbeatId), */
+                        null, /* cs.getOperationsId(heartbeatId), */
+                        null, /* getMetaAttrsRefId(), */
+                        null, /* cloneMetaAttrsRefIds, */
+                        getMetaAttrsRefId(),
+                        null, /* getOperationsRefId(), */
+                        testOnly);
         }
         setLocations(heartbeatId, dcHost, testOnly);
         if (!testOnly) {
@@ -757,6 +795,9 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
         }
+        if (!super.isStarted(testOnly)) {
+            return false;
+        }
         return true;
     }
 
@@ -776,6 +817,9 @@ public class GroupInfo extends ServiceInfo {
                     return true;
                 }
             }
+        }
+        if (super.isStopped(testOnly)) {
+            return true;
         }
         return false;
     }

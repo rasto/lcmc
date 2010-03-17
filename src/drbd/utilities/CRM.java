@@ -141,6 +141,7 @@ public final class CRM {
                            final String cloneId,
                            final boolean master,
                            final Map<String, String> cloneMetaArgs,
+                           final Map<String, String> groupMetaArgs,
                            final String groupId,
                            final Map<String, String> pacemakerResAttrs,
                            final Map<String, String> pacemakerResArgs,
@@ -151,19 +152,9 @@ public final class CRM {
                            String operationsId,
                            final String metaAttrsRefId,
                            final String cloneMetaAttrsRefId,
+                           final String groupMetaAttrsRefId,
                            final String operationsRefId,
                            final boolean testOnly) {
-        if (instanceAttrId == null) {
-            instanceAttrId = heartbeatId + "-instance_attributes";
-        }
-        final StringBuffer attrsString = new StringBuffer(100);
-        for (final String attrName : pacemakerResAttrs.keySet()) {
-            final String value = pacemakerResAttrs.get(attrName);
-            attrsString.append(attrName);
-            attrsString.append("=\"");
-            attrsString.append(value);
-            attrsString.append("\" ");
-        }
 
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
@@ -192,59 +183,78 @@ public final class CRM {
             //}
         }
         if (groupId != null) {
-            xml.append("<group id=\"");
-            xml.append(groupId);
-            xml.append("\">");
+            if (heartbeatId != null) {
+                xml.append("<group id=\"");
+                xml.append(groupId);
+                xml.append("\">");
+            }
+            xml.append(getMetaAttributes(host,
+                                         groupId,
+                                         groupMetaArgs,
+                                         groupMetaAttrsRefId));
         }
-        xml.append("<primitive ");
-        xml.append(attrsString);
-        xml.append('>');
-        /* instance_attributes */
-        if (!pacemakerResArgs.isEmpty()) {
-            xml.append("<instance_attributes id=\"");
-            xml.append(instanceAttrId);
-            xml.append("\">");
-            if (pmV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.99.0") < 0) {
-                /* 2.1.4 */
-                xml.append("<attributes>");
+        if (heartbeatId != null) {
+            if (instanceAttrId == null) {
+                instanceAttrId = heartbeatId + "-instance_attributes";
             }
+            final StringBuffer attrsString = new StringBuffer(100);
+            for (final String attrName : pacemakerResAttrs.keySet()) {
+                final String value = pacemakerResAttrs.get(attrName);
+                attrsString.append(attrName);
+                attrsString.append("=\"");
+                attrsString.append(value);
+                attrsString.append("\" ");
+            }
+            xml.append("<primitive ");
+            xml.append(attrsString);
+            xml.append('>');
+            /* instance_attributes */
+            if (!pacemakerResArgs.isEmpty()) {
+                xml.append("<instance_attributes id=\"");
+                xml.append(instanceAttrId);
+                xml.append("\">");
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    /* 2.1.4 */
+                    xml.append("<attributes>");
+                }
 
-            for (final String paramName : pacemakerResArgs.keySet()) {
-                final String value = pacemakerResArgs.get(paramName);
-                String nvpairId = null;
-                if (nvpairIdsHash != null) {
-                    nvpairId = nvpairIdsHash.get(paramName);
+                for (final String paramName : pacemakerResArgs.keySet()) {
+                    final String value = pacemakerResArgs.get(paramName);
+                    String nvpairId = null;
+                    if (nvpairIdsHash != null) {
+                        nvpairId = nvpairIdsHash.get(paramName);
+                    }
+                    if (nvpairId == null) {
+                        nvpairId = "nvpair-"
+                                   + heartbeatId
+                                   + "-"
+                                   + paramName;
+                    }
+                    xml.append("<nvpair id=\"");
+                    xml.append(nvpairId);
+                    xml.append("\" name=\"");
+                    xml.append(paramName);
+                    xml.append("\" value=\"");
+                    xml.append(value);
+                    xml.append("\"/>");
                 }
-                if (nvpairId == null) {
-                    nvpairId = "nvpair-"
-                               + heartbeatId
-                               + "-"
-                               + paramName;
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    /* 2.1.4 */
+                    xml.append("</attributes>");
                 }
-                xml.append("<nvpair id=\"");
-                xml.append(nvpairId);
-                xml.append("\" name=\"");
-                xml.append(paramName);
-                xml.append("\" value=\"");
-                xml.append(value);
-                xml.append("\"/>");
+                xml.append("</instance_attributes>");
             }
-            if (pmV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.99.0") < 0) {
-                /* 2.1.4 */
-                xml.append("</attributes>");
-            }
-            xml.append("</instance_attributes>");
         }
         /* operations */
         if (operationsRefId != null) {
             xml.append("<operations id-ref=\"");
             xml.append(operationsRefId);
             xml.append("\"/>");
-        } else if (!pacemakerOps.isEmpty()) {
+        } else if (pacemakerOps != null && !pacemakerOps.isEmpty()) {
             //TODO: not "else if" but update the referred service.
             if (pmV != null
                 || hbV == null
@@ -275,14 +285,14 @@ public final class CRM {
             xml.append("</operations>");
         }
         /* meta_attributes */
-        //if (!pacemakerMetaArgs.isEmpty()) {
-        xml.append(getMetaAttributes(host,
-                                     heartbeatId,
-                                     pacemakerMetaArgs,
-                                     metaAttrsRefId));
-        //}
-        xml.append("</primitive>");
-        if (groupId != null) {
+        if (heartbeatId != null) {
+            xml.append(getMetaAttributes(host,
+                                         heartbeatId,
+                                         pacemakerMetaArgs,
+                                         metaAttrsRefId));
+            xml.append("</primitive>");
+        }
+        if (groupId != null && heartbeatId != null) {
             xml.append("</group>");
         }
         if (cloneId != null) {
