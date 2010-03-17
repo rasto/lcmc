@@ -2382,11 +2382,12 @@ public class ClusterBrowser extends Browser {
                 vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
             }
 
-            for (final HbConnectionInfo hbci
-                                        : heartbeatGraph.getAllHbConnections()) {
-                hbci.checkResourceFields(null, hbci.getParametersFromXML());
-                hbci.updateAdvancedPanels();
-            }
+        }
+
+        for (final HbConnectionInfo hbci
+                                    : heartbeatGraph.getAllHbConnections()) {
+            hbci.checkResourceFields(null, hbci.getParametersFromXML());
+            hbci.updateAdvancedPanels();
         }
     }
 }

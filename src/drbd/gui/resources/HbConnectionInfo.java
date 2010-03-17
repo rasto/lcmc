@@ -762,4 +762,14 @@ public class HbConnectionInfo extends EditableInfo {
     protected final ConfigData.AccessType getAccessType(String param) {
         return ConfigData.AccessType.ADMIN;
     }
+
+    /**
+     * Hide/Show advanced panels.
+     */
+    public final void updateAdvancedPanels() {
+        super.updateAdvancedPanels();
+        for (final HbConstraintInterface c : constraints) {
+            c.updateAdvancedPanels();
+        }
+    }
 }

@@ -906,7 +906,7 @@ public abstract class EditableInfo extends Info {
     /**
      * Hide/Show advanced panels.
      */
-    public final void updateAdvancedPanels() {
+    public void updateAdvancedPanels() {
         final boolean expertMode = Tools.getConfigData().getExpertMode();
         for (final JPanel apl : advancedPanelList) {
             apl.setVisible(expertMode);
