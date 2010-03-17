@@ -428,18 +428,6 @@ public class CRMXML extends XML {
         pcmkClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
                                       "",
                                       "clone");
-        if (pcmkV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            addMetaAttribute(pcmkClone,
-                             "target_role",
-                             TARGET_ROLE_META_ATTR,
-                             false);
-            addMetaAttribute(pcmkClone,
-                             "is_managed",
-                             IS_MANAGED_META_ATTR,
-                             false);
-        }
         addMetaAttribute(pcmkClone, MASTER_MAX_META_ATTR,      null, true);
         addMetaAttribute(pcmkClone, MASTER_NODE_MAX_META_ATTR, null, true);
         addMetaAttribute(pcmkClone, CLONE_MAX_META_ATTR,       null, false);
@@ -451,6 +439,10 @@ public class CRMXML extends XML {
         /* groups */
         final Map<String, String> metaAttrParams = getMetaAttrParameters();
         for (final String metaAttr : metaAttrParams.keySet()) {
+            addMetaAttribute(pcmkClone,
+                             metaAttr,
+                             metaAttrParams.get(metaAttr),
+                             false);
             addMetaAttribute(hbGroup,
                              metaAttr,
                              metaAttrParams.get(metaAttr),
@@ -987,7 +979,7 @@ public class CRMXML extends XML {
     public final boolean isAdvanced(final ResourceAgent ra,
                                     final String param) {
         if (isMetaAttr(ra, param)) {
-            if (ra == hbGroup) {
+            if (ra == hbGroup || ra == pcmkClone) {
                 return true;
             }
             return !M_A_NOT_ADVANCED.contains(param);
