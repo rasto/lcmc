@@ -1640,9 +1640,9 @@ public class ServiceInfo extends EditableInfo {
         // TODO: need lock operationsComboBoxHash
         operationsComboBoxHash.clear();
 
-        final JPanel panel = getParamPanel(
+        final JPanel sectionPanel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
-        panel.setLayout(new SpringLayout());
+        //panel.setLayout(new SpringLayout());
         String defaultOpIdRef = null;
         final Info savedOpIdRef = getSameServiceOpIdRef();
         if (savedOpIdRef != null) {
@@ -1660,19 +1660,32 @@ public class ServiceInfo extends EditableInfo {
         final JLabel label = new JLabel(Tools.getString(
                                            "ClusterBrowser.OperationsSameAs"));
         sameAsOperationsCB.setLabel(label);
-        addField(panel,
+        final JPanel saPanel = new JPanel(new SpringLayout());
+        saPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        addField(saPanel,
                  label,
                  sameAsOperationsCB,
                  leftWidth,
                  rightWidth,
                  0);
-        rows++;
+        SpringUtilities.makeCompactGrid(saPanel, 1, 2,
+                                        1, 1,  // initX, initY
+                                        1, 1); // xPad, yPad
+        sectionPanel.add(saPanel);
         boolean allAreDefaultValues = true;
         try {
             mSavedOperationsLock.acquire();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        final JPanel normalOpPanel = new JPanel(new SpringLayout());
+        normalOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        int normalRows = 0;
+        final JPanel advancedOpPanel = new JPanel(new SpringLayout());
+        advancedOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        addToAdvancedList(advancedOpPanel);
+        advancedOpPanel.setVisible(Tools.getConfigData().getExpertMode());
+        int advancedRows = 0;
         for (final String op : ClusterBrowser.HB_OPERATIONS) {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                           op)) {
@@ -1719,6 +1732,14 @@ public class ServiceInfo extends EditableInfo {
                                                   + " / "
                                                   + Tools.ucfirst(param));
                 cb.setLabel(cbLabel);
+                JPanel panel;
+                if (ClusterBrowser.HB_OP_NOT_ADVANCED.containsKey(op, param)) {
+                    panel = normalOpPanel;
+                    normalRows++;
+                } else {
+                    panel = advancedOpPanel;
+                    advancedRows++;
+                }
                 addField(panel,
                          cbLabel,
                          cb,
@@ -1727,6 +1748,15 @@ public class ServiceInfo extends EditableInfo {
                          0);
             }
         }
+        SpringUtilities.makeCompactGrid(normalOpPanel, normalRows, 2,
+                                        1, 1,  // initX, initY
+                                        1, 1); // xPad, yPad
+        SpringUtilities.makeCompactGrid(advancedOpPanel, advancedRows, 2,
+                                        1, 1,  // initX, initY
+                                        1, 1); // xPad, yPad
+        sectionPanel.add(normalOpPanel);
+        sectionPanel.add(getMoreOptionsPanel(leftWidth + rightWidth + 4));
+        sectionPanel.add(advancedOpPanel);
         mSavedOperationsLock.release();
         if (allAreDefaultValues && savedOpIdRef == null) {
             sameAsOperationsCB.setValue(OPERATIONS_DEFAULT_VALUES_TEXT);
@@ -1759,11 +1789,7 @@ public class ServiceInfo extends EditableInfo {
             },
             null
         );
-
-        SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
-                                        1, 1,           /* initX, initY */
-                                        1, 1);          /* xPad, yPad */
-        optionsPanel.add(panel);
+        optionsPanel.add(sectionPanel);
     }
 
     /**

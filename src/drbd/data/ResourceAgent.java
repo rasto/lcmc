@@ -64,11 +64,6 @@ public class ResourceAgent {
     private final List<String> parameters = new ArrayList<String>();
     /** List of required parameters. */
     private final Set<String> paramRequired = new HashSet<String>();
-    /** List of advanced parameters. */
-    private final Set<String> paramAdvanced = new HashSet<String>();
-    /** Access type of parameters. */
-    private final Map<String, ConfigData.AccessType> paramAccessType =
-                                   new HashMap<String, ConfigData.AccessType>();
     /** List of parameters that are meta attributes. */
     private final Set<String> paramIsMetaAttr = new HashSet<String>();
     /** Map from parameter to its long description. */
@@ -290,31 +285,6 @@ public class ResourceAgent {
         Tools.appError("Wrong parameter: " + param);
     }
 
-    /** Sets whether the supplied parameter is advanced. */
-    public final void setParamAdvanced(final String param,
-                                       final boolean advanced) {
-        if (!masterParameters.contains(param)) {
-            wrongParameterError(param);
-            return;
-        }
-        if (advanced) {
-            paramAdvanced.add(param);
-        } else {
-            paramAdvanced.remove(param);
-        }
-    }
-
-    /** Sets access type of the parameter. */
-    public final void setParamAccessType(
-                                     final String param,
-                                     final ConfigData.AccessType accessType) {
-        if (!masterParameters.contains(param)) {
-            wrongParameterError(param);
-            return;
-        }
-        paramAccessType.put(param, accessType);
-    }
-
     /**
      * Sets whether the supplied parameter is required.
      */
@@ -329,16 +299,6 @@ public class ResourceAgent {
         } else {
             paramRequired.remove(param);
         }
-    }
-
-    /** Returns whether the parameter is advanced. */
-    public final boolean isAdvanced(final String param) {
-        return paramAdvanced.contains(param);
-    }
-
-    /** Returns access type of the parameter. */
-    public final ConfigData.AccessType getAccessType(final String param) {
-        return paramAccessType.get(param);
     }
 
     /**

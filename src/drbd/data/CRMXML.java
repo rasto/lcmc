@@ -976,7 +976,10 @@ public class CRMXML extends XML {
      */
     public final boolean isAdvanced(final ResourceAgent ra,
                                     final String param) {
-        return ra.isAdvanced(param);
+        if (isMetaAttr(ra, param)) {
+            return !M_A_NOT_ADVANCED.contains(param);
+        }
+        return !isRequired(ra, param);
     }
 
     /**
@@ -984,11 +987,15 @@ public class CRMXML extends XML {
      */
     public final ConfigData.AccessType getAccessType(final ResourceAgent ra,
                                                      final String param) {
-        final ConfigData.AccessType at = ra.getAccessType(param);
-        if (at == null) {
-            return ConfigData.AccessType.ADMIN;
+        if (isMetaAttr(ra, param)) {
+            final ConfigData.AccessType accessType =
+                                                M_A_ACCESS_TYPE.get(param);
+            if (accessType != null) {
+                return accessType;
+            }
+            
         }
-        return at;
+        return ConfigData.AccessType.ADMIN;
     }
 
     /**
@@ -1317,13 +1324,6 @@ public class CRMXML extends XML {
         } else {
             ra.addParameter(name);
         }
-        final boolean advanced = !M_A_NOT_ADVANCED.contains(newName);
-        ra.setParamAdvanced(name, advanced);
-        ConfigData.AccessType accessType = M_A_ACCESS_TYPE.get(newName);
-        if (accessType == null) {
-            accessType = ConfigData.AccessType.ADMIN;
-        }
-        ra.setParamAccessType(name, accessType);
         ra.setParamIsMetaAttr(name, true);
         ra.setParamRequired(name, false);
         ra.setParamPossibleChoices(name, M_A_POSSIBLE_CHOICES.get(newName));

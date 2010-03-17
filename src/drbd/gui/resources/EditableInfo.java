@@ -110,7 +110,7 @@ public abstract class EditableInfo extends Info {
     private final List<JPanel> advancedOnlySectionList =
                                                       new ArrayList<JPanel>();
     /** List of messages if advanced panels are hidden. */
-    private final List<JPanel> messageList = new ArrayList<JPanel>();
+    private final List<JPanel> moreOptionsMessages = new ArrayList<JPanel>();
 
     /** How much of the info is used. */
     public int getUsed() {
@@ -439,24 +439,9 @@ public abstract class EditableInfo extends Info {
         }
 
         for (final JPanel sectionPanel : sectionMap.values()) {
-            final JLabel l = new JLabel(
-                                  Tools.getString("EditableInfo.MoreOptions"));
-            final Font font = l.getFont();
-            final String name = font.getFontName();
-            final int style = font.ITALIC;
-            final int size = font.getSize();
-            l.setFont(new Font(name, style, size - 3));
-
             if (advancedSections.contains(sectionPanel)) {
-                final JPanel moreOptionsPanel = new JPanel();
-                moreOptionsPanel.setBackground(Browser.PANEL_BACKGROUND);
-                moreOptionsPanel.add(l);
-                final Dimension d = moreOptionsPanel.getPreferredSize();
-                d.width = leftWidth + rightWidth + 4;
-                moreOptionsPanel.setMaximumSize(d);
-                moreOptionsPanel.setVisible(
-                                        !Tools.getConfigData().getExpertMode());
-                messageList.add(moreOptionsPanel);
+                final JPanel moreOptionsPanel =
+                                getMoreOptionsPanel(leftWidth + rightWidth + 4);
                 sectionPanel.add(moreOptionsPanel);
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
@@ -464,6 +449,30 @@ public abstract class EditableInfo extends Info {
                 sectionPanel.setVisible(Tools.getConfigData().getExpertMode());
             }
         }
+    }
+
+    /**
+     * Returns a more panel with "more options are available" message.
+     */
+    protected final JPanel getMoreOptionsPanel(final int width) {
+        final JLabel l = new JLabel(
+                              Tools.getString("EditableInfo.MoreOptions"));
+        final Font font = l.getFont();
+        final String name = font.getFontName();
+        final int style = font.ITALIC;
+        final int size = font.getSize();
+        l.setFont(new Font(name, style, size - 3));
+
+        final JPanel moreOptionsPanel = new JPanel();
+        moreOptionsPanel.setBackground(Browser.PANEL_BACKGROUND);
+        moreOptionsPanel.add(l);
+        final Dimension d = moreOptionsPanel.getPreferredSize();
+        d.width = width;
+        moreOptionsPanel.setMaximumSize(d);
+        moreOptionsPanel.setVisible(
+                                !Tools.getConfigData().getExpertMode());
+        moreOptionsMessages.add(moreOptionsPanel);
+        return moreOptionsPanel;
     }
 
     /**
@@ -888,6 +897,13 @@ public abstract class EditableInfo extends Info {
     }
 
     /**
+     * Adds a panel to the advanced list.
+     */
+    protected final void addToAdvancedList(final JPanel p) {
+        advancedPanelList.add(p);
+    }
+
+    /**
      * Hide/Show advanced panels.
      */
     public final void updateAdvancedPanels() {
@@ -895,7 +911,7 @@ public abstract class EditableInfo extends Info {
         for (final JPanel apl : advancedPanelList) {
             apl.setVisible(expertMode);
         }
-        for (final JPanel ml : messageList) {
+        for (final JPanel ml : moreOptionsMessages) {
             ml.setVisible(!expertMode);
         }
         for (final JPanel p : advancedOnlySectionList) {

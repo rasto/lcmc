@@ -90,8 +90,8 @@ import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
-
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -291,6 +291,14 @@ public class ClusterBrowser extends Browser {
                                                   HB_OP_MONITOR,
                                                   HB_OP_META_DATA,
                                                   HB_OP_VALIDATE_ALL};
+    /** Not advanced operations. */
+    public static final MultiKeyMap HB_OP_NOT_ADVANCED = new MultiKeyMap();
+    static {
+        HB_OP_NOT_ADVANCED.put(HB_OP_START, HB_PAR_TIMEOUT, 1);
+        HB_OP_NOT_ADVANCED.put(HB_OP_STOP, HB_PAR_TIMEOUT, 1);
+        HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_TIMEOUT, 1);
+        HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_INTERVAL, 1);
+    }
     /** Parameters for the hb operations. */
     private final Map<String, List<String>> crmOperationParams =
                                            new HashMap<String, List<String>>();
