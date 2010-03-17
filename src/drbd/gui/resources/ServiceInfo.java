@@ -1891,8 +1891,9 @@ public class ServiceInfo extends EditableInfo {
         if (isCheckBox(param)) {
             return crmXML.getCheckBoxChoices(resourceAgent, param);
         } else {
-            // TODO: this does nothing, I think
-            return crmXML.getParamPossibleChoices(resourceAgent, param);
+            final boolean ms = cloneInfo != null
+                               && cloneInfo.getService().isMaster();
+            return crmXML.getParamPossibleChoices(resourceAgent, param, ms);
         }
     }
 

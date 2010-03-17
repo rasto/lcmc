@@ -267,6 +267,9 @@ public class CRMXML extends XML {
     /** Possible choices for meta attributes. */
     private static final Map<String, String[]> M_A_POSSIBLE_CHOICES =
                                                 new HashMap<String, String[]>();
+    /** Possible choices for m/s meta attributes. */
+    private static final Map<String, String[]> M_A_POSSIBLE_CHOICES_MS =
+                                                new HashMap<String, String[]>();
     /** Short descriptions for meta attributes. */
     private static final Map<String, String> M_A_SHORT_DESC =
                                                 new HashMap<String, String>();
@@ -287,13 +290,20 @@ public class CRMXML extends XML {
     static {
         /* target-role */
         M_A_POSSIBLE_CHOICES.put(
-                       TARGET_ROLE_META_ATTR,
-                       new String[]{TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
+                   TARGET_ROLE_META_ATTR,
+                   new String[]{null, TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
+        M_A_POSSIBLE_CHOICES_MS.put(
+                   TARGET_ROLE_META_ATTR,
+                   new String[]{null,
+                                TARGET_ROLE_MASTER,
+                                TARGET_ROLE_STARTED,
+                                TARGET_ROLE_SLAVE,
+                                TARGET_ROLE_STOPPED});
         M_A_SHORT_DESC.put(TARGET_ROLE_META_ATTR,
                            Tools.getString("CRMXML.TargetRole.ShortDesc"));
         M_A_LONG_DESC.put(TARGET_ROLE_META_ATTR,
                           Tools.getString("CRMXML.TargetRole.LongDesc"));
-        M_A_DEFAULT.put(TARGET_ROLE_META_ATTR, TARGET_ROLE_STARTED);
+        M_A_DEFAULT.put(TARGET_ROLE_META_ATTR, null);
         M_A_NOT_ADVANCED.add(TARGET_ROLE_META_ATTR);
 
         /* is-managed */
@@ -944,8 +954,13 @@ public class CRMXML extends XML {
      * the combo box.
      */
     public final String[] getParamPossibleChoices(final ResourceAgent ra,
-                                                  final String param) {
-        return ra.getParamPossibleChoices(param);
+                                                  final String param,
+                                                  final boolean ms) {
+        if (ms) {
+            return ra.getParamPossibleChoicesMS(param);
+        } else {
+            return ra.getParamPossibleChoices(param);
+        }
     }
 
     /**
@@ -1332,6 +1347,7 @@ public class CRMXML extends XML {
         ra.setParamIsMetaAttr(name, true);
         ra.setParamRequired(name, false);
         ra.setParamPossibleChoices(name, M_A_POSSIBLE_CHOICES.get(newName));
+        ra.setParamPossibleChoicesMS(name, M_A_POSSIBLE_CHOICES_MS.get(newName));
         ra.setParamShortDesc(name, M_A_SHORT_DESC.get(newName));
         ra.setParamLongDesc(name, M_A_LONG_DESC.get(newName));
         ra.setParamDefault(name, M_A_DEFAULT.get(newName));

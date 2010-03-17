@@ -83,6 +83,9 @@ public class ResourceAgent {
     /** Map from parameter to an array of its possible choices. */
     private final Map<String, String[]> paramPossibleChoices =
                                                 new HashMap<String, String[]>();
+    /** Map from m/s parameter to an array of its possible choices. */
+    private final Map<String, String[]> paramPossibleChoicesMS =
+                                                new HashMap<String, String[]>();
     /** Name of the hb service in the pull down menus. */
     private final String menuName;
     /** Map that holds default values for operations. The keys are the name and
@@ -402,11 +405,35 @@ public class ResourceAgent {
     }
 
     /**
+     * Sets the possible choices for the parameter.
+     */
+    public final void setParamPossibleChoicesMS(final String param,
+                                                final String[] choices) {
+        if (!masterParameters.contains(param)) {
+            wrongParameterError(param);
+            return;
+        }
+        paramPossibleChoicesMS.put(param, choices);
+    }
+
+    /**
      * Gets the array of the possible choices of the parameter.
      */
     public final String[] getParamPossibleChoices(final String param) {
         return paramPossibleChoices.get(param);
     }
+
+    /**
+     * Gets the array of the possible choices of the m/s parameter.
+     */
+    public final String[] getParamPossibleChoicesMS(final String param) {
+        String[] ret = paramPossibleChoicesMS.get(param);
+        if (ret == null) {
+            return getParamPossibleChoices(param);
+        }
+        return ret;
+    }
+
 
     /**
      * Returns the short description of the parameter.

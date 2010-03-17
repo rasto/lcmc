@@ -606,4 +606,18 @@ public class CloneInfo extends ServiceInfo {
         }
         return super.getSection(param);
     }
+
+    /**
+     * Returns possible choices for drop down lists.
+     */
+    protected Object[] getParamPossibleChoices(final String param) {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        if (isCheckBox(param)) {
+            return crmXML.getCheckBoxChoices(getResourceAgent(), param);
+        } else {
+            return crmXML.getParamPossibleChoices(getResourceAgent(),
+                                                  param,
+                                                  getService().isMaster());
+        }
+    }
 }
