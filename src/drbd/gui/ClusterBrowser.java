@@ -299,6 +299,14 @@ public class ClusterBrowser extends Browser {
         HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_TIMEOUT, 1);
         HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_INTERVAL, 1);
     }
+    /** Operations that should not have default values. */
+    public static final List<String> HB_OP_IGNORE_DEFAULT =
+                                                    new ArrayList<String>();
+    static {
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_STATUS);
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_META_DATA);
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_VALIDATE_ALL);
+    }
     /** Parameters for the hb operations. */
     private final Map<String, List<String>> crmOperationParams =
                                            new HashMap<String, List<String>>();

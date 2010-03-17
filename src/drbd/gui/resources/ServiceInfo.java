@@ -618,10 +618,13 @@ public class ServiceInfo extends EditableInfo {
         for (final String op : ClusterBrowser.HB_OPERATIONS) {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                           op)) {
-                final String defaultValue =
-                                resourceAgent.getOperationDefault(op, param);
+                String defaultValue =
+                                   resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
                     continue;
+                }
+                if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
+                    defaultValue = "";
                 }
                 String value = cs.getOperation(refCRMId, op, param);
                 if (value == null || "".equals(value)) {
@@ -1029,10 +1032,13 @@ public class ServiceInfo extends EditableInfo {
         for (final String op : ClusterBrowser.HB_OPERATIONS) {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                           op)) {
-                final String defaultValue =
+                String defaultValue =
                                 resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
                     continue;
+                }
+                if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
+                    defaultValue = "";
                 }
                 final GuiComboBox cb =
                         (GuiComboBox) operationsComboBoxHash.get(op, param);
@@ -1602,6 +1608,9 @@ public class ServiceInfo extends EditableInfo {
                 if (defaultValue == null) {
                     continue;
                 }
+                if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
+                    defaultValue = "";
+                }
                 final GuiComboBox cb =
                           (GuiComboBox) operationsComboBoxHash.get(op, param);
                 final Object oldValue = cb.getValue();
@@ -1690,9 +1699,12 @@ public class ServiceInfo extends EditableInfo {
             for (final String param : getBrowser().getCRMOperationParams().get(
                                                                           op)) {
                 String defaultValue =
-                                resourceAgent.getOperationDefault(op, param);
+                                   resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
                     continue;
+                }
+                if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
+                    defaultValue = "";
                 }
                 GuiComboBox.Type type;
                 final String regexp = "^-?\\d*$";
