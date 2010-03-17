@@ -522,6 +522,13 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /**
+     * Adds "migrate from" and "force migrate" menuitems to the submenu.
+     */
+    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
+        /* no migrate / unmigrate menu items for clones. */
+    }
+
+    /**
      * Returns items for the clone popup.
      */
     public final List<UpdatableItem> createPopup() {

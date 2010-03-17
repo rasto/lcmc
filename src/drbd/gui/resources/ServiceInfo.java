@@ -4191,12 +4191,9 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Adds expert submenu.
+     * Adds "migrate from" and "force migrate" menuitems to the submenu.
      */
-    public final void addExpertMenu(final MyMenu submenu) {
-        if (submenu.getItemCount() > 0) {
-            return;
-        }
+    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
         final boolean testOnly = false;
         final ServiceInfo thisClass = this;
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -4330,6 +4327,16 @@ public class ServiceInfo extends EditableInfo {
             submenu.add(forceMigrateMenuItem);
             registerMenuItem((UpdatableItem) forceMigrateMenuItem);
         }
+    }
+
+    /**
+     * Adds expert submenu.
+     */
+    public final void addExpertMenu(final MyMenu submenu) {
+        if (submenu.getItemCount() > 0) {
+            return;
+        }
+        addMoreMigrateMenuItems(submenu);
     }
 
 
