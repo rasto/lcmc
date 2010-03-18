@@ -101,7 +101,8 @@ public class PatternDocument extends DefaultStyledDocument {
      * Returns true if the text matches the pattern.
      */
     private boolean matches(final String text) {
-        final Matcher m = pattern.matcher(text);
-        return m.matches();
+        return true; // TODO: disabled, because it does not work good
+        //final Matcher m = pattern.matcher(text);
+        //return m.matches();
     }
 }

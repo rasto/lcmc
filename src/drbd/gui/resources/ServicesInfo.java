@@ -175,6 +175,11 @@ public class ServicesInfo extends EditableInfo {
 
     /** Returns whether this parameter is advanced. */
     protected final boolean isAdvanced(final String param) {
+        if (!Tools.areEqual(getParamDefault(param),
+                            getParamSaved(param))) {
+            /* it changed, show it */
+            return false;
+        }
         return getBrowser().getCRMXML().isGlobalAdvanced(param);
     }
 
