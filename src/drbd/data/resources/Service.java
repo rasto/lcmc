@@ -52,8 +52,12 @@ public class Service extends Resource {
     private String resourceClass = null;
     /** Whether this service master when it is clone. */
     private boolean master = false;
+    /** Whether this service is stonith device. */
+    private boolean stonith = false;
     /** Heartbeat id prefix for resource. */
     public static final String RES_ID_PREFIX = "res_";
+    /** Heartbeat id prefix for stonith device. */
+    public static final String STONITH_ID_PREFIX = "stonith_";
     /** Heartbeat id prefix for group. */
     public static final String GRP_ID_PREFIX = "grp_";
     /** Pacemaker id prefix for clone. */
@@ -128,6 +132,9 @@ public class Service extends Resource {
             if (crmId.startsWith(RES_ID_PREFIX + getName() + "_")) {
                 id = crmId.substring((RES_ID_PREFIX + getName()).length()
                                            + 1);
+            } else if (crmId.startsWith(STONITH_ID_PREFIX + getName() + "_")) {
+                id = crmId.substring((STONITH_ID_PREFIX + getName()).length()
+                                           + 1);
             } else {
                 id = crmId;
             }
@@ -166,6 +173,10 @@ public class Service extends Resource {
         } else {
             if (id.startsWith(RES_ID_PREFIX + getName() + "_")) {
                 return id;
+            } else if (id.startsWith(STONITH_ID_PREFIX + getName() + "_")) {
+                return id;
+            } else if (stonith) {
+                return STONITH_ID_PREFIX + getName() + "_" + id;
             } else {
                 return RES_ID_PREFIX + getName() + "_" + id;
             }
@@ -280,5 +291,10 @@ public class Service extends Resource {
      */
     public final boolean isMaster() {
         return master;
+    }
+
+    /** Sets whether it is a stonith device. */
+    public final void setStonith(final boolean stonith) {
+        this.stonith = stonith;
     }
 }

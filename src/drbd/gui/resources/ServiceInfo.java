@@ -201,6 +201,7 @@ public class ServiceInfo extends EditableInfo {
         this.resourceAgent = resourceAgent;
         if (resourceAgent.isStonith()) {
             setResource(new Service(name.replaceAll("/", "_")));
+            getService().setStonith(true);
         } else {
             setResource(new Service(name));
         }
@@ -368,7 +369,10 @@ public class ServiceInfo extends EditableInfo {
             } else if (heartbeatId.equals(Service.RES_ID_PREFIX
                                           + getService().getName()
                                           + "_" + id)
-                || heartbeatId.equals(id)) {
+                       || heartbeatId.equals(Service.STONITH_ID_PREFIX
+                                          + getService().getName()
+                                          + "_" + id)
+                       || heartbeatId.equals(id)) {
                 if (checkHostLocationsFieldsChanged()
                     || checkOperationFieldsChanged()) {
                     changed = true;

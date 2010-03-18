@@ -254,6 +254,10 @@ public class CRMXML extends XML {
     private static final String ORDERED_META_ATTR = "ordered";
     /** Name of the interleave clone meta attribute. */
     private static final String INTERLEAVE_META_ATTR = "interleave";
+    /** Name of the stonith-priority meta attribute. */
+    private static final String STONITH_PRIORITY_META_ATTR = "stonith-priority";
+    /** Name of the stonith-timeout meta attribute. */
+    private static final String STONITH_TIMEOUT_META_ATTR = "stonith-timeout";
 
     /** Section for meta attributes in rsc_defaults. */
     private static final Map<String, String> M_A_SECTION =
