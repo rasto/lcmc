@@ -792,6 +792,11 @@ public class ServiceInfo extends EditableInfo {
         return false;
     }
 
+    /** Returns whether the group is stopped. */
+    public boolean isGroupStopped(final boolean testOnly) {
+        return false;
+    }
+
     /**
      * Returns whether service is managed.
      * TODO: "default" value
@@ -4511,7 +4516,8 @@ public class ServiceInfo extends EditableInfo {
                 return null;
             } else if (isFailed(testOnly)) {
                 return Tools.getString("ClusterBrowser.Hb.StartingFailed");
-
+            } else if (isGroupStopped(testOnly)) {
+                return Tools.getString("ClusterBrowser.Hb.GroupStopped");
             } else {
                 return Tools.getString("ClusterBrowser.Hb.Starting");
             }

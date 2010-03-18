@@ -1364,6 +1364,9 @@ public class TextResource extends
         {"ClusterBrowser.Hb.NoInfoAvailable",
          "no info available"},
 
+        {"ClusterBrowser.Hb.GroupStopped",
+         "stopped (group)"},
+
         {"ClusterBrowser.Hb.StartingFailed",
          "starting failed"},
 

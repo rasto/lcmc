@@ -795,9 +795,6 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
         }
-        if (!super.isStarted(testOnly)) {
-            return false;
-        }
         return true;
     }
 
@@ -818,10 +815,12 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
         }
-        if (super.isStopped(testOnly)) {
-            return true;
-        }
         return false;
+    }
+
+    /** Returns whether the group is stopped. */
+    public final boolean isGroupStopped(final boolean testOnly) {
+        return super.isStopped(testOnly);
     }
 
     /**

@@ -1746,7 +1746,10 @@ public class CRMXML extends XML {
                 if (maNode.getNodeName().equals("nvpair")) {
                     final String nvpairId = getAttribute(maNode, "id");
                     final String name = getAttribute(maNode, "name");
-                    final String value = getAttribute(maNode, "value");
+                    String value = getAttribute(maNode, "value");
+                    if (TARGET_ROLE_META_ATTR.equals(name)) {
+                        value = value.toLowerCase();
+                    }
                     rscDefaultsParams.put(name, value);
                     rscDefaultsParamsNvpairIds.put(name, nvpairId);
                 }
@@ -1780,7 +1783,6 @@ public class CRMXML extends XML {
                 nvpairsMA = metaAttrsNode.getChildNodes();
             }
             /* <nvpair...> */
-            /* target-role and is-managed */
             for (int l = 0; l < nvpairsMA.getLength(); l++) {
                 final Node maNode = nvpairsMA.item(l);
                 if (maNode.getNodeName().equals("nvpair")) {
@@ -1912,7 +1914,10 @@ public class CRMXML extends XML {
                     if (maNode.getNodeName().equals("nvpair")) {
                         final String nvpairId = getAttribute(maNode, "id");
                         final String name = getAttribute(maNode, "name");
-                        final String value = getAttribute(maNode, "value");
+                        String value = getAttribute(maNode, "value");
+                        if (TARGET_ROLE_META_ATTR.equals(name)) {
+                            value = value.toLowerCase();
+                        }
                         params.put(name, value);
                         nvpairIds.put(name, nvpairId);
                     }
@@ -2006,7 +2011,10 @@ public class CRMXML extends XML {
                     if (maNode.getNodeName().equals("nvpair")) {
                         final String nvpairId = getAttribute(maNode, "id");
                         final String name = getAttribute(maNode, "name");
-                        final String value = getAttribute(maNode, "value");
+                        String value = getAttribute(maNode, "value");
+                        if (TARGET_ROLE_META_ATTR.equals(name)) {
+                            value = value.toLowerCase();
+                        }
                         params.put(name, value);
                         nvpairIds.put(name, nvpairId);
                     }
