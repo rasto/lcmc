@@ -230,7 +230,7 @@ public class CRMXML extends XML {
      * with versions. */
     private Map<String, String> metaAttrParams = null;
     /** Meta attributes for rsc defaults meta attributes. */
-    private Map<String, String> rscDefaultsParams = null;
+    private Map<String, String> rscDefaultsMetaAttrs = null;
     /** Name of the priority meta attribute. */
     private static final String PRIORITY_META_ATTR = "priority";
     /** Name of the resource-stickiness meta attribute. */
@@ -633,6 +633,10 @@ public class CRMXML extends XML {
 
 
         if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
+            String clusterRecheckInterval = "cluster-recheck-interval";
+            if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                clusterRecheckInterval = "cluster_recheck_interval";
+            }
             final String[] params = {
                 "stonith-action",
                 "is-managed-default",
@@ -647,7 +651,7 @@ public class CRMXML extends XML {
                 "startup-fencing",
                 "start-failure-is-fatal",
                 "dc-deadtime",
-                "cluster-recheck-interval",
+                clusterRecheckInterval,
                 "election-timeout",
                 "shutdown-escalation",
                 "crmd-integration-timeout",
@@ -657,7 +661,7 @@ public class CRMXML extends XML {
             globalNotAdvancedParams.add("maintenance-mode");
             paramGlobalAccessTypes.put("maintenance-mode",
                                        ConfigData.AccessType.OP);
-            globalNotAdvancedParams.add("cluster-recheck-interval");
+            globalNotAdvancedParams.add(clusterRecheckInterval);
 
             for (String param : params) {
                 globalParams.add(param);
@@ -1125,21 +1129,34 @@ public class CRMXML extends XML {
     }
 
     /**
+     * Converts rsc default parameter to the internal representation, that can
+     * be different on older cluster software.
+     */
+    private String convertRscDefaultsParam(final String param) {
+        final String newParam = rscDefaultsMetaAttrs.get(param);
+        if (newParam == null) {
+            return param;
+        }
+        return newParam;
+    }
+    /**
      * Checks meta attribute param.
      */
     public final boolean checkMetaAttrParam(final String param,
                                             final String value) {
-        final String type = M_A_TYPE.get(param);
-        final boolean required = isRscDefaultsRequired(param);
+        final String newParam = convertRscDefaultsParam(param);
+        final String type = M_A_TYPE.get(newParam);
+        final boolean required = isRscDefaultsRequired(newParam);
         final boolean metaAttr = true;
-        return checkParam(type, required, metaAttr, param, value);
+        return checkParam(type, required, metaAttr, newParam, value);
     }
 
     /**
      * Returns section of the rsc defaults meta attribute.
      */
     public final String getRscDefaultsSection(final String param) {
-        final String section = M_A_SECTION.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        final String section = M_A_SECTION.get(newParam);
         if (section == null) {
             return Tools.getString("CRMXML.RscDefaultsSection");
         }
@@ -1150,28 +1167,32 @@ public class CRMXML extends XML {
      * Returns default of the meta attribute.
      */
     public final String getRscDefaultsDefault(final String param) {
-        return M_A_DEFAULT.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        return M_A_DEFAULT.get(newParam);
     }
 
     /**
      * Returns preferred of the meta attribute.
      */
     public final String getRscDefaultsPreferred(final String param) {
-        return M_A_PREFERRED.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        return M_A_PREFERRED.get(newParam);
     }
 
     /**
      * Returns preferred of the meta attribute.
      */
     public final String[] getRscDefaultsPossibleChoices(final String param) {
-        return M_A_POSSIBLE_CHOICES.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        return M_A_POSSIBLE_CHOICES.get(newParam);
     }
 
     /**
      * Returns choices for check box. (True, False).
      */
     public final String[] getRscDefaultsCheckBoxChoices(final String param) {
-        final String paramDefault = getRscDefaultsDefault(param);
+        final String newParam = convertRscDefaultsParam(param);
+        final String paramDefault = getRscDefaultsDefault(newParam);
         return getCheckBoxChoices(paramDefault);
     }
 
@@ -1179,14 +1200,16 @@ public class CRMXML extends XML {
      * Returns short description of the default meta attr parameter.
      */
     public final String getRscDefaultsShortDesc(final String param) {
-        return M_A_SHORT_DESC.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        return M_A_SHORT_DESC.get(newParam);
     }
 
     /**
      * Return long description of the default meta attr parameter.
      */
     public final String getRscDefaultsLongDesc(final String param) {
-        return M_A_LONG_DESC.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        return M_A_LONG_DESC.get(newParam);
     }
 
     /**
@@ -1194,18 +1217,21 @@ public class CRMXML extends XML {
      * It can be string, integer, boolean...
      */
     public final String getRscDefaultsType(final String param) {
-        return M_A_TYPE.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        return M_A_TYPE.get(newParam);
     }
 
     /** Checks if parameter is advanced. */
     public final boolean isRscDefaultsAdvanced(final String param) {
-        return !M_A_NOT_ADVANCED.contains(param);
+        final String newParam = convertRscDefaultsParam(param);
+        return !M_A_NOT_ADVANCED.contains(newParam);
     }
 
     /** Returns access type of the meta attribute. */
     public final ConfigData.AccessType getRscDefaultsAccessType(
                                                          final String param) {
-        final ConfigData.AccessType at = M_A_ACCESS_TYPE.get(param);
+        final String newParam = convertRscDefaultsParam(param);
+        final ConfigData.AccessType at = M_A_ACCESS_TYPE.get(newParam);
         if (at == null) {
             return ConfigData.AccessType.ADMIN;
         }
@@ -1216,6 +1242,7 @@ public class CRMXML extends XML {
      * Checks if parameter is required or not.
      */
     public final boolean isRscDefaultsRequired(final String param) {
+        final String newParam = convertRscDefaultsParam(param);
         return false;
     }
 
@@ -1223,7 +1250,8 @@ public class CRMXML extends XML {
      * Checks if the meta attr parameter is integer.
      */
     public final boolean isRscDefaultsInteger(final String param) {
-        final String type = getRscDefaultsType(param);
+        final String newParam = convertRscDefaultsParam(param);
+        final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_INTEGER.equals(type);
     }
 
@@ -1231,7 +1259,8 @@ public class CRMXML extends XML {
      * Checks if the meta attr parameter is boolean.
      */
     public final boolean isRscDefaultsBoolean(final String param) {
-        final String type = getRscDefaultsType(param);
+        final String newParam = convertRscDefaultsParam(param);
+        final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
@@ -1239,7 +1268,8 @@ public class CRMXML extends XML {
      * Whether the rsc default parameter is of the time type.
      */
     public final boolean isRscDefaultsTimeType(final String param) {
-        final String type = getRscDefaultsType(param);
+        final String newParam = convertRscDefaultsParam(param);
+        final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_TIME.equals(type);
     }
 
@@ -1399,23 +1429,32 @@ public class CRMXML extends XML {
      * is called in the cluster manager and value how it is stored in the GUI.
      */
     public final Map<String, String> getRscDefaultsParameters() {
-        if (rscDefaultsParams != null) {
-            return rscDefaultsParams;
+        if (rscDefaultsMetaAttrs != null) {
+            return rscDefaultsMetaAttrs;
         }
-        rscDefaultsParams = new LinkedHashMap<String, String>();
+        rscDefaultsMetaAttrs = new LinkedHashMap<String, String>();
+        final String hbV = host.getHeartbeatVersion();
+        final String pcmkV = host.getPacemakerVersion();
+        if (pcmkV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            /* no rsc defaults in older versions. */
+            return rscDefaultsMetaAttrs;
+        }
+
         for (final String param : getMetaAttrParameters().keySet()) {
-            rscDefaultsParams.put(param, getMetaAttrParameters().get(param));
+            rscDefaultsMetaAttrs.put(param, getMetaAttrParameters().get(param));
         }
         /* Master / Slave */
-        rscDefaultsParams.put(MASTER_MAX_META_ATTR,      null);
-        rscDefaultsParams.put(MASTER_NODE_MAX_META_ATTR, null);
+        rscDefaultsMetaAttrs.put(MASTER_MAX_META_ATTR,      null);
+        rscDefaultsMetaAttrs.put(MASTER_NODE_MAX_META_ATTR, null);
         /* Clone */
-        rscDefaultsParams.put(CLONE_MAX_META_ATTR,       null);
-        rscDefaultsParams.put(NOTIFY_META_ATTR,          null);
-        rscDefaultsParams.put(GLOBALLY_UNIQUE_META_ATTR, null);
-        rscDefaultsParams.put(ORDERED_META_ATTR,         null);
-        rscDefaultsParams.put(INTERLEAVE_META_ATTR,      null);
-        return rscDefaultsParams;
+        rscDefaultsMetaAttrs.put(CLONE_MAX_META_ATTR,       null);
+        rscDefaultsMetaAttrs.put(NOTIFY_META_ATTR,          null);
+        rscDefaultsMetaAttrs.put(GLOBALLY_UNIQUE_META_ATTR, null);
+        rscDefaultsMetaAttrs.put(ORDERED_META_ATTR,         null);
+        rscDefaultsMetaAttrs.put(INTERLEAVE_META_ATTR,      null);
+        return rscDefaultsMetaAttrs;
     }
 
     /**
