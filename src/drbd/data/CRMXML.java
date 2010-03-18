@@ -215,6 +215,15 @@ public class CRMXML extends XML {
                                                     "100",
                                                     INFINITY_STRING,
                                                     MINUS_INFINITY_STRING};
+    /** Name of the stonith timeout instance attribute. */
+    private static final String STONITH_TIMEOUT_INSTANCE_ATTR =
+                                                            "stonith-timeout";
+    /** Name of the stonith priority instance attribute.
+        It is actually only "priority" but it clashes with priority meta
+        attribute. It is converted, wenn it is parsed and when it is stored to
+        cib. */
+    public static final String STONITH_PRIORITY_INSTANCE_ATTR =
+                                                            "stonith-priority";
     /** Constraint score keyword. */
     public static final String SCORE_STRING = "score";
     /** Meta attributes for primitives. Cannot be static because it changes
@@ -254,10 +263,6 @@ public class CRMXML extends XML {
     private static final String ORDERED_META_ATTR = "ordered";
     /** Name of the interleave clone meta attribute. */
     private static final String INTERLEAVE_META_ATTR = "interleave";
-    /** Name of the stonith-priority meta attribute. */
-    private static final String STONITH_PRIORITY_META_ATTR = "stonith-priority";
-    /** Name of the stonith-timeout meta attribute. */
-    private static final String STONITH_TIMEOUT_META_ATTR = "stonith-timeout";
 
     /** Section for meta attributes in rsc_defaults. */
     private static final Map<String, String> M_A_SECTION =
@@ -1422,6 +1427,7 @@ public class CRMXML extends XML {
         final String pcmkV = host.getPacemakerVersion();
 
         final NodeList parameters = parametersNode.getChildNodes();
+        
         for (int i = 0; i < parameters.getLength(); i++) {
             final Node parameterNode = parameters.item(i);
             if (parameterNode.getNodeName().equals("parameter")) {
@@ -1470,6 +1476,23 @@ public class CRMXML extends XML {
                     ra.setParamDefault(param, defaultValue);
                 }
             }
+        }
+        if (ra.isStonith()) {
+            /* stonith-timeout */
+            ra.addParameter(STONITH_TIMEOUT_INSTANCE_ATTR);
+            ra.setParamShortDesc(STONITH_TIMEOUT_INSTANCE_ATTR,
+                                 "Stonith Timeout");
+            ra.setParamType(STONITH_TIMEOUT_INSTANCE_ATTR, PARAM_TYPE_TIME);
+            ra.setParamDefault(STONITH_TIMEOUT_INSTANCE_ATTR, "");
+            /* priority */
+            ra.addParameter(STONITH_PRIORITY_INSTANCE_ATTR);
+
+            ra.setParamShortDesc(STONITH_PRIORITY_INSTANCE_ATTR,
+                                 "Stonith Priority");
+            ra.setParamPossibleChoices(STONITH_PRIORITY_INSTANCE_ATTR,
+                                       new String[]{"", "0", "5", "10"});
+            ra.setParamType(STONITH_PRIORITY_INSTANCE_ATTR, PARAM_TYPE_INTEGER);
+            ra.setParamDefault(STONITH_PRIORITY_INSTANCE_ATTR, "");
         }
         final Map<String, String> metaAttrParams = getMetaAttrParameters();
         for (final String metaAttr : metaAttrParams.keySet()) {
@@ -1814,7 +1837,8 @@ public class CRMXML extends XML {
               final Map<String, String> operationsIdRefs,
               final Map<String, String> operationsIdtoCRMId,
               final Map<String, String> metaAttrsIdRefs,
-              final Map<String, String> metaAttrsIdToCRMId) {
+              final Map<String, String> metaAttrsIdToCRMId,
+              final boolean stonith) {
         final Map<String, String> params =
                                         new HashMap<String, String>();
         parametersMap.put(crmId, params);
@@ -1824,9 +1848,8 @@ public class CRMXML extends XML {
         final String hbV = host.getHeartbeatVersion();
         final String pcmkV = host.getPacemakerVersion();
         /* <instance_attributes> */
-        final Node instanceAttrNode =
-                                   getChildNode(resourceNode,
-                                                "instance_attributes");
+        final Node instanceAttrNode = getChildNode(resourceNode,
+                                                   "instance_attributes");
         /* <nvpair...> */
         if (instanceAttrNode != null) {
             final String iAId = getAttribute(instanceAttrNode, "id");
@@ -1846,8 +1869,12 @@ public class CRMXML extends XML {
                 final Node optionNode = nvpairsRes.item(j);
                 if (optionNode.getNodeName().equals("nvpair")) {
                     final String nvpairId = getAttribute(optionNode, "id");
-                    final String name = getAttribute(optionNode, "name");
+                    String name = getAttribute(optionNode, "name");
                     final String value = getAttribute(optionNode, "value");
+                    if (stonith && "priority".equals(name)) {
+                        /* so it does not clash with meta attr priority */
+                        name = STONITH_PRIORITY_INSTANCE_ATTR;
+                    }
                     params.put(name, value);
                     nvpairIds.put(name, nvpairId);
                 }
@@ -2066,7 +2093,8 @@ public class CRMXML extends XML {
                         operationsIdRefs,
                         operationsIdtoCRMId,
                         metaAttrsIdRefs,
-                        metaAttrsIdToCRMId);
+                        metaAttrsIdToCRMId,
+                        "stonith".equals(raClass));
     }
 
     /**
@@ -2478,7 +2506,8 @@ public class CRMXML extends XML {
                                 operationsIdRefs,
                                 operationsIdtoCRMId,
                                 metaAttrsIdRefs,
-                                metaAttrsIdToCRMId);
+                                metaAttrsIdToCRMId,
+                                false);
                 for (int j = 0; j < primitives.getLength(); j++) {
                     final Node primitiveNode = primitives.item(j);
                     if (primitiveNode.getNodeName().equals("primitive")) {

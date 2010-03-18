@@ -156,23 +156,24 @@ public class GroupInfo extends ServiceInfo {
             CRM.setParameters(
                         dcHost,
                         "-R",
-                        null,   /* crm id */
-                        null,   /* TODO: clone id */
+                        null,  /* crm id */
+                        null,  /* TODO: clone id */
                         false, /* master */
-                        null, /* cloneMetaArgs, */
+                        null,  /* cloneMetaArgs, */
                         groupMetaArgs,
                         heartbeatId, /* group id */
-                        null, /* pacemakerResAttrs, */
-                        null, /* pacemakerResArgs, */
-                        null, /* pacemakerMetaArgs, */
-                        null, /* cs.getResourceInstanceAttrId(heartbeatId), */
-                        null, /* cs.getParametersNvpairsIds(heartbeatId), */
-                        null, /* getOperations(heartbeatId), */
-                        null, /* cs.getOperationsId(heartbeatId), */
-                        null, /* getMetaAttrsRefId(), */
-                        null, /* cloneMetaAttrsRefIds, */
+                        null,  /* pacemakerResAttrs, */
+                        null,  /* pacemakerResArgs, */
+                        null,  /* pacemakerMetaArgs, */
+                        null,  /* cs.getResourceInstanceAttrId(heartbeatId), */
+                        null,  /* cs.getParametersNvpairsIds(heartbeatId), */
+                        null,  /* getOperations(heartbeatId), */
+                        null,  /* cs.getOperationsId(heartbeatId), */
+                        null,  /* getMetaAttrsRefId(), */
+                        null,  /* cloneMetaAttrsRefIds, */
                         getMetaAttrsRefId(),
-                        null, /* getOperationsRefId(), */
+                        null,  /* getOperationsRefId(), */
+                        false, /* stonith */
                         testOnly);
         }
         setLocations(heartbeatId, dcHost, testOnly);

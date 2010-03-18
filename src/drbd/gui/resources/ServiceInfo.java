@@ -2830,6 +2830,7 @@ public class ServiceInfo extends EditableInfo {
                               cloneMetaAttrsRefIds,
                               groupMetaAttrsRefIds,
                               getOperationsRefId(),
+                              resourceAgent.isStonith(),
                               testOnly);
             if (gInfo == null) {
                 final String[] parents =
@@ -2944,6 +2945,7 @@ public class ServiceInfo extends EditableInfo {
                         cloneMetaAttrsRefIds,
                         groupMetaAttrsRefIds,
                         getOperationsRefId(),
+                        resourceAgent.isStonith(),
                         testOnly);
             if (isFailed(testOnly)) {
                 cleanupResource(dcHost, testOnly);

@@ -127,6 +127,9 @@ public class Unit {
      * Returns short name of the unit.
      */
     public final String getShortName() {
+        if (empty) {
+            return "";
+        }
         return shortName;
     }
 }

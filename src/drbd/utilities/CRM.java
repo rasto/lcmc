@@ -23,6 +23,7 @@ package drbd.utilities;
 
 import drbd.data.Host;
 import drbd.data.HostLocation;
+import drbd.data.CRMXML;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -154,6 +155,7 @@ public final class CRM {
                            final String cloneMetaAttrsRefId,
                            final String groupMetaAttrsRefId,
                            final String operationsRefId,
+                           final boolean stonith,
                            final boolean testOnly) {
 
         final StringBuffer xml = new StringBuffer(360);
@@ -226,16 +228,24 @@ public final class CRM {
                     if (nvpairIdsHash != null) {
                         nvpairId = nvpairIdsHash.get(paramName);
                     }
+                    String newParamName;
+                    if (stonith
+                        && CRMXML.STONITH_PRIORITY_INSTANCE_ATTR.equals(
+                                                                  paramName)) {
+                        newParamName = "priority";
+                    } else {
+                        newParamName = paramName;
+                    }
                     if (nvpairId == null) {
                         nvpairId = "nvpair-"
                                    + heartbeatId
                                    + "-"
-                                   + paramName;
+                                   + newParamName;
                     }
                     xml.append("<nvpair id=\"");
                     xml.append(nvpairId);
                     xml.append("\" name=\"");
-                    xml.append(paramName);
+                    xml.append(newParamName);
                     xml.append("\" value=\"");
                     xml.append(value);
                     xml.append("\"/>");

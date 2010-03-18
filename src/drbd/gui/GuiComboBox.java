@@ -139,6 +139,8 @@ public class GuiComboBox extends JPanel {
     private JLabel label = null;
     /** Whether the component should be enabled. */
     private boolean enablePredicate = true;
+    /** Whether the unit combo box should be enabled. */
+    private boolean unitEnabled = true;
     /** Access Type for this component to become enabled. */
     private ConfigData.AccessType enableAccessType =
                                                      ConfigData.AccessType.RO;
@@ -622,7 +624,7 @@ public class GuiComboBox extends JPanel {
                 final Object o0 = ((Object[]) o)[0];
                 final Object o1 = ((Object[]) o)[1];
                 String v = o0.toString();
-                if (o1 != null) {
+                if (v != null && !"".equals(v) && o1 != null) {
                     v += ((Unit) o1).getShortName();
                 }
                 return v;
@@ -696,6 +698,7 @@ public class GuiComboBox extends JPanel {
                     if ("".equals(text)) {
                         if (!u.isEmpty()) {
                             u.setEmpty(true);
+                            unitEnabled = false;
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     unitComboBox.repaint();
@@ -707,6 +710,7 @@ public class GuiComboBox extends JPanel {
                         if (u.isEmpty()) {
                             u.setEmpty(false);
                             if (textFieldWithoutUnit.isEnabled()) {
+                                unitEnabled = true;
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         unitComboBox.repaint();
@@ -813,7 +817,7 @@ public class GuiComboBox extends JPanel {
                 switch(type) {
                     case TEXTFIELDWITHUNIT:
                         textFieldWithoutUnit.setEnabled(enabled);
-                        unitComboBox.setEnabled(enabled);
+                        unitComboBox.setEnabled(enabled && unitEnabled);
                     break;
                 }
             }
