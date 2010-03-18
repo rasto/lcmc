@@ -634,8 +634,14 @@ public class CRMXML extends XML {
 
         if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
             String clusterRecheckInterval = "cluster-recheck-interval";
-            if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            String dcDeadtime = "dc-deadtime";
+            String electionTimeout = "election-timeout";
+            String shutdownEscalation = "shutdown-escalation";
+            if (pcmkV == null && Tools.compareVersions(hbV, "2.1.4") <= 0) {
                 clusterRecheckInterval = "cluster_recheck_interval";
+                dcDeadtime = "dc_deadtime";
+                electionTimeout = "election_timeout";
+                shutdownEscalation = "shutdown_escalation";
             }
             final String[] params = {
                 "stonith-action",
@@ -650,10 +656,10 @@ public class CRMXML extends XML {
                 "pe-input-series-max",
                 "startup-fencing",
                 "start-failure-is-fatal",
-                "dc-deadtime",
+                dcDeadtime,
                 clusterRecheckInterval,
-                "election-timeout",
-                "shutdown-escalation",
+                electionTimeout,
+                shutdownEscalation,
                 "crmd-integration-timeout",
                 "crmd-finalization-timeout"
             };
