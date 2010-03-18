@@ -117,7 +117,7 @@ class IPaddrInfo extends ServiceInfo {
                                       regexp,
                                       width,
                                       null, /* abbrv */
-                                      ConfigData.AccessType.ADMIN);
+                                      getAccessType(param));
 
             paramCb.setAlwaysEditable(true);
             paramComboBoxAdd(param, prefix, paramCb);

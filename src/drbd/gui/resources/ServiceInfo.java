@@ -1938,6 +1938,11 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns whether this parameter is advanced. */
     protected final boolean isAdvanced(final String param) {
+        if (!Tools.areEqual(getParamDefault(param),
+                            getParamSaved(param))) {
+            /* it changed, show it */
+            return false;
+        }
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isAdvanced(resourceAgent, param);
     }

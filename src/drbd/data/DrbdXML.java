@@ -149,6 +149,26 @@ public class DrbdXML extends XML {
         MODES.add(new StringInfo("Single-Primary", MODE_SINGLE_PRIMARY, null));
         MODES.add(new StringInfo("Dual-Primary",   "True",   null));
     }
+    /** Some non advanced parameters. */
+    public static final List<String> NOT_ADVANCED_PARAMS =
+                                                    new ArrayList<String>();
+    static {
+        NOT_ADVANCED_PARAMS.add("rate");
+        NOT_ADVANCED_PARAMS.add("fence-peer");
+        NOT_ADVANCED_PARAMS.add("wfc-timeout");
+        NOT_ADVANCED_PARAMS.add("become-primary-on");
+        NOT_ADVANCED_PARAMS.add("timeout");
+        NOT_ADVANCED_PARAMS.add("allow-two-primaries");
+        NOT_ADVANCED_PARAMS.add("fencing");
+        NOT_ADVANCED_PARAMS.add("after");
+        NOT_ADVANCED_PARAMS.add("usage-count"); /* global */
+    }
+    /** Access types of some parameters. */
+    public static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =
+                                new HashMap<String, ConfigData.AccessType>();
+    static {
+        PARAM_ACCESS_TYPE.put("rate", ConfigData.AccessType.OP);
+    }
 
     /**
      * Prepares a new <code>DrbdXML</code> object.
@@ -532,12 +552,26 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Return whether parameter is required.
-     */
+    /** Returns whether parameter is required. */
     public final boolean isRequired(final String param) {
         return requiredParametersList.contains(param);
     }
+
+    /** Returns whether parameter is advanced. */
+    public final boolean isAdvanced(final String param) {
+        return !isRequired(param)
+               && !NOT_ADVANCED_PARAMS.contains(param);
+    }
+
+    /** Returns access type of the parameter. */
+    public final ConfigData.AccessType getAccessType(final String param) {
+        ConfigData.AccessType at = PARAM_ACCESS_TYPE.get(param);
+        if (at == null) {
+          return ConfigData.AccessType.ADMIN;
+        }
+        return at;
+    }
+
 
     /**
      * Parses command xml for parameters and fills up the hashes.

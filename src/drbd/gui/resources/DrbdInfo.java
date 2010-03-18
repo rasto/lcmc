@@ -263,6 +263,20 @@ public class DrbdInfo extends EditableInfo {
         return getBrowser().getDrbdXML().isRequired(param);
     }
 
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(String param) {
+        if (!Tools.areEqual(getParamDefault(param),
+                            getParamSaved(param))) {
+            /* it changed, show it */
+            return false;
+        }
+        return getBrowser().getDrbdXML().isAdvanced(param);
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(String param) {
+        return getBrowser().getDrbdXML().getAccessType(param);
+    }
+
     /**
      * Returns whether the parameter is of the integer type.
      */
@@ -720,14 +734,5 @@ public class DrbdInfo extends EditableInfo {
      */
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
-    }
-
-    /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(String param) {
-        return false;
-    }
-    /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(String param) {
-        return ConfigData.AccessType.ADMIN;
     }
 }

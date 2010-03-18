@@ -424,11 +424,23 @@ public class DrbdResourceInfo extends EditableInfo
         return getBrowser().getDrbdXML().getSection(param);
     }
 
-    /**
-     * Returns whether this drbd parameter is required parameter.
-     */
+    /** Returns whether this drbd parameter is required parameter. */
     protected final boolean isRequired(final String param) {
         return getBrowser().getDrbdXML().isRequired(param);
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(String param) {
+        if (!Tools.areEqual(getParamDefault(param),
+                            getParamSaved(param))) {
+            /* it changed, show it */
+            return false;
+        }
+        return getBrowser().getDrbdXML().isAdvanced(param);
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(String param) {
+        return getBrowser().getDrbdXML().getAccessType(param);
     }
 
     /**
@@ -513,7 +525,7 @@ public class DrbdResourceInfo extends EditableInfo
                                       null, /* regexp */
                                       width,
                                       null, /* abbrv */
-                                      ConfigData.AccessType.ADMIN);
+                                      getAccessType(param));
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
         } else if (ClusterBrowser.DRBD_RES_PARAM_DEV.equals(param)) {
@@ -543,7 +555,7 @@ public class DrbdResourceInfo extends EditableInfo
                                           null, /* regexp */
                                           width,
                                           null, /* abbrv */
-                                          ConfigData.AccessType.ADMIN);
+                                          getAccessType(param));
                 paramCb.setEditable(true);
             } else {
                 final String defaultItem = getDevice();
@@ -559,7 +571,7 @@ public class DrbdResourceInfo extends EditableInfo
                                        regexp,
                                        width,
                                        null, /* abbrv */
-                                       ConfigData.AccessType.ADMIN);
+                                       getAccessType(param));
             }
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
@@ -606,7 +618,7 @@ public class DrbdResourceInfo extends EditableInfo
                                       null, /* regexp */
                                       width,
                                       null, /* abbrv */
-                                      ConfigData.AccessType.ADMIN);
+                                      getAccessType(param));
 
             paramComboBoxAdd(param, prefix, paramCb);
         } else if (hasUnitPrefix(param)) {
@@ -663,7 +675,7 @@ public class DrbdResourceInfo extends EditableInfo
                                       regexp,
                                       width,
                                       null, /* abbrv */
-                                      ConfigData.AccessType.ADMIN);
+                                      getAccessType(param));
 
             paramComboBoxAdd(param, prefix, paramCb);
         } else {
@@ -1400,14 +1412,5 @@ public class DrbdResourceInfo extends EditableInfo
             return blockDevInfo2.getBlockDevice().getUsed();
         }
         return -1;
-    }
-
-    /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(String param) {
-        return false;
-    }
-    /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(String param) {
-        return ConfigData.AccessType.ADMIN;
     }
 }

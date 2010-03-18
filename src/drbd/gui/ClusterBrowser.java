@@ -2369,13 +2369,16 @@ public class ClusterBrowser extends Browser {
         drbdGraph.getDrbdInfo().updateAdvancedPanels();
         for (final DrbdResourceInfo dri : drbdResHash.values()) {
             dri.checkResourceFields(null, dri.getParametersFromXML());
+            dri.updateAdvancedPanels();
             final BlockDevInfo bdi1 = dri.getFirstBlockDevInfo();
             if (bdi1 != null) {
                 bdi1.checkResourceFields(null, bdi1.getParametersFromXML());
+                bdi1.updateAdvancedPanels();
             }
             final BlockDevInfo bdi2 = dri.getSecondBlockDevInfo();
             if (bdi2 != null) {
                 bdi2.checkResourceFields(null, bdi2.getParametersFromXML());
+                bdi2.updateAdvancedPanels();
             }
         }
 
@@ -2387,6 +2390,7 @@ public class ClusterBrowser extends Browser {
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
+                vmsvdi.updateAdvancedPanels();
             }
 
         }

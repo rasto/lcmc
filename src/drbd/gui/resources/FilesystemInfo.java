@@ -239,7 +239,7 @@ class FilesystemInfo extends ServiceInfo {
                                       null, /* regexp */
                                       width,
                                       null, /* abbrv */
-                                      ConfigData.AccessType.ADMIN);
+                                      getAccessType(param));
             blockDeviceParamCb = paramCb;
             addParamComboListeners(paramCb);
             paramComboBoxAdd(param, prefix, paramCb);
@@ -258,7 +258,7 @@ class FilesystemInfo extends ServiceInfo {
                               null, /* regexp */
                               width,
                               null, /* abbrv */
-                              ConfigData.AccessType.ADMIN);
+                              getAccessType(param));
             fstypeParamCb = paramCb;
 
             paramComboBoxAdd(param, prefix, paramCb);
@@ -290,7 +290,7 @@ class FilesystemInfo extends ServiceInfo {
                                       regexp,
                                       width,
                                       null, /* abbrv */
-                                      ConfigData.AccessType.ADMIN);
+                                      getAccessType(param));
             paramComboBoxAdd(param, prefix, paramCb);
             paramCb.setAlwaysEditable(true);
         } else {

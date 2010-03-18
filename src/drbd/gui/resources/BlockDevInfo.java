@@ -385,7 +385,7 @@ public class BlockDevInfo extends EditableInfo {
                        regexp,
                        width,
                        null, /* abbrv */
-                       ConfigData.AccessType.ADMIN);
+                       getAccessType(param));
             gcb.setValue(defaultPort);
             paramComboBoxAdd(param, prefix, gcb);
             gcb.setEnabled(true);
@@ -459,6 +459,15 @@ public class BlockDevInfo extends EditableInfo {
 
     protected final boolean isRequired(final String param) {
         return true;
+    }
+
+    /** Returns whether this parameter is advanced. */
+    protected final boolean isAdvanced(final String param) {
+        return false;
+    }
+    /** Returns access type of this parameter. */
+    protected final ConfigData.AccessType getAccessType(final String param) {
+        return ConfigData.AccessType.ADMIN;
     }
 
     protected final boolean isInteger(final String param) {
@@ -1507,14 +1516,5 @@ public class BlockDevInfo extends EditableInfo {
             return;
         }
         b.setDRBDtestData(drbdtestData);
-    }
-
-    /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
-        return false;
-    }
-    /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
     }
 }
