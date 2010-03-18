@@ -1387,6 +1387,9 @@ public class ClusterBrowser extends Browser {
         }
         if (nodeChanged) {
             reload(vmsNode);
+            for (final ServiceInfo si : getExistingServiceList(null)) {
+                si.connectWithVMS();
+            }
         }
         final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
         if (vmsi != null) {

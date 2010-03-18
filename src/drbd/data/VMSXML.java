@@ -147,6 +147,7 @@ public class VMSXML extends XML {
         final Node infoNode = getChildNode(vmNode, "info");
         final String name = getAttribute(vmNode, VM_PARAM_NAME);
         final String config = getAttribute(vmNode, "config");
+        configsMap.put(config, name);
         final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
         if (autostart == null) {
             parameterValues.put(name, VM_PARAM_AUTOSTART, "false");

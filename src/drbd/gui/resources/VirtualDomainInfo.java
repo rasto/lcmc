@@ -92,7 +92,7 @@ class VirtualDomainInfo extends ServiceInfo {
     /**
      * Removes the service without confirmation dialog.
      */
-    protected void removeMyselfNoConfirm(final Host dcHost,
+    protected final void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         super.removeMyselfNoConfirm(dcHost, testOnly);
     }
@@ -100,8 +100,15 @@ class VirtualDomainInfo extends ServiceInfo {
     /**
      * Sets service parameters with values from resourceNode hash.
      */
-    public void setParameters(final Map<String, String> resourceNode) {
+    public final void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
+        connectWithVMS();
+    }
+
+    /**
+     * Connects with VMSVirtualDomainInfo object.
+     */
+    public final void connectWithVMS() {
         final String config = getParamSaved("config");
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);

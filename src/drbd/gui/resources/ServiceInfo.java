@@ -4586,4 +4586,11 @@ public class ServiceInfo extends EditableInfo {
     public boolean isInfoPanelOk() {
         return infoPanel != null;
     }
+
+    /**
+     * Connects with VMSVirtualDomainInfo object.
+     */
+    public void connectWithVMS() {
+        /* for VirtualDomainInfo */
+    }
 }
