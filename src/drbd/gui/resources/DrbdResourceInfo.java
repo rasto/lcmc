@@ -892,6 +892,7 @@ public class DrbdResourceInfo extends EditableInfo
      * infos without confirmation dialog.
      */
     public final void removeMyselfNoConfirm(final boolean testOnly) {
+        getBrowser().getDrbdXML().removeResource(getName());
         getBrowser().getDrbdGraph().removeDrbdResource(this);
         final Host[] hosts = getCluster().getHostsArray();
         for (final Host host : hosts) {

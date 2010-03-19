@@ -863,6 +863,10 @@ public class BlockDevInfo extends EditableInfo {
                             try {
                                 drbdResourceInfo.getDrbdInfo()
                                               .createDrbdConfig(false);
+                                for (final Host h
+                                    : getHost().getCluster().getHostsArray()) {
+                                    DRBD.adjust(h, "all", false);
+                                }
                             } catch (Exceptions.DrbdConfigException e) {
                                 Tools.appError("config failed");
                             }

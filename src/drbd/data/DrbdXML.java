@@ -1131,4 +1131,9 @@ public class DrbdXML extends XML {
         }
         return false;
     }
+
+    /** Removes the resource from resources, so that it does not reappear. */
+    public final void removeResource(final String res) {
+        resourceList.remove(res);
+    }
 }
