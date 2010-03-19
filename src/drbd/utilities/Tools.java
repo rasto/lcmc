@@ -1344,49 +1344,6 @@ public final class Tools {
         return false;
     }
 
-    ///**
-    // * Hides panel with expert options if not in an expert mode.
-    // *
-    // * @param extraOptionsPanel
-    // *          panel with extra options
-    // */
-    //public static void hideExpertModePanel(final JPanel extraOptionsPanel) {
-    //    if (!Tools.getConfigData().getExpertMode()) {
-    //        extraOptionsPanel.setVisible(false);
-    //    }
-    //}
-
-    ///**
-    // * Register expert panel.
-    // */
-    //public static void registerExpertPanel(final JPanel extraOptionsPanel) {
-    //    try {
-    //        mExpertPanels.acquire();
-    //    } catch (InterruptedException e) {
-    //        Thread.currentThread().interrupt();
-    //    }
-    //    //System.out.println("register expert panel: " + expertPanels.size());
-    //    if (!expertPanels.contains(extraOptionsPanel)) {
-    //        expertPanels.add(extraOptionsPanel);
-    //    }
-    //    mExpertPanels.release();
-    //}
-
-    ///**
-    // * Unregister expert panel.
-    // */
-    //public static void unregisterExpertPanel(final JPanel extraOptionsPanel) {
-    //    try {
-    //        mExpertPanels.acquire();
-    //    } catch (InterruptedException e) {
-    //        Thread.currentThread().interrupt();
-    //    }
-    //    expertPanels.remove(extraOptionsPanel);
-    //    //System.out.println("unregister expert panel: " + expertPanels.size());
-    //    mExpertPanels.release();
-    //}
-
-
     /**
      * Escapes for config file.
      */

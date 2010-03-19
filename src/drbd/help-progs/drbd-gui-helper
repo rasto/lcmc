@@ -1058,7 +1058,7 @@ sub get_drbd_xml {
 
 			if ($desc) {
 				my ($arg) = $desc =~ /^.*?&lt;i&gt;(.*?)&lt;/;
-				if (!$arg) {
+				if (!$arg || $arg eq $option) {
 					$type = "boolean";
 				} elsif ($arg eq "count" || $arg eq "time") {
 					$type = "numeric";
@@ -1293,7 +1293,3 @@ sub get_vm_info {
 	print $out;
 	print "</vms>\n";
 }
-
-
-
-
