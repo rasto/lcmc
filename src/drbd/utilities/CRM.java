@@ -778,8 +778,10 @@ public final class CRM {
                                                                "-R",
                                                                "crm_config",
                                                                xml.toString()));
-
-        if (rdiMetaArgs != null) {
+        if (rdiMetaArgs != null
+            && (pmV != null
+                || hbV == null
+                || Tools.compareVersions(hbV, "2.99.0") >= 0)) {
             String updateOrReplace = "-R";
             if (rscDefaultsId == null) {
                 rscDefaultsId = "rsc-options";

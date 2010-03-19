@@ -1597,11 +1597,13 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         boolean nothingSelected = false;
-        if (GuiComboBox.NOTHING_SELECTED.equals(info.toString())) {
+        if (info == null
+            || GuiComboBox.NOTHING_SELECTED.equals(info.toString())) {
             nothingSelected = true;
         }
         boolean sameAs = true;
-        if (OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
+        if (info == null
+            || OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
             sameAs = false;
         }
         try {
