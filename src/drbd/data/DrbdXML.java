@@ -201,9 +201,6 @@ public class DrbdXML extends XML {
             String section = null;
 
             for (String line : lines) {
-                //<command name="AudibleAlarm">
-                // ...
-                //</command>
                 final Matcher m = bp.matcher(line);
                 if (m.matches()) {
                     section = m.group(1);
@@ -333,14 +330,15 @@ public class DrbdXML extends XML {
         if (defaultValue == null) {
             return "";
         }
-        final StringBuffer defaultValueBuf = new StringBuffer(defaultValue);
         if (hasUnitPrefix(param)) {
+            final StringBuffer defaultValueBuf = new StringBuffer(defaultValue);
             final String unit = getDefaultUnit(param);
             if (unit != null) {
                 defaultValueBuf.append(unit);
             }
+            return defaultValueBuf.toString();
         }
-        return defaultValueBuf.toString();
+        return defaultValue;
     }
 
     /**
@@ -572,6 +570,42 @@ public class DrbdXML extends XML {
         return at;
     }
 
+    /**
+     * Parses the global node in the drbd config.
+     */
+    private void parseConfigGlobalNode(final Node globalNode) {
+        Map<String, String> nameValueMap =
+                                optionsMap.get("global");
+        if (nameValueMap == null) {
+            nameValueMap = new HashMap<String, String>();
+        }
+        final NodeList options = globalNode.getChildNodes();
+        nameValueMap.put("usage-count", "yes");
+        nameValueMap.put("disable-ip-verification",
+                         Tools.getString("Boolean.False"));
+        for (int i = 0; i < options.getLength(); i++) {
+            final Node option = options.item(i);
+            final String nodeName = option.getNodeName();
+            if ("dialog-refresh".equals(nodeName)) {
+                final String dialogRefresh = getAttribute(option, "refresh");
+                nameValueMap.put(nodeName, dialogRefresh);
+            } else if ("minor-count".equals(nodeName)) {
+                final String minorCount = getAttribute(option, "count");
+                nameValueMap.put(nodeName, minorCount);
+            } else if ("disable-ip-verification".equals(nodeName)) {
+                nameValueMap.put(nodeName, Tools.getString("Boolean.True"));
+            } else if ("usage-count".equals(nodeName)) {
+                /* does not come from drbdadm (<=8.3.7) */
+                /* TODO: "count" is guessed. */
+                final String usageCount = getAttribute(option, "count");
+                if (usageCount != null) {
+                    nameValueMap.put(nodeName, usageCount);
+                }
+            }
+        }
+        optionsMap.put("global", nameValueMap);
+    }
+
 
     /**
      * Parses command xml for parameters and fills up the hashes.
@@ -595,7 +629,6 @@ public class DrbdXML extends XML {
             if (optionNode.getNodeName().equals("option")) {
                 final String name = getAttribute(optionNode, "name");
                 String type = getAttribute(optionNode, "type");
-
                 if ("allow-two-primaries".equals(name)) {
                     paramItemsMap.put(name, MODES);
                     paramDefaultMap.put(name, MODE_SINGLE_PRIMARY);
@@ -650,6 +683,7 @@ public class DrbdXML extends XML {
                     paramItemsMap.put(name, l);
                 }
                 final NodeList optionInfos = optionNode.getChildNodes();
+                paramDefaultMap.put("usage-count", "");
                 for (int j = 0; j < optionInfos.getLength(); j++) {
                     final Node optionInfo = optionInfos.item(j);
                     final String tag = optionInfo.getNodeName();
@@ -722,7 +756,6 @@ public class DrbdXML extends XML {
                                 + unit;
                     }
                 }
-                nameValueMap.remove(name);
                 nameValueMap.put(name, value);
             }
         }
@@ -934,6 +967,10 @@ public class DrbdXML extends XML {
 
         for (int i = 0; i < resources.getLength(); i++) {
             final Node resourceNode = resources.item(i);
+            /* <global> */
+            if (resourceNode.getNodeName().equals("global")) {
+                parseConfigGlobalNode(resourceNode);
+            }
             /* <common> */
             if (resourceNode.getNodeName().equals("common")) {
                 parseConfigResourceNode(resourceNode, "Section.Common");
@@ -947,6 +984,21 @@ public class DrbdXML extends XML {
                 parseConfigResourceNode(resourceNode, resName);
             }
         }
+    }
+
+    /**
+     * Returns value from drbd global config identified by option name.
+     */
+    public final String getGlobalConfigValue(final String optionName) {
+        final Map<String, String> option = optionsMap.get("global");
+        String value = null;
+        if (option != null) {
+            value = option.get(optionName);
+        }
+        if (value == null) {
+            return "";
+        }
+        return value;
     }
 
     /**

@@ -706,6 +706,7 @@ public class ClusterBrowser extends Browser {
                     newDrbdXML.update(configString);
                 }
                 drbdXML = newDrbdXML;
+                getDrbdGraph().getDrbdInfo().setParameters();
                 /* available services */
                 final String clusterName = getCluster().getName();
                 Tools.startProgressIndicator(clusterName,
@@ -725,11 +726,11 @@ public class ClusterBrowser extends Browser {
                 //});
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        drbdGraph.getDrbdInfo().getInfoPanel();
-                    }
-                });
+                //SwingUtilities.invokeLater(new Runnable() {
+                //    public void run() {
+                //        drbdGraph.getDrbdInfo().getInfoPanel();
+                //    }
+                //});
                 Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
                 cluster.getBrowser().startServerStatus();
@@ -956,6 +957,12 @@ public class ClusterBrowser extends Browser {
 
                            final String configString =
                                                    newDrbdXML.getConfig(host);
+                           boolean configUpdated = false;
+                           if (!Tools.areEqual(configString,
+                                           oldDrbdConfigString.get(host))) {
+                               oldDrbdConfigString.put(host, configString);
+                               configUpdated = true;
+                           }
                            newDrbdXML.update(configString);
                            for (final String line : lines) {
                                if (newDrbdXML.parseDrbdEvent(host.getName(),
@@ -965,13 +972,9 @@ public class ClusterBrowser extends Browser {
                                    host.setDrbdStatus(true);
                                }
                            }
-                           if (updated) {
-                               if (!Tools.areEqual(configString,
-                                               oldDrbdConfigString.get(host))) {
-                                   oldDrbdConfigString.put(host, configString);
-                                   updated = true;
-                               }
+                           if (updated || configUpdated) {
                                drbdXML = newDrbdXML;
+                               getDrbdGraph().getDrbdInfo().setParameters();
                                drbdGraph.repaint();
                                Tools.debug(this, "drbd status update: "
                                              + host.getName());
@@ -1117,9 +1120,9 @@ public class ClusterBrowser extends Browser {
                                                 "update cluster status: "
                                                 + host.getName());
                                     final ServicesInfo ssi = servicesInfo;
-                                    ssi.setGlobalConfig();
                                     rscDefaultsInfo.setParameters(
                                       clusterStatus.getRscDefaultsValuePairs());
+                                    ssi.setGlobalConfig();
                                     ssi.setAllResources(testOnly);
                                     if (firstTime.getCount() == 1) {
                                         /* one more time so that id-refs work.*/

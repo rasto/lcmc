@@ -78,6 +78,30 @@ public class DrbdInfo extends EditableInfo {
         ((ClusterBrowser) browser).getDrbdGraph().setDrbdInfo(this);
     }
 
+    /** Sets stored parameters. */
+    public void setParameters() {
+        final DrbdXML dxml = getBrowser().getDrbdXML();
+        for (final String param : getParametersFromXML()) {
+            String value;
+            value = dxml.getGlobalConfigValue(param);
+            final String defaultValue = getParamDefault(param);
+            if (value == null) {
+                value = defaultValue;
+            }
+            if (value == null) {
+                value = "";
+            }
+            final String oldValue = getParamSaved(param);
+            final GuiComboBox cb = paramComboBoxGet(param, null);
+            if (!Tools.areEqual(value, oldValue)) {
+                getResource().setValue(param, value);
+                if (cb != null) {
+                    cb.setValue(value);
+                }
+            }
+        }
+    }
+
     /**
      * Returns browser object of this info.
      */
@@ -128,23 +152,22 @@ public class DrbdInfo extends EditableInfo {
         final String[] params = dxml.getGlobalParams();
         global.append("global {\n");
         for (String param : params) {
-            if ("usage-count".equals(param)) {
-                final String value = "yes";
-                global.append("\t\t");
-                global.append(param);
-                global.append('\t');
-                global.append(Tools.escapeConfig(value));
-                global.append(";\n");
-            } else {
-                //String value = getResource().getValue(param);
-                String value = getComboBoxValue(param);
-                if (value == null && "usage-count".equals(param)) {
-                    value = "yes";
-                }
-                if (value == null) {
-                    continue;
-                }
-                if (!value.equals(dxml.getParamDefault(param))) {
+            String value = getComboBoxValue(param);
+            if ("usage-count".equals(param)
+                && (value == null || "".equals(value))) {
+                value = "yes";
+            }
+            if (value == null) {
+                continue;
+            }
+            if (!value.equals(dxml.getParamDefault(param))) {
+                if (isCheckBox(param)
+                    || "booleanhandler".equals(getParamType(param))) {
+                    if (value.equals(Tools.getString("Boolean.True"))) {
+                        /* boolean parameter */
+                        global.append("\t\t" + param + ";\n");
+                    }
+                } else {
                     global.append("\t\t");
                     global.append(param);
                     global.append('\t');
