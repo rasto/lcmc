@@ -24,6 +24,7 @@ package drbd.gui.resources;
 import drbd.gui.Browser;
 import drbd.gui.HostBrowser;
 import drbd.utilities.Tools;
+import drbd.utilities.SSH;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -78,11 +79,13 @@ public class FSInfo extends Info {
         final Runnable runnable = new Runnable() {
             public void run() {
                 if (modinfo == null) {
-                    modinfo = Tools.execCommand(getBrowser().getHost(),
+                    final SSH.SSHOutput ret =
+                              Tools.execCommand(getBrowser().getHost(),
                                                 "/sbin/modinfo "
                                                 + getName(),
                                                 null,   /* ExecCallback */
                                                 false); /* outputVisible */
+                    modinfo = ret.getOutput();
                 }
                 ep.setText("<html><pre>" + modinfo + "</html></pre>");
             }

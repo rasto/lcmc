@@ -24,6 +24,7 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
+import drbd.utilities.SSH;
 import drbd.data.CRMXML.ResStatus;
 
 import java.util.Map;
@@ -70,13 +71,17 @@ public class ClusterStatus {
         final String command =
                    host.getDistCommand("Heartbeat.getClusterMetadata",
                                        (ConvertCmdCallback) null);
-        final String output =
+        final SSH.SSHOutput ret =
                     Tools.execCommandProgressIndicator(
                             host,
                             command,
                             null,  /* ExecCallback */
                             false, /* outputVisible */
                             Tools.getString("Heartbeat.getClusterMetadata"));
+        final String output = ret.getOutput();
+        if (ret.getExitCode() != 0) {
+            return;
+        }
         if (output != null) {
             crmXML.parseClusterMetaData(output);
         }

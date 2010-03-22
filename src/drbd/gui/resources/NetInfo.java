@@ -26,6 +26,7 @@ import drbd.gui.Browser;
 import drbd.gui.HostBrowser;
 import drbd.data.resources.NetInterface;
 import drbd.utilities.Tools;
+import drbd.utilities.SSH;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
@@ -62,12 +63,13 @@ public class NetInfo extends Info {
     public final void updateInfo(final JEditorPane ep) {
         final Runnable runnable = new Runnable() {
             public void run() {
-                String text = Tools.execCommand(getBrowser().getHost(),
+                final SSH.SSHOutput ret =
+                              Tools.execCommand(getBrowser().getHost(),
                                                 "/sbin/ifconfig "
                                                 + getName(),
                                                 null,   /* ExecCallback */
                                                 false); /* outputVisible */
-                ep.setText(text);
+                ep.setText(ret.getOutput());
             }
         };
         final Thread thread = new Thread(runnable);

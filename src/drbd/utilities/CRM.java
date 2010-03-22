@@ -70,10 +70,10 @@ public final class CRM {
     /**
      * Executes specified command on the host.
      */
-    private static void execCommand(final Host host,
-                                    final String command,
-                                    final boolean outputVisible,
-                                    final boolean testOnly) {
+    private static SSH.SSHOutput execCommand(final Host host,
+                                             final String command,
+                                             final boolean outputVisible,
+                                             final boolean testOnly) {
         try {
             mPtestLock.acquire();
         } catch (InterruptedException e) {
@@ -86,9 +86,9 @@ public final class CRM {
                           "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
                           + "if [ ! -e $file ]; then cibadmin -Ql > $file;fi;"
                           + "export CIB_file=$file; ";
-            Tools.execCommand(host, testCmd + command, null, false);
+            return Tools.execCommand(host, testCmd + command, null, false);
         } else {
-            Tools.execCommandProgressIndicator(
+            return Tools.execCommandProgressIndicator(
                                     host,
                                     command,
                                     null,
@@ -118,13 +118,14 @@ public final class CRM {
                             + PTEST_END_DELIM
                             + "';cat $file;"
                             + "mv $file{,.last}";
-        final String output = Tools.execCommand(host, command, null, false);
+        final SSH.SSHOutput output =
+                               Tools.execCommand(host, command, null, false);
         try {
             mPtestLock.acquire();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        final String po = output;
+        final String po = output.getOutput();
         if (ptestOutput == null) {
             ptestOutput = po;
         }
@@ -135,7 +136,7 @@ public final class CRM {
     /**
      * Adds or updates resource in the CIB.
      */
-    public static void setParameters(
+    public static boolean setParameters(
                            final Host host,
                            final String command, /* -R or -C */
                            final String heartbeatId,
@@ -320,12 +321,13 @@ public final class CRM {
         }
         xml.append('\'');
 
-        execCommand(host,
-                    getCibCommand(command,
-                                  "resources",
-                                  xml.toString()),
-                    true,
-                    testOnly);
+        final SSH.SSHOutput ret = execCommand(host,
+                                              getCibCommand(command,
+                                                            "resources",
+                                                            xml.toString()),
+                                              true,
+                                              testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
@@ -417,12 +419,12 @@ public final class CRM {
     /**
      * Sets location constraint.
      */
-    public static void setLocation(final Host host,
-                                   final String heartbeatId,
-                                   final String onHost,
-                                   final HostLocation hostLocation,
-                                   String locationId,
-                                   final boolean testOnly) {
+    public static boolean setLocation(final Host host,
+                                      final String heartbeatId,
+                                      final String onHost,
+                                      final HostLocation hostLocation,
+                                      String locationId,
+                                      final boolean testOnly) {
         String command = "-U";
         if (locationId == null) {
             locationId = "loc_" + heartbeatId + "_" + onHost;
@@ -439,20 +441,22 @@ public final class CRM {
                                           score,
                                           op,
                                           locationId);
-        execCommand(host,
-                    getCibCommand(command, "constraints", xml),
-                    true,
-                    testOnly);
+        final SSH.SSHOutput ret = execCommand(
+                                    host,
+                                    getCibCommand(command, "constraints", xml),
+                                    true,
+                                    testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Removes location constraint.
      */
-    public static void removeLocation(final Host host,
-                                      final String locationId,
-                                      final String heartbeatId,
-                                      final HostLocation hostLocation,
-                                      final boolean testOnly) {
+    public static boolean removeLocation(final Host host,
+                                         final String locationId,
+                                         final String heartbeatId,
+                                         final HostLocation hostLocation,
+                                         final boolean testOnly) {
         String score = null;
         String op = null;
         if (hostLocation != null) {
@@ -465,20 +469,20 @@ public final class CRM {
                                           null,
                                           locationId);
         final String command = getCibCommand("-D", "constraints", xml);
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
-
 
     /**
      * Removes a resource from crm. If heartbeat id is null and group id is
      * not, the whole group will be removed.
      */
-    public static void removeResource(final Host host,
-                                      final String heartbeatId,
-                                      final String groupId,
-                                      final String cloneId,
-                                      final boolean master,
-                                      final boolean testOnly) {
+    public static boolean removeResource(final Host host,
+                                         final String heartbeatId,
+                                         final String groupId,
+                                         final String cloneId,
+                                         final boolean master,
+                                         final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append('\'');
         final String hbV = host.getHeartbeatVersion();
@@ -530,34 +534,39 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "resources",
                                              xml.toString());
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Cleans up resource in crm.
      */
-    public static void cleanupResource(final Host host,
-                                       final String heartbeatId,
-                                       final Host[] clusterHosts,
-                                       final boolean testOnly) {
+    public static boolean cleanupResource(final Host host,
+                                          final String heartbeatId,
+                                          final Host[] clusterHosts,
+                                          final boolean testOnly) {
         /* make cleanup on all cluster hosts. */
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
+        int exitCode = 0;
         for (Host clusterHost : clusterHosts) {
             replaceHash.put("@HOST@", clusterHost.getName());
             final String command =
                       host.getDistCommand("CRM.cleanupResource",
                                           replaceHash);
-            execCommand(host, command, true, testOnly);
+            final SSH.SSHOutput ret =
+                                    execCommand(host, command, true, testOnly);
+            exitCode = ret.getExitCode();
         }
+        return exitCode == 0;
     }
 
     /**
      * Starts resource.
      */
-    public static void startResource(final Host host,
-                                     final String heartbeatId,
-                                     final boolean testOnly) {
+    public static boolean startResource(final Host host,
+                                        final String heartbeatId,
+                                        final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String cmd = "CRM.startResource";
@@ -569,7 +578,8 @@ public final class CRM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         final String command = host.getDistCommand(cmd, replaceHash);
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
@@ -631,10 +641,10 @@ public final class CRM {
     /**
      * Sets whether the service should be managed or not.
      */
-    public static void setManaged(final Host host,
-                                  final String heartbeatId,
-                                  final boolean isManaged,
-                                  final boolean testOnly) {
+    public static boolean setManaged(final Host host,
+                                     final String heartbeatId,
+                                     final boolean isManaged,
+                                     final boolean testOnly) {
         String string;
         if (isManaged) {
             string = ".isManagedOn";
@@ -653,15 +663,16 @@ public final class CRM {
         replaceHash.put("@ID@", heartbeatId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Stops resource.
      */
-    public static void stopResource(final Host host,
-                                    final String heartbeatId,
-                                    final boolean testOnly) {
+    public static boolean stopResource(final Host host,
+                                       final String heartbeatId,
+                                       final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String cmd = "CRM.stopResource";
@@ -674,73 +685,78 @@ public final class CRM {
         replaceHash.put("@ID@", heartbeatId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Migrates resource to the specified host.
      */
-    public static void migrateResource(final Host host,
-                                       final String heartbeatId,
-                                       final String onHost,
-                                       final boolean testOnly) {
+    public static boolean migrateResource(final Host host,
+                                          final String heartbeatId,
+                                          final String onHost,
+                                          final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         replaceHash.put("@HOST@", onHost);
         final String command = host.getDistCommand("CRM.migrateResource",
                                                    replaceHash);
 
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Migrates resource from where it is running.
      */
-    public static void migrateFromResource(final Host host,
-                                           final String heartbeatId,
-                                           final boolean testOnly) {
+    public static boolean migrateFromResource(final Host host,
+                                              final String heartbeatId,
+                                              final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         final String command = host.getDistCommand("CRM.migrateFromResource",
                                                    replaceHash);
 
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Migrates resource to the specified host.
      */
-    public static void forceMigrateResource(final Host host,
-                                            final String heartbeatId,
-                                            final String onHost,
-                                            final boolean testOnly) {
+    public static boolean forceMigrateResource(final Host host,
+                                               final String heartbeatId,
+                                               final String onHost,
+                                               final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         replaceHash.put("@HOST@", onHost);
         final String command = host.getDistCommand("CRM.forceMigrateResource",
                                                    replaceHash);
 
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Unmigrates resource that was previously migrated.
      */
-    public static void unmigrateResource(final Host host,
-                                         final String heartbeatId,
-                                         final boolean testOnly) {
+    public static boolean unmigrateResource(final Host host,
+                                            final String heartbeatId,
+                                            final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", heartbeatId);
         final String command = host.getDistCommand(
                                              "CRM.unmigrateResource",
                                              replaceHash);
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Sets global heartbeat parameters.
      */
-    public static void setGlobalParameters(
+    public static boolean setGlobalParameters(
                                         final Host host,
                                         final Map<String, String> args,
                                         final Map<String, String> rdiMetaArgs,
@@ -808,18 +824,20 @@ public final class CRM {
                                          "rsc_defaults",
                                          rscdXML.toString()));
         }
-        execCommand(host, command.toString(), true, testOnly);
+        final SSH.SSHOutput ret =
+                        execCommand(host, command.toString(), true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Removes colocation with specified colocation id.
      */
-    public static void removeColocation(final Host host,
-                                        final String colocationId,
-                                        final String rsc1,
-                                        final String rsc2,
-                                        final String score,
-                                        final boolean testOnly) {
+    public static boolean removeColocation(final Host host,
+                                           final String colocationId,
+                                           final String rsc1,
+                                           final String rsc2,
+                                           final String score,
+                                           final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String rscString = "rsc";
@@ -846,18 +864,19 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "constraints",
                                              xml.toString());
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Adds colocation between service with heartbeatId and parentHbId.
      */
-    public static void addColocation(final Host host,
-                                     final String colId,
-                                     final String heartbeatId,
-                                     final String parentHbId,
-                                     Map<String, String> attrs,
-                                     final boolean testOnly) {
+    public static boolean addColocation(final Host host,
+                                        final String colId,
+                                        final String heartbeatId,
+                                        final String parentHbId,
+                                        Map<String, String> attrs,
+                                        final boolean testOnly) {
         String colocationId;
         String cibadminOpt;
         if (colId == null) {
@@ -906,19 +925,20 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Removes order constraint with specified order id.
      */
-    public static void removeOrder(final Host host,
-                                   final String orderId,
-                                   final String rscFrom,
-                                   final String rscTo,
-                                   final String score,
-                                   final String symmetrical,
-                                   final boolean testOnly) {
+    public static boolean removeOrder(final Host host,
+                                      final String orderId,
+                                      final String rscFrom,
+                                      final String rscTo,
+                                      final String score,
+                                      final String symmetrical,
+                                      final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String firstString = "first";
@@ -949,18 +969,19 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "constraints",
                                              xml.toString());
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Adds order constraint.
      */
-    public static void addOrder(final Host host,
-                                final String ordId,
-                                final String parentHbId,
-                                final String heartbeatId,
-                                Map<String, String> attrs,
-                                final boolean testOnly) {
+    public static boolean addOrder(final Host host,
+                                   final String ordId,
+                                   final String parentHbId,
+                                   final String heartbeatId,
+                                   Map<String, String> attrs,
+                                   final boolean testOnly) {
         String orderId;
         String cibadminOpt;
         if (ordId == null) {
@@ -1007,7 +1028,8 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
@@ -1031,22 +1053,24 @@ public final class CRM {
     /**
      * Makes heartbeat stand by.
      */
-    public static void standByOn(final Host host, final boolean testOnly) {
+    public static boolean standByOn(final Host host, final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@HOST@", host.getName());
         final String command = host.getDistCommand("CRM.standByOn",
                                                    replaceHash);
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 
     /**
      * Undoes heartbeat stand by.
      */
-    public static void standByOff(final Host host, final boolean testOnly) {
+    public static boolean standByOff(final Host host, final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@HOST@", host.getName());
         final String command = host.getDistCommand("CRM.standByOff",
                                                    replaceHash);
-        execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
     }
 }

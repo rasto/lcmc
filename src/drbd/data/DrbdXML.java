@@ -26,6 +26,7 @@ import drbd.gui.DrbdGraph;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
+import drbd.utilities.SSH;
 import drbd.gui.resources.StringInfo;
 
 import org.w3c.dom.Document;
@@ -183,13 +184,15 @@ public class DrbdXML extends XML {
                                 host.getDistCommand("Drbd.getParameters",
                                                     (ConvertCmdCallback) null);
 
-            final String output =
-                        Tools.execCommand(
-                                    host,
-                                    command,
-                                    null,  /* ExecCallback */
-                                    false, /* outputVisible */
-                                    Tools.getString("DrbdXML.GetParameters"));
+            final SSH.SSHOutput ret =
+                                  Tools.execCommand(host,
+                                                    command,
+                                                    null,   /* ExecCallback */
+                                                    false); /* outputVisible */
+            if (ret.getExitCode() != 0) {
+                return;
+            }
+            final String output = ret.getOutput();
             if (output == null) {
                 return;
             }
@@ -237,13 +240,14 @@ public class DrbdXML extends XML {
         }
         final String command2 = host.getDistCommand("Drbd.getConfig",
                                                     (ConvertCmdCallback) null);
-        final String configString =
-                      Tools.execCommand(host,
-                                        command2,
-                                        null,  /* ExecCallback */
-                                        false, /* outputVisible */
-                                        Tools.getString("DrbdXML.GetConfig"));
-        return configString;
+        final SSH.SSHOutput ret = Tools.execCommand(host,
+                                                    command2,
+                                                    null,  /* ExecCallback */
+                                                    false);/* outputVisible */
+        if (ret.getExitCode() == 0) {
+            return ret.getOutput();
+        }
+        return null;
     }
 
     /**

@@ -409,32 +409,10 @@ public final class Tools {
     }
 
     /**
-     * Shows exec command dialog with progress bar. The dialog disposes
-     * of itself after command has finished. If command failed and retry
-     * button was pressed the dialog will be restarted.
-     *
-     * @param host
-     *          host
-     * @param command
-     *          command
-     * @param outputVisible
-     *          whether the output of the command should be visible
-     */
-    public static String execCommandProgressIndicator(final Host host,
-                                           final String command,
-                                           final ExecCallback execCallback,
-                                           final boolean outputVisible) {
-        return execCommandProgressIndicator(host,
-                                            command,
-                                            execCallback,
-                                            outputVisible,
-                                            command);
-    }
-
-    /**
      * Executes a command with progress indicator.
      */
-    public static String execCommandProgressIndicator(final Host host,
+    public static SSH.SSHOutput execCommandProgressIndicator(
+                                           final Host host,
                                            final String command,
                                            final ExecCallback execCallback,
                                            final boolean outputVisible,
@@ -443,6 +421,7 @@ public final class Tools {
         final String hostName = host.getName();
         Tools.startProgressIndicator(hostName, text);
         final StringBuffer output = new StringBuffer("");
+        final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
             ec = new ExecCallback() {
                              public void done(final String ans) {
@@ -457,6 +436,7 @@ public final class Tools {
                                                    ans,
                                                    exitCode);
                                  }
+                                 exitCodeHolder[0] = exitCode; 
                                  output.append(ans);
                              }
                          };
@@ -477,29 +457,20 @@ public final class Tools {
             Thread.currentThread().interrupt();
         }
         Tools.stopProgressIndicator(hostName, text);
-        return output.toString();
+        return host.getSSH().new SSHOutput(output.toString(),
+                                           exitCodeHolder[0]);
     }
 
     /**
      * Executes a command.
      */
-    public static String execCommand(final Host host,
-                                     final String command,
-                                     final ExecCallback execCallback,
-                                     final boolean outputVisible) {
-        return execCommand(host, command, execCallback, outputVisible, null);
-    }
-
-    /**
-     * Executes a command.
-     */
-    public static String execCommand(final Host host,
-                                     final String command,
-                                     final ExecCallback execCallback,
-                                     final boolean outputVisible,
-                                     final String text) {
-        final StringBuffer output = new StringBuffer("");
+    public static SSH.SSHOutput execCommand(final Host host,
+                                            final String command,
+                                            final ExecCallback execCallback,
+                                            final boolean outputVisible) {
         ExecCallback ec;
+        final StringBuffer output = new StringBuffer("");
+        final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
             ec = new ExecCallback() {
                              public void done(final String ans) {
@@ -514,6 +485,8 @@ public final class Tools {
                                                    ans,
                                                    exitCode);
                                  }
+                                 exitCodeHolder[0] = exitCode; 
+                                 output.append(ans);
                              }
                            };
         } else {
@@ -533,7 +506,8 @@ public final class Tools {
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        return output.toString();
+        return host.getSSH().new SSHOutput(output.toString(),
+                                           exitCodeHolder[0]);
     }
 
     /**

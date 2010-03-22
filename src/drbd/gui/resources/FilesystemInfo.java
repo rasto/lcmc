@@ -25,6 +25,7 @@ import drbd.data.ResourceAgent;
 import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.utilities.Tools;
+import drbd.utilities.SSH;
 import drbd.gui.GuiComboBox;
 import drbd.gui.Browser;
 
@@ -131,14 +132,15 @@ class FilesystemInfo extends ServiceInfo {
             boolean confirm = false; /* confirm only once */
             for (Host host : getBrowser().getClusterHosts()) {
                 final String hostName = host.getName();
-                final String ret = Tools.execCommandProgressIndicator(
-                                                       host,
-                                                       "stat -c \"%F\" " + dir
-                                                       + "||true",
-                                                       null,
-                                                       true);
+                final String statCmd = "stat -c \"%F\" " + dir + "||true";
+                final SSH.SSHOutput ret =
+                                   Tools.execCommandProgressIndicator(host,
+                                                                      statCmd,
+                                                                      null,
+                                                                      true,
+                                                                      statCmd);
 
-                if (ret == null || !"directory".equals(ret.trim())) {
+                if (ret == null || !"directory".equals(ret.getOutput().trim())) {
                     String title =
                           Tools.getString("ClusterBrowser.CreateDir.Title");
                     String desc  = Tools.getString(
@@ -152,10 +154,12 @@ class FilesystemInfo extends ServiceInfo {
                           desc,
                           Tools.getString("ClusterBrowser.CreateDir.Yes"),
                           Tools.getString("ClusterBrowser.CreateDir.No"))) {
+                        final String cmd = "mkdir " + dir;
                         Tools.execCommandProgressIndicator(host,
-                                                           "mkdir " + dir,
+                                                           cmd,
                                                            null,
-                                                           true);
+                                                           true,
+                                                           cmd);
                         confirm = true;
                     }
                 }

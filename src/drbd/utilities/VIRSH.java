@@ -55,21 +55,27 @@ public final class VIRSH {
     /**
      * Executes the specified virsh commands on the specified hosts.
      */
-    private static void execCommand(final Host[] hosts,
+    private static boolean execCommand(final Host[] hosts,
                                       final String commands,
                                       final boolean outputVisible) {
-
+        boolean exitCode = false;
         for (final Host host : hosts) {
             if (host.isConnected()) {
-                Tools.execCommandProgressIndicator(
+                final SSH.SSHOutput ret =
+                            Tools.execCommandProgressIndicator(
                                      host,
                                      commands,
                                      null,
                                      outputVisible,
                                      Tools.getString("VIRSH.ExecutingCommand")
                                      + " " + commands + "...");
+                if (ret.getExitCode() != 0) {
+                    return false;
+                }
+                exitCode = true;
             }
         }
+        return exitCode;
     }
 
     /**
@@ -114,5 +120,71 @@ public final class VIRSH {
             commands.append(command);
         }
         execCommand(hosts, commands.toString(), true);
+    }
+
+    /**
+     * Starts virtual domain.
+     */
+    public static boolean start(final Host host, final String domain) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domain);
+        final String command = host.getDistCommand("VIRSH.Start",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
+    }
+
+    /**
+     * Shuts down virtual domain.
+     */
+    public static boolean shutdown(final Host host, final String domain) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domain);
+        final String command = host.getDistCommand("VIRSH.Shutdown",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
+    }
+
+    /**
+     * Reboots virtual domain.
+     */
+    public static boolean reboot(final Host host, final String domain) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domain);
+        final String command = host.getDistCommand("VIRSH.Reboot",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
+    }
+
+    /**
+     * Destroys virtual domain.
+     */
+    public static boolean destroy(final Host host, final String domain) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domain);
+        final String command = host.getDistCommand("VIRSH.Destroy",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
+    }
+
+    /**
+     * Suspends virtual domain.
+     */
+    public static boolean suspend(final Host host, final String domain) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domain);
+        final String command = host.getDistCommand("VIRSH.Suspend",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
+    }
+
+    /**
+     * Resumes virtual domain.
+     */
+    public static boolean resume(final Host host, final String domain) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domain);
+        final String command = host.getDistCommand("VIRSH.Resume",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
     }
 }

@@ -23,6 +23,7 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
+import drbd.utilities.SSH;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -484,13 +485,17 @@ public class CRMXML extends XML {
             command = host.getDistCommand("Heartbeat.getOCFParameters",
                                           (ConvertCmdCallback) null);
         }
-        final String output =
+        final SSH.SSHOutput ret =
                     Tools.execCommandProgressIndicator(
                             host,
                             command,
                             null,  /* ExecCallback */
                             false, /* outputVisible */
                             Tools.getString("CRMXML.GetOCFParameters"));
+        if (ret.getExitCode() != 0) {
+            return;
+        }
+        final String output = ret.getOutput();
         if (output == null) {
             //Tools.appError("heartbeat ocf output is null");
             return;

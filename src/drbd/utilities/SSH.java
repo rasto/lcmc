@@ -396,11 +396,11 @@ public class SSH {
         * @param outputVisible
         *          whether the output of the command should be visible
         */
-        private Object[] execOneCommand(final String command,
-                                        final boolean outputVisible) {
+        private SSHOutput execOneCommand(final String command,
+                                         final boolean outputVisible) {
             this.command = command;
             this.outputVisible = outputVisible;
-            Integer exitCode = 100;
+            int exitCode = 100;
             final StringBuffer res = new StringBuffer("");
             try {
                 mConnectionLock.acquire();
@@ -409,18 +409,18 @@ public class SSH {
             }
             if (connection == null) {
                 mConnectionLock.release();
-                return new Object[]{"SSH.NotConnected", 1};
+                return new SSHOutput("SSH.NotConnected", 1);
             } else {
                 mConnectionLock.release();
             }
             if ("installGuiHelper".equals(command)) {
                 installGuiHelper();
-                return new Object[]{"", 0};
+                return new SSHOutput("", 0);
             }
             try {
                 final Session thisSession = sess;
                 if (thisSession == null) {
-                    return new Object[]{"", 130};
+                    return new SSHOutput("", 130);
                 }
                 /* requestPTY mixes stdout and strerr together, but it works
                 better at the moment. */
@@ -538,7 +538,7 @@ public class SSH {
                     }
 
                     if (cancelIt) {
-                        return new Object[]{"", 130};
+                        return new SSHOutput("", 130);
                     }
 
                     if (newOutputCallback == null) {
@@ -551,7 +551,10 @@ public class SSH {
                 }
                 thisSession.waitForCondition(ChannelCondition.EXIT_STATUS,
                                              10000);
-                exitCode = thisSession.getExitStatus();
+                final Integer ec = thisSession.getExitStatus();
+                if (ec != null) {
+                    exitCode = ec;
+                }
                 //Tools.debug(this, "exitCode: " + exitCode);
                 thisSession.close();
                 sess = null;
@@ -559,13 +562,10 @@ public class SSH {
                 exitCode = ERROR_EXIT_CODE;
                 //e.printStackTrace();
             }
-            if (exitCode == null) {
-                exitCode = 0;
-            }
             if (exitCode == 0) {
                 commandCache.put(command, res.toString());
             }
-            return new Object[]{res, exitCode};
+            return new SSHOutput(res.toString(), exitCode);
         }
 
         /**
@@ -668,11 +668,11 @@ public class SSH {
                         host.getTerminalPanel().addCommand(consoleCommand);
                     }
                 }
-                final Object[] ret = execOneCommand(commands[i],
-                                                    outputVisible);
-                ans.append(ret[0]);
+                final SSHOutput ret = execOneCommand(commands[i],
+                                                     outputVisible);
+                ans.append(ret.getOutput());
 
-                final Integer exitCode = (Integer) ret[1];
+                final int exitCode = ret.getExitCode();
                 // don't execute after error
                 if (exitCode != 0) {
                     if (execCallback != null) {
@@ -1611,5 +1611,29 @@ public class SSH {
         } catch (final java.io.IOException e) {
             throw e;
         }
+    }
+
+    /**
+     * Class that holds output of ssh command.
+     */
+    public final class SSHOutput {
+        /** Output string. */
+        private final String output;
+        /** Exit code */
+        private final int exitCode;
+        /** Creates new SSHOutput object. */
+        public SSHOutput(final String output, final int exitCode) {
+            this.output = output;
+            this.exitCode = exitCode;
+        }
+        /** Returns output string. */
+        public final String getOutput() {
+            return output;
+        }
+        /** Returns exit code. */
+        public final int getExitCode() {
+            return exitCode;
+        }
+
     }
 }

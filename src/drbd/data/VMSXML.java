@@ -25,6 +25,7 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
+import drbd.utilities.SSH;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -108,10 +109,14 @@ public class VMSXML extends XML {
     public final boolean update() {
         final String command = host.getDistCommand("VMSXML.GetData",
                                                    (ConvertCmdCallback) null);
-        final String output = Tools.execCommand(host,
-                                                command,
-                                                null,  /* ExecCallback */
-                                                false); /* outputVisible */
+        final SSH.SSHOutput ret = Tools.execCommand(host,
+                                                   command,
+                                                   null,  /* ExecCallback */
+                                                   false); /* outputVisible */
+        if (ret.getExitCode() != 0) {
+            return false;
+        }
+        final String output = ret.getOutput();
         if (output == null) {
             return false;
         }

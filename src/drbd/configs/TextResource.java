@@ -1819,7 +1819,25 @@ public class TextResource extends
          "Autostart"},
 
         {"VMSVirtualDomainInfo.StartVNCViewerOn",
-         "start @VIEWER@ VNC viewer on "},
+         "Start @VIEWER@ VNC viewer on "},
+
+        {"VMSVirtualDomainInfo.StartOn",
+         "Start on "},
+
+        {"VMSVirtualDomainInfo.ShutdownOn",
+         "Gracefully shutdown on "},
+
+        {"VMSVirtualDomainInfo.DestroyOn",
+         "Power off on "},
+
+        {"VMSVirtualDomainInfo.RebootOn",
+         "Reboot on "},
+
+        {"VMSVirtualDomainInfo.SuspendOn",
+         "Suspend on "},
+
+        {"VMSVirtualDomainInfo.ResumeOn",
+         "Resume on "},
 
         {"ConfigData.OpMode.RO",
          "Read-Only"},

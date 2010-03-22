@@ -330,5 +330,23 @@ public class DistResource extends
 
         {"VMSXML.GetData",
          "@GUI-HELPER@ get-vm-info"},
+
+        {"VIRSH.Start",
+         "virsh start @DOMAIN@"},
+
+        {"VIRSH.Shutdown",
+         "virsh shutdown @DOMAIN@"},
+
+        {"VIRSH.Destroy",
+         "virsh destroy @DOMAIN@"},
+
+        {"VIRSH.Reboot",
+         "virsh reboot @DOMAIN@"},
+
+        {"VIRSH.Suspend",
+         "virsh suspend @DOMAIN@"},
+
+        {"VIRSH.Resume",
+         "virsh resume @DOMAIN@"},
     };
 }
