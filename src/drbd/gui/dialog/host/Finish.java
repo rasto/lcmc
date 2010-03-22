@@ -207,7 +207,7 @@ public class Finish extends DialogHost {
             }
         });
         pane.add(addAnotherHostButton);
-        if (Tools.getConfigData().danglingHostsCount() < 2) {
+        if (Tools.getConfigData().danglingHostsCount() < 1) {
             confClusterButton.setEnabled(false);
         }
         pane.add(confClusterButton);

@@ -245,9 +245,9 @@ public class ClusterBrowser extends Browser {
                                 Tools.getConfigData().PM_CLONE_SET_NAME;
     /** String array with all hb classes. */
     public static final String[] HB_CLASSES = {HB_OCF_CLASS,
-                                                HB_HEARTBEAT_CLASS,
-                                                HB_LSB_CLASS,
-                                                HB_STONITH_CLASS};
+                                               HB_HEARTBEAT_CLASS,
+                                               HB_LSB_CLASS,
+                                               HB_STONITH_CLASS};
 
     /** Hb start operation. */
     private static final String HB_OP_START = "start";
@@ -313,13 +313,13 @@ public class ClusterBrowser extends Browser {
     /** All parameters for the hb operations, so that it is possible to create
      * arguments for up_rsc_full_ops. */
     public static final String[] HB_OPERATION_PARAM_LIST = {HB_PAR_DESC,
-                                                             HB_PAR_INTERVAL,
-                                                             HB_PAR_TIMEOUT,
-                                                             HB_PAR_START_DELAY,
-                                                             HB_PAR_DISABLED,
-                                                             HB_PAR_ROLE,
-                                                             HB_PAR_PREREQ,
-                                                             HB_PAR_ON_FAIL};
+                                                            HB_PAR_INTERVAL,
+                                                            HB_PAR_TIMEOUT,
+                                                            HB_PAR_START_DELAY,
+                                                            HB_PAR_DISABLED,
+                                                            HB_PAR_ROLE,
+                                                            HB_PAR_PREREQ,
+                                                            HB_PAR_ON_FAIL};
     /** Starting ptest tooltip. */
     public static final String STARTING_PTEST_TOOLTIP =
                                 Tools.getString("ClusterBrowser.StartingPtest");

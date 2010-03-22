@@ -126,7 +126,7 @@ public class ClusterHosts extends DialogCluster {
         }
         boolean enable = true;
         final List<String> hostnames = new ArrayList<String>();
-        if (selected < 2) {
+        if (selected < 1) {
             enable = false;
         } else {
             /* check if some of the hosts are the same. It will not work all

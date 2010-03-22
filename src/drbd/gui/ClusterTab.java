@@ -58,7 +58,7 @@ public class ClusterTab extends JPanel {
      * adds host views to the desktop.
      */
     public final void addClusterView() {
-        if (cluster.hostsCount() > 1) {
+        if (cluster.hostsCount() > 0) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     add(new ClusterViewPanel(cluster));

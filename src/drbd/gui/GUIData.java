@@ -285,7 +285,7 @@ public class GUIData  {
         if (!addClusterButtonList.contains(addClusterButton)) {
             addClusterButtonList.add(addClusterButton);
             addClusterButton.setEnabled(
-                             Tools.getConfigData().danglingHostsCount() >= 2);
+                             Tools.getConfigData().danglingHostsCount() >= 1);
         }
     }
 
@@ -314,7 +314,7 @@ public class GUIData  {
      */
     public final void checkAddClusterButtons() {
         final boolean enabled =
-                            Tools.getConfigData().danglingHostsCount() >= 2;
+                            Tools.getConfigData().danglingHostsCount() >= 1;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 for (JComponent addClusterButton : addClusterButtonList) {
