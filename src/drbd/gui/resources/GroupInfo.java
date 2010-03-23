@@ -698,7 +698,8 @@ public class GroupInfo extends ServiceInfo {
                             unmanaged = " / unmanaged";
                         }
                         String migrated = "";
-                        if (si.getMigratedTo(testOnly) != null) {
+                        if (si.getMigratedTo(testOnly) != null
+                            || si.getMigratedFrom(testOnly) != null) {
                             migrated = " / migrated";
                         }
                         texts.add(new Subtext("   " + si.toString()
@@ -722,7 +723,7 @@ public class GroupInfo extends ServiceInfo {
     }
 
     /**
-     * Returns whether all some services or the whole group is migrated.
+     * Returns to which hosts the services or the whole group is migrated.
      */
     public final List<Host> getMigratedTo(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -753,6 +754,37 @@ public class GroupInfo extends ServiceInfo {
         return hosts;
     }
 
+    /**
+     * Returns from which hosts the services or the whole group was migrated.
+     */
+    public final List<Host> getMigratedFrom(final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
+        List<Host> hosts = super.getMigratedFrom(testOnly);
+        if (resources == null) {
+            return null;
+        } else {
+            if (resources.isEmpty()) {
+                return null;
+            }
+            for (final String hbId : resources) {
+                final ServiceInfo si =
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
+                if (si != null) {
+                    final List<Host> siHosts = si.getMigratedFrom(testOnly);
+                    if (siHosts != null) {
+                        if (hosts == null) {
+                            hosts = new ArrayList<Host>();
+                        }
+                        hosts.addAll(siHosts);
+                    }
+                }
+            }
+        }
+        return hosts;
+    }
 
     /**
      * Returns whether at least one service is unmaneged.
@@ -879,5 +911,4 @@ public class GroupInfo extends ServiceInfo {
             }
         }
     }
-
 }

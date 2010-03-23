@@ -828,8 +828,34 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if ((CRMXML.INFINITY_STRING.equals(score)
-                 || CRMXML.MINUS_INFINITY_STRING.equals(score))
+            if (CRMXML.INFINITY_STRING.equals(score)
+                && "eq".equals(op)) {
+                final List<Host> hosts = new ArrayList<Host>();
+                hosts.add(host);
+                return hosts;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns whether the service where was migrated or null.
+     */
+    public List<Host> getMigratedFrom(final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        for (Host host : getBrowser().getClusterHosts()) {
+            final HostInfo hi = host.getBrowser().getHostInfo();
+            final HostLocation hostLocation = cs.getScore(
+                                                      getHeartbeatId(testOnly),
+                                                      hi.getName(),
+                                                      testOnly);
+            String score = null;
+            String op = null;
+            if (hostLocation != null) {
+                score = hostLocation.getScore();
+                op = hostLocation.getOperation();
+            }
+            if (CRMXML.MINUS_INFINITY_STRING.equals(score)
                 && "eq".equals(op)) {
                 final List<Host> hosts = new ArrayList<Host>();
                 hosts.add(host);
@@ -4186,7 +4212,8 @@ public class ServiceInfo extends EditableInfo {
                     // TODO: if it was migrated
                     return !getBrowser().clStatusFailed()
                            && getService().isAvailable()
-                           && getMigratedTo(testOnly) != null;
+                           && (getMigratedTo(testOnly) != null
+                               || getMigratedFrom(testOnly) != null);
                 }
 
                 public void action() {
@@ -4416,7 +4443,8 @@ public class ServiceInfo extends EditableInfo {
     public Subtext getRightCornerTextForGraph(final boolean testOnly) {
         if (!isManaged(testOnly)) {
             return UNMANAGED_SUBTEXT;
-        } else if (getMigratedTo(testOnly) != null) {
+        } else if (getMigratedTo(testOnly) != null
+                   || getMigratedFrom(testOnly) != null) {
             return MIGRATED_SUBTEXT;
         }
         return null;
@@ -4523,6 +4551,27 @@ public class ServiceInfo extends EditableInfo {
                                 return Tools.getString(
                                                 "ClusterBrowser.Hb.Migrating");
                             }
+                        }
+                    }
+                } else {
+                    final List<Host> migratedFrom = getMigratedFrom(testOnly);
+                    if (migratedFrom != null) {
+                        final List<String> runningOnNodes =
+                                                   getRunningOnNodes(testOnly);
+                        boolean alreadyThere = false;
+                        if (runningOnNodes == null) {
+                            alreadyThere = true;
+                        } else  {
+                            alreadyThere = true;
+                            for (final Host mfrom : migratedFrom) {
+                                if (runningOnNodes.contains(mfrom.getName())) {
+                                    alreadyThere = false;
+                                }
+                            }
+                        }
+                        if (!alreadyThere) {
+                            return Tools.getString(
+                                            "ClusterBrowser.Hb.Migrating");
                         }
                     }
                 }
