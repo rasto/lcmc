@@ -157,4 +157,11 @@ public class Connect extends DialogCluster {
                                               1, 1); // xPad, yPad
         return pane;
     }
+
+    /**
+     * Enable skip button.
+     */
+    protected final boolean skipButtonEnabled() {
+        return true;
+    }
 }
