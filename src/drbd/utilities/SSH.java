@@ -626,7 +626,7 @@ public class SSH {
                 if (connection == null) {
                     mConnectionLock.release();
                     if (execCallback != null) {
-                        execCallback.doneError("not connected", 0);
+                        execCallback.doneError("not connected", 139);
                     }
                 } else {
                     final Connection conn = connection;

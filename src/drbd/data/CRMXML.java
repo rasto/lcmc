@@ -362,14 +362,11 @@ public class CRMXML extends XML {
         M_A_TYPE.put(MIGRATION_THRESHOLD_META_ATTR, PARAM_TYPE_INTEGER);
 
         /* failure-timeout since 2.1.4 */
-        M_A_POSSIBLE_CHOICES.put(FAILURE_TIMEOUT_META_ATTR,
-                                 new String[]{DISABLED_STRING, "0", "5", "60"});
         M_A_SHORT_DESC.put(FAILURE_TIMEOUT_META_ATTR,
                            Tools.getString("CRMXML.FailureTimeout.ShortDesc"));
         M_A_LONG_DESC.put(FAILURE_TIMEOUT_META_ATTR,
                           Tools.getString("CRMXML.FailureTimeout.LongDesc"));
-        M_A_DEFAULT.put(FAILURE_TIMEOUT_META_ATTR, DISABLED_STRING);
-        M_A_TYPE.put(FAILURE_TIMEOUT_META_ATTR, PARAM_TYPE_INTEGER);
+        M_A_TYPE.put(FAILURE_TIMEOUT_META_ATTR, PARAM_TYPE_TIME);
 
         /* multiple-active */
         M_A_POSSIBLE_CHOICES.put(MULTIPLE_ACTIVE_META_ATTR,

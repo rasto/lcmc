@@ -207,14 +207,16 @@ public class GuiComboBox extends JPanel {
                 component = new JPanel();
                 component.setLayout(new SpringLayout());
 
-                final Matcher m = unitPattern.matcher(selectedValue);
                 String number = "";
                 String unit = "";
-                if (m.matches()) {
-                    number = m.group(1);
-                    final String parsedUnit = m.group(2);
-                    if (!"".equals(parsedUnit)) {
-                        unit = parsedUnit;
+                if (selectedValue != null) {
+                    final Matcher m = unitPattern.matcher(selectedValue);
+                    if (m.matches()) {
+                        number = m.group(1);
+                        final String parsedUnit = m.group(2);
+                        if (!"".equals(parsedUnit)) {
+                            unit = parsedUnit;
+                        }
                     }
                 }
 
