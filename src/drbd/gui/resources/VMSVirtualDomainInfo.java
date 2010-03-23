@@ -115,6 +115,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
+    /** Pause / Suspend icon. */
+    private static final ImageIcon PAUSE_ICON = Tools.createImageIcon(
+                                       Tools.getDefault("VMS.Pause.IconLarge"));
+    /** Resume icon. */
+    private static final ImageIcon RESUME_ICON = Tools.createImageIcon(
+                                      Tools.getDefault("VMS.Resume.IconLarge"));
+    /** Shutdown icon. */
+    private static final ImageIcon SHUTDOWN_ICON = Tools.createImageIcon(
+                                    Tools.getDefault("VMS.Shutdown.IconLarge"));
+    /** Reboot icon. */
+    private static final ImageIcon REBOOT_ICON = Tools.createImageIcon(
+                                      Tools.getDefault("VMS.Reboot.IconLarge"));
+    /** Destroy icon. */
+    private static final ImageIcon DESTROY_ICON = Tools.createImageIcon(
+                                    Tools.getDefault("VMS.Destroy.IconLarge"));
     /** Header table. */
     private static final String HEADER_TABLE = "header";
     /** Disk table. */
@@ -552,7 +567,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyMenuItem shutdownMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.ShutdownOn")
                             + host.getName(),
-                            HostBrowser.HOST_OFF_ICON_LARGE,
+                            SHUTDOWN_ICON,
                             null,
                             ConfigData.AccessType.OP,
                             ConfigData.AccessType.OP) {
@@ -593,7 +608,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyMenuItem destroyMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.DestroyOn")
                             + host.getName(),
-                            HostBrowser.HOST_REMOVE_ICON,
+                            DESTROY_ICON,
                             null,
                             ConfigData.AccessType.ADMIN,
                             ConfigData.AccessType.OP) {
@@ -633,7 +648,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyMenuItem rebootMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.RebootOn")
                             + host.getName(),
-                            HostBrowser.HOST_REMOVE_ICON,
+                            REBOOT_ICON,
                             null,
                             ConfigData.AccessType.ADMIN,
                             ConfigData.AccessType.OP) {
@@ -673,7 +688,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyMenuItem suspendMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.SuspendOn")
                             + host.getName(),
-                            HostBrowser.HOST_REMOVE_ICON,
+                            PAUSE_ICON,
                             null,
                             ConfigData.AccessType.ADMIN,
                             ConfigData.AccessType.OP) {
@@ -713,7 +728,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyMenuItem resumeMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
-                            HostBrowser.HOST_REMOVE_ICON,
+                            RESUME_ICON,
                             null,
                             ConfigData.AccessType.ADMIN,
                             ConfigData.AccessType.OP) {
