@@ -317,6 +317,7 @@ public class AppDefaults extends
         {"Dialog.Dialog.FinishIcon",   "Icons/tango/16x16/finish2_16x16.png"},
         {"BackIcon",                   "Icons/tango/16x16/back2_16x16.png"},
         {"BackIconLarge",              "Icons/tango/32x32/back2_32x32.png"},
+        {"VMS.VNC.IconLarge",          "Icons/tango/32x32/vnc_32x32.png"},
         {"VMS.Pause.IconLarge",        "Icons/tango/32x32/pause_32x32.png"},
         {"VMS.Resume.IconLarge",       "Icons/tango/32x32/resume_32x32.png"},
         {"VMS.Reboot.IconLarge",       "Icons/tango/32x32/reboot_32x32.png"},

@@ -784,17 +784,7 @@ public class ClusterBrowser extends Browser {
                 Tools.startProgressIndicator(hostName,
                                              ": updating VMs status...");
             }
-            final VMSXML newVMSXML = new VMSXML(host);
-            if (newVMSXML.update()) {
-                try {
-                    mVMSLock.acquire();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                vmsXML.put(host, newVMSXML);
-                mVMSLock.release();
-                updateVMS();
-            }
+            periodicalVMSUpdate(host);
             if (firstTime) {
                 Tools.stopProgressIndicator(hostName,
                                              ": updating VMs status...");
@@ -816,6 +806,21 @@ public class ClusterBrowser extends Browser {
             }
         }
     }
+
+    /** * Updates VMs info. */
+    public final void periodicalVMSUpdate(final Host host) {
+        final VMSXML newVMSXML = new VMSXML(host);
+        if (newVMSXML.update()) {
+            try {
+                mVMSLock.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            vmsXML.put(host, newVMSXML);
+            mVMSLock.release();
+            updateVMS();
+        }
+     }
 
     /**
      * Cancels the server status.

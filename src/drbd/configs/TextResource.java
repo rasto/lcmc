@@ -1819,7 +1819,7 @@ public class TextResource extends
          "Autostart"},
 
         {"VMSVirtualDomainInfo.StartVNCViewerOn",
-         "Start @VIEWER@ VNC viewer on "},
+         "Console (@VIEWER@ VNC) on "},
 
         {"VMSVirtualDomainInfo.StartOn",
          "Start on "},
@@ -1828,7 +1828,7 @@ public class TextResource extends
          "Gracefully shutdown on "},
 
         {"VMSVirtualDomainInfo.DestroyOn",
-         "Power off on "},
+         "Kill on "},
 
         {"VMSVirtualDomainInfo.RebootOn",
          "Reboot on "},

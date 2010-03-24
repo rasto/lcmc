@@ -68,6 +68,9 @@ public class VMSXML extends XML {
     /** Whether the domain is running. */
     private final Map<String, Boolean> runningMap =
                                                 new HashMap<String, Boolean>();
+    /** Whether the domain is suspended. */
+    private final Map<String, Boolean> suspendedMap =
+                                                new HashMap<String, Boolean>();
     /** Map from domain name and target device to the disk data. */
     private final Map<String, Map<String, DiskData>> disksMap =
                              new HashMap<String, Map<String, DiskData>>();
@@ -339,18 +342,25 @@ public class VMSXML extends XML {
     public final void parseInfo(final String name, final String info) {
         if (info != null) {
             boolean running = false;
+            boolean suspended = false;
             for (final String line : info.split("\n")) {
                 final String[] optionValue = line.split(":");
                 if (optionValue.length == 2) {
                     final String option = optionValue[0].trim();
                     final String value = optionValue[1].trim();
-                    if ("State".equals(option)
-                        && "running".equals(value)) {
-                        running = true;
+                    if ("State".equals(option)) {
+                        if ("running".equals(value)) {
+                            running = true;
+                            suspended = false;
+                        } else if ("paused".equals(value)) {
+                            running = true;
+                            suspended = true;
+                        }
                     }
                 }
             }
             runningMap.put(name, running);
+            suspendedMap.put(name, suspended);
         }
     }
 
@@ -371,6 +381,18 @@ public class VMSXML extends XML {
         }
         return false;
     }
+
+    /**
+     * Returns whether the domain is suspended.
+     */
+    public final boolean isSuspended(final String name) {
+        final Boolean s = suspendedMap.get(name);
+        if (s != null) {
+            return s;
+        }
+        return false;
+    }
+
 
     /**
      * Returns remote port.
