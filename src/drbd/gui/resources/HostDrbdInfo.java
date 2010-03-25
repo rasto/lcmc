@@ -97,7 +97,7 @@ public class HostDrbdInfo extends Info {
     /**
      * Returns a host icon for the category in the menu.
      */
-    public final ImageIcon getCategoryIcon() {
+    public final ImageIcon getCategoryIcon(final boolean testOnly) {
         return HostBrowser.HOST_ICON;
     }
 

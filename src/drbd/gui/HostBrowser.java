@@ -75,9 +75,6 @@ public class HostBrowser extends Browser {
     /** Host info object of the host in drbd view of this browser. */
     private final HostDrbdInfo hostDrbdInfo;
 
-    /** Block device harddisc icon. */
-    public static final ImageIcon BD_ICON = Tools.createImageIcon(
-                              Tools.getDefault("HostBrowser.BlockDeviceIcon"));
     /** Host icon. */
     public static final ImageIcon HOST_ICON = Tools.createImageIcon(
                               Tools.getDefault("HostBrowser.HostIconSmall"));

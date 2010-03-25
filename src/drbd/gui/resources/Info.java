@@ -50,6 +50,7 @@ import javax.swing.SwingConstants;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.BoxLayout;
+import javax.swing.border.TitledBorder;
 
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -277,7 +278,7 @@ public class Info implements Comparable {
     /**
      * Returns the icon fot the category.
      */
-    public ImageIcon getCategoryIcon() {
+    public ImageIcon getCategoryIcon(final boolean testOnly) {
         return null;
     }
 
@@ -754,6 +755,22 @@ public class Info implements Comparable {
      */
     public final int compareTo(final Object o) {
         return toString().compareToIgnoreCase(o.toString());
+    }
+
+    /** Retruns panel with table and border. */
+    protected JComponent getTablePanel(final String title,
+                                     final String tableName) {
+        final JPanel p = new JPanel();
+        p.setBackground(Browser.PANEL_BACKGROUND);
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        final TitledBorder titleBorder = Tools.getBorder(title);
+        p.setBorder(titleBorder);
+        final JTable table = getTable(tableName);
+        if (table != null) {
+            p.add(table.getTableHeader());
+            p.add(table);
+        }
+        return p;
     }
 
     /**

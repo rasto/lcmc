@@ -1342,10 +1342,12 @@ public class ClusterBrowser extends Browser {
         boolean nodeChanged = false;
         if (!domainNames.isEmpty()) {
             addVMSNode();
-            final Enumeration e = vmsNode.children();
-            while (e.hasMoreElements()) {
+        }
+        if (vmsNode != null) {
+            final Enumeration ee = vmsNode.children();
+            while (ee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) e.nextElement();
+                                    (DefaultMutableTreeNode) ee.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 if (domainNames.contains(vmsvdi.toString())) {
@@ -1361,7 +1363,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /* remove nodes */
-        for (DefaultMutableTreeNode node : nodesToRemove) {
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
 
@@ -1370,9 +1372,8 @@ public class ClusterBrowser extends Browser {
         }
 
         final Enumeration e = vmsNode.children();
-        /* block devices */
         int i = 0;
-        for (String domainName : domainNames) {
+        for (final String domainName : domainNames) {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
                                      (DefaultMutableTreeNode) e.nextElement();
@@ -1383,12 +1384,12 @@ public class ClusterBrowser extends Browser {
                 }
                 i++;
             }
-            /* add new block devices */
+            /* add new vms nodes */
             final VMSVirtualDomainInfo vmsvdi =
                                    new VMSVirtualDomainInfo(domainName, this);
-            vmsvdi.updateParameters();
             resource = new DefaultMutableTreeNode(vmsvdi);
             setNode(resource);
+            vmsvdi.updateParameters();
             vmsNode.insert(resource, i);
             i++;
             nodeChanged = true;

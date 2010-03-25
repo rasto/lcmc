@@ -85,9 +85,7 @@ class IPaddrInfo extends ServiceInfo {
         return ret;
     }
 
-    /**
-     * Returns combo box for parameter.
-     */
+    /** Returns combo box for parameter. */
     protected GuiComboBox getParamComboBox(final String param,
                                            final String prefix,
                                            final int width) {

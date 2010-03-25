@@ -157,7 +157,7 @@ public class DrbdInfo extends EditableInfo {
                 && (value == null || "".equals(value))) {
                 value = "yes";
             }
-            if (value == null) {
+            if (value == null || "".equals(value)) {
                 continue;
             }
             if (!value.equals(dxml.getParamDefault(param))) {

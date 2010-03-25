@@ -834,7 +834,8 @@ public class TextResource extends
         {"Dialog.About.Description",
          "<b>DRBD Management Console by Rasto Levrinc "
          + "(rasto@linbit.com).</b><br>"
-         + "(C)opyright 2002-2009 by LINBIT HA-Solutions GmbH.<br>"
+         + "(C)opyright 2007-2010 by LINBIT HA-Solutions GmbH.<br>"
+         + "(C)opyright 2007-2010 by Rasto Levrinc.<br>"
          + "Please visit the website "
          + "http://www.drbd.org/mc/management-console/<br>"
          + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },

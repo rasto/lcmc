@@ -221,9 +221,6 @@ public class AppDefaults extends
         {"Browser.ApplyIconLarge", "Icons/tango/32x32/ok_32x32.png"},
         {"Browser.ActionsIcon",  "Icons/32X32/Arrow-down.png"},
 
-        {"HostBrowser.BlockDeviceIcon",
-                                    "Icons/tango/16x16/blockdevice_16x16.png"},
-
         {"HostBrowser.NetIntIcon", "Icons/tango/16x16/netzwk_16x16.png"},
 
         {"HostBrowser.NetIntIconLarge",
@@ -231,8 +228,6 @@ public class AppDefaults extends
 
         {"HostBrowser.FileSystemIcon", "Icons/tango/16x16/filesys_16x16.png"},
         {"HostBrowser.RemoveIcon", "Icons/tango/32x32/cancel_32x32.png"},
-        {"ClusterBrowser.CommonBlockDeviceIcon",
-                                    "Icons/tango/16x16/blockdevice_16x16.png"},
 
         {"ClusterBrowser.HostIcon", "Icons/tango/16x16/host_16x16.png"},
         {"HeartbeatGraph.ServiceRunningIcon",
@@ -287,10 +282,14 @@ public class AppDefaults extends
 
         {"HostsPanel.HostIcon",          "Icons/tango/32x32/host_32x32.png"},
 
-        {"DrbdGraph.HarddiscIcon",
+        {"BlockDevInfo.HarddiskIconLarge",
          "Icons/tango/32x32/blockdevice_32x32.png"},
 
-        {"DrbdGraph.NoHarddiscIcon",    "Icons/tango/32x32/noharddisc.png"},
+        {"BlockDevInfo.NoHarddiskIconLarge",
+         "Icons/tango/32x32/noharddisk.png"},
+
+        {"BlockDevInfo.HarddiskIcon",
+         "Icons/tango/16x16/blockdevice_16x16.png"},
 
         {"HeartbeatGraph.ServiceIcon",  "Icons/tango/32x32/service1_32x32.png"},
         {"HeartbeatGraph.StartIcon",     "Icons/tango/32x32/ok_32x32.png"},

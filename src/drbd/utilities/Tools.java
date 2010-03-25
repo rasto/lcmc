@@ -31,6 +31,7 @@ import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
 import drbd.data.CRMXML;
 import drbd.gui.GUIData;
+import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.ConfirmDialog;
 
 import java.util.regex.Pattern;
@@ -48,6 +49,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashSet;
+import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -67,6 +69,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.JFileChooser;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -80,6 +83,8 @@ import java.awt.Point;
 import java.awt.Cursor;
 import java.awt.image.MemoryImageSource;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -117,9 +122,9 @@ public final class Tools {
     private static Set<String> appWarningHash = new HashSet<String>();
     /** Map with all errors, so that they don't appear more than once. */
     private static Set<String> appErrorHash = new HashSet<String>();
+    /** Image icon cache. */
     private static Map<String, ImageIcon> imageIcons =
                                               new HashMap<String, ImageIcon>();
-
     /** Locales. */
     private static String localeLang = "";
     /** Locales. */
@@ -461,9 +466,7 @@ public final class Tools {
                                            exitCodeHolder[0]);
     }
 
-    /**
-     * Executes a command.
-     */
+    /** Executes a command. */
     public static SSH.SSHOutput execCommand(final Host host,
                                             final String command,
                                             final ExecCallback execCallback,
@@ -1930,7 +1933,7 @@ public final class Tools {
         } else if (o2 == null && o1 != null) {
             return o1.toString().equals("");
         } else if (o1 instanceof Object[]
-                   || o2 instanceof Object[]) {
+                   && o2 instanceof Object[]) {
             final Object[] array1 = (Object[]) o1;
             final Object[] array2 = (Object[]) o2;
             for (int i = 0; i < array1.length; i++) {

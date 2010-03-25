@@ -1183,8 +1183,7 @@ public class CRMXML extends XML {
      * Returns preferred of the meta attribute.
      */
     public final String getRscDefaultsPreferred(final String param) {
-        final String newParam = convertRscDefaultsParam(param);
-        return M_A_PREFERRED.get(newParam);
+        return null;
     }
 
     /**

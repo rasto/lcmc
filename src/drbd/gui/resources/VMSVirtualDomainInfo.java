@@ -51,12 +51,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
@@ -93,6 +95,17 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private final Set<String> resuming = new HashSet<String>();
     /** Progress dots when starting or stopping */
     private final StringBuffer dots = new StringBuffer(".....");
+    /** Disk to info hash lock. */
+    private final Mutex mDiskToInfoLock = new Mutex();
+    /** Map from key to vms virtual domain info object. */
+    private final Map<String, VMSDiskInfo> diskToInfo =
+                                           new HashMap<String, VMSDiskInfo>();
+    /** Map from target string in the table to vms virtual domain info object.
+     */
+    private volatile Map<String, VMSDiskInfo> diskKeyToInfo =
+                                           new HashMap<String, VMSDiskInfo>();
+    /** Timeout of starting, shutting down, etc. actions in seconds. */
+    private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                                VMSXML.VM_PARAM_VCPU,
@@ -143,7 +156,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private static final ImageIcon DESTROY_ICON = Tools.createImageIcon(
                                     Tools.getDefault("VMS.Destroy.IconLarge"));
     /** Header table. */
-    private static final String HEADER_TABLE = "header";
+    protected static final String HEADER_TABLE = "header";
     /** Disk table. */
     protected static final String DISK_TABLE = "disks";
     /** Interface table. */
@@ -226,8 +239,77 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Returns domain name.
      */
-    public final String domainName() {
+    protected final String getDomainName() {
         return getName();
+    }
+
+    /** Updates disk nodes. Returns whether the node changed. */
+    private boolean updateDiskNodes() {
+        final Map<String, DiskData> disks = getDisks();
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            final VMSDiskInfo vmsdi =
+                              (VMSDiskInfo) node.getUserObject();
+            if (disks != null && disks.containsKey(vmsdi.toString())) {
+                /* keeping */
+                disks.remove(vmsdi.toString());
+                vmsdi.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mDiskToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                diskToInfo.remove(vmsdi.toString());
+                mDiskToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        if (disks != null) {
+            for (final String disk : disks.keySet()) {
+                while (eee.hasMoreElements()) {
+                    final DefaultMutableTreeNode node =
+                                        (DefaultMutableTreeNode) eee.nextElement();
+                    final VMSDiskInfo vmsdi = (VMSDiskInfo) node.getUserObject();
+                    if (disk.compareTo(vmsdi.getName()) < 0) {
+                        break;
+                    }
+                    i++;
+                }
+                /* add new vm disk */
+                final VMSDiskInfo vmsdi = new VMSDiskInfo(disk, getBrowser(), this);
+                try {
+                    mDiskToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                diskToInfo.put(disk, vmsdi);
+                mDiskToInfoLock.release();
+                vmsdi.updateParameters();
+                final DefaultMutableTreeNode resource =
+                                                new DefaultMutableTreeNode(vmsdi);
+                getBrowser().setNode(resource);
+                getNode().insert(resource, i);
+                i++;
+                nodeChanged = true;
+            }
+        }
+        return nodeChanged;
     }
 
     /**
@@ -241,13 +323,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             final String hostName = h.getName();
             if (vmsxml != null
-                && vmsxml.getDomainNames().contains(domainName())) {
-                if (vmsxml.isRunning(domainName())) {
-                    if (vmsxml.isSuspended(domainName())) {
+                && vmsxml.getDomainNames().contains(getDomainName())) {
+                if (vmsxml.isRunning(getDomainName())) {
+                    if (vmsxml.isSuspended(getDomainName())) {
                         suspendedOnHosts.add(hostName);
                         try {
                             mTransitionLock.acquire();
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
                         suspending.remove(hostName);
@@ -255,7 +337,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     } else {
                         try {
                             mTransitionLock.acquire();
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
                         resuming.remove(hostName);
@@ -264,7 +346,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     runningOnHosts.add(hostName);
                     try {
                         mTransitionLock.acquire();
-                    } catch (InterruptedException e) {
+                    } catch (final InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                     starting.remove(hostName);
@@ -283,7 +365,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         running = runningOnHosts.isEmpty();
         try {
             mTransitionLock.acquire();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         if (runningOnHosts.isEmpty() && starting.isEmpty()) {
@@ -301,7 +383,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
             try {
                 mTransitionLock.acquire();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             if (!starting.isEmpty()) {
@@ -362,7 +444,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
                     final String savedValue =
-                                       vmsxml.getValue(domainName(), param);
+                                       vmsxml.getValue(getDomainName(), param);
                     if (savedValue != null) {
                         value = savedValue;
                     }
@@ -379,6 +461,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         updateTable(HEADER_TABLE);
         updateTable(DISK_TABLE);
         updateTable(INTERFACES_TABLE);
+        /* disks */
+        final boolean nodeChanged = updateDiskNodes();
+        if (nodeChanged) {
+            getBrowser().reload(getNode());
+        }
+        //final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
+        //if (vmsi != null) {
+        //    vmsi.updateTable(VMSInfo.MAIN_TABLE);
+        //}
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 getBrowser().repaintTree();
@@ -461,7 +552,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                   params,
                   ClusterBrowser.SERVICE_LABEL_WIDTH,
                   ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
-                  null); // TODO: same as?
+                  null);
         for (final String param : params) {
             if (VMSXML.VM_PARAM_BOOT.equals(param)) {
                 /* no virsh command for os-boot */
@@ -495,33 +586,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /**
-     * Retruns panel with table and border.
-     */
-    private JComponent getTablePanel(final String title,
-                                     final String tableName) {
-        final JPanel p = new JPanel();
-        p.setBackground(Browser.PANEL_BACKGROUND);
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        final TitledBorder titleBorder = Tools.getBorder(title);
-        p.setBorder(titleBorder);
-        final JTable table = getTable(tableName);
-        if (table != null) {
-            p.add(table.getTableHeader());
-            p.add(table);
-        }
-        return p;
-    }
-
-    /**
      * Starts the domain.
      */
     public final void start(final Host host) {
-        final boolean ret = VIRSH.start(host, domainName());
+        final boolean ret = VIRSH.start(host, getDomainName());
         if (ret) {
             int i = 0;
             try {
                 mTransitionLock.acquire();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             boolean wasEmpty = starting.isEmpty();
@@ -530,7 +603,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionLock.release();
                 return;
             }
-            while (!starting.isEmpty() && i < 60) {
+            while (!starting.isEmpty() && i < ACTION_TIMEOUT) {
                 mTransitionLock.release();
                 getBrowser().periodicalVMSUpdate(host);
                 updateParameters();
@@ -539,11 +612,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 i++;
                 try {
                     mTransitionLock.acquire();
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+            if (i >= ACTION_TIMEOUT) {
+                Tools.appWarning("could not start on " + host.getName());
+                starting.clear();
+            }
             mTransitionLock.release();
+            getBrowser().periodicalVMSUpdate(host);
+            updateParameters();
+            getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
         }
     }
 
@@ -554,7 +634,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         int i = 0;
         try {
             mTransitionLock.acquire();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         boolean wasEmpty = starting.isEmpty();
@@ -563,7 +643,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             mTransitionLock.release();
             return;
         }
-        while (!shuttingdown.isEmpty() && i < 60) {
+        while (!shuttingdown.isEmpty() && i < ACTION_TIMEOUT) {
             mTransitionLock.release();
             getBrowser().periodicalVMSUpdate(host);
             updateParameters();
@@ -572,18 +652,25 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             i++;
             try {
                 mTransitionLock.acquire();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
+        if (i >= ACTION_TIMEOUT) {
+            Tools.appWarning("could not shut down on " + host.getName());
+            shuttingdown.clear();
+        }
         mTransitionLock.release();
+        getBrowser().periodicalVMSUpdate(host);
+        updateParameters();
+        getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
     }
 
     /**
      * Shuts down the domain.
      */
     public final void shutdown(final Host host) {
-        final boolean ret = VIRSH.shutdown(host, domainName());
+        final boolean ret = VIRSH.shutdown(host, getDomainName());
         if (ret) {
             startShuttingdownIndicator(host);
         }
@@ -593,7 +680,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Destroys down the domain.
      */
     public final void destroy(final Host host) {
-        final boolean ret = VIRSH.destroy(host, domainName());
+        final boolean ret = VIRSH.destroy(host, getDomainName());
         if (ret) {
             startShuttingdownIndicator(host);
         }
@@ -603,7 +690,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Reboots the domain.
      */
     public final void reboot(final Host host) {
-        final boolean ret = VIRSH.reboot(host, domainName());
+        final boolean ret = VIRSH.reboot(host, getDomainName());
         if (ret) {
             startShuttingdownIndicator(host);
         }
@@ -613,12 +700,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Suspend down the domain.
      */
     public final void suspend(final Host host) {
-        final boolean ret = VIRSH.suspend(host, domainName());
+        final boolean ret = VIRSH.suspend(host, getDomainName());
         if (ret) {
             int i = 0;
             try {
                 mTransitionLock.acquire();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             boolean wasEmpty = suspending.isEmpty();
@@ -627,7 +714,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionLock.release();
                 return;
             }
-            while (!suspending.isEmpty() && i < 60) {
+            while (!suspending.isEmpty() && i < ACTION_TIMEOUT) {
                 mTransitionLock.release();
                 getBrowser().periodicalVMSUpdate(host);
                 updateParameters();
@@ -636,11 +723,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 i++;
                 try {
                     mTransitionLock.acquire();
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+            if (i >= ACTION_TIMEOUT) {
+                Tools.appWarning("could not suspend on " + host.getName());
+                suspending.clear();
+            }
             mTransitionLock.release();
+            getBrowser().periodicalVMSUpdate(host);
+            updateParameters();
+            getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
         }
     }
 
@@ -648,12 +742,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Resume down the domain.
      */
     public final void resume(final Host host) {
-        final boolean ret = VIRSH.resume(host, domainName());
+        final boolean ret = VIRSH.resume(host, getDomainName());
         if (ret) {
             int i = 0;
             try {
                 mTransitionLock.acquire();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             boolean wasEmpty = resuming.isEmpty();
@@ -662,7 +756,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionLock.release();
                 return;
             }
-            while (!resuming.isEmpty() && i < 60) {
+            while (!resuming.isEmpty() && i < ACTION_TIMEOUT) {
                 mTransitionLock.release();
                 getBrowser().periodicalVMSUpdate(host);
                 updateParameters();
@@ -671,11 +765,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 i++;
                 try {
                     mTransitionLock.acquire();
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+            if (i >= ACTION_TIMEOUT) {
+                Tools.appWarning("could not resume on " + host.getName());
+                resuming.clear();
+            }
             mTransitionLock.release();
+            getBrowser().periodicalVMSUpdate(host);
+            updateParameters();
+            getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
         }
     }
 
@@ -697,8 +798,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainName())
-                       && !vmsxml.isRunning(domainName());
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && !vmsxml.isRunning(getDomainName());
             }
 
             public boolean enablePredicate() {
@@ -739,8 +840,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainName())
-                       && vmsxml.isRunning(domainName());
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && vmsxml.isRunning(getDomainName());
             }
 
             public boolean enablePredicate() {
@@ -781,8 +882,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainName())
-                       && vmsxml.isRunning(domainName());
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && vmsxml.isRunning(getDomainName());
             }
 
             public boolean enablePredicate() {
@@ -823,14 +924,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainName())
-                       && vmsxml.isSuspended(domainName());
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && vmsxml.isSuspended(getDomainName());
             }
 
             public boolean enablePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.isSuspended(domainName());
+                       && vmsxml.isSuspended(getDomainName());
             }
 
             public void action() {
@@ -868,8 +969,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainName())
-                       && vmsxml.isRunning(domainName());
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && vmsxml.isRunning(getDomainName());
             }
 
             public boolean enablePredicate() {
@@ -910,14 +1011,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainName())
-                       && vmsxml.isRunning(domainName());
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && vmsxml.isRunning(getDomainName());
             }
 
             public boolean enablePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && !vmsxml.isSuspended(domainName());
+                       && !vmsxml.isSuspended(getDomainName());
             }
 
             public void action() {
@@ -954,14 +1055,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainName())
-                       && vmsxml.isRunning(domainName());
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && vmsxml.isRunning(getDomainName());
             }
 
             public boolean enablePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
-                       && vmsxml.isSuspended(domainName());
+                       && vmsxml.isSuspended(getDomainName());
             }
 
             public void action() {
@@ -1041,16 +1142,20 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /**
      * Returns service icon in the menu. It can be started or stopped.
-     * TODO: broken icon, not managed icon.
      */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null && vmsxml.isRunning(domainName())) {
+            if (vmsxml != null && vmsxml.isRunning(getDomainName())) {
                 return HostBrowser.HOST_ON_ICON;
             }
         }
         return HostBrowser.HOST_OFF_ICON;
+    }
+
+    /** Returns category icon. */
+    public final ImageIcon getCategoryIcon(final boolean testOnly) {
+        return getMenuIcon(testOnly);
     }
 
     /** Adds vnc viewer menu items. */
@@ -1076,7 +1181,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 public boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
-                           && vmsxml.isRunning(domainName());
+                           && vmsxml.isRunning(getDomainName());
                 }
 
                 public void action() {
@@ -1087,7 +1192,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     });
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
-                        final int remotePort = vxml.getRemotePort(domainName());
+                        final int remotePort = vxml.getRemotePort(
+                                                            getDomainName());
                         final Host host = vxml.getHost();
                         if (host != null && remotePort > 0) {
                             Tools.startTightVncViewer(host, remotePort);
@@ -1117,7 +1223,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 public boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
-                           && vmsxml.isRunning(domainName());
+                           && vmsxml.isRunning(getDomainName());
                 }
 
                 public void action() {
@@ -1128,7 +1234,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     });
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
-                        final int remotePort = vxml.getRemotePort(domainName());
+                        final int remotePort = vxml.getRemotePort(
+                                                             getDomainName());
                         final Host host = vxml.getHost();
                         if (host != null && remotePort > 0) {
                             Tools.startUltraVncViewer(host, remotePort);
@@ -1158,7 +1265,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 public boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
-                           && vmsxml.isRunning(domainName());
+                           && vmsxml.isRunning(getDomainName());
                 }
 
                 public void action() {
@@ -1169,7 +1276,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     });
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
-                        final int remotePort = vxml.getRemotePort(domainName());
+                        final int remotePort = vxml.getRemotePort(
+                                                            getDomainName());
                         final Host host = vxml.getHost();
                         if (host != null && remotePort > 0) {
                             Tools.startRealVncViewer(host, remotePort);
@@ -1282,10 +1390,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /**
-     * Returns the type of the parameter according to the OCF.
+     * Returns the type of the parameter.
      */
     protected final String getParamType(final String param) {
-        return "undef";
+        return "undef"; // TODO:
     }
 
     /**
@@ -1317,7 +1425,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         VIRSH.setParameters(getBrowser().getClusterHosts(),
-                            domainName(),
+                            getDomainName(),
                             parameters);
         checkResourceFields(null, params);
     }
@@ -1394,9 +1502,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Returns data for the main table.
      */
-    private Object[][] getMainTableData() {
+    protected Object[][] getMainTableData() {
         final List<Object[]> rows = new ArrayList<Object[]>();
-        final String domainName = domainName();
+        final String domainName = getDomainName();
         ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
         Color newColor = Browser.PANEL_BACKGROUND;
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -1404,7 +1512,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             if (vxml != null) {
                 if (vxml.isRunning(domainName)) {
                     newColor = host.getPmColors()[0];
-                    if (vxml.isSuspended(domainName())) {
+                    if (vxml.isSuspended(domainName)) {
                         hostIcon = PAUSE_ICON;
                     } else {
                         hostIcon = HostBrowser.HOST_ON_ICON_LARGE;
@@ -1423,46 +1531,72 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /**
-     * Returns data for the disk table.
-     */
-    private Object[][] getDiskTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+    /** Returns all disks. */
+    protected Map<String, DiskData> getDisks() {
         Map<String, DiskData> disks = null;
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
-                disks = vxml.getDisks(domainName());
+                disks = vxml.getDisks(getDomainName());
                 break;
             }
         }
-        if (disks != null) {
+        return disks;
+    }
+
+    /** Get one row of the table. */
+    protected Object[] getDiskDataRow(final String targetDev,
+                                      final Map<String, VMSDiskInfo> dkti,
+                                      final Map<String, DiskData> disks,
+                                      final boolean opaque) {
+        final DiskData diskData = disks.get(targetDev);
+        final StringBuffer target = new StringBuffer(10);
+        target.append(diskData.getTargetBus());
+        target.append(' ');
+        target.append(diskData.getDevice());
+        target.append(" : /dev/");
+        target.append(targetDev);
+        if (dkti != null) {
+            final VMSDiskInfo vdi = diskToInfo.get(targetDev);
+            dkti.put(target.toString(), vdi);
+        }
+        final MyButton targetDevLabel = new MyButton(
+                                    target.toString(),
+                                    BlockDevInfo.HARDDISK_ICON_LARGE);
+        targetDevLabel.setOpaque(opaque);
+        final StringBuffer source = new StringBuffer(20);
+        String s = diskData.getSourceDev();
+        if (s == null) {
+            s = diskData.getSourceFile();
+        }
+        if (s != null) {
+            source.append(diskData.getType());
+            source.append(" : ");
+            source.append(s);
+        }
+        return new Object[]{targetDevLabel, source.toString()};
+    }
+
+    /** Returns data for the disk table. */
+    private Object[][] getDiskTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, DiskData> disks = getDisks();
+        final Map<String, VMSDiskInfo> dkti =
+                                          new HashMap<String, VMSDiskInfo>();
+        if (disks != null && !disks.isEmpty()) {
             for (final String targetDev : disks.keySet()) {
-                final DiskData diskData = disks.get(targetDev);
-                final StringBuffer target = new StringBuffer(10);
-                target.append(diskData.getTargetBus());
-                target.append(' ');
-                target.append(diskData.getDevice());
-                target.append(" : /dev/");
-                target.append(targetDev);
-                final MyButton targetDevLabel = new MyButton(
-                                                    target.toString(),
-                                                    BlockDevInfo.HARDDISK_ICON);
-                targetDevLabel.setOpaque(true);
-                final StringBuffer source = new StringBuffer(20);
-                String s = diskData.getSourceDev();
-                if (s == null) {
-                    s = diskData.getSourceFile();
-                }
-                if (s != null) {
-                    source.append(diskData.getType());
-                    source.append(" : ");
-                    source.append(s);
-                }
-                rows.add(new Object[]{targetDevLabel,
-                                      source.toString()});
+                final Object[] row =
+                                  getDiskDataRow(targetDev, dkti, disks, false);
+                rows.add(row);
             }
         }
+        try {
+            mDiskToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        diskKeyToInfo = dkti;
+        mDiskToInfoLock.release();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -1475,7 +1609,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
-                interfaces = vxml.getInterfaces(domainName());
+                interfaces = vxml.getInterfaces(getDomainName());
                 break;
             }
         }
@@ -1512,6 +1646,17 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     protected final void rowClicked(final String tableName, final String key) {
         if (HEADER_TABLE.equals(tableName)) {
             getBrowser().getVMSInfo().selectMyself();
+        } else if (DISK_TABLE.equals(tableName)) {
+            try {
+                mDiskToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSDiskInfo vdi = diskKeyToInfo.get(key);
+            mDiskToInfoLock.release();
+            if (vdi != null) {
+                vdi.selectMyself();
+            }
         }
     }
 
@@ -1543,6 +1688,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                       final String key) {
         if (HEADER_TABLE.equals(tableName)) {
             return this;
+        } else if (DISK_TABLE.equals(tableName)) {
+            return diskToInfo.get(key);
         }
         return null;
     }

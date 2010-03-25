@@ -162,7 +162,7 @@ public class Browser {
     /**
      * Sets node variable in the info object that this tree node points to.
      */
-    protected final void setNode(final DefaultMutableTreeNode node) {
+    public final void setNode(final DefaultMutableTreeNode node) {
         ((Info) node.getUserObject()).setNode(node);
     }
 
@@ -269,7 +269,7 @@ public class Browser {
                 setToolTipText(null);
             } else {
                 setToolTipText(null);
-                ImageIcon icon = i.getCategoryIcon();
+                ImageIcon icon = i.getCategoryIcon(false);
                 if (icon == null) {
                     icon = CATEGORY_ICON;
                 }

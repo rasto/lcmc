@@ -98,6 +98,7 @@ public class VMSXML extends XML {
     public static final String VM_PARAM_BOOT = "boot";
     /** VM field: autostart. */
     public static final String VM_PARAM_AUTOSTART = "autostart";
+
     /**
      * Prepares a new <code>VMSXML</code> object.
      */
@@ -461,6 +462,23 @@ public class VMSXML extends XML {
         private final String targetBus;
         /** Whether the disk is read only. */
         private final boolean readonly;
+        /** name value pairs */
+        private final Map<String, String> valueMap =
+                                                new HashMap<String, String>();
+        /** Type. */
+        public static final String TYPE = "type";
+        /** Device. */
+        public static final String DEVICE = "device";
+        /** Target device string */
+        public static final String TARGET_DEVICE = "target_device";
+        /** Source file. */
+        public static final String SOURCE_FILE = "source_file";
+        /** Source dev. */
+        public static final String SOURCE_DEVICE = "source_dev";
+        /** Target bus. */
+        public static final String TARGET_BUS = "target_bus";
+        /** Readonly. */
+        public static final String READONLY = "readonly";
 
         /**
          * Creates new DiskData object.
@@ -473,12 +491,23 @@ public class VMSXML extends XML {
                         final String targetBus,
                         final boolean readonly) {
             this.type = type;
+            valueMap.put(TYPE, type);
             this.device = device;
+            valueMap.put(DEVICE, device);
             this.targetDev = targetDev;
+            valueMap.put(TARGET_DEVICE, targetDev);
             this.sourceFile = sourceFile;
+            valueMap.put(SOURCE_FILE, sourceFile);
             this.sourceDev = sourceDev;
+            valueMap.put(SOURCE_DEVICE, sourceDev);
             this.targetBus = targetBus;
+            valueMap.put(TARGET_BUS, targetBus);
             this.readonly = readonly;
+            if (readonly) {
+                valueMap.put(READONLY, "true");
+            } else {
+                valueMap.put(READONLY, "false");
+            }
         }
 
         /** Returns type. */
@@ -514,6 +543,11 @@ public class VMSXML extends XML {
         /** Returns whether the disk is read only. */
         public final boolean isReadonly() {
             return readonly;
+        }
+
+        /** Returns value of this parameter. */
+        public final String getValue(final String param) {
+            return valueMap.get(param);
         }
     }
 

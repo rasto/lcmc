@@ -82,16 +82,12 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /**
-     * Returns name as it appears in the menu.
-     */
+    /** Returns name as it appears in the menu. */
     public final String toString() {
         return getName().toUpperCase();
     }
 
-    /**
-     * Execute when row in the table was clicked.
-     */
+    /** Execute when row in the table was clicked. */
     protected final void rowClicked(final String tableName, final String key) {
         final ResourceAgent ra = raMap.get(key);
         if (ra != null) {

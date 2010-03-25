@@ -27,6 +27,7 @@ import drbd.utilities.Unit;
 import drbd.utilities.PatternDocument;
 import drbd.data.ConfigData;
 import drbd.gui.resources.Info;
+import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -48,6 +49,8 @@ import javax.swing.SpringLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JFileChooser;
+import java.io.File;
 
 import java.awt.BorderLayout;
 
@@ -86,7 +89,8 @@ import java.util.regex.Matcher;
 public class GuiComboBox extends JPanel {
     /** Widget type. */
     public enum Type { LABELFIELD, TEXTFIELD, PASSWDFIELD, COMBOBOX,
-                       RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT };
+                       RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT,
+                       TEXTFIELDWITHBUTTON };
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Component of this widget. */
@@ -102,11 +106,13 @@ public class GuiComboBox extends JPanel {
     /** Array of unit objects. */
     private Unit[] units = null;
     /** Text field in widget with units. */
-    private JTextField textFieldWithoutUnit = null;
+    private JTextField textFieldPart = null;
     /** Combo box with units. */
     private JComboBox unitComboBox = null;
     /** Pattern that matches value and unit. */
     private final Pattern unitPattern = Pattern.compile("^(\\d+)(\\D*)$");
+    /** File chooser button. */
+    private MyButton textFieldBtn;
     /** Name for the 'true' value. */
     private String checkBoxTrue = Tools.getString("Boolean.True");
     /** Name for the 'false' value. */
@@ -147,9 +153,7 @@ public class GuiComboBox extends JPanel {
     /** Tooltip if element is enabled. */
     private String toolTipText = null;
 
-    /**
-     * Prepares a new <code>GuiComboBox</code> object with specified units.
-     */
+    /** Prepares a new <code>GuiComboBox</code> object. */
     public GuiComboBox(final String selectedValue,
                        final Object[] items,
                        final Unit[] units,
@@ -158,9 +162,31 @@ public class GuiComboBox extends JPanel {
                        final int width,
                        final Map<String, String> abbreviations,
                        final ConfigData.AccessType enableAccessType) {
+        this(selectedValue,
+             items,
+             units,
+             type,
+             regexp,
+             width,
+             abbreviations,
+             enableAccessType,
+             null); /* without button */
+    }
+
+    /** Prepares a new <code>GuiComboBox</code> object. */
+    public GuiComboBox(final String selectedValue,
+                       final Object[] items,
+                       final Unit[] units,
+                       final Type type,
+                       String regexp,
+                       final int width,
+                       final Map<String, String> abbreviations,
+                       final ConfigData.AccessType enableAccessType,
+                       final MyButton textFieldBtn) {
         super();
         this.units = units;
         this.enableAccessType = enableAccessType;
+        this.textFieldBtn = textFieldBtn;
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
             regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
@@ -221,10 +247,10 @@ public class GuiComboBox extends JPanel {
                 }
 
                 /* text field */
-                textFieldWithoutUnit = (JTextField) getTextField(number,
-                                                                 regexp,
-                                                                 abbreviations);
-                component.add(textFieldWithoutUnit);
+                textFieldPart = (JTextField) getTextField(number,
+                                                          regexp,
+                                                          abbreviations);
+                component.add(textFieldPart);
 
                 /* unit combo box */
                 unitComboBox = (JComboBox) getComboBox(unit,
@@ -233,6 +259,21 @@ public class GuiComboBox extends JPanel {
                                                        abbreviations);
 
                 component.add(unitComboBox);
+                SpringUtilities.makeCompactGrid(component, 1, 2,
+                                                           0, 0,
+                                                           0, 0);
+                break;
+            case TEXTFIELDWITHBUTTON:
+                component = new JPanel();
+                component.setLayout(new SpringLayout());
+
+                /* text field */
+                textFieldPart = (JTextField) getTextField(selectedValue,
+                                                          regexp,
+                                                          abbreviations);
+                component.add(textFieldPart);
+                /** add button */
+                component.add(textFieldBtn);
                 SpringUtilities.makeCompactGrid(component, 1, 2,
                                                            0, 0,
                                                            0, 0);
@@ -250,12 +291,12 @@ public class GuiComboBox extends JPanel {
             default:
         }
         if (this.type == Type.TEXTFIELDWITHUNIT) {
-            textFieldWithoutUnit.setMinimumSize(new Dimension(width / 3,
-                                                              WIDGET_HEIGHT));
-            textFieldWithoutUnit.setMaximumSize(new Dimension(width / 3,
-                                                              WIDGET_HEIGHT));
-            textFieldWithoutUnit.setPreferredSize(new Dimension(width / 3,
-                                                                WIDGET_HEIGHT));
+            textFieldPart.setMinimumSize(new Dimension(width / 3,
+                                                       WIDGET_HEIGHT));
+            textFieldPart.setMaximumSize(new Dimension(width / 3,
+                                                       WIDGET_HEIGHT));
+            textFieldPart.setPreferredSize(new Dimension(width / 3,
+                                                         WIDGET_HEIGHT));
             unitComboBox.setMinimumSize(new Dimension(width / 3 * 2,
                                                       WIDGET_HEIGHT));
             unitComboBox.setMaximumSize(new Dimension(width / 3 * 2,
@@ -400,9 +441,7 @@ public class GuiComboBox extends JPanel {
         return cb;
     }
 
-    /**
-     * Reloads combo box with items and selects supplied value.
-     */
+    /** Reloads combo box with items and selects supplied value. */
     public final void reloadComboBox(final String selectedValue,
                                      final Object[] items) {
         if (type != Type.COMBOBOX) {
@@ -432,9 +471,7 @@ public class GuiComboBox extends JPanel {
         }
     }
 
-    /**
-     * Adds items to the combo box.
-     */
+    /** Adds items to the combo box. */
     private Object addItems(final List<Object> comboList,
                             final String selectedValue,
                             final Object[] items) {
@@ -466,9 +503,7 @@ public class GuiComboBox extends JPanel {
         return selectedValueInfo;
     }
 
-    /**
-     * Returns radio group with selected value.
-     */
+    /** Returns radio group with selected value. */
     private JComponent getRadioGroup(final String selectedValue,
                                      final Object[] items) {
         final ButtonGroup group = new ButtonGroup();
@@ -545,8 +580,11 @@ public class GuiComboBox extends JPanel {
             text = text + getDisabledTooltip();
         }
         if (type == Type.TEXTFIELDWITHUNIT) {
-            textFieldWithoutUnit.setToolTipText("<html>" + text + "</html>");
+            textFieldPart.setToolTipText("<html>" + text + "</html>");
             unitComboBox.setToolTipText("<html>" + text + "</html>");
+        } else if (type == Type.TEXTFIELDWITHBUTTON) {
+            textFieldPart.setToolTipText("<html>" + text + "</html>");
+            textFieldBtn.setToolTipText("<html>" + text + "</html>");
         } else {
             component.setToolTipText("<html>" + text + "</html>");
         }
@@ -684,7 +722,7 @@ public class GuiComboBox extends JPanel {
                 }
                 break;
             case TEXTFIELDWITHUNIT:
-                String text = textFieldWithoutUnit.getText();
+                String text = textFieldPart.getText();
                 if (text == null) {
                     text = "";
                 }
@@ -711,7 +749,7 @@ public class GuiComboBox extends JPanel {
                     } else {
                         if (u.isEmpty()) {
                             u.setEmpty(false);
-                            if (textFieldWithoutUnit.isEnabled()) {
+                            if (textFieldPart.isEnabled()) {
                                 unitEnabled = true;
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
@@ -724,6 +762,9 @@ public class GuiComboBox extends JPanel {
                     }
                 }
                 value = new Object[]{text, unit};
+                break;
+            case TEXTFIELDWITHBUTTON:
+                value = textFieldPart.getText();
                 break;
             default:
                 /* error */
@@ -787,9 +828,14 @@ public class GuiComboBox extends JPanel {
                 }
                 switch(type) {
                     case TEXTFIELDWITHUNIT:
-                        textFieldWithoutUnit.setVisible(visible);
+                        textFieldPart.setVisible(visible);
                         unitComboBox.setVisible(visible);
-                    break;
+                        break;
+                    case TEXTFIELDWITHBUTTON:
+                        textFieldPart.setVisible(visible);
+                        textFieldBtn.setVisible(visible);
+                        break;
+
                 }
                 repaint();
             }
@@ -818,9 +864,13 @@ public class GuiComboBox extends JPanel {
                 }
                 switch(type) {
                     case TEXTFIELDWITHUNIT:
-                        textFieldWithoutUnit.setEnabled(enabled);
+                        textFieldPart.setEnabled(enabled);
                         unitComboBox.setEnabled(enabled && unitEnabled);
-                    break;
+                        break;
+                    case TEXTFIELDWITHBUTTON:
+                        textFieldPart.setEnabled(enabled);
+                        textFieldBtn.setEnabled(enabled && unitEnabled);
+                        break;
                 }
             }
         });
@@ -920,7 +970,7 @@ public class GuiComboBox extends JPanel {
                         }
                     }
 
-                    textFieldWithoutUnit.setText(number);
+                    textFieldPart.setText(number);
 
                     Object selectedUnitInfo = null;
                     for (Unit u : units) {
@@ -930,6 +980,11 @@ public class GuiComboBox extends JPanel {
                     }
 
                     unitComboBox.setSelectedItem(selectedUnitInfo);
+                }
+                break;
+            case TEXTFIELDWITHBUTTON:
+                if (item != null) {
+                    textFieldPart.setText((String) item);
                 }
                 break;
             default:
@@ -972,6 +1027,8 @@ public class GuiComboBox extends JPanel {
 
             case TEXTFIELDWITHUNIT:
                 break;
+            case TEXTFIELDWITHBUTTON:
+                break;
             default:
                 Tools.appError("impossible type");
         }
@@ -996,6 +1053,8 @@ public class GuiComboBox extends JPanel {
             case CHECKBOX:
                 return null;
             case TEXTFIELDWITHUNIT:
+                return null;
+            case TEXTFIELDWITHBUTTON:
                 return null;
             default:
                 return null;
@@ -1082,10 +1141,15 @@ public class GuiComboBox extends JPanel {
                 break;
             case TEXTFIELDWITHUNIT:
                 if (dl != null) {
-                    textFieldWithoutUnit.getDocument().addDocumentListener(dl);
+                    textFieldPart.getDocument().addDocumentListener(dl);
                 }
                 if (il != null) {
                     unitComboBox.addItemListener(il);
+                }
+                break;
+            case TEXTFIELDWITHBUTTON:
+                if (dl != null) {
+                    textFieldPart.getDocument().addDocumentListener(dl);
                 }
                 break;
             default:
@@ -1180,7 +1244,10 @@ public class GuiComboBox extends JPanel {
                 component.setBackground(backgroundColor);
                 break;
             case TEXTFIELDWITHUNIT:
-                textFieldWithoutUnit.setBackground(Color.WHITE);
+                textFieldPart.setBackground(Color.WHITE);
+                break;
+            case TEXTFIELDWITHBUTTON:
+                textFieldPart.setBackground(Color.WHITE);
                 break;
             default:
                 /* error */
@@ -1307,7 +1374,10 @@ public class GuiComboBox extends JPanel {
             case CHECKBOX:
                 break;
             case TEXTFIELDWITHUNIT:
-                textFieldWithoutUnit.requestFocus();
+                textFieldPart.requestFocus();
+                break;
+            case TEXTFIELDWITHBUTTON:
+                textFieldPart.requestFocus();
                 break;
             default:
                 break;
@@ -1333,7 +1403,10 @@ public class GuiComboBox extends JPanel {
             case CHECKBOX:
                 break;
             case TEXTFIELDWITHUNIT:
-                textFieldWithoutUnit.selectAll();
+                textFieldPart.selectAll();
+                break;
+            case TEXTFIELDWITHBUTTON:
+                textFieldPart.selectAll();
                 break;
             default:
                 break;
@@ -1399,7 +1472,10 @@ public class GuiComboBox extends JPanel {
                         component.setBackground(bg);
                         break;
                     case TEXTFIELDWITHUNIT:
-                        textFieldWithoutUnit.setBackground(bg);
+                        textFieldPart.setBackground(bg);
+                        break;
+                    case TEXTFIELDWITHBUTTON:
+                        textFieldPart.setBackground(bg);
                         break;
                     default:
                         /* error */

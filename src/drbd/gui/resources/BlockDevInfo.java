@@ -89,12 +89,16 @@ public class BlockDevInfo extends EditableInfo {
     private static final String DRBD_NI_PARAM         = "DrbdNetInterface";
     /** Internal parameter name of drbd network interface port. */
     private static final String DRBD_NI_PORT_PARAM    = "DrbdNetInterfacePort";
+    /** Large harddisk icon. */
+    public static final ImageIcon HARDDISK_ICON_LARGE = Tools.createImageIcon(
+                           Tools.getDefault("BlockDevInfo.HarddiskIconLarge"));
+    /** Large no harddisk icon. */
+    public static final ImageIcon NO_HARDDISK_ICON_LARGE =
+                    Tools.createImageIcon(
+                         Tools.getDefault("BlockDevInfo.NoHarddiskIconLarge"));
     /** Harddisk icon. */
     public static final ImageIcon HARDDISK_ICON = Tools.createImageIcon(
-                                   Tools.getDefault("DrbdGraph.HarddiscIcon"));
-    /** No harddisk icon. */
-    private static final ImageIcon NO_HARDDISK_ICON = Tools.createImageIcon(
-                                 Tools.getDefault("DrbdGraph.NoHarddiscIcon"));
+                                Tools.getDefault("BlockDevInfo.HarddiskIcon"));
     /** Meta-disk subtext. */
     private static final Subtext METADISK_SUBTEXT =
                                           new Subtext("meta-disk", Color.BLUE);
@@ -169,7 +173,7 @@ public class BlockDevInfo extends EditableInfo {
      * Returns block device icon for the menu.
      */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return HostBrowser.BD_ICON;
+        return BlockDevInfo.HARDDISK_ICON;
     }
 
     /**
@@ -1057,11 +1061,11 @@ public class BlockDevInfo extends EditableInfo {
         /* attach / detach */
         final MyMenuItem attachMenu =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
-                           NO_HARDDISK_ICON,
+                           NO_HARDDISK_ICON_LARGE,
                            Tools.getString("HostBrowser.Drbd.Detach.ToolTip"),
 
                            Tools.getString("HostBrowser.Drbd.Attach"),
-                           HARDDISK_ICON,
+                           HARDDISK_ICON_LARGE,
                            Tools.getString("HostBrowser.Drbd.Attach.ToolTip"),
 
                            ConfigData.AccessType.OP,

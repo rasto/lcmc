@@ -93,12 +93,6 @@ public class DrbdGraph extends ResourceGraph {
     ///** Old location of the moved vertex. */
     //private double oldLocation;
 
-    /** Hard disc icon. */
-    private static final ImageIcon HARDDISC_ICON = Tools.createImageIcon(
-                                Tools.getDefault("DrbdGraph.HarddiscIcon"));
-    /** No hard disc icon. (detached) */
-    private static final ImageIcon NO_HARDDISC_ICON = Tools.createImageIcon(
-                                Tools.getDefault("DrbdGraph.NoHarddiscIcon"));
     /** Horizontal step in pixels by which the block devices are drawn in
      * the graph. */
     private static final int BD_STEP_Y = 55;
@@ -275,9 +269,9 @@ public class DrbdGraph extends ResourceGraph {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         if (isVertexBlockDevice((Vertex) v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo((Vertex) v);
-            icons.add(HARDDISC_ICON);
+            icons.add(BlockDevInfo.HARDDISK_ICON_LARGE);
             if (bdi.isDiskless(testOnly)) {
-                icons.add(NO_HARDDISC_ICON);
+                icons.add(BlockDevInfo.NO_HARDDISK_ICON_LARGE);
                 return icons;
             } else {
                 return icons;

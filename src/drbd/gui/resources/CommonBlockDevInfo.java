@@ -36,10 +36,6 @@ public class CommonBlockDevInfo extends HbCategoryInfo
                                 implements CommonDeviceInterface {
     /** block devices of this common block device on all nodes. */
     private final BlockDevice[] blockDevices;
-    /** Common block device icon. */
-    private static final ImageIcon COMMON_BD_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.CommonBlockDeviceIcon"));
 
     /**
      * Prepares a new <code>CommonBlockDevInfo</code> object.
@@ -56,7 +52,7 @@ public class CommonBlockDevInfo extends HbCategoryInfo
      * Returns icon for common block devices menu category.
      */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return COMMON_BD_ICON;
+        return BlockDevInfo.HARDDISK_ICON;
     }
 
     /**
