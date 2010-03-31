@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import drbd.utilities.Tools;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class holds a set of all clusters.
@@ -40,33 +41,64 @@ public class Clusters implements Serializable {
     private static final long serialVersionUID = 1L;
     /** Set of cluster objects. */
     private final Set<Cluster> clusters = new LinkedHashSet<Cluster>();
+    /** Clusters set lock. */
+    private final Mutex mClustersLock = new Mutex();
 
     /**
      * Adds cluster to the set of clusters.
      */
     public final void addCluster(final Cluster cluster) {
+        try {
+            mClustersLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         clusters.add(cluster);
+        mClustersLock.release();
     }
 
     /**
      * removes cluster from the clusters.
      */
     public final void removeCluster(final Cluster cluster) {
+        try {
+            mClustersLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         clusters.remove(cluster);
+        mClustersLock.release();
     }
 
     /**
      * Returns true if cluster is in the clusters or false if it is not.
      */
     public final boolean existsCluster(final Cluster cluster) {
-        return clusters.contains(cluster);
+        try {
+            mClustersLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final boolean ret = clusters.contains(cluster);
+        mClustersLock.release();
+        return ret;
     }
 
     /**
      * Gets set of clusters.
      */
     public final Set<Cluster> getClusterSet() {
-        return clusters;
+        final Set<Cluster> copy = new LinkedHashSet<Cluster>();
+        try {
+            mClustersLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        for (final Cluster c : clusters) {
+            copy.add(c);
+        }
+        mClustersLock.release();
+        return copy;
     }
 
     /**
@@ -75,6 +107,11 @@ public class Clusters implements Serializable {
     public final String getDefaultClusterName() {
         int index = 0;
         final String defaultName = Tools.getString("Clusters.DefaultName");
+        try {
+            mClustersLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (clusters != null) {
             for (final Cluster cluster : clusters) {
             /* find the bigest index of cluster default name and increment it
@@ -92,6 +129,7 @@ public class Clusters implements Serializable {
                 }
             }
         }
+        mClustersLock.release();
         return defaultName + Integer.toString(index + 1);
     }
 }
