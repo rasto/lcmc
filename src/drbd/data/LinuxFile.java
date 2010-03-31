@@ -22,6 +22,7 @@
 package drbd.data;
 
 import java.io.File;
+import drbd.utilities.Tools;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite
@@ -46,6 +47,9 @@ public class LinuxFile extends File {
     public final boolean isFile() {
         return true;
     }
+    public final boolean exists() {
+        return true;
+    }
     public final boolean canRead() {
         return true;
     }
@@ -53,8 +57,10 @@ public class LinuxFile extends File {
         return directory;
     }
 
+
     public final long lastModified() {
-        System.out.println(toString() + " last modified: " + lastModified);
+        System.out.println(toString() + " last modified1: " + lastModified);
+        System.out.println(toString() + " last modified2: " + super.lastModified());
         return lastModified;
     }
 

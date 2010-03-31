@@ -347,8 +347,7 @@ public class VMSDiskInfo extends EditableInfo {
      * Returns type of the field.
      */
     protected final GuiComboBox.Type getFieldType(final String param) {
-        //return FIELD_TYPES.get(param);
-        return GuiComboBox.Type.LABELFIELD;
+        return FIELD_TYPES.get(param);
     }
 
     /**
@@ -567,7 +566,7 @@ public class VMSDiskInfo extends EditableInfo {
                             //System.out.println("name: " + m.group(5));
                             final String type = m.group(1);
                             final long lastModified =
-                                                    Long.parseLong(m.group(3));
+                                           Long.parseLong(m.group(3)) * 1000;
                             final long size = Long.parseLong(m.group(4));
                             final String filename = m.group(5);
                             files.add(new LinuxFile(filename,
@@ -635,35 +634,35 @@ public class VMSDiskInfo extends EditableInfo {
     protected GuiComboBox getParamComboBox(final String param,
                                            final String prefix,
                                            final int width) {
-        //if (DiskData.SOURCE_FILE.equals(param)) {
-        //    /* get networks */
-        //    final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
-        //    final String regexp = "[^/]$";
-        //    final MyButton fileChooserBtn = new MyButton("Browse...");
-        //    final GuiComboBox paramCb = new GuiComboBox(sourceFile,
-        //                              null,
-        //                              null, /* units */
-        //                              GuiComboBox.Type.TEXTFIELDWITHBUTTON,
-        //                              regexp,
-        //                              width,
-        //                              null, /* abbrv */
-        //                              getAccessType(param),
-        //                              fileChooserBtn);
+        if (DiskData.SOURCE_FILE.equals(param)) {
+            /* get networks */
+            final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
+            final String regexp = "[^/]$";
+            final MyButton fileChooserBtn = new MyButton("Browse...");
+            final GuiComboBox paramCb = new GuiComboBox(sourceFile,
+                                      null,
+                                      null, /* units */
+                                      GuiComboBox.Type.TEXTFIELDWITHBUTTON,
+                                      regexp,
+                                      width,
+                                      null, /* abbrv */
+                                      getAccessType(param),
+                                      fileChooserBtn);
 
-        //    fileChooserBtn.addActionListener(new ActionListener() {
-        //        public void actionPerformed(final ActionEvent e) {
-        //            final Thread t = new Thread(new Runnable() {
-        //                public void run() {
-        //                    startFileChooser(paramCb);
-        //                }
-        //            });
-        //            t.start();
-        //        }
-        //    });
-        //    paramComboBoxAdd(param, prefix, paramCb);
-        //    return paramCb;
-        //} else {
-            return super.getParamComboBox(param, prefix, width);
-        //}
+            fileChooserBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            startFileChooser(paramCb);
+                        }
+                    });
+                    t.start();
+                }
+            });
+            paramComboBoxAdd(param, prefix, paramCb);
+            return paramCb;
+        } else {
+          return super.getParamComboBox(param, prefix, width);
+        }
     }
 }
