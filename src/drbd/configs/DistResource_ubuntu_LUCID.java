@@ -24,9 +24,9 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for ubuntu karmic.
+ * Here are commands for ubuntu lucid.
  */
-public class DistResource_ubuntu_KARMIC extends
+public class DistResource_ubuntu_LUCID extends
             java.util.ListResourceBundle {
 
     /** Get contents. */
@@ -36,26 +36,7 @@ public class DistResource_ubuntu_KARMIC extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support",            "ubuntu-KARMIC"},
-        {"distributiondir",    "ubuntu-karmic-server"},
-
-        /* pacemaker heartbeat install method 1 */
-        {"HbPmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 2.99.x"},
-
-        {"HbPmInst.install.1",
-         "apt-get update && /usr/bin/apt-get -y install -o"
-         + " 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
-
-        /* pacemaker corosync install method 1 */
-        {"PmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 1.0.x"},
-
-        {"PmInst.install.1",
-         "apt-get update && /usr/bin/apt-get -y install -o"
-         + " 'DPkg::Options::force=--force-confnew' pacemaker-openais "
-         + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync)"
-         + " && if [ -e /etc/corosync/corosync.conf ];then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+        {"Support",            "ubuntu-LUCID"},
+        {"distributiondir",    "ubuntu-lucid-server"},
     };
 }

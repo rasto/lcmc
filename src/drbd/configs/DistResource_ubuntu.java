@@ -38,7 +38,8 @@ public class DistResource_ubuntu extends
     private static Object[][] contents = {
         {"Support",                       "ubuntu"},
         {"version:7.04",                  ""},
-        //{"version:5.0/9.10",              "KARMIC"},
+//        {"version:squeeze/sid/10.04",     "LUCID"},
+        {"version:squeeze/sid/9.10",     "KARMIC"},
         {"version:5.0/9.04",              "JAUNTY"},
         {"version:lenny/sid/8.10",        "INTREPID"},
         {"version:lenny/sid/8.04",        "HARDY"},
@@ -56,7 +57,8 @@ public class DistResource_ubuntu extends
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
-         + " 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
+         + " 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"
+         + " && /usr/sbin/update-rc.d -f corosync remove"},
 
         /* pacemaker corosync install method 1 */
         {"PmInst.install.text.1",
@@ -64,7 +66,7 @@ public class DistResource_ubuntu extends
 
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
-         + " 'DPkg::Options::force=--force-confnew' pacemaker-openais "
+         + " 'DPkg::Options::force=--force-confnew' pacemaker corosync "
          + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync)"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
@@ -102,7 +104,7 @@ public class DistResource_ubuntu extends
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "
          + "'DPkg::Options::force=--force-confnew'"
-         + " linux-headers-`uname -r` drbd8-utils"},
+         + "  drbd8-utils"},
 
         {"HbCheck.version",
          "@GUI-HELPER@ get-cluster-versions;"

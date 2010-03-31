@@ -606,7 +606,7 @@ public class Host implements Serializable {
         String[] v1a = (v1 + ".999999").split("\\.");
         String[] v2a = (v2 + ".999999").split("\\.");
         if (v1a.length != 4 || v2a.length != 4) {
-            Tools.appError("wrong versions: " + v1 + ", " + v2);
+            Tools.appWarning("wrong versions: " + v1 + ", " + v2);
             return false;
         }
 
