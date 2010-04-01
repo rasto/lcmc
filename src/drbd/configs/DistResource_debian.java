@@ -93,7 +93,7 @@ public class DistResource_debian extends
          + "|sed 's/-.*//'"},
 
         {"Heartbeat.deleteFromRc",
-         "/usr/sbin/update-rc.d heartbeat remove"},
+         "/usr/sbin/update-rc.d -f heartbeat remove"},
 
         {"Heartbeat.addToRc",
          "/usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
@@ -102,13 +102,13 @@ public class DistResource_debian extends
          "/usr/sbin/update-rc.d corosync start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
         {"Corosync.deleteFromRc",
-         "/usr/sbin/update-rc.d corosync remove"},
+         "/usr/sbin/update-rc.d -f corosync remove"},
 
         {"Openais.addToRc",
          "/usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
         {"Openais.deleteFromRc",
-         "/usr/sbin/update-rc.d openais remove"},
+         "/usr/sbin/update-rc.d -f openais remove"},
 
         /* corosync/pacemaker from source */
         {"PmInst.install.text.2",
