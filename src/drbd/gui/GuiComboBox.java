@@ -147,6 +147,8 @@ public class GuiComboBox extends JPanel {
     private boolean enablePredicate = true;
     /** Whether the unit combo box should be enabled. */
     private boolean unitEnabled = true;
+    /** Whether the extra text field button should be enabled. */
+    private boolean tfButtonEnabled = true;
     /** Access Type for this component to become enabled. */
     private ConfigData.AccessType enableAccessType =
                                                      ConfigData.AccessType.RO;
@@ -852,6 +854,12 @@ public class GuiComboBox extends JPanel {
                      && Tools.getConfigData().isAccessible(enableAccessType));
     }
 
+    /** Sets extra button enabled. */
+    public final void setTFButtonEnabled(final boolean tfButtonEnabled) {
+        this.tfButtonEnabled = tfButtonEnabled;
+        textFieldBtn.setEnabled(tfButtonEnabled);
+    }
+
     /**
      * Sets component enabled or disabled.
      */
@@ -869,7 +877,7 @@ public class GuiComboBox extends JPanel {
                         break;
                     case TEXTFIELDWITHBUTTON:
                         textFieldPart.setEnabled(enabled);
-                        textFieldBtn.setEnabled(enabled && unitEnabled);
+                        textFieldBtn.setEnabled(enabled && tfButtonEnabled);
                         break;
                 }
             }

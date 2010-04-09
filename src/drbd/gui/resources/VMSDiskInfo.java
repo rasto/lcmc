@@ -22,21 +22,16 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
-import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.VMSXML.DiskData;
-import drbd.data.VMSXML.InterfaceData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
 import drbd.data.LinuxFile;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
-import drbd.utilities.MyMenu;
-import drbd.utilities.MyMenuItem;
-import drbd.utilities.VIRSH;
 import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
@@ -44,7 +39,6 @@ import drbd.utilities.SSH;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;
-import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -52,13 +46,10 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -70,13 +61,9 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
- * This class holds info about Virtual Disks
+ * This class holds info about Virtual Disks.
  */
 public class VMSDiskInfo extends EditableInfo {
     /** Cache for the info panel. */
@@ -131,11 +118,15 @@ public class VMSDiskInfo extends EditableInfo {
                                                new HashMap<String, Object[]>();
     /** Default location for libvirt images. */
     private static final String LIBVIRT_IMAGE_LOCATION =
-                                                    "/var/lib/libvirt/images/";
+                                             "/drbd-mc/var/lib/libvirt/images/";
+    /** Pattern that parses stat output. */
     private static final Pattern STAT_PATTERN = Pattern.compile(
-       "(.).{9}\\s+(\\d+)\\s+"
-       + "(\\d+)\\s+"
-       + "(\\d+) (.*)$");
+                                                       "(.).{9}\\s+(\\d+)\\s+"
+                                                       + "(\\d+)\\s+"
+                                                       + "(\\d+) (.*)$");
+    /** Cache for files. */
+    private final Map<String, LinuxFile> linuxFileCache =
+                                            new HashMap<String, LinuxFile>();
     /**
      * Creates the VMSDiskInfo object.
      */
@@ -519,6 +510,7 @@ public class VMSDiskInfo extends EditableInfo {
         updateTable(VMSVirtualDomainInfo.DISK_TABLE);
     }
 
+    /** Get first host that has this vm and is connected. */
     private Host getFirstConnectedHost() {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -529,6 +521,102 @@ public class VMSDiskInfo extends EditableInfo {
         return null;
     }
 
+    /** Returns cached file object. */
+    public final LinuxFile getLinuxDir(final String dir, final Host host) {
+        LinuxFile ret = linuxFileCache.get(dir);
+        if (ret == null) {
+            ret = new LinuxFile(this, host, dir, "d", 0, 0);
+            linuxFileCache.put(dir, ret);
+        }
+        return ret;
+    }
+
+    /** Returns file system view that allows remote browsing. */
+    private FileSystemView getFileSystemView(final Host host) {
+        final VMSDiskInfo thisClass = this;
+        return new FileSystemView() {
+            public final File[] getRoots() {
+                return new LinuxFile[]{getLinuxDir("/", host)};
+            }
+
+            public final boolean isRoot(final File f) {
+                final String path = Tools.getUnixPath(f.toString());
+                if ("/".equals(path)) {
+                    return true;
+                }
+                return false;
+            }
+
+            public final File createNewFolder(final File containingDir) {
+                return null;
+            }
+
+            public final File getHomeDirectory() {
+                return getLinuxDir(LIBVIRT_IMAGE_LOCATION, host);
+            }
+
+            public final Boolean isTraversable(final File f) {
+                final LinuxFile lf = linuxFileCache.get(f.toString());
+                if (lf != null) {
+                    return lf.isDirectory();
+                }
+                return true;
+            }
+
+            public final File getParentDirectory(final File dir) {
+                return getLinuxDir(dir.getParent(), host);
+            }
+
+            public final File[] getFiles(final File dir,
+                                         final boolean useFileHiding) {
+                final StringBuffer dirSB = new StringBuffer(dir.toString());
+                if ("/".equals(dir.toString())) {
+                    dirSB.append('*');
+                } else {
+                    dirSB.append("/*");
+                }
+                final SSH.SSHOutput out =
+                        Tools.execCommandProgressIndicator(
+                                      host,
+                                      "stat -c \"%A %a %Y %s %n\" "
+                                      + dirSB.toString()
+                                      + " 2>/dev/null",
+                                      null,
+                                      false,
+                                      "executing...");
+                final List<LinuxFile> files = new ArrayList<LinuxFile>();
+                if (out.getExitCode() == 0) {
+                    for (final String line : out.getOutput().split("\r\n")) {
+                        final Matcher m = STAT_PATTERN.matcher(line);
+                        if (m.matches()) {
+                            final String type = m.group(1);
+                            final long lastModified =
+                                           Long.parseLong(m.group(3)) * 1000;
+                            final long size = Long.parseLong(m.group(4));
+                            final String filename = m.group(5);
+                            LinuxFile lf = linuxFileCache.get(filename);
+                            if (lf == null) {
+                                lf = new LinuxFile(thisClass,
+                                                   host,
+                                                   filename,
+                                                   type,
+                                                   lastModified,
+                                                   size);
+                                linuxFileCache.put(filename, lf);
+                            } else {
+                                lf.update(type, lastModified, size);
+                            }
+                            files.add(lf);
+                        } else {
+                            Tools.appWarning("could not match: " + line);
+                        }
+                    }
+                }
+                return files.toArray(new LinuxFile[files.size()]);
+            }
+        };
+    }
+
     /** Starts file chooser. */
     private void startFileChooser(final GuiComboBox paramCb) {
         final Host host = getFirstConnectedHost();
@@ -536,104 +624,38 @@ public class VMSDiskInfo extends EditableInfo {
             Tools.appError("Connection to host lost.");
             return;
         }
-        final JFileChooser fc = new JFileChooser();
-        fc.setFileSystemView(new FileSystemView() {
-            public final File createNewFolder(final File containingDir) {
-                System.out.println("create new folder");
-                return null;
-            }
-            public final File[] getFiles(final File dir,
-                                         final boolean useFileHiding) {
-                System.out.println("get files: " + dir);
-                final SSH.SSHOutput out =
-                        Tools.execCommandProgressIndicator(
-                                      host,
-                                      "stat -c \"%A %a %Y %s %n\" "
-                                      + dir.getAbsolutePath()
-                                      + "/* 2>/dev/null || true",
-                                      null,
-                                      true,
-                                      "executing...");
-                final List<File> files = new ArrayList<File>();
-                if (out.getExitCode() == 0) {
-                    for (final String line : out.getOutput().split("\r\n")) {
-                        final Matcher m = STAT_PATTERN.matcher(line);
-                        if (m.matches()) {
-                            //System.out.println("type: " + m.group(1));
-                            //System.out.println("perm: " + m.group(2));
-                            //System.out.println("time: " + m.group(3));
-                            //System.out.println("size: " + m.group(4));
-                            //System.out.println("name: " + m.group(5));
-                            final String type = m.group(1);
-                            final long lastModified =
-                                           Long.parseLong(m.group(3)) * 1000;
-                            final long size = Long.parseLong(m.group(4));
-                            final String filename = m.group(5);
-                            files.add(new LinuxFile(filename,
-                                                    type,
-                                                    lastModified,
-                                                    size));
-                        } else {
-                            Tools.appWarning("could not match: " + line);
-                        }
-                    }
+        final VMSDiskInfo thisClass = this;
+        final JFileChooser fc = new JFileChooser(
+                                    getLinuxDir(LIBVIRT_IMAGE_LOCATION, host),
+                                    getFileSystemView(host)) {
+            /** Serial version UID. */
+            private static final long serialVersionUID = 1L;
+                public final void setCurrentDirectory(final File dir) {
+                    super.setCurrentDirectory(new LinuxFile(
+                                                    thisClass,
+                                                    host,
+                                                    dir.toString(),
+                                                    "d",
+                                                    0,
+                                                    0));
                 }
-                return files.toArray(new File[files.size()]);
 
-                //return new File[]{new File(dir.getAbsolutePath() + "/boot"),
-                //                  new File(dir.getAbsolutePath() + "/a"),
-                //                  new File("a"),
-                //                  new File("b") {
-                //                      public boolean isDirectory() {
-                //                          return true;
-                //                      }
-                //                  }};
-            }
-            //public final Boolean isTraversable(final File f) {
-            //    System.out.println("is traversable: " + super.isTraversable(f));
-            //    return true;
-            //}
-        });
-        fc.setSelectedFile(new File(LIBVIRT_IMAGE_LOCATION));
-        //fc.addPropertyChangeListener(new PropertyChangeListener() {
-        //    public void propertyChange(final PropertyChangeEvent e) {
-        //        boolean update = false;
-        //        final String prop = e.getPropertyName();
-        //        System.out.println("fc prop: " + prop
-        //                           + " - " + e.getNewValue());
-        //        //If the directory changed, don't show an image.
-        //        if (JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(prop)) {
-        //            //file = null;
-        //            //update = true;
-
-        //        //If a file became selected, find out which one.
-        //        } else if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(prop)) {
-        //            //file = (File) e.getNewValue();
-        //            //update = true;
-        //        }
-
-        //        ////Update the preview accordingly.
-        //        //if (update) {
-        //        //    thumbnail = null;
-        //        //    if (isShowing()) {
-        //        //        loadImage();
-        //        //        repaint();
-        //        //    }
-        //        //}
-        //    }
-        //});
-        final int ret = fc.showOpenDialog(
-                           Tools.getGUIData().getMainFrame());
+            };
+        fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
+        final int ret = fc.showOpenDialog(Tools.getGUIData().getMainFrame());
+        linuxFileCache.clear();
         if (ret == JFileChooser.APPROVE_OPTION) {
-            final String name = fc.getSelectedFile().getAbsolutePath();
-            paramCb.setValue(name);
+            if (fc.getSelectedFile() != null) {
+                final String name = fc.getSelectedFile().getAbsolutePath();
+                paramCb.setValue(name);
+            }
         }
     }
 
     /** Returns combo box for parameter. */
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
+    protected final GuiComboBox getParamComboBox(final String param,
+                                                 final String prefix,
+                                                 final int width) {
         if (DiskData.SOURCE_FILE.equals(param)) {
             /* get networks */
             final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
@@ -648,7 +670,14 @@ public class VMSDiskInfo extends EditableInfo {
                                       null, /* abbrv */
                                       getAccessType(param),
                                       fileChooserBtn);
-
+            if (Tools.isWindows()) {
+                /* does not work on windows and I tries, ultimatly because
+                   FilePane.usesShellFolder(fc) in BasicFileChooserUI returns
+                   true and it is not possible to descent into a directory.
+                   TODO: It may work in the future.
+                */
+                paramCb.setTFButtonEnabled(false);
+            }
             fileChooserBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread t = new Thread(new Runnable() {

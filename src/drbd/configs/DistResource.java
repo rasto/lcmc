@@ -308,7 +308,7 @@ public class DistResource extends
         {"HostBrowser.getCrmMon",
          "crm_mon -1"},
         {"HostBrowser.getCrmConfigureShow",
-         "crm configure show"},
+         "echo $TERM;crm configure show"},
 
         {"Logs.hbLog",
          "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null"

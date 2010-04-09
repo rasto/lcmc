@@ -22,49 +22,131 @@
 package drbd.data;
 
 import java.io.File;
+import java.io.IOException;
+
 import drbd.utilities.Tools;
+import drbd.utilities.SSH;
+import drbd.gui.resources.VMSDiskInfo;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite
  * everything that browse file system may ask about the file.
  */
 public class LinuxFile extends File {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
+
+    public static final char separatorChar = '/';
+    public static final String separator = "" + separatorChar;
+    public static final char pathSeparatorChar = '/';
+    public static final String pathSeparator = "" + pathSeparatorChar;
+    /** Host on which is this file. */
+    private final Host host;
     /** Whether it is directory. */
     private boolean directory = false;
+    /** Last modified. */
     private long lastModified;
+    /** File length. */
     private long fileLength;
-    public LinuxFile(final String name,
+    /** Is true if this file exists, false it doesn't, null - it is not known.*/
+    private Boolean existCache = null;
+    /** VMs disk info object. */
+    private final VMSDiskInfo vmsDiskInfo;
+
+    /** Creates new LinuxFile object. */
+    public LinuxFile(final VMSDiskInfo vmsDiskInfo,
+                     final Host host,
+                     final String name,
                      final String type,
                      final long lastModified,
                      final long fileLength) {
-        super(name);
+        super(Tools.getUnixPath(name));
+        this.vmsDiskInfo = vmsDiskInfo;
+        this.host = host;
         if ("d".equals(type)) {
             directory = true;
         }
         this.lastModified = lastModified;
         this.fileLength = fileLength;
     }
+
+    /** Updates this file with possible new info. */
+    public final void update(final String type,
+                             final long lastModified,
+                             final long fileLength) {
+        if ("d".equals(type)) {
+            directory = true;
+        }
+        this.lastModified = lastModified;
+        this.fileLength = fileLength;
+    }
+
+    /** Returns whether it is a file. */
     public final boolean isFile() {
         return true;
     }
+
+    /** Returns whether it exists. */
     public final boolean exists() {
-        return true;
+        if (existCache != null) {
+            return existCache;
+        }
+        final SSH.SSHOutput out =
+                Tools.execCommandProgressIndicator(
+                              host,
+                              "stat "
+                              + Tools.getUnixPath(toString())
+                              + " 2>/dev/null",
+                              null,
+                              false,
+                              "executing...");
+        existCache = out.getExitCode() == 0;
+        return existCache;
     }
+
+    /** Returns whether it readable. */
     public final boolean canRead() {
         return true;
     }
+
+    /** Returns whether it executable. */
+    public final boolean canExecute() {
+        return true;
+    }
+
+    /** Returns whether it is directory. */
     public final boolean isDirectory() {
         return directory;
     }
 
-
+    /** Returns last modified time. */
     public final long lastModified() {
-        System.out.println(toString() + " last modified1: " + lastModified);
-        System.out.println(toString() + " last modified2: " + super.lastModified());
         return lastModified;
     }
 
+    /** Returns length of the file. */
     public final long length() {
         return fileLength;
+    }
+
+    /** Returns file with absolute path. */
+    public final File getAbsoluteFile() {
+        final String absPath = getAbsolutePath();
+        return vmsDiskInfo.getLinuxDir(absPath, host);
+    }
+
+    /** Returns cannonical file name. */
+    public final File getCanonicalFile() throws IOException {
+        final String canonPath = getCanonicalPath();
+        return vmsDiskInfo.getLinuxDir(canonPath, host);
+    }
+
+    /** Returns parent dir. */
+    public final File getParentFile() {
+        final String p = getParent();
+        if (p == null) {
+            return null;
+        }
+        return vmsDiskInfo.getLinuxDir(p, host);
     }
 }

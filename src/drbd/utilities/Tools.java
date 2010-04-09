@@ -2101,4 +2101,20 @@ public final class Tools {
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
                             .setHorizontalAlignment(SwingConstants.CENTER);
     }
+
+    /** Converts windows path to unix path. */
+    public static String getUnixPath(final String dir) {
+        String unixPath;
+        if (isWindows()) {
+            unixPath = dir.replaceAll("\\\\", "/");
+            if (unixPath.length() >= 2
+                && "c:".equalsIgnoreCase(unixPath.substring(0, 2))) {
+                unixPath = unixPath.substring(2);
+            }
+        } else {
+            unixPath = dir;
+        }
+        return unixPath;
+    }
+
 }
