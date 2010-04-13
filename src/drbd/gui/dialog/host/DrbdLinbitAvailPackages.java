@@ -489,21 +489,20 @@ public class DrbdLinbitAvailPackages extends DialogHost {
      */
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        final JPanel progrPane = getProgressBarPane();
-        pane.add(progrPane);
         final JPanel labelP = new JPanel(new FlowLayout(FlowLayout.LEFT));
         labelP.setPreferredSize(new Dimension(0, 0));
         labelP.add(new JLabel(
             Tools.getString(
                 "Dialog.Host.DrbdLinbitAvailPackages.AvailablePackages")));
-        labelP.setBackground(progrPane.getBackground());
         pane.add(labelP);
         pane.add(getChoiceBoxes());
+        final JPanel progrPane = getProgressBarPane();
+        pane.add(progrPane);
         pane.add(getAnswerPane(Tools.getString(
                             "Dialog.Host.DrbdLinbitAvailPackages.Executing")));
         SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
+                                              0, 0,  // initX, initY
+                                              0, 0); // xPad, yPad
         return pane;
     }
 }

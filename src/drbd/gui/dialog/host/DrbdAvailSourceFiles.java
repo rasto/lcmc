@@ -230,14 +230,14 @@ public class DrbdAvailSourceFiles extends DialogHost {
      */
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        pane.add(getProgressBarPane());
         pane.add(getChoiceBoxes());
+        pane.add(getProgressBarPane());
         pane.add(
             getAnswerPane(
                Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Executing")));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
+                                              0, 0,  // initX, initY
+                                              0, 0); // xPad, yPad
         return pane;
     }
 }

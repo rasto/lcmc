@@ -300,8 +300,8 @@ public class CRMXML extends XML {
     static {
         /* target-role */
         M_A_POSSIBLE_CHOICES.put(
-                   TARGET_ROLE_META_ATTR,
-                   new String[]{null, TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
+               TARGET_ROLE_META_ATTR,
+               new String[]{null, TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
         M_A_POSSIBLE_CHOICES_MS.put(
                    TARGET_ROLE_META_ATTR,
                    new String[]{null,
@@ -1034,7 +1034,6 @@ public class CRMXML extends XML {
             if (accessType != null) {
                 return accessType;
             }
-            
         }
         return ConfigData.AccessType.ADMIN;
     }
@@ -1393,7 +1392,8 @@ public class CRMXML extends XML {
         ra.setParamIsMetaAttr(name, true);
         ra.setParamRequired(name, false);
         ra.setParamPossibleChoices(name, M_A_POSSIBLE_CHOICES.get(newName));
-        ra.setParamPossibleChoicesMS(name, M_A_POSSIBLE_CHOICES_MS.get(newName));
+        ra.setParamPossibleChoicesMS(name,
+                                     M_A_POSSIBLE_CHOICES_MS.get(newName));
         ra.setParamShortDesc(name, M_A_SHORT_DESC.get(newName));
         ra.setParamLongDesc(name, M_A_LONG_DESC.get(newName));
         ra.setParamDefault(name, M_A_DEFAULT.get(newName));
@@ -1473,7 +1473,7 @@ public class CRMXML extends XML {
         final String pcmkV = host.getPacemakerVersion();
 
         final NodeList parameters = parametersNode.getChildNodes();
-        
+
         for (int i = 0; i < parameters.getLength(); i++) {
             final Node parameterNode = parameters.item(i);
             if (parameterNode.getNodeName().equals("parameter")) {

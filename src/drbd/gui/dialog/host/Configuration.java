@@ -428,15 +428,16 @@ public class Configuration extends DialogHost {
         }
 
         SpringUtilities.makeCompactGrid(inputPane, 3, 1 + hops, // rows, cols
-                                                   1, 1,  // initX, initY
-                                                   1, 1); // xPad, yPad
+                                                   0, 0,  // initX, initY
+                                                   0, 0); // xPad, yPad
         final JPanel pane = new JPanel(new SpringLayout());
-        pane.add(getProgressBarPane());
+        pane.setBorder(null);
         pane.add(inputPane);
+        pane.add(getProgressBarPane());
         pane.add(getAnswerPane(""));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  //rows, cols
-                                              1, 1,  //initX, initY
-                                              1, 1); //xPad, yPad
+                                              0, 0,  //initX, initY
+                                              0, 0); //xPad, yPad
         return pane;
     }
 }

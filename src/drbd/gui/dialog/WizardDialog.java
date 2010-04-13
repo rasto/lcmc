@@ -24,6 +24,8 @@ package drbd.gui.dialog;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
+import drbd.utilities.CancelCallback;
+import drbd.gui.ProgressBar;
 
 import javax.swing.SwingUtilities;
 import java.awt.Color;
@@ -31,6 +33,7 @@ import java.awt.FlowLayout;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.Container;
@@ -50,7 +53,7 @@ public abstract class WizardDialog extends ConfigDialog {
     private static final long serialVersionUID = 1L;
     /** Previous dialog object. A dialog that will be displayed after
      * clicking on the back button */
-    private final WizardDialog previousDialog;
+    private WizardDialog previousDialog;
     /** Cancel icon. */
     private static final ImageIcon CANCEL_ICON =
             Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.CancelIcon"));
@@ -63,6 +66,8 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Back icon. */
     private static final ImageIcon BACK_ICON =
             Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.BackIcon"));
+    /** Progress bar. */
+    private ProgressBar progressBar = null;
 
     /**
      * Prepares a new <code>WizardDialog</code> object.
@@ -78,6 +83,14 @@ public abstract class WizardDialog extends ConfigDialog {
      */
     public WizardDialog getPreviousDialog() {
         return previousDialog;
+    }
+
+    /**
+     * Returns previous dialog. It is used to get with the back button to
+     * the dialog before this one.
+     */
+    protected final void setPreviousDialog(final WizardDialog previousDialog) {
+        this.previousDialog = previousDialog;
     }
 
     ///**
@@ -312,7 +325,7 @@ public abstract class WizardDialog extends ConfigDialog {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     buttonClass(retryButton()).setVisible(false);
-                    buttonClass(retryButton()).setBackground(Color.RED);
+                    buttonClass(retryButton()).setBackgroundColor(Color.RED);
                 }
             });
         }
@@ -460,7 +473,7 @@ public abstract class WizardDialog extends ConfigDialog {
      * Hides the retry button if it is there.
      */
     public final void hideRetryButton() {
-        final MyButton rb = (MyButton) buttonClass(retryButton());
+        final MyButton rb = buttonClass(retryButton());
 
         if (rb != null && rb.isVisible()) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -475,7 +488,7 @@ public abstract class WizardDialog extends ConfigDialog {
      * Presses the retry button.
      */
     public final void pressRetryButton() {
-        final MyButton rb = (MyButton) buttonClass(retryButton());
+        final MyButton rb = buttonClass(retryButton());
 
         if (rb != null && rb.isVisible() && rb.isEnabled()) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -490,7 +503,7 @@ public abstract class WizardDialog extends ConfigDialog {
      * Presses the next button.
      */
     public final void pressNextButton() {
-        final MyButton nb = (MyButton) buttonClass(nextButton());
+        final MyButton nb = buttonClass(nextButton());
         if (nb != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -500,5 +513,50 @@ public abstract class WizardDialog extends ConfigDialog {
                 }
             });
         }
+    }
+
+    /**
+     * Creates progress bar that can be used during connecting to the host
+     * and returns pane, where the progress bar is displayed.
+     */
+    public JPanel getProgressBarPane(final CancelCallback cancelCallback) {
+        progressBar = new ProgressBar(cancelCallback);
+        final JPanel p = progressBar.getProgressBarPane();
+        p.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        return p;
+    }
+
+    /**
+     * Is called after failed connection.
+     */
+    public final void progressBarDoneError() {
+        progressBar.doneError();
+    }
+
+    /**
+     * Is called after successful connection.
+     */
+    public final void progressBarDone() {
+        progressBar.done();
+    }
+
+    /**
+     * Returns progressBar object.
+     */
+    public final ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+    /**
+     * Creates progress bar that can be used during connecting to the host
+     * and returns pane, where the progress bar is displayed.
+     */
+    public final JPanel getProgressBarPane(
+                                        final String title,
+                                        final CancelCallback cancelCallback) {
+        progressBar = new ProgressBar(title, cancelCallback);
+        final JPanel p = progressBar.getProgressBarPane();
+        p.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        return p;
     }
 }

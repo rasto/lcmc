@@ -755,11 +755,11 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(String param) {
+    protected final boolean isAdvanced(final String param) {
         return false;
     }
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(String param) {
+    protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 

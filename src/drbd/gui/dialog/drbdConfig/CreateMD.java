@@ -211,6 +211,8 @@ public class CreateMD extends DrbdConfig {
      */
     protected final void initDialog() {
         super.initDialog();
+        makeMDButton.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
         if (getDrbdResourceInfo().isHaveToCreateMD()) {
             enableComponentsLater(new JComponent[]{});
         } else {
@@ -302,12 +304,14 @@ public class CreateMD extends DrbdConfig {
             public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
                     public void run() {
+                        getProgressBar().start(10000);
                         if (metadataCB.getStringValue().equals(
                                               createNewMetadataDestroyData)) {
                             createMetadata(true);
                         } else {
                             createMetadata(false);
                         }
+                        progressBarDone();
                     }
                 });
                 thread.start();
@@ -321,10 +325,11 @@ public class CreateMD extends DrbdConfig {
                                                    1, 1); // xPad, yPad
 
         pane.add(inputPane);
+        pane.add(getProgressBarPane(null));
         pane.add(getAnswerPane(""));
-        SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
+        SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
+                                              0, 0,  // initX, initY
+                                              0, 0); // xPad, yPad
 
         return pane;
     }

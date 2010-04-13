@@ -305,6 +305,7 @@ public class AllHostsInfo extends Info {
      */
     public final void addClusterBox(final Cluster cluster) {
         final JPanel label = new JPanel();
+        label.setBackground(Color.WHITE);
         label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
         label.add(new JLabel(cluster.getName()));
         for (final Host host : cluster.getHosts()) {
@@ -322,7 +323,10 @@ public class AllHostsInfo extends Info {
         startPanel.setBorder(new LineBorder(Tools.getDefaultColor(
                                    "EmptyBrowser.StartPanelTitleBorder")));
         final JPanel left = new JPanel();
+        left.setBackground(Color.WHITE);
+        clusterBackgrounds.put(cluster, startPanel);
         final JCheckBox markCB = new JCheckBox();
+        markCB.setBackground(Color.WHITE);
         allCheckboxes.put(cluster, markCB);
         left.add(markCB);
         left.add(label);
@@ -542,7 +546,7 @@ public class AllHostsInfo extends Info {
      * Creates the popup for all hosts.
      */
     public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem>items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
         final MyMenuItem newHostWizardItem =

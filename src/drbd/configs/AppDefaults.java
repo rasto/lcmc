@@ -29,6 +29,8 @@ import java.util.Arrays;
  */
 public class AppDefaults extends
             java.util.ListResourceBundle {
+    /** Linbit dark orange. */
+    public static final Color LINBIT_DARK_ORANGE  = new Color(214, 75, 42);
     /** Linbit orange. */
     private static final Color LINBIT_ORANGE       = new Color(250, 133, 34);
     /** Linbit light orange. */
@@ -146,12 +148,12 @@ public class AppDefaults extends
         {"TerminalPanel.TerminalCyan",       Color.CYAN},
 
         {"ConfigDialog.Background",          Color.WHITE },
-        {"ConfigDialog.Background.Dark",     LINBIT_LIGHT_ORANGE },
+        {"ConfigDialog.Background.Dark",     LINBIT_ORANGE },
         {"ConfigDialog.Background.Light",    LINBIT_LIGHT_ORANGE },
-        {"ConfigDialog.AnswerPane",          LINBIT_LIGHT_ORANGE },
+        {"ConfigDialog.AnswerPane",          Color.BLACK },
         {"ConfigDialog.AnswerPane.Error",    Color.RED },
         {"ProgressBar.Background",           Color.WHITE },
-        {"ProgressBar.Foreground",           LINBIT_ORANGE },
+        {"ProgressBar.Foreground",           LINBIT_DARK_ORANGE },
 
         {"ProgressBar.DefaultWidth",         300},
         {"ProgressBar.DefaultHeight",        30},
@@ -200,7 +202,7 @@ public class AppDefaults extends
         {"ClusterBrowser.Test.Tooltip.Background", Color.YELLOW},
         {"Browser.Background",                    new Color(255, 255, 255) },
 
-        {"EmptyBrowser.StartPanelTitleBorder",    Color.BLACK },
+        {"EmptyBrowser.StartPanelTitleBorder",    LINBIT_DARK_ORANGE },
 
         /*
          * Images

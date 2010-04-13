@@ -65,7 +65,7 @@ public class HeartbeatInst extends DialogHost {
                                         getHost());
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.HeartbeatInst.InstOk"));
-        enableComponents();
+        enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
         if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
@@ -158,8 +158,8 @@ public class HeartbeatInst extends DialogHost {
         pane.add(getAnswerPane(
                      Tools.getString("Dialog.Host.HeartbeatInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
+                                              0, 0,  // initX, initY
+                                              0, 0); // xPad, yPad
 
         return pane;
     }

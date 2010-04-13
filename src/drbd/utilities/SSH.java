@@ -1044,6 +1044,7 @@ public class SSH {
                                         "Keyboard Interactive Authentication",
                                         content,
                                         null,
+                                        null,
                                         !echo[i]);
                     lastPassword = ans;
                 } else {
@@ -1235,7 +1236,13 @@ public class SSH {
                                                       "<html>"
                                                       + Tools.getString(
                                                        "SSH.Enter.passphrase")
-                                                      + "</html>"},
+                                                      + "</html>",
+
+                                                      },
+                                        "<html>"
+                                        + Tools.getString(
+                                                    "SSH.Enter.passphrase2")
+                                        + "</html>",
                                         Tools.getDefault("SSH.PublicKey"),
                                         true);
                                 if (key == null) {
@@ -1363,6 +1370,7 @@ public class SSH {
                                                   + Tools.getString(
                                                        "SSH.Enter.password")
                                                   + "</html>"},
+                                    null,
                                     null,
                                     true);
                             if (ans == null) {
@@ -1627,11 +1635,11 @@ public class SSH {
             this.exitCode = exitCode;
         }
         /** Returns output string. */
-        public final String getOutput() {
+        public String getOutput() {
             return output;
         }
         /** Returns exit code. */
-        public final int getExitCode() {
+        public int getExitCode() {
             return exitCode;
         }
 

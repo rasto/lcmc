@@ -341,8 +341,7 @@ public class TextResource extends
          + "possible only if you have support contract with LINBIT.<br>"
          + "You can also choose a <b>Pacemaker</b> installation method. "
          + "The newest packages for many different distributions are in "
-         + "Clusterlabs and Opensuse repositories, yes even if your "
-         + "distribution is not an Opensuse."},
+         + "Clusterlabs repositories."},
 
         {"Dialog.Host.CheckInstallation.Drbd.NotInstalled",
          "DRBD is not installed. Click 'Install' button to install a new "
@@ -936,6 +935,12 @@ public class TextResource extends
         {"Dialog.DrbdConfig.CreateFS.CreateFsButton",
          "Create File System"},
 
+        {"Dialog.DrbdConfig.CreateFS.MakeFS",
+         "Creating file system..."},
+
+        {"Dialog.DrbdConfig.CreateFS.MakeFS.Done",
+         "done"},
+
         {"Dialog.DrbdConfig.CreateMD.Title",
          "Create DRBD Meta-Data"},
 
@@ -988,7 +993,7 @@ public class TextResource extends
          + "data from other host on this block device will be discarded."},
 
         {"Dialog.Drbd.SplitBrain.ChooseHost",
-         "host"},
+         "host: "},
 
         {"Dialog.Drbd.SplitBrain.ResolveButton",
          "Resolve"},
@@ -1730,6 +1735,9 @@ public class TextResource extends
         {"SSH.Enter.passphrase",
          "Enter&nbsp;<font color=red>passphrase</font>&nbsp;for&nbsp;key:"},
 
+        {"SSH.Enter.passphrase2",
+         "(or press &lt;enter&gt; for password authentication)"},
+
         {"SSH.Publickey.Authentication.Failed",
          "Authentication failed."},
 
@@ -1860,6 +1868,14 @@ public class TextResource extends
 
         {"EmptyViewPanel.HideHelpButton",
          "I am a DMC expert"},
+
+        {"VMSDiskInfo.FileChooserTitle",
+         "Select image on "}, 
+
+        {"VMSDiskInfo.Approve",
+         "Select"}, 
+        {"VMSDiskInfo.Approve.ToolTip",
+         "Select this image."}, 
 
         {"EmptyViewPanel.HelpText",
 "<h3>Welcome to the DRBD Management Console</h3>"

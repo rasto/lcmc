@@ -259,7 +259,6 @@ public class DrbdAvailFiles extends DialogHost {
                                            0,    /* width */
                                            null, /* abbrv */
                                            ConfigData.AccessType.RO);
-        //drbdVersionCombo.setEnabled(false);
         pane.add(drbdVersionCombo);
 
         /* build combo box */
@@ -272,7 +271,6 @@ public class DrbdAvailFiles extends DialogHost {
                                          null, /* abbrv */
                                          ConfigData.AccessType.RO);
 
-        //drbdBuildCombo.setEnabled(false);
         pane.add(drbdBuildCombo);
 
         SpringUtilities.makeCompactGrid(pane, 1, 2,  // rows, cols
@@ -324,13 +322,13 @@ public class DrbdAvailFiles extends DialogHost {
      */
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        pane.add(getProgressBarPane());
         pane.add(getChoiceBoxes());
+        pane.add(getProgressBarPane());
         pane.add(getAnswerPane(
                     Tools.getString("Dialog.Host.DrbdAvailFiles.Executing")));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
+                                              0, 0,  // initX, initY
+                                              0, 0); // xPad, yPad
         return pane;
     }
 }

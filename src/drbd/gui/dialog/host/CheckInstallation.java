@@ -142,6 +142,8 @@ public class CheckInstallation extends DialogHost {
         final CheckInstallation thisClass = this;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                drbdButton.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
                 drbdButton.setEnabled(false);
                 drbdInstMethodCB.setEnabled(false);
                 pmButton.setEnabled(false);
@@ -177,8 +179,7 @@ public class CheckInstallation extends DialogHost {
                         }
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                ((MyButton) buttonClass(
-                                                nextButton())).pressButton();
+                                buttonClass(nextButton()).pressButton();
                             }
                         });
                     } else {
@@ -186,8 +187,7 @@ public class CheckInstallation extends DialogHost {
                                  new LinbitLogin(thisClass, getHost());
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                ((MyButton) buttonClass(
-                                                nextButton())).pressButton();
+                                buttonClass(nextButton()).pressButton();
                             }
                         });
                     }
@@ -195,6 +195,8 @@ public class CheckInstallation extends DialogHost {
             }
         );
 
+        hbPmButton.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
         hbPmButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -204,14 +206,15 @@ public class CheckInstallation extends DialogHost {
                     getHost().setHbPmInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            ((MyButton) buttonClass(
-                                                nextButton())).pressButton();
+                            buttonClass(nextButton()).pressButton();
                         }
                     });
                 }
             }
         );
 
+        pmButton.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
         pmButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -221,8 +224,7 @@ public class CheckInstallation extends DialogHost {
                     getHost().setPmInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            ((MyButton) buttonClass(
-                                                nextButton())).pressButton();
+                            buttonClass(nextButton()).pressButton();
                         }
                     });
                 }
@@ -860,8 +862,8 @@ public class CheckInstallation extends DialogHost {
         pane.add(getAnswerPane(Tools.getString(
                                     "Dialog.Host.CheckInstallation.Checking")));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  //rows, cols
-                                              1, 1,  //initX, initY
-                                              1, 1); //xPad, yPad
+                                              0, 0,  //initX, initY
+                                              0, 0); //xPad, yPad
 
         return pane;
     }

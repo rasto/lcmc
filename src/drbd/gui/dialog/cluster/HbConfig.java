@@ -114,7 +114,7 @@ public class HbConfig extends DialogCluster {
      * configs. */
     private JCheckBox configCheckbox;
     /** Editable hearbeat config panel. */
-    private final JPanel configPanel = new JPanel(new SpringLayout());
+    private final JPanel configPanel = new JPanel();
     /** Whether the config was changed by the user. */
     private boolean configChanged = false;
     /** Multicast type string. */
@@ -134,7 +134,7 @@ public class HbConfig extends DialogCluster {
     /** Width of the interface combobox. */
     private static final int INTF_COMBOBOX_WIDTH = 80;
     /** Width of the remove button. */
-    private static final int REMOVE_BUTTON_WIDTH  = 80;
+    private static final int REMOVE_BUTTON_WIDTH  = 100;
     /** Height of the remove button. */
     private static final int REMOVE_BUTTON_HEIGHT = 14;
     /** Checkbox text (Edit the config). */
@@ -149,6 +149,8 @@ public class HbConfig extends DialogCluster {
     private static final String NEWLINE = "\\r?\\n";
     /** Config scroll pane. */
     private volatile JScrollPane configScrollPane = null;
+    /** Whether the config pane was already moved to the position. */
+    private volatile boolean alreadyMoved = false;
 
     /**
      * Prepares a new <code>HbConfig</code> object.
@@ -158,6 +160,8 @@ public class HbConfig extends DialogCluster {
         super(previousDialog, cluster);
         final Host[] hosts = getCluster().getHostsArray();
         configs = new String[hosts.length];
+        makeConfigButton.setBackgroundColor(
+                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
         makeConfigButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -239,6 +243,9 @@ public class HbConfig extends DialogCluster {
      */
     protected final void initDialog() {
         super.initDialog();
+        configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
+        configPanel.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background"));
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final Thread thread = new Thread(
             new Runnable() {
@@ -454,6 +461,8 @@ public class HbConfig extends DialogCluster {
             public void run() {
                 makeConfigButton.setEnabled(false);
                 configPanel.removeAll();
+                final JPanel insideConfigPanel = new JPanel(
+                                                        new SpringLayout());
                 int cols = 0;
                 for (int i = 0; i < hosts.length; i++) {
                     if (HA_CF_ERROR_STRING.equals(configs[i])) {
@@ -464,21 +473,23 @@ public class HbConfig extends DialogCluster {
                     final JLabel l = new JLabel(hosts[i].getName() + ":");
                     l.setBackground(Color.WHITE);
                     final JPanel labelP = new JPanel();
-                    labelP.setBackground(Color.WHITE);
+                    labelP.setBackground(
+                            Tools.getDefaultColor("ConfigDialog.Background"));
                     labelP.setLayout(new BoxLayout(labelP, BoxLayout.Y_AXIS));
                     labelP.setAlignmentX(Component.TOP_ALIGNMENT);
                     labelP.add(l);
-                    configPanel.add(labelP);
+                    insideConfigPanel.add(labelP);
                     final JTextArea ta = new JTextArea(configs[i]);
                     ta.setEditable(false);
-                    configPanel.add(ta);
+                    insideConfigPanel.add(ta);
                     cols += 2;
                 }
                 if (cols > 0) {
-                    SpringUtilities.makeCompactGrid(configPanel,
+                    SpringUtilities.makeCompactGrid(insideConfigPanel,
                                                     1, cols,
                                                     1, 1,
                                                     1, 1);
+                    configPanel.add(insideConfigPanel);
                 }
                 configPanel.revalidate();
                 configPanel.repaint();
@@ -497,18 +508,13 @@ public class HbConfig extends DialogCluster {
                     makeConfigButton.setEnabled(false);
                 }
                 configPanel.removeAll();
-                int rows = 0;
                 /* head */
                 final String[] head =
                                 hbConfigHead(true).toString().split(NEWLINE);
                 for (String line : head) {
                     configPanel.add(new JLabel(line));
-                    configPanel.add(new JLabel(" "));
-                    rows++;
                 }
-                configPanel.add(new JLabel(""));
                 configPanel.add(new JLabel(" "));
-                rows++;
                 if (castAddresses.size() < 2) {
                     JLabel l;
                     if (castAddresses.size() < 1) {
@@ -520,8 +526,6 @@ public class HbConfig extends DialogCluster {
                     }
                     l.setForeground(Color.RED);
                     configPanel.add(l);
-                    configPanel.add(new JLabel(""));
-                    rows++;
                     final JLabel label = l;
                     label.addComponentListener(new ComponentListener() {
                         public final void componentHidden(
@@ -532,6 +536,10 @@ public class HbConfig extends DialogCluster {
                                                       final ComponentEvent e) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
+                                    if (alreadyMoved) {
+                                        return;
+                                    }
+                                    alreadyMoved = true;
                                     configScrollPane.getViewport()
                                                     .setViewPosition(
                                             label.getBounds().getLocation());
@@ -550,31 +558,24 @@ public class HbConfig extends DialogCluster {
                 }
                 /* addresses */
                 for (final CastAddress c : castAddresses) {
-                    configPanel.add(new JLabel(c.getConfigString()));
-                    configPanel.add(getRemoveButton(c));
-                    rows++;
+                    configPanel.add(getComponentPanel(c.getConfigString(),
+                                                      getRemoveButton(c)));
                 }
-                configPanel.add(new JLabel(""));
                 configPanel.add(new JLabel(" "));
-                rows++;
                 /* mcast etc combo boxes */
                 configPanel.add(mcast);
-                configPanel.add(new JLabel(""));
-                rows++;
                 /* dopd */
                 final String[] dopdLines =
                         hbConfigDopd(
                            dopdCB.isSelected()).toString().split(NEWLINE);
                 boolean checkboxDone = false;
                 for (String line : dopdLines) {
-                    configPanel.add(new JLabel(line));
                     if (checkboxDone) {
-                        configPanel.add(new JLabel(" "));
+                        configPanel.add(new JLabel(line));
                     } else {
-                        configPanel.add(dopdCB);
+                        configPanel.add(getComponentPanel(line, dopdCB));
                         checkboxDone = true;
                     }
-                    rows++;
                 }
 
                 /* mgmtd */
@@ -583,20 +584,12 @@ public class HbConfig extends DialogCluster {
                            mgmtdCB.isSelected()).toString().split(NEWLINE);
                 checkboxDone = false;
                 for (String line : mgmtdLines) {
-                    configPanel.add(new JLabel(line));
                     if (checkboxDone) {
-                        configPanel.add(new JLabel(" "));
+                        configPanel.add(new JLabel(line));
                     } else {
-                        configPanel.add(mgmtdCB);
+                        configPanel.add(getComponentPanel(line, mgmtdCB));
                         checkboxDone = true;
                     }
-                    rows++;
-                }
-                if (rows > 0) {
-                    SpringUtilities.makeCompactGrid(configPanel,
-                                                    rows, 2,
-                                                    1, 1,
-                                                    1, 1);
                 }
                 configPanel.revalidate();
                 configPanel.repaint();
@@ -894,32 +887,32 @@ public class HbConfig extends DialogCluster {
                     if (type != null) {
                         Thread thread = new Thread(new Runnable() {
                             public void run() {
+                                if (MCAST_TYPE.equals(type)
+                                    || BCAST_TYPE.equals(type)) {
+                                    ifaceCB.setVisible(true);
+                                } else {
+                                    ifaceCB.setVisible(false);
+                                }
+
+                                if (MCAST_TYPE.equals(type)) {
+                                    addrCB.setVisible(true);
+                                } else {
+                                    addrCB.setVisible(false);
+                                }
+                                if (SERIAL_TYPE.equals(type)) {
+                                    serialCB.setVisible(true);
+                                } else {
+                                    serialCB.setVisible(false);
+                                }
+                                if (UCAST_TYPE.equals(type)) {
+                                    ucastLink1CB.setVisible(true);
+                                    ucastLink2CB.setVisible(true);
+                                } else {
+                                    ucastLink1CB.setVisible(false);
+                                    ucastLink2CB.setVisible(false);
+                                }
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        if (MCAST_TYPE.equals(type)
-                                            || BCAST_TYPE.equals(type)) {
-                                            ifaceCB.setVisible(true);
-                                        } else {
-                                            ifaceCB.setVisible(false);
-                                        }
-
-                                        if (MCAST_TYPE.equals(type)) {
-                                            addrCB.setVisible(true);
-                                        } else {
-                                            addrCB.setVisible(false);
-                                        }
-                                        if (SERIAL_TYPE.equals(type)) {
-                                            serialCB.setVisible(true);
-                                        } else {
-                                            serialCB.setVisible(false);
-                                        }
-                                        if (UCAST_TYPE.equals(type)) {
-                                            ucastLink1CB.setVisible(true);
-                                            ucastLink2CB.setVisible(true);
-                                        } else {
-                                            ucastLink1CB.setVisible(false);
-                                            ucastLink2CB.setVisible(false);
-                                        }
                                         mcast.setMaximumSize(
                                                     mcast.getPreferredSize());
                                     }
@@ -1011,6 +1004,8 @@ public class HbConfig extends DialogCluster {
 
         addButton = new MyButton(
                       Tools.getString("Dialog.Cluster.HbConfig.AddIntButton"));
+        addButton.setBackgroundColor(
+                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
         addButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -1029,9 +1024,15 @@ public class HbConfig extends DialogCluster {
                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
                                    );
+        configScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE,
+                                                      150));
+        configScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE,
+                                                        150));
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
+        configCheckbox.setBackground(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
         Tools.getGUIData().setAccessible(configCheckbox,
                                          ConfigData.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
@@ -1075,6 +1076,7 @@ public class HbConfig extends DialogCluster {
         pane.add(configScrollPane);
         configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
         mcast.add(typeCB);
         mcast.add(ifaceCB);
@@ -1084,11 +1086,13 @@ public class HbConfig extends DialogCluster {
         mcast.add(ucastLink2CB);
         mcast.add(addButton);
         mcast.setMaximumSize(mcast.getPreferredSize());
+        mcast.setAlignmentX(Component.LEFT_ALIGNMENT);
         /* dopd */
         dopdCB = new JCheckBox(
                     Tools.getString("Dialog.Cluster.HbConfig.UseDopdCheckBox"),
                     null,
                     false);
+        dopdCB.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         dopdCB.setToolTipText(
             Tools.getString("Dialog.Cluster.HbConfig.UseDopdCheckBox.ToolTip"));
         dopdCB.addItemListener(
@@ -1108,6 +1112,7 @@ public class HbConfig extends DialogCluster {
                     Tools.getString("Dialog.Cluster.HbConfig.UseMgmtdCheckBox"),
                     null,
                     false);
+        mgmtdCB.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mgmtdCB.setToolTipText(
            Tools.getString("Dialog.Cluster.HbConfig.UseMgmtdCheckBox.ToolTip"));
         mgmtdCB.addItemListener(

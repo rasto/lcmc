@@ -24,7 +24,6 @@ package drbd.gui.resources;
 import drbd.gui.Browser;
 import drbd.gui.GuiComboBox;
 import drbd.data.ResourceAgent;
-import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 
 import java.util.Map;

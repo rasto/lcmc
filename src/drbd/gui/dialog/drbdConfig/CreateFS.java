@@ -130,6 +130,9 @@ public class CreateFS extends DrbdConfig {
     protected final void createFilesystem() {
         final Runnable runnable = new Runnable() {
             public void run() {
+                getProgressBar().start(1);
+                answerPaneSetText(
+                        Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         buttonClass(finishButton()).setEnabled(false);
@@ -146,10 +149,12 @@ public class CreateFS extends DrbdConfig {
                 bdiPri.setSecondary(testOnly);
                 hostCB.setValue(NO_HOST_STRING);
                 filesystemCB.setValue(NO_FILESYSTEM_STRING);
+                answerPaneSetText(
+                     Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS.Done"));
+                progressBarDone();
             }
         };
         final Thread thread = new Thread(runnable);
-        //thread.setPriority(Thread.MAX_PRIORITY);
         thread.start();
     }
 
@@ -182,6 +187,8 @@ public class CreateFS extends DrbdConfig {
      */
     protected final void initDialog() {
         super.initDialog();
+        makeFsButton.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
@@ -204,21 +211,21 @@ public class CreateFS extends DrbdConfig {
         if (noFileSystem) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ((MyButton) buttonClass(finishButton())).setEnabled(true);
+                    buttonClass(finishButton()).setEnabled(true);
                     makeFsButton.setEnabled(false);
                 }
             });
         } else if (noHost) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ((MyButton) buttonClass(finishButton())).setEnabled(false);
+                    buttonClass(finishButton()).setEnabled(false);
                 }
             });
             makeFsButton.setEnabled(false);
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ((MyButton) buttonClass(finishButton())).setEnabled(false);
+                    buttonClass(finishButton()).setEnabled(false);
                     makeFsButton.setEnabled(true);
                 }
             });
@@ -329,10 +336,11 @@ public class CreateFS extends DrbdConfig {
                                                    1, 1); // xPad, yPad
 
         pane.add(inputPane);
+        pane.add(getProgressBarPane(null));
         pane.add(getAnswerPane(""));
-        SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
+        SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
+                                              0, 0,  // initX, initY
+                                              0, 0); // xPad, yPad
 
         return pane;
     }

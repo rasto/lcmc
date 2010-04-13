@@ -89,7 +89,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         /* cluster wizard */
         final MyButton clusterWizardButton = new MyButton(
                             Tools.getString("ClusterViewPanel.ClusterWizard"));
-        clusterWizardButton.setPreferredSize(new Dimension(130, 20));
+        clusterWizardButton.setPreferredSize(new Dimension(150, 20));
         clusterWizardButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {

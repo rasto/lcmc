@@ -27,15 +27,16 @@ import drbd.utilities.DRBD;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.dialog.WizardDialog;
-import drbd.utilities.MyButton;
+import drbd.gui.SpringUtilities;
 import drbd.Exceptions;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-
+import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
+
 import java.awt.Component;
 
 /**
@@ -144,7 +145,7 @@ public class BlockDev extends DrbdConfig {
         enableComponents();
 
         final String[] params = blockDevInfo.getParametersFromXML();
-        ((MyButton) buttonClass(nextButton())).setEnabled(
+        buttonClass(nextButton()).setEnabled(
                     blockDevInfo.checkResourceFieldsCorrect(null, params));
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -159,9 +160,7 @@ public class BlockDev extends DrbdConfig {
      * Returns the input pane with block device parameters.
      */
     protected final JComponent getInputPane() {
-        final JPanel inputPane = new JPanel();
-        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.Y_AXIS));
-
+        final JPanel inputPane = new JPanel(new SpringLayout());
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -171,13 +170,19 @@ public class BlockDev extends DrbdConfig {
         blockDevInfo.addWizardParams(
                  optionsPanel,
                  params,
-                 (MyButton) buttonClass(nextButton()),
+                 buttonClass(nextButton()),
                  Tools.getDefaultInt("Dialog.DrbdConfig.BlockDev.LabelWidth"),
                  Tools.getDefaultInt("Dialog.DrbdConfig.BlockDev.FieldWidth"),
                  null);
 
-        inputPane.add(new JLabel(blockDevInfo.getHost().getName()));
+        final JPanel p = new JPanel();
+        p.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        p.add(new JLabel(blockDevInfo.getHost().getName()));
+        inputPane.add(p);
         inputPane.add(optionsPanel);
+        SpringUtilities.makeCompactGrid(inputPane, 2, 1,  //rows, cols
+                                                   0, 0,  //initX, initY
+                                                   0, 0); //xPad, yPad
         return inputPane;
     }
 }

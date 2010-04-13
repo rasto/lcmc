@@ -118,7 +118,7 @@ public class VMSDiskInfo extends EditableInfo {
                                                new HashMap<String, Object[]>();
     /** Default location for libvirt images. */
     private static final String LIBVIRT_IMAGE_LOCATION =
-                                             "/drbd-mc/var/lib/libvirt/images/";
+                                             "/var/lib/libvirt/images/";
     /** Pattern that parses stat output. */
     private static final Pattern STAT_PATTERN = Pattern.compile(
                                                        "(.).{9}\\s+(\\d+)\\s+"
@@ -641,8 +641,17 @@ public class VMSDiskInfo extends EditableInfo {
                 }
 
             };
+        fc.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
+        fc.setDialogTitle(Tools.getString("VMSDiskInfo.FileChooserTitle")
+                          + host.getName());
+//        fc.setApproveButtonText(Tools.getString("VMSDiskInfo.Approve"));
+        fc.setApproveButtonToolTipText(
+                               Tools.getString("VMSDiskInfo.Approve.ToolTip"));
         fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
-        final int ret = fc.showOpenDialog(Tools.getGUIData().getMainFrame());
+        final int ret = fc.showDialog(
+                                       Tools.getGUIData().getMainFrame(),
+                                       Tools.getString("VMSDiskInfo.Approve"));
         linuxFileCache.clear();
         if (ret == JFileChooser.APPROVE_OPTION) {
             if (fc.getSelectedFile() != null) {

@@ -67,25 +67,25 @@ import javax.swing.SwingUtilities;
  */
 public class DrbdGraph extends ResourceGraph {
     /** Map from vertex to host. */
-    private final Map<Vertex, HostDrbdInfo>vertexToHostMap =
+    private final Map<Vertex, HostDrbdInfo> vertexToHostMap =
                                  new LinkedHashMap<Vertex, HostDrbdInfo>();
     /** Map from host to vertex. */
-    private final Map<HostDrbdInfo, Vertex>hostToVertexMap =
+    private final Map<HostDrbdInfo, Vertex> hostToVertexMap =
                                  new LinkedHashMap<HostDrbdInfo, Vertex>();
     /** Map from block device info object to vertex. */
-    private final Map<BlockDevInfo, Vertex>bdiToVertexMap =
+    private final Map<BlockDevInfo, Vertex> bdiToVertexMap =
                                  new LinkedHashMap<BlockDevInfo, Vertex>();
     /** Map from block device to vertex. */
-    private final Map<BlockDevice, Vertex>blockDeviceToVertexMap =
+    private final Map<BlockDevice, Vertex> blockDeviceToVertexMap =
                                  new LinkedHashMap<BlockDevice, Vertex>();
     /** Map from host to the list of block devices. */
-    private final Map<HostDrbdInfo, List<Vertex>>hostBDVerticesMap =
+    private final Map<HostDrbdInfo, List<Vertex>> hostBDVerticesMap =
                                new LinkedHashMap<HostDrbdInfo, List<Vertex>>();
     /** Map from graph edge to the drbd resource info object. */
-    private final Map<Edge, DrbdResourceInfo>edgeToDrbdResourceMap =
+    private final Map<Edge, DrbdResourceInfo> edgeToDrbdResourceMap =
                                  new LinkedHashMap<Edge, DrbdResourceInfo>();
     /** Map from drbd resource info object to the graph edge. */
-    private final Map<DrbdResourceInfo, Edge>drbdResourceToEdgeMap =
+    private final Map<DrbdResourceInfo, Edge> drbdResourceToEdgeMap =
                                  new LinkedHashMap<DrbdResourceInfo, Edge>();
 
     /** Drbd info object to which this graph belongs. */

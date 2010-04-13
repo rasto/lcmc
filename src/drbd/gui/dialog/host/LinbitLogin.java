@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
 
 /**.
  * An implementation of a dialog where user can enter the name and password
@@ -150,7 +151,10 @@ public class LinbitLogin extends DialogHost {
      * can select a check box to save the info for later.
      */
     protected final JComponent getInputPane() {
+        final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
+        inputPane.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         /* user */
         final JLabel userLabel = new JLabel(
@@ -191,19 +195,24 @@ public class LinbitLogin extends DialogHost {
 
         /* save */
         final JLabel saveLabel = new JLabel("");
+        saveLabel.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         inputPane.add(saveLabel);
         saveCheckBox = new JCheckBox(
                             Tools.getString("Dialog.Host.LinbitLogin.Save"),
                             Tools.getConfigData().getLoginSave());
         saveLabel.setLabelFor(saveCheckBox);
+        saveCheckBox.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         inputPane.add(saveCheckBox);
 
         SpringUtilities.makeCompactGrid(inputPane, 3, 2,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad
 
-        return inputPane;
+        p.add(inputPane, BorderLayout.SOUTH);
+        return p;
     }
 
 }

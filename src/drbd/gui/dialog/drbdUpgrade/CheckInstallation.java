@@ -101,7 +101,7 @@ public class CheckInstallation extends DialogHost {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
                     nextDialogObject = new LinbitLogin(thisClass, getHost());
-                    ((MyButton) buttonClass(nextButton())).pressButton();
+                    buttonClass(nextButton()).pressButton();
                 }
             }
         );

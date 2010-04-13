@@ -27,7 +27,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.JButton;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
 import java.awt.geom.Point2D;
@@ -46,10 +45,13 @@ import java.awt.GraphicsEnvironment;
 public class MyButton extends JButton implements ComponentWithTest {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Default background color. */
+    private static final Color DEFAULT_COLOR =
+                           Tools.getDefaultColor("DefaultButton.Background");
     /** First color in the gradient. */
-    private Color color1;
+    private Color color1 = Color.WHITE;
     /** Second color in the gradient. */
-    private Color color2;
+    private Color color2 = DEFAULT_COLOR;
     /** Robot to move a mouse a little if a tooltip has changed. */
     private Robot robot = null;
     /** Button tooltip. */
@@ -64,7 +66,9 @@ public class MyButton extends JButton implements ComponentWithTest {
      * Prepares a new <code>MyButton</code> object.
      */
     public MyButton() {
-        this(Color.WHITE, Tools.getDefaultColor("DefaultButton.Background"));
+        super();
+        setContentAreaFilled(false);  // *
+    //    this(Color.WHITE, Tools.getDefaultColor("DefaultButton.Background"));
     }
 
     /**
@@ -74,8 +78,10 @@ public class MyButton extends JButton implements ComponentWithTest {
      *          text in the button
      */
     public MyButton(final String text) {
-        this();
-        setText(text);
+        super(text);
+        setContentAreaFilled(false);  // *
+        //this();
+        //setText(text);
     }
 
     /**
@@ -87,9 +93,11 @@ public class MyButton extends JButton implements ComponentWithTest {
      *          icon in the button
      */
     public MyButton(final String text, final ImageIcon icon) {
-        this();
-        setText(text);
-        setIcon((Icon) icon);
+        super(text, icon);
+        setContentAreaFilled(false);  // *
+        //this();
+        //setText(text);
+        //setIcon((Icon) icon);
     }
 
     /**
@@ -198,9 +206,9 @@ public class MyButton extends JButton implements ComponentWithTest {
     /**
      * Sets background of the button.
      */
-    public final void setBackground(final Color c) {
+    public final void setBackgroundColor(final Color c) {
         if (c == null) {
-            color2 = Tools.getDefaultColor("DefaultButton.Background");
+            color2 = DEFAULT_COLOR;
         } else {
             color2 = c;
         }
@@ -212,6 +220,10 @@ public class MyButton extends JButton implements ComponentWithTest {
      * Gets background of the button.
      */
     public final Color getBackground() {
+        if (color2 == null) {
+            return DEFAULT_COLOR;
+            //return super.getBackground();
+        }
         return color2;
     }
 
@@ -219,10 +231,19 @@ public class MyButton extends JButton implements ComponentWithTest {
      * Overloaded in order to paint the background.
      */
     protected final void paintComponent(final Graphics g) {
-        if (!isEnabled() || getModel().isPressed()) {
+        if (!isEnabled()) {
+            setContentAreaFilled(false);  // *
+            g.setColor(color2);
+            g.fillRect(0, 0, getWidth(), getHeight());
             super.paintComponent(g);
             return;
         }
+        if (getModel().isPressed()) {
+            setContentAreaFilled(true);  // *
+            super.paintComponent(g);
+            return;
+        }
+        setContentAreaFilled(false);  // *
 
         GradientPaint gp1, gp2;
         Rectangle2D.Float rf1, rf2;
@@ -231,13 +252,13 @@ public class MyButton extends JButton implements ComponentWithTest {
                             RenderingHints.VALUE_ANTIALIAS_ON);
         gp1 = new GradientPaint(1.0f,
                                 (float) getHeight(),
-                                color2,
+                                getBackground(),
                                 1.0f,
                                 (float) getHeight() * 0.3f,
                                 color1);
         gp2 = new GradientPaint(1.0f,
                                 0.0f,
-                                color2,
+                                getBackground(),
                                 1.0f,
                                 (float) getHeight() * 0.3f, color1);
         rf1 = new Rectangle2D.Float(0.0f, (float) getHeight() * 0.3f,

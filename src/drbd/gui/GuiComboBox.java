@@ -49,8 +49,6 @@ import javax.swing.SpringLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JFileChooser;
-import java.io.File;
 
 import java.awt.BorderLayout;
 
@@ -75,6 +73,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -154,6 +153,8 @@ public class GuiComboBox extends JPanel {
                                                      ConfigData.AccessType.RO;
     /** Tooltip if element is enabled. */
     private String toolTipText = null;
+    /** getValue setValue lock */
+    private final Mutex mValueLock = new Mutex();
 
     /** Prepares a new <code>GuiComboBox</code> object. */
     public GuiComboBox(final String selectedValue,
@@ -681,6 +682,11 @@ public class GuiComboBox extends JPanel {
      */
     public final Object getValue() {
         Object value = null;
+        try {
+            mValueLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         switch(type) {
             case LABELFIELD:
                 value = ((JLabel) component).getText();
@@ -706,6 +712,7 @@ public class GuiComboBox extends JPanel {
                     }
 
                     if ("".equals(value)) {
+                        mValueLock.release();
                         return null;
                     }
                 } else {
@@ -771,6 +778,7 @@ public class GuiComboBox extends JPanel {
             default:
                 /* error */
         }
+        mValueLock.release();
         if (NOTHING_SELECTED.equals(value)) {
             return null;
         }
@@ -818,9 +826,9 @@ public class GuiComboBox extends JPanel {
      * Sets component visible or invisible.
      */
     private void setComponentsVisible(final boolean visible) {
+        super.setVisible(visible);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                setVisible(visible);
                 if (label != null) {
                     label.setVisible(visible);
                 }
@@ -912,6 +920,11 @@ public class GuiComboBox extends JPanel {
      * Sets item/value in the component and waits till it is set.
      */
     public final void setValueAndWait(final Object item) {
+        try {
+            mValueLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         switch(type) {
             case LABELFIELD:
                 ((JLabel) component).setText((String) item);
@@ -998,6 +1011,7 @@ public class GuiComboBox extends JPanel {
             default:
                 Tools.appError("impossible type");
         }
+        mValueLock.release();
     }
 
     /**
@@ -1170,6 +1184,9 @@ public class GuiComboBox extends JPanel {
      */
     public final void wrongValue() {
         setBackgroundColor(ERROR_VALUE_BACKGROUND);
+        if (label != null) {
+            label.setForeground(Color.RED);
+        }
     }
 
     /**

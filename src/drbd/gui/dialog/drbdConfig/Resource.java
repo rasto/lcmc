@@ -25,7 +25,6 @@ package drbd.gui.dialog.drbdConfig;
 import drbd.utilities.Tools;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.dialog.WizardDialog;
-import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -34,6 +33,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 
 import java.awt.Component;
+import java.awt.Dimension;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
@@ -132,15 +132,18 @@ public class Resource extends DrbdConfig {
         getDrbdResourceInfo().addWizardParams(
                   optionsPanel,
                   PARAMS,
-                  (MyButton) buttonClass(nextButton()),
+                  buttonClass(nextButton()),
                   Tools.getDefaultInt("Dialog.DrbdConfig.Resource.LabelWidth"),
                   Tools.getDefaultInt("Dialog.DrbdConfig.Resource.FieldWidth"),
                   null);
 
         inputPane.add(optionsPanel);
 
-        ((MyButton) buttonClass(nextButton())).setEnabled(
-                getDrbdResourceInfo().checkResourceFields(null, PARAMS));
-        return new JScrollPane(inputPane);
+        buttonClass(nextButton()).setEnabled(
+                     getDrbdResourceInfo().checkResourceFields(null, PARAMS));
+        final JScrollPane sp = new JScrollPane(inputPane);
+        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        return sp;
     }
 }

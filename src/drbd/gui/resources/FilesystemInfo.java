@@ -23,7 +23,6 @@ package drbd.gui.resources;
 
 import drbd.data.ResourceAgent;
 import drbd.data.Host;
-import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.SSH;
 import drbd.gui.GuiComboBox;
@@ -140,7 +139,8 @@ class FilesystemInfo extends ServiceInfo {
                                                                       true,
                                                                       statCmd);
 
-                if (ret == null || !"directory".equals(ret.getOutput().trim())) {
+                if (ret == null
+                    || !"directory".equals(ret.getOutput().trim())) {
                     String title =
                           Tools.getString("ClusterBrowser.CreateDir.Title");
                     String desc  = Tools.getString(

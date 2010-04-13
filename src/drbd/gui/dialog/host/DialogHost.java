@@ -25,7 +25,6 @@ package drbd.gui.dialog.host;
 import drbd.data.Host;
 import drbd.utilities.CancelCallback;
 import drbd.utilities.SSH.ExecCommandThread;
-import drbd.gui.ProgressBar;
 import drbd.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -41,8 +40,6 @@ public abstract class DialogHost extends WizardDialog {
     private static final long serialVersionUID = 1L;
     /** Host for which is this dialog. */
     private final Host host;
-    /** Progress bar. */
-    private ProgressBar progressBar = null;
     /** Thread in which a command can be executed. */
     private ExecCommandThread commandThread = null;
 
@@ -63,35 +60,14 @@ public abstract class DialogHost extends WizardDialog {
     }
 
     /**
-     * Creates progress bar that can be used during connecting to the host
-     * and returns pane, where the progress bar is displayed.
-     */
-    public final JPanel getProgressBarPane(final String title,
-                                     final CancelCallback cancelCallback) {
-        progressBar = new ProgressBar(title, cancelCallback);
-        return progressBar.getProgressBarPane();
-    }
-
-    /**
-     * Creates progress bar that can be used during connecting to the host
-     * and returns pane, where the progress bar is displayed.
-     */
-    public final JPanel getProgressBarPane(
-                                        final CancelCallback cancelCallback) {
-        progressBar = new ProgressBar(cancelCallback);
-        return progressBar.getProgressBarPane();
-    }
-
-    /**
      * Sets the command thread, so that it can be canceled.
      */
     public final void setCommandThread(final ExecCommandThread commandThread) {
         this.commandThread = commandThread;
-        if (progressBar != null) {
-            progressBar.setCancelEnabled(commandThread != null);
+        if (getProgressBar() != null) {
+            getProgressBar().setCancelEnabled(commandThread != null);
         }
     }
-
     /**
      * Creates progress bar that can be used during connecting to the host
      * and returns pane, where the progress bar is displayed.
@@ -123,33 +99,12 @@ public abstract class DialogHost extends WizardDialog {
     }
 
     /**
-     * Returns progressBar object.
-     */
-    public final ProgressBar getProgressBar() {
-        return progressBar;
-    }
-
-    /**
-     * Is called after successful connection.
-     */
-    public final void progressBarDone() {
-        progressBar.done();
-    }
-
-    /**
      * Prints error text in the answer pane, stops progress bar, reenables
      * buttons and adds retry button.
      */
     public final void printErrorAndRetry(final String text) {
         super.printErrorAndRetry(text);
         progressBarDone();
-    }
-
-    /**
-     * Is called after failed connection.
-     */
-    public final void progressBarDoneError() {
-        progressBar.doneError();
     }
 
     /**

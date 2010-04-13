@@ -32,12 +32,14 @@ import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.border.LineBorder;
 
 import java.awt.Window;
 import java.awt.Frame;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Font;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,15 +100,16 @@ public class SSHGui {
      */
     public final String enterSomethingDialog(final String title,
                                              final String[] content,
+                                             final String underText,
                                              final String defaultValue,
                                              final boolean isPassword) {
         EnterSomethingDialog esd;
         if (rootPane.getClass().getName().equals("javax.swing.JDialog")) {
             esd = new EnterSomethingDialog((JDialog) rootPane, title,
-                    content, defaultValue, isPassword);
+                    content, underText, defaultValue, isPassword);
         } else {
             esd = new EnterSomethingDialog((Frame) rootPane, title,
-                    content, defaultValue, isPassword);
+                    content, underText, defaultValue, isPassword);
         }
 
         esd.setVisible(true);
@@ -137,10 +140,12 @@ public class SSHGui {
         public EnterSomethingDialog(final Window parent,
                                     final String title,
                                     final String content,
+                                    final String underText,
                                     final boolean isPasswordA) {
             this((JDialog) parent,
                  title,
                  new String[] {content},
+                 underText,
                  null,
                  isPasswordA);
         }
@@ -151,10 +156,11 @@ public class SSHGui {
         public EnterSomethingDialog(final JDialog parent,
                                     final String title,
                                     final String[] content,
+                                    final String underText,
                                     final String defaultValue,
                                     final boolean isPasswordA) {
             super(parent, title, true);
-            init(content, defaultValue, isPasswordA);
+            init(content, underText, defaultValue, isPasswordA);
             setLocationRelativeTo(parent);
         }
 
@@ -164,10 +170,11 @@ public class SSHGui {
         public EnterSomethingDialog(final Frame parent,
                                     final String title,
                                     final String[] content,
+                                    final String underText,
                                     final String defaultValue,
                                     final boolean isPasswordA) {
             super(parent, title, true);
-            init(content, defaultValue, isPasswordA);
+            init(content, underText, defaultValue, isPasswordA);
             setLocationRelativeTo(parent);
         }
 
@@ -175,6 +182,7 @@ public class SSHGui {
          * Init.
          */
         private void init(final String[] content,
+                          final String underText,
                           final String defaultValue,
                           final boolean isPassword) {
             this.isPassword = isPassword;
@@ -194,6 +202,9 @@ public class SSHGui {
             }
 
             final JPanel pan = new JPanel();
+            pan.setBorder(new LineBorder(
+                   Tools.getDefaultColor("ConfigDialog.Background.Light"), 5));
+            pan.setBackground(java.awt.Color.WHITE);
             pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
             if (host != null && host.getName() != null) {
                 pan.add(new JLabel("host: " + host.getName()));
@@ -236,7 +247,16 @@ public class SSHGui {
             passwordField.addKeyListener(kl);
 
             getContentPane().add(BorderLayout.CENTER, pan);
-
+            if (underText != null) {
+                final JLabel l = new JLabel(underText);
+                final Font font = l.getFont();
+                final String name = font.getFontName();
+                final int style = font.ITALIC;
+                final int size = font.getSize();
+                l.setFont(new Font(name, style, size - 3));
+                l.setForeground(java.awt.Color.GRAY);
+                pan.add(l);
+            }
             setResizable(false);
             pack();
         }

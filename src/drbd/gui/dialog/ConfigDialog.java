@@ -23,10 +23,10 @@ package drbd.gui.dialog;
 
 import drbd.utilities.Tools;
 import drbd.gui.GuiComboBox;
+import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JOptionPane;
-import drbd.utilities.MyButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
@@ -37,10 +37,12 @@ import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Component;
+import java.awt.FlowLayout;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -138,10 +140,16 @@ public abstract class ConfigDialog {
         answerPane = new JEditorPane(Tools.MIME_TYPE_TEXT_PLAIN, initialText);
         answerPane.setBackground(
                             Tools.getDefaultColor("ConfigDialog.AnswerPane"));
+        answerPane.setForeground(java.awt.Color.WHITE);
+        //answerPane.setBackground(
+        //                    Tools.getDefaultColor("ConfigDialog.AnswerPane"));
+        //descSP.setBorder(null);
         answerPane.setEditable(false);
         final JScrollPane scrollPane = new JScrollPane(answerPane);
         scrollPane.setHorizontalScrollBarPolicy(
                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 80));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 80));
         return scrollPane;
     }
 
@@ -192,7 +200,6 @@ public abstract class ConfigDialog {
     protected final JPanel body() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-        pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         final JEditorPane descPane = new JEditorPane(
                        Tools.MIME_TYPE_TEXT_HTML,
                        "<p style='font-family:Dialog; font-size:16; "
@@ -200,7 +207,10 @@ public abstract class ConfigDialog {
                        + getDialogTitle() + "</p>"
                        + "<p style='font-family:Dialog; font-size:12;'>"
                        + getDescription() + "</p>");
-        descPane.setBackground(pane.getBackground());
+        descPane.setSize(300, Integer.MAX_VALUE);
+
+        descPane.setBackground(
+                            Tools.getDefaultColor("ConfigDialog.Background"));
         descPane.setEditable(false);
         final JScrollPane descSP = new JScrollPane(descPane);
         descSP.setBorder(null);
@@ -208,14 +218,15 @@ public abstract class ConfigDialog {
         pane.add(descSP);
         final JComponent inputPane = getInputPane();
         if (inputPane != null) {
-            inputPane.setPreferredSize(new Dimension(Short.MAX_VALUE,
+            inputPane.setMinimumSize(new Dimension(Short.MAX_VALUE,
                                                      INPUT_PANE_HEIGHT));
             inputPane.setBackground(
                             Tools.getDefaultColor("ConfigDialog.Background"));
             inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);
             pane.add(inputPane);
         }
-
+        pane.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         return pane;
     }
 
@@ -292,7 +303,7 @@ public abstract class ConfigDialog {
      * Returns class of the button, so that it can be enabled or
      * disabled.
      */
-    protected final JButton buttonClass(final String button) {
+    protected final MyButton buttonClass(final String button) {
         return buttonToObjectMap.get(button);
     }
 
@@ -435,13 +446,15 @@ public abstract class ConfigDialog {
             skipButton = new JCheckBox(Tools.getString(
                                            "Dialog.ConfigDialog.SkipButton"));
             skipButton.setBackground(
-                    Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+                    Tools.getDefaultColor("ConfigDialog.Background.Light"));
             skipButton.addItemListener(skipButtonListener());
             allOptions.add(skipButton);
         }
         /* populate buttonToObjectMap */
         for (int i = 0; i < buttons.length; i++) {
             options[i] = new MyButton(buttons[i], icons[i]);
+            options[i].setBackgroundColor(
+                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
             allOptions.add(options[i]);
             buttonToObjectMap.put(buttons[i], options[i]);
             if (buttons[i].equals(defaultButton())) {
@@ -492,12 +505,6 @@ public abstract class ConfigDialog {
                                                  dialogHeight()));
         dialogPanel.setMinimumSize(new Dimension(dialogWidth(),
                                                  dialogHeight()));
-        for (Component c : optionPane.getComponents()) {
-            if (c instanceof JPanel) {
-                c.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-            }
-        }
         /* set location like the previous dialog */
         dialogPanel.setVisible(true);
         initDialog();
@@ -613,5 +620,19 @@ public abstract class ConfigDialog {
             });
             t.start();
         }
+    }
+
+    /** Returns panel with checkbox. */
+    protected final JPanel getComponentPanel(final String text,
+                                             final JComponent component) {
+        final JPanel mp = new JPanel(
+                     new FlowLayout(FlowLayout.LEFT, 0, 0));
+        mp.setBackground(
+             Tools.getDefaultColor("ConfigDialog.Background"));
+        mp.add(new JLabel(text));
+        mp.add(new JLabel(" "));
+        mp.add(component);
+        mp.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return mp;
     }
 }

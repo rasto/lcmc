@@ -50,7 +50,6 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Map;
 import java.util.HashMap;
@@ -93,7 +92,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private final Set<String> suspending = new HashSet<String>();
     /** Resuming. */
     private final Set<String> resuming = new HashSet<String>();
-    /** Progress dots when starting or stopping */
+    /** Progress dots when starting or stopping. */
     private final StringBuffer dots = new StringBuffer(".....");
     /** Disk to info hash lock. */
     private final Mutex mDiskToInfoLock = new Mutex();
@@ -246,6 +245,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Updates disk nodes. Returns whether the node changed. */
     private boolean updateDiskNodes() {
         final Map<String, DiskData> disks = getDisks();
+        final List<String> diskNames  = new ArrayList<String>();
+        if (disks != null) {
+            for (final String d : disks.keySet()) {
+                diskNames.add(d);
+            }
+        }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
         final Enumeration e = getNode().children();
@@ -255,9 +260,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 (DefaultMutableTreeNode) e.nextElement();
             final VMSDiskInfo vmsdi =
                               (VMSDiskInfo) node.getUserObject();
-            if (disks != null && disks.containsKey(vmsdi.toString())) {
+            if (diskNames.contains(vmsdi.toString())) {
                 /* keeping */
-                disks.remove(vmsdi.toString());
+                diskNames.remove(vmsdi.toString());
                 vmsdi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
@@ -280,34 +285,34 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
         final Enumeration eee = getNode().children();
         int i = 0;
-        if (disks != null) {
-            for (final String disk : disks.keySet()) {
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node =
-                                        (DefaultMutableTreeNode) eee.nextElement();
-                    final VMSDiskInfo vmsdi = (VMSDiskInfo) node.getUserObject();
-                    if (disk.compareTo(vmsdi.getName()) < 0) {
-                        break;
-                    }
-                    i++;
+        for (final String disk : diskNames) {
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                final VMSDiskInfo vmsdi =
+                                        (VMSDiskInfo) node.getUserObject();
+                if (disk.compareTo(vmsdi.getName()) < 0) {
+                    break;
                 }
-                /* add new vm disk */
-                final VMSDiskInfo vmsdi = new VMSDiskInfo(disk, getBrowser(), this);
-                try {
-                    mDiskToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
-                diskToInfo.put(disk, vmsdi);
-                mDiskToInfoLock.release();
-                vmsdi.updateParameters();
-                final DefaultMutableTreeNode resource =
-                                                new DefaultMutableTreeNode(vmsdi);
-                getBrowser().setNode(resource);
-                getNode().insert(resource, i);
                 i++;
-                nodeChanged = true;
             }
+            /* add new vm disk */
+            final VMSDiskInfo vmsdi =
+                                new VMSDiskInfo(disk, getBrowser(), this);
+            try {
+                mDiskToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            diskToInfo.put(disk, vmsdi);
+            mDiskToInfoLock.release();
+            vmsdi.updateParameters();
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmsdi);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            i++;
+            nodeChanged = true;
         }
         return nodeChanged;
     }
@@ -565,7 +570,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         /* Actions */
         final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         JMenu serviceCombo;
         serviceCombo = getActionsMenu();
         mb.add(serviceCombo);
@@ -597,7 +601,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            boolean wasEmpty = starting.isEmpty();
+            final boolean wasEmpty = starting.isEmpty();
             starting.add(host.getName());
             if (!wasEmpty) {
                 mTransitionLock.release();
@@ -630,14 +634,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Starts shutting down indicator.
      */
-    final void startShuttingdownIndicator(final Host host) {
+    private void startShuttingdownIndicator(final Host host) {
         int i = 0;
         try {
             mTransitionLock.acquire();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        boolean wasEmpty = starting.isEmpty();
+        final boolean wasEmpty = starting.isEmpty();
         shuttingdown.add(host.getName());
         if (!wasEmpty) {
             mTransitionLock.release();
@@ -708,7 +712,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            boolean wasEmpty = suspending.isEmpty();
+            final boolean wasEmpty = suspending.isEmpty();
             suspending.add(host.getName());
             if (!wasEmpty) {
                 mTransitionLock.release();
@@ -750,7 +754,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            boolean wasEmpty = resuming.isEmpty();
+            final boolean wasEmpty = resuming.isEmpty();
             resuming.add(host.getName());
             if (!wasEmpty) {
                 mTransitionLock.release();
@@ -1550,6 +1554,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                       final Map<String, DiskData> disks,
                                       final boolean opaque) {
         final DiskData diskData = disks.get(targetDev);
+        if (diskData == null) {
+            return new Object[]{targetDev, "unknown"};
+        }
         final StringBuffer target = new StringBuffer(10);
         target.append(diskData.getTargetBus());
         target.append(' ');

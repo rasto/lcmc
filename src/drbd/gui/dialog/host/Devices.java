@@ -165,8 +165,8 @@ public class Devices extends DialogHost {
         pane.add(getAnswerPane(
                             Tools.getString("Dialog.Host.Devices.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  //rows, cols
-                                              1, 1,  //initX, initY
-                                              1, 1); //xPad, yPad
+                                              0, 0,  //initX, initY
+                                              0, 1); //xPad, yPad
 
         return pane;
     }

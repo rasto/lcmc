@@ -240,7 +240,7 @@ public class HostDrbdInfo extends Info {
      * Creates the popup for the host.
      */
     public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem>items = new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
         final MyMenuItem hostWizardItem =

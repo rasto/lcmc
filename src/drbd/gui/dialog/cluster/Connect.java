@@ -25,7 +25,6 @@ package drbd.gui.dialog.cluster;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
-import drbd.utilities.MyButton;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.WizardDialog;
 
@@ -108,7 +107,7 @@ public class Connect extends DialogCluster {
 
              SwingUtilities.invokeLater(new Runnable() {
                  public void run() {
-                    ((MyButton) buttonClass(nextButton())).pressButton();
+                    buttonClass(nextButton()).pressButton();
                  }
              });
         }

@@ -105,12 +105,14 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         buttonPanel.setBackground(STATUS_BACKGROUND);
         add(buttonPanel, BorderLayout.NORTH);
         final JPanel logoPanel = new JPanel(new CardLayout());
-        logoPanel.setBackground(STATUS_BACKGROUND);
-        final ImageIcon logoImage = Tools.createImageIcon(
-                                                        "startpage_head.jpg");
+        logoPanel.setBackground(java.awt.Color.WHITE);
+        final ImageIcon logoImage = Tools.createImageIcon("startpage_head.jpg");
 
         final JLabel logo = new JLabel(logoImage);
-        logoPanel.add(logo, LOGO_PANEL_STRING);
+        final JPanel lPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        lPanel.setBackground(java.awt.Color.WHITE);
+        lPanel.add(logo);
+        logoPanel.add(lPanel, LOGO_PANEL_STRING);
         final JEditorPane hp =
                   new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, HELP_TEXT_STRING);
         hp.setCaretPosition(0);
@@ -169,8 +171,8 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         final MyButton addHostButton = new MyButton(
                                     Tools.getString("ClusterTab.AddNewHost"),
                                     HOST_ICON);
-        addHostButton.setBackground(
-                        Tools.getDefaultColor("DefaultButton.Background"));
+        //addHostButton.setBackground(
+        //                Tools.getDefaultColor("DefaultButton.Background"));
         addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addHostButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {

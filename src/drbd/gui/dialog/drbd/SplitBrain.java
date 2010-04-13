@@ -139,6 +139,8 @@ public class SplitBrain extends DrbdConfig {
      */
     protected final void initDialog() {
         super.initDialog();
+        resolveButton.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
         enableComponents();
     }
 

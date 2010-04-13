@@ -104,8 +104,15 @@ public class ProgressBar implements ActionListener {
             cancelButton.addActionListener(this);
             pbPanel.add(cancelButton);
         }
-        pbPanel.setMaximumSize(pbPanel.getPreferredSize());
-        //pbPanel.setVisible(false);
+        final Dimension d = new Dimension(
+                              Short.MAX_VALUE,
+                              (int) pbPanel.getPreferredSize().getHeight());
+        pbPanel.setMaximumSize(d);
+        pbPanel.setPreferredSize(d);
+        progressBar.setVisible(false);
+        if (cancelButton != null) {
+            cancelButton.setVisible(false);
+        }
     }
 
     /**
@@ -151,6 +158,7 @@ public class ProgressBar implements ActionListener {
      */
     public final void start(final int t) {
         this.timeout = t;
+        stopNow = false;
         if (timeout == 0) {
             timeout = DEFAULT_TIMEOUT;
         }
@@ -176,7 +184,10 @@ public class ProgressBar implements ActionListener {
                             isVisible = true;
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
-                                    pbPanel.setVisible(true);
+                                    progressBar.setVisible(true);
+                                    if (cancelButton != null) {
+                                        cancelButton.setVisible(true);
+                                    }
                                 }
                             });
                         }
@@ -191,13 +202,11 @@ public class ProgressBar implements ActionListener {
                         }
 
                         time += sleepTime;
-                        // catch unclosed threads !!!!!
                         if (time > threshold) {
                             Tools.appWarning("Thread with timeout: "
                                              + timeout
                                              + " is running way too long");
                             threshold += DEBUG_THRESHOLD;
-                            //break;
                         }
                         if (progress >= timeout) {
                             /* premature end */
@@ -222,8 +231,8 @@ public class ProgressBar implements ActionListener {
         } else {
             progress = 0;
             time = 0;
-            }
         }
+    }
 
     /**
      * Returns progress bar panel.
@@ -279,6 +288,9 @@ public class ProgressBar implements ActionListener {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 progressBar.setVisible(false);
+                if (cancelButton != null) {
+                    cancelButton.setVisible(false);
+                }
             }
         });
     }
@@ -296,6 +308,9 @@ public class ProgressBar implements ActionListener {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 progressBar.setVisible(false);
+                if (cancelButton != null) {
+                    cancelButton.setVisible(false);
+                }
             }
         });
     }
@@ -308,6 +323,9 @@ public class ProgressBar implements ActionListener {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 progressBar.setVisible(true);
+                if (cancelButton != null) {
+                    cancelButton.setVisible(true);
+                }
                 progressBar.setIndeterminate(true);
             }
         });

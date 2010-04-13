@@ -28,6 +28,7 @@ package drbd;
 
 import drbd.gui.MainPanel;
 import drbd.gui.MainMenu;
+import drbd.gui.ClusterBrowser;
 import drbd.gui.ProgressIndicatorPanel;
 import drbd.utilities.Tools;
 import drbd.data.ConfigData;
@@ -36,8 +37,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.ColorUIResource;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
+import java.util.Arrays;
+import javax.swing.plaf.metal.OceanTheme;
+
 
 /**
  * This is the central class with main function. It starts the DRBD GUI.
@@ -60,9 +66,56 @@ public final class DrbdMC extends JPanel {
      * Create the GUI and show it.
      */
     private static void createAndShowGUI() {
+        final java.util.List buttonGradient = Arrays.asList(
+          new Object[] {new Float(.3f),
+                        new Float(0f),
+                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
+                        new ColorUIResource(0xFFFFFF),
+                        new ColorUIResource(ClusterBrowser.STATUS_BACKGROUND)});
+        final java.util.List checkboxGradient = Arrays.asList(
+          new Object[] {new Float(.3f),
+                        new Float(0f),
+                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
+                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
+                        new ColorUIResource(0xFFFFFF)});
         try {
             /* Metal */
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            MetalLookAndFeel.setCurrentTheme(
+                new OceanTheme() {
+                    /** e.g. arrows on split pane... */
+                    protected ColorUIResource getPrimary1() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.STATUS_BACKGROUND);
+                    }
+
+                    /** unknown to me */
+                    protected ColorUIResource getPrimary2() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                    /** unknown to me */
+                    protected ColorUIResource getPrimary3() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                    /** Button and other borders. */
+                    protected ColorUIResource getSecondary1() {
+                        return new ColorUIResource(
+                                  drbd.configs.AppDefaults.LINBIT_DARK_ORANGE);
+                    }
+                    protected ColorUIResource getSecondary2() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                    /** Split pane divider. Line in the main menu. */
+                    protected ColorUIResource getSecondary3() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                }
+            );
+
         } catch (final Exception e) {
             /* ignore it then */
         }
@@ -74,6 +127,54 @@ public final class DrbdMC extends JPanel {
                       Tools.getDefaultColor("DrbdMC.TableHeader"));
         UIManager.put("TableHeader.font",
                       UIManager.getFont("Label.font"));
+
+//      UIManager.put("SplitPane.dividerFocusColor", new Color(255, 255, 255));
+
+        UIManager.put("Button.gradient", buttonGradient);
+        UIManager.put("Button.select", ClusterBrowser.PANEL_BACKGROUND);
+//        UIManager.put("Button.disabledText", ClusterBrowser.PANEL_BACKGROUND);
+
+        UIManager.put("CheckBox.gradient", checkboxGradient);
+        UIManager.put("CheckBoxMenuItem.gradient", checkboxGradient);
+        UIManager.put("RadioButton.gradient", checkboxGradient);
+        UIManager.put("RadioButton.rollover", Boolean.TRUE);
+        UIManager.put("RadioButtonMenuItem.gradient", checkboxGradient);
+        UIManager.put("ScrollBar.gradient", buttonGradient);
+        UIManager.put("ToggleButton.gradient", buttonGradient);
+
+        UIManager.put("Menu.selectionBackground",
+                      ClusterBrowser.PANEL_BACKGROUND);
+        //UIManager.put("MenuBar.background",
+        //              ClusterBrowser.PANEL_BACKGROUND);
+        UIManager.put("MenuItem.selectionBackground",
+                      ClusterBrowser.PANEL_BACKGROUND);
+        UIManager.put("List.selectionBackground",
+                      ClusterBrowser.PANEL_BACKGROUND);
+        UIManager.put("ComboBox.selectionBackground",
+                      ClusterBrowser.PANEL_BACKGROUND);
+
+        //UIManager.put("OptionPane.messageBackground", Color.YELLOW);
+        //UIManager.put("OptionPane.messageForeground", Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.titlePane.background",
+        //              Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.border.background",
+        //                Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.border.background",
+        //                Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.border.background",
+        //                Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.titlePane.background",
+        //                Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.titlePane.background",
+        //                Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.border.background",
+        //                Color.YELLOW);
+        //UIManager.put("OptionPane.warningDialog.titlePane.background",
+        //                Color.YELLOW);
+        UIManager.put("Panel.background",
+                      ClusterBrowser.PANEL_BACKGROUND);
+
+
         /* Create and set up the window. */
         final JFrame mainFrame = new JFrame(
                Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());

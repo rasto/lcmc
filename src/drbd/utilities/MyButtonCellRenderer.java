@@ -77,7 +77,7 @@ public class MyButtonCellRenderer extends MyButton
         setHorizontalAlignment(al);
         final String key = ((MyButton) table.getValueAt(row, 0)).getText();
         final Color bg = getRowColor(key);
-        setBackground(bg);
+        setBackgroundColor(bg);
         setToolTipText(button.getText());
         return this;
     }

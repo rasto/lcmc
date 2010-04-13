@@ -31,7 +31,6 @@ import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
 import drbd.data.CRMXML;
 import drbd.gui.GUIData;
-import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.ConfirmDialog;
 
 import java.util.regex.Pattern;
@@ -49,7 +48,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashSet;
-import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -69,7 +67,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.JFileChooser;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -83,8 +80,6 @@ import java.awt.Point;
 import java.awt.Cursor;
 import java.awt.image.MemoryImageSource;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -441,7 +436,7 @@ public final class Tools {
                                                    ans,
                                                    exitCode);
                                  }
-                                 exitCodeHolder[0] = exitCode; 
+                                 exitCodeHolder[0] = exitCode;
                                  output.append(ans);
                              }
                          };
@@ -488,7 +483,7 @@ public final class Tools {
                                                    ans,
                                                    exitCode);
                                  }
-                                 exitCodeHolder[0] = exitCode; 
+                                 exitCodeHolder[0] = exitCode;
                                  output.append(ans);
                              }
                            };
@@ -1687,7 +1682,7 @@ public final class Tools {
     public static String getLatestVersion() {
         String version = null;
         final Pattern vp = Pattern.compile(
-                                    ".*<a\\s+href=\"drbd-mc-([0-9.]*?)\\.tar\\..*");
+                              ".*<a\\s+href=\"drbd-mc-([0-9.]*?)\\.tar\\..*");
         try {
             final String url = "http://oss.linbit.com/drbd-mc/?drbd-mc-check-"
                                + getRelease();

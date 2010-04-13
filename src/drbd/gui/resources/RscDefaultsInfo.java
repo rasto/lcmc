@@ -200,7 +200,7 @@ public class RscDefaultsInfo extends EditableInfo {
     }
 
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(String param) {
+    protected final ConfigData.AccessType getAccessType(final String param) {
         return getBrowser().getCRMXML().getRscDefaultsAccessType(param);
     }
 

@@ -24,16 +24,14 @@ package drbd.gui.dialog.host;
 import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.CancelCallback;
-import drbd.utilities.MyButton;
 import drbd.utilities.ConnectionCallback;
-import drbd.gui.SpringUtilities;
 import drbd.gui.SSHGui;
 import drbd.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.BoxLayout;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
@@ -77,8 +75,7 @@ public class SSH extends DialogHost {
                              //enableComponents();
                              SwingUtilities.invokeLater(new Runnable() {
                                  public void run() {
-                                    ((MyButton) buttonClass(
-                                                nextButton())).pressButton();
+                                    buttonClass(nextButton()).pressButton();
                                  }
                              });
                          }
@@ -142,7 +139,9 @@ public class SSH extends DialogHost {
      * Returns a pane where ssh connection will be attempted.
      */
     protected final JComponent getInputPane() {
-        final JPanel pane = new JPanel(new SpringLayout());
+        final JPanel pane = new JPanel();
+        //final JPanel pane = new JPanel(new SpringLayout());
+        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.add(getProgressBarPane(
                     new CancelCallback() {
                         public void cancel() {
@@ -153,9 +152,9 @@ public class SSH extends DialogHost {
                 ));
         pane.add(getAnswerPane(Tools.getString("Dialog.Host.SSH.Connecting")));
 
-        SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
+//        SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
+//                                              1, 1,  // initX, initY
+//                                              1, 1); // xPad, yPad
         return pane;
     }
 }

@@ -242,8 +242,8 @@ public class DrbdXML extends XML {
                                                     (ConvertCmdCallback) null);
         final SSH.SSHOutput ret = Tools.execCommand(host,
                                                     command2,
-                                                    null,  /* ExecCallback */
-                                                    false);/* outputVisible */
+                                                    null,   /* ExecCallback */
+                                                    false); /* outputVisible */
         if (ret.getExitCode() == 0) {
             return ret.getOutput();
         }

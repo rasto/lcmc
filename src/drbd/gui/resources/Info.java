@@ -666,7 +666,7 @@ public class Info implements Comparable {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        List<UpdatableItem> copy = new ArrayList<UpdatableItem>(menuList);
+        final List<UpdatableItem> copy = new ArrayList<UpdatableItem>(menuList);
         mMenuListLock.release();
         for (final UpdatableItem i : copy) {
             i.setPos(pos);

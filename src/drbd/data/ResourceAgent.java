@@ -427,7 +427,7 @@ public class ResourceAgent {
      * Gets the array of the possible choices of the m/s parameter.
      */
     public final String[] getParamPossibleChoicesMS(final String param) {
-        String[] ret = paramPossibleChoicesMS.get(param);
+        final String[] ret = paramPossibleChoicesMS.get(param);
         if (ret == null) {
             return getParamPossibleChoices(param);
         }

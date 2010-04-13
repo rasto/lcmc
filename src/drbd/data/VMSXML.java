@@ -462,14 +462,14 @@ public class VMSXML extends XML {
         private final String targetBus;
         /** Whether the disk is read only. */
         private final boolean readonly;
-        /** name value pairs */
+        /** Name value pairs. */
         private final Map<String, String> valueMap =
                                                 new HashMap<String, String>();
         /** Type. */
         public static final String TYPE = "type";
         /** Device. */
         public static final String DEVICE = "device";
-        /** Target device string */
+        /** Target device string. */
         public static final String TARGET_DEVICE = "target_device";
         /** Source file. */
         public static final String SOURCE_FILE = "source_file";

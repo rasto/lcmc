@@ -107,7 +107,7 @@ public class CoroConfig extends DialogCluster {
      * configs. */
     private JCheckBox configCheckbox;
     /** Editable hearbeat config panel. */
-    private final JPanel configPanel = new JPanel(new SpringLayout());
+    private final JPanel configPanel = new JPanel();
     /** Whether the config was changed by the user. */
     private boolean configChanged = false;
     /** Multicast type string. */
@@ -121,7 +121,7 @@ public class CoroConfig extends DialogCluster {
     /** Width of the interface combobox. */
     private static final int INTF_COMBOBOX_WIDTH = 80;
     /** Width of the remove button. */
-    private static final int REMOVE_BUTTON_WIDTH  = 80;
+    private static final int REMOVE_BUTTON_WIDTH  = 100;
     /** Height of the remove button. */
     private static final int REMOVE_BUTTON_HEIGHT = 14;
     /** Checkbox text (Edit the config). */
@@ -138,6 +138,8 @@ public class CoroConfig extends DialogCluster {
     private static final String SPACE_TAB = "        ";
     /** Config scroll pane. */
     private volatile JScrollPane configScrollPane = null;
+    /** Whether the config pane was already moved to the position. */
+    private volatile boolean alreadyMoved = false;
 
     /**
      * Prepares a new <code>CoroConfig</code> object.
@@ -147,6 +149,8 @@ public class CoroConfig extends DialogCluster {
         super(previousDialog, cluster);
         final Host[] hosts = getCluster().getHostsArray();
         configs = new String[hosts.length];
+        makeConfigButton.setBackgroundColor(
+                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
         makeConfigButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -232,6 +236,9 @@ public class CoroConfig extends DialogCluster {
      */
     protected final void initDialog() {
         super.initDialog();
+        configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
+        configPanel.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background"));
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final Thread thread = new Thread(
             new Runnable() {
@@ -474,6 +481,8 @@ public class CoroConfig extends DialogCluster {
             public void run() {
                 makeConfigButton.setEnabled(false);
                 configPanel.removeAll();
+                final JPanel insideConfigPanel = new JPanel(
+                                                        new SpringLayout());
                 int cols = 0;
                 for (int i = 0; i < hosts.length; i++) {
                     if (AIS_CONF_ERROR_STRING.equals(configs[i])) {
@@ -484,21 +493,23 @@ public class CoroConfig extends DialogCluster {
                     final JLabel l = new JLabel(hosts[i].getName() + ":");
                     l.setBackground(Color.WHITE);
                     final JPanel labelP = new JPanel();
-                    labelP.setBackground(Color.WHITE);
+                    labelP.setBackground(
+                            Tools.getDefaultColor("ConfigDialog.Background"));
                     labelP.setLayout(new BoxLayout(labelP, BoxLayout.Y_AXIS));
                     labelP.setAlignmentX(Component.TOP_ALIGNMENT);
                     labelP.add(l);
-                    configPanel.add(labelP);
+                    insideConfigPanel.add(labelP);
                     final JTextArea ta = new JTextArea(configs[i]);
                     ta.setEditable(false);
-                    configPanel.add(ta);
+                    insideConfigPanel.add(ta);
                     cols += 2;
                 }
                 if (cols > 0) {
-                    SpringUtilities.makeCompactGrid(configPanel,
+                    SpringUtilities.makeCompactGrid(insideConfigPanel,
                                                     1, cols,
                                                     1, 1,
                                                     1, 1);
+                    configPanel.add(insideConfigPanel);
                 }
                 configPanel.revalidate();
                 configPanel.repaint();
@@ -518,34 +529,29 @@ public class CoroConfig extends DialogCluster {
                     makeConfigButton.setEnabled(false);
                 }
                 configPanel.removeAll();
-                int rows = 0;
                 /* head */
                 final String[] head =
                            aisConfigHead(true).toString().split(NEWLINE);
                 for (String line : head) {
                     configPanel.add(new JLabel(line));
-                    configPanel.add(new JLabel(" "));
-                    rows++;
                 }
                 /* addresses */
                 int ringnumber = 0;
                 for (final AisCastAddress c : aisCastAddresses) {
                     configPanel.add(new JLabel(""));
-                    configPanel.add(new JLabel(" "));
-                    rows++;
                     final String[] interfaceLines =
                                 c.getConfigString(ringnumber++,
                                                   SPACE_TAB).split(NEWLINE);
                     boolean firstLine = true;
                     for (final String interfaceLine : interfaceLines) {
-                        configPanel.add(new JLabel(interfaceLine));
                         if (firstLine) {
-                            configPanel.add(getRemoveButton(c));
+                            configPanel.add(getComponentPanel(
+                                                          interfaceLine,
+                                                          getRemoveButton(c)));
                             firstLine = false;
                         } else {
-                            configPanel.add(new JLabel(" "));
+                            configPanel.add(new JLabel(interfaceLine));
                         }
-                        rows++;
                     }
                 }
 
@@ -563,7 +569,6 @@ public class CoroConfig extends DialogCluster {
                     l.setForeground(Color.RED);
                     configPanel.add(l);
                     configPanel.add(new JLabel(""));
-                    rows++;
                     final JLabel label = l;
                     label.addComponentListener(new ComponentListener() {
                         public final void componentHidden(
@@ -574,6 +579,10 @@ public class CoroConfig extends DialogCluster {
                                                       final ComponentEvent e) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
+                                    if (alreadyMoved) {
+                                        return;
+                                    }
+                                    alreadyMoved = true;
                                     configScrollPane.getViewport()
                                                     .setViewPosition(
                                             label.getBounds().getLocation());
@@ -592,15 +601,9 @@ public class CoroConfig extends DialogCluster {
                 }
 
                 configPanel.add(new JLabel(""));
-                configPanel.add(new JLabel(" "));
-                rows++;
                 /* mcast etc combo boxes */
                 configPanel.add(mcast);
-                configPanel.add(new JLabel(""));
-                rows++;
                 configPanel.add(new JLabel("}"));
-                configPanel.add(new JLabel(""));
-                rows++;
 
                 /* service pacemaker */
                 final String serviceVersion =
@@ -613,20 +616,12 @@ public class CoroConfig extends DialogCluster {
                                                           .split(NEWLINE);
                 final Pattern p = Pattern.compile("\\s*use_mgmtd\\s*:.*");
                 for (String line : pacemakerLines) {
-                    configPanel.add(new JLabel(line));
                     final Matcher m = p.matcher(line);
                     if (m.matches()) {
-                        configPanel.add(mgmtdCB);
+                        configPanel.add(getComponentPanel(line, mgmtdCB));
                     } else {
-                        configPanel.add(new JLabel(" "));
+                        configPanel.add(new JLabel(line));
                     }
-                    rows++;
-                }
-                if (rows > 0) {
-                    SpringUtilities.makeCompactGrid(configPanel,
-                                                    rows, 2,
-                                                    1, 1,
-                                                    1, 1);
                 }
                 configPanel.revalidate();
                 configPanel.repaint();
@@ -654,6 +649,8 @@ public class CoroConfig extends DialogCluster {
     private MyButton getRemoveButton(final AisCastAddress c) {
         final MyButton removeButton = new MyButton(
               Tools.getString("Dialog.Cluster.CoroConfig.RemoveIntButton"));
+        removeButton.setBackgroundColor(
+                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
         removeButton.setMaximumSize(new Dimension(REMOVE_BUTTON_WIDTH,
                                                   REMOVE_BUTTON_HEIGHT));
         removeButton.setPreferredSize(new Dimension(REMOVE_BUTTON_WIDTH,
@@ -950,6 +947,8 @@ public class CoroConfig extends DialogCluster {
 
         addButton = new MyButton(
                      Tools.getString("Dialog.Cluster.CoroConfig.AddIntButton"));
+        addButton.setBackgroundColor(
+                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
         addButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -968,9 +967,16 @@ public class CoroConfig extends DialogCluster {
                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
                                    );
+        configScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE,
+                                                      150));
+        configScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE,
+                                                        150));
         statusPanel = new JPanel();
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
+        configCheckbox.setBackground(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+
         Tools.getGUIData().setAccessible(configCheckbox,
                                          ConfigData.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
@@ -1014,18 +1020,21 @@ public class CoroConfig extends DialogCluster {
         pane.add(configScrollPane);
         configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
         mcast.add(typeCB);
         mcast.add(ifaceCB);
         mcast.add(addrCB);
         mcast.add(portCB);
         mcast.add(addButton);
-        mcast.setMaximumSize(mcast.getPreferredSize());
+        mcast.setPreferredSize(mcast.getMinimumSize());
+        mcast.setAlignmentX(Component.LEFT_ALIGNMENT);
         /* mgmtd */
         mgmtdCB = new JCheckBox(
                 Tools.getString("Dialog.Cluster.CoroConfig.UseMgmtdCheckBox"),
                 null,
                 false);
+        mgmtdCB.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mgmtdCB.setToolTipText(Tools.getString(
                         "Dialog.Cluster.CoroConfig.UseMgmtdCheckBox.ToolTip"));
         mgmtdCB.addItemListener(
@@ -1039,7 +1048,7 @@ public class CoroConfig extends DialogCluster {
                     thread.start();
                 }
             });
-        makeConfigButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+//        makeConfigButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         pane.add(makeConfigButton);
         return pane;
     }

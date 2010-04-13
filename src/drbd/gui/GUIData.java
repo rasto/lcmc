@@ -191,7 +191,8 @@ public class GUIData  {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 final int height = (int)
-                    terminalSplitPane.getBottomComponent().getSize().getHeight();
+                    terminalSplitPane.getBottomComponent().getSize()
+                                                          .getHeight();
                 if ((buttonNo == 0 && height == 0)
                     || (buttonNo == 1 && height > 0)) {
                     Tools.debug(this, "expand terminal split pane");
@@ -341,6 +342,7 @@ public class GUIData  {
      * Enable/Disable all 'Add Host' buttons.
      */
     public final void enableAddHostButtons(final boolean enable) {
+        //TODO: lock addHostButtonList
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 for (JComponent addHostButton : addHostButtonList) {

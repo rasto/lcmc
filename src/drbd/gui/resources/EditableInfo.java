@@ -104,7 +104,7 @@ public abstract class EditableInfo extends Info {
     protected MyButton applyButton;
     /** Is counted down, first time the info panel is initialized. */
     private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
-    /** List of advanced panels */
+    /** List of advanced panels. */
     private final List<JPanel> advancedPanelList = new ArrayList<JPanel>();
     /** List of messages if advanced panels are hidden. */
     private final List<JPanel> advancedOnlySectionList =

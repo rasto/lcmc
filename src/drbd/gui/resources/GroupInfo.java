@@ -39,7 +39,6 @@ import drbd.utilities.MyMenuItem;
 
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -377,7 +376,7 @@ public class GroupInfo extends ServiceInfo {
      * Returns items for the group popup.
      */
     public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem>items = super.createPopup();
+        final List<UpdatableItem> items = super.createPopup();
         final boolean testOnly = false;
         /* add group service */
         final MyMenu addGroupServiceMenuItem = new MyMenu(

@@ -600,8 +600,11 @@ public class Init extends DialogCluster {
 
             drbdLoadedInfos.add(new JLabel(
                         Tools.getString("Dialog.Cluster.Init.CheckingDrbd")));
-            drbdLoadButtons.add(new MyButton(
-                       Tools.getString("Dialog.Cluster.Init.LoadDrbdButton")));
+            final MyButton drbdb = new MyButton(
+                       Tools.getString("Dialog.Cluster.Init.LoadDrbdButton"));
+            drbdb.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+            drbdLoadButtons.add(drbdb);
             drbdLoadButtons.get(i).setVisible(false);
 
             drbdLoadButtons.get(i).addActionListener(
@@ -635,12 +638,16 @@ public class Init extends DialogCluster {
             /* Heartbeat */
             hbStartedInfos.add(new JLabel(
                         Tools.getString("Dialog.Cluster.Init.CheckingHb")));
+            MyButton button;
             if (host.isCsAisRunning() || host.isCsAisRc()) {
-                hbStartButtons.add(new MyButton(HB_BUTTON_SWITCH));
+                button = new MyButton(HB_BUTTON_SWITCH);
             } else {
-                hbStartButtons.add(new MyButton(
-                         Tools.getString("Dialog.Cluster.Init.StartHbButton")));
+                button = new MyButton(
+                         Tools.getString("Dialog.Cluster.Init.StartHbButton"));
             }
+            button.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+            hbStartButtons.add(button);
             hbStartButtons.get(i).setVisible(false);
 
             hbStartButtons.get(i).addActionListener(
@@ -692,8 +699,11 @@ public class Init extends DialogCluster {
             /* Pacemaker */
             pmStartedInfos.add(new JLabel(
                         Tools.getString("Dialog.Cluster.Init.CheckingPm")));
-            pmStartButtons.add(new MyButton(
-                      Tools.getString("Dialog.Cluster.Init.StartCsAisButton")));
+            final MyButton pmsb = new MyButton(
+                      Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
+            pmsb.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+            pmStartButtons.add(pmsb);
             pmStartButtons.get(i).setVisible(false);
 
             pmStartButtons.get(i).addActionListener(

@@ -50,6 +50,8 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Component;
 import java.awt.LayoutManager;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
@@ -71,6 +73,8 @@ public class ClusterHosts extends DialogCluster {
     /** Host not checked icon. */
     private static final ImageIcon HOST_UNCHECKED_ICON = Tools.createImageIcon(
             Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
+    /** Whether the scrolling pane was already moved. */
+    private volatile boolean alreadyMoved = false;
 
     /**
      * Prepares a new <code>ClusterHosts</code> object.
@@ -218,9 +222,16 @@ public class ClusterHosts extends DialogCluster {
                 }
             }
         }
+        final JScrollPane sp = new JScrollPane(p1,
+                               JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JCheckBox lastButton = null;
         for (final Host host : hosts.getHostsArray()) {
             final JCheckBox button = new JCheckBox(host.getName(),
                                                    HOST_UNCHECKED_ICON);
+            lastButton = button;
+            button.setBackground(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
             button.setSelectedIcon(HOST_CHECKED_ICON);
             if (getCluster().getBrowser() != null
                 && getCluster() == host.getCluster()) {
@@ -244,10 +255,35 @@ public class ClusterHosts extends DialogCluster {
             button.addItemListener(chListener);
             p1.add(button);
         }
+        if (lastButton != null) {
+            /* move the scrolling pane till the end. */
+            final JCheckBox lb = lastButton;
+            lb.addComponentListener(new ComponentListener() {
+                public final void componentHidden(final ComponentEvent e) {
+                }
+
+                public final void componentMoved(final ComponentEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (alreadyMoved) {
+                                return;
+                            }
+                            alreadyMoved = true;
+                            sp.getViewport().setViewPosition(
+                                                lb.getBounds().getLocation());
+                        }
+                    });
+                }
+
+                public final void componentResized(final ComponentEvent e) {
+                }
+
+                public final void componentShown(final ComponentEvent e) {
+                }
+            });
+        }
         p1.setBackground(Color.WHITE);
-        return new JScrollPane(p1,
-                               JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        return sp;
     }
 
     /**
