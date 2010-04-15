@@ -24,6 +24,10 @@ package drbd.gui.dialog.cluster;
 
 import drbd.data.Cluster;
 import drbd.gui.dialog.ClusterLogs;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -42,7 +46,7 @@ public class DrbdLogs extends ClusterLogs {
      */
     public DrbdLogs(final Cluster cluster, final String device) {
         super(cluster);
-        deviceName = device.substring(device.lastIndexOf('/') + 1) + ":";
+        deviceName = device.substring(device.lastIndexOf('/') + 1);
     }
 
     /**
@@ -53,10 +57,17 @@ public class DrbdLogs extends ClusterLogs {
         return "DrbdLog.log";
     }
 
-    /**
-     * Returns pattern that will be greped in the log.
-     */
-    protected final String grepPattern() {
-        return deviceName;
+    /** Returns which pattern names are selected by default. */
+    protected Set<String> getSelectedSet() {
+        final Set<String> selected = new HashSet<String>();
+        selected.add(deviceName);
+        return selected;
+    }
+
+    /** Returns a map from pattern name to its pattern. */
+    protected Map<String, String> getPatternMap() {
+        final Map<String, String> pm = new LinkedHashMap<String, String>();
+        pm.put(deviceName, wordBoundary(deviceName));
+        return pm;
     }
 }

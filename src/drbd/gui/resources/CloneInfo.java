@@ -133,15 +133,23 @@ public class CloneInfo extends ServiceInfo {
         return "";
     }
 
-    /**
-     * Returns the main text that appears in the graph.
-     */
+    /** Returns the main text that appears in the graph. */
     public final String getMainTextForGraph() {
         final ServiceInfo cs = containedService;
         if (cs == null) {
             return super.getMainTextForGraph();
         } else {
             return cs.getMainTextForGraph();
+        }
+    }
+
+    /** Returns name of this resource, that is used in logs. */
+    public String getNameForLog() {
+        final ServiceInfo cs = containedService;
+        if (cs == null) {
+            return super.getName();
+        } else {
+            return cs.getName();
         }
     }
 

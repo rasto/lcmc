@@ -25,6 +25,11 @@ package drbd.gui.dialog.pacemaker;
 import drbd.data.Cluster;
 import drbd.gui.dialog.ClusterLogs;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.HashSet;
+
 /**
  * An implementation of an dialog with log files from many hosts.
  *
@@ -34,22 +39,37 @@ import drbd.gui.dialog.ClusterLogs;
 public class ServiceLogs extends ClusterLogs {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Service type. e.g. Filesystem. */
+    private final String serviceType;
     /** Service heartbeat id. */
     private final String serviceHbId;
 
     /**
      * Prepares a new <code>ServiceLogs</code> object.
      */
-    public ServiceLogs(final Cluster cluster, final String serviceHbId) {
+    public ServiceLogs(final Cluster cluster,
+                       final String serviceType,
+                       final String serviceHbId) {
         super(cluster);
+        this.serviceType = serviceType;
         this.serviceHbId = serviceHbId;
     }
 
-    /**
-     * Grep pattern to grep in the logs. It is a heartbeat id of the service on
-     * the word boundary.
-     */
-    protected String grepPattern() {
-        return "'\\\\<" + serviceHbId + "\\\\>'";
+    /** Returns a map from pattern name to its pattern. */
+    protected final Map<String, String> getPatternMap() {
+        final Map<String, String> pm = new LinkedHashMap<String, String>();
+        pm.put("lrmd", wordBoundary("lrmd"));
+        pm.put(serviceType, wordBoundary(serviceType));
+        pm.put(serviceHbId, wordBoundary(serviceHbId));
+        pm.put("ERROR", wordBoundary("ERROR"));
+        return pm;
+    }
+
+    /** Returns which pattern names are selected by default. */
+    protected final Set<String> getSelectedSet() {
+        final Set<String> selected = new HashSet<String>();
+        selected.add(serviceType); // TODO: till pacemaker 1.0.8
+        selected.add("ERROR");
+        return selected;
     }
 }

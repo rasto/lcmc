@@ -23,20 +23,6 @@ package drbd.gui.dialog;
 
 import drbd.utilities.Tools;
 import drbd.data.Host;
-import drbd.gui.SpringUtilities;
-import drbd.utilities.ExecCallback;
-import drbd.gui.ProgressBar;
-
-import javax.swing.SpringLayout;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-
-import java.util.Map;
-import java.util.HashMap;
-
 
 /**
  * An implementation of an dialog, with log files.
@@ -44,11 +30,9 @@ import java.util.HashMap;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class HostLogs extends ConfigDialog {
+public class HostLogs extends Logs {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Text area where the log is written to. */
-    private final JTextArea logTextArea = new JTextArea();
     /** Host from which we get the log/logs. */
     private final Host host;
 
@@ -67,6 +51,11 @@ public class HostLogs extends ConfigDialog {
         return host;
     }
 
+    /** Returns this host. */
+    protected Host[] getHosts() {
+        return new Host[]{host};
+    }
+
     /**
      * Returns a command name from the DistResource that gets the drbd log file.
      * "HostLogs.hbLog"
@@ -76,96 +65,10 @@ public class HostLogs extends ConfigDialog {
     }
 
     /**
-     * Returns a pattern that should be searched in the config file.
-     * ("heartbeat:").
-     */
-    protected String grepPattern() {
-        return "heartbeat:";
-    }
-
-    /**
-     * Inits the dialog and starts the log command.
-     */
-    protected void initDialog() {
-        super.initDialog();
-        final Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    getLog();
-                }
-            });
-        thread.start();
-    }
-
-    /**
-     * Exectures the log command greps the pattern and sets the log area with
-     * the result.
-     */
-    protected void getLog() {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@GREPPATTERN@", grepPattern());
-        final String command = host.getDistCommand(logFileCommand(),
-                                                   replaceHash);
-        host.execCommandRaw(command,
-                             (ProgressBar) null,
-                             new ExecCallback() {
-                                 public void done(final String ans) {
-                                     SwingUtilities.invokeLater(
-                                                        new Runnable() {
-                                         public void run() {
-                                            logTextArea.setText(ans);
-                                            logTextArea.setCaretPosition(
-                                                logTextArea.getDocument().
-                                                                 getLength());
-                                         }
-                                     });
-                                     enableComponents();
-                                 }
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
-                                     Tools.sshError(host,
-                                                    command,
-                                                    ans,
-                                                    exitCode);
-                                     SwingUtilities.invokeLater(
-                                                        new Runnable() {
-                                         public void run() {
-                                            logTextArea.setText("error...");
-
-                                            enableComponents();
-                                         }
-                                     });
-                                 }
-                             }, false, false);
-    }
-
-    /**
      * Gets the title of the dialog, defined as Dialog.Logs.Title in
      * TextResources.
      */
     protected String getDialogTitle() {
         return Tools.getString("Dialog.HostLogs.Title");
-    }
-
-    /**
-     * Returns description for dialog. Nothing
-     */
-    protected String getDescription() {
-        return "";
-    }
-
-    /**
-     * Returns the pane where the log file will be shown.
-     */
-    protected JComponent getInputPane() {
-        final JPanel pane = new JPanel(new SpringLayout());
-        logTextArea.setEditable(false);
-        logTextArea.setText("loading...");
-
-        pane.add(new JScrollPane(logTextArea));
-        SpringUtilities.makeCompactGrid(pane, 1, 1,  // rows, cols
-                                              1, 1,  // initX, initY
-                                              1, 1); // xPad, yPad
-        return pane;
     }
 }

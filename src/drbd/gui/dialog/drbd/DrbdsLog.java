@@ -24,6 +24,10 @@ package drbd.gui.dialog.drbd;
 
 import drbd.data.Host;
 import drbd.gui.dialog.HostLogs;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 /**
  * An implementation of an dialog with log files.
@@ -49,10 +53,17 @@ public class DrbdsLog extends HostLogs {
         return "DrbdLog.log";
     }
 
-    /**
-     * Returns a pattern that should be searched in the config file. ("drbd")
-     */
-    protected String grepPattern() {
-        return "drbd";
+    /** Returns which pattern names are selected by default. */
+    protected Set<String> getSelectedSet() {
+        final Set<String> selected = new HashSet<String>();
+        selected.add("drbd");
+        return selected;
+    }
+
+    /** Returns a map from pattern name to its pattern. */
+    protected Map<String, String> getPatternMap() {
+        final Map<String, String> pm = new LinkedHashMap<String, String>();
+        pm.put("drbd", wordBoundary("drbd"));
+        return pm;
     }
 }

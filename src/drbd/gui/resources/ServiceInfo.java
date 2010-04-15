@@ -684,12 +684,16 @@ public class ServiceInfo extends EditableInfo {
         getService().setAvailable();
     }
 
-    /**
-     * Returns the main text that appears in the graph.
-     */
+    /** Returns the main text that appears in the graph. */
     public String getMainTextForGraph() {
         return toString();
     }
+
+    /** Returns name of this resource, that is used in logs. */
+    public String getNameForLog() {
+        return getName();
+    }
+
 
     /**
      * Returns a name of the service with id in the parentheses.
@@ -4100,6 +4104,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 });
                 ServiceLogs l = new ServiceLogs(getBrowser().getCluster(),
+                                                getNameForLog(),
                                                 getService().getHeartbeatId());
                 l.showDialog();
             }

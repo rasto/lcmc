@@ -23,6 +23,10 @@ package drbd.gui.dialog.drbd;
 
 import drbd.data.Host;
 import drbd.gui.dialog.HostLogs;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 /**
  * An implementation of an dialog with log files.
@@ -41,7 +45,7 @@ public class DrbdLog extends HostLogs {
      */
     public DrbdLog(final Host host, final String device) {
         super(host);
-        deviceName = device.substring(device.lastIndexOf('/') + 1) + ":";
+        deviceName = device.substring(device.lastIndexOf('/') + 1);
     }
 
     /**
@@ -52,11 +56,17 @@ public class DrbdLog extends HostLogs {
         return "DrbdLog.log";
     }
 
-    /**
-     * Returns a pattern that should be searched in the config file. (device
-     * name)
-     */
-    protected String grepPattern() {
-        return deviceName;
+    /** Returns which pattern names are selected by default. */
+    protected Set<String> getSelectedSet() {
+        final Set<String> selected = new HashSet<String>();
+        selected.add(deviceName);
+        return selected;
+    }
+
+    /** Returns a map from pattern name to its pattern. */
+    protected Map<String, String> getPatternMap() {
+        final Map<String, String> pm = new LinkedHashMap<String, String>();
+        pm.put(deviceName, wordBoundary(deviceName));
+        return pm;
     }
 }
