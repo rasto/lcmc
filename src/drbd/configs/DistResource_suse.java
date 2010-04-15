@@ -113,5 +113,8 @@ public class DistResource_suse extends
 
         {"Openais.deleteFromRc",
          "/sbin/chkconfig --del openais"},
+
+        {"DrbdLog.log",
+         "grep @GREPPATTERN@ /var/log/messages | tail -500"},
     };
 }

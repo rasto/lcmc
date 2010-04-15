@@ -316,7 +316,8 @@ public class DistResource extends
          + " || grep @GREPPATTERN@ /var/log/messages)|tail -500"},
 
         {"DrbdLog.log",
-         "grep @GREPPATTERN@ /var/log/kern.log | tail -500"},
+         "(grep @GREPPATTERN@ /var/log/kern.log 2>/dev/null"
+         +  " || grep @GREPPATTERN@ /var/log/messages)| tail -500"},
 
         {"DrbdInst.install.text.1", "packages from LINBIT"},
         {"DrbdInst.install.1",
