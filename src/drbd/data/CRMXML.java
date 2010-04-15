@@ -274,6 +274,10 @@ public class CRMXML extends XML {
     /** Access type of meta attributes. */
     private static final Map<String, ConfigData.AccessType> M_A_ACCESS_TYPE =
                                   new HashMap<String, ConfigData.AccessType>();
+    /** Access type of meta attributes in rsc defaults. */
+    private static final Map<String,ConfigData.AccessType>
+                                M_A_RSC_DEFAULTS_ACCESS_TYPE =
+                                  new HashMap<String, ConfigData.AccessType>();
     /** Possible choices for meta attributes. */
     private static final Map<String, String[]> M_A_POSSIBLE_CHOICES =
                                                 new HashMap<String, String[]>();
@@ -386,6 +390,8 @@ public class CRMXML extends XML {
         M_A_POSSIBLE_CHOICES.put(MASTER_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(MASTER_MAX_META_ATTR,
                         "Master / Slave Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(MASTER_MAX_META_ATTR,
+                                         ConfigData.AccessType.GOD);
         /* master-node-max */
         M_A_SHORT_DESC.put(MASTER_NODE_MAX_META_ATTR, "M/S Master-Node-Max");
         M_A_DEFAULT.put(MASTER_NODE_MAX_META_ATTR, "1");
@@ -393,6 +399,8 @@ public class CRMXML extends XML {
         M_A_POSSIBLE_CHOICES.put(MASTER_NODE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(MASTER_NODE_MAX_META_ATTR,
                         "Master / Slave Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(MASTER_NODE_MAX_META_ATTR,
+                                         ConfigData.AccessType.GOD);
         /* clone-max */
         M_A_SHORT_DESC.put(CLONE_MAX_META_ATTR, "Clone Max");
         M_A_DEFAULT.put(CLONE_MAX_META_ATTR, "");
@@ -400,34 +408,46 @@ public class CRMXML extends XML {
         M_A_TYPE.put(CLONE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
         M_A_POSSIBLE_CHOICES.put(CLONE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(CLONE_MAX_META_ATTR, "Clone Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(CLONE_MAX_META_ATTR,
+                                         ConfigData.AccessType.GOD);
         /* clone-node-max */
         M_A_SHORT_DESC.put(CLONE_NODE_MAX_META_ATTR, "Clone Node Max");
         M_A_DEFAULT.put(CLONE_NODE_MAX_META_ATTR, "1");
         M_A_TYPE.put(CLONE_NODE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
         M_A_POSSIBLE_CHOICES.put(CLONE_NODE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(CLONE_NODE_MAX_META_ATTR, "Clone Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(CLONE_NODE_MAX_META_ATTR,
+                                         ConfigData.AccessType.GOD);
         /* notify */
         M_A_SHORT_DESC.put(NOTIFY_META_ATTR, "Notify");
         M_A_DEFAULT.put(NOTIFY_META_ATTR, PCMK_FALSE);
         M_A_PREFERRED.put(NOTIFY_META_ATTR, PCMK_TRUE);
         M_A_POSSIBLE_CHOICES.put(NOTIFY_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(NOTIFY_META_ATTR, "Clone Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(NOTIFY_META_ATTR,
+                                         ConfigData.AccessType.GOD);
         /* globally-unique */
         M_A_SHORT_DESC.put(GLOBALLY_UNIQUE_META_ATTR, "Globally-Unique");
         M_A_DEFAULT.put(GLOBALLY_UNIQUE_META_ATTR, PCMK_FALSE);
         M_A_POSSIBLE_CHOICES.put(GLOBALLY_UNIQUE_META_ATTR,
                                  PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(GLOBALLY_UNIQUE_META_ATTR, "Clone Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GLOBALLY_UNIQUE_META_ATTR,
+                                         ConfigData.AccessType.GOD);
         /* ordered */
         M_A_SHORT_DESC.put(ORDERED_META_ATTR, "Ordered");
         M_A_DEFAULT.put(ORDERED_META_ATTR, PCMK_FALSE);
         M_A_POSSIBLE_CHOICES.put(ORDERED_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(ORDERED_META_ATTR, "Clone Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(ORDERED_META_ATTR,
+                                         ConfigData.AccessType.GOD);
         /* interleave */
         M_A_SHORT_DESC.put(INTERLEAVE_META_ATTR, "Interleave");
         M_A_DEFAULT.put(INTERLEAVE_META_ATTR, PCMK_FALSE);
         M_A_POSSIBLE_CHOICES.put(INTERLEAVE_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(INTERLEAVE_META_ATTR, "Clone Resource Defaults");
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(INTERLEAVE_META_ATTR,
+                                         ConfigData.AccessType.GOD);
     }
     /**
      * Prepares a new <code>CRMXML</code> object.
@@ -1237,7 +1257,8 @@ public class CRMXML extends XML {
     public final ConfigData.AccessType getRscDefaultsAccessType(
                                                          final String param) {
         final String newParam = convertRscDefaultsParam(param);
-        final ConfigData.AccessType at = M_A_ACCESS_TYPE.get(newParam);
+        final ConfigData.AccessType at =
+                                M_A_RSC_DEFAULTS_ACCESS_TYPE.get(newParam);
         if (at == null) {
             return ConfigData.AccessType.ADMIN;
         }
