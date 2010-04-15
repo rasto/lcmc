@@ -1027,16 +1027,16 @@ public class TextResource extends
          "No"},
 
         {"EmptyBrowser.LoadMarkedClusters",
-         "Load Marked Clusters"},
+         "Connect Marked Clusters"},
 
         {"EmptyBrowser.LoadMarkedClusters.ToolTip",
-         "Load marked clusters in the GUI."},
+         "Connect marked clusters in the GUI."},
 
         {"EmptyBrowser.UnloadMarkedClusters",
-         "Unload Marked Clusters"},
+         "Disconnnect Marked Clusters"},
 
         {"EmptyBrowser.UnloadMarkedClusters.ToolTip",
-         "Unload marked clusters in the GUI."},
+         "Disconnnect marked clusters in the GUI."},
 
         {"EmptyBrowser.RemoveMarkedClusters",
          "Remove Marked Clusters"},
@@ -1045,7 +1045,7 @@ public class TextResource extends
          "Remove marked clusters from the GUI."},
 
         {"EmptyBrowser.LoadClusterButton",
-         "Load"},
+         "Connect"},
 
         {"EmptyBrowser.NewHostWizard",
          "New Host Wizard"},
