@@ -59,7 +59,7 @@ public class ClusterLogs extends Logs {
     }
 
     /** Returns all hosts in the cluster. */
-    protected Host[] getHosts() {
+    protected final Host[] getHosts() {
         return cluster.getHostsArray();
     }
 

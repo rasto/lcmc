@@ -1294,7 +1294,7 @@ public class DrbdResourceInfo extends EditableInfo
         /* view log */
         final MyMenuItem viewLogMenu = new MyMenuItem(
                                Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
-                               null,
+                               LOGFILE_ICON,
                                null,
                                ConfigData.AccessType.RO,
                                ConfigData.AccessType.RO) {

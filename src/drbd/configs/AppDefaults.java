@@ -252,7 +252,6 @@ public class AppDefaults extends
         {"ClusterBrowser.ServiceIcon", "Icons/tango/16x16/service1_16x16.png"},
         {"ClusterBrowser.NetworkIcon", "Icons/tango/16x16/netzwk_16x16.png"},
         {"ClusterBrowser.RemoveIcon",  "Icons/tango/32x32/cancel_32x32.png"},
-        {"ClusterBrowser.LogIcon",     "Icons/tango/32x32/logfile.png"},
 
         {"ClusterBrowser.ClusterIconSmall",
          "Icons/tango/16x16/cluster_16x16.png"},
@@ -285,6 +284,7 @@ public class AppDefaults extends
 
         {"HostsPanel.HostIcon",          "Icons/tango/32x32/host_32x32.png"},
 
+        {"Info.LogIcon",     "Icons/tango/32x32/logfile.png"},
         {"BlockDevInfo.HarddiskIconLarge",
          "Icons/tango/32x32/blockdevice_32x32.png"},
 

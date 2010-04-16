@@ -136,6 +136,8 @@ public final class Tools {
     private static GUIData guiData;
     /** Drbd gui xml object. */
     private static DrbdGuiXML drbdGuiXML = new DrbdGuiXML();
+    /** String that starts info messages. */
+    private static final String INFO_STRING = "INFO: ";
     /** String that starts debug messages. */
     private static final String DEBUG_STRING = "DEBUG: ";
     /** Default dialog panel width. */
@@ -228,6 +230,11 @@ public final class Tools {
         }
     }
 
+    /** Prints info message to the stdout. */
+    public static void info(final String msg) {
+        System.out.println(INFO_STRING + msg);
+    }
+
     /**
      * Sets defaults from AppDefaults bundle.
      */
@@ -242,6 +249,18 @@ public final class Tools {
         localeLang = getDefault("Locale.Lang");
         localeCountry = getDefault("Locale.Country");
 
+    }
+
+    /** Increments the debug level. */
+    public static void incrementDebugLevel() {
+        debugLevel++;
+        info("debug level: " + debugLevel);
+    }
+
+    /** Decrements the debug level. */
+    public static void decrementDebugLevel() {
+        debugLevel--;
+        info("debug level: " + debugLevel);
     }
 
     /**
@@ -278,7 +297,9 @@ public final class Tools {
      */
     private static void debug(final String msg, final int level) {
         if (level <= debugLevel) {
-            System.out.println(DEBUG_STRING + msg + " (drbd.utilities.Tools)");
+            System.out.println(DEBUG_STRING
+                               + "(" + level + ") "
+                               + msg + " (drbd.utilities.Tools)");
         }
     }
 
@@ -318,7 +339,9 @@ public final class Tools {
                              final String msg,
                              final int level) {
         if (level <= debugLevel) {
-            System.out.println(DEBUG_STRING + msg
+            System.out.println(DEBUG_STRING
+                               + "(" + level + ") "
+                               + msg
                                + " (" + object.getClass().getName() + ")");
         }
     }

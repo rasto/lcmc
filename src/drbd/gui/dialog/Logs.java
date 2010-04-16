@@ -28,10 +28,11 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
-import drbd.gui.SpringUtilities;
+import javax.swing.ImageIcon;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.MyButton;
 import drbd.gui.ProgressBar;
+import drbd.gui.resources.Info;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -57,6 +58,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.JTextPane;
 import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -72,6 +74,10 @@ public class Logs extends ConfigDialog {
     /** Map from pattern name to its checkbox. */
     private final Map<String, JCheckBox> checkBoxMap =
                                             new HashMap<String, JCheckBox>();
+    /** Refresh button. */
+    private final MyButton refreshBtn = new MyButton("Refresh");
+    /** Refresh lock. */
+    private final Mutex mRefreshLock = new Mutex();
 
     /**
      * Command that gets the log. The command must be specified in the
@@ -84,7 +90,7 @@ public class Logs extends ConfigDialog {
     /**
      * Grep pattern for the log.
      */
-    protected String grepPattern() {
+    protected final String grepPattern() {
         final StringBuffer pattern = new StringBuffer(40);
         pattern.append('\'');
         final Map<String, String> patternMap = getPatternMap();
@@ -107,6 +113,7 @@ public class Logs extends ConfigDialog {
      */
     protected final void initDialog() {
         super.initDialog();
+        enableAllComponents(false);
         refreshLogsThread();
     }
 
@@ -115,7 +122,15 @@ public class Logs extends ConfigDialog {
         final Thread thread = new Thread(
             new Runnable() {
                 public void run() {
+                    try {
+                        if (!mRefreshLock.attempt(0)) {
+                            return;
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     refreshLogs();
+                    mRefreshLock.release();
                 }
             });
         thread.start();
@@ -126,12 +141,24 @@ public class Logs extends ConfigDialog {
         return new Host[]{};
     }
 
+    /** Enables/disables all the components. */
+    private void enableAllComponents(final boolean enable) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                refreshBtn.setEnabled(enable);
+                for (final String name : checkBoxMap.keySet()) {
+                    checkBoxMap.get(name).setEnabled(enable);
+                }
+            }
+        });
+    }
     /**
      * Gets logs from specified command (logFileCommand) and grep pattern
      * (grepPatter). It also mixes the log files from all the nodes, sorts
      * them, and assigns colors for lines from different hosts.
      */
     protected final void refreshLogs() {
+        enableAllComponents(false);
         final Host[] hosts = getHosts();
         Thread[] threads = new Thread[hosts.length];
         final String[] texts = new String[hosts.length];
@@ -231,44 +258,39 @@ public class Logs extends ConfigDialog {
         //promptColorStyleConstants.setForeground(c, host.getColor());
         StyleConstants.setForeground(color1, Color.BLACK);
         StyleConstants.setForeground(color2, Color.BLUE);
-                SimpleAttributeSet color = null;
-                int start = 0;
-                int a = 0;
-                String prevHost = "";
-                for (final String line : output) {
-                    final String[] tok = line.split("\\s+");
-                    if (tok.length > 3) {
-                        final String host = tok[3];
-                        if (!host.equals(prevHost)) {
-                            if (a == 0) {
-                                a++;
-                                color = color1;
-                            } else {
-                                a--;
-                                color = color2;
-                            }
-                        }
-                        prevHost = host;
+        SimpleAttributeSet color = null;
+        int start = 0;
+        int a = 0;
+        String prevHost = "";
+        for (final String line : output) {
+            final String[] tok = line.split("\\s+");
+            if (tok.length > 3) {
+                final String host = tok[3];
+                if (!host.equals(prevHost)) {
+                    if (a == 0) {
+                        a++;
+                        color = color1;
+                    } else {
+                        a--;
+                        color = color2;
                     }
-                    final SimpleAttributeSet color0 = color;
-                    final int start0 = start;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            try {
-                                doc.insertString(start0, line + "\n", color0);
-                            } catch (Exception e) {
-                                Tools.appError("Could not insert line: "
-                                               + line, e);
-                            }
-
-                            logTextArea.setCaretPosition(
-                                        logTextArea.getDocument().getLength());
-                        }
-                    });
-                    start = start + line.length() + 1;
                 }
+                prevHost = host;
+            }
+            final SimpleAttributeSet color0 = color;
+            final int start0 = start;
+            try {
+                doc.insertString(start0, line + "\n", color0);
+            } catch (Exception e) {
+                Tools.appError("Could not insert line", e);
+            }
+
+            logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
+            start = start + line.length() + 1;
+        }
 
         enableComponents();
+        enableAllComponents(true);
     }
 
     /**
@@ -320,7 +342,6 @@ public class Logs extends ConfigDialog {
             });
             pane.add(cb);
         }
-        final MyButton refreshBtn = new MyButton("Refresh");
         refreshBtn.addActionListener(new ActionListener() {
             public final void actionPerformed(final ActionEvent e) {
                 refreshLogsThread();
@@ -342,13 +363,15 @@ public class Logs extends ConfigDialog {
         logTextArea.setText("loading...");
         pane.add(getGrepChoicesPane());
         final JScrollPane sp = new JScrollPane(logTextArea);
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 250));
+        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         pane.add(sp);
-        SpringUtilities.makeCompactGrid(pane, 2, 1,  //rows, cols
-                                              0, 0,  //initX, initY
-                                              0, 0); //xPad, yPad
         pane.setMaximumSize(new Dimension(Short.MAX_VALUE,
                                           pane.getPreferredSize().height));
         return pane;
+    }
+
+    /** Returns an icon. */
+    protected final ImageIcon icon() {
+        return Info.LOGFILE_ICON;
     }
 }

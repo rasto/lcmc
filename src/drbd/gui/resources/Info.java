@@ -121,7 +121,9 @@ public class Info implements Comparable {
     /** Table models. */
     private final Map<String, DefaultTableModel> tableModels =
                                     new HashMap<String, DefaultTableModel>();
-
+    /** Log file icon. */
+    public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
+                                  Tools.getDefault("Info.LogIcon"));
     /**
      * Prepares a new <code>Info</code> object.
      *

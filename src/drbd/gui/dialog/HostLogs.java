@@ -47,12 +47,12 @@ public class HostLogs extends Logs {
     /**
      * Returns the host.
      */
-    protected Host getHost() {
+    protected final Host getHost() {
         return host;
     }
 
     /** Returns this host. */
-    protected Host[] getHosts() {
+    protected final Host[] getHosts() {
         return new Host[]{host};
     }
 

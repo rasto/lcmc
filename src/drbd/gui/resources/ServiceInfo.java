@@ -145,9 +145,6 @@ public class ServiceInfo extends EditableInfo {
     private static final String CACHED_FIELD = "cached";
     /** Master / Slave type string. */
     public static final String MASTER_SLAVE_TYPE_STRING = "Master/Slave";
-    /** Log file icon. */
-    private static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
-                                  Tools.getDefault("ClusterBrowser.LogIcon"));
     /** Unmanage service icon. */
     private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
                       Tools.getDefault("HeartbeatGraph.ServiceUnmanagedIcon"));

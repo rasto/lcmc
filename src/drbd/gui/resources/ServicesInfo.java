@@ -1201,7 +1201,7 @@ public class ServicesInfo extends EditableInfo {
         /* view logs */
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ViewLogs"),
-                           null,
+                           LOGFILE_ICON,
                            null,
                            ConfigData.AccessType.RO,
                            ConfigData.AccessType.RO) {

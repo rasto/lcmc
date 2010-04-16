@@ -346,7 +346,7 @@ public class HostInfo extends Info {
         /* view logs */
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                           null,
+                           LOGFILE_ICON,
                            null,
                            ConfigData.AccessType.RO,
                            ConfigData.AccessType.RO) {

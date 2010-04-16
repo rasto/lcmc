@@ -1368,7 +1368,7 @@ public class BlockDevInfo extends EditableInfo {
         /* view log */
         final MyMenuItem viewDrbdLogItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewDrbdLog"),
-                           null,
+                           LOGFILE_ICON,
                            null,
                            ConfigData.AccessType.RO,
                            ConfigData.AccessType.RO) {

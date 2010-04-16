@@ -215,6 +215,7 @@ public abstract class ConfigDialog {
         final JScrollPane descSP = new JScrollPane(descPane);
         descSP.setBorder(null);
         descSP.setAlignmentX(Component.LEFT_ALIGNMENT);
+        descSP.setMinimumSize(new Dimension(0, 50));
         pane.add(descSP);
         final JComponent inputPane = getInputPane();
         if (inputPane != null) {
@@ -230,9 +231,7 @@ public abstract class ConfigDialog {
         return pane;
     }
 
-    /**
-     * Returns an icon or null for default icon.
-     */
+    /** Returns an icon or null for default icon. */
     protected ImageIcon icon() {
         return Tools.createImageIcon(Tools.getDefault("ConfigDialog.Icon"));
     }
@@ -499,6 +498,7 @@ public abstract class ConfigDialog {
         dialogPanel = optionPane.createDialog(Tools.getGUIData().getMainFrame(),
                                               getDialogTitle());
         dialogPanel.setModal(false);
+        dialogPanel.setResizable(true);
         dialogPanel.setPreferredSize(new Dimension(dialogWidth(),
                                                    dialogHeight()));
         dialogPanel.setMaximumSize(new Dimension(dialogWidth(),
