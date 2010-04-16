@@ -908,7 +908,9 @@ public class ClusterBrowser extends Browser {
                                              + "exit code: "
                                              + exitCode,
                                        2);
-                           if (exitCode != 143) {
+                           if (exitCode != 143 && exitCode != 100) {
+                               // TODO: exit code is null -> 100 all of the
+                               // sudden
                                /* was killed intentionally */
                                if (host.isDrbdStatus()) {
                                    host.setDrbdStatus(false);
