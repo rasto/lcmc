@@ -25,9 +25,11 @@ package drbd.gui;
 import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.RoboTest;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleConstants;
@@ -43,6 +45,7 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+
 import javax.swing.plaf.TextUI;
 
 import java.awt.Font;
@@ -91,6 +94,40 @@ public class TerminalPanel extends JScrollPane {
                                             new HashMap<String, Color>();
     /** Default text color of the output in the terminal. */
     private final Color defaultOutputColor;
+
+    /** Command to list all the cheats. */
+    private static final String CHEAT_LIST  = "cheatlist";
+    /** Command to turn off the god mode. */
+    private static final String GOD_OFF = "nogodmode";
+    /** Command to turn on the god mode. */
+    private static final String GOD_ON  = "godmode";
+    /** Command to start frenzy clicking for short period. */
+    private static final String CLICKTEST_SHORT = "clicktestshort";
+    /** Command to start frenzy clicking for longer period. */
+    private static final String CLICKTEST_LONG = "clicktestlong";
+    /** Command to start lazy clicking for short period. */
+    private static final String CLICKTEST_LAZY_SHORT = "clicktestlazyshort";
+    /** Command to start lazy clicking for longer period. */
+    private static final String CLICKTEST_LAZY_LONG = "clicktestlazylong";
+    /** Command to increment debug level. */
+    private static final String DEBUG_INC = "debuginc";
+    /** Command to decrement debug level. */
+    private static final String DEBUG_DEC = "debugdec";
+    /** List of cheats, with positions while typing them. */
+    private static final Map<String, Integer> CHEATS_MAP =
+                                     new LinkedHashMap<String, Integer>();
+    static {
+        CHEATS_MAP.put(CHEAT_LIST, 0);
+        CHEATS_MAP.put(GOD_OFF, 0); /* off must be before on */
+        CHEATS_MAP.put(GOD_ON, 0);
+        CHEATS_MAP.put(CLICKTEST_SHORT, 0);
+        CHEATS_MAP.put(CLICKTEST_LONG, 0);
+        CHEATS_MAP.put(CLICKTEST_LAZY_SHORT, 0);
+        CHEATS_MAP.put(CLICKTEST_LAZY_LONG, 0);
+        CHEATS_MAP.put(DEBUG_INC, 0);
+        CHEATS_MAP.put(DEBUG_DEC, 0);
+    }
+
 
     /**
      * Prepares a new <code>TerminalPanel</code> object.
@@ -483,6 +520,7 @@ public class TerminalPanel extends JScrollPane {
         });
     }
 
+
     /**
      * This class overwrites the DefaultStyledDocument in order to add godmode
      * feature.
@@ -490,12 +528,6 @@ public class TerminalPanel extends JScrollPane {
     public class MyDocument extends DefaultStyledDocument {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
-        /** Command to turn on the god mode. */
-        private static final String COMMAND_CHEAT_ON  = "godmode";
-        /** Command to turn off the god mode. */
-        private static final String COMMAND_CHEAT_OFF = "nogodmode";
-        /** Position while writing the cheat code. */
-        private int cheatPos = 0;
 
         /**
          * Is called while a string is inserted. It checks if a cheat code is
@@ -509,7 +541,6 @@ public class TerminalPanel extends JScrollPane {
                 offs = commandOffset;
             }
             if (userCommand) {
-                String cheatCode;
                 if (editEnabled) {
                     if (s.charAt(s.length() - 1) == '\n') {
                         final int end = terminalArea.getDocument().getLength();
@@ -524,19 +555,21 @@ public class TerminalPanel extends JScrollPane {
                     } else {
                         super.insertString(offs, s, commandColor);
                     }
-                    cheatCode = COMMAND_CHEAT_OFF;
-                } else {
-                    cheatCode = COMMAND_CHEAT_ON;
                 }
-                if (s.equals(cheatCode.substring(cheatPos, cheatPos + 1))) {
-                    cheatPos++;
-                    if (cheatPos == cheatCode.length()) {
-                        editEnabled = !editEnabled;
-                        Tools.getGUIData().godModeChanged(editEnabled);
-                        cheatPos = 0;
+                for (final String cheat : CHEATS_MAP.keySet()) {
+                    int pos = CHEATS_MAP.get(cheat);
+                    if (s.equals(cheat.substring(pos, pos + 1))) {
+                        pos++;
+                        CHEATS_MAP.put(cheat, pos);
+                        if (pos == cheat.length()) {
+                            for (final String ch : CHEATS_MAP.keySet()) {
+                                CHEATS_MAP.put(ch, 0);
+                            }
+                            startCheat(cheat);
+                        }
+                    } else {
+                        CHEATS_MAP.put(cheat, 0);
                     }
-                } else {
-                    cheatPos = 0;
                 }
             } else {
                 super.insertString(offs, s, a);
@@ -549,8 +582,12 @@ public class TerminalPanel extends JScrollPane {
         public final void remove(final int offs,
                                  final int len) throws BadLocationException {
             if (offs >= commandOffset) {
-                if (cheatPos > 0) {
-                    cheatPos--;
+
+                for (final String cheat : CHEATS_MAP.keySet()) {
+                    final int pos = CHEATS_MAP.get(cheat);
+                    if (pos > 0) {
+                        CHEATS_MAP.put(cheat, pos - 1);
+                    }
                 }
                 if (editEnabled) {
                     super.remove(offs, len);
@@ -566,5 +603,39 @@ public class TerminalPanel extends JScrollPane {
         throws BadLocationException {
             super.remove(offs, len);
         }
+    }
+
+    /** Starts action after cheat was entered. */
+    private void startCheat(final String cheat) {
+        if (!editEnabled) {
+            addCommand(cheat);
+        }
+        if (!editEnabled && GOD_ON.equals(cheat)) {
+            editEnabled = true;
+            Tools.getGUIData().godModeChanged(editEnabled);
+        } else if (editEnabled && GOD_OFF.equals(cheat)) {
+            editEnabled = false;
+            Tools.getGUIData().godModeChanged(editEnabled);
+        } else if (CHEAT_LIST.equals(cheat)) {
+            final StringBuffer list = new StringBuffer();
+            for (final String ch : CHEATS_MAP.keySet()) {
+                list.append(ch);
+                list.append('\n');
+            }
+            addCommandOutput(list.toString());
+        } else if (CLICKTEST_SHORT.equals(cheat)) {
+            RoboTest.startClicker(10000, false);
+        } else if (CLICKTEST_LONG.equals(cheat)) {
+            RoboTest.startClicker(10000000, false);
+        } else if (CLICKTEST_LAZY_SHORT.equals(cheat)) {
+            RoboTest.startClicker(60, true);
+        } else if (CLICKTEST_LAZY_LONG.equals(cheat)) {
+            RoboTest.startClicker(3600, true); /* 1 hour */
+        } else if (DEBUG_INC.equals(cheat)) {
+            Tools.incrementDebugLevel();
+        } else if (DEBUG_DEC.equals(cheat)) {
+            Tools.decrementDebugLevel();
+        }
+        nextCommand();
     }
 }
