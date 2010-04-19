@@ -152,25 +152,8 @@ public final class DrbdMC extends JPanel {
                       ClusterBrowser.PANEL_BACKGROUND);
         UIManager.put("ComboBox.selectionBackground",
                       ClusterBrowser.PANEL_BACKGROUND);
-
-        //UIManager.put("OptionPane.messageBackground", Color.YELLOW);
-        //UIManager.put("OptionPane.messageForeground", Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.titlePane.background",
-        //              Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.border.background",
-        //                Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.border.background",
-        //                Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.border.background",
-        //                Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.titlePane.background",
-        //                Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.titlePane.background",
-        //                Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.border.background",
-        //                Color.YELLOW);
-        //UIManager.put("OptionPane.warningDialog.titlePane.background",
-        //                Color.YELLOW);
+        UIManager.put("OptionPane.background",
+                      ClusterBrowser.STATUS_BACKGROUND);
         UIManager.put("Panel.background",
                       ClusterBrowser.PANEL_BACKGROUND);
 
