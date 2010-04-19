@@ -56,25 +56,6 @@ public class DistResource_redhatenterpriseserver_5 extends
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
          + "&& /sbin/chkconfig --add heartbeat"},
 
-        ///* Heartbeat/Pacemaker opensuse */
-        //{"HbPmInst.install.text.2",
-        // "opensuse:ha-clustering repo: 1.0.x/2.99.x" },
-
-        //{"HbPmInst.install.2",
-        // "wget -N -nd -P /etc/yum.repos.d/"
-        // + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
-        // + "yum -y install resource-agents heartbeat.`uname -m"
-        // + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
-        // + "/sbin/chkconfig --add heartbeat"},
-
-        //{"HbPmInst.install.2.i686",
-        // "wget -N -nd -P /etc/yum.repos.d/"
-        // + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
-        // + "yum -y install resource-agents heartbeat.`uname -m"
-        // + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
-        // + "chmod g+w /var/run/heartbeat/ccm/ &&"
-        // + "/sbin/chkconfig --add heartbeat"},
-
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
          "clusterlabs repo: 1.0.x/1.2.x" },
@@ -92,39 +73,6 @@ public class DistResource_redhatenterpriseserver_5 extends
          + " && (/sbin/chkconfig --del heartbeat;"
          + " /sbin/chkconfig --level 2345 corosync on"
          + " && /sbin/chkconfig --level 016 corosync off)"},
-
-        ///* Corosync/Openais/Pacemaker opensuse */
-        //{"PmInst.install.text.2",
-        // "opensuse:ha-clustering repo: 1.0.x/0.80.x" },
-
-        //{"PmInst.install.2.i686",
-        // "wget -N -nd -P /etc/yum.repos.d/"
-        // + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
-        // + "yum -y install resource-agents.`uname -m"
-        // + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
-        // + "chmod g+w /var/run/heartbeat/ccm/ &&"
-        // + "((/sbin/chkconfig --level 2345 corosync on"
-        // + "  && /sbin/chkconfig --level 016 corosync off)"
-        // + " || (/sbin/chkconfig --level 2345 openais on"
-        // + "     && /sbin/chkconfig --level 016 openais off));"
-        // + " if [ -e /etc/ais/openais.conf ];then"
-        // + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
-        // + " if [ -e /etc/corosync/corosync.conf ];then"
-        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
-
-        //{"PmInst.install.2",
-        // "wget -N -nd -P /etc/yum.repos.d/"
-        // + " http://download.opensuse.org/repositories/server:/ha-clustering/RHEL_5/server:ha-clustering.repo && "
-        // + "yum -y install resource-agents.`uname -m"
-        // + "|sed s/i.86/i386/` pacemaker.`uname -m|sed s/i.86/i386/` && "
-        // + "((/sbin/chkconfig --level 2345 corosync on"
-        // + "  && /sbin/chkconfig --level 016 corosync off)"
-        // + " || (/sbin/chkconfig --level 2345 openais on"
-        // + "     && /sbin/chkconfig --level 016 openais off));"
-        // + " if [ -e /etc/ais/openais.conf ];then"
-        // + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
-        // + " if [ -e /etc/corosync/corosync.conf ];then"
-        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi;"},
 
         /* Workaround, where aisexec hangs the gui if called directly. */
         {"Openais.startOpenais.i686",

@@ -53,7 +53,7 @@ public class DistResource_ubuntu extends
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 2.99.x"},
+         "the ubuntu way: 1.0.x / 3.0.x"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -62,7 +62,7 @@ public class DistResource_ubuntu extends
 
         /* pacemaker corosync install method 1 */
         {"PmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 1.0.x"},
+         "the ubuntu way: 1.0.x / 1.2.x"},
 
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
