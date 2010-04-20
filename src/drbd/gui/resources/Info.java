@@ -488,10 +488,18 @@ public class Info implements Comparable {
     public final void showPopup(final JComponent c,
                                 final int x,
                                 final int y) {
-        final JPopupMenu pm = getPopup();
-        if (pm != null) {
-            pm.show(c, x, y);
-        }
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                final JPopupMenu empty = new JPopupMenu();
+                empty.add(new javax.swing.JMenuItem("wait..."));
+                empty.show(c, x, y);
+                final JPopupMenu pm = getPopup();
+                if (pm != null) {
+                    pm.show(c, x, y);
+                }
+            }
+        });
+        thread.start();
     }
 
     /**

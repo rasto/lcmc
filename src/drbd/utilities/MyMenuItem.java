@@ -245,7 +245,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             }
         } else {
             setText(text2);
-            if (icon2 != null) {
+            if (icon1 != null) { /* icon1 is here on purpose */
                 setIcon(icon2);
             }
             if (shortDesc2 != null && !shortDesc1.equals(text2)) {

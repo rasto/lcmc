@@ -94,6 +94,23 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /**
+     * Returns whether one of the services are newly added.
+     */
+    private boolean isNew() {
+        if ((lastServiceInfoRsc != null
+             && lastServiceInfoRsc.getService().isNew())
+            || (lastServiceInfoWithRsc != null
+                && lastServiceInfoWithRsc.getService().isNew())
+            || (lastServiceInfoParent != null
+                && lastServiceInfoParent.getService().isNew())
+            || (lastServiceInfoChild != null
+                && lastServiceInfoChild.getService().isNew())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Returns long description of the parameter, that is used for
      * tool tips.
      */
@@ -474,11 +491,16 @@ public class HbConnectionInfo extends EditableInfo {
         };
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
                   getBrowser().new ClMenuItemCallback(removeEdgeItem, null) {
+            public final boolean isEnabled() {
+                return !isNew();
+            }
             public void action(final Host dcHost) {
-                getBrowser().getHeartbeatGraph().removeConnection(
+                if (!isNew()) {
+                    getBrowser().getHeartbeatGraph().removeConnection(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
                                                       true);
+                }
             }
         };
         addMouseOverListener(removeEdgeItem, removeEdgeCallback);
@@ -528,21 +550,26 @@ public class HbConnectionInfo extends EditableInfo {
 
         final ClusterBrowser.ClMenuItemCallback removeOrderCallback =
                  getBrowser().new ClMenuItemCallback(removeOrderItem, null) {
+            public final boolean isEnabled() {
+                return !isNew();
+            }
             public void action(final Host dcHost) {
-                if (getBrowser().getHeartbeatGraph().isOrder(thisClass)) {
-                    getBrowser().getHeartbeatGraph().removeOrder(
+                if (!isNew()) {
+                    if (getBrowser().getHeartbeatGraph().isOrder(thisClass)) {
+                        getBrowser().getHeartbeatGraph().removeOrder(
                                                      thisClass,
                                                      getBrowser().getDCHost(),
                                                      true);
-                } else {
-                    /* there is colocation constraint so let's get the
-                     * endpoints from it. */
-                    addOrder(getLastServiceInfoRsc(),
-                             getLastServiceInfoWithRsc());
-                    getBrowser().getHeartbeatGraph().addOrder(
+                    } else {
+                        /* there is colocation constraint so let's get the
+                         * endpoints from it. */
+                        addOrder(getLastServiceInfoRsc(),
+                                 getLastServiceInfoWithRsc());
+                        getBrowser().getHeartbeatGraph().addOrder(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
                                                       true);
+                    }
                 }
             }
         };
@@ -576,11 +603,11 @@ public class HbConnectionInfo extends EditableInfo {
 
             public void action() {
                 if (this.getText().equals(Tools.getString(
-                                   "ClusterBrowser.Hb.RemoveColocation"))) {
+                                  "ClusterBrowser.Hb.RemoveColocation"))) {
                     getBrowser().getHeartbeatGraph().removeColocation(
-                                                       thisClass,
-                                                       getBrowser().getDCHost(),
-                                                       testOnly);
+                                                   thisClass,
+                                                   getBrowser().getDCHost(),
+                                                   testOnly);
                 } else {
                     /* add colocation */
                     /* there is order constraint so let's get the endpoints
@@ -588,31 +615,38 @@ public class HbConnectionInfo extends EditableInfo {
                     addColocation(getLastServiceInfoParent(),
                                   getLastServiceInfoChild());
                     getBrowser().getHeartbeatGraph().addColocation(
-                                                       thisClass,
-                                                       getBrowser().getDCHost(),
-                                                       testOnly);
+                                                   thisClass,
+                                                   getBrowser().getDCHost(),
+                                                   testOnly);
                 }
             }
         };
 
         final ClusterBrowser.ClMenuItemCallback removeColocationCallback =
             getBrowser().new ClMenuItemCallback(removeColocationItem, null) {
-            public void action(final Host dcHost) {
-                if (getBrowser().getHeartbeatGraph().isColocation(thisClass)) {
-                    getBrowser().getHeartbeatGraph().removeColocation(
+
+            public final boolean isEnabled() {
+                return !isNew();
+            }
+            public final void action(final Host dcHost) {
+                if (!isNew()) {
+                    if (getBrowser().getHeartbeatGraph().isColocation(
+                                                                thisClass)) {
+                        getBrowser().getHeartbeatGraph().removeColocation(
                                                        thisClass,
                                                        getBrowser().getDCHost(),
                                                        true);
-                } else {
-                    /* add colocation */
-                    /* there is order constraint so let's get the endpoints
-                     * from it. */
-                    addColocation(getLastServiceInfoParent(),
-                                  getLastServiceInfoChild());
-                    getBrowser().getHeartbeatGraph().addColocation(
+                    } else {
+                        /* add colocation */
+                        /* there is order constraint so let's get the endpoints
+                         * from it. */
+                        addColocation(getLastServiceInfoParent(),
+                                      getLastServiceInfoChild());
+                        getBrowser().getHeartbeatGraph().addColocation(
                                                        thisClass,
                                                        getBrowser().getDCHost(),
                                                        true);
+                    }
                 }
             }
         };
@@ -668,6 +702,8 @@ public class HbConnectionInfo extends EditableInfo {
                         serviceInfoParent.getService().getHeartbeatId(),
                         serviceInfoChild.getService().getHeartbeatId());
 
+        lastServiceInfoParent = serviceInfoParent;
+        lastServiceInfoChild = serviceInfoChild;
         if (ordId == null) {
             /* we'll get it later with id. */
             return;
@@ -676,8 +712,6 @@ public class HbConnectionInfo extends EditableInfo {
             orderIds.get(ordId).setParameters();
             return;
         }
-        lastServiceInfoParent = serviceInfoParent;
-        lastServiceInfoChild = serviceInfoChild;
         final HbOrderInfo oi = new HbOrderInfo(this,
                                                serviceInfoParent,
                                                serviceInfoChild,
@@ -701,6 +735,8 @@ public class HbConnectionInfo extends EditableInfo {
         final String colId = clStatus.getColocationId(
                          serviceInfoRsc.getService().getHeartbeatId(),
                          serviceInfoWithRsc.getService().getHeartbeatId());
+        lastServiceInfoRsc = serviceInfoRsc;
+        lastServiceInfoWithRsc = serviceInfoWithRsc;
         if (colId == null) {
             /* we'll get it later with id. */
             return;
@@ -709,8 +745,6 @@ public class HbConnectionInfo extends EditableInfo {
             colocationIds.get(colId).setParameters();
             return;
         }
-        lastServiceInfoRsc = serviceInfoRsc;
-        lastServiceInfoWithRsc = serviceInfoWithRsc;
         final HbColocationInfo ci = new HbColocationInfo(this,
                                                          serviceInfoRsc,
                                                          serviceInfoWithRsc,

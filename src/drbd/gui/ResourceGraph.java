@@ -169,6 +169,8 @@ public abstract class ResourceGraph {
     private final Mutex mTestAnimationThreadLock = new Mutex();
     /** List of edges that are made only during test. */
     private final List<Edge> testEdges = new ArrayList<Edge>();
+    /** List of edges that are being tested during test. */
+    private final List<Edge> existingTestEdges = new ArrayList<Edge>();
     /** Lock for test edge list. */
     private final Mutex mTestEdgeLock = new Mutex();
     /** Interval beetween two animation frames. */
@@ -359,14 +361,15 @@ public abstract class ResourceGraph {
      * Stops the test animation.
      */
     public final void stopTestAnimation(final JComponent component) {
-        removeTestEdges();
         try {
             mTestAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
+        removeTestEdges();
         testAnimationList.remove(component);
         mTestAnimationListLock.release();
+        removeExistingTestEdges();
     }
 
 
@@ -935,38 +938,54 @@ public abstract class ResourceGraph {
          * Creates and displays popup menus for vertices and edges.
          */
         protected void handlePopup(final MouseEvent me) {
-            // TODO: it comes here twice
-            final VisualizationViewer vv = (VisualizationViewer) me.getSource();
-            final Point2D p = vv.inverseViewTransform(me.getPoint());
-            final PickSupport pickSupport = vv.getPickSupport();
-            final Vertex v = pickSupport.getVertex(p.getX(), p.getY());
-            final Point2D popP = me.getPoint();
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    // TODO: it comes here twice
+                    final VisualizationViewer vv =
+                                        (VisualizationViewer) me.getSource();
+                    final Point2D p = vv.inverseViewTransform(me.getPoint());
+                    final PickSupport pickSupport = vv.getPickSupport();
+                    final Vertex v = pickSupport.getVertex(p.getX(), p.getY());
+                    final Point2D popP = me.getPoint();
 
-            final int posX = (int) popP.getX();
-            final int posY = (int) popP.getY();
-            if (v == null) {
-                final Edge edge = pickSupport.getEdge(p.getX(), p.getY());
-                if (edge == null) {
-                    /* background was clicked */
-                    final JPopupMenu backgroundPopup = handlePopupBackground(p);
-                    if (backgroundPopup != null) {
-                        backgroundPopup.show(vv, posX, posY);
+                    final int posX = (int) popP.getX();
+                    final int posY = (int) popP.getY();
+
+                    final JPopupMenu empty = new JPopupMenu();
+                    empty.add(new javax.swing.JMenuItem("wait..."));
+                    empty.show(vv, posX, posY);
+
+                    if (v == null) {
+                        final Edge edge = pickSupport.getEdge(p.getX(),
+                                                              p.getY());
+                        if (edge == null) {
+                            /* background was clicked */
+                            final JPopupMenu backgroundPopup =
+                                                    handlePopupBackground(p);
+                            if (backgroundPopup != null) {
+                                empty.setVisible(false);
+                                backgroundPopup.show(vv, posX, posY);
+                            }
+                            backgroundClicked();
+                        } else {
+                            final JPopupMenu edgePopup = handlePopupEdge(edge);
+                            if (edgePopup != null) {
+                                empty.setVisible(false);
+                                edgePopup.show(vv, posX, posY);
+                            }
+                            oneEdgePressed(edge);
+                        }
+                    } else {
+                        final JPopupMenu vertexPopup = handlePopupVertex(v, p);
+                        if (vertexPopup != null) {
+                            empty.setVisible(false);
+                            vertexPopup.show(vv, posX, posY);
+                        }
+                        oneVertexPressed(v); /* select this vertex */
                     }
-                    backgroundClicked();
-                } else {
-                    final JPopupMenu edgePopup = handlePopupEdge(edge);
-                    if (edgePopup != null) {
-                        edgePopup.show(vv, posX, posY);
-                    }
-                    oneEdgePressed(edge);
                 }
-            } else {
-                final JPopupMenu vertexPopup = handlePopupVertex(v, p);
-                if (vertexPopup != null) {
-                    vertexPopup.show(vv, posX, posY);
-                }
-                oneVertexPressed(v); /* select this vertex */
-            }
+            });
+            thread.start();
         }
     }
 
@@ -1679,14 +1698,18 @@ public abstract class ResourceGraph {
             Thread.currentThread().interrupt();
         }
         for (final Edge e : testEdges) {
-            getGraph().removeEdge(e);
+            try {
+                getGraph().removeEdge(e);
+            } catch (final Exception ee) {
+            }
         }
         testEdges.clear();
         mTestEdgeLock.release();
+
     }
 
     /**
-     * Adds a test edges.
+     * Creates a test edge.
      */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
         try {
@@ -1694,8 +1717,38 @@ public abstract class ResourceGraph {
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        final Edge edge = getGraph().addEdge(new MyEdge(vP, v));
-        testEdges.add(edge);
+        try {
+            if (isTestOnly()) {
+                final Edge edge = getGraph().addEdge(new MyEdge(vP, v));
+                testEdges.add(edge);
+            }
+        } catch (final Exception e) {
+            /* ignore */
+        }
+        mTestEdgeLock.release();
+    }
+
+    /** Adds an existing edge to the test edges. */
+    protected final void addExistingTestEdge(final Edge edge) {
+        try {
+            mTestEdgeLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        if (isTestOnly()) {
+            existingTestEdges.add(edge);
+        }
+        mTestEdgeLock.release();
+    }
+
+    /** Removes existing test edges. */
+    protected final void removeExistingTestEdges() {
+        try {
+            mTestEdgeLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        existingTestEdges.clear();
         mTestEdgeLock.release();
     }
 
@@ -1708,7 +1761,8 @@ public abstract class ResourceGraph {
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        final boolean is = testEdges.contains(e);
+        final boolean is = testEdges.contains(e)
+                           || existingTestEdges.contains(e);
         mTestEdgeLock.release();
         return is;
     }

@@ -343,7 +343,8 @@ public final class CRM {
 
     /**
      * Sets colocation and order constraint between service with heartbeatId
-     * and parents.
+     * and parents. If colAttrsList or ordAttrsList are null, there is only
+     * colocation or order but not both defined.
      */
     public static void setOrderAndColocation(
                                 final Host host,
@@ -353,18 +354,22 @@ public final class CRM {
                                 final List<Map<String, String>> ordAttrsList,
                                 final boolean testOnly) {
         for (int i = 0; i < parents.length; i++) {
-            addColocation(host,
-                          null,
-                          heartbeatId,
-                          parents[i],
-                          colAttrsList.get(i),
-                          testOnly);
-            addOrder(host,
-                     null,
-                     parents[i],
-                     heartbeatId,
-                     ordAttrsList.get(i),
-                     testOnly);
+            if (colAttrsList.get(i) != null) {
+                addColocation(host,
+                              null,
+                              heartbeatId,
+                              parents[i],
+                              colAttrsList.get(i),
+                              testOnly);
+            }
+            if (ordAttrsList.get(i) != null) {
+                addOrder(host,
+                         null,
+                         parents[i],
+                         heartbeatId,
+                         ordAttrsList.get(i),
+                         testOnly);
+            }
         }
     }
 

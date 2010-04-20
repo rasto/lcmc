@@ -1385,6 +1385,12 @@ public class TextResource extends
         {"ClusterBrowser.Hb.Migrating",
          "migrating..."},
 
+        {"ClusterBrowser.Hb.ColOnlySubmenu",
+         "Colocation Only"},
+
+        {"ClusterBrowser.Hb.OrdOnlySubmenu",
+         "Order Only"},
+
         {"ClusterBrowser.HbUpdateResources",
          "updating cluster resources..."},
 
@@ -1458,7 +1464,6 @@ public class TextResource extends
 
         {"ClusterBrowser.OperationsSameAs",
          "Same As"},
-
 
         {"PtestData.ToolTip",
          "What happens when you apply it:"},

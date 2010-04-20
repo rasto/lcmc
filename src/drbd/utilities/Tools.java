@@ -1520,6 +1520,7 @@ public final class Tools {
                 if (callbackHash != null) {
                     for (final MyMenuItem item : callbackHash.keySet()) {
                         callbackHash.get(item).mouseOut();
+                        list.clearSelection();
                     }
                 }
             }
@@ -2134,5 +2135,4 @@ public final class Tools {
         }
         return unixPath;
     }
-
 }

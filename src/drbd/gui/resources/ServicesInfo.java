@@ -897,7 +897,12 @@ public class ServicesInfo extends EditableInfo {
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
-        if (!hg.addResource(newServiceInfo, null, pos, testOnly)) {
+        if (!hg.addResource(newServiceInfo,
+                            null,
+                            pos,
+                            false, /* colocation only */
+                            false, /* order only */
+                            testOnly)) {
             getBrowser().addNameToServiceInfoHash(newServiceInfo);
             final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
