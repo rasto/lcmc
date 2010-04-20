@@ -273,6 +273,16 @@ public class HbOrderInfo extends EditableInfo
         return (Service) getResource();
     }
 
+    /** Returns name of the rsc1 attribute. */
+    public final String getRsc1Name() {
+        return "first";
+    }
+
+    /** Returns name of the rsc2 attribute. */
+    public final String getRsc2Name() {
+        return "then";
+    }
+
     /**
      * Get parent resource in order constraint.
      */

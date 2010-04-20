@@ -89,13 +89,13 @@ public interface HbConstraintInterface {
                        final int leftWidth,
                        final int rightWidth,
                        final int height);
-    /**
-     * Returns name of this constraint: colocation or order.
-     */
+    /** Returns name of this constraint: colocation or order. */
     String getName();
-    /**
-     * Returns resource 1.
-     */
+    /** Returns name of resource 1. */
+    String getRsc1Name();
+    /** Returns name of resource 2. */
+    String getRsc2Name();
+    /** Returns resource 1. */
     String getRsc1();
     /** Returns resource 2. */
     String getRsc2();

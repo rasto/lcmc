@@ -384,13 +384,13 @@ public class HbConnectionInfo extends EditableInfo {
                             ClusterBrowser.SERVICE_FIELD_WIDTH,
                             height);
             c.addLabelField(panel,
-                            "rsc1",
+                            c.getRsc1Name(),
                             c.getRsc1(),
                             ClusterBrowser.SERVICE_LABEL_WIDTH,
                             ClusterBrowser.SERVICE_FIELD_WIDTH,
                             height);
             c.addLabelField(panel,
-                            "rsc2",
+                            c.getRsc2Name(),
                             c.getRsc2(),
                             ClusterBrowser.SERVICE_LABEL_WIDTH,
                             ClusterBrowser.SERVICE_FIELD_WIDTH,
@@ -744,7 +744,7 @@ public class HbConnectionInfo extends EditableInfo {
     /**
      * Selects the node in the menu and reloads everything underneath.
      */
-    public void selectMyself() {
+    public final void selectMyself() {
         super.selectMyself();
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                         getBrowser().getTree().getLastSelectedPathComponent();

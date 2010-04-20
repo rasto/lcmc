@@ -269,6 +269,16 @@ public class HbColocationInfo extends EditableInfo
         return (Service) getResource();
     }
 
+    /** Returns name of the rsc1 attribute. */
+    public final String getRsc1Name() {
+        return "with-rsc";
+    }
+
+    /** Returns name of the rsc2 attribute. */
+    public final String getRsc2Name() {
+        return "rsc";
+    }
+
     /**
      * Resource 1 in colocation constraint.
      */
@@ -309,11 +319,11 @@ public class HbColocationInfo extends EditableInfo
     }
 
     /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(String param) {
+    protected final boolean isAdvanced(final String param) {
         return true;
     }
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(String param) {
+    protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 }
