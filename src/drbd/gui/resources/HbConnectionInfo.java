@@ -772,4 +772,16 @@ public class HbConnectionInfo extends EditableInfo {
             c.updateAdvancedPanels();
         }
     }
+
+    /**
+     * Returns whether this resource is resource 1 in colocation constraint.
+     */
+    public final boolean isRsc1(final ServiceInfo si) {
+        for (final HbConstraintInterface c : constraints) {
+            if (!c.isOrder() && ((HbColocationInfo) c).getRscInfo1() == si) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -275,6 +275,13 @@ public class HbColocationInfo extends EditableInfo
     public final String getRsc1() {
         return serviceInfoWithRsc.toString();
     }
+
+    /**
+     * Resource 1 object in colocation constraint.
+     */
+    public final ServiceInfo getRscInfo1() {
+        return serviceInfoWithRsc;
+    }
     /**
      * Resource 2 in colocation constraint.
      */

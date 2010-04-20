@@ -844,6 +844,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo s1 = (ServiceInfo) getInfo((Vertex) p.getSecond());
         final ServiceInfo s2 = (ServiceInfo) getInfo((Vertex) p.getFirst());
         String ret;
+        final HbConnectionInfo hbci = edgeToHbconnectionMap.get((Edge) e);
         if (edgeIsOrder && edgeIsColocation) {
             if (edgeToHbconnectionMap.get((Edge) e).isColScoreNegative()) {
                 ret = Tools.getString("HeartbeatGraph.NoColOrd");
@@ -853,7 +854,7 @@ public class HeartbeatGraph extends ResourceGraph {
         } else if (edgeIsOrder) {
             ret = Tools.getString("HeartbeatGraph.Order");
         } else if (edgeIsColocation) {
-            if (edgeToHbconnectionMap.get((Edge) e).isColScoreNegative()) {
+            if (hbci.isColScoreNegative()) {
                 ret = Tools.getString("HeartbeatGraph.NoColocation");
             } else {
                 ret = Tools.getString("HeartbeatGraph.Colocation");
@@ -862,6 +863,20 @@ public class HeartbeatGraph extends ResourceGraph {
             ret = Tools.getString("HeartbeatGraph.Unconfigured");
         } else {
             ret = Tools.getString("HeartbeatGraph.Removing");
+        }
+        final Vertex v1 = (Vertex) p.getSecond();
+        final Vertex v2 = (Vertex) p.getFirst();
+        final double s1X =
+                getVertexLocations().getLocation(v1).getX();
+        final double s2X =
+                getVertexLocations().getLocation(v2).getX();
+        if (edgeIsColocation) {
+            if ((hbci.isRsc1(s1) && s1X < s2X)
+                || (!hbci.isRsc1(s1) && s1X > s2X)) {
+                return "\u2190 " + ret; /* <- */
+            } else {
+                return " \u2192" + ret; /* -> */
+            }
         }
         return ret;
     }

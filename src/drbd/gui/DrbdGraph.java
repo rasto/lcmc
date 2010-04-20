@@ -46,6 +46,7 @@ import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.impl.SparseVertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.VertexShapeFactory;
+import edu.uci.ics.jung.visualization.Coordinates;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -122,6 +123,12 @@ public class DrbdGraph extends ResourceGraph {
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
+    /** Minimum vertical position. */
+    private static final int MIN_Y_POS = 20;
+    /** Maximum horizontal position. */
+    private static final int MAX_X_POS = 2600;
+    /** Maximum vertical position. */
+    private static final int MAX_Y_POS = 2600;
 
     /**
      * Prepares a new <code>DrbdGraph</code> object.
@@ -340,11 +347,11 @@ public class DrbdGraph extends ResourceGraph {
                                 getVertexLocations().getLocation(dest).getX();
                     if (sourceBD.isPausedSync() || destBD.isPausedSync()) {
                         l.append(" (" + syncedProgress + "% paused)");
-                    } else if (sourceBD.isSyncSource() && sourceX < destX
-                               || destBD.isSyncSource() && sourceX > destX) {
-                        l.append(" (" + syncedProgress + "% ->)");
+                    } else if ((sourceBD.isSyncSource() && sourceX < destX)
+                               || (destBD.isSyncSource() && sourceX > destX)) {
+                        l.append(" (" + syncedProgress + "% \u2192)"); /* -> */
                     } else {
-                        l.append(" (<- " + syncedProgress + "%)");
+                        l.append(" (\u2190 " + syncedProgress + "%)"); /* <- */
                     }
                 } else if (dri.isSplitBrain()) {
                     l.append(" (split-brain)");
@@ -608,6 +615,19 @@ public class DrbdGraph extends ResourceGraph {
      */
     protected final void vertexReleased(final Vertex v, final Point2D pos) {
         // TODO: make it work
+        double x = pos.getX();
+        double y = pos.getY();
+        final double minPos = (getVertexWidth(v)
+                               - getDefaultVertexWidth(v)) / 2;
+        x = x < minPos ? minPos : x;
+        x = x > MAX_X_POS ? MAX_X_POS : x;
+        y = y < MIN_Y_POS ? MIN_Y_POS : y;
+        y = y > MAX_Y_POS ? MAX_Y_POS : y;
+        final Coordinates c = getLayout().getCoordinates(v);
+        c.setX(x);
+        c.setY(y);
+        pos.setLocation(x, y);
+        getVertexLocations().setLocation(v, pos);
     }
     //protected final void vertexReleased(final Vertex v, final Point2D pos) {
     //    double y = pos.getY();
