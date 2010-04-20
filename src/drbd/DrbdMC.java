@@ -127,12 +127,8 @@ public final class DrbdMC extends JPanel {
                       Tools.getDefaultColor("DrbdMC.TableHeader"));
         UIManager.put("TableHeader.font",
                       UIManager.getFont("Label.font"));
-
-//      UIManager.put("SplitPane.dividerFocusColor", new Color(255, 255, 255));
-
         UIManager.put("Button.gradient", buttonGradient);
         UIManager.put("Button.select", ClusterBrowser.PANEL_BACKGROUND);
-//        UIManager.put("Button.disabledText", ClusterBrowser.PANEL_BACKGROUND);
 
         UIManager.put("CheckBox.gradient", checkboxGradient);
         UIManager.put("CheckBoxMenuItem.gradient", checkboxGradient);
@@ -144,8 +140,6 @@ public final class DrbdMC extends JPanel {
 
         UIManager.put("Menu.selectionBackground",
                       ClusterBrowser.PANEL_BACKGROUND);
-        //UIManager.put("MenuBar.background",
-        //              ClusterBrowser.PANEL_BACKGROUND);
         UIManager.put("MenuItem.selectionBackground",
                       ClusterBrowser.PANEL_BACKGROUND);
         UIManager.put("List.selectionBackground",
