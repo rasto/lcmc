@@ -1973,8 +1973,14 @@ public class Host implements Serializable {
         final StringBuffer lines = new StringBuffer();
         for (final String id : positions.keySet()) {
             final Point2D p = positions.get(id);
-            final double x = p.getX();
-            final double y = p.getY();
+            double x = p.getX();
+            if (x < 0) {
+                x = 0;
+            }
+            double y = p.getY();
+            if (y < 0) {
+                y = 0;
+            }
             lines.append(id + ";x=" + x + ";y=" + y + "\n");
         }
         getSSH().createConfig(lines.toString(),
