@@ -3931,7 +3931,6 @@ public class ServiceInfo extends EditableInfo {
      * be executed on the heartbeat services.
      */
     public List<UpdatableItem> createPopup() {
-        Tools.printStackTrace("create popup");
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
 

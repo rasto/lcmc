@@ -85,6 +85,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.JMenuItem;
 
 import java.awt.geom.Area;
 
@@ -262,6 +263,7 @@ public abstract class ResourceGraph {
      */
     public final void startTestAnimation(final JComponent component,
                                          final CountDownLatch startTestLatch) {
+        //Tools.setMenuOpaque(component, false);
         try {
             mTestAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
@@ -298,6 +300,8 @@ public abstract class ResourceGraph {
                             testOnlyFlag = !testOnlyFlag;
                             final boolean testOnlyFlagLast = testOnlyFlag;
                             mTestOnlyFlag.release();
+                                    Tools.setMenuOpaque(component,
+                                                        !testOnlyFlag);
                             repaint();
                             int sleep = 300;
                             if (testOnlyFlag) {
@@ -361,6 +365,7 @@ public abstract class ResourceGraph {
      * Stops the test animation.
      */
     public final void stopTestAnimation(final JComponent component) {
+        Tools.setMenuOpaque(component, true);
         try {
             mTestAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
@@ -952,8 +957,12 @@ public abstract class ResourceGraph {
                     final int posY = (int) popP.getY();
 
                     final JPopupMenu empty = new JPopupMenu();
-                    empty.add(new javax.swing.JMenuItem("wait..."));
-                    empty.show(vv, posX, posY);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            empty.add(new JMenuItem("wait for popup..."));
+                            empty.show(vv, posX, posY);
+                        }
+                    });
 
                     if (v == null) {
                         final Edge edge = pickSupport.getEdge(p.getX(),
@@ -963,23 +972,35 @@ public abstract class ResourceGraph {
                             final JPopupMenu backgroundPopup =
                                                     handlePopupBackground(p);
                             if (backgroundPopup != null) {
-                                empty.setVisible(false);
-                                backgroundPopup.show(vv, posX, posY);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        empty.setVisible(false);
+                                        backgroundPopup.show(vv, posX, posY);
+                                    }
+                                });
                             }
                             backgroundClicked();
                         } else {
                             final JPopupMenu edgePopup = handlePopupEdge(edge);
                             if (edgePopup != null) {
-                                empty.setVisible(false);
-                                edgePopup.show(vv, posX, posY);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        empty.setVisible(false);
+                                        edgePopup.show(vv, posX, posY);
+                                    }
+                                });
                             }
                             oneEdgePressed(edge);
                         }
                     } else {
                         final JPopupMenu vertexPopup = handlePopupVertex(v, p);
                         if (vertexPopup != null) {
-                            empty.setVisible(false);
-                            vertexPopup.show(vv, posX, posY);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    empty.setVisible(false);
+                                    vertexPopup.show(vv, posX, posY);
+                                }
+                            });
                         }
                         oneVertexPressed(v); /* select this vertex */
                     }

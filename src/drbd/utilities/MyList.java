@@ -28,10 +28,14 @@ import javax.swing.JList;
 import javax.swing.JToolTip;
 import javax.swing.ListModel;
 
+import java.awt.event.MouseEvent;
 import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 
 /**
  * A Jlist with updatable tooltips.
@@ -85,7 +89,11 @@ public class MyList extends JList implements ComponentWithTest {
      * Sets tooltip and wiggles the mouse to refresh it.
      */
     public final void setToolTipText(final String toolTipText) {
+        if (toolTipText == null) {
+            return;
+        }
         super.setToolTipText(toolTipText);
+        toolTip.setTipText(toolTipText);
         if (toolTip != null && toolTip.isShowing() && robot != null) {
             final GraphicsDevice[] devices =
                             GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -107,5 +115,19 @@ public class MyList extends JList implements ComponentWithTest {
             robot.mouseMove((int) p.getX() + xOffset + 1, (int) p.getY());
             robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
         }
+    }
+
+    /** Returns location of the tooltip, so that it does not cover the menu
+     * item. */
+    public Point getToolTipLocation(final MouseEvent event) {
+        final Point screenLocation = getLocationOnScreen();
+        final Rectangle sBounds = Tools.getScreenBounds(this);
+        final Dimension size = toolTip.getPreferredSize();
+        if (screenLocation.x + size.width + event.getX() + 5 > sBounds.width) {
+            return new Point(event.getX() - size.width - 5,
+                             event.getY() + 20);
+        }
+        return new Point(event.getX() + 5, /* to not cover the pointer. */
+                         event.getY() + 20);
     }
 }

@@ -319,26 +319,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.toolTipBackground = toolTipBackground;
     }
 
-    private Rectangle getScreenBounds() {
-        final GraphicsConfiguration gc = getGraphicsConfiguration();
-        final Rectangle sBounds = gc.getBounds();
-        final Insets screenInsets =
-                                Toolkit.getDefaultToolkit().getScreenInsets(gc);
-        /* Take into account screen insets, decrease viewport */
-        sBounds.x += screenInsets.left;
-        sBounds.y += screenInsets.top;
-        sBounds.width -= (screenInsets.left + screenInsets.right);
-        sBounds.height -= (screenInsets.top + screenInsets.bottom);
-        return sBounds;
-    }
-
+    /** Returns location of the tooltip, so that it does not cover the menu
+     * item. */
     public Point getToolTipLocation(final MouseEvent event) {
         final Point screenLocation = getLocationOnScreen();
-        final Rectangle sBounds = getScreenBounds();
+        final Rectangle sBounds = Tools.getScreenBounds(this);
         final Dimension size = toolTip.getPreferredSize();
         if (screenLocation.x + size.width + event.getX() + 5 > sBounds.width) {
-            return new Point( event.getX() - size.width - 5,
-                              event.getY() + 20);
+            return new Point(event.getX() - size.width - 5,
+                             event.getY() + 20);
         }
         return new Point(event.getX() + 5, /* to not cover the pointer. */
                          event.getY() + 20);

@@ -51,6 +51,7 @@ import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.BoxLayout;
 import javax.swing.border.TitledBorder;
+import javax.swing.JMenuItem;
 
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -491,11 +492,20 @@ public class Info implements Comparable {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
                 final JPopupMenu empty = new JPopupMenu();
-                empty.add(new javax.swing.JMenuItem("wait..."));
-                empty.show(c, x, y);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        empty.add(new JMenuItem("wait for popup..."));
+                        empty.show(c, x, y);
+                    }
+                });
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
-                    pm.show(c, x, y);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            empty.setVisible(false);
+                            pm.show(c, x, y);
+                        }
+                    });
                 }
             }
         });

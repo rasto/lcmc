@@ -49,6 +49,7 @@ import drbd.gui.resources.CategoryInfo;
 import drbd.gui.resources.AllHostsInfo;
 import drbd.gui.resources.ServicesInfo;
 import drbd.gui.resources.ServiceInfo;
+import drbd.gui.resources.GroupInfo;
 import drbd.gui.resources.StringInfo;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.NetworkInfo;
@@ -1699,7 +1700,14 @@ public class ClusterBrowser extends Browser {
                                             nameToServiceInfoHash.get(name);
             for (final String id : idHash.keySet()) {
                 final ServiceInfo si = idHash.get(id);
-                if (p == null || !getHeartbeatGraph().existsInThePath(si, p)) {
+                final GroupInfo gi = si.getGroupInfo();
+                ServiceInfo sigi = si;
+                if (gi != null) {
+                    sigi = gi;
+                    // TODO: it does not work here
+                }
+                if (p == null
+                    || !getHeartbeatGraph().existsInThePath(sigi, p)) {
                     existingServiceList.add(si);
                 }
             }
@@ -1808,8 +1816,7 @@ public class ClusterBrowser extends Browser {
      * are taken from serviceInfo object. nameToServiceInfoHash
      * contains a hash with id as a key and ServiceInfo as a value.
      */
-    public final void addNameToServiceInfoHash(
-                                                final ServiceInfo serviceInfo) {
+    public final void addNameToServiceInfoHash(final ServiceInfo serviceInfo) {
         /* add to the hash with service name and id as
          * keys */
         final Service service = serviceInfo.getService();
@@ -1879,7 +1886,6 @@ public class ClusterBrowser extends Browser {
                 }
             }
         }
-        idToInfoHash.remove(service.getId());
         idToInfoHash.put(service.getId(), serviceInfo);
         nameToServiceInfoHash.put(service.getName(), idToInfoHash);
         mNameToServiceLock.release();

@@ -67,6 +67,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -80,6 +82,14 @@ import java.awt.Point;
 import java.awt.Cursor;
 import java.awt.image.MemoryImageSource;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.GraphicsConfiguration;
+import java.awt.Insets;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -2121,6 +2131,45 @@ public final class Tools {
                             .setHorizontalAlignment(SwingConstants.CENTER);
     }
 
+    /** Sets the menu opaque, not opaque. */
+    public static void setMenuOpaque(final JComponent menu,
+                                      final boolean opaque) {
+        JComponent parent = (JComponent) menu.getParent();
+        if (parent instanceof javax.swing.JViewport) {
+            /* MyList */
+            parent = (JComponent) parent.getParent();
+            parent = (JComponent) parent.getParent();
+        }
+        if (parent instanceof JPopupMenu) {
+            JComponent inv = (JComponent) ((JPopupMenu) parent).getInvoker();
+            while (inv != null) {
+                final JComponent invP = (JComponent) inv.getParent();
+                if (!(invP instanceof JPopupMenu)) {
+                    break;
+                }
+                invP.setOpaque(opaque);
+                for (final java.awt.Component c : invP.getComponents()) {
+                    ((JComponent) c).setOpaque(opaque);
+                }
+                final JComponent pp = (JComponent) invP.getParent();
+                if (pp != null) {
+                    pp.setOpaque(opaque);
+                }
+                inv = (JComponent) ((JPopupMenu) invP).getInvoker();
+            }
+            menu.setOpaque(opaque);
+            parent.setOpaque(opaque);
+            final JComponent pp = (JComponent) parent.getParent();
+            if (pp != null) {
+                pp.setOpaque(opaque);
+            }
+            for (final java.awt.Component c : parent.getComponents()) {
+                ((JComponent) c).setOpaque(opaque);
+            }
+            parent.repaint();
+        }
+    }
+
     /** Converts windows path to unix path. */
     public static String getUnixPath(final String dir) {
         String unixPath;
@@ -2135,4 +2184,19 @@ public final class Tools {
         }
         return unixPath;
     }
+
+    /** Returns bounds of the whole screen. */
+    public static Rectangle getScreenBounds(final JComponent component) {
+        final GraphicsConfiguration gc = component.getGraphicsConfiguration();
+        final Rectangle sBounds = gc.getBounds();
+        final Insets screenInsets =
+                                Toolkit.getDefaultToolkit().getScreenInsets(gc);
+        /* Take into account screen insets, decrease viewport */
+        sBounds.x += screenInsets.left;
+        sBounds.y += screenInsets.top;
+        sBounds.width -= (screenInsets.left + screenInsets.right);
+        sBounds.height -= (screenInsets.top + screenInsets.bottom);
+        return sBounds;
+    }
+
 }

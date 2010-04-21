@@ -204,6 +204,8 @@ public class GroupInfo extends ServiceInfo {
                     newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
         getBrowser().addToHeartbeatIdList(newServiceInfo);
+        System.out.println("add group service panel");
+        getBrowser().addNameToServiceInfoHash(newServiceInfo);
         final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);

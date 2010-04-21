@@ -47,6 +47,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
         super(text);
         this.enableAccessType = enableAccessType;
         this.visibleAccessType = visibleAccessType;
+        setOpaque(false);
         processAccessType(); //TODO: should not be called here
     }
 

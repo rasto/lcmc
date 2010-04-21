@@ -199,7 +199,7 @@ public class AppDefaults extends
         {"GuiComboBox.ErrorValue",                new Color(255, 100, 100) },
 
         {"ClusterBrowser.Background",             new Color(255, 255, 255) },
-        {"ClusterBrowser.Test.Tooltip.Background", Color.YELLOW},
+        {"ClusterBrowser.Test.Tooltip.Background", new Color(255, 255, 0, 160)},
         {"Browser.Background",                    new Color(255, 255, 255) },
 
         {"EmptyBrowser.StartPanelTitleBorder",    LINBIT_DARK_ORANGE },
