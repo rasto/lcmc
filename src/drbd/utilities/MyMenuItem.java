@@ -24,17 +24,25 @@ package drbd.utilities;
 import drbd.data.ConfigData;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
+import javax.swing.SwingUtilities;
 
 import java.awt.MouseInfo;
 import java.awt.Robot;
+import java.awt.Point;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.GraphicsConfiguration;
+import java.awt.Insets;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()
@@ -199,7 +207,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final int style   = font.ITALIC;
         final int size    = font.getSize();
         setFont(new Font(name, style, size));
-        setBackground(Color.WHITE);
+        //setBackground(Color.WHITE);
     }
 
     /**
@@ -311,10 +319,36 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.toolTipBackground = toolTipBackground;
     }
 
+    private Rectangle getScreenBounds() {
+        final GraphicsConfiguration gc = getGraphicsConfiguration();
+        final Rectangle sBounds = gc.getBounds();
+        final Insets screenInsets =
+                                Toolkit.getDefaultToolkit().getScreenInsets(gc);
+        /* Take into account screen insets, decrease viewport */
+        sBounds.x += screenInsets.left;
+        sBounds.y += screenInsets.top;
+        sBounds.width -= (screenInsets.left + screenInsets.right);
+        sBounds.height -= (screenInsets.top + screenInsets.bottom);
+        return sBounds;
+    }
+
+    public Point getToolTipLocation(final MouseEvent event) {
+        final Point screenLocation = getLocationOnScreen();
+        final Rectangle sBounds = getScreenBounds();
+        final Dimension size = toolTip.getPreferredSize();
+        if (screenLocation.x + size.width + event.getX() + 5 > sBounds.width) {
+            return new Point( event.getX() - size.width - 5,
+                              event.getY() + 20);
+        }
+        return new Point(event.getX() + 5, /* to not cover the pointer. */
+                         event.getY() + 20);
+    }
+
     /**
      * Sets tooltip and wiggles the mouse to refresh it.
      */
     public final void setToolTipText(final String toolTipText) {
+        toolTip.setTipText(toolTipText);
         super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             final GraphicsDevice[] devices =
