@@ -586,8 +586,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                     cb.setValue(score);
                     final JLabel label = cb.getLabel();
-                    final String text = getHostLocationLabel(hi.getName(),
-                                                             op);
+                    final String text = getHostLocationLabel(hi.getName(), op);
                     label.setText(text);
                 }
             }
@@ -607,8 +606,7 @@ public class ServiceInfo extends EditableInfo {
         }
 
         savedOperationsId = newOperationsId;
-        String refCRMId = cs.getOperationsRef(
-                                            getService().getHeartbeatId());
+        String refCRMId = cs.getOperationsRef(getService().getHeartbeatId());
         final ServiceInfo operationIdRef =
                                 getBrowser().getServiceInfoFromCRMId(refCRMId);
         if (refCRMId == null) {
@@ -3027,7 +3025,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Removes order.
+     * Removes order(s).
      */
     public void removeOrder(final ServiceInfo parent,
                             final Host dcHost,
@@ -3037,22 +3035,20 @@ public class ServiceInfo extends EditableInfo {
             parent.setUpdated(true);
             setUpdated(true);
         }
-        final String parentHbId = parent.getHeartbeatId(testOnly);
+        final String rscFirstId = parent.getHeartbeatId(testOnly);
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final String orderId = cs.getOrderId(parentHbId,
-                                             getHeartbeatId(testOnly));
-        final String score = cs.getOrderScore(parent.getHeartbeatId(testOnly),
-                                              getHeartbeatId(testOnly));
-        final String symmetrical =
-                        cs.getOrderSymmetrical(parent.getHeartbeatId(testOnly),
-                                               getHeartbeatId(testOnly));
-        CRM.removeOrder(dcHost,
-                        orderId,
-                        parentHbId,
-                        getHeartbeatId(testOnly),
-                        score,
-                        symmetrical,
-                        testOnly);
+        final List<CRMXML.OrderData> allData = cs.getOrderDatas(rscFirstId);
+        if (allData != null) {
+            for (final CRMXML.OrderData orderData : allData) {
+                final String orderId = orderData.getId();
+                final String rscThenId = orderData.getRscThen();
+                if (rscThenId.equals(getHeartbeatId(testOnly))) {
+                    CRM.removeOrder(dcHost,
+                                    orderId,
+                                    testOnly);
+                }
+            }
+        }
     }
 
     /**
@@ -3094,7 +3090,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Removes colocation.
+     * Removes colocation(s).
      */
     public void removeColocation(final ServiceInfo parent,
                                  final Host dcHost,
@@ -3104,20 +3100,21 @@ public class ServiceInfo extends EditableInfo {
             parent.setUpdated(true);
             setUpdated(true);
         }
-        final String parentHbId = parent.getHeartbeatId(testOnly);
+        final String rscId = getHeartbeatId(testOnly);
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final String colocationId = cs.getColocationId(
-                                                     parentHbId,
-                                                     getHeartbeatId(testOnly));
-        final String score =
-                        cs.getColocationScore(parent.getHeartbeatId(testOnly),
-                                              getHeartbeatId(testOnly));
-        CRM.removeColocation(dcHost,
-                             colocationId,
-                             getHeartbeatId(testOnly), /* to */
-                             parentHbId, /* from */
-                             score,
-                             testOnly);
+        final List<CRMXML.ColocationData> allData =
+                                         cs.getColocationDatas(rscId);
+        if (allData != null) {
+            for (final CRMXML.ColocationData colocationData : allData) {
+                final String colocationId = colocationData.getId();
+                final String withRscId = colocationData.getWithRsc();
+                if (withRscId.equals(parent.getHeartbeatId(testOnly))) {
+                    CRM.removeColocation(dcHost,
+                                         colocationId,
+                                         testOnly);
+                }
+            }
+        }
     }
 
     /**
@@ -3437,7 +3434,7 @@ public class ServiceInfo extends EditableInfo {
                                                                       testOnly);
                 }
 
-                for (String locId : cs.getLocationIds(
+                for (final String locId : cs.getLocationIds(
                                               getHeartbeatId(testOnly))) {
                     // TODO: remove locationMap, is null anyway
                     final HostLocation loc = cs.getHostLocationFromId(locId);
@@ -3562,6 +3559,72 @@ public class ServiceInfo extends EditableInfo {
         return cloneInfo;
     }
 
+    /** Adds existing service menu item for every member of a group. */
+    protected void addExistingGroupServiceMenuItems(
+                        final ServiceInfo asi,
+                        final DefaultListModel dlm,
+                        final Map<MyMenuItem, ButtonCallback> callbackHash,
+                        final MyList list,
+                        final boolean colocationOnly,
+                        final boolean orderOnly,
+                        final boolean testOnly) {
+    }
+
+    /** Adds existing service menu item. */
+    protected void addExistingServiceMenuItem(
+                        final String name,
+                        final ServiceInfo asi,
+                        final DefaultListModel dlm,
+                        final Map<MyMenuItem, ButtonCallback> callbackHash,
+                        final MyList list,
+                        final boolean colocationOnly,
+                        final boolean orderOnly,
+                        final boolean testOnly) {
+        final MyMenuItem mmi = new MyMenuItem(name,
+                                              null,
+                                              null,
+                                              ConfigData.AccessType.ADMIN,
+                                              ConfigData.AccessType.OP) {
+            private static final long serialVersionUID = 1L;
+            public void action() {
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        addServicePanel(asi,
+                                        null,
+                                        colocationOnly,
+                                        orderOnly,
+                                        true,
+                                        testOnly);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                repaint();
+                            }
+                        });
+                    }
+                });
+                thread.start();
+            }
+        };
+        dlm.addElement(mmi);
+        final ClusterBrowser.ClMenuItemCallback mmiCallback =
+            getBrowser().new ClMenuItemCallback(list, null) {
+                                   public void action(final Host dcHost) {
+                                       addServicePanel(asi,
+                                                       null,
+                                                       colocationOnly,
+                                                       orderOnly,
+                                                       true,
+                                                       true); /* test only */
+                                   }
+                               };
+        callbackHash.put(mmi, mmiCallback);
+    }
+
     /**
      * Returns existing service manu item.
      */
@@ -3591,58 +3654,26 @@ public class ServiceInfo extends EditableInfo {
                 final MyList list = new MyList(dlm, getBackground());
                 for (final ServiceInfo asi
                             : getBrowser().getExistingServiceList(thisClass)) {
-                    if (asi.getGroupInfo() != null
-                        || asi.getCloneInfo() != null) {
-                        /* skip services that are in group. */
+                    if (asi.getCloneInfo() != null
+                        || asi.getGroupInfo() != null) {
+                        /* skip services that are clones or in groups. */
                         continue;
                     }
-                    final MyMenuItem mmi = new MyMenuItem(
-                                              asi.toString(),
-                                              null,
-                                              null,
-                                              ConfigData.AccessType.ADMIN,
-                                              ConfigData.AccessType.OP) {
-                        private static final long serialVersionUID = 1L;
-                        public void action() {
-                            final Thread thread = new Thread(new Runnable() {
-                                public void run() {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        public void run() {
-                                            getPopup().setVisible(
-                                                             false);
-                                        }
-                                    });
-                                    addServicePanel(asi,
-                                                    null,
-                                                    colocationOnly,
-                                                    orderOnly,
-                                                    true,
-                                                    testOnly);
-                                    SwingUtilities.invokeLater(
-                                        new Runnable() {
-                                            public void run() {
-                                                repaint();
-                                            }
-                                        }
-                                    );
-                                }
-                            });
-                            thread.start();
-                        }
-                    };
-                    dlm.addElement(mmi);
-                    final ClusterBrowser.ClMenuItemCallback mmiCallback =
-                        getBrowser().new ClMenuItemCallback(list, null) {
-                                   public void action(final Host dcHost) {
-                                       addServicePanel(asi,
-                                                       null,
-                                                       colocationOnly,
-                                                       orderOnly,
-                                                       true,
-                                                       true); /* test only */
-                                   }
-                               };
-                    callbackHash.put(mmi, mmiCallback);
+                    addExistingServiceMenuItem(asi.toString(),
+                                               asi,
+                                               dlm,
+                                               callbackHash,
+                                               list,
+                                               colocationOnly,
+                                               orderOnly,
+                                               testOnly);
+                    asi.addExistingGroupServiceMenuItems(thisClass,
+                                                         dlm,
+                                                         callbackHash,
+                                                         list,
+                                                         colocationOnly,
+                                                         orderOnly,
+                                                         testOnly);
                 }
                 final JScrollPane jsp = Tools.getScrollingMenu(this,
                                                                dlm,

@@ -109,6 +109,14 @@ public class TerminalPanel extends JScrollPane {
     private static final String CLICKTEST_LAZY_SHORT = "clicktestlazyshort";
     /** Command to start lazy clicking for longer period. */
     private static final String CLICKTEST_LAZY_LONG = "clicktestlazylong";
+    /** Command to start short mouse moving. */
+    private static final String MOVETEST_SHORT = "movetestshort";
+    /** Command to start mouse moving. */
+    private static final String MOVETEST_LONG = "movetestlong";
+    /** Command to start mouse moving. */
+    private static final String MOVETEST_LAZY_SHORT = "movetestlazyshort";
+    /** Command to start mouse moving. */
+    private static final String MOVETEST_LAZY_LONG = "movetestlazylong";
     /** Command to increment debug level. */
     private static final String DEBUG_INC = "debuginc";
     /** Command to decrement debug level. */
@@ -124,6 +132,10 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(CLICKTEST_LONG, 0);
         CHEATS_MAP.put(CLICKTEST_LAZY_SHORT, 0);
         CHEATS_MAP.put(CLICKTEST_LAZY_LONG, 0);
+        CHEATS_MAP.put(MOVETEST_SHORT, 0);
+        CHEATS_MAP.put(MOVETEST_LONG, 0);
+        CHEATS_MAP.put(MOVETEST_LAZY_SHORT, 0);
+        CHEATS_MAP.put(MOVETEST_LAZY_LONG, 0);
         CHEATS_MAP.put(DEBUG_INC, 0);
         CHEATS_MAP.put(DEBUG_DEC, 0);
     }
@@ -624,13 +636,21 @@ public class TerminalPanel extends JScrollPane {
             }
             addCommandOutput(list.toString());
         } else if (CLICKTEST_SHORT.equals(cheat)) {
-            RoboTest.startClicker(10000, false);
+            RoboTest.startClicker(1, false);
         } else if (CLICKTEST_LONG.equals(cheat)) {
-            RoboTest.startClicker(10000000, false);
+            RoboTest.startClicker(8 * 60, false);
         } else if (CLICKTEST_LAZY_SHORT.equals(cheat)) {
-            RoboTest.startClicker(60, true);
+            RoboTest.startClicker(1, true);
         } else if (CLICKTEST_LAZY_LONG.equals(cheat)) {
-            RoboTest.startClicker(3600, true); /* 1 hour */
+            RoboTest.startClicker(8 * 60, true); /* 8 hours */
+        } else if (MOVETEST_SHORT.equals(cheat)) {
+            RoboTest.startMover(1, false);
+        } else if (MOVETEST_LONG.equals(cheat)) {
+            RoboTest.startMover(8 * 60, false);
+        } else if (MOVETEST_LAZY_SHORT.equals(cheat)) {
+            RoboTest.startMover(1, true);
+        } else if (MOVETEST_LAZY_LONG.equals(cheat)) {
+            RoboTest.startMover(8 * 60, true);
         } else if (DEBUG_INC.equals(cheat)) {
             Tools.incrementDebugLevel();
         } else if (DEBUG_DEC.equals(cheat)) {

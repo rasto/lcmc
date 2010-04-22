@@ -23,6 +23,7 @@ package drbd.data;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -49,34 +50,20 @@ public class CibQuery {
     private Map<String, ResourceAgent> resourceType;
     /** Map with resource instance_attributes id. */
     private Map<String, String> resourceInstanceAttrId;
-    /** Colocation map. */
-    private Map<String, List<String>> colocation =
-                                           new HashMap<String, List<String>>();
+    /** Colocation rsc map. */
+    private Map<String, List<CRMXML.ColocationData>> colocationRsc =
+                      new LinkedHashMap<String, List<CRMXML.ColocationData>>();
+    /** Colocation id map. */
+    private Map<String, CRMXML.ColocationData> colocationId =
+                      new LinkedHashMap<String, CRMXML.ColocationData>();
+    /** Order rsc map. */
+    private Map<String, List<CRMXML.OrderData>> orderRsc =
+                      new LinkedHashMap<String, List<CRMXML.OrderData>>();
+    /** Order id map. */
+    private Map<String, CRMXML.OrderData> orderId =
+                      new LinkedHashMap<String, CRMXML.OrderData>();
     /** Node parameters map. */
     private MultiKeyMap nodeParameters;
-    /** Colocation score map. */
-    private MultiKeyMap colocationScore;
-    /** Colocation rsc1 role map. */
-    private MultiKeyMap colocationRscRole = new MultiKeyMap();
-    /** Colocation's with-rsc-role map. */
-    private MultiKeyMap colocationWithRscRole = new MultiKeyMap();
-    /** Colocation id map. */
-    private MultiKeyMap colocationId;
-    /** Order map. */
-    private Map<String, List<String>> order =
-                                           new HashMap<String, List<String>>();
-    /** Order score map. */
-    private MultiKeyMap orderScore;
-    /** if order is symmetrical map. */
-    private MultiKeyMap orderSymmetrical;
-    /** Order id map. */
-    private MultiKeyMap orderId;
-    /** Order's first-action map. */
-    private  MultiKeyMap orderFirstAction = new MultiKeyMap();
-    /** Order's then-action map. */
-    private  MultiKeyMap orderThenAction = new MultiKeyMap();
-    /** Order direction map. */
-    private MultiKeyMap orderDirection;
     /** Location map. */
     private Map<String, Map<String, HostLocation>> location =
                               new HashMap<String, Map<String, HostLocation>>();
@@ -205,19 +192,66 @@ public class CibQuery {
 
 
     /**
-     * Sets the colocation map with one resource as a key and list of resources
-     * with which it is colocated.
+     * Sets the colocation map with one resource as a key and list of
+     * colocation constraints.
      */
-    public final void setColocation(
-                                final Map<String, List<String>> colocation) {
-        this.colocation = colocation;
+    public final void setColocationRsc(
+              final Map<String, List<CRMXML.ColocationData>> colocationRsc) {
+        this.colocationRsc = colocationRsc;
     }
 
     /**
-     * Returns colocation map.
+     * Sets the colocation map with resource id as a key with colocation data
+     * object.
      */
-    public final Map<String, List<String>> getColocation() {
-        return colocation;
+    public final void setColocationId(
+                  final Map<String, CRMXML.ColocationData> colocationId) {
+        this.colocationId = colocationId;
+    }
+
+    /**
+     * Returns colocation id map.
+     */
+    public final Map<String, CRMXML.ColocationData> getColocationId() {
+        return colocationId;
+    }
+
+    /**
+     * Returns colocation rsc map.
+     */
+    public final Map<String, List<CRMXML.ColocationData>> getColocationRsc() {
+        return colocationRsc;
+    }
+
+    /**
+     * Sets the colocation map with one resource as a key and list of
+     * colocation constraints.
+     */
+    public final void setOrderRsc(
+              final Map<String, List<CRMXML.OrderData>> orderRsc) {
+        this.orderRsc = orderRsc;
+    }
+
+    /**
+     * Sets the order map with resource id as a key with order data
+     * object.
+     */
+    public final void setOrderId(
+                  final Map<String, CRMXML.OrderData> orderId) {
+        this.orderId = orderId;
+    }
+
+    /**
+     * Returns id rsc map.
+     */
+    public final Map<String, CRMXML.OrderData> getOrderId() {
+        return orderId;
+    }
+    /**
+     * Returns order rsc map.
+     */
+    public final Map<String, List<CRMXML.OrderData>> getOrderRsc() {
+        return orderRsc;
     }
 
     /**
@@ -232,163 +266,6 @@ public class CibQuery {
      */
     public final MultiKeyMap getNodeParameters() {
         return nodeParameters;
-    }
-
-    /**
-     * Sets colocation score map.
-     */
-    public final void setColocationScore(final MultiKeyMap colocationScore) {
-        this.colocationScore = colocationScore;
-    }
-
-    /**
-     * Sets colocation rsc-role map.
-     */
-    public final void setColocationRscRole(
-                                     final MultiKeyMap colocationRscRole) {
-        this.colocationRscRole = colocationRscRole;
-    }
-
-
-    /**
-     * Sets colocation with-rsc-role map.
-     */
-    public final void setColocationWithRscRole(
-                                     final MultiKeyMap colocationWithRscRole) {
-        this.colocationWithRscRole = colocationWithRscRole;
-    }
-
-    /**
-     * Returns colocation score map.
-     */
-    public final MultiKeyMap getColocationScore() {
-        return colocationScore;
-    }
-
-    /**
-     * Returns colocation rsc1 role map.
-     */
-    public final MultiKeyMap getColocationRscRole() {
-        return colocationRscRole;
-    }
-
-    /**
-     * Returns colocation rsc2 role map.
-     */
-    public final MultiKeyMap getColocationWithRscRole() {
-        return colocationWithRscRole;
-    }
-
-    /**
-     * Sets colocation id map.
-     */
-    public final void setColocationId(final MultiKeyMap colocationId) {
-        this.colocationId = colocationId;
-    }
-
-    /**
-     * Returns colocation id map.
-     */
-    public final MultiKeyMap getColocationId() {
-        return colocationId;
-    }
-
-    /**
-     * Sets order map.
-     */
-    public final void setOrder(final Map<String, List<String>> order) {
-        this.order = order;
-    }
-
-    /**
-     * Returns order map.
-     */
-    public final Map<String, List<String>> getOrder() {
-        return order;
-    }
-
-    /**
-     * Sets order id map.
-     */
-    public final void setOrderId(final MultiKeyMap orderId) {
-        this.orderId = orderId;
-    }
-
-    /**
-     * Sets order's first action map.
-     */
-    public final void setOrderFirstAction(final MultiKeyMap orderFirstAction) {
-        this.orderFirstAction = orderFirstAction;
-    }
-
-    /**
-     * Sets order's then action map.
-     */
-    public final void setOrderThenAction(final MultiKeyMap orderThenAction) {
-        this.orderThenAction = orderThenAction;
-    }
-
-    /**
-     * Returns order id map.
-     */
-    public final MultiKeyMap getOrderId() {
-        return orderId;
-    }
-
-    /**
-     * Sets order score map.
-     */
-    public final void setOrderScore(final MultiKeyMap orderScore) {
-        this.orderScore = orderScore;
-    }
-
-    /**
-     * Returns order score map.
-     */
-    public final MultiKeyMap getOrderScore() {
-        return orderScore;
-    }
-
-    /**
-     * Returns order first action map.
-     */
-    public final MultiKeyMap getOrderFirstAction() {
-        return orderFirstAction;
-    }
-
-    /**
-     * Returns order then action map.
-     */
-    public final MultiKeyMap getOrderThenAction() {
-        return orderThenAction;
-    }
-
-    /**
-     * Sets if order is symmetrical map.
-     */
-    public final void setOrderSymmetrical(final MultiKeyMap orderSymmetrical) {
-        this.orderSymmetrical = orderSymmetrical;
-    }
-
-    /**
-     * Returns whether order is symmetrical.
-     */
-    public final MultiKeyMap getOrderSymmetrical() {
-        return orderSymmetrical;
-    }
-
-    /**
-     * Sets order direction map.
-     */
-    public final void setOrderDirection(final MultiKeyMap orderDirection) {
-        this.orderDirection = orderDirection;
-    }
-
-    /**
-     * Returns order direction map.
-     */
-    public final MultiKeyMap getOrderDirection() {
-        return orderDirection;
     }
 
     /**

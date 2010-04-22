@@ -1758,7 +1758,7 @@ public class Host implements Serializable {
      * Parses the host info.
      */
     public final void parseHostInfo(final String ans) {
-        Tools.debug(this, "updating host info: " + getName());
+        Tools.debug(this, "updating host info: " + getName(), 1);
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
         final List<String> versionLines = new ArrayList<String>();

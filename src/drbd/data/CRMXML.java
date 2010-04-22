@@ -275,7 +275,7 @@ public class CRMXML extends XML {
     private static final Map<String, ConfigData.AccessType> M_A_ACCESS_TYPE =
                                   new HashMap<String, ConfigData.AccessType>();
     /** Access type of meta attributes in rsc defaults. */
-    private static final Map<String,ConfigData.AccessType>
+    private static final Map<String, ConfigData.AccessType>
                                 M_A_RSC_DEFAULTS_ACCESS_TYPE =
                                   new HashMap<String, ConfigData.AccessType>();
     /** Possible choices for meta attributes. */
@@ -594,7 +594,6 @@ public class CRMXML extends XML {
         paramGlobalLongDescMap.put("stonith-enabled", "Stonith Enabled");
         paramGlobalTypeMap.put("stonith-enabled", PARAM_TYPE_BOOLEAN);
         paramGlobalDefaultMap.put("stonith-enabled", hbBooleanTrue);
-        //paramGlobalPreferredMap.put("stonith-enabled", hbBooleanFalse);
         paramGlobalPossibleChoices.put("stonith-enabled", booleanValues);
         globalRequiredParams.add("stonith-enabled");
         globalNotAdvancedParams.add("stonith-enabled");
@@ -623,7 +622,6 @@ public class CRMXML extends XML {
         paramGlobalPossibleChoices.put("default-resource-stickiness",
                                        INTEGER_VALUES);
         paramGlobalDefaultMap.put("default-resource-stickiness", "0");
-        //paramGlobalPreferredMap.put("default-resource-stickiness", "100");
         globalRequiredParams.add("default-resource-stickiness");
 
         /* no quorum policy */
@@ -2636,22 +2634,14 @@ public class CRMXML extends XML {
         }
 
         /* <constraints> */
-        final Map<String, List<String>> colocationMap =
-                                          new HashMap<String, List<String>>();
-        final MultiKeyMap colocationIdMap = new MultiKeyMap();
-        final MultiKeyMap colocationScoreMap = new MultiKeyMap();
-        final MultiKeyMap colocationRscRoleMap = new MultiKeyMap();
-        final MultiKeyMap colocationWithRscRoleMap = new MultiKeyMap();
-
-        final Map<String, List<String>> orderMap =
-                                           new HashMap<String, List<String>>();
-        final MultiKeyMap orderIdMap = new MultiKeyMap();
-        final MultiKeyMap orderFirstActionMap = new MultiKeyMap();
-        final MultiKeyMap orderThenActionMap = new MultiKeyMap();
-        final MultiKeyMap orderDirectionMap = new MultiKeyMap();
-        final MultiKeyMap orderScoreMap = new MultiKeyMap();
-        final MultiKeyMap orderSymmetricalMap = new MultiKeyMap();
-
+        final Map<String, ColocationData> colocationIdMap =
+                                    new LinkedHashMap<String, ColocationData>();
+        final Map<String, List<ColocationData>> colocationRscMap =
+                            new HashMap<String, List<ColocationData>>();
+        final Map<String, OrderData> orderIdMap =
+                                    new LinkedHashMap<String, OrderData>();
+        final Map<String, List<OrderData>> orderRscMap =
+                            new HashMap<String, List<OrderData>>();
         final Map<String, Map<String, HostLocation>> locationMap =
                               new HashMap<String, Map<String, HostLocation>>();
         final Map<String, List<String>> locationsIdMap =
@@ -2691,23 +2681,26 @@ public class CRMXML extends XML {
                                                             withRscRoleString);
                     final String score = getAttribute(constraintNode,
                                                       SCORE_STRING);
-                    List<String> tos = colocationMap.get(rsc);
-                    if (tos == null) {
-                        tos = new ArrayList<String>();
+                    final ColocationData colocationData =
+                                               new ColocationData(colId,
+                                                                  rsc,
+                                                                  withRsc,
+                                                                  rscRole,
+                                                                  withRscRole,
+                                                                  score);
+                    colocationIdMap.put(colId, colocationData);
+                    List<ColocationData> withs = colocationRscMap.get(rsc);
+                    if (withs == null) {
+                        withs = new ArrayList<ColocationData>();
                     }
-                    tos.add(withRsc);
-                    colocationMap.put(rsc, tos);
-                    colocationScoreMap.put(rsc, withRsc, score);
-                    colocationRscRoleMap.put(rsc, withRsc, rscRole);
-                    colocationWithRscRoleMap.put(rsc, withRsc, withRscRole);
-                    colocationIdMap.put(rsc, withRsc, colId);
-                    // TODO: node-attribute
+                    withs.add(colocationData);
+                    colocationRscMap.put(rsc, withs);
                 } else if (constraintNode.getNodeName().equals("rsc_order")) {
                     final String ordId = getAttribute(constraintNode, "id");
-                    final String rscFrom = getAttribute(constraintNode,
+                    final String rscFirst = getAttribute(constraintNode,
                                                         firstString);
-                    final String rscTo = getAttribute(constraintNode,
-                                                      thenString);
+                    final String rscThen = getAttribute(constraintNode,
+                                                        thenString);
                     final String score = getAttribute(constraintNode,
                                                       SCORE_STRING);
                     final String symmetrical = getAttribute(constraintNode,
@@ -2716,19 +2709,20 @@ public class CRMXML extends XML {
                                                             firstActionString);
                     final String thenAction = getAttribute(constraintNode,
                                                            thenActionString);
-                    List<String> tos = orderMap.get(rscFrom);
-                    if (tos == null) {
-                        tos = new ArrayList<String>();
+                    final OrderData orderData = new OrderData(ordId,
+                                                              rscFirst,
+                                                              rscThen,
+                                                              score,
+                                                              symmetrical,
+                                                              firstAction,
+                                                              thenAction);
+                    orderIdMap.put(ordId, orderData);
+                    List<OrderData> thens = orderRscMap.get(rscFirst);
+                    if (thens == null) {
+                        thens = new ArrayList<OrderData>();
                     }
-                    tos.add(rscTo);
-                    orderMap.put(rscFrom, tos);
-                    //TODO: before is not needed in pacemaker anymore
-                    orderDirectionMap.put(rscFrom, rscTo, "before");
-                    orderScoreMap.put(rscFrom, rscTo, score);
-                    orderSymmetricalMap.put(rscFrom, rscTo, symmetrical);
-                    orderIdMap.put(rscFrom, rscTo, ordId);
-                    orderFirstActionMap.put(rscFrom, rscTo, firstAction);
-                    orderThenActionMap.put(rscFrom, rscTo, thenAction);
+                    thens.add(orderData);
+                    orderRscMap.put(rscFirst, thens);
                 } else if ("rsc_location".equals(
                                               constraintNode.getNodeName())) {
                     final String locId = getAttribute(constraintNode, "id");
@@ -2831,19 +2825,11 @@ public class CRMXML extends XML {
         cibQueryData.setResourceType(resourceTypeMap);
         cibQueryData.setResourceInstanceAttrId(resourceInstanceAttrIdMap);
 
-        cibQueryData.setColocation(colocationMap);
-        cibQueryData.setColocationScore(colocationScoreMap);
-        cibQueryData.setColocationRscRole(colocationRscRoleMap);
-        cibQueryData.setColocationWithRscRole(colocationWithRscRoleMap);
+        cibQueryData.setColocationRsc(colocationRscMap);
         cibQueryData.setColocationId(colocationIdMap);
 
-        cibQueryData.setOrder(orderMap);
         cibQueryData.setOrderId(orderIdMap);
-        cibQueryData.setOrderFirstAction(orderFirstActionMap);
-        cibQueryData.setOrderThenAction(orderThenActionMap);
-        cibQueryData.setOrderScore(orderScoreMap);
-        cibQueryData.setOrderSymmetrical(orderSymmetricalMap);
-        cibQueryData.setOrderDirection(orderDirectionMap);
+        cibQueryData.setOrderRsc(orderRscMap);
 
         cibQueryData.setLocation(locationMap);
         cibQueryData.setLocationsId(locationsIdMap);
@@ -3162,5 +3148,136 @@ public class CRMXML extends XML {
     /** Returns whether linbit::drbd ra is present. */
     public final boolean isLinbitDrbdPresent() {
         return linbitDrbdPresent;
+    }
+
+    /** Class that holds colocation data. */
+    public class ColocationData {
+        /** Colocation id. */
+        private final String id;
+        /** Colocation resource 1. */
+        private final String rsc;
+        /** Colocation resource 2. */
+        private final String withRsc;
+        /** Resource 1 role. */
+        private final String rscRole;
+        /** Resource 2 role. */
+        private final String withRscRole;
+        /** Colocation score. */
+        private final String score;
+
+        /** Creates new ColocationData object. */
+        public ColocationData(final String id,
+                              final String rsc,
+                              final String withRsc,
+                              final String rscRole,
+                              final String withRscRole,
+                              final String score) {
+            this.id = id;
+            this.rsc = rsc;
+            this.withRsc = withRsc;
+            this.rscRole = rscRole;
+            this.withRscRole = withRscRole;
+            this.score = score;
+        }
+
+        /** Returns colocation id. */
+        public final String getId() {
+            return id;
+        }
+
+        /** Returns colocation rsc. */
+        public final String getRsc() {
+            return rsc;
+        }
+
+        /** Returns colocation with-rsc. */
+        public final String getWithRsc() {
+            return withRsc;
+        }
+
+        /** Returns colocation rsc role. */
+        public final String getRscRole() {
+            return rscRole;
+        }
+
+        /** Returns colocation with-rsc role. */
+        public final String getWithRscRole() {
+            return withRscRole;
+        }
+
+        /** Returns colocation score. */
+        public final String getScore() {
+            return score;
+        }
+    }
+
+    /** Class that holds order data. */
+    public class OrderData {
+        /** Order id. */
+        private final String id;
+        /** Order resource 1. */
+        private final String rscFirst;
+        /** Order resource 2. */
+        private final String rscThen;
+        /** Order score. */
+        private final String score;
+        /** Symmetical. */
+        private final String symmetrical;
+        /** Action of the first resource. */
+        private final String firstAction;
+        /** Action of the second resource. */
+        private final String thenAction;
+
+        /** Creates new OrderData object. */
+        public OrderData(final String id,
+                         final String rscFirst,
+                         final String rscThen,
+                         final String score,
+                         final String symmetrical,
+                         final String firstAction,
+                         final String thenAction) {
+            this.id = id;
+            this.rscFirst = rscFirst;
+            this.rscThen = rscThen;
+            this.score = score;
+            this.symmetrical = symmetrical;
+            this.firstAction = firstAction;
+            this.thenAction = thenAction;
+        }
+
+        /** Returns order id. */
+        public final String getId() {
+            return id;
+        }
+
+        /** Returns order first rsc. */
+        public final String getRscFirst() {
+            return rscFirst;
+        }
+
+        /** Returns order then rsc. */
+        public final String getRscThen() {
+            return rscThen;
+        }
+
+        /** Returns order score. */
+        public final String getScore() {
+            return score;
+        }
+
+        /** Returns order symmetrical attribute. */
+        public final String getSymmetrical() {
+            return symmetrical;
+        }
+
+        /** Returns order action for "first" resource. */
+        public final String getFirstAction() {
+            return firstAction;
+        }
+
+        /** Returns order action for "then" resource. */
+        public final String getThenAction() {
+            return thenAction;
+        }
     }
 }

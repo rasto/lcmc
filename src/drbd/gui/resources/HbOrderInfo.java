@@ -41,9 +41,9 @@ import java.util.LinkedHashMap;
 public class HbOrderInfo extends EditableInfo
                          implements HbConstraintInterface {
     /** Parent resource in order constraint. */
-    private final ServiceInfo serviceInfoParent;
+    private ServiceInfo serviceInfoParent;
     /** Child resource in order constraint. */
-    private final ServiceInfo serviceInfoChild;
+    private ServiceInfo serviceInfoChild;
     /** Connection that keeps this constraint. */
     private final HbConnectionInfo connectionInfo;
 
@@ -61,6 +61,18 @@ public class HbOrderInfo extends EditableInfo
         this.serviceInfoChild = serviceInfoChild;
     }
 
+    /** Sets "first" parent service info. */
+    public final void setServiceInfoParent(
+                                    final ServiceInfo serviceInfoParent) {
+        this.serviceInfoParent = serviceInfoParent;
+    }
+
+    /** Sets "then" child service info. */
+    public final void setServiceInfoChild(
+                                    final ServiceInfo serviceInfoChild) {
+        this.serviceInfoChild = serviceInfoChild;
+    }
+
     /**
      * Returns browser object of this info.
      */
@@ -73,19 +85,15 @@ public class HbOrderInfo extends EditableInfo
      * Sets the order's parameters.
      */
     public final void setParameters() {
-        final String rscParent =
-                        serviceInfoParent.getService().getHeartbeatId();
-        final String rscChild = serviceInfoChild.getService().getHeartbeatId();
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String score = clStatus.getOrderScore(rscParent, rscChild);
-        final String symmetrical = clStatus.getOrderSymmetrical(rscParent,
-                                                                rscChild);
-        final String firstAction = clStatus.getOrderFirstAction(rscParent,
-                                                                rscChild);
-        final String thenAction = clStatus.getOrderThenAction(rscParent,
-                                                              rscChild);
-        final String ordId = clStatus.getOrderId(rscParent,
-                                                 rscChild);
+        final String ordId = getService().getHeartbeatId();
+        final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
+
+        final String score = orderData.getScore();
+        final String symmetrical = orderData.getSymmetrical();
+        final String firstAction = orderData.getFirstAction();
+        final String thenAction = orderData.getThenAction();
+
         final Map<String, String> resourceNode = new HashMap<String, String>();
         resourceNode.put(CRMXML.SCORE_STRING, score);
         resourceNode.put("symmetrical", symmetrical);
@@ -283,18 +291,24 @@ public class HbOrderInfo extends EditableInfo
         return "then";
     }
 
-    /**
-     * Get parent resource in order constraint.
-     */
+    /** Get parent resource in order constraint. */
     public final String getRsc1() {
         return serviceInfoParent.toString();
     }
 
-    /**
-     * Get child resource in order constraint.
-     */
+    /** Get child resource in order constraint. */
     public final String getRsc2() {
         return serviceInfoChild.toString();
+    }
+
+    /** Get parent resource in order constraint. */
+    public final ServiceInfo getRscInfo1() {
+        return serviceInfoParent;
+    }
+
+    /** Get child resource in order constraint. */
+    public final ServiceInfo getRscInfo2() {
+        return serviceInfoChild;
     }
 
     /** Returns whether this parameter is advanced. */
@@ -305,4 +319,24 @@ public class HbOrderInfo extends EditableInfo
     protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
+
+    /** Returns the score of this order. */
+    public final int getScore() {
+        final ClusterStatus clStatus = getBrowser().getClusterStatus();
+        final String ordId = getService().getHeartbeatId();
+        final CRMXML.OrderData data = clStatus.getOrderData(ordId);
+        if (data == null) {
+            return 0;
+        }
+        final String score = data.getScore();
+        if (score == null) {
+            return 0;
+        } else if (CRMXML.INFINITY_STRING.equals(score)) {
+            return 1000000;
+        } else if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
+            return -1000000;
+        }
+        return Integer.parseInt(score);
+    }
+
 }

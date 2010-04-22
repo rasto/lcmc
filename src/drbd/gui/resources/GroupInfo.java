@@ -36,6 +36,7 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.Tools;
 import drbd.utilities.MyList;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.ButtonCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -204,7 +205,6 @@ public class GroupInfo extends ServiceInfo {
                     newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
         getBrowser().addToHeartbeatIdList(newServiceInfo);
-        System.out.println("add group service panel");
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
@@ -273,7 +273,7 @@ public class GroupInfo extends ServiceInfo {
     /**
      * Returns node name of the host where this service is running.
      */
-    public List<String> getMasterOnNodes(final boolean testOnly) {
+    public final List<String> getMasterOnNodes(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
                                                       getHeartbeatId(testOnly),
@@ -703,9 +703,51 @@ public class GroupInfo extends ServiceInfo {
                             || si.getMigratedFrom(testOnly) != null) {
                             migrated = " / migrated";
                         }
-                        texts.add(new Subtext("   " + si.toString()
+                        final HbConnectionInfo[] hbcis =
+                          getBrowser().getHeartbeatGraph().getHbConnections(si);
+                        String constraintLeft = "";
+                        String constraint = "";
+                        if (hbcis != null) {
+                            boolean scoreFirst = false;
+                            boolean scoreThen = false;
+                            boolean someConnection = false;
+                            for (final HbConnectionInfo hbci : hbcis) {
+                                if (hbci == null) {
+                                    continue;
+                                }
+                                if (!someConnection
+                                    && hbci.hasColocationOrOrder(si)) {
+                                    someConnection = true;
+                                }
+                                if (!scoreFirst
+                                    && !hbci.isOrdScoreNull(si, null)) {
+                                    scoreFirst = true;
+                                }
+                                if (!scoreThen
+                                    && !hbci.isOrdScoreNull(null, si)) {
+                                    scoreThen = true;
+                                }
+                            }
+                            if (someConnection) {
+                                if (!scoreFirst && !scoreThen) {
+                                    /* just colocation */
+                                    constraint = " --"; /* -- */
+                                } else {
+                                    if (scoreFirst) {
+                                        constraint = " \u27F6"; /* -> */
+                                    }
+                                    if (scoreThen) {
+                                        constraintLeft = "\u27F6 "; /* -> */
+                                    }
+                                }
+                            }
+                        }
+                        texts.add(new Subtext("   "
+                                              + constraintLeft
+                                              + si.toString()
                                               + unmanaged
-                                              + migrated,
+                                              + migrated
+                                              + constraint,
                                               sSubtext.getColor()));
                         boolean skip = true;
                         for (final Subtext st : subtexts) {
@@ -909,6 +951,35 @@ public class GroupInfo extends ServiceInfo {
                 final ServiceInfo si =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
                 si.updateMenus(pos);
+            }
+        }
+    }
+
+    /** Adds existing service menu item for every member of a group. */
+    protected final void addExistingGroupServiceMenuItems(
+                        final ServiceInfo asi,
+                        final DefaultListModel dlm,
+                        final Map<MyMenuItem, ButtonCallback> callbackHash,
+                        final MyList list,
+                        final boolean colocationOnly,
+                        final boolean orderOnly,
+                        final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                 getHeartbeatId(false),
+                                                 false);
+        if (resources != null) {
+            for (final String hbId : resources) {
+                final ServiceInfo si =
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
+                asi.addExistingServiceMenuItem("         " + si.toString(),
+                                           si,
+                                           dlm,
+                                           callbackHash,
+                                           list,
+                                           colocationOnly,
+                                           orderOnly,
+                                           testOnly);
             }
         }
     }

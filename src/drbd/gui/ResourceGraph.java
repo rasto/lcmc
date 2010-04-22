@@ -169,9 +169,9 @@ public abstract class ResourceGraph {
     /** This mutex is for protecting the test animation thread. */
     private final Mutex mTestAnimationThreadLock = new Mutex();
     /** List of edges that are made only during test. */
-    private final List<Edge> testEdges = new ArrayList<Edge>();
+    private volatile Edge testEdge = null;
     /** List of edges that are being tested during test. */
-    private final List<Edge> existingTestEdges = new ArrayList<Edge>();
+    private volatile Edge existingTestEdge = null;
     /** Lock for test edge list. */
     private final Mutex mTestEdgeLock = new Mutex();
     /** Interval beetween two animation frames. */
@@ -329,6 +329,7 @@ public abstract class ResourceGraph {
                                 }
 
                                 if (testAnimationList.isEmpty()) {
+                                    Tools.setMenuOpaque(component, true);
                                     mTestAnimationListLock.release();
                                     try {
                                         mTestOnlyFlag.acquire();
@@ -361,22 +362,32 @@ public abstract class ResourceGraph {
         mTestAnimationListLock.release();
     }
 
-    /**
-     * Stops the test animation.
-     */
+    /** Stops the test animation. */
     public final void stopTestAnimation(final JComponent component) {
-        Tools.setMenuOpaque(component, true);
         try {
             mTestAnimationListLock.acquire();
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        removeTestEdges();
         testAnimationList.remove(component);
         mTestAnimationListLock.release();
-        removeExistingTestEdges();
+        removeExistingTestEdge();
+        removeTestEdge();
+        Tools.setMenuOpaque(component, true);
     }
 
+    /** Is test animation running. */
+    public final boolean isTestAnimation() {
+        boolean running;
+        try {
+            mTestAnimationListLock.acquire();
+        } catch (java.lang.InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        running = !testAnimationList.isEmpty();
+        mTestAnimationListLock.release();
+        return running;
+    }
 
 
     /**
@@ -498,7 +509,7 @@ public abstract class ResourceGraph {
     /**
      * Returns the vertex that represents the specified resource.
      */
-    protected final Vertex getVertex(final Info i) {
+    protected Vertex getVertex(final Info i) {
         return infoToVertexMap.get(i);
     }
 
@@ -663,9 +674,10 @@ public abstract class ResourceGraph {
          * Reverse direction of the edge.
          */
         public void reverse() {
-            final Vertex f = mFrom;
-            final Vertex t = mTo;
-            setDirection(t, f);
+            //final Vertex f = mFrom;
+            //final Vertex t = mTo;
+            //setDirection(t, f);
+            setDirection(origTo, origFrom);
         }
 
         /**
@@ -1712,19 +1724,16 @@ public abstract class ResourceGraph {
     /**
      * Removes test edges.
      */
-    protected void removeTestEdges() {
+    protected void removeTestEdge() {
         try {
             mTestEdgeLock.acquire();
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        for (final Edge e : testEdges) {
-            try {
-                getGraph().removeEdge(e);
-            } catch (final Exception ee) {
-            }
+        try {
+            getGraph().removeEdge(testEdge);
+        } catch (final Exception ee) {
         }
-        testEdges.clear();
         mTestEdgeLock.release();
 
     }
@@ -1733,16 +1742,29 @@ public abstract class ResourceGraph {
      * Creates a test edge.
      */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
+        boolean gotlock = false;
         try {
-            mTestEdgeLock.acquire();
+            gotlock = mTestEdgeLock.attempt(0);
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
+        if (!gotlock) {
+            return;
+        }
         try {
-            if (isTestOnly()) {
-                final Edge edge = getGraph().addEdge(new MyEdge(vP, v));
-                testEdges.add(edge);
+            if (testEdge != null) {
+                getGraph().removeEdge(testEdge);
             }
+        } catch (final Exception e) {
+            /* ignore */
+        }
+        if (!isTestAnimation()) {
+            mTestEdgeLock.release();
+            return;
+        }
+        try {
+            final Edge edge = getGraph().addEdge(new MyEdge(vP, v));
+            testEdge = edge;
         } catch (final Exception e) {
             /* ignore */
         }
@@ -1751,25 +1773,32 @@ public abstract class ResourceGraph {
 
     /** Adds an existing edge to the test edges. */
     protected final void addExistingTestEdge(final Edge edge) {
+        boolean gotlock = false;
         try {
-            mTestEdgeLock.acquire();
+            gotlock = mTestEdgeLock.attempt(0);
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        if (isTestOnly()) {
-            existingTestEdges.add(edge);
+        if (!gotlock) {
+            return;
         }
+        if (!isTestAnimation()) {
+            existingTestEdge = null;
+            mTestEdgeLock.release();
+            return;
+        }
+        existingTestEdge = edge;
         mTestEdgeLock.release();
     }
 
     /** Removes existing test edges. */
-    protected final void removeExistingTestEdges() {
+    protected final void removeExistingTestEdge() {
         try {
             mTestEdgeLock.acquire();
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        existingTestEdges.clear();
+        existingTestEdge = null;
         mTestEdgeLock.release();
     }
 
@@ -1782,8 +1811,7 @@ public abstract class ResourceGraph {
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        final boolean is = testEdges.contains(e)
-                           || existingTestEdges.contains(e);
+        final boolean is = testEdge == e || existingTestEdge == e;
         mTestEdgeLock.release();
         return is;
     }

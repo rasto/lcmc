@@ -839,32 +839,10 @@ public final class CRM {
      */
     public static boolean removeColocation(final Host host,
                                            final String colocationId,
-                                           final String rsc1,
-                                           final String rsc2,
-                                           final String score,
                                            final boolean testOnly) {
-        final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        String rscString = "rsc";
-        String withRscString = "with-rsc";
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            /* <= 2.1.4 */
-            rscString = "from";
-            withRscString = "to";
-        }
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
-        xml.append("\" " + rscString + "=\"");
-        xml.append(rsc1);
-        if (score != null) {
-            xml.append("\" score=\"");
-            xml.append(score);
-        }
-        xml.append("\" " + withRscString + "=\"");
-        xml.append(rsc2);
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",
@@ -939,37 +917,10 @@ public final class CRM {
      */
     public static boolean removeOrder(final Host host,
                                       final String orderId,
-                                      final String rscFrom,
-                                      final String rscTo,
-                                      final String score,
-                                      final String symmetrical,
                                       final boolean testOnly) {
-        final String hbV = host.getHeartbeatVersion();
-        final String pmV = host.getPacemakerVersion();
-        String firstString = "first";
-        String thenString = "then";
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
-            /* <= 2.1.4 */
-            firstString = "from";
-            thenString = "to";
-        }
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_order id=\"");
         xml.append(orderId);
-        xml.append("\" " + firstString + "=\"");
-        xml.append(rscFrom);
-        if (score != null) {
-            xml.append("\" score=\"");
-            xml.append(score);
-        }
-        if (symmetrical != null) {
-            xml.append("\" symmetrical=\"");
-            xml.append(symmetrical);
-        }
-        xml.append("\" " + thenString + "=\"");
-        xml.append(rscTo);
         xml.append("\"/>'");
         final String command = getCibCommand("-D",
                                              "constraints",

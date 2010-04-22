@@ -95,8 +95,8 @@ public class HeartbeatGraph extends ResourceGraph {
     private final Map<Vertex, HostInfo> vertexToHostMap =
                                          new LinkedHashMap<Vertex, HostInfo>();
     /** Map from the host to the vertex. */
-    private final Map<HostInfo, Vertex> hostToVertexMap =
-                                         new LinkedHashMap<HostInfo, Vertex>();
+    private final Map<Info, Vertex> hostToVertexMap =
+                                         new LinkedHashMap<Info, Vertex>();
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
@@ -327,16 +327,15 @@ public class HeartbeatGraph extends ResourceGraph {
             putVertexToInfo(v, (Info) serviceInfo);
             vertexExists = false;
         } else if (testOnly) {
-            removeTestEdges();
             addTestEdge(getVertex(parent), getVertex(serviceInfo));
         }
 
         if (parent != null && !testOnly) {
             if (!orderOnly) {
-                addColocation(parent, serviceInfo);
+                addColocation(null, serviceInfo, parent);
             }
             if (!colocationOnly) {
-                addOrder(parent, serviceInfo);
+                addOrder(null, parent, serviceInfo);
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
@@ -348,16 +347,10 @@ public class HeartbeatGraph extends ResourceGraph {
     }
 
     /**
-     * Removes test edges.
-     */
-    protected final void removeTestEdges() {
-        super.removeTestEdges();
-    }
-
-    /**
      * Adds order constraint from parent to the service.
      */
-    public final void addOrder(final ServiceInfo parent,
+    public final void addOrder(final String ordId,
+                               final ServiceInfo parent,
                                final ServiceInfo serviceInfo) {
         if (parent == null || serviceInfo == null) {
             return;
@@ -368,42 +361,32 @@ public class HeartbeatGraph extends ResourceGraph {
             return;
         }
 
-        ServiceInfo colRsc = null;
-        ServiceInfo colWithRsc = null;
+        //ServiceInfo colRsc = null;
+        //ServiceInfo colWithRsc = null;
         MyEdge edge = (MyEdge) vP.findEdge(v);
 
         if (edge == null) {
             edge = (MyEdge) v.findEdge(vP);
             if (edge != null) {
-                /* reversed */
-                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-                if (edgeIsColocationList.contains(edge)) {
-                    colRsc = hbci.getLastServiceInfoRsc();
-                    colWithRsc = hbci.getLastServiceInfoWithRsc();
-                    edgeIsColocationList.remove(edge);
-                }
-                edgeIsOrderList.remove(edge);
-                hbconnectionToEdgeMap.remove(hbci);
-                edgeToHbconnectionMap.remove(edge);
-                getGraph().removeEdge(edge);
-                edge = null;
+                edge.reverse();
             }
+        } else {
+            edge.reset();
         }
         HbConnectionInfo hbci;
         if (edge == null) {
             hbci = getClusterBrowser().getNewHbConnectionInfo();
             edge = (MyEdge) getGraph().addEdge(new MyEdge(vP, v));
-            if (colRsc != null) {
-                edgeIsColocationList.add(edge);
-                hbci.addColocation(colRsc, colWithRsc);
-            }
+            //if (colRsc != null) {
+            //    edgeIsColocationList.add(edge);
+            //    hbci.addColocation(null, colRsc, colWithRsc);
+            //}
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         } else {
             hbci = edgeToHbconnectionMap.get(edge);
         }
-        hbci.addOrder(parent, serviceInfo);
-
+        hbci.addOrder(ordId, parent, serviceInfo);
         if (!edgeIsOrderList.contains(edge)) {
             edgeIsOrderList.add(edge);
         }
@@ -460,30 +443,31 @@ public class HeartbeatGraph extends ResourceGraph {
     /**
      * Adds colocation constraint from parent to the service.
      */
-    public final void addColocation(final ServiceInfo rsc,
+    public final void addColocation(final String colId,
+                                    final ServiceInfo rsc,
                                     final ServiceInfo withRsc) {
         if (rsc == null || withRsc == null) {
             return;
         }
         final Vertex vRsc = getVertex(rsc);
-        final Vertex v = getVertex(withRsc);
-        if (v == null || vRsc == null) {
+        final Vertex vWithRsc = getVertex(withRsc);
+        if (vWithRsc == null || vRsc == null) {
             return;
         }
-        MyEdge edge = (MyEdge) vRsc.findEdge(v);
+        MyEdge edge = (MyEdge) vWithRsc.findEdge(vRsc);
         if (edge == null) {
-            edge = (MyEdge) v.findEdge(vRsc);
+            edge = (MyEdge) vRsc.findEdge(vWithRsc);
         }
         HbConnectionInfo hbci;
         if (edge == null) {
             hbci = getClusterBrowser().getNewHbConnectionInfo();
-            edge = (MyEdge) getGraph().addEdge(new MyEdge(vRsc, v));
+            edge = (MyEdge) getGraph().addEdge(new MyEdge(vWithRsc, vRsc));
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         } else {
             hbci = edgeToHbconnectionMap.get(edge);
         }
-        hbci.addColocation(rsc, withRsc);
+        hbci.addColocation(colId, rsc, withRsc);
         if (!edgeIsColocationList.contains(edge)) {
             edgeIsColocationList.add(edge);
         }
@@ -717,27 +701,9 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         final ServiceInfo siP = (ServiceInfo) getInfo(parent);
         final StringBuffer s = new StringBuffer(100);
-        String state = "";
-
-
-        if (edgeIsOrder && edgeIsColocation) {
-            if (edgeToHbconnectionMap.get(edge).isColScoreNegative()) {
-                state = "repelled & ordered";
-            } else {
-                state = "colocated & ordered";
-            }
-        } else if (edgeIsOrder) {
-            state = "ordered";
-        } else if (edgeIsColocation) {
-            if (edgeToHbconnectionMap.get(edge).isColScoreNegative()) {
-                state = "repelled";
-            } else {
-                state = "colocated";
-            }
-        }
-
         s.append(siP.toString());
-        if (edgeIsOrder) {
+        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+        if (edgeIsOrder && !hbci.isOrdScoreNull(null, null)) {
             s.append(" is started before ");
         } else {
             s.append(" and ");
@@ -747,7 +713,10 @@ public class HeartbeatGraph extends ResourceGraph {
             s.append(" are located");
         }
         if (edgeIsColocation) {
-            if (edgeToHbconnectionMap.get(edge).isColScoreNegative()) {
+            final HbConnectionInfo.ColScoreType colSType =
+             edgeToHbconnectionMap.get(edge).getColocationScoreType(null, null);
+            if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
+                || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
                 s.append(" not on the same host");
             } else {
                 s.append(" on the same host");
@@ -756,7 +725,7 @@ public class HeartbeatGraph extends ResourceGraph {
             s.append(" not necessarily on the same host");
         }
 
-        return "<b>" + state + "</b><br>" + s.toString();
+        return s.toString();
     }
 
     /**
@@ -808,42 +777,105 @@ public class HeartbeatGraph extends ResourceGraph {
         final Pair p = ((Edge) e).getEndpoints();
         final ServiceInfo s1 = (ServiceInfo) getInfo((Vertex) p.getSecond());
         final ServiceInfo s2 = (ServiceInfo) getInfo((Vertex) p.getFirst());
-        String ret;
         final HbConnectionInfo hbci = edgeToHbconnectionMap.get((Edge) e);
-        if (edgeIsOrder && edgeIsColocation) {
-            if (edgeToHbconnectionMap.get((Edge) e).isColScoreNegative()) {
-                ret = Tools.getString("HeartbeatGraph.NoColOrd");
-            } else {
-                ret = Tools.getString("HeartbeatGraph.ColOrd");
+        String colDesc = null;
+        String ordDesc = null;
+        String desc = null;
+        String leftArrow = "\u2190 "; /* <- */
+        String rightArrow = " \u2192"; /* -> */
+        final HbConnectionInfo.ColScoreType colSType =
+         edgeToHbconnectionMap.get((Edge) e).getColocationScoreType(null, null);
+        if (edgeIsColocation) {
+            if (hbci.isColocationTwoDirections()) {
+                leftArrow = "\u21AE "; /* </> */
+                rightArrow = "\u21AE "; /* </> */
+            } else if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
+                || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
+                leftArrow = "\u2194 "; /* <-> */
+                rightArrow = "\u2194 "; /* <-> */
+            } else if (colSType == HbConnectionInfo.ColScoreType.IS_NULL) {
+                leftArrow = "\u21E0 "; /* < - - */
+                rightArrow = "\u21E2 "; /* - - > */
+            } else if (colSType == HbConnectionInfo.ColScoreType.MIXED) {
+                leftArrow = "\u219A "; /* </- */
+                rightArrow = "\u219B "; /* -/> */
             }
-        } else if (edgeIsOrder) {
-            ret = Tools.getString("HeartbeatGraph.Order");
-        } else if (edgeIsColocation) {
-            if (hbci.isColScoreNegative()) {
-                ret = Tools.getString("HeartbeatGraph.NoColocation");
+        }
+        if (edgeIsOrder && edgeIsColocation) {
+            if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
+                || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
+                colDesc = "repelled";
             } else {
-                ret = Tools.getString("HeartbeatGraph.Colocation");
+                colDesc = "col";
+            }
+            ordDesc = "ord";
+        } else if (edgeIsOrder) {
+            ordDesc = "ordered";
+        } else if (edgeIsColocation) {
+            if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
+                || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
+                colDesc = "repelled";
+                leftArrow = "\u2194 "; /* <-> */
+                rightArrow = "\u2194 "; /* <-> */
+            } else {
+                colDesc = "colocated";
             }
         } else if (s1.getService().isNew() || s2.getService().isNew()) {
-            ret = Tools.getString("HeartbeatGraph.Unconfigured");
+            desc = Tools.getString("HeartbeatGraph.Unconfigured");
         } else {
-            ret = Tools.getString("HeartbeatGraph.Removing");
+            desc = Tools.getString("HeartbeatGraph.Removing");
+        }
+        if (desc != null) {
+            return desc;
         }
         final Vertex v1 = (Vertex) p.getSecond();
         final Vertex v2 = (Vertex) p.getFirst();
-        final double s1X =
-                getVertexLocations().getLocation(v1).getX();
-        final double s2X =
-                getVertexLocations().getLocation(v2).getX();
+        final double s1X = getVertexLocations().getLocation(v1).getX();
+        final double s2X = getVertexLocations().getLocation(v2).getX();
+        final StringBuffer sb = new StringBuffer(15);
         if (edgeIsColocation) {
-            if ((hbci.isRsc1(s1) && s1X < s2X)
-                || (!hbci.isRsc1(s1) && s1X > s2X)) {
-                return "\u2190 " + ret; /* <- */
+            final boolean left = hbci.isWithRsc(s2);
+            if (s1X >= s2X) {
+                if (left) {
+                    sb.append(leftArrow); /* <- */
+                    sb.append(colDesc);
+                    if (edgeIsOrder) {
+                        sb.append('/');
+                    }
+                }
+                if (edgeIsOrder) {
+                    sb.append(ordDesc);
+                }
+                if (!left) {
+                    if (edgeIsOrder) {
+                        sb.append('/');
+                    }
+                    sb.append(colDesc);
+                    sb.append(rightArrow); /* -> */
+                }
             } else {
-                return " \u2192" + ret; /* -> */
+                if (!left) {
+                    sb.append(leftArrow); /* <- */
+                    sb.append(colDesc);
+                    if (edgeIsOrder) {
+                        sb.append('/');
+                    }
+                }
+                if (edgeIsOrder) {
+                    sb.append(ordDesc);
+                }
+                if (left) {
+                    if (edgeIsOrder) {
+                        sb.append('/');
+                    }
+                    sb.append(colDesc);
+                    sb.append(rightArrow); /* -> */
+                }
             }
+        } else if (edgeIsOrder) {
+            sb.append(ordDesc);
         }
-        return ret;
+        return sb.toString();
     }
 
     /**
@@ -855,11 +887,9 @@ public class HeartbeatGraph extends ResourceGraph {
             p = super.getEdgeDrawPaint(e);
         } else if (edgeIsOrderList.contains(e)
                    || edgeIsColocationList.contains(e)) {
-            p = Tools.getDefaultColor(
-                                      "ResourceGraph.EdgeDrawPaintBrighter");
+            p = Tools.getDefaultColor("ResourceGraph.EdgeDrawPaintBrighter");
         } else {
-            p = Tools.getDefaultColor(
-                                      "ResourceGraph.EdgeDrawPaintRemoved");
+            p = Tools.getDefaultColor("ResourceGraph.EdgeDrawPaintRemoved");
         }
         return p;
     }
@@ -1051,7 +1081,13 @@ public class HeartbeatGraph extends ResourceGraph {
      * Returns whether to show an edge arrow.
      */
     protected final boolean showEdgeArrow(final Edge e) {
-        return edgeIsOrderList.contains(e);
+        if (edgeIsOrderList.contains(e)) {
+            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
+            return hbci != null
+                   && !hbci.isOrderTwoDirections()
+                   && !hbci.isOrdScoreNull(null, null);
+        }
+        return false;
     }
 
     /**
@@ -1102,7 +1138,6 @@ public class HeartbeatGraph extends ResourceGraph {
             }
         }
         if (testOnly) {
-            removeExistingTestEdges();
             addExistingTestEdge(edge);
         }
     }
@@ -1123,7 +1158,6 @@ public class HeartbeatGraph extends ResourceGraph {
             siC.removeOrder(siP, dcHost, testOnly);
         }
         if (testOnly) {
-            removeExistingTestEdges();
             addExistingTestEdge(edge);
         }
     }
@@ -1138,13 +1172,12 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siWithRsc =
                                   hbConnectionInfo.getLastServiceInfoWithRsc();
         if (siWithRsc.getService().isNew()) {
-            addOrder(siRsc, siWithRsc);
+            addOrder(null, siRsc, siWithRsc);
         } else {
             siRsc.addOrder(siWithRsc, dcHost, testOnly);
         }
         if (testOnly) {
             final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-            removeExistingTestEdges();
             addExistingTestEdge(edge);
         }
     }
@@ -1167,7 +1200,6 @@ public class HeartbeatGraph extends ResourceGraph {
             siRsc.removeColocation(siWithRsc, dcHost, testOnly);
         }
         if (testOnly) {
-            removeExistingTestEdges();
             addExistingTestEdge(edge);
         }
     }
@@ -1181,13 +1213,12 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siP = hbConnectionInfo.getLastServiceInfoParent();
         final ServiceInfo siC = hbConnectionInfo.getLastServiceInfoChild();
         if (siC.getService().isNew()) {
-            addColocation(siP, siC);
+            addColocation(null, siP, siC);
         } else {
             siP.addColocation(siC, dcHost, testOnly);
         }
         if (testOnly) {
             final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-            removeExistingTestEdges();
             addExistingTestEdge(edge);
         }
     }
@@ -1213,7 +1244,7 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void addHost(final HostInfo hostInfo) {
 
-        Vertex v = getVertex(hostInfo);
+        Vertex v = super.getVertex(hostInfo);
         if (v == null) {
             /* add host vertex */
             final SparseVertex sv = new SparseVertex();
@@ -1384,5 +1415,20 @@ public class HeartbeatGraph extends ResourceGraph {
             allConnections.add(hbci);
         }
         return allConnections;
+    }
+
+    /**
+     * Returns the vertex that represents the specified resource or its group.
+     */
+    protected final Vertex getVertex(final Info i) {
+        if (hostToVertexMap.containsKey(i)) {
+            return super.getVertex(i);
+        }
+        final GroupInfo gi = ((ServiceInfo) i).getGroupInfo();
+        if (gi == null) {
+            return super.getVertex(i);
+        } else {
+            return super.getVertex(gi);
+        }
     }
 }

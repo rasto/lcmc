@@ -896,7 +896,7 @@ public class ClusterBrowser extends Browser {
                                host.setDrbdStatus(true);
                                drbdGraph.repaint();
                                Tools.debug(this, "drbd status update: "
-                                                     + host.getName());
+                                                     + host.getName(), 1);
                                clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
                            }
@@ -916,7 +916,7 @@ public class ClusterBrowser extends Browser {
                                if (host.isDrbdStatus()) {
                                    host.setDrbdStatus(false);
                                    Tools.debug(this, "drbd status update: "
-                                                     + host.getName());
+                                                     + host.getName(), 1);
                                    drbdGraph.repaint();
                                    clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
@@ -942,7 +942,7 @@ public class ClusterBrowser extends Browser {
                                     "modprobe drbd") >= 0) {
                                if (host.isDrbdStatus()) {
                                    Tools.debug(this, "drbd status update: "
-                                                 + host.getName());
+                                                 + host.getName(), 1);
                                    host.setDrbdStatus(false);
                                    drbdGraph.repaint();
                                    clusterHostsInfo.updateTable(
@@ -952,7 +952,7 @@ public class ClusterBrowser extends Browser {
                            } else {
                                if (!host.isDrbdStatus()) {
                                    Tools.debug(this, "drbd status update: "
-                                                 + host.getName());
+                                                 + host.getName(), 1);
                                    host.setDrbdStatus(true);
                                    drbdGraph.repaint();
                                    clusterHostsInfo.updateTable(
@@ -985,7 +985,7 @@ public class ClusterBrowser extends Browser {
                                getDrbdGraph().getDrbdInfo().setParameters();
                                drbdGraph.repaint();
                                Tools.debug(this, "drbd status update: "
-                                             + host.getName());
+                                             + host.getName(), 1);
                                clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
                                final Thread thread = new Thread(
@@ -1126,7 +1126,7 @@ public class ClusterBrowser extends Browser {
                                 if (clusterStatus.parseStatus(status)) {
                                     Tools.debug(this,
                                                 "update cluster status: "
-                                                + host.getName());
+                                                + host.getName(), 1);
                                     final ServicesInfo ssi = servicesInfo;
                                     rscDefaultsInfo.setParameters(
                                       clusterStatus.getRscDefaultsValuePairs());
@@ -1331,7 +1331,7 @@ public class ClusterBrowser extends Browser {
      */
     public final void updateVMS() {
         DefaultMutableTreeNode resource;
-        Tools.debug(this, "VM status update");
+        Tools.debug(this, "VM status update", 1);
 
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {

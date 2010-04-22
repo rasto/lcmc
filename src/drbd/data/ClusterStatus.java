@@ -275,139 +275,36 @@ public class ClusterStatus {
         return cibQueryMap.getResourceInstanceAttrId().get(hbId);
     }
 
-    /**
-     * Returns colocation map.
-     */
-    public final Map<String, List<String>> getColocationMap() {
-        return cibQueryMap.getColocation();
+    /** Returns colocation data from id. */
+    public final CRMXML.ColocationData getColocationData(final String colId) {
+        return cibQueryMap.getColocationId().get(colId);
     }
 
-    /**
-     * Returns order map.
-     */
-    public final Map<String, List<String>> getOrderMap() {
-        return cibQueryMap.getOrder();
+    /** Returns list of colocation data from specified resource. */
+    public final List<CRMXML.ColocationData> getColocationDatas(
+                                                            final String rsc) {
+        return cibQueryMap.getColocationRsc().get(rsc);
     }
 
-    /**
-     * Returns colocation id of two resources.
-     */
-    public final String getColocationId(final String rsc1,
-                                        final String rsc2) {
-        final MultiKeyMap colMap = cibQueryMap.getColocationId();
-        if (colMap == null) {
-            return null;
-        }
-        final String ret = (String) colMap.get(rsc1, rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getColocationId().get(rsc2, rsc1);
-        }
-        return ret;
+    /** Returns colocation rsc map. */
+    public final Map<String, List<CRMXML.ColocationData>>
+                                                        getColocationRscMap() {
+        return cibQueryMap.getColocationRsc();
     }
 
-    /**
-     * Returns colocation score.
-     */
-    public final String getColocationScore(final String rsc1,
-                                           final String rsc2) {
-        final String ret = (String) cibQueryMap.getColocationScore().get(rsc1,
-                                                                         rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getColocationScore().get(rsc2, rsc1);
-        }
-        return ret;
+    /** Returns order data from id. */
+    public final CRMXML.OrderData getOrderData(final String ordId) {
+        return cibQueryMap.getOrderId().get(ordId);
     }
 
-    /**
-     * Returns colocation rsc1 role.
-     */
-    public final String getColocationRscRole(final String rsc1,
-                                             final String rsc2) {
-        final String ret = (String) cibQueryMap.getColocationRscRole().get(
-                                                                         rsc1,
-                                                                         rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getColocationRscRole().get(rsc2, rsc1);
-        }
-        return ret;
+    /** Returns list of order data from specified resource. */
+    public final List<CRMXML.OrderData> getOrderDatas(final String rsc) {
+        return cibQueryMap.getOrderRsc().get(rsc);
     }
 
-    /**
-     * Returns colocation rsc2 role.
-     */
-    public final String getColocationWithRscRole(final String rsc1,
-                                                 final String rsc2) {
-        final String ret = (String) cibQueryMap.getColocationWithRscRole().get(
-                                                                         rsc1,
-                                                                         rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getColocationWithRscRole().get(rsc2,
-                                                                       rsc1);
-        }
-        return ret;
-    }
-
-    /**
-     * Returns order id of two resources.
-     */
-    public final String getOrderId(final String rsc1, final String rsc2) {
-        final String ret = (String) cibQueryMap.getOrderId().get(rsc1, rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getOrderId().get(rsc2, rsc1);
-        }
-        return ret;
-    }
-
-    /**
-     * Returns order score of two resources.
-     */
-    public final String getOrderScore(final String rsc1, final String rsc2) {
-        final String ret = (String) cibQueryMap.getOrderScore().get(rsc1,
-                                                                    rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getOrderScore().get(rsc2, rsc1);
-        }
-        return ret;
-    }
-
-    /**
-     * Returns order first-action of two resources.
-     */
-    public final String getOrderFirstAction(final String rsc1,
-                                            final String rsc2) {
-        final String ret = (String) cibQueryMap.getOrderFirstAction().get(rsc1,
-                                                                          rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getOrderFirstAction().get(rsc2, rsc1);
-        }
-        return ret;
-    }
-
-    /**
-     * Returns order then-action of two resources.
-     */
-    public final String getOrderThenAction(final String rsc1,
-                                           final String rsc2) {
-        final String ret = (String) cibQueryMap.getOrderThenAction().get(rsc1,
-                                                                         rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getOrderThenAction().get(rsc2, rsc1);
-        }
-        return ret;
-    }
-
-    /**
-     * Returns a string that takes "true" or "false" value, whether order is
-     * symmetrical.
-     */
-    public final String getOrderSymmetrical(final String rsc1,
-                                            final String rsc2) {
-        final String ret = (String) cibQueryMap.getOrderSymmetrical().get(rsc1,
-                                                                          rsc2);
-        if (ret == null) {
-            return (String) cibQueryMap.getOrderSymmetrical().get(rsc2, rsc1);
-        }
-        return ret;
+    /** Returns order rsc map. */
+    public final Map<String, List<CRMXML.OrderData>> getOrderRscMap() {
+        return cibQueryMap.getOrderRsc();
     }
 
     /**
@@ -420,20 +317,6 @@ public class ClusterStatus {
         } else {
             return locs;
         }
-    }
-
-    /**
-     * Returns direction of the order constraint. 'before' or 'after'
-     */
-    public final String getOrderDirection(final String rsc1,
-                                          final String rsc2) {
-        final String ret = (String) cibQueryMap.getOrderDirection().get(rsc1,
-                                                                        rsc2);
-        cibQueryMap.getOrderDirection();
-        if (ret == null) {
-            return (String) cibQueryMap.getOrderDirection().get(rsc2, rsc1);
-        }
-        return ret;
     }
 
     /**
@@ -667,7 +550,7 @@ public class ClusterStatus {
                 final String status = Tools.join("\n", data.toArray(
                                                      new String[data.size()]));
                 if (!status.equals(oldStatus)) {
-                    Tools.debug(this, "status update: " + host.getName());
+                    Tools.debug(this, "status update: " + host.getName(), 1);
                     oldStatus = status;
                     parseResStatus(status);
                     return true;
@@ -676,7 +559,7 @@ public class ClusterStatus {
                 final String cib =
                        Tools.join("\n", data.toArray(new String[data.size()]));
                 if (!cib.equals(oldCib)) {
-                    Tools.debug(this, "cib update: " + host.getName());
+                    Tools.debug(this, "cib update: " + host.getName(), 1);
                     oldCib = cib;
                     parseCibQuery(cib);
                     return true;

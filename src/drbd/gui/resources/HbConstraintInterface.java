@@ -99,6 +99,10 @@ public interface HbConstraintInterface {
     String getRsc1();
     /** Returns resource 2. */
     String getRsc2();
+    /** Returns info object from resource 1. */
+    ServiceInfo getRscInfo1();
+    /** Returns info object from resource 2. */
+    ServiceInfo getRscInfo2();
     /** Hide/Show advanced panels. */
     void updateAdvancedPanels();
 }

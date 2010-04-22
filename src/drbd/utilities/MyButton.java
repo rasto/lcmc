@@ -159,8 +159,8 @@ public class MyButton extends JButton implements ComponentWithTest {
      * Sets tooltip and wiggles the mouse to refresh it.
      */
     public final void setToolTipText(final String toolTipText) {
-        super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
+            super.setToolTipText(toolTipText);
             final GraphicsDevice[] devices =
                     GraphicsEnvironment.getLocalGraphicsEnvironment()
                                        .getScreenDevices();

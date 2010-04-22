@@ -564,46 +564,59 @@ public class ServicesInfo extends EditableInfo {
                               testOnly);
         }
         hg.clearColocationList();
-        final Map<String, List<String>> colocationMap =
-                                            clStatus.getColocationMap();
-        for (final String heartbeatIdP : colocationMap.keySet()) {
-            final List<String> tos = colocationMap.get(heartbeatIdP);
-            for (final String heartbeatId : tos) {
-                final ServiceInfo si  = getBrowser().getServiceInfoFromCRMId(
-                                                                  heartbeatId);
+        final Map<String, List<CRMXML.ColocationData>> colocationMap =
+                                                 clStatus.getColocationRscMap();
+        for (final String rscId : colocationMap.keySet()) {
+            final List<CRMXML.ColocationData> withs =
+                                                colocationMap.get(rscId);
+            for (final CRMXML.ColocationData data : withs) {
+                final String withRscId = data.getWithRsc();
+                final ServiceInfo withSi = getBrowser().getServiceInfoFromCRMId(
+                                                                   withRscId);
                 final ServiceInfo siP = getBrowser().getServiceInfoFromCRMId(
-                                                                 heartbeatIdP);
-                hg.addColocation(siP, si);
+                                                                        rscId);
+                hg.addColocation(data.getId(), siP, withSi);
             }
         }
 
         hg.clearOrderList();
-        final Map<String, List<String>> orderMap = clStatus.getOrderMap();
-        for (final String heartbeatIdP : orderMap.keySet()) {
-            for (final String heartbeatId : orderMap.get(heartbeatIdP)) {
+        final Map<String, List<CRMXML.OrderData>> orderMap =
+                                                    clStatus.getOrderRscMap();
+        for (final String rscFirstId : orderMap.keySet()) {
+            for (final CRMXML.OrderData data : orderMap.get(rscFirstId)) {
+                final String rscThenId = data.getRscThen();
                 final ServiceInfo si =
-                        getBrowser().getServiceInfoFromCRMId(heartbeatId);
+                        getBrowser().getServiceInfoFromCRMId(rscThenId);
                 if (si != null) { /* not yet complete */
                     final ServiceInfo siP =
-                            getBrowser().getServiceInfoFromCRMId(heartbeatIdP);
+                            getBrowser().getServiceInfoFromCRMId(rscFirstId);
                     if (siP != null && siP.getResourceAgent() != null) {
                         /* dangling orders and colocations */
                         if ((siP.getResourceAgent().isDrbddisk()
                              || siP.getResourceAgent().isLinbitDrbd())
                             && si.getName().equals("Filesystem")) {
-                            final List<String> colIds =
-                                           colocationMap.get(heartbeatIdP);
-                            // TODO: race here
-                            if (colIds != null) {
-                                for (String colId : colIds) {
-                                    if (colId != null
-                                        && colId.equals(heartbeatId)) {
+                            final List<CRMXML.ColocationData> cds =
+                                     clStatus.getColocationDatas(rscFirstId);
+                            if (cds != null) {
+                                for (final CRMXML.ColocationData cd : cds) {
+                                    if (cd.getWithRsc().equals(rscThenId)) {
                                         setFilesystemWithDrbd(siP, si);
                                     }
                                 }
                             }
+                            //final List<String> colIds =
+                            //               colocationMap.get(rscFirstId);
+                            //// TODO: race here
+                            //if (colIds != null) {
+                            //    for (String colId : colIds) {
+                            //        if (colId != null
+                            //            && colId.equals(rscThenId)) {
+                            //            setFilesystemWithDrbd(siP, si);
+                            //        }
+                            //    }
+                            //}
                         }
-                        hg.addOrder(siP, si);
+                        hg.addOrder(data.getId(), siP, si);
                     }
                 }
             }

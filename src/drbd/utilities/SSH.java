@@ -434,7 +434,7 @@ public class SSH {
                                   + host.getName()
                                   + ": "
                                   + host.getHoppedCommand(command),
-                                  1);
+                                  2);
                 thisSession.execCommand(host.getHoppedCommand(command));
 
                 final InputStream stdout = thisSession.getStdout();
@@ -717,7 +717,7 @@ public class SSH {
             return null;
         }
         final String realCommand = host.replaceVars(command);
-        Tools.debug(this, "real command: " + realCommand, 1);
+        Tools.debug(this, "real command: " + realCommand, 2);
         if (cacheIt && commandCache.containsKey(realCommand)) {
             execCallback.done(commandCache.get(realCommand));
             return null;

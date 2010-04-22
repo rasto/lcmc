@@ -46,7 +46,7 @@ import javax.swing.SpringLayout;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -74,10 +74,17 @@ public class HbConnectionInfo extends EditableInfo {
     private ServiceInfo lastServiceInfoChild = null;
     /** List of colocation ids. */
     private final Map<String, HbColocationInfo> colocationIds =
-                                   new HashMap<String, HbColocationInfo>();
+                                 new LinkedHashMap<String, HbColocationInfo>();
     /** List of order ids. */
     private final Map<String, HbOrderInfo> orderIds =
-                                        new HashMap<String, HbOrderInfo>();
+                                      new LinkedHashMap<String, HbOrderInfo>();
+    /** Colocation Score type. */
+    public enum ColScoreType { MIXED,
+                               INFINITY,
+                               MINUS_INFINITY,
+                               IS_NULL,
+                               NEGATIVE,
+                               POSITIVE };
 
     /**
      * Prepares a new <code>HbConnectionInfo</code> object.
@@ -538,7 +545,8 @@ public class HbConnectionInfo extends EditableInfo {
                 } else {
                     /* there is colocation constraint so let's get the
                      * endpoints from it. */
-                    addOrder(getLastServiceInfoRsc(),
+                    addOrder(null,
+                             getLastServiceInfoRsc(),
                              getLastServiceInfoWithRsc());
                     getBrowser().getHeartbeatGraph().addOrder(
                                                   thisClass,
@@ -563,7 +571,8 @@ public class HbConnectionInfo extends EditableInfo {
                     } else {
                         /* there is colocation constraint so let's get the
                          * endpoints from it. */
-                        addOrder(getLastServiceInfoRsc(),
+                        addOrder(null,
+                                 getLastServiceInfoRsc(),
                                  getLastServiceInfoWithRsc());
                         getBrowser().getHeartbeatGraph().addOrder(
                                                       thisClass,
@@ -612,7 +621,8 @@ public class HbConnectionInfo extends EditableInfo {
                     /* add colocation */
                     /* there is order constraint so let's get the endpoints
                      * from it. */
-                    addColocation(getLastServiceInfoParent(),
+                    addColocation(null,
+                                  getLastServiceInfoParent(),
                                   getLastServiceInfoChild());
                     getBrowser().getHeartbeatGraph().addColocation(
                                                    thisClass,
@@ -640,7 +650,8 @@ public class HbConnectionInfo extends EditableInfo {
                         /* add colocation */
                         /* there is order constraint so let's get the endpoints
                          * from it. */
-                        addColocation(getLastServiceInfoParent(),
+                        addColocation(null,
+                                      getLastServiceInfoParent(),
                                       getLastServiceInfoChild());
                         getBrowser().getHeartbeatGraph().addColocation(
                                                        thisClass,
@@ -670,6 +681,11 @@ public class HbConnectionInfo extends EditableInfo {
             }
         }
         for (final HbConstraintInterface c : constraintsToRemove) {
+           if (isOrder) {
+               orderIds.remove(c.getService().getHeartbeatId());
+           } else {
+               colocationIds.remove(c.getService().getHeartbeatId());
+           }
            constraints.remove(c);
         }
         infoPanel = null;
@@ -695,13 +711,10 @@ public class HbConnectionInfo extends EditableInfo {
     /**
      * Adds a new order.
      */
-    public final void addOrder(final ServiceInfo serviceInfoParent,
+    public final void addOrder(final String ordId,
+                               final ServiceInfo serviceInfoParent,
                                final ServiceInfo serviceInfoChild) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String ordId = clStatus.getOrderId(
-                        serviceInfoParent.getService().getHeartbeatId(),
-                        serviceInfoChild.getService().getHeartbeatId());
-
         lastServiceInfoParent = serviceInfoParent;
         lastServiceInfoChild = serviceInfoChild;
         if (ordId == null) {
@@ -709,7 +722,10 @@ public class HbConnectionInfo extends EditableInfo {
             return;
         }
         if (orderIds.containsKey(ordId)) {
-            orderIds.get(ordId).setParameters();
+            final HbOrderInfo hoi = orderIds.get(ordId);
+            hoi.setServiceInfoParent(serviceInfoParent);
+            hoi.setServiceInfoChild(serviceInfoChild);
+            hoi.setParameters();
             return;
         }
         final HbOrderInfo oi = new HbOrderInfo(this,
@@ -728,13 +744,10 @@ public class HbConnectionInfo extends EditableInfo {
     /**
      * Adds a new colocation.
      */
-    public final void addColocation(final ServiceInfo serviceInfoRsc,
+    public final void addColocation(final String colId,
+                                    final ServiceInfo serviceInfoRsc,
                                     final ServiceInfo serviceInfoWithRsc) {
-        //waitForInfoPanel();
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String colId = clStatus.getColocationId(
-                         serviceInfoRsc.getService().getHeartbeatId(),
-                         serviceInfoWithRsc.getService().getHeartbeatId());
         lastServiceInfoRsc = serviceInfoRsc;
         lastServiceInfoWithRsc = serviceInfoWithRsc;
         if (colId == null) {
@@ -742,7 +755,10 @@ public class HbConnectionInfo extends EditableInfo {
             return;
         }
         if (colocationIds.containsKey(colId)) {
-            colocationIds.get(colId).setParameters();
+            final HbColocationInfo hci = colocationIds.get(colId);
+            hci.setServiceInfoRsc(serviceInfoRsc);
+            hci.setServiceInfoWithRsc(serviceInfoWithRsc);
+            hci.setParameters();
             return;
         }
         final HbColocationInfo ci = new HbColocationInfo(this,
@@ -759,15 +775,68 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /**
-     * Returns whether the colocation score is negative.
+     * Returns whether the colocation score is negative. Order of rsc1 rsc2 is
+     * not important.
      */
-    public final boolean isColScoreNegative() {
+    public final ColScoreType getColocationScoreType(final ServiceInfo rsc1,
+                                                     final ServiceInfo rsc2) {
         int score = 0;
+        boolean plusInf = false;
+        boolean minusInf = false;
         for (final String colId : colocationIds.keySet()) {
-            score += colocationIds.get(colId).getScore();
+            final HbColocationInfo hbci = colocationIds.get(colId);
+            if ((rsc1 != null && rsc2 != null)
+                && (hbci.getRscInfo1() != rsc1 || hbci.getRscInfo2() != rsc2)
+                && (hbci.getRscInfo1() != rsc2 || hbci.getRscInfo2() != rsc1)) {
+                continue;
+            }
+
+            final int s = hbci.getScore();
+            if (s == 1000000) {
+                plusInf = true;
+            } else if (s == -1000000) {
+                minusInf = true;
+            }
+            score += s;
         }
-        return score < 0;
+        if (plusInf && minusInf) {
+            return ColScoreType.MIXED;
+        } else if (plusInf) {
+            return ColScoreType.INFINITY;
+        } else if (minusInf) {
+            return ColScoreType.MINUS_INFINITY;
+        } else if (score == 0) {
+            return ColScoreType.IS_NULL;
+        } else if (score < 0) {
+            return ColScoreType.NEGATIVE;
+        } else {
+            return ColScoreType.POSITIVE;
+        }
     }
+
+    /**
+     * Returns whether the order score is negative.
+     */
+    public final boolean isOrdScoreNull(final ServiceInfo first,
+                                        final ServiceInfo then) {
+        int score = 0;
+        for (final String ordId : orderIds.keySet()) {
+            final HbOrderInfo hoi = orderIds.get(ordId);
+            if (first != null && hoi.getRscInfo1() != first) {
+                continue;
+            }
+            if (then != null && hoi.getRscInfo2() != then) {
+                continue;
+            }
+            int s = hoi.getScore();
+            if (s < 0) {
+                s = 0;
+            }
+            score += s;
+        }
+        return score == 0;
+    }
+
     /**
      * Removes this connection.
      */
@@ -810,9 +879,71 @@ public class HbConnectionInfo extends EditableInfo {
     /**
      * Returns whether this resource is resource 1 in colocation constraint.
      */
-    public final boolean isRsc1(final ServiceInfo si) {
+    public final boolean isWithRsc(final ServiceInfo si) {
         for (final HbConstraintInterface c : constraints) {
-            if (!c.isOrder() && ((HbColocationInfo) c).getRscInfo1() == si) {
+            if (!c.isOrder()) {
+                ServiceInfo rsc2 = ((HbColocationInfo) c).getRscInfo2();
+                final GroupInfo gi = rsc2.getGroupInfo();
+                if (gi != null) {
+                    rsc2 = gi;
+                }
+                if (rsc2.equals(si)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns whether colocation or order have at least two different
+     * directions.
+     */
+    private boolean isTwoDirections(final boolean isOrder) {
+        ServiceInfo allRsc1 = null;
+        ServiceInfo allRsc2 = null;
+        for (final HbConstraintInterface c : constraints) {
+            if (c.isOrder() == isOrder) {
+                ServiceInfo rsc1 = c.getRscInfo1();
+                ServiceInfo rsc2 = c.getRscInfo2();
+                final GroupInfo gi1 = rsc1.getGroupInfo();
+                if (gi1 != null) {
+                    rsc1 = gi1;
+                }
+                final GroupInfo gi2 = rsc2.getGroupInfo();
+                if (gi2 != null) {
+                    rsc2 = gi2;
+                }
+                if (allRsc1 == null) {
+                    allRsc1 = rsc1;
+                } else if (!rsc1.equals(allRsc1)) {
+                    return true;
+                }
+                if (allRsc2 == null) {
+                    allRsc2 = rsc2;
+                } else if (!rsc2.equals(allRsc2)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** Returns whether there are different directions of orders. */
+    public final boolean isOrderTwoDirections() {
+        return isTwoDirections(true);
+    }
+
+    /** Returns whether there are different directions of colocations. */
+    public final boolean isColocationTwoDirections() {
+        return isTwoDirections(false);
+    }
+    /** Returns whether this service has a colocation or order. */
+    public final boolean hasColocationOrOrder(final ServiceInfo si) {
+        for (final HbConstraintInterface c : constraints) {
+            final ServiceInfo rsc1 = c.getRscInfo1();
+            final ServiceInfo rsc2 = c.getRscInfo2();
+            if (si.equals(rsc1) || si.equals(rsc2)) {
                 return true;
             }
         }

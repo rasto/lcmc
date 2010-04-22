@@ -985,7 +985,8 @@ public class DrbdResourceInfo extends EditableInfo
         di.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(di);
         fi.setDrbddiskInfo(di);
-        hg.addColocation(di, fi);
+        hg.addColocation(null, fi, di);
+        hg.addOrder(null, di, fi);
         di.waitForInfoPanel();
         di.paramComboBoxGet("1", null).setValueAndWait(getName());
         di.apply(dcHost, testOnly);
@@ -1015,7 +1016,8 @@ public class DrbdResourceInfo extends EditableInfo
         getBrowser().addToHeartbeatIdList(ldi);
         fi.setLinbitDrbdInfo(ldi);
         /* it adds coloation only to the graph. */
-        hg.addColocation(ldi.getCloneInfo(), fi);
+        hg.addColocation(null, fi, ldi.getCloneInfo());
+        hg.addOrder(null, ldi.getCloneInfo(), fi);
         /* this must be executed after the getInfoPanel is executed. */
         ldi.waitForInfoPanel();
         ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(getName());

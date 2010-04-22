@@ -1875,12 +1875,12 @@ public class TextResource extends
          "I am a DMC expert"},
 
         {"VMSDiskInfo.FileChooserTitle",
-         "Select image on "}, 
+         "Select image on "},
 
         {"VMSDiskInfo.Approve",
-         "Select"}, 
+         "Select"},
         {"VMSDiskInfo.Approve.ToolTip",
-         "Select this image."}, 
+         "Select this image."},
 
         {"EmptyViewPanel.HelpText",
 "<h3>Welcome to the DRBD Management Console</h3>"

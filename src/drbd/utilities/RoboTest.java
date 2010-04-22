@@ -69,53 +69,147 @@ public final class RoboTest {
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
             public void run() {
-                Tools.sleep(5000);
+                Tools.sleep(10000);
                 Robot robot = null;
                 try {
                     robot = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
                     Tools.appWarning("Robot error");
                 }
-                if (robot != null) {
-                    for (int i = 0; i < duration; i++) {
-                        robot.mousePress(InputEvent.BUTTON1_MASK);
-                        if (lazy) {
-                            Tools.sleep(500);
-
-                        }
-                        robot.mouseRelease(InputEvent.BUTTON1_MASK);
-                        if (abortWithMouseMovement()) {
-                            break;
-                        }
-                        if (lazy) {
-                            Tools.sleep(500);
-
-                        }
-                    }
-                    Tools.info("click test done");
+                if (robot == null) {
+                    return;
                 }
+                final long startTime = System.currentTimeMillis();
+                while (true) {
+                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    if (lazy) {
+                        Tools.sleep(500);
+
+                    }
+                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                    if (abortWithMouseMovement()) {
+                        break;
+                    }
+                    final long current = System.currentTimeMillis();
+                    if ((current - startTime) > duration * 60 * 1000) {
+                        break;
+                    }
+                    if (lazy) {
+                        Tools.sleep(100);
+                    } else {
+                        Tools.sleep(10);
+                    }
+                }
+                Tools.info("click test done");
             }
         });
         thread.start();
     }
-                //final Point2D p = MouseInfo.getPointerInfo().getLocation();
-                //final GraphicsDevice[] devices =
-                //    GraphicsEnvironment.getLocalGraphicsEnvironment()
-                //                       .getScreenDevices();
 
-                //int xOffset = 0;
-                //if (devices.length >= 2) {
-                //    /* workaround for dual monitors that are flipped. */
-                //    //TODO: not sure how is it with three monitors
-                //    final int x1 =
-                //        devices[0].getDefaultConfiguration().getBounds().x;
-                //    final int x2 =
-                //        devices[1].getDefaultConfiguration().getBounds().x;
-                //    if (x1 > x2) {
-                //        xOffset = -x1;
-                //    }
-                //}
+    /** Starts automatic mouse mover in 10 seconds. */
+    public static void startMover(final int duration,
+                                  final boolean lazy) {
+        Tools.info("start mouse move test in 10 seconds");
+        prevP = null;
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Tools.sleep(10000);
+                Robot robot = null;
+                try {
+                    robot = new Robot(SCREEN_DEVICE);
+                } catch (final java.awt.AWTException e) {
+                    Tools.appWarning("Robot error");
+                }
+                if (robot == null) {
+                    return;
+                }
+                int xOffset = getOffset();
+                final Point2D origP =
+                            MouseInfo.getPointerInfo().getLocation();
+                final int origX = (int) origP.getX();
+                final int origY = (int) origP.getY();
+                Tools.info("move mouse to the end position");
+                Tools.sleep(5000);
+                final Point2D endP =
+                            MouseInfo.getPointerInfo().getLocation();
+                final int endX = (int) endP.getX();
+                final int endY = (int) endP.getY();
+                int destX = origX;
+                int destY = origY;
+                Tools.info("test started");
+                final long startTime = System.currentTimeMillis();
+                while (true) {
+                    final Point2D p =
+                                MouseInfo.getPointerInfo().getLocation();
 
-                //final Point2D p = MouseInfo.getPointerInfo().getLocation();
-                //robot.mouseMove((int) p.getX() + xOffset - 1, (int) p.getY());
+                    final int x = (int) p.getX();
+                    final int y = (int) p.getY();
+                    int directionX;
+                    int directionY;
+                    if (x < destX) {
+                        directionX = 1;
+                    } else if (x > destX) {
+                        directionX = -1;
+                    } else {
+                        if (destX == endX) {
+                            destX = origX;
+                            directionX = -1;
+                        } else {
+                            destX = endX;
+                            directionX = 1;
+                        }
+                    }
+                    if (y < destY) {
+                        directionY = 1;
+                    } else if (y > destY) {
+                        directionY = -1;
+                    } else {
+                        if (destY == endY) {
+                            destY = origY;
+                            directionY = -1;
+                        } else {
+                            destY = endY;
+                            directionY = 1;
+                        }
+                    }
+                    robot.mouseMove((int) p.getX() + xOffset + directionX,
+                                    (int) p.getY() + directionY);
+                    if (lazy) {
+                        Tools.sleep(40);
+                    } else {
+                        Tools.sleep(5);
+                    }
+                    if (abortWithMouseMovement()) {
+                        break;
+                    }
+                    final long current = System.currentTimeMillis();
+                    if ((current - startTime) > duration * 60 * 1000) {
+                        break;
+                    }
+                }
+                Tools.info("mouse move test done");
+            }
+        });
+        thread.start();
+    }
+
+    /** workaround for dual monitors that are flipped. */
+    private static int getOffset() {
+        final Point2D p = MouseInfo.getPointerInfo().getLocation();
+        final GraphicsDevice[] devices =
+            GraphicsEnvironment.getLocalGraphicsEnvironment()
+                               .getScreenDevices();
+
+        int xOffset = 0;
+        if (devices.length >= 2) {
+            final int x1 =
+                devices[0].getDefaultConfiguration().getBounds().x;
+            final int x2 =
+                devices[1].getDefaultConfiguration().getBounds().x;
+            if (x1 > x2) {
+                xOffset = -x1;
+            }
+        }
+        return xOffset;
+    }
 }

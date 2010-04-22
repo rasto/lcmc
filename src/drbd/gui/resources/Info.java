@@ -51,7 +51,6 @@ import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.BoxLayout;
 import javax.swing.border.TitledBorder;
-import javax.swing.JMenuItem;
 
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -1016,7 +1015,7 @@ public class Info implements Comparable {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
                 final Object[][] data = getTableData(tableName);
-                Tools.debug(this, "update table in: " + getName());
+                Tools.debug(this, "update table in: " + getName(), 1);
                 final TableRowSorter sorter =
                                         (TableRowSorter) table.getRowSorter();
                 SwingUtilities.invokeLater(new Runnable() {

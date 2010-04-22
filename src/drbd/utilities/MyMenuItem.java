@@ -31,7 +31,6 @@ import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
-import javax.swing.SwingUtilities;
 
 import java.awt.MouseInfo;
 import java.awt.Robot;
@@ -40,9 +39,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.GraphicsConfiguration;
-import java.awt.Insets;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()

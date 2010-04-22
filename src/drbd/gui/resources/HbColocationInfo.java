@@ -41,9 +41,9 @@ import java.util.LinkedHashMap;
 public class HbColocationInfo extends EditableInfo
                               implements HbConstraintInterface {
     /** Resource 1 in colocation constraint. */
-    private final ServiceInfo serviceInfoRsc;
+    private ServiceInfo serviceInfoRsc;
     /** Resource 2 in colocation constraint. */
-    private final ServiceInfo serviceInfoWithRsc;
+    private ServiceInfo serviceInfoWithRsc;
     /** Connection that keeps this constraint. */
     private final HbConnectionInfo connectionInfo;
 
@@ -61,6 +61,17 @@ public class HbColocationInfo extends EditableInfo
         this.serviceInfoWithRsc = serviceInfoWithRsc;
     }
 
+    /** Sets service info of the resource. */
+    public final void setServiceInfoRsc(final ServiceInfo serviceInfoRsc) {
+        this.serviceInfoRsc = serviceInfoRsc;
+    }
+
+    /** Sets service info of the with-resource. */
+    public final void setServiceInfoWithRsc(
+                                        final ServiceInfo serviceInfoWithRsc) {
+        this.serviceInfoWithRsc = serviceInfoWithRsc;
+    }
+
     /**
      * Returns browser object of this info.
      */
@@ -73,14 +84,17 @@ public class HbColocationInfo extends EditableInfo
      * Sets the colocation's parameters.
      */
     public final void setParameters() {
-        final String rsc = serviceInfoRsc.getService().getHeartbeatId();
-        final String withRsc = serviceInfoWithRsc.getService().getHeartbeatId();
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String score = clStatus.getColocationScore(rsc, withRsc);
-        final String rscRole = clStatus.getColocationRscRole(rsc, withRsc);
-        final String withRscRole = clStatus.getColocationWithRscRole(
-                                                                      rsc,
-                                                                      withRsc);
+        final String colId = getService().getHeartbeatId();
+        final CRMXML.ColocationData colocationData =
+                        clStatus.getColocationData(colId);
+
+        final String rsc = colocationData.getRsc();
+        final String withRsc = colocationData.getWithRsc();
+        final String score = colocationData.getScore();
+        final String rscRole = colocationData.getRscRole();
+        final String withRscRole = colocationData.getWithRscRole();
+
         final Map<String, String> resourceNode = new HashMap<String, String>();
         resourceNode.put(CRMXML.SCORE_STRING, score);
         resourceNode.put("rsc-role", rscRole);
@@ -271,18 +285,25 @@ public class HbColocationInfo extends EditableInfo
 
     /** Returns name of the rsc1 attribute. */
     public final String getRsc1Name() {
-        return "with-rsc";
+        return "rsc";
     }
 
     /** Returns name of the rsc2 attribute. */
     public final String getRsc2Name() {
-        return "rsc";
+        return "with-rsc";
     }
 
     /**
      * Resource 1 in colocation constraint.
      */
     public final String getRsc1() {
+        return serviceInfoRsc.toString();
+    }
+
+    /**
+     * Resource 2 in colocation constraint.
+     */
+    public final String getRsc2() {
         return serviceInfoWithRsc.toString();
     }
 
@@ -290,24 +311,28 @@ public class HbColocationInfo extends EditableInfo
      * Resource 1 object in colocation constraint.
      */
     public final ServiceInfo getRscInfo1() {
-        return serviceInfoWithRsc;
-    }
-    /**
-     * Resource 2 in colocation constraint.
-     */
-    public final String getRsc2() {
-        return serviceInfoRsc.toString();
+        return serviceInfoRsc;
     }
 
     /**
-     * Returns the score of this colocation.
+     * Resource 2 object in colocation constraint.
      */
+    public final ServiceInfo getRscInfo2() {
+        return serviceInfoWithRsc;
+    }
+
+    /** Returns the score of this colocation. */
     public final int getScore() {
-        final String rsc = serviceInfoRsc.getService().getHeartbeatId();
-        final String withRsc =
-                          serviceInfoWithRsc.getService().getHeartbeatId();
-        final String score =
-              getBrowser().getClusterStatus().getColocationScore(rsc, withRsc);
+        //final String rsc = serviceInfoRsc.getService().getHeartbeatId();
+        //final String withRsc =
+        //                  serviceInfoWithRsc.getService().getHeartbeatId();
+        final ClusterStatus clStatus = getBrowser().getClusterStatus();
+        final String colId = getService().getHeartbeatId();
+        final CRMXML.ColocationData data = clStatus.getColocationData(colId);
+        if (data == null) {
+            return 0;
+        }
+        final String score = data.getScore();
         if (score == null) {
             return 0;
         } else if (CRMXML.INFINITY_STRING.equals(score)) {
