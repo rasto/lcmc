@@ -2677,6 +2677,11 @@ public class CRMXML extends XML {
                                                             rscRoleString);
                     final String withRsc = getAttribute(constraintNode,
                                                         withRscString);
+                    if (rsc == null || withRsc == null) {
+                        Tools.debug(this,
+                                    "ignoring rsc_colocation: " + colId, 2);
+                        continue;
+                    }
                     final String withRscRole = getAttribute(constraintNode,
                                                             withRscRoleString);
                     final String score = getAttribute(constraintNode,
@@ -2701,6 +2706,10 @@ public class CRMXML extends XML {
                                                         firstString);
                     final String rscThen = getAttribute(constraintNode,
                                                         thenString);
+                    if (rscFirst == null || rscThen == null) {
+                        Tools.debug(this, "ignoring rsc_order: " + ordId, 2);
+                        continue;
+                    }
                     final String score = getAttribute(constraintNode,
                                                       SCORE_STRING);
                     final String symmetrical = getAttribute(constraintNode,
