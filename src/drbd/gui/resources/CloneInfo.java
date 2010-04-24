@@ -561,6 +561,7 @@ public class CloneInfo extends ServiceInfo {
                         removeAll();
                     }
                 });
+                cs.unregisterAllMenuItems();
                 for (final UpdatableItem u : cs.createPopup()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

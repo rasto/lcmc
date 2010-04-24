@@ -255,33 +255,34 @@ public class ClusterHosts extends DialogCluster {
             button.addItemListener(chListener);
             p1.add(button);
         }
-        if (lastButton != null) {
-            /* move the scrolling pane till the end. */
-            final JCheckBox lb = lastButton;
-            lb.addComponentListener(new ComponentListener() {
-                public final void componentHidden(final ComponentEvent e) {
-                }
+        // TODO: it does not work all the time, it destroys the pane sometimes.
+        //if (lastButton != null) {
+        //    /* move the scrolling pane till the end. */
+        //    final JCheckBox lb = lastButton;
+        //    lb.addComponentListener(new ComponentListener() {
+        //        public final void componentHidden(final ComponentEvent e) {
+        //        }
 
-                public final void componentMoved(final ComponentEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            if (alreadyMoved) {
-                                return;
-                            }
-                            alreadyMoved = true;
-                            sp.getViewport().setViewPosition(
-                                                lb.getBounds().getLocation());
-                        }
-                    });
-                }
+        //        public final void componentMoved(final ComponentEvent e) {
+        //            SwingUtilities.invokeLater(new Runnable() {
+        //                public void run() {
+        //                    if (alreadyMoved) {
+        //                        return;
+        //                    }
+        //                    alreadyMoved = true;
+        //                    sp.getViewport().setViewPosition(
+        //                                        lb.getBounds().getLocation());
+        //                }
+        //            });
+        //        }
 
-                public final void componentResized(final ComponentEvent e) {
-                }
+        //        public final void componentResized(final ComponentEvent e) {
+        //        }
 
-                public final void componentShown(final ComponentEvent e) {
-                }
-            });
-        }
+        //        public final void componentShown(final ComponentEvent e) {
+        //        }
+        //    });
+        //}
         p1.setBackground(Color.WHITE);
         return sp;
     }

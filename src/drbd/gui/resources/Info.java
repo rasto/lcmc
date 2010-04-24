@@ -91,6 +91,8 @@ public class Info implements Comparable {
     private Resource resource;
     /** Amount of frames per second. */
     private static final float FPS = Tools.getConfigData().getAnimFPS();
+    /** TODL: Checking for leak. */
+    private int maxMenuList = 0;
 
     /**
      * Area with text info.
@@ -525,12 +527,24 @@ public class Info implements Comparable {
         return null;
     }
 
+    /** Unregister all menu items. */
+    protected final void unregisterAllMenuItems() {
+        try {
+            mMenuListLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        menuList.clear();
+        mMenuListLock.release();
+    }
+
     /**
      * Returns the popup widget. The createPopup must be defined with menu
      * items.
      */
     public final JPopupMenu getPopup() {
         if (popup == null) {
+            unregisterAllMenuItems();
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
                 popup = new JPopupMenu();
@@ -552,6 +566,7 @@ public class Info implements Comparable {
     public final JPopupMenu getPopup(final Point2D pos) {
         if (popup == null) {
             popup = new JPopupMenu();
+            unregisterAllMenuItems();
             final List<UpdatableItem> items = createPopup();
             for (final UpdatableItem u : items) {
                 popup.add((JMenuItem) u);
@@ -635,6 +650,7 @@ public class Info implements Comparable {
                 public void run() {
                     menu.setIcon(Browser.ACTIONS_ICON);
                     menu.setBackground(Browser.STATUS_BACKGROUND);
+                    unregisterAllMenuItems();
                     final List<UpdatableItem> items = createPopup();
                     if (items != null) {
                         for (final UpdatableItem u : items) {
@@ -703,6 +719,11 @@ public class Info implements Comparable {
             Thread.currentThread().interrupt();
         }
         menuList.add(m);
+        int s = menuList.size();
+        if (s > maxMenuList) {
+            maxMenuList = s;
+            Tools.debug(this, toString() + " menu items: " + s, 1);
+        }
         mMenuListLock.release();
     }
 

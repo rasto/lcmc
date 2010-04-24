@@ -27,6 +27,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
 import java.awt.geom.Point2D;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * This class is used to test the GUI.
@@ -62,9 +63,34 @@ public final class RoboTest {
         return false;
     }
 
-    /** Starts automatic clicker in 10 seconds. */
+    /** Starts automatic left clicker in 10 seconds. */
     public static void startClicker(final int duration,
                                     final boolean lazy) {
+        startClicker0(duration, lazy, InputEvent.BUTTON1_MASK,
+                      10,   /* after click */
+                      10,   /* after release */
+                      500,  /* lazy after click */
+                      100); /* lazy after release */
+    }
+
+    /** Starts automatic right clicker in 10 seconds. */
+    public static void startRightClicker(final int duration,
+                                         final boolean lazy) {
+        startClicker0(duration, lazy, InputEvent.BUTTON3_MASK,
+                      10,   /* after click */
+                      500,   /* after release */
+                      500,  /* lazy after click */
+                      5000); /* lazy after release */
+    }
+
+    /** Starts automatic clicker in 10 seconds. */
+    private static void startClicker0(final int duration,
+                                      final boolean lazy,
+                                      final int buttonMask,
+                                      final int timeAfterClick,
+                                      final int timeAfterRelase,
+                                      final int timeAfterClickLazy,
+                                      final int timeAfterRelaseLazy) {
         Tools.info("start click test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
@@ -81,12 +107,21 @@ public final class RoboTest {
                 }
                 final long startTime = System.currentTimeMillis();
                 while (true) {
-                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    robot.mousePress(buttonMask);
                     if (lazy) {
-                        Tools.sleep(500);
-
+                        Tools.sleep(timeAfterClickLazy);
+                    } else {
+                        Tools.sleep(timeAfterClick);
                     }
-                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                    robot.mouseRelease(buttonMask);
+                    if (lazy) {
+                        Tools.sleep(timeAfterRelaseLazy);
+                    } else {
+                        Tools.sleep(timeAfterRelase);
+                    }
+                    robot.keyPress(KeyEvent.VK_ESCAPE);
+                    Tools.sleep(100);
+                    robot.keyRelease(KeyEvent.VK_ESCAPE);
                     if (abortWithMouseMovement()) {
                         break;
                     }
@@ -94,11 +129,7 @@ public final class RoboTest {
                     if ((current - startTime) > duration * 60 * 1000) {
                         break;
                     }
-                    if (lazy) {
-                        Tools.sleep(100);
-                    } else {
-                        Tools.sleep(10);
-                    }
+                    Tools.sleep(500);
                 }
                 Tools.info("click test done");
             }

@@ -102,21 +102,31 @@ public class TerminalPanel extends JScrollPane {
     /** Command to turn on the god mode. */
     private static final String GOD_ON  = "godmode";
     /** Command to start frenzy clicking for short period. */
-    private static final String CLICKTEST_SHORT = "clicktestshort";
+    private static final String CLICKTEST_SHORT = "lclicksh";
     /** Command to start frenzy clicking for longer period. */
-    private static final String CLICKTEST_LONG = "clicktestlong";
+    private static final String CLICKTEST_LONG = "lclicklo";
     /** Command to start lazy clicking for short period. */
-    private static final String CLICKTEST_LAZY_SHORT = "clicktestlazyshort";
+    private static final String CLICKTEST_LAZY_SHORT = "lclicklazysh";
     /** Command to start lazy clicking for longer period. */
-    private static final String CLICKTEST_LAZY_LONG = "clicktestlazylong";
+    private static final String CLICKTEST_LAZY_LONG = "lclicklazylo";
+    /** Command to start frenzy rigth clicking for short period. */
+    private static final String RIGHT_CLICKTEST_SHORT = "rclicksh";
+    /** Command to start frenzy rigth clicking for longer period. */
+    private static final String RIGHT_CLICKTEST_LONG = "rclicklo";
+    /** Command to start lazy rigth clicking for short period. */
+    private static final String RIGHT_CLICKTEST_LAZY_SHORT =
+                                                    "rclicklazysh";
+    /** Command to start lazy rigth clicking for longer period. */
+    private static final String RIGHT_CLICKTEST_LAZY_LONG =
+                                                        "rclicklazylo";
     /** Command to start short mouse moving. */
-    private static final String MOVETEST_SHORT = "movetestshort";
+    private static final String MOVETEST_SHORT = "movetestsh";
     /** Command to start mouse moving. */
-    private static final String MOVETEST_LONG = "movetestlong";
+    private static final String MOVETEST_LONG = "movetestlo";
     /** Command to start mouse moving. */
-    private static final String MOVETEST_LAZY_SHORT = "movetestlazyshort";
+    private static final String MOVETEST_LAZY_SHORT = "movetestlazysh";
     /** Command to start mouse moving. */
-    private static final String MOVETEST_LAZY_LONG = "movetestlazylong";
+    private static final String MOVETEST_LAZY_LONG = "movetestlazylo";
     /** Command to increment debug level. */
     private static final String DEBUG_INC = "debuginc";
     /** Command to decrement debug level. */
@@ -132,6 +142,10 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(CLICKTEST_LONG, 0);
         CHEATS_MAP.put(CLICKTEST_LAZY_SHORT, 0);
         CHEATS_MAP.put(CLICKTEST_LAZY_LONG, 0);
+        CHEATS_MAP.put(RIGHT_CLICKTEST_SHORT, 0);
+        CHEATS_MAP.put(RIGHT_CLICKTEST_LONG, 0);
+        CHEATS_MAP.put(RIGHT_CLICKTEST_LAZY_SHORT, 0);
+        CHEATS_MAP.put(RIGHT_CLICKTEST_LAZY_LONG, 0);
         CHEATS_MAP.put(MOVETEST_SHORT, 0);
         CHEATS_MAP.put(MOVETEST_LONG, 0);
         CHEATS_MAP.put(MOVETEST_LAZY_SHORT, 0);
@@ -643,6 +657,14 @@ public class TerminalPanel extends JScrollPane {
             RoboTest.startClicker(1, true);
         } else if (CLICKTEST_LAZY_LONG.equals(cheat)) {
             RoboTest.startClicker(8 * 60, true); /* 8 hours */
+        } else if (RIGHT_CLICKTEST_SHORT.equals(cheat)) {
+            RoboTest.startRightClicker(1, false);
+        } else if (RIGHT_CLICKTEST_LONG.equals(cheat)) {
+            RoboTest.startRightClicker(8 * 60, false);
+        } else if (RIGHT_CLICKTEST_LAZY_SHORT.equals(cheat)) {
+            RoboTest.startRightClicker(1, true);
+        } else if (RIGHT_CLICKTEST_LAZY_LONG.equals(cheat)) {
+            RoboTest.startRightClicker(8 * 60, true); /* 8 hours */
         } else if (MOVETEST_SHORT.equals(cheat)) {
             RoboTest.startMover(1, false);
         } else if (MOVETEST_LONG.equals(cheat)) {

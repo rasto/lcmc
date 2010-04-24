@@ -468,18 +468,19 @@ public class GroupInfo extends ServiceInfo {
 
                     public void update() {
                         super.update();
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                        //SwingUtilities.invokeLater(new Runnable() {
+                        //    public void run() {
                                 removeAll();
-                            }
-                        });
+                        //    }
+                        //});
+                        gsi.unregisterAllMenuItems();
                         for (final UpdatableItem u : gsi.createPopup()) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
+                            //SwingUtilities.invokeLater(new Runnable() {
+                            //    public void run() {
                                     add((JMenuItem) u);
                                     u.update();
-                                }
-                            });
+                            //    }
+                            //});
                         }
                     }
                 };

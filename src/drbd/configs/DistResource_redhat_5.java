@@ -54,7 +54,7 @@ public class DistResource_redhat_5 extends
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://www.clusterlabs.org/rpm/epel-5/clusterlabs.repo && "
          + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
-         + "/epel-release-5-3.noarch.rpm && "
+         + "/epel-release-5-3.noarch.rpm ; "
          + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
@@ -72,7 +72,7 @@ public class DistResource_redhat_5 extends
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://www.clusterlabs.org/rpm/epel-5/clusterlabs.repo && "
          + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
-         + "/epel-release-5-3.noarch.rpm && "
+         + "/epel-release-5-3.noarch.rpm ; "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
          + " && /sbin/chkconfig --add heartbeat"},

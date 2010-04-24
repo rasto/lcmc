@@ -744,19 +744,19 @@ public class CRMXML extends XML {
         }
 
         /* Hardcoding colocation params */
-        colParams.add("with-rsc-role");
-        paramColShortDescMap.put("with-rsc-role", "rsc1 col role");
-        paramColLongDescMap.put("with-rsc-role", "@WITH-RSC@ colocation role");
-        paramColTypeMap.put("with-rsc-role", PARAM_TYPE_STRING);
-        paramColPossibleChoices.put("with-rsc-role", ATTRIBUTE_ROLES);
-        paramColPossibleChoicesMS.put("with-rsc-role", ATTRIBUTE_ROLES_MS);
-
         colParams.add("rsc-role");
-        paramColShortDescMap.put("rsc-role", "rsc2 col role");
+        paramColShortDescMap.put("rsc-role", "rsc col role");
         paramColLongDescMap.put("rsc-role", "@RSC@ colocation role");
         paramColTypeMap.put("rsc-role", PARAM_TYPE_STRING);
         paramColPossibleChoices.put("rsc-role", ATTRIBUTE_ROLES);
         paramColPossibleChoicesMS.put("rsc-role", ATTRIBUTE_ROLES_MS);
+
+        colParams.add("with-rsc-role");
+        paramColShortDescMap.put("with-rsc-role", "with-rsc col role");
+        paramColLongDescMap.put("with-rsc-role", "@WITH-RSC@ colocation role");
+        paramColTypeMap.put("with-rsc-role", PARAM_TYPE_STRING);
+        paramColPossibleChoices.put("with-rsc-role", ATTRIBUTE_ROLES);
+        paramColPossibleChoicesMS.put("with-rsc-role", ATTRIBUTE_ROLES_MS);
 
         colParams.add(SCORE_STRING);
         paramColShortDescMap.put(SCORE_STRING, "Score");
