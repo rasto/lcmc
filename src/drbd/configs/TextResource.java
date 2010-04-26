@@ -205,6 +205,9 @@ public class TextResource extends
         {"Dialog.Host.NewHost.SSHPort",
          "SSH Port:"},
 
+        {"Dialog.Host.NewHost.UseSudo",
+         "Use sudo:"},
+
         {"Dialog.Host.NewHost.EnterPassword",
          "Password:"},
 
@@ -1742,6 +1745,9 @@ public class TextResource extends
 
         {"SSH.Enter.passphrase2",
          "(or press &lt;enter&gt; for password authentication)"},
+
+        {"SSH.Enter.sudoPassword",
+         "&nbsp;<font color=red>sudo</font>&nbsp;password:"},
 
         {"SSH.Publickey.Authentication.Failed",
          "Authentication failed."},

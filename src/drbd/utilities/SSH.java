@@ -433,9 +433,11 @@ public class SSH {
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "
-                                  + host.getHoppedCommand(command),
+                                  + host.getSudoCommand(
+                                               host.getHoppedCommand(command)),
                                   2);
-                thisSession.execCommand(host.getHoppedCommand(command));
+                thisSession.execCommand(host.getSudoCommand(
+                                            host.getHoppedCommand(command)));
 
                 final InputStream stdout = thisSession.getStdout();
                 final InputStream stderr = thisSession.getStderr();
@@ -510,7 +512,6 @@ public class SSH {
                                 host.getTerminalPanel().addContent(buffString);
                             }
                         }
-
                     }
 
                     /* stderr */
@@ -688,6 +689,54 @@ public class SSH {
                 execCallback.done(ans.toString());
             }
         }
+    }
+
+    /**
+     * Executes command and returns an exit code.
+     * 100 is timeout
+     * 101 no host
+     * 102 no io error
+     */
+    public final SSHOutput execCommandAndWait(final String command,
+                                              final boolean outputVisible,
+                                              final boolean commandVisible,
+                                              final int sshCommandTimeout) {
+
+        if (host == null) {
+            return new SSHOutput("", 101);
+        }
+        ExecCommandThread execCommandThread;
+        final String[] answer = new String[]{""};
+        final Integer[] exitCode = new Integer[]{100};
+        try {
+            execCommandThread = new ExecCommandThread(
+                            command,
+                            new ExecCallback() {
+                                public void done(final String ans) {
+                                    answer[0] = ans;
+                                    exitCode[0] = 0;
+                                }
+                                public void doneError(final String ans,
+                                                      final int ec) {
+                                    answer[0] = ans;
+                                    exitCode[0] = ec;
+                                }
+                            },
+                            null,
+                            outputVisible,
+                            commandVisible,
+                            sshCommandTimeout);
+        } catch (java.io.IOException e) {
+            Tools.appError("Can not execute command: " + command, "", e);
+            return new SSHOutput("", 102);
+        }
+        execCommandThread.start();
+        try {
+            execCommandThread.join();
+        } catch (java.lang.InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return new SSHOutput(answer[0], exitCode[0]);
     }
 
     /**
@@ -1047,8 +1096,10 @@ public class SSH {
                                         null,
                                         !echo[i]);
                     lastPassword = ans;
+                    host.setSudoPassword(lastPassword);
                 } else {
                     ans = lastPassword;
+                    host.setSudoPassword(lastPassword);
                 }
                 result[i] = ans;
                 promptCount++;
@@ -1105,6 +1156,7 @@ public class SSH {
             if (callback != null && isConnected()) {
                 callback.done(1);
             }
+            host.setSudoPassword("");
             final Connection conn = new Connection(hostname,
                                                    host.getSSHPortInt());
             disconnectForGood = false;
@@ -1390,6 +1442,7 @@ public class SSH {
                                                                       ans);
                         if (res) {
                             lastPassword = ans;
+                            host.setSudoPassword(lastPassword);
                             lastRSAKey = null;
                             lastDSAKey = null;
                             break;
@@ -1460,6 +1513,50 @@ public class SSH {
                     }
                     connectionThread = null;
                     mConnectionThreadLock.release();
+                    if (host.isUseSudo()) {
+                        lastError = "";
+                        while (true) {
+                            final String lastSudoPwd = host.getSudoPassword();
+                            if (lastSudoPwd != null
+                                && !"".equals(lastSudoPwd)) {
+                                final SSHOutput ret =
+                                    execCommandAndWait(
+                                                 "true",
+                                                 true,
+                                                 false,
+                                                 10000);
+                                final int ec = ret.getExitCode();
+                                if (ec == 0) {
+                                    break;
+                                }
+                                host.setSudoPassword(null);
+                            }
+                            final String sudoPwd = sshGui.enterSomethingDialog(
+                                    "Sudo Authentication",
+                                    new String[] {lastError,
+                                                  "<html>"
+                                                  + host.getName()
+                                                  + Tools.getString(
+                                                      "SSH.Enter.sudoPassword")
+                                                  + "</html>"},
+                                    null,
+                                    null,
+                                    true);
+                            host.setSudoPassword(sudoPwd);
+                            if (sudoPwd == null) {
+                                try {
+                                    mConnectionLock.acquire();
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                }
+                                connection = null;
+                                mConnectionLock.release();
+                                host.setConnected();
+                                break;
+                            }
+                            lastError = "wrong password";
+                        }
+                    }
                     host.setConnected();
                     if (callback != null) {
                         callback.done(0);
@@ -1556,8 +1653,7 @@ public class SSH {
         final int index = remoteFilename.lastIndexOf('/');
         if (index > 0) {
             final String dir = remoteFilename.substring(0, index + 1);
-            commands.append("mkdir -p ");
-            commands.append(dir);
+            commands.append("mkdir -p " + dir);
             commands.append(';');
         }
         if  (!isConnected()) {
@@ -1568,8 +1664,8 @@ public class SSH {
                             + "echo \""
                             + host.escapeQuotes(fileContent, 1)
                             + "\">" + remoteFilename
-                            + ";chmod " + mode + " "
-                            + remoteFilename,
+                            + ";"
+                            + "chmod " + mode + " " + remoteFilename,
                             new ExecCallback() {
                                 public void done(final String ans) {
                                     /* ok */

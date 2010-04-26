@@ -45,7 +45,7 @@ public class DistResource_suse_OPENSUSE11_1 extends
         {"DRBD.load",
          "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
          + " /etc/modprobe.d/unsupported-modules;"
-         + "modprobe drbd"},
+         + "/sbin/modprobe drbd"},
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",

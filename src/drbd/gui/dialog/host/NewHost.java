@@ -35,6 +35,8 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.BorderLayout;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
@@ -55,12 +57,18 @@ public class NewHost extends DialogHost {
     private GuiComboBox usernameField;
     /** SSH Port field. */
     private GuiComboBox sshPortField;
+    /** Whether sudo should be used. */
+    private GuiComboBox useSudoField;
     /** Whether the fields are big (if more hops are being used). */
     private boolean bigFields = false;
     /** Normal widths of the fields. */
     private static final int FIELD_WIDTH = 120;
     /** Widths of the fields if hops are used. */
     private static final int BIG_FIELD_WIDTH = 400;
+    /** Default ssh user. */
+    private static final String SSH_ROOT_USER = Tools.getDefault("SSH.User");
+    /** Default ssh port. */
+    private static final String SSH_PORT = Tools.getDefault("SSH.Port");
 
     /**
      * Prepares a new <code>NewHost</code> object.
@@ -76,8 +84,16 @@ public class NewHost extends DialogHost {
     protected final void finishDialog() {
         final String hostnameEntered = hostField.getStringValue().trim();
         getHost().setHostnameEntered(hostnameEntered);
-        getHost().setUsername(usernameField.getStringValue().trim());
-        getHost().setSSHPort(sshPortField.getStringValue().trim());
+        final String username = usernameField.getStringValue().trim();
+        getHost().setUsername(username);
+        Tools.getConfigData().setLastEnteredUser(username);
+        final String sshPort = sshPortField.getStringValue().trim();
+        getHost().setSSHPort(sshPort);
+        Tools.getConfigData().setLastEnteredSSHPort(sshPort);
+        final String useSudoString = useSudoField.getStringValue().trim();
+        getHost().setUseSudo("true".equals(useSudoString));
+        Tools.getConfigData().setLastEnteredUseSudo(
+                                                "true".equals(useSudoString));
         if (!Tools.getConfigData().existsHost(getHost())) {
             Tools.getConfigData().addHostToHosts(getHost());
             final TerminalPanel terminalPanel = new TerminalPanel(getHost());
@@ -148,6 +164,14 @@ public class NewHost extends DialogHost {
                     usernameField.setBackground(getHost().getUsername(),
                                                 getHost().getUsername(),
                                                 true);
+                    if (useSudoField != null) {
+                        if ("root".equals(us)) {
+                            useSudoField.setValueAndWait("false");
+                            useSudoField.setEnabled(false);
+                        } else {
+                            useSudoField.setEnabled(true);
+                        }
+                    }
                 }
             });
         } else {
@@ -258,7 +282,14 @@ public class NewHost extends DialogHost {
                         Tools.getString("Dialog.Host.NewHost.SSHPort"));
 
         inputPane.add(sshPortLabel);
-        sshPortField = new GuiComboBox(getHost().getSSHPort(),
+        String sshPort = getHost().getSSHPort();
+        if (sshPort == null) {
+            sshPort = Tools.getConfigData().getLastEnteredSSHPort();
+            if (sshPort == null) {
+                sshPort = SSH_PORT;
+            }
+        }
+        sshPortField = new GuiComboBox(sshPort,
                                        null, /* items */
                                        null, /* units */
                                        null, /* type */
@@ -279,22 +310,62 @@ public class NewHost extends DialogHost {
                         Tools.getString("Dialog.Host.NewHost.EnterUsername"));
 
         inputPane.add(usernameLabel);
-        usernameField = new GuiComboBox(getHost().getUsername(),
-                                        null, /* items */
-                                        null, /* units */
-                                        null, /* type */
-                                        regexp,
-                                        FIELD_WIDTH,
-                                        null, /* abbrv */
-                                        ConfigData.AccessType.RO);
+        String userName = getHost().getUsername();
+        if (userName == null) {
+            userName = Tools.getConfigData().getLastEnteredUser();
+            if (userName == null) {
+                userName = SSH_ROOT_USER;
+            }
+        }
+        final List<String> users = new ArrayList<String>();
+        final String user = System.getProperty("user.name");
+        if (!SSH_ROOT_USER.equals(user)) {
+            users.add(SSH_ROOT_USER);
+        }
+        users.add(user);
+        usernameField = new GuiComboBox(
+                                    userName,
+                                    users.toArray(new String[users.size()]),
+                                    null, /* units */
+                                    null, /* type */
+                                    regexp,
+                                    FIELD_WIDTH,
+                                    null, /* abbrv */
+                                    ConfigData.AccessType.RO);
+        usernameField.setEditable(true);
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField);
         inputPane.add(usernameField);
         usernameField.setBackground(getHost().getUsername(),
                                     getHost().getUsername(),
                                     true);
-        inputPane.add(new JLabel(""));
-        inputPane.add(new JLabel(""));
+        /* use sudo */
+        final JLabel useSudoLabel = new JLabel(
+                        Tools.getString("Dialog.Host.NewHost.UseSudo"));
+
+        inputPane.add(useSudoLabel);
+        Boolean useSudo = getHost().isUseSudo();
+        if (useSudo == null) {
+            useSudo = Tools.getConfigData().getLastEnteredUseSudo();
+            if (useSudo == null) {
+                useSudo = false;
+            }
+        }
+        useSudoField = new GuiComboBox(
+                                   useSudo.toString(),
+                                   new String[]{"true", "false"}, /* items */
+                                   null, /* units */
+                                   null, /* type */
+                                   null, /* regexp */
+                                   50,
+                                   null, /* abbrv */
+                                   ConfigData.AccessType.RO);
+        //addCheckField(useSudoField);
+        useSudoLabel.setLabelFor(useSudoField);
+        inputPane.add(useSudoField);
+        useSudoField.setBackground(useSudo,
+                                   useSudo,
+                                   true);
 
         SpringUtilities.makeCompactGrid(inputPane, 2, 4,  // rows, cols
                                                    1, 1,  // initX, initY

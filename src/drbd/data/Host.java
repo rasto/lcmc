@@ -76,7 +76,7 @@ public class Host implements Serializable {
     /** Hostname of the host. */
     private String hostname = "unknown";
     /** Username, root most of the times. */
-    private String username = Tools.getDefault("SSH.User");
+    private String username = null;
     /** Detected kernel name. */
     private String detectedKernelName = "";
     /** Detected distribution. */
@@ -178,7 +178,11 @@ public class Host implements Serializable {
     /** Terminal panel of this host. */
     private TerminalPanel terminalPanel = null;
     /** SSH port. */
-    private String sshPort = "22";
+    private String sshPort = null;
+    /** Whether sudo should be used. */
+    private Boolean useSudo = null;
+    /** Sudo password. */
+    private String sudoPassword = "";
     /** Browser panel (the one with menus and all the logic) of this host. */
     private HostBrowser browser;
     /** Timeout after which the drbd status is considered hanging and will be
@@ -207,7 +211,6 @@ public class Host implements Serializable {
     private String oldHwInfo = null;
     /** Index of this host in its cluster. */
     private int index = 0;
-
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1328,6 +1331,9 @@ public class Host implements Serializable {
      * Escapes the quotes for the stacked ssh commands.
      */
     public final String escapeQuotes(final String s, final int count) {
+        if (s == null) {
+            return null;
+        }
         if (count <= 0) {
             return s;
         }
@@ -1344,6 +1350,27 @@ public class Host implements Serializable {
             }
         }
         return escapeQuotes(sb.toString(), count - 1);
+    }
+
+    /** Returns sudo prefix. */
+    public final String getSudoPrefix() {
+        if (useSudo != null && useSudo) {
+            return "echo \""
+                   + escapeQuotes(sudoPassword, 1)
+                   + "\"|sudo -S -p '' ";
+        } else {
+            return "";
+        }
+    }
+    /** Returns command exclosed in sh -c "" */
+    public final String getSudoCommand(final String command) {
+        if (useSudo != null && useSudo) {
+            return getSudoPrefix()
+                   + "bash -c \"trap '' PIPE; { "
+                   + escapeQuotes(command, 1) + "; } 2>&1\" 2>/dev/null";
+        } else {
+            return command;
+        }
     }
 
     /**
@@ -1385,6 +1412,7 @@ public class Host implements Serializable {
             s.append(' ');
             s.append(escapeQuotes("\"", i - 1));
         }
+
         s.append(escapeQuotes(command, hops - 1));
 
         for (int i = hops - 1; i > 0; i--) {
@@ -2110,25 +2138,39 @@ public class Host implements Serializable {
         isLoadingGate.countDown();
     }
 
-    /**
-     * Returns ssh port.
-     */
+    /** Returns ssh port. */
     public final String getSSHPort() {
         return sshPort;
     }
 
-    /**
-     * Returns ssh port as integer.
-     */
+    /** Returns ssh port as integer. */
     public final int getSSHPortInt() {
         return Integer.valueOf(sshPort);
     }
 
-    /**
-     * Sets ssh port.
-     */
+    /** Sets ssh port. */
     public final void setSSHPort(final String sshPort) {
         this.sshPort = sshPort;
+    }
+
+    /** Returns sudo password. */
+    public final String getSudoPassword() {
+        return sudoPassword;
+    }
+
+    /** Sets sudo password. */
+    public final void setSudoPassword(final String sudoPassword) {
+        this.sudoPassword = sudoPassword;
+    }
+
+    /** Returns whether sudo is used. */
+    public final Boolean isUseSudo() {
+        return useSudo;
+    }
+
+    /** Sets whether sudo should be used. */
+    public final void setUseSudo(final Boolean useSudo) {
+        this.useSudo = useSudo;
     }
 
     /**

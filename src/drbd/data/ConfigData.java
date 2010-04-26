@@ -111,6 +111,12 @@ public class ConfigData implements Serializable {
     private String lastHbPmInstalledMethod = null;
     /** Last installed drbd method. */
     private String lastDrbdInstalledMethod = null;
+    /** Last entered user. */
+    private String lastEnteredUser = null;
+    /** Last use sudo. */
+    private Boolean lastEnteredUseSudo = null;
+    /** Last ssh port. */
+    private String lastEnteredSSHPort = null;
     /** Whether drbd gui helper should be overwritten. */
     private boolean keepHelper = false;
     /** Hosts that have auto options. */
@@ -392,6 +398,48 @@ public class ConfigData implements Serializable {
      */
     public final String getLastDrbdInstalledMethod() {
         return lastDrbdInstalledMethod;
+    }
+
+    /**
+     * Sets last entered user.
+     */
+    public final void setLastEnteredUser(final String lastEnteredUser) {
+        this.lastEnteredUser = lastEnteredUser;
+    }
+
+    /**
+     * Gets last entered user.
+     */
+    public final String getLastEnteredUser() {
+        return lastEnteredUser;
+    }
+
+    /**
+     * Sets last used sudo.
+     */
+    public final void setLastEnteredUseSudo(final Boolean lastEnteredUseSudo) {
+        this.lastEnteredUseSudo = lastEnteredUseSudo;
+    }
+
+    /**
+     * Returns last entered sudo.
+     */
+    public final Boolean getLastEnteredUseSudo() {
+        return lastEnteredUseSudo;
+    }
+
+    /**
+     * Sets last ssh port.
+     */
+    public final void setLastEnteredSSHPort(final String lastEnteredSSHPort) {
+        this.lastEnteredSSHPort = lastEnteredSSHPort;
+    }
+
+    /**
+     * Returns last ssh port.
+     */
+    public final String getLastEnteredSSHPort() {
+        return lastEnteredSSHPort;
     }
 
     /**

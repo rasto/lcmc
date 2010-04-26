@@ -61,7 +61,7 @@ public class DistResource extends
 
         /* DrbdCheck.version has exit code != 0 if nothing is installed */
         {"DrbdCheck.version",
-         "echo|drbdadm help | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
+         "/sbin/drbdadm help | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
 
         {"HbCheck.version",
          "@GUI-HELPER@ get-cluster-versions"},
@@ -162,38 +162,38 @@ public class DistResource extends
         {"GetNetInfo",  "@GUI-HELPER@ get-net-info"},
 
         /* heartbeat crm commands */
-        {"CRM.cleanupResource",    "crm_resource -C -r @ID@ -H @HOST@"},
+        {"CRM.cleanupResource",    "/usr/sbin/crm_resource -C -r @ID@ -H @HOST@"},
 
         /* 2.1.4 and before */
         {"CRM.2.1.4.startResource",
-         "crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
 
         {"CRM.2.1.4.stopResource",
-         "crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
 
         {"CRM.2.1.4.isManagedOn",
-         "crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
 
         {"CRM.2.1.4.isManagedOff",
-         "crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
         /* HB 2.99.0, pacemaker and after. */
         {"CRM.startResource",
-         "crm_resource --meta -t primitive -r @ID@ -p target-role -v started"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target-role -v started"},
 
         {"CRM.stopResource",
-         "crm_resource --meta -t primitive -r @ID@ -p target-role -v stopped"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target-role -v stopped"},
 
         {"CRM.isManagedOn",
-         "crm_resource --meta -t primitive -r @ID@ -p is-managed -v true"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is-managed -v true"},
 
         {"CRM.isManagedOff",
-         "crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
+         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
 
-        {"CRM.migrateResource",   "crm_resource -r @ID@ -H @HOST@ --migrate"},
+        {"CRM.migrateResource",   "/usr/sbin/crm_resource -r @ID@ -H @HOST@ --migrate"},
         {"CRM.forceMigrateResource",
-         "crm_resource -f -r @ID@ -H @HOST@ --migrate"},
-        {"CRM.migrateFromResource", "crm_resource -r @ID@ --migrate"},
-        {"CRM.unmigrateResource", "crm_resource -r @ID@ --un-migrate"},
+         "/usr/sbin/crm_resource -f -r @ID@ -H @HOST@ --migrate"},
+        {"CRM.migrateFromResource", "/usr/sbin/crm_resource -r @ID@ --migrate"},
+        {"CRM.unmigrateResource", "/usr/sbin/crm_resource -r @ID@ --un-migrate"},
 
         /* gets all ocf resources and theirs meta-data */
         /* TODO: buggy xml in heartbeat 2.0.8 in ftp and mysql */
@@ -251,8 +251,8 @@ public class DistResource extends
          + "chmod o-x /sbin/drbdmeta;"
          + "chmod u+s /sbin/drbdmeta;"},
 
-        {"CRM.standByOn",      "crm_standby -U @HOST@ -v on"},
-        {"CRM.standByOff",     "crm_standby -U @HOST@ -v off"},
+        {"CRM.standByOn",      "/usr/sbin/crm_standby -U @HOST@ -v on"},
+        {"CRM.standByOff",     "/usr/sbin/crm_standby -U @HOST@ -v off"},
 
         {"OpenAIS.getAisConfig",     "cat /etc/ais/openais.conf"},
         {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
@@ -303,10 +303,10 @@ public class DistResource extends
         {"DRBD.getProcDrbd",   "cat /proc/drbd"},
         {"DRBD.getProcesses",  "ps aux|grep drbd"},
         {"DRBD.start",         "/etc/init.d/drbd start"},
-        {"DRBD.load",          "modprobe drbd"},
+        {"DRBD.load",          "/sbin/modprobe drbd"},
 
         {"HostBrowser.getCrmMon",
-         "crm_mon -1"},
+         "/usr/sbin/crm_mon -1"},
         {"HostBrowser.getCrmConfigureShow",
          "crm configure show"},
 

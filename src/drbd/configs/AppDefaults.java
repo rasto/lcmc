@@ -344,26 +344,20 @@ public class AppDefaults extends
         {"Dialog.Host.Finish.ClusterIcon",
          "Icons/tango/32x32/cluster_32x32.png"},
 
-        /*
-         * ssh
-         */
-        //{"SSH.User",                          "rasto,root"},
+        /* ssh */
         {"SSH.User",           "root"},
+        {"SSH.Port",           "22"},
         {"SSH.ConnectTimeout", 30000}, /* milliseconds, 0 no timeout */
         {"SSH.KexTimeout",     30000}, /* milliseconds, 0 no timeout */
         {"SSH.Command.Timeout", 0},     /* milliseconds, 0 no timeout */
         {"ProgressBar.Sleep",  100},   /* milliseconds */
         {"ProgressBar.Delay",  50},    /* milliseconds */
 
-        /*
-          score
-         */
+        /* score */
         {"Score.Infinity",                    100000},
         {"Score.MinusInfinity",               -100000},
 
-        /*
-         * drbd
-         */
+        /* drbd */
        {"HostBrowser.DrbdNetInterfacePort",  7788},
 
         /*

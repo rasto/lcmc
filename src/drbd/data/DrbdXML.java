@@ -1087,7 +1087,7 @@ public class DrbdXML extends XML {
     public final boolean parseDrbdEvent(final String hostName,
                                         final DrbdGraph drbdGraph,
                                         final String rawOutput) {
-        if (rawOutput == null) {
+        if (rawOutput == null || hostName == null) {
             return false;
         }
 

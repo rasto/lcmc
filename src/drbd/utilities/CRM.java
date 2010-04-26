@@ -83,9 +83,9 @@ public final class CRM {
         mPtestLock.release();
         if (testOnly) {
             final String testCmd =
-                          "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                          + "if [ ! -e $file ]; then cibadmin -Ql > $file;fi;"
-                          + "export CIB_file=$file; ";
+                 "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
+                 + "if [ ! -e $file ]; then /usr/sbin/cibadmin -Ql > $file;fi;"
+                 + "export CIB_file=$file; ";
             return Tools.execCommand(host, testCmd + command, null, false);
         } else {
             return Tools.execCommandProgressIndicator(
@@ -114,7 +114,7 @@ public final class CRM {
         mPtestLock.release();
         final String command =
                             "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                            + "ptest -VVV -S -x $file 2>&1;echo '"
+                            + "/usr/sbin/ptest -VVV -S -x $file 2>&1;echo '"
                             + PTEST_END_DELIM
                             + "';cat $file;"
                             + "mv $file{,.last}";

@@ -65,6 +65,8 @@ public class DrbdGuiXML extends XML {
     private static final String HOST_NAME_ATTR = "name";
     /** Host ssh port attribute string. */
     private static final String HOST_SSHPORT_ATTR = "ssh";
+    /** Host use sudo attribute string. */
+    private static final String HOST_USESUDO_ATTR = "sudo";
     /** Cluster name attribute string. */
     private static final String CLUSTER_NAME_ATTR = "name";
     /** Name of the host node. */
@@ -108,10 +110,14 @@ public class DrbdGuiXML extends XML {
             final String ip = host.getIp();
             final String username = host.getUsername();
             final String sshPort = host.getSSHPort();
+            final Boolean useSudo = host.isUseSudo();
             final Element hostNode = (Element) hosts.appendChild(
                                         doc.createElement(HOST_NODE_STRING));
             hostNode.setAttribute(HOST_NAME_ATTR, hostName);
             hostNode.setAttribute(HOST_SSHPORT_ATTR, sshPort);
+            if (useSudo != null && useSudo) {
+                hostNode.setAttribute(HOST_USESUDO_ATTR, "true");
+            }
             if (ip != null) {
                 final Node ipNode = (Element) hostNode.appendChild(
                                                        doc.createElement("ip"));
@@ -238,16 +244,30 @@ public class DrbdGuiXML extends XML {
                             final String sshPort =
                                                 getAttribute(hostNode,
                                                              HOST_SSHPORT_ATTR);
+                            final String useSudo =
+                                                getAttribute(hostNode,
+                                                             HOST_USESUDO_ATTR);
                             final Node ipNode = getChildNode(hostNode, "ip");
                             final String ip = getText(ipNode);
                             final Node usernameNode = getChildNode(hostNode,
                                                                    "user");
                             final String username = getText(usernameNode);
+                            Tools.getConfigData().setLastEnteredUser(username);
                             final Host host = new Host();
                             host.setHostname(nodeName);
                             if (sshPort != null) {
                                 host.setSSHPort(sshPort);
+                                Tools.getConfigData().setLastEnteredSSHPort(
+                                                                      sshPort);
                             }
+                            Boolean sudo = false;
+                            if (sudo != null) {
+                                if ("true".equals(useSudo)) {
+                                    sudo = true;
+                                    host.setUseSudo(true);
+                                }
+                            }
+                            Tools.getConfigData().setLastEnteredUseSudo(sudo);
                             Tools.getConfigData().addHostToHosts(host);
 
                             new TerminalPanel(host);

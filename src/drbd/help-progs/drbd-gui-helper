@@ -270,13 +270,17 @@ sub get_swaps {
 # minor numbers are separated with ":". And a hash that contains block devices
 # that have lvm on top of them.
 sub get_lvm {
+	my $path = "/usr/sbin/";
+	if (-e "/sbin/pvdisplay") {
+		$path = "/sbin";
+	}
 	if (! -e "/sbin/pvdisplay" && ! -e "/usr/sbin/pvdisplay") {
 		return ({}, {}, {}, {});
 	}
 
 	# create physical volume to volume group hash
 	my %group_to_pv;
-	for (`pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null`) {
+	for (`$path/pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null`) {
 		my ($pv_name, $vg_name) = split;
 		$pv_name =~ s!^/dev/!!;
 		print_debug("pv: $pv_name, $vg_name");
@@ -288,7 +292,7 @@ sub get_lvm {
 	my %lvm_devs;
 
 	# create major:minor kernel number to device hash
-	for (`lvdisplay -C --noheadings -o lv_kernel_major,lv_kernel_minor,vg_name,lv_name 2>/dev/null`) {
+	for (`$path/lvdisplay -C --noheadings -o lv_kernel_major,lv_kernel_minor,vg_name,lv_name 2>/dev/null`) {
 		my ($major, $minor, $group, $name) = split;
 		print_debug("get_lvm: ($major, $minor, $group, $name, $group_to_pv{$group})");
 		$major_minor_to_dev{"$major:$minor"} = "$group/$name";
@@ -432,7 +436,7 @@ sub get_filesystems_info {
 	for (`ls /sbin/mkfs.* 2>/dev/null`) {
 		chomp;
 		my ($fs) = /([^\.]+)$/;
-		`modinfo $fs >/dev/null 2>&1 || grep '\\<$fs\\>' /proc/filesystems`;
+		`/sbin/modinfo $fs >/dev/null 2>&1 || grep '\\<$fs\\>' /proc/filesystems`;
 		print "$fs\n" if !$?;
 	}
 }
@@ -701,7 +705,7 @@ sub get_resource_status {
 	my %running;
 	my %unmanaged;
 	my %resources;
-	for my $line (`ptest -VVVV -L 2>&1`) {
+	for my $line (`/usr/sbin/ptest -VVVV -L 2>&1`) {
 		my $what;
 		my $on;
 		my $res;
@@ -806,7 +810,7 @@ sub get_resource_status {
 sub get_cluster_info {
 	my $info = get_resource_status();
 	# TODO: use cib.xml if cibadmin can't connect
-	my $cibinfo = `cibadmin -Ql || cat /var/lib/heartbeat/crm/cib.xml 2>/dev/null`;
+	my $cibinfo = `/usr/sbin/cibadmin -Ql || cat /var/lib/heartbeat/crm/cib.xml 2>/dev/null`;
 	if ($cibinfo) {
 		my $res_status = "res_status";
 		my $cibquery = "cibadmin";
@@ -1218,7 +1222,7 @@ sub get_cluster_versions {
 	my $hb_running = system("$hb_running_cmd 2>/dev/null") >> 8 || "on";
 	my $cs_ais_running = system("$cs_ais_running_cmd 2>/dev/null") >> 8
 								|| "on";
-	my $drbd_loaded = system("lsmod |grep '\\<drbd\\>'") >> 8 || "on";
+	my $drbd_loaded = system("/sbin/lsmod |grep '\\<drbd\\>'") >> 8 || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf 2>/dev/null") >> 8 || "on";
 	my $cs_ais_conf;
 	if ($cs_version) {
@@ -1233,9 +1237,9 @@ sub get_cluster_versions {
 	chomp $cs_ais_running;
 	# drbd version
 	my ($drbd_version) =
-			`echo|drbdadm help 2>/dev/null`=~ /Version:\s+(\S+)/;
+			`echo|/sbin/drbdadm help 2>/dev/null`=~ /Version:\s+(\S+)/;
 	$drbd_version = "" if !$drbd_version;
-	my $drbd_mod_version = `(modinfo -F version drbd 2>/dev/null|grep . || modinfo -F description drbd 2>/dev/null|sed 's/.* v//')` || "";
+	my $drbd_mod_version = `(/sbin/modinfo -F version drbd 2>/dev/null|grep . || /sbin/modinfo -F description drbd 2>/dev/null|sed 's/.* v//')` || "";
 	chomp $drbd_mod_version;
 
 	return "hb:$hb_version\n"
