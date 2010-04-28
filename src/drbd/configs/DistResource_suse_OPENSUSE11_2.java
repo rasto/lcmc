@@ -49,12 +49,22 @@ public class DistResource_suse_OPENSUSE11_2 extends
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
-         "from the source tarball"},
-
-        {"DrbdInst.install.method.2",
-         "source"},
+         " the opensuse way: 8.3.x"},
 
         {"DrbdInst.install.2",
+         "zypper -n in drbd drbd-kmp-desktop"},
+
+        {"DrbdInst.install.method.2",
+         ""},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.3",
+         "source"},
+
+        {"DrbdInst.install.3",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
          + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
