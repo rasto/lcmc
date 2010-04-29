@@ -45,6 +45,7 @@ public class AddHostDialog {
         Tools.getGUIData().enableAddHostButtons(false);
         final Host host = new Host();
         DialogHost dialog = new NewHost(null, host);
+        Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
@@ -53,6 +54,7 @@ public class AddHostDialog {
                 Tools.getConfigData().removeHostFromHosts(host);
                 dialog.cancelDialog();
                 Tools.getGUIData().enableAddHostButtons(true);
+                Tools.getGUIData().expandTerminalSplitPane(1);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 Tools.getGUIData().allHostsUpdate();
@@ -64,6 +66,7 @@ public class AddHostDialog {
                 dialog = newdialog;
             }
         }
+        Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().enableAddHostButtons(true);
     }
 }

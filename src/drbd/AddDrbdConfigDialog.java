@@ -53,17 +53,20 @@ public class AddDrbdConfigDialog {
      */
     public final void showDialogs() {
         DrbdConfig dialog = new Resource(null, dri);
+        Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 canceled = true;
+                Tools.getGUIData().expandTerminalSplitPane(1);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
+        Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();
     }
 

@@ -29,11 +29,11 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import java.awt.event.HierarchyEvent;
 
-
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.HierarchyListener;
+
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * @author rasto
@@ -45,6 +45,10 @@ public class MainPanel extends JPanel {
 
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
+    /** Whether the terminal was already expanded at least once. */
+    private boolean expandingDone = false;
+    /** Expanding flag mutex. */
+    private final Mutex mExpanding = new Mutex();
 
     /**
      * Prepares a new <code>MainPanel</code> object.
@@ -69,9 +73,20 @@ public class MainPanel extends JPanel {
 
         splitPane.addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(final HierarchyEvent e) {
-                if ((e.getChangeFlags()
-                     & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                try {
+                    mExpanding.acquire();
+                } catch (InterruptedException ee) {
+                    Thread.currentThread().interrupt();
+                }
+                if (!expandingDone
+                    && (e.getChangeFlags()
+                        & HierarchyEvent.SHOWING_CHANGED) != 0) {
+
+                    expandingDone = true;
+                    mExpanding.release();
                     Tools.getGUIData().expandTerminalSplitPane(1);
+                } else {
+                    mExpanding.release();
                 }
             }
         });

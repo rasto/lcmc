@@ -23,6 +23,7 @@
 package drbd;
 
 import drbd.data.Cluster;
+import drbd.utilities.Tools;
 import drbd.gui.dialog.cluster.DialogCluster;
 import drbd.gui.dialog.cluster.Name;
 
@@ -49,14 +50,17 @@ public class EditClusterDialog {
      */
     public final void showDialogs() {
         DialogCluster dialog = new Name(null, cluster);
+        Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedButton("Cancel")) {
+                Tools.getGUIData().expandTerminalSplitPane(1);
                 return;
             } else if (dialog.isPressedButton("Finish")) {
                 break;
             }
             dialog = newdialog;
         }
+        Tools.getGUIData().expandTerminalSplitPane(1);
     }
 }

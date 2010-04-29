@@ -54,17 +54,20 @@ public class AddDrbdUpgradeDialog {
      */
     public final void showDialogs() {
         WizardDialog dialog = new Dist(null, hostDrbdInfo.getHost());
+        Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 canceled = true;
+                Tools.getGUIData().expandTerminalSplitPane(1);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
+        Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();
     }
 

@@ -23,6 +23,7 @@
 package drbd;
 
 import drbd.data.Host;
+import drbd.utilities.Tools;
 
 import drbd.gui.dialog.host.DialogHost;
 import drbd.gui.dialog.host.SSH;
@@ -52,14 +53,17 @@ public class EditHostDialog {
      */
     public final void showDialogs() {
         DialogHost dialog = new SSH(null, host);
+        Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
+                Tools.getGUIData().expandTerminalSplitPane(1);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
+        Tools.getGUIData().expandTerminalSplitPane(1);
     }
 }

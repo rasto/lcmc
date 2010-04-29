@@ -188,23 +188,19 @@ public class GUIData  {
      * Expands the terminal split pane.
      */
     public final void expandTerminalSplitPane(final int buttonNo) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                final int height = (int)
-                    terminalSplitPane.getBottomComponent().getSize()
-                                                          .getHeight();
-                if ((buttonNo == 0 && height == 0)
-                    || (buttonNo == 1 && height > 0)) {
-                    Tools.debug(this, "expand terminal split pane");
-                    final BasicSplitPaneUI ui =
-                                   (BasicSplitPaneUI) terminalSplitPane.getUI();
-                    final BasicSplitPaneDivider divider = ui.getDivider();
-                    final JButton button = (JButton) divider.getComponent(
-                                                                      buttonNo);
-                    button.doClick();
-                }
-            }
-        });
+        final int height = (int)
+            terminalSplitPane.getBottomComponent().getSize()
+                                                  .getHeight();
+        if ((buttonNo == 0 && height == 0)
+            || (buttonNo == 1 && height > 0)) {
+            Tools.debug(this, "expand terminal split pane");
+            final BasicSplitPaneUI ui =
+                           (BasicSplitPaneUI) terminalSplitPane.getUI();
+            final BasicSplitPaneDivider divider = ui.getDivider();
+            final JButton button = (JButton) divider.getComponent(
+                                                              buttonNo);
+            button.doClick();
+        }
     }
 
     /**
