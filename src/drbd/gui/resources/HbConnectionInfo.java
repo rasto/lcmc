@@ -499,7 +499,7 @@ public class HbConnectionInfo extends EditableInfo {
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
                   getBrowser().new ClMenuItemCallback(removeEdgeItem, null) {
             public final boolean isEnabled() {
-                return !isNew();
+                return super.isEnabled() && !isNew();
             }
             public void action(final Host dcHost) {
                 if (!isNew()) {
@@ -559,7 +559,7 @@ public class HbConnectionInfo extends EditableInfo {
         final ClusterBrowser.ClMenuItemCallback removeOrderCallback =
                  getBrowser().new ClMenuItemCallback(removeOrderItem, null) {
             public final boolean isEnabled() {
-                return !isNew();
+                return super.isEnabled() && !isNew();
             }
             public void action(final Host dcHost) {
                 if (!isNew()) {
@@ -636,7 +636,7 @@ public class HbConnectionInfo extends EditableInfo {
             getBrowser().new ClMenuItemCallback(removeColocationItem, null) {
 
             public final boolean isEnabled() {
-                return !isNew();
+                return super.isEnabled() && !isNew();
             }
             public final void action(final Host dcHost) {
                 if (!isNew()) {
