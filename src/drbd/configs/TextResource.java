@@ -942,7 +942,7 @@ public class TextResource extends
          "Creating file system..."},
 
         {"Dialog.DrbdConfig.CreateFS.MakeFS.Done",
-         "done"},
+         "Filesystem was created."},
 
         {"Dialog.DrbdConfig.CreateMD.Title",
          "Create DRBD Meta-Data"},
