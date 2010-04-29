@@ -735,10 +735,10 @@ public class GroupInfo extends ServiceInfo {
                                     constraint = " --"; /* -- */
                                 } else {
                                     if (scoreFirst) {
-                                        constraint = " \u27F6"; /* -> */
+                                        constraint = " \u2192"; /* -> */
                                     }
                                     if (scoreThen) {
-                                        constraintLeft = "\u27F6 "; /* -> */
+                                        constraintLeft = "\u2192 "; /* -> */
                                     }
                                 }
                             }
