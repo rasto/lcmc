@@ -2702,10 +2702,10 @@ public class CRMXML extends XML {
                     colocationRscMap.put(rsc, withs);
                 } else if (constraintNode.getNodeName().equals("rsc_order")) {
                     final String ordId = getAttribute(constraintNode, "id");
-                    final String rscFirst = getAttribute(constraintNode,
-                                                        firstString);
-                    final String rscThen = getAttribute(constraintNode,
-                                                        thenString);
+                    String rscFirst = getAttribute(constraintNode,
+                                                   firstString);
+                    String rscThen = getAttribute(constraintNode,
+                                                  thenString);
                     if (rscFirst == null || rscThen == null) {
                         Tools.debug(this, "ignoring rsc_order: " + ordId, 2);
                         continue;
@@ -2714,10 +2714,20 @@ public class CRMXML extends XML {
                                                       SCORE_STRING);
                     final String symmetrical = getAttribute(constraintNode,
                                                                "symmetrical");
-                    final String firstAction = getAttribute(constraintNode,
+                    String firstAction = getAttribute(constraintNode,
                                                             firstActionString);
-                    final String thenAction = getAttribute(constraintNode,
+                    String thenAction = getAttribute(constraintNode,
                                                            thenActionString);
+                    final String type = getAttribute(constraintNode, "type");
+                    if (type != null && "after".equals(type)) {
+                        /* exchange resoruces */
+                        final String rsc = rscFirst;
+                        rscFirst = rscThen;
+                        rscThen = rsc;
+                        final String act = firstAction;
+                        firstAction = thenAction;
+                        thenAction = act;
+                    }
                     final OrderData orderData = new OrderData(ordId,
                                                               rscFirst,
                                                               rscThen,
