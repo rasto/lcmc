@@ -766,7 +766,7 @@ public class CRMXML extends XML {
         paramColPossibleChoices.put(SCORE_STRING, INTEGER_VALUES);
         /* Hardcoding order params */
         ordParams.add("first-action");
-        paramOrdShortDescMap.put("first-action", "rsc1 order action");
+        paramOrdShortDescMap.put("first-action", "first order action");
         paramOrdLongDescMap.put("first-action", "@FIRST-RSC@ order action");
         paramOrdTypeMap.put("first-action", PARAM_TYPE_STRING);
         paramOrdPossibleChoices.put("first-action", ATTRIBUTE_ACTIONS);
@@ -774,7 +774,7 @@ public class CRMXML extends XML {
         paramOrdDefaultMap.put("first-action", null);
 
         ordParams.add("then-action");
-        paramOrdShortDescMap.put("then-action", "rsc2 order action");
+        paramOrdShortDescMap.put("then-action", "then order action");
         paramOrdLongDescMap.put("then-action", "@THEN-RSC@ order action");
         paramOrdTypeMap.put("then-action", PARAM_TYPE_STRING);
         paramOrdPossibleChoices.put("then-action", ATTRIBUTE_ACTIONS);
