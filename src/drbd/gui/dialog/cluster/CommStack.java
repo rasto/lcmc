@@ -30,13 +30,17 @@ import drbd.utilities.SSH.ExecCommandThread;
 import drbd.gui.ProgressBar;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
+import drbd.gui.SpringUtilities;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
 
+import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
@@ -58,7 +62,6 @@ public class CommStack extends DialogCluster {
     private static final String HEARTBEAT_NAME =
                                         Tools.getConfigData().HEARTBEAT_NAME;
 
-    //TODO: progressbar
     /**
      * Prepares a new <code>CommStack</code> object.
      */
@@ -105,10 +108,11 @@ public class CommStack extends DialogCluster {
         final ExecCommandThread[] infoThreads =
                                         new ExecCommandThread[hosts.length];
         int i = 0;
+        getProgressBar().start(10000);
         for (final Host host : hosts) {
             infoThreads[i] = host.execCommand(
                              "Cluster.Init.getInstallationInfo",
-                             (ProgressBar) null,
+                             getProgressBar(),
                              new ExecCallback() {
                                  public void done(final String ans) {
                                      //drbdLoaded[index] = true;
@@ -135,6 +139,7 @@ public class CommStack extends DialogCluster {
                 Thread.currentThread().interrupt();
             }
         }
+        progressBarDone();
         boolean aisIsPossible = true;
         boolean hbIsPossible = true;
         for (final Host host : hosts) {
@@ -182,7 +187,7 @@ public class CommStack extends DialogCluster {
      * Returns the panel with radio boxes.
      */
     protected final JComponent getInputPane() {
-        final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
+        final JPanel inputPane = new JPanel(new SpringLayout());
         final Host[] hosts = getCluster().getHostsArray();
         boolean hbImpossible = false;
         boolean aisImpossible = false;
@@ -243,8 +248,17 @@ public class CommStack extends DialogCluster {
         chooseStackCombo.setEnabled(COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);
-        p1.add(chooseStackCombo);
-        return p1;
+        inputPane.add(getProgressBarPane(null));
+        inputPane.add(chooseStackCombo);
+        SpringUtilities.makeCompactGrid(inputPane, 2, 1,  // rows, cols
+                                                   0, 0,  // initX, initY
+                                                   0, 0); // xPad, yPad
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(inputPane);
+        panel.add(Box.createVerticalStrut(100));
+
+        return panel;
     }
 
     /**

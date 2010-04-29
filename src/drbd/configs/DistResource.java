@@ -258,7 +258,7 @@ public class DistResource extends
         {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
 
         {"Cluster.Init.getInstallationInfo",
-         "sleep 10;@GUI-HELPER@ installation-info"},
+         "@GUI-HELPER@ installation-info"},
 
 
         /* drbd commands */
