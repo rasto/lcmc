@@ -1365,7 +1365,8 @@ public class Host implements Serializable {
     /** Returns command exclosed in sh -c "" */
     public final String getSudoCommand(final String command) {
         if (useSudo != null && useSudo) {
-            return getSudoPrefix()
+            return "trap '' PIPE;"
+                   + getSudoPrefix()
                    + "bash -c \"trap '' PIPE; { "
                    + escapeQuotes(command, 1) + "; } 2>&1\" 2>/dev/null";
         } else {

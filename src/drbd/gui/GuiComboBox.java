@@ -544,7 +544,11 @@ public class GuiComboBox extends JPanel {
         final boolean accessible =
                            Tools.getConfigData().isAccessible(enableAccessType);
         if (componentsHash.containsKey(s)) {
-            componentsHash.get(s).setEnabled(enabled && accessible);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    componentsHash.get(s).setEnabled(enabled && accessible);
+                }
+            });
         }
         if (label != null) {
             label.setEnabled(accessible);

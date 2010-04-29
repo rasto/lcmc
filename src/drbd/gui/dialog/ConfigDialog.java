@@ -95,6 +95,8 @@ public abstract class ConfigDialog {
     private JCheckBox skipButton = null;
     /** Answer from the optionpane. */
     private volatile Object optionPaneAnswer;
+    /** Whether the skipt button should be enabled. */
+    private boolean skipButtonShouldBeEnabled = true;
 
     /**
      * Gets dialogPanel.
@@ -422,13 +424,7 @@ public abstract class ConfigDialog {
      * Enable/disable skip button.
      */
     protected final void skipButtonSetEnabled(final boolean enable) {
-        if (skipButton != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    skipButton.setEnabled(enable);
-                }
-            });
-        }
+        skipButtonShouldBeEnabled = enable;
     }
 
     /**
@@ -444,6 +440,7 @@ public abstract class ConfigDialog {
         if (skipButtonEnabled()) {
             skipButton = new JCheckBox(Tools.getString(
                                            "Dialog.ConfigDialog.SkipButton"));
+            skipButton.setEnabled(false);
             skipButton.setBackground(
                     Tools.getDefaultColor("ConfigDialog.Background.Light"));
             skipButton.addItemListener(skipButtonListener());
@@ -571,6 +568,9 @@ public abstract class ConfigDialog {
                     }
                 }
                 disabledComponents.clear();
+                if (skipButton != null) {
+                    skipButton.setEnabled(skipButtonShouldBeEnabled);
+                }
             }
         });
     }
