@@ -104,6 +104,8 @@ public class Info implements Comparable {
                                         new HashMap<String, GuiComboBox>();
     /** popup menu for this object. */
     private JPopupMenu popup;
+    /** Popup object lock. */
+    private final Mutex mPopupLock = new Mutex();
     /** menu of this object. */
     private JMenu menu;
     /** Menu list lock. */
@@ -543,6 +545,11 @@ public class Info implements Comparable {
      * items.
      */
     public final JPopupMenu getPopup() {
+        try {
+            mPopupLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (popup == null) {
             unregisterAllMenuItems();
             final List<UpdatableItem> items = createPopup();
@@ -552,18 +559,24 @@ public class Info implements Comparable {
                     popup.add((JMenuItem) u);
                 }
             }
+        }
+        final JPopupMenu popup0 = popup;
+        mPopupLock.release();
+        if (popup0 != null) {
             updateMenus(null);
         }
-        if (popup != null) {
-            updateMenus(null);
-        }
-        return popup;
+        return popup0;
     }
 
     /**
      * Returns popup on the spefified position.
      */
     public final JPopupMenu getPopup(final Point2D pos) {
+        try {
+            mPopupLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (popup == null) {
             popup = new JPopupMenu();
             unregisterAllMenuItems();
@@ -572,8 +585,10 @@ public class Info implements Comparable {
                 popup.add((JMenuItem) u);
             }
         }
+        final JPopupMenu popup0 = popup;
+        mPopupLock.release();
         updateMenus(pos);
-        return popup;
+        return popup0;
     }
 
     /**
@@ -689,7 +704,13 @@ public class Info implements Comparable {
      * Force popup to be recreated.
      */
     protected final void resetPopup() {
+        try {
+            mPopupLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         popup = null;
+        mPopupLock.release();
     }
 
     /**

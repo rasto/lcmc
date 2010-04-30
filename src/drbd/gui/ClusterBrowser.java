@@ -1052,9 +1052,9 @@ public class ClusterBrowser extends Browser {
         for (Host host : hosts) {
             final String online = clusterStatus.isOnlineNode(host.getName());
             if ("yes".equals(online)) {
-                host.setClStatus(true);
+                setClStatus(host, true);
             } else {
-                host.setClStatus(false);
+                setClStatus(host, false);
             }
         }
     }
@@ -1077,6 +1077,16 @@ public class ClusterBrowser extends Browser {
                             Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
+    /** Sets status and checks if it changes and if it does some action will be
+     * performed. */
+    private void setClStatus(final Host host, final boolean status) {
+        final boolean oldStatus = host.isClStatus();
+        host.setClStatus(status);
+        if (oldStatus != status) {
+            selectServices();
+        }
+    }
+
     /**
      * Process output from cluster.
      */
@@ -1093,7 +1103,7 @@ public class ClusterBrowser extends Browser {
         }
         if (output == null) {
             clusterStatus.setOnlineNode(host.getName(), "no");
-            host.setClStatus(false);
+            setClStatus(host, false);
             firstTime.countDown();
         } else {
             // TODO: if we get ERROR:... show it somewhere
@@ -1117,12 +1127,12 @@ public class ClusterBrowser extends Browser {
                                 final boolean oldStatus = host.isClStatus();
                                 clusterStatus.setOnlineNode(host.getName(),
                                                             "no");
-                                host.setClStatus(false);
+                                setClStatus(host, false);
                                 if (oldStatus) {
                                    heartbeatGraph.repaint();
                                 }
                             } else {
-                                host.setClStatus(true);
+                                setClStatus(host, true);
                                 if (clusterStatus.parseStatus(status)) {
                                     Tools.debug(this,
                                                 "update cluster status: "
@@ -1196,7 +1206,7 @@ public class ClusterBrowser extends Browser {
             host.execClStatusCommand(
                  new ExecCallback() {
                      public void done(final String ans) {
-                         host.setClStatus(true);
+                         setClStatus(host, true);
                          firstTime.countDown();
                      }
 
@@ -1210,7 +1220,7 @@ public class ClusterBrowser extends Browser {
                          }
                          clStatusLock();
                          clusterStatus.setOnlineNode(host.getName(), "no");
-                         host.setClStatus(false);
+                         setClStatus(host, false);
                          clusterStatus.setDC(null);
                          clStatusUnlock();
                          if (exitCode == 255) {
@@ -1619,7 +1629,7 @@ public class ClusterBrowser extends Browser {
      */
     public final void selectServices() {
         // this fires treeStructureChanged in ViewPanel.
-        reload(servicesNode);
+        nodeChanged(servicesNode);
     }
 
     /**

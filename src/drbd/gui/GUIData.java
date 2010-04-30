@@ -184,9 +184,7 @@ public class GUIData  {
         }
     }
 
-    /**
-     * Expands the terminal split pane.
-     */
+    /** Expands the terminal split pane. */
     public final void expandTerminalSplitPane(final int buttonNo) {
         final int height = (int)
             terminalSplitPane.getBottomComponent().getSize()

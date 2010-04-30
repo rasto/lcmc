@@ -263,6 +263,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private void processAccessType() {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessType);
+        System.out.println(getText()
+                           + " enable "
+                           + (enablePredicate() && accessible));
         setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
                    && Tools.getConfigData().isAccessible(visibleAccessType));
