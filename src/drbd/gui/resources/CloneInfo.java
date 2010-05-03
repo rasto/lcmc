@@ -539,8 +539,9 @@ public class CloneInfo extends ServiceInfo {
     /**
      * Returns items for the clone popup.
      */
-    public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = super.createPopup();
+    public final List<UpdatableItem> createPopup(
+                            final List<UpdatableItem> registeredMenuItem) {
+        final List<UpdatableItem> items = super.createPopup(registeredMenuItem);
         final ServiceInfo cs = containedService;
         if (cs == null) {
             return items;
@@ -561,8 +562,8 @@ public class CloneInfo extends ServiceInfo {
                         removeAll();
                     }
                 });
-                cs.unregisterAllMenuItems();
-                for (final UpdatableItem u : cs.createPopup()) {
+                for (final UpdatableItem u : cs.createPopup(
+                                                        registeredMenuItem)) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             add((JMenuItem) u);
@@ -573,7 +574,7 @@ public class CloneInfo extends ServiceInfo {
             }
         };
         items.add((UpdatableItem) csMenu);
-        registerMenuItem((UpdatableItem) csMenu);
+        registeredMenuItem.add((UpdatableItem) csMenu);
         return items;
     }
 

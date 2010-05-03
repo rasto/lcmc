@@ -983,7 +983,8 @@ public class BlockDevInfo extends EditableInfo {
     /**
      * Creates popup for the block device.
      */
-    public final List<UpdatableItem> createPopup() {
+    public final List<UpdatableItem> createPopup(
+                             final List<UpdatableItem> registeredMenuItems) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final BlockDevInfo thisClass = this;
         if (!getBlockDevice().isDrbd() && !getBlockDevice().isAvailable()) {
@@ -1057,7 +1058,7 @@ public class BlockDevInfo extends EditableInfo {
             }
         };
         items.add(repMenuItem);
-        registerMenuItem(repMenuItem);
+        registeredMenuItems.add(repMenuItem);
         /* attach / detach */
         final MyMenuItem attachMenu =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
@@ -1108,7 +1109,7 @@ public class BlockDevInfo extends EditableInfo {
             addMouseOverListener(attachMenu, attachItemCallback);
         }
         items.add(attachMenu);
-        registerMenuItem(attachMenu);
+        registeredMenuItems.add(attachMenu);
 
         /* connect / disconnect */
         final MyMenuItem connectMenu =
@@ -1163,7 +1164,7 @@ public class BlockDevInfo extends EditableInfo {
             addMouseOverListener(connectMenu, connectItemCallback);
         }
         items.add(connectMenu);
-        registerMenuItem(connectMenu);
+        registeredMenuItems.add(connectMenu);
 
         /* set primary */
         final MyMenuItem setPrimaryItem =
@@ -1203,7 +1204,7 @@ public class BlockDevInfo extends EditableInfo {
                 }
             };
         items.add(setPrimaryItem);
-        registerMenuItem(setPrimaryItem);
+        registeredMenuItems.add(setPrimaryItem);
 
         /* set secondary */
         final MyMenuItem setSecondaryItem =
@@ -1228,7 +1229,7 @@ public class BlockDevInfo extends EditableInfo {
             };
         //enableMenu(setSecondaryItem, false);
         items.add(setSecondaryItem);
-        registerMenuItem(setSecondaryItem);
+        registeredMenuItems.add(setSecondaryItem);
 
         /* force primary */
         final MyMenuItem forcePrimaryItem =
@@ -1251,7 +1252,7 @@ public class BlockDevInfo extends EditableInfo {
                 }
             };
         items.add(forcePrimaryItem);
-        registerMenuItem(forcePrimaryItem);
+        registeredMenuItems.add(forcePrimaryItem);
 
         /* invalidate */
         final MyMenuItem invalidateItem =
@@ -1276,7 +1277,7 @@ public class BlockDevInfo extends EditableInfo {
                 }
             };
         items.add(invalidateItem);
-        registerMenuItem(invalidateItem);
+        registeredMenuItems.add(invalidateItem);
 
         /* resume / pause sync */
         final MyMenuItem resumeSyncItem =
@@ -1314,7 +1315,7 @@ public class BlockDevInfo extends EditableInfo {
                 }
             };
         items.add(resumeSyncItem);
-        registerMenuItem(resumeSyncItem);
+        registeredMenuItems.add(resumeSyncItem);
 
         /* resize */
         final MyMenuItem resizeItem =
@@ -1337,7 +1338,7 @@ public class BlockDevInfo extends EditableInfo {
                 }
             };
         items.add(resizeItem);
-        registerMenuItem(resizeItem);
+        registeredMenuItems.add(resizeItem);
 
         /* discard my data */
         final MyMenuItem discardDataItem =
@@ -1363,7 +1364,7 @@ public class BlockDevInfo extends EditableInfo {
                 }
             };
         items.add(discardDataItem);
-        registerMenuItem(discardDataItem);
+        registeredMenuItems.add(discardDataItem);
 
         /* view log */
         final MyMenuItem viewDrbdLogItem =
@@ -1389,7 +1390,7 @@ public class BlockDevInfo extends EditableInfo {
                 }
             };
         items.add(viewDrbdLogItem);
-        registerMenuItem(viewDrbdLogItem);
+        registeredMenuItems.add(viewDrbdLogItem);
 
         return items;
     }

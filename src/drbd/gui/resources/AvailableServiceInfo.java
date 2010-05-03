@@ -157,7 +157,8 @@ public class AvailableServiceInfo extends HbCategoryInfo {
     /**
      * Returns list of menu items.
      */
-    public final List<UpdatableItem> createPopup() {
+    public final List<UpdatableItem> createPopup(
+                              final List<UpdatableItem> registeredMenuItem) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final MyMenuItem addServiceMenu = new MyMenuItem(
                             "Add Service To Cluster",
@@ -188,7 +189,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
                                    testOnly);
             }
         };
-        registerMenuItem(addServiceMenu);
+        registeredMenuItem.add(addServiceMenu);
         items.add(addServiceMenu);
         return items;
     }

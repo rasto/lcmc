@@ -246,7 +246,8 @@ public class HostInfo extends Info {
     /**
      * Creates the popup for the host.
      */
-    public final List<UpdatableItem> createPopup() {
+    public final List<UpdatableItem> createPopup(
+                              final List<UpdatableItem> registeredMenuItem) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
         /* host wizard */
@@ -268,7 +269,7 @@ public class HostInfo extends Info {
                 }
             };
         items.add(hostWizardItem);
-        registerMenuItem(hostWizardItem);
+        registeredMenuItem.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
         /* heartbeat standby on/off */
         final HostInfo thisClass = this;
@@ -315,7 +316,7 @@ public class HostInfo extends Info {
             addMouseOverListener(standbyItem, standbyItemCallback);
         }
         items.add(standbyItem);
-        registerMenuItem(standbyItem);
+        registeredMenuItem.add(standbyItem);
         /* change host color */
         final MyMenuItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
@@ -341,7 +342,7 @@ public class HostInfo extends Info {
                 }
             };
         items.add(changeHostColorItem);
-        registerMenuItem(changeHostColorItem);
+        registeredMenuItem.add(changeHostColorItem);
 
         /* view logs */
         final MyMenuItem viewLogsItem =
@@ -363,7 +364,7 @@ public class HostInfo extends Info {
                 }
             };
         items.add(viewLogsItem);
-        registerMenuItem(viewLogsItem);
+        registeredMenuItem.add(viewLogsItem);
         /* expert options */
         final MyMenu hostExpertSubmenu = new MyMenu(
                         Tools.getString("HostBrowser.ExpertSubmenu"),
@@ -380,7 +381,7 @@ public class HostInfo extends Info {
             }
         };
         items.add(hostExpertSubmenu);
-        registerMenuItem(hostExpertSubmenu);
+        registeredMenuItem.add(hostExpertSubmenu);
 
         /* remove host from gui */
         final MyMenuItem removeHostItem =
@@ -401,7 +402,7 @@ public class HostInfo extends Info {
                     Tools.getGUIData().allHostsUpdate();
                 }
             };
-        registerMenuItem(removeHostItem);
+        registeredMenuItem.add(removeHostItem);
         items.add(removeHostItem);
 
 

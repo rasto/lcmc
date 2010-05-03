@@ -239,7 +239,8 @@ public class HostDrbdInfo extends Info {
     /**
      * Creates the popup for the host.
      */
-    public final List<UpdatableItem> createPopup() {
+    public final List<UpdatableItem> createPopup(
+                              final List<UpdatableItem> registeredMenuItem) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
@@ -261,7 +262,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(hostWizardItem);
-        registerMenuItem(hostWizardItem);
+        registeredMenuItem.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
         final boolean testOnly = false;
         /* load drbd */
@@ -283,7 +284,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(loadItem);
-        registerMenuItem(loadItem);
+        registeredMenuItem.add(loadItem);
 
         /* start drbd */
         final MyMenuItem upAllItem =
@@ -310,7 +311,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(upAllItem);
-        registerMenuItem(upAllItem);
+        registeredMenuItem.add(upAllItem);
 
         /* upgrade drbd */
         final MyMenuItem upgradeDrbdItem =
@@ -330,7 +331,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(upgradeDrbdItem);
-        registerMenuItem(upgradeDrbdItem);
+        registeredMenuItem.add(upgradeDrbdItem);
 
         /* change host color */
         final MyMenuItem changeHostColorItem =
@@ -357,7 +358,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(changeHostColorItem);
-        registerMenuItem(changeHostColorItem);
+        registeredMenuItem.add(changeHostColorItem);
 
         /* view logs */
         final MyMenuItem viewLogsItem =
@@ -379,7 +380,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(viewLogsItem);
-        registerMenuItem(viewLogsItem);
+        registeredMenuItem.add(viewLogsItem);
 
         /* connect all */
         final MyMenuItem connectAllItem =
@@ -405,7 +406,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(connectAllItem);
-        registerMenuItem(connectAllItem);
+        registeredMenuItem.add(connectAllItem);
 
         /* disconnect all */
         final MyMenuItem disconnectAllItem =
@@ -431,7 +432,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(disconnectAllItem);
-        registerMenuItem(disconnectAllItem);
+        registeredMenuItem.add(disconnectAllItem);
 
         /* attach dettached */
         final MyMenuItem attachAllItem =
@@ -457,7 +458,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(attachAllItem);
-        registerMenuItem(attachAllItem);
+        registeredMenuItem.add(attachAllItem);
 
         /* set all primary */
         final MyMenuItem setAllPrimaryItem =
@@ -483,7 +484,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(setAllPrimaryItem);
-        registerMenuItem(setAllPrimaryItem);
+        registeredMenuItem.add(setAllPrimaryItem);
 
         /* set all secondary */
         final MyMenuItem setAllSecondaryItem =
@@ -509,7 +510,7 @@ public class HostDrbdInfo extends Info {
                 }
             };
         items.add(setAllSecondaryItem);
-        registerMenuItem(setAllSecondaryItem);
+        registeredMenuItem.add(setAllSecondaryItem);
 
         /* remove host from gui */
         final MyMenuItem removeHostItem =
@@ -530,7 +531,7 @@ public class HostDrbdInfo extends Info {
                     Tools.getGUIData().allHostsUpdate();
                 }
             };
-        registerMenuItem(removeHostItem);
+        registeredMenuItem.add(removeHostItem);
         items.add(removeHostItem);
 
         /* expert options */
@@ -549,7 +550,7 @@ public class HostDrbdInfo extends Info {
             }
         };
         items.add(hostExpertSubmenu);
-        registerMenuItem(hostExpertSubmenu);
+        registeredMenuItem.add(hostExpertSubmenu);
 
         return items;
     }

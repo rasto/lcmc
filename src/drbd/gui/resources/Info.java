@@ -111,7 +111,11 @@ public class Info implements Comparable {
     /** Menu list lock. */
     private final Mutex mMenuListLock = new Mutex();
     /** list of items in the menu for this object. */
-    private final List<UpdatableItem> menuList = new ArrayList<UpdatableItem>();
+    private List<UpdatableItem> menuList = new ArrayList<UpdatableItem>();
+    /** Action menu list lock. */
+    private final Mutex mActionMenuListLock = new Mutex();
+    /** list of items in the action menu for this object. */
+    private List<UpdatableItem> actionMenuList = new ArrayList<UpdatableItem>();
     /** Whether the info object is being updated. */
     private boolean updated = false;
     /** Animation index. */
@@ -525,19 +529,9 @@ public class Info implements Comparable {
     /**
      * Returns list of menu items for the popup.
      */
-    protected /*abstract*/ List<UpdatableItem> createPopup() {
+    protected /*abstract*/ List<UpdatableItem> createPopup(
+                                  final List<UpdatableItem> itemsToRegister) {
         return null;
-    }
-
-    /** Unregister all menu items. */
-    protected final void unregisterAllMenuItems() {
-        try {
-            mMenuListLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        menuList.clear();
-        mMenuListLock.release();
     }
 
     /**
@@ -551,8 +545,10 @@ public class Info implements Comparable {
             Thread.currentThread().interrupt();
         }
         if (popup == null) {
-            unregisterAllMenuItems();
-            final List<UpdatableItem> items = createPopup();
+            final List<UpdatableItem> allItemsAndSubitems =
+                                                new ArrayList<UpdatableItem>();
+            final List<UpdatableItem> items = createPopup(allItemsAndSubitems);
+            registerAllMenuItems(allItemsAndSubitems);
             if (items != null) {
                 popup = new JPopupMenu();
                 for (final UpdatableItem u : items) {
@@ -579,8 +575,10 @@ public class Info implements Comparable {
         }
         if (popup == null) {
             popup = new JPopupMenu();
-            unregisterAllMenuItems();
-            final List<UpdatableItem> items = createPopup();
+            final List<UpdatableItem> allItemsAndSubitems =
+                                                new ArrayList<UpdatableItem>();
+            final List<UpdatableItem> items = createPopup(allItemsAndSubitems);
+            registerAllMenuItems(allItemsAndSubitems);
             for (final UpdatableItem u : items) {
                 popup.add((JMenuItem) u);
             }
@@ -665,8 +663,22 @@ public class Info implements Comparable {
                 public void run() {
                     menu.setIcon(Browser.ACTIONS_ICON);
                     menu.setBackground(Browser.STATUS_BACKGROUND);
-                    unregisterAllMenuItems();
-                    final List<UpdatableItem> items = createPopup();
+                    final List<UpdatableItem> allItemsAndSubitems =
+                                                new ArrayList<UpdatableItem>();
+                    final List<UpdatableItem> items =
+                                               createPopup(allItemsAndSubitems);
+                    try {
+                        mActionMenuListLock.acquire();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    actionMenuList = allItemsAndSubitems;
+                    if (actionMenuList.size() > maxMenuList) {
+                        maxMenuList = actionMenuList.size();
+                        Tools.debug(this,
+                                    "a.menu list size: " + maxMenuList, 1);
+                    }
+                    mActionMenuListLock.release();
                     if (items != null) {
                         for (final UpdatableItem u : items) {
                             menu.add((JMenuItem) u);
@@ -728,22 +740,33 @@ public class Info implements Comparable {
             i.setPos(pos);
             i.update();
         }
+
+        try {
+            mActionMenuListLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final List<UpdatableItem> actionMenuCopy =
+                                 new ArrayList<UpdatableItem>(actionMenuList);
+        mActionMenuListLock.release();
+        for (final UpdatableItem i : actionMenuCopy) {
+            i.setPos(pos);
+            i.update();
+        }
     }
 
-    /**
-     * Registers a menu item.
-     */
-    public final void registerMenuItem(final UpdatableItem m) {
+    /** Registers all menu items. */
+    public final void registerAllMenuItems(
+                               final List<UpdatableItem> allItemsAndSubitems) {
         try {
             mMenuListLock.acquire();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        menuList.add(m);
-        int s = menuList.size();
-        if (s > maxMenuList) {
-            maxMenuList = s;
-            Tools.debug(this, toString() + " menu items: " + s, 1);
+        menuList = allItemsAndSubitems;
+        if (menuList.size() > maxMenuList) {
+            maxMenuList = menuList.size();
+            Tools.debug(this, "menu list size: " + maxMenuList, 2);
         }
         mMenuListLock.release();
     }

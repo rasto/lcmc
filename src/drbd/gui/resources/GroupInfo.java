@@ -377,8 +377,9 @@ public class GroupInfo extends ServiceInfo {
     /**
      * Returns items for the group popup.
      */
-    public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = super.createPopup();
+    public final List<UpdatableItem> createPopup(
+                            final List<UpdatableItem> registeredMenuItem) {
+        final List<UpdatableItem> items = super.createPopup(registeredMenuItem);
         final boolean testOnly = false;
         /* add group service */
         final MyMenu addGroupServiceMenuItem = new MyMenu(
@@ -445,7 +446,7 @@ public class GroupInfo extends ServiceInfo {
             }
         };
         items.add(0, (UpdatableItem) addGroupServiceMenuItem);
-        registerMenuItem((UpdatableItem) addGroupServiceMenuItem);
+        registeredMenuItem.add((UpdatableItem) addGroupServiceMenuItem);
 
         /* group services */
         final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -473,8 +474,8 @@ public class GroupInfo extends ServiceInfo {
                                 removeAll();
                         //    }
                         //});
-                        gsi.unregisterAllMenuItems();
-                        for (final UpdatableItem u : gsi.createPopup()) {
+                        for (final UpdatableItem u : gsi.createPopup(
+                                                        registeredMenuItem)) {
                             //SwingUtilities.invokeLater(new Runnable() {
                             //    public void run() {
                                     add((JMenuItem) u);
@@ -485,7 +486,7 @@ public class GroupInfo extends ServiceInfo {
                     }
                 };
                 items.add((UpdatableItem) groupServicesMenu);
-                registerMenuItem((UpdatableItem) groupServicesMenu);
+                registeredMenuItem.add((UpdatableItem) groupServicesMenu);
             }
         }
         return items;

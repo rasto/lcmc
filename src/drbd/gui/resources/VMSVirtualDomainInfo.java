@@ -787,8 +787,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Adds vm domain start menu item.
      */
-    public final void addStartMenu(final List<UpdatableItem> items,
-                                   final Host host) {
+    public final void addStartMenu(
+                                 final List<UpdatableItem> items,
+                                 final List<UpdatableItem> registeredMenuItem,
+                                 final Host host) {
         final MyMenuItem startMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.StartOn")
                             + host.getName(),
@@ -823,14 +825,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         };
         items.add(startMenuItem);
-        registerMenuItem(startMenuItem);
+        registeredMenuItem.add(startMenuItem);
     }
 
     /**
      * Adds vm domain shutdown menu item.
      */
-    public final void addShutdownMenu(final List<UpdatableItem> items,
-                                      final Host host) {
+    public final void addShutdownMenu(
+                                 final List<UpdatableItem> items,
+                                 final List<UpdatableItem> registeredMenuItem,
+                                 final Host host) {
         final MyMenuItem shutdownMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.ShutdownOn")
                             + host.getName(),
@@ -865,14 +869,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         };
         items.add(shutdownMenuItem);
-        registerMenuItem(shutdownMenuItem);
+        registeredMenuItem.add(shutdownMenuItem);
     }
 
     /**
      * Adds vm domain reboot menu item.
      */
-    public final void addRebootMenu(final List<UpdatableItem> items,
-                                    final Host host) {
+    public final void addRebootMenu(
+                                  final List<UpdatableItem> items,
+                                  final List<UpdatableItem> registeredMenuItem,
+                                  final Host host) {
         final MyMenuItem rebootMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.RebootOn")
                             + host.getName(),
@@ -907,14 +913,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         };
         items.add(rebootMenuItem);
-        registerMenuItem(rebootMenuItem);
+        registeredMenuItem.add(rebootMenuItem);
     }
 
     /**
      * Adds vm domain resume menu item.
      */
-    public final void addResumeMenu(final List<UpdatableItem> items,
-                                    final Host host) {
+    public final void addResumeMenu(
+                                final List<UpdatableItem> items,
+                                final List<UpdatableItem> registeredMenuItem,
+                                final Host host) {
         final MyMenuItem resumeMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
@@ -951,15 +959,17 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         };
         items.add(resumeMenuItem);
-        registerMenuItem(resumeMenuItem);
+        registeredMenuItem.add(resumeMenuItem);
     }
 
 
     /**
      * Adds vm domain destroy menu item.
      */
-    public final void addDestroyMenu(final MyMenu expertSubmenu,
-                                     final Host host) {
+    public final void addDestroyMenu(
+                                final MyMenu expertSubmenu,
+                                final List<UpdatableItem> registeredMenuItem,
+                                final Host host) {
         final MyMenuItem destroyMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.DestroyOn")
                             + host.getName(),
@@ -994,14 +1004,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         };
         expertSubmenu.add(destroyMenuItem);
-        registerMenuItem(destroyMenuItem);
+        registeredMenuItem.add(destroyMenuItem);
     }
 
     /**
      * Adds vm domain suspend menu item.
      */
-    public final void addSuspendMenu(final MyMenu expertSubmenu,
-                                     final Host host) {
+    public final void addSuspendMenu(
+                                 final MyMenu expertSubmenu,
+                                 final List<UpdatableItem> registeredMenuItem,
+                                 final Host host) {
         final MyMenuItem suspendMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.SuspendOn")
                             + host.getName(),
@@ -1038,14 +1050,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         };
         expertSubmenu.add(suspendMenuItem);
-        registerMenuItem(suspendMenuItem);
+        registeredMenuItem.add(suspendMenuItem);
     }
 
     /**
      * Adds vm domain resume menu item.
      */
-    public final void addResumeExpertMenu(final MyMenu expertSubmenu,
-                                          final Host host) {
+    public final void addResumeExpertMenu(
+                              final MyMenu expertSubmenu,
+                              final List<UpdatableItem> registeredMenuItem,
+                              final Host host) {
         final MyMenuItem resumeMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
@@ -1082,37 +1096,38 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         };
         expertSubmenu.add(resumeMenuItem);
-        registerMenuItem(resumeMenuItem);
+        registeredMenuItem.add(resumeMenuItem);
     }
 
     /**
      * Returns list of menu items for VM.
      */
-    public final List<UpdatableItem> createPopup() {
+    public final List<UpdatableItem> createPopup(
+                              final List<UpdatableItem> registeredMenuItem) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* vnc viewers */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addVncViewersToTheMenu(items, h);
+            addVncViewersToTheMenu(items, registeredMenuItem, h);
         }
 
         /* start */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addStartMenu(items, h);
+            addStartMenu(items, registeredMenuItem, h);
         }
 
         /* shutdown */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addShutdownMenu(items, h);
+            addShutdownMenu(items, registeredMenuItem, h);
         }
 
         /* reboot */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addRebootMenu(items, h);
+            addRebootMenu(items, registeredMenuItem, h);
         }
 
         /* resume */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addResumeMenu(items, h);
+            addResumeMenu(items, registeredMenuItem, h);
         }
 
         /* expert options */
@@ -1128,19 +1143,19 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         items.add(expertSubmenu);
         /* destroy */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addDestroyMenu(expertSubmenu, h);
+            addDestroyMenu(expertSubmenu, registeredMenuItem, h);
         }
 
         /* suspend */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addSuspendMenu(expertSubmenu, h);
+            addSuspendMenu(expertSubmenu, registeredMenuItem, h);
         }
 
         /* resume */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addResumeExpertMenu(expertSubmenu, h);
+            addResumeExpertMenu(expertSubmenu, registeredMenuItem, h);
         }
-        registerMenuItem(expertSubmenu);
+        registeredMenuItem.add(expertSubmenu);
         return items;
     }
 
@@ -1163,8 +1178,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds vnc viewer menu items. */
-    public final void addVncViewersToTheMenu(final List<UpdatableItem> items,
-                                             final Host host) {
+    public final void addVncViewersToTheMenu(
+                                 final List<UpdatableItem> items,
+                                 final List<UpdatableItem> registeredMenuItem,
+                                 final Host host) {
         final boolean testOnly = false;
         final VMSVirtualDomainInfo thisClass = this;
         if (Tools.getConfigData().isTightvnc()) {
@@ -1205,7 +1222,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     }
                 }
             };
-            registerMenuItem(tightvncViewerMenu);
+            registeredMenuItem.add(tightvncViewerMenu);
             items.add(tightvncViewerMenu);
         }
 
@@ -1247,7 +1264,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     }
                 }
             };
-            registerMenuItem(ultravncViewerMenu);
+            registeredMenuItem.add(ultravncViewerMenu);
             items.add(ultravncViewerMenu);
         }
 
@@ -1289,7 +1306,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     }
                 }
             };
-            registerMenuItem(realvncViewerMenu);
+            registeredMenuItem.add(realvncViewerMenu);
             items.add(realvncViewerMenu);
         }
     }
