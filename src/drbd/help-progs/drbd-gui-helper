@@ -306,6 +306,22 @@ sub get_lvm {
 		\%lvm_devs);
 }
 
+# this is used if the devices is dm but not lvm
+sub get_device_mapper_hash {
+        my %major_minor_hash;
+        my $dir = "/dev/mapper";
+        if (opendir(DIR, $dir)) {
+                for (sort grep { $_ !~ /^\./ && -b "$dir/$_" } readdir(DIR)) {
+                        my $out = `/sbin/dmsetup info $dir/$_`;
+                        my ($major, $minor) = $out =~ /^Major.*?(\d+)\D+(\d+)/m;
+                        $major_minor_hash{"$major:$minor"} = "$dir/$_";
+
+                }
+                closedir DIR;
+        }
+        return \%major_minor_hash;
+}
+
 # get_raid()
 #
 # returns hash with devices that are in the raid.
@@ -351,7 +367,11 @@ sub get_device_mapper_major {
 # them. In this case only device names of raid or lvm are used.
 sub get_disk_info {
 	my $devs_in_raid = get_raid();
-	my ($group_to_pv, $major_minor_to_dev, $devs_with_lvm, $lvm_devs) = get_lvm();
+	my ($group_to_pv,
+	    $lvm_major_minor_to_dev,
+	    $devs_with_lvm,
+	    $lvm_devs) = get_lvm();
+	my $dm_major_minor_to_dev = get_device_mapper_hash();
 	my $drbd_devs = get_drbd_devs();
 	my $dev_to_mount = get_mount($lvm_devs, $drbd_devs);
 	my $dev_to_used = get_used($lvm_devs, $drbd_devs);
@@ -380,11 +400,14 @@ sub get_disk_info {
 		next if $$devs_with_lvm{$name} || $$devs_in_raid{$name};
 		my $device;
 		if ($major == $device_mapper_major) {
-			if ($$major_minor_to_dev{"$major:$minor"}) {
-				$device = "/dev/".$$major_minor_to_dev{"$major:$minor"};
-				my $dev = $$major_minor_to_dev{"$major:$minor"};
+			if ($$lvm_major_minor_to_dev{"$major:$minor"}) {
+				$device = "/dev/".$$lvm_major_minor_to_dev{"$major:$minor"};
+				my $dev = $$lvm_major_minor_to_dev{"$major:$minor"};
 				$dev = $name if !$dev;
 				$device = "/dev/".$dev;
+			} elsif ($$dm_major_minor_to_dev{"$major:$minor"}) {
+				$device =
+				     $$dm_major_minor_to_dev{"$major:$minor"};
 			} else {
 				$device = "/dev/$name";
 			}
