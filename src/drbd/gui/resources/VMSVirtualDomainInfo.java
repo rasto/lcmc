@@ -1523,7 +1523,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Returns data for the main table.
      */
-    protected Object[][] getMainTableData() {
+    protected final Object[][] getMainTableData() {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final String domainName = getDomainName();
         ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
@@ -1553,7 +1553,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns all disks. */
-    protected Map<String, DiskData> getDisks() {
+    protected final Map<String, DiskData> getDisks() {
         Map<String, DiskData> disks = null;
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
@@ -1566,10 +1566,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Get one row of the table. */
-    protected Object[] getDiskDataRow(final String targetDev,
-                                      final Map<String, VMSDiskInfo> dkti,
-                                      final Map<String, DiskData> disks,
-                                      final boolean opaque) {
+    protected final Object[] getDiskDataRow(final String targetDev,
+                                            final Map<String, VMSDiskInfo> dkti,
+                                            final Map<String, DiskData> disks,
+                                            final boolean opaque) {
         final DiskData diskData = disks.get(targetDev);
         if (diskData == null) {
             return new Object[]{targetDev, "unknown"};

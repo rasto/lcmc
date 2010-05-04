@@ -608,6 +608,10 @@ public final class Tools {
         errorString.append(getErrorString("AppError.Text"));
         errorString.append("\nrelease: ");
         errorString.append(getRelease());
+        errorString.append("\njava: ");
+        errorString.append(System.getProperty("java.vendor"));
+        errorString.append(' ');
+        errorString.append(System.getProperty("java.version"));
         errorString.append("\n\n");
         errorString.append(getErrorString(msg));
         errorString.append('\n');

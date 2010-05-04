@@ -1513,7 +1513,7 @@ public class SSH {
                     }
                     connectionThread = null;
                     mConnectionThreadLock.release();
-                    if (host.isUseSudo()) {
+                    if (host.isUseSudo() != null && host.isUseSudo()) {
                         lastError = "";
                         while (true) {
                             final String lastSudoPwd = host.getSudoPassword();
@@ -1723,7 +1723,7 @@ public class SSH {
     public final class SSHOutput {
         /** Output string. */
         private final String output;
-        /** Exit code */
+        /** Exit code. */
         private final int exitCode;
         /** Creates new SSHOutput object. */
         public SSHOutput(final String output, final int exitCode) {

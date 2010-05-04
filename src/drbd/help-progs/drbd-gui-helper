@@ -311,7 +311,7 @@ sub get_device_mapper_hash {
         my %major_minor_hash;
         my $dir = "/dev/mapper";
         if (opendir(DIR, $dir)) {
-                for (sort grep { $_ !~ /^\./ && -b "$dir/$_" } readdir(DIR)) {
+                for (grep { $_ !~ /^\./ && -b "$dir/$_" } readdir(DIR)) {
                         my $out = `/sbin/dmsetup info $dir/$_`;
                         my ($major, $minor) = $out =~ /^Major.*?(\d+)\D+(\d+)/m;
                         $major_minor_hash{"$major:$minor"} = "$dir/$_";

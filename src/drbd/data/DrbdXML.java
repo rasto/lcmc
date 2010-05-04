@@ -567,7 +567,7 @@ public class DrbdXML extends XML {
 
     /** Returns access type of the parameter. */
     public final ConfigData.AccessType getAccessType(final String param) {
-        ConfigData.AccessType at = PARAM_ACCESS_TYPE.get(param);
+        final ConfigData.AccessType at = PARAM_ACCESS_TYPE.get(param);
         if (at == null) {
           return ConfigData.AccessType.ADMIN;
         }

@@ -27,13 +27,11 @@ import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.SSH.ExecCommandThread;
-import drbd.gui.ProgressBar;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.SpringUtilities;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;

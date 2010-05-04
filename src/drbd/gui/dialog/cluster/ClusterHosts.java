@@ -50,8 +50,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Component;
 import java.awt.LayoutManager;
-import java.awt.event.ComponentListener;
-import java.awt.event.ComponentEvent;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to

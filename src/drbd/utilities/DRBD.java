@@ -114,7 +114,7 @@ public final class DRBD {
                                      execCallback,
                                      outputVisible,
                                      Tools.getString("DRBD.ExecutingCommand")
-                                     + " " + command + "...");
+                                     + " " + cmd + "...");
         }
     }
 

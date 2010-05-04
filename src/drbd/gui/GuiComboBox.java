@@ -153,7 +153,7 @@ public class GuiComboBox extends JPanel {
                                                      ConfigData.AccessType.RO;
     /** Tooltip if element is enabled. */
     private String toolTipText = null;
-    /** getValue setValue lock */
+    /** getValue setValue lock. */
     private final Mutex mValueLock = new Mutex();
 
     /** Prepares a new <code>GuiComboBox</code> object. */

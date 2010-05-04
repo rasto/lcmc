@@ -144,7 +144,7 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Returns name of this resource, that is used in logs. */
-    public String getNameForLog() {
+    public final String getNameForLog() {
         final ServiceInfo cs = containedService;
         if (cs == null) {
             return super.getName();
@@ -620,7 +620,7 @@ public class CloneInfo extends ServiceInfo {
     /**
      * Returns possible choices for drop down lists.
      */
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected final Object[] getParamPossibleChoices(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (isCheckBox(param)) {
             return crmXML.getCheckBoxChoices(getResourceAgent(), param);

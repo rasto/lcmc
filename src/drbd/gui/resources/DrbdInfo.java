@@ -79,7 +79,7 @@ public class DrbdInfo extends EditableInfo {
     }
 
     /** Sets stored parameters. */
-    public void setParameters() {
+    public final void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         for (final String param : getParametersFromXML()) {
             String value;

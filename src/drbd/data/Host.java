@@ -1362,7 +1362,7 @@ public class Host implements Serializable {
             return "";
         }
     }
-    /** Returns command exclosed in sh -c "" */
+    /** Returns command exclosed in sh -c "". */
     public final String getSudoCommand(final String command) {
         if (useSudo != null && useSudo) {
             return "trap - SIGPIPE;"
