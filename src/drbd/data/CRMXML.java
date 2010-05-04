@@ -1771,6 +1771,9 @@ public class CRMXML extends XML {
         if (ra == null) {
             Tools.appWarning(raClass + ":" + provider + ":" + serviceName
                              + " RA does not exist");
+            final ResourceAgent notInstalledRA =
+                            new ResourceAgent(serviceName, provider, raClass);
+            return notInstalledRA;
 
         }
         return ra;

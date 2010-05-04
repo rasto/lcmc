@@ -448,7 +448,6 @@ public class ServicesInfo extends EditableInfo {
                  * in the wrong places.
                  */
                 Tools.appWarning(hbId + ": could not find resource agent");
-                continue;
             }
             /* continue of creating/updating of the
              * service in the gui.
@@ -458,32 +457,37 @@ public class ServicesInfo extends EditableInfo {
                                        clStatus.getParamValuePairs(hbId);
             if (newSi == null) {
                 // TODO: get rid of the service name? (everywhere)
-                final String serviceName = newRA.getName();
-                if (newRA.isFilesystem()) {
+                String serviceName;
+                if (newRA == null) {
+                    serviceName = hbId;
+                } else {
+                    serviceName = newRA.getName();
+                }
+                if (newRA != null && newRA.isFilesystem()) {
                     newSi = new FilesystemInfo(serviceName,
                                                newRA,
                                                hbId,
                                                resourceNode,
                                                getBrowser());
-                } else if (newRA.isLinbitDrbd()) {
+                } else if (newRA != null && newRA.isLinbitDrbd()) {
                     newSi = new LinbitDrbdInfo(serviceName,
                                                newRA,
                                                hbId,
                                                resourceNode,
                                                getBrowser());
-                } else if (newRA.isDrbddisk()) {
+                } else if (newRA != null && newRA.isDrbddisk()) {
                     newSi = new DrbddiskInfo(serviceName,
                                              newRA,
                                              hbId,
                                              resourceNode,
                                              getBrowser());
-                } else if (newRA.isIPaddr()) {
+                } else if (newRA != null && newRA.isIPaddr()) {
                     newSi = new IPaddrInfo(serviceName,
                                            newRA,
                                            hbId,
                                            resourceNode,
                                            getBrowser());
-                } else if (newRA.isVirtualDomain()) {
+                } else if (newRA != null && newRA.isVirtualDomain()) {
                     newSi = new VirtualDomainInfo(serviceName,
                                                   newRA,
                                                   hbId,

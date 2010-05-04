@@ -99,7 +99,6 @@ public class ResourceAgent {
     /** Map to field types for some parameters. */
     private final Map<String, GuiComboBox.Type> fieldType =
                                        new HashMap<String, GuiComboBox.Type>();
-
     /**
      * Prepares a new <code>ResourceAgent</code> object.
      */
