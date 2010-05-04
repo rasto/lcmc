@@ -513,6 +513,12 @@ public class Info implements Comparable {
                             pm.show(c, x, y);
                         }
                     });
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            empty.setVisible(false);
+                        }
+                    });
                 }
             }
         });

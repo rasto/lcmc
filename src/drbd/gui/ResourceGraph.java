@@ -1001,6 +1001,7 @@ public abstract class ResourceGraph {
                                         edgePopup.show(vv, posX, posY);
                                     }
                                 });
+                            } else {
                             }
                             oneEdgePressed(edge);
                         }
@@ -1016,6 +1017,11 @@ public abstract class ResourceGraph {
                         }
                         oneVertexPressed(v); /* select this vertex */
                     }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            empty.setVisible(false);
+                        }
+                    });
                 }
             });
             thread.start();
