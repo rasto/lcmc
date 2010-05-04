@@ -395,7 +395,11 @@ public class HbConnectionInfo extends EditableInfo {
 
         /* params */
         final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+        EditableInfo firstConstraint = null;
         for (final HbConstraintInterface c : constraints) {
+            if (firstConstraint == null) {
+                firstConstraint = (EditableInfo) c;
+            }
             final String[] params = c.getParametersFromXML();
             /* heartbeat id */
             final JPanel panel = getParamPanel(c.getName());
@@ -455,6 +459,11 @@ public class HbConnectionInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
+        if (firstConstraint != null) {
+        newPanel.add(firstConstraint.getMoreOptionsPanel(
+                                  ClusterBrowser.SERVICE_LABEL_WIDTH
+                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
+        }
         newPanel.add(new JScrollPane(mainPanel));
         newPanel.setMinimumSize(new Dimension(
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),

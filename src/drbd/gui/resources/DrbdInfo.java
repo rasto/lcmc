@@ -527,6 +527,9 @@ public class DrbdInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
+        newPanel.add(getMoreOptionsPanel(
+               Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth")
+               + Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
         return infoPanel;

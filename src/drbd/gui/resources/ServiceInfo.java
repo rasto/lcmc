@@ -2504,12 +2504,14 @@ public class ServiceInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         applyButton.setEnabled(checkResourceFields(null, params));
-
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
+        newPanel.add(getMoreOptionsPanel(
+                                  ClusterBrowser.SERVICE_LABEL_WIDTH
+                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
         newPanel.add(new JScrollPane(mainPanel));
         /* if id textfield was changed and this id is not used,
          * enable apply button */

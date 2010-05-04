@@ -224,6 +224,9 @@ public class VMSDiskInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
+        newPanel.add(getMoreOptionsPanel(
+                                  ClusterBrowser.SERVICE_LABEL_WIDTH
+                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
         newPanel.add(new JScrollPane(mainPanel));
         applyButton.setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;

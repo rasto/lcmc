@@ -829,6 +829,9 @@ public class ServicesInfo extends EditableInfo {
 
         mainPanel.add(optionsPanel);
 
+        newPanel.add(getMoreOptionsPanel(
+                                  ClusterBrowser.SERVICE_LABEL_WIDTH
+                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
         newPanel.add(new JScrollPane(mainPanel));
 
         hg.pickBackground();
