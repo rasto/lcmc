@@ -25,6 +25,7 @@ import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
@@ -153,7 +154,8 @@ public class DrbdAvailFiles extends DialogHost {
                             }
                           },
                           null,   /* ConvertCmdCallback */
-                          false); /* outputVisible */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**
@@ -199,7 +201,8 @@ public class DrbdAvailFiles extends DialogHost {
                         }
                       },
                       null,  /* ConvertCmdCallback */
-                      true); /* outputVisible */
+                      true,  /* outputVisible */
+                      SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**

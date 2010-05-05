@@ -25,6 +25,7 @@ package drbd.gui.dialog.host;
 import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.WizardDialog;
 
@@ -76,7 +77,8 @@ public class DrbdLinbitInst extends DialogHost {
                             }
                           },
                           null,  /* ConvertCmdCallback */
-                          true); /* outputVisible */
+                          true,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**
@@ -102,7 +104,8 @@ public class DrbdLinbitInst extends DialogHost {
                               }
                           },
                           null,  /* ConvertCmdCallback */
-                          true); /* outputVisible */
+                          true,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**
@@ -126,7 +129,8 @@ public class DrbdLinbitInst extends DialogHost {
                             }
                           },
                           null,  /* ConvertCmdCallback */
-                          true); /* outputVisible */
+                          true,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**
@@ -156,7 +160,8 @@ public class DrbdLinbitInst extends DialogHost {
                             }
                           },
                           null,  /* ConvertCmdCallback */
-                          true); /* outputVisible */
+                          true,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
     /**

@@ -586,7 +586,8 @@ public class VMSDiskInfo extends EditableInfo {
                                       + " 2>/dev/null",
                                       null,
                                       false,
-                                      "executing...");
+                                      "executing...",
+                                      SSH.DEFAULT_COMMAND_TIMEOUT);
                 final List<LinuxFile> files = new ArrayList<LinuxFile>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {

@@ -77,7 +77,8 @@ public class ClusterStatus {
                             command,
                             null,  /* ExecCallback */
                             false, /* outputVisible */
-                            Tools.getString("Heartbeat.getClusterMetadata"));
+                            Tools.getString("Heartbeat.getClusterMetadata"),
+                            SSH.DEFAULT_COMMAND_TIMEOUT);
         final String output = ret.getOutput();
         if (ret.getExitCode() != 0) {
             return;

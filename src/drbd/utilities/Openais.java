@@ -58,7 +58,8 @@ public final class Openais {
                                 command,
                                 null,
                                 outputVisible,
-                                Tools.getString("Openais.ExecutingCommand"));
+                                Tools.getString("Openais.ExecutingCommand"),
+                                180000);
     }
 
     /**

@@ -27,6 +27,7 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.ProgressBar;
 import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH;
 import drbd.utilities.SSH.ExecCommandThread;
 
 import javax.swing.JPanel;
@@ -100,8 +101,9 @@ public class Devices extends DialogHost {
                                      getAllInfo();
                                  }
                              },
-                             null,   /* ConvertCmdCallback */
-                             false); /* outputVisible */
+                             null,  /* ConvertCmdCallback */
+                             false, /* outputVisible */
+                             SSH.DEFAULT_COMMAND_TIMEOUT);
                     setCommandThread(t);
                 }
             });
@@ -128,8 +130,9 @@ public class Devices extends DialogHost {
                                                     exitCode);
                              }
                          },
-                         null,  /* ConvertCmdCallback */
-                         true); /* outputVisible */
+                         null, /* ConvertCmdCallback */
+                         true, /* outputVisible */
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 

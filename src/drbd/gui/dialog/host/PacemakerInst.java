@@ -23,6 +23,7 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.utilities.Tools;
+import drbd.utilities.SSH;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.ConvertCmdCallback;
 import drbd.gui.SpringUtilities;
@@ -141,7 +142,8 @@ public class PacemakerInst extends DialogHost {
                                                            archString);
                              }
                          },
-                         true);
+                         true,
+                         SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
     /**

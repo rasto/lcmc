@@ -26,6 +26,7 @@ import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
@@ -107,7 +108,6 @@ public class CheckInstallation extends DialogHost {
     private final JLabel pmIcon = new JLabel(CHECKING_ICON);
     /** Heartbeat/pacemaker icon: checking ... */
     private final JLabel hbPmIcon = new JLabel(CHECKING_ICON);
-
     /** Whether drbd installation was ok. */
     private boolean drbdOk = false;
     /** Whether corosync/openais/pacemaker installation was ok. */
@@ -244,7 +244,8 @@ public class CheckInstallation extends DialogHost {
                              }
                          },
                          null,   /* ConvertCmdCallback */
-                         false); /* outputVisible */
+                         false,  /* outputVisible */
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**
@@ -307,7 +308,8 @@ public class CheckInstallation extends DialogHost {
                              }
                          },
                          null,   /* ConvertCmdCallback */
-                         false); /* outputVisible */
+                         false,
+                         SSH.DEFAULT_COMMAND_TIMEOUT); /* outputVisible */
     }
 
     /**

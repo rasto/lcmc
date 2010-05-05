@@ -27,6 +27,7 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.ConvertCmdCallback;
+import drbd.utilities.SSH;
 
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -123,7 +124,8 @@ public class HeartbeatInst extends DialogHost {
                                                            archString);
                              }
                          },
-                         true);
+                         true,
+                         SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
     /**

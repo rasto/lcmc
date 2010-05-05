@@ -26,6 +26,7 @@ import drbd.data.ConfigData;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.SSH.ExecCommandThread;
@@ -117,7 +118,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
                           },
                           null,   /* ConvertCmdCallback */
-                          false); /* outputVisible */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 
@@ -158,7 +160,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
                           },
                           null,   /* ConvertCmdCallback */
-                          false); /* outputVisible */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 
@@ -207,7 +210,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
                           },
                           null,   /* ConvertCmdCallback */
-                          false); /* outputVisible */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 
@@ -265,7 +269,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
                           },
                           null,   /* ConvertCmdCallback */
-                          false); /* outputVisible */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
 
         setCommandThread(t);
     }
@@ -292,7 +297,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
                           },
                           null,   /* ConvertCmdCallback */
-                          false); /* outputVisible */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
 
         setCommandThread(t);
     }

@@ -26,6 +26,7 @@ import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.RoboTest;
+import drbd.utilities.SSH;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -440,7 +441,9 @@ public class TerminalPanel extends JScrollPane {
                      }
                  }
              },
-             true, false);
+             true,
+             false,
+             SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**

@@ -508,7 +508,8 @@ public class CRMXML extends XML {
                             command,
                             null,  /* ExecCallback */
                             false, /* outputVisible */
-                            Tools.getString("CRMXML.GetOCFParameters"));
+                            Tools.getString("CRMXML.GetOCFParameters"),
+                            300000);
         if (ret.getExitCode() != 0) {
             return;
         }

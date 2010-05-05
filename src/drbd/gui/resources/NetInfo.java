@@ -68,7 +68,8 @@ public class NetInfo extends Info {
                                                 "/sbin/ifconfig "
                                                 + getName(),
                                                 null,   /* ExecCallback */
-                                                false); /* outputVisible */
+                                                false,  /* outputVisible */
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
                 ep.setText(ret.getOutput());
             }
         };

@@ -352,28 +352,6 @@ public final class Tools {
     }
 
     /**
-     * Shows warning message dialog and prints warning to the stdout.
-     *
-     * @param msg
-     *          warning message
-     */
-    public static void warning(final String msg) {
-        System.out.println("WARNING: " + Tools.getString(msg));
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(
-                            guiData.getMainFrame(),
-                            new JScrollPane(new JTextArea(Tools.getString(msg),
-                                                          20,
-                                                          60)),
-                            Tools.getString("Tools.Warning.Title"),
-                            JOptionPane.WARNING_MESSAGE);
-            }
-        });
-
-    }
-
-    /**
      * Shows error message dialog and prints error to the stdout.
      *
      * @param msg
@@ -413,11 +391,11 @@ public final class Tools {
             onHost.append(host.getName());
         }
         Tools.printStackTrace();
-        Tools.warning(Tools.getString("Tools.sshError.command")
-                      + " '" + command + "'" + onHost.toString() + "\n"
-                      + Tools.getString("Tools.sshError.returned")
-                      + " " + exitCode + "\n"
-                      + ans);
+        Tools.appWarning(Tools.getString("Tools.sshError.command")
+                         + " '" + command + "'" + onHost.toString() + "\n"
+                         + Tools.getString("Tools.sshError.returned")
+                         + " " + exitCode + "\n"
+                         + ans);
     }
 
     /**
@@ -444,7 +422,8 @@ public final class Tools {
                                            final String command,
                                            final ExecCallback execCallback,
                                            final boolean outputVisible,
-                                           final String text) {
+                                           final String text,
+                                           final int commandTimeout) {
         ExecCallback ec;
         final String hostName = host.getName();
         Tools.startProgressIndicator(hostName, text);
@@ -474,7 +453,8 @@ public final class Tools {
         final Thread commandThread = host.execCommandRaw(command,
                                                          ec,
                                                          outputVisible,
-                                                         true);
+                                                         true,
+                                                         commandTimeout);
 
 
         try {
@@ -493,7 +473,8 @@ public final class Tools {
     public static SSH.SSHOutput execCommand(final Host host,
                                             final String command,
                                             final ExecCallback execCallback,
-                                            final boolean outputVisible) {
+                                            final boolean outputVisible,
+                                            final int commandTimeout) {
         ExecCallback ec;
         final StringBuffer output = new StringBuffer("");
         final Integer[] exitCodeHolder = new Integer[]{0};
@@ -522,7 +503,8 @@ public final class Tools {
         final Thread commandThread = host.execCommandRaw(command,
                                                          ec,
                                                          outputVisible,
-                                                         true);
+                                                         true,
+                                                         commandTimeout);
 
 
         try {

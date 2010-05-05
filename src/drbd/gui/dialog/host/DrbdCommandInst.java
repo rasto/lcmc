@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH;
 import drbd.utilities.ConvertCmdCallback;
 
 import javax.swing.JPanel;
@@ -129,7 +130,8 @@ public class DrbdCommandInst extends DialogHost {
                                                         drbdVersion);
                              }
                          },
-                         true);
+                         true,
+                         SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
     /**

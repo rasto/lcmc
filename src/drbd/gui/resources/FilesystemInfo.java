@@ -133,11 +133,13 @@ class FilesystemInfo extends ServiceInfo {
                 final String hostName = host.getName();
                 final String statCmd = "stat -c \"%F\" " + dir + "||true";
                 final SSH.SSHOutput ret =
-                                   Tools.execCommandProgressIndicator(host,
-                                                                      statCmd,
-                                                                      null,
-                                                                      true,
-                                                                      statCmd);
+                                   Tools.execCommandProgressIndicator(
+                                                host,
+                                                statCmd,
+                                                null,
+                                                true,
+                                                statCmd,
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
 
                 if (ret == null
                     || !"directory".equals(ret.getOutput().trim())) {
@@ -155,11 +157,13 @@ class FilesystemInfo extends ServiceInfo {
                           Tools.getString("ClusterBrowser.CreateDir.Yes"),
                           Tools.getString("ClusterBrowser.CreateDir.No"))) {
                         final String cmd = "mkdir " + dir;
-                        Tools.execCommandProgressIndicator(host,
-                                                           cmd,
-                                                           null,
-                                                           true,
-                                                           cmd);
+                        Tools.execCommandProgressIndicator(
+                                                host,
+                                                cmd,
+                                                null,
+                                                true,
+                                                cmd,
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
                         confirm = true;
                     }
                 }

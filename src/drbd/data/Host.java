@@ -204,9 +204,6 @@ public class Host implements Serializable {
     private String drbdInstallMethod;
     /** MD5 checksum of VM Info from server. */
     private String vmInfoMD5 = null;
-    /** Default timeout for SSH commands. */
-    private static final int SSH_COMMAND_TIMEOUT =
-                                    Tools.getDefaultInt("SSH.Command.Timeout");
     /** Previous hw info output. */
     private String oldHwInfo = null;
     /** Index of this host in its cluster. */
@@ -1010,7 +1007,8 @@ public class Host implements Serializable {
                                 final String commandString,
                                 final ExecCallback execCallback,
                                 final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible) {
+                                final boolean outputVisible,
+                                final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1022,7 +1020,7 @@ public class Host implements Serializable {
                                execCallback,
                                outputVisible,
                                true,
-                               SSH_COMMAND_TIMEOUT);
+                               commandTimeout);
     }
 
     /**
@@ -1038,7 +1036,8 @@ public class Host implements Serializable {
                                 final ExecCallback execCallback,
                                 final ConvertCmdCallback convertCmdCallback,
                                 final NewOutputCallback newOutputCallback,
-                                final boolean outputVisible) {
+                                final boolean outputVisible,
+                                final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1051,7 +1050,7 @@ public class Host implements Serializable {
                                newOutputCallback,
                                outputVisible,
                                true,
-                               SSH_COMMAND_TIMEOUT);
+                               commandTimeout);
     }
 
 
@@ -1063,7 +1062,8 @@ public class Host implements Serializable {
     public final ExecCommandThread execCommandRaw(final String command,
                                             final ExecCallback callback,
                                             final boolean outputVisible,
-                                            final boolean commandVisible) {
+                                            final boolean commandVisible,
+                                            final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1071,7 +1071,7 @@ public class Host implements Serializable {
                                callback,
                                outputVisible,
                                commandVisible,
-                               SSH_COMMAND_TIMEOUT);
+                               commandTimeout);
     }
 
     /**
@@ -1085,7 +1085,8 @@ public class Host implements Serializable {
                                 final String params,
                                 final ExecCallback callback,
                                 final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible) {
+                                final boolean outputVisible,
+                                final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1098,7 +1099,7 @@ public class Host implements Serializable {
                                callback,
                                outputVisible,
                                true,
-                               SSH_COMMAND_TIMEOUT);
+                               commandTimeout);
     }
 
     /**
@@ -1111,7 +1112,8 @@ public class Host implements Serializable {
                                 final ProgressBar progressBar,
                                 final ExecCallback callback,
                                 final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible) {
+                                final boolean outputVisible,
+                                final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1124,7 +1126,7 @@ public class Host implements Serializable {
                                callback,
                                outputVisible,
                                true,
-                               SSH_COMMAND_TIMEOUT);
+                               commandTimeout);
     }
 
     /**
@@ -1137,7 +1139,8 @@ public class Host implements Serializable {
                                                 final ProgressBar progressBar,
                                                 final ExecCallback execCallback,
                                                 final boolean outputVisible,
-                                                final boolean commandVisible) {
+                                                final boolean commandVisible,
+                                                final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1146,7 +1149,7 @@ public class Host implements Serializable {
                                execCallback,
                                outputVisible,
                                commandVisible,
-                               SSH_COMMAND_TIMEOUT);
+                               commandTimeout);
     }
 
     /**
@@ -1160,7 +1163,8 @@ public class Host implements Serializable {
                                 final ProgressBar progressBar,
                                 final ExecCallback callback,
                                 final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible) {
+                                final boolean outputVisible,
+                                final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1174,7 +1178,7 @@ public class Host implements Serializable {
                                true,
                                outputVisible,
                                true,
-                               SSH_COMMAND_TIMEOUT);
+                               commandTimeout);
     }
 
     /**
@@ -1626,7 +1630,8 @@ public class Host implements Serializable {
                              }
                          },
                          null, /* ConvertCmdCallback */
-                         false);
+                         false,
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
         try {
             t.join(0);
         } catch (java.lang.InterruptedException e) {
@@ -1658,7 +1663,8 @@ public class Host implements Serializable {
                              }
                          },
                          null, /* ConvertCmdCallback */
-                         false);
+                         false,
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
         try {
             t.join(0);
         } catch (java.lang.InterruptedException e) {

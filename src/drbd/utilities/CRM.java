@@ -86,14 +86,19 @@ public final class CRM {
                  "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
                  + "if [ ! -e $file ]; then /usr/sbin/cibadmin -Ql > $file;fi;"
                  + "export CIB_file=$file; ";
-            return Tools.execCommand(host, testCmd + command, null, false);
+            return Tools.execCommand(host,
+                                     testCmd + command,
+                                     null,
+                                     false,
+                                     SSH.DEFAULT_COMMAND_TIMEOUT);
         } else {
             return Tools.execCommandProgressIndicator(
                                     host,
                                     command,
                                     null,
                                     outputVisible,
-                                    Tools.getString("CIB.ExecutingCommand"));
+                                    Tools.getString("CIB.ExecutingCommand"),
+                                    SSH.DEFAULT_COMMAND_TIMEOUT);
         }
     }
 
@@ -118,8 +123,12 @@ public final class CRM {
                             + PTEST_END_DELIM
                             + "';cat $file;"
                             + "mv $file{,.last}";
-        final SSH.SSHOutput output =
-                               Tools.execCommand(host, command, null, false);
+        final SSH.SSHOutput output = Tools.execCommand(
+                                                host,
+                                                command,
+                                                null,
+                                                false,
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
         try {
             mPtestLock.acquire();
         } catch (InterruptedException e) {

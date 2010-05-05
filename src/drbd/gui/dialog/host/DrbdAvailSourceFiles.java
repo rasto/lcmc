@@ -25,10 +25,11 @@ import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
+import drbd.utilities.ComboInfo;
+import drbd.utilities.SSH;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
-import drbd.utilities.ComboInfo;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -130,7 +131,8 @@ public class DrbdAvailSourceFiles extends DialogHost {
                 }
               },
               null,   /* ConvertCmdCallback */
-              false); /* outputVisible */
+              false,  /* outputVisible */
+              SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**

@@ -179,12 +179,15 @@ public class Logs extends ConfigDialog {
                                      }
                                      public void doneError(final String ans,
                                                            final int exitCode) {
+                                         texts[index] = host.getName()
+                                                        + ": "
+                                                        + ans + "\n";
                                          Tools.sshError(host,
                                                         command,
                                                         ans,
                                                         exitCode);
                                      }
-                                 }, false, false);
+                                 }, false, false, 30000);
             i++;
         }
         i = 0;

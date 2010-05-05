@@ -87,8 +87,12 @@ public final class DRBD {
                 cmd = cmd.replaceAll("@DRYRUNCONF@",
                                      "-c /var/lib/drbd/drbd.conf-drbd-mc-test");
             }
-            final SSH.SSHOutput output =
-                                    Tools.execCommand(host, cmd, null, false);
+            final SSH.SSHOutput output = Tools.execCommand(
+                                                host,
+                                                cmd,
+                                                null,
+                                                false,
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
             try {
                 mDRBDtestLock.acquire();
             } catch (InterruptedException e) {
@@ -114,7 +118,8 @@ public final class DRBD {
                                      execCallback,
                                      outputVisible,
                                      Tools.getString("DRBD.ExecutingCommand")
-                                     + " " + cmd + "...");
+                                     + " " + cmd + "...",
+                                     SSH.DEFAULT_COMMAND_TIMEOUT);
         }
     }
 

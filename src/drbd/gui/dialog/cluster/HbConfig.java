@@ -24,17 +24,18 @@ package drbd.gui.dialog.cluster;
 
 import drbd.utilities.MyButton;
 import drbd.utilities.Heartbeat;
+import drbd.utilities.Tools;
+import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH.ExecCommandThread;
+import drbd.utilities.SSH;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.ConfigData;
 import drbd.data.CastAddress;
 import drbd.data.resources.NetInterface;
 import drbd.data.resources.UcastLink;
-import drbd.utilities.Tools;
-import drbd.utilities.SSH.ExecCommandThread;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
-import drbd.utilities.ExecCallback;
 import drbd.gui.ProgressBar;
 import drbd.gui.dialog.WizardDialog;
 
@@ -343,7 +344,8 @@ public class HbConfig extends DialogCluster {
                                  }
                              },
                              null,   /* ConvertCmdCallback */
-                             false); /* outputVisible */
+                             false,  /* outputVisible */
+                             SSH.DEFAULT_COMMAND_TIMEOUT);
             i++;
         }
         for (ExecCommandThread t : ts) {

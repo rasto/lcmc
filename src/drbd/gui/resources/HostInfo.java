@@ -39,6 +39,7 @@ import drbd.utilities.ExecCallback;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.CRM;
+import drbd.utilities.SSH;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -156,7 +157,8 @@ public class HostInfo extends Info {
                 host.execCommand("HostBrowser.getCrmMon",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true); /* outputVisible */
+                                 true,  /* outputVisible */
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
         host.registerEnableOnConnect(crmMonButton);
@@ -167,7 +169,8 @@ public class HostInfo extends Info {
                 host.execCommand("HostBrowser.getCrmConfigureShow",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true); /* outputVisible */
+                                 true,  /* outputVisible */
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
         host.registerEnableOnConnect(crmConfigureShowButton);

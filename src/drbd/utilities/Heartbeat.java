@@ -58,7 +58,8 @@ public final class Heartbeat {
                                 command,
                                 null,
                                 outputVisible,
-                                Tools.getString("Heartbeat.ExecutingCommand"));
+                                Tools.getString("Heartbeat.ExecutingCommand"),
+                                180000);
     }
 
     /**
@@ -180,7 +181,11 @@ public final class Heartbeat {
         } else {
             cmd = "Heartbeat.enableDopd";
         }
-        final Thread t = host.execCommand(cmd, null, null, true);
+        final Thread t = host.execCommand(cmd,
+                                          null,
+                                          null,
+                                          true,
+                                          SSH.DEFAULT_COMMAND_TIMEOUT);
         try {
             t.join();
         } catch (InterruptedException ie) {

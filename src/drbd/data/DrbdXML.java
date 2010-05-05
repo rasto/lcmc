@@ -185,10 +185,11 @@ public class DrbdXML extends XML {
                                                     (ConvertCmdCallback) null);
 
             final SSH.SSHOutput ret =
-                                  Tools.execCommand(host,
-                                                    command,
-                                                    null,   /* ExecCallback */
-                                                    false); /* outputVisible */
+                              Tools.execCommand(host,
+                                                command,
+                                                null,   /* ExecCallback */
+                                                false,  /* outputVisible */
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
             if (ret.getExitCode() != 0) {
                 return;
             }
@@ -240,10 +241,12 @@ public class DrbdXML extends XML {
         }
         final String command2 = host.getDistCommand("Drbd.getConfig",
                                                     (ConvertCmdCallback) null);
-        final SSH.SSHOutput ret = Tools.execCommand(host,
-                                                    command2,
-                                                    null,   /* ExecCallback */
-                                                    false); /* outputVisible */
+        final SSH.SSHOutput ret = Tools.execCommand(
+                                                host,
+                                                command2,
+                                                null,   /* ExecCallback */
+                                                false,  /* outputVisible */
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
         if (ret.getExitCode() == 0) {
             return ret.getOutput();
         }

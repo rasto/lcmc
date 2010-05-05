@@ -87,6 +87,12 @@ public class SSH {
     private final Mutex mConnectionThreadLock = new Mutex();
     /** Local port forwarder. */
     private LocalPortForwarder localPortForwarder = null;
+    /** Default timeout for SSH commands. */
+    public static final int DEFAULT_COMMAND_TIMEOUT =
+                                    Tools.getDefaultInt("SSH.Command.Timeout");
+    /** Default timeout for SSH commands. */
+    public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
+                               Tools.getDefaultInt("SSH.Command.Timeout.Long");
 
     /**
      * Reconnect.
@@ -468,6 +474,7 @@ public class SSH {
 
                         if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                                 /* A timeout occured. */
+                                System.out.println("timeout");
                                 throw new IOException(
                                   "Timeout while waiting for data from peer.");
                         }

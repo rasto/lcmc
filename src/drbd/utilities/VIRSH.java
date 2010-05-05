@@ -68,7 +68,8 @@ public final class VIRSH {
                                      null,
                                      outputVisible,
                                      Tools.getString("VIRSH.ExecutingCommand")
-                                     + " " + commands + "...");
+                                     + " " + commands + "...",
+                                     SSH.DEFAULT_COMMAND_TIMEOUT);
                 if (ret.getExitCode() != 0) {
                     return false;
                 }

@@ -36,6 +36,7 @@ import drbd.gui.resources.NetInfo;
 
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.SSH;
 import drbd.gui.resources.CategoryInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -388,7 +389,11 @@ public class HostBrowser extends Browser {
                 final String command = "MakeKernelPanic";
                 Tools.startProgressIndicator(hostName,
                                              host.getDistString(command));
-                host.execCommand(command, null, null, true);
+                host.execCommand(command,
+                                 null,
+                                 null,
+                                 true,
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
                 Tools.stopProgressIndicator(hostName,
                                             host.getDistString(command));
             }
@@ -414,7 +419,11 @@ public class HostBrowser extends Browser {
                 final String command = "MakeKernelReboot";
                 Tools.startProgressIndicator(hostName,
                                              host.getDistString(command));
-                host.execCommand(command, null, null, true);
+                host.execCommand(command,
+                                 null,
+                                 null,
+                                 true,
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
                 Tools.stopProgressIndicator(hostName,
                                             host.getDistString(command));
             }

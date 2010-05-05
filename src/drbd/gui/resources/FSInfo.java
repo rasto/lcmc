@@ -84,7 +84,8 @@ public class FSInfo extends Info {
                                                 "/sbin/modinfo "
                                                 + getName(),
                                                 null,   /* ExecCallback */
-                                                false); /* outputVisible */
+                                                false,  /* outputVisible */
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
                     modinfo = ret.getOutput();
                 }
                 ep.setText("<html><pre>" + modinfo + "</html></pre>");

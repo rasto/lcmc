@@ -345,13 +345,14 @@ public class AppDefaults extends
          "Icons/tango/32x32/cluster_32x32.png"},
 
         /* ssh */
-        {"SSH.User",           "root"},
-        {"SSH.Port",           "22"},
-        {"SSH.ConnectTimeout", 30000}, /* milliseconds, 0 no timeout */
-        {"SSH.KexTimeout",     30000}, /* milliseconds, 0 no timeout */
-        {"SSH.Command.Timeout", 0},     /* milliseconds, 0 no timeout */
-        {"ProgressBar.Sleep",  100},   /* milliseconds */
-        {"ProgressBar.Delay",  50},    /* milliseconds */
+        {"SSH.User",                 "root"},
+        {"SSH.Port",                 "22"},
+        {"SSH.ConnectTimeout",       30000}, /* milliseconds, 0 no timeout */
+        {"SSH.KexTimeout",           30000}, /* milliseconds, 0 no timeout */
+        {"SSH.Command.Timeout.Long", 0},     /* milliseconds, 0 no timeout */
+        {"SSH.Command.Timeout",      180000}, /* milliseconds */
+        {"ProgressBar.Sleep",        100},   /* milliseconds */
+        {"ProgressBar.Delay",        50},    /* milliseconds */
 
         /* score */
         {"Score.Infinity",                    100000},

@@ -24,10 +24,11 @@ package drbd.gui.dialog.drbdUpgrade;
 import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
+import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.dialog.host.DialogHost;
-import drbd.utilities.ExecCallback;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -120,7 +121,8 @@ public class CheckInstallation extends DialogHost {
                              }
                          },
                          null,   /* ConvertCmdCallback */
-                         false); /* outputVisible */
+                         false,  /* outputVisible */
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**

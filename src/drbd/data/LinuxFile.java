@@ -99,7 +99,8 @@ public class LinuxFile extends File {
                               + " 2>/dev/null",
                               null,
                               false,
-                              "executing...");
+                              "executing...",
+                              SSH.DEFAULT_COMMAND_TIMEOUT);
         existCache = out.getExitCode() == 0;
         return existCache;
     }

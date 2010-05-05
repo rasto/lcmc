@@ -113,10 +113,12 @@ public class VMSXML extends XML {
     public final boolean update() {
         final String command = host.getDistCommand("VMSXML.GetData",
                                                    (ConvertCmdCallback) null);
-        final SSH.SSHOutput ret = Tools.execCommand(host,
-                                                   command,
-                                                   null,  /* ExecCallback */
-                                                   false); /* outputVisible */
+        final SSH.SSHOutput ret = Tools.execCommand(
+                                               host,
+                                               command,
+                                               null,  /* ExecCallback */
+                                               false,  /* outputVisible */
+                                               SSH.DEFAULT_COMMAND_TIMEOUT);
         if (ret.getExitCode() != 0) {
             return false;
         }

@@ -27,6 +27,7 @@ import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.SSH.ExecCommandThread;
+import drbd.utilities.SSH;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.SpringUtilities;
@@ -126,7 +127,8 @@ public class CommStack extends DialogCluster {
                                  }
                              },
                              null,   /* ConvertCmdCallback */
-                             false); /* outputVisible */
+                             false,  /* outputVisible */
+                             SSH.DEFAULT_COMMAND_TIMEOUT);
             i++;
         }
         for (final ExecCommandThread t : infoThreads) {

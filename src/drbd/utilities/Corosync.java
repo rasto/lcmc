@@ -58,7 +58,8 @@ public final class Corosync {
                                 command,
                                 null,
                                 outputVisible,
-                                Tools.getString("Corosync.ExecutingCommand"));
+                                Tools.getString("Corosync.ExecutingCommand"),
+                                SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**

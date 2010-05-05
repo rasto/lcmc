@@ -32,6 +32,7 @@ import drbd.utilities.Openais;
 import drbd.utilities.Corosync;
 import drbd.utilities.SSH.ExecCommandThread;
 import drbd.utilities.MyButton;
+import drbd.utilities.SSH;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.ExecCallback;
 import drbd.gui.ProgressBar;
@@ -240,7 +241,8 @@ public class Init extends DialogCluster {
                                  }
                              },
                              null,   /* ConvertCmdCallback */
-                             false); /* outputVisible */
+                             false,  /* outputVisible */
+                             SSH.DEFAULT_COMMAND_TIMEOUT);
             i++;
         }
         for (final ExecCommandThread t : infoThreads) {

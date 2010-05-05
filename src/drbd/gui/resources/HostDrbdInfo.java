@@ -38,6 +38,7 @@ import drbd.utilities.ExecCallback;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.DRBD;
+import drbd.utilities.SSH;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -147,7 +148,8 @@ public class HostDrbdInfo extends Info {
                 host.execCommand("DRBD.getProcDrbd",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true); /* outputVisible */
+                                 true,  /* outputVisible */
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
         host.registerEnableOnConnect(procDrbdButton);
@@ -157,7 +159,8 @@ public class HostDrbdInfo extends Info {
                 host.execCommand("DRBD.getProcesses",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true); /* outputVisible */
+                                 true,  /* outputVisible */
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
         host.registerEnableOnConnect(drbdProcsButton);
