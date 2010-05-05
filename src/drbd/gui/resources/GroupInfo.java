@@ -974,14 +974,16 @@ public class GroupInfo extends ServiceInfo {
             for (final String hbId : resources) {
                 final ServiceInfo si =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
-                asi.addExistingServiceMenuItem("         " + si.toString(),
-                                           si,
-                                           dlm,
-                                           callbackHash,
-                                           list,
-                                           colocationOnly,
-                                           orderOnly,
-                                           testOnly);
+                if (si != null) {
+                    asi.addExistingServiceMenuItem("         " + si.toString(),
+                                                   si,
+                                                   dlm,
+                                                   callbackHash,
+                                                   list,
+                                                   colocationOnly,
+                                                   orderOnly,
+                                                   testOnly);
+                }
             }
         }
     }
