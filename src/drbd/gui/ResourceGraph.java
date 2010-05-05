@@ -1219,13 +1219,17 @@ public abstract class ResourceGraph {
                     visualizationViewer.layoutTransform(layout.getLocation(v));
             final float x = (float) p.getX();
             final float y = (float) p.getY();
-
+            final Color col = getVertexFillColor(v);
+            final Color secCol = getVertexFillSecondaryColor(v);
+            if (col == null || secCol == null) {
+                return null;
+            }
             return new GradientPaint(x,
                                      y - getVertexHeight(v) / 2,
-                                     getVertexFillSecondaryColor(v),
+                                     secCol,
                                      x,
                                      y + getVertexHeight(v) / 2,
-                                     getVertexFillColor(v),
+                                     col,
                                      false);
         }
     }

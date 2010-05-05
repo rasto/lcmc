@@ -121,8 +121,8 @@ public final class CRM {
                             "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
                             + "/usr/sbin/ptest -VVV -S -x $file 2>&1;echo '"
                             + PTEST_END_DELIM
-                            + "';cat $file;"
-                            + "mv $file{,.last}";
+                            + "';cat $file 2>/dev/null;"
+                            + "mv $file{,.last} 2>/dev/null";
         final SSH.SSHOutput output = Tools.execCommand(
                                                 host,
                                                 command,

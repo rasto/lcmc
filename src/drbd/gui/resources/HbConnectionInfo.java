@@ -103,7 +103,7 @@ public class HbConnectionInfo extends EditableInfo {
     /**
      * Returns whether one of the services are newly added.
      */
-    private boolean isNew() {
+    public final boolean isNew() {
         if ((lastServiceInfoRsc != null
              && lastServiceInfoRsc.getService().isNew())
             || (lastServiceInfoWithRsc != null
@@ -829,6 +829,9 @@ public class HbConnectionInfo extends EditableInfo {
      */
     public final boolean isOrdScoreNull(final ServiceInfo first,
                                         final ServiceInfo then) {
+        if (isNew()) {
+            return false;
+        }
         int score = 0;
         for (final String ordId : orderIds.keySet()) {
             final HbOrderInfo hoi = orderIds.get(ordId);
@@ -902,7 +905,7 @@ public class HbConnectionInfo extends EditableInfo {
                 }
             }
         }
-        return false;
+        return true;
     }
 
     /**

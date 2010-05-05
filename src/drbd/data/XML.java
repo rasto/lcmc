@@ -84,13 +84,16 @@ public class XML {
      * Parses xml passed as a string and returns document object with
      * the tree.
      */
-    protected final Document getXMLDocument(final String xml) {
+    protected final Document getXMLDocument(final String xmlraw) {
+        if (xmlraw == null) {
+            return null;
+        }
+        final String xml = xmlraw.trim();
         final DocumentBuilderFactory factory =
             DocumentBuilderFactory.newInstance();
         if (factory == null
-            || xml == null
             || xml.equals("")
-            || xml.trim().equals("no resources defined!")) {
+            || xml.equals("no resources defined!")) {
             return null;
         }
         Document document;

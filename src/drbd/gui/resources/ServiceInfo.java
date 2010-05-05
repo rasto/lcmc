@@ -3251,12 +3251,14 @@ public class ServiceInfo extends EditableInfo {
                 colAttrsList.add(colAttrs);
                 ordAttrsList.add(ordAttrs);
             }
-            CRM.setOrderAndColocation(getBrowser().getDCHost(),
-                                      heartbeatId,
-                                      new String[]{parentId},
-                                      colAttrsList,
-                                      ordAttrsList,
-                                      testOnly);
+            if (!getService().isNew() && !serviceInfo.getService().isNew()) {
+                CRM.setOrderAndColocation(getBrowser().getDCHost(),
+                                          heartbeatId,
+                                          new String[]{parentId},
+                                          colAttrsList,
+                                          ordAttrsList,
+                                          testOnly);
+            }
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
             final DefaultMutableTreeNode newServiceNode =
