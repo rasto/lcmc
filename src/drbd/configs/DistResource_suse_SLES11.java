@@ -49,7 +49,7 @@ public class DistResource_suse_SLES11 extends
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "clusterlabs repo: 1.0.x/1.0.x" },
+         "clusterlabs repo: 1.2.x/1.0.x" },
         {"PmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://www.clusterlabs.org/rpm/opensuse-11.1/clusterlabs.repo && "
@@ -59,6 +59,14 @@ public class DistResource_suse_SLES11 extends
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"},
 
+        /* Openais/Corosync/Pacemaker ha extension */
+        {"PmInst.install.text.2", "HAE: 1.0.x/0.80.x" },
+        {"PmInst.install.2",
+         "zypper -n install pacemaker"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && chkconfig --add openais"},
+
         /* Heartbeat/Pacemaker Clusterlabs */
         {"HbPmInst.install.text.1",
          "clusterlabs repo: 1.0.x/3.0.x" },
@@ -67,5 +75,15 @@ public class DistResource_suse_SLES11 extends
          + " http://www.clusterlabs.org/rpm/opensuse-11.1/clusterlabs.repo && "
          + "zypper -n --no-gpg-check install heartbeat pacemaker"
          + " && chkconfig --add heartbeat"},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         " the suse way: 8.2.x"},
+
+        {"DrbdInst.install.3",
+         "zypper -n in drbd drbd-kmp-`uname -r|sed s/.*-//`"},
+
+        {"DrbdInst.install.method.3",
+         ""},
     };
 }
