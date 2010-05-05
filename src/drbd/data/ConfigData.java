@@ -145,6 +145,8 @@ public class ConfigData implements Serializable {
     private boolean realvnc = false;
     /** Whether the drbd packages should be downloaded from staging dir. */
     private boolean stagingDrbd = false;
+    /** Whether more pacemaker installation options should appear. */
+    private boolean stagingPacemaker = false;
     /** Frames per second for animations. */
     private float animFPS = 15;
     /** Access type of the application at the moment. */
@@ -596,6 +598,16 @@ public class ConfigData implements Serializable {
      */
     public final void setStagingDrbd(final boolean stagingDrbd) {
         this.stagingDrbd = stagingDrbd;
+    }
+
+    /** Sets whether more pacemaker installation options should be shown. */
+    public final void setStagingPacemaker(final boolean stagingPacemaker) {
+        this.stagingPacemaker = stagingPacemaker;
+    }
+
+    /** Returns whether more pacemaker installation options should be shown. */
+    public final boolean isStagingPacemaker() {
+        return stagingPacemaker;
     }
 
     /**

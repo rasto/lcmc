@@ -114,6 +114,8 @@ public class DistResource_debian extends
         {"PmInst.install.text.2",
          "from source: latest/1.1.x"},
 
+        {"PmInst.install.staging.2", "true"},
+
         {"PmInst.install.2",
          "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"
@@ -203,9 +205,11 @@ public class DistResource_debian extends
          + "/usr/bin/apt-get -y -q install -o"
          + " 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
-        /* corosync/pacemaker from source */
+        /* Heartbeat/pacemaker from source */
         {"HbPmInst.install.text.3",
          "from source: latest/3.0.x"},
+
+        {"HbPmInst.install.staging.3", "true"},
 
         {"HbPmInst.install.3",
          "export LCRSODIR=/usr/libexec/lcrso;"

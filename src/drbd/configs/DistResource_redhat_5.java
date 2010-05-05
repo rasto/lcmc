@@ -64,6 +64,27 @@ public class DistResource_redhat_5 extends
          + " /sbin/chkconfig --level 2345 corosync on"
          + " && /sbin/chkconfig --level 016 corosync off)"},
 
+        /* Next Corosync/Openais/Pacemaker clusterlabs */
+        {"PmInst.install.text.2",
+         "clusterlabs test repo: 1.1.x/1.2.x" },
+
+        {"PmInst.install.staging.2", "true"},
+
+        {"PmInst.install.2",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm-next/epel-5/clusterlabs.repo && "
+         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
+         + "/epel-release-5-3.noarch.rpm ; "
+         + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"},
+
+
         /* Heartbeat/Pacemaker clusterlabs */
         {"HbPmInst.install.text.1",
          "clusterlabs repo: 1.0.x/3.0.x" },
@@ -77,6 +98,7 @@ public class DistResource_redhat_5 extends
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
          + " && /sbin/chkconfig --add heartbeat"},
 
+        /* old heartbeat */
         {"HbPmInst.install.text.2", "the centos way: HB 2.1.3 (obsolete)" },
 
         {"HbPmInst.install.2",
@@ -88,5 +110,20 @@ public class DistResource_redhat_5 extends
          "/etc/init.d/openais start"},
         {"Openais.reloadOpenais.i686",
          "/etc/init.d/openais reload"},
+
+        /* Next Heartbeat/Pacemaker clusterlabs */
+        {"HbPmInst.install.text.3",
+         "clusterlabs next repo: 1.1.x/3.0.x" },
+
+        {"HbPmInst.install.staging.3", "true"},
+
+        {"HbPmInst.install.3",
+         "wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm-next/epel-5/clusterlabs.repo && "
+         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
+         + "/epel-release-5-3.noarch.rpm ; "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
+         + " && /sbin/chkconfig --add heartbeat"},
     };
 }

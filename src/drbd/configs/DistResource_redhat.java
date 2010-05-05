@@ -107,6 +107,8 @@ public class DistResource_redhat extends
         {"PmInst.install.text.9",
          "from source: latest/1.1.x"},
 
+        {"PmInst.install.staging.9", "true"},
+
         {"PmInst.install.9",
          "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"

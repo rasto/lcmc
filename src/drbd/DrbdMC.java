@@ -290,6 +290,9 @@ public final class DrbdMC extends JPanel {
                     System.out.println(
                                "--vnc-port-offset OFFSET, for port forwarding");
                     System.out.println(
+                               "--staging-pacemaker, enable more installation"
+                               + " options for pacemaker");
+                    System.out.println(
                        "--slow, specify this if you have slow computer. Can be"
                        + " specified more times");
                     System.out.print(
@@ -312,6 +315,8 @@ public final class DrbdMC extends JPanel {
                     auto = true;
                 } else if ("--staging-drbd".equals(arg)) {
                     Tools.getConfigData().setStagingDrbd(true);
+                } else if ("--staging-pacemaker".equals(arg)) {
+                    Tools.getConfigData().setStagingPacemaker(true);
                 } else if ("--slow".equals(arg)) {
                     fps = fps / 2;
                 } else if ("--fast".equals(arg)) {

@@ -133,6 +133,8 @@ public class DistResource_ubuntu extends
         {"PmInst.install.text.2",
          "from source: latest/1.1.x"},
 
+        {"PmInst.install.staging.2", "true"},
+
         {"PmInst.install.2",
          "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"

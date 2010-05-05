@@ -612,6 +612,14 @@ public class CheckInstallation extends DialogHost {
                 i++;
                 continue;
             }
+            final String staging =
+                    getHost().getDistString("PmInst.install.staging." + index);
+            if (staging != null && "true".equals(staging)
+                && !Tools.getConfigData().isStagingPacemaker()) {
+                /* skip staging */
+                i++;
+                continue;
+            }
             final InstallMethods pmInstallMethod = new InstallMethods(
               Tools.getString("Dialog.Host.CheckInstallation.PmInstallMethod")
               + text, i);
@@ -676,7 +684,19 @@ public class CheckInstallation extends DialogHost {
             final String text =
                      getHost().getDistString("HbPmInst.install.text." + index);
             if (text == null || text.equals("")) {
-                break;
+                if (i > 9) {
+                    break;
+                }
+                i++;
+                continue;
+            }
+            final String staging =
+                  getHost().getDistString("HbPmInst.install.staging." + index);
+            if (staging != null && "true".equals(staging)
+                && !Tools.getConfigData().isStagingPacemaker()) {
+                /* skip staging */
+                i++;
+                continue;
             }
             final InstallMethods hbPmInstallMethod = new InstallMethods(
               Tools.getString("Dialog.Host.CheckInstallation.HbPmInstallMethod")
@@ -745,11 +765,19 @@ public class CheckInstallation extends DialogHost {
             if (text == null || text.equals("")) {
                 break;
             }
+            final String staging =
+                  getHost().getDistString("DrbdInst.install.staging." + index);
+            if (staging != null && "true".equals(staging)
+                && !Tools.getConfigData().isStagingDrbd()) {
+                /* skip staging */
+                i++;
+                continue;
+            }
             String method =
                    getHost().getDistString("DrbdInst.install.method." + index);
             if (method == null) {
                 method = "";
-            }
+            } 
             final InstallMethods drbdInstallMethod = new InstallMethods(
               Tools.getString("Dialog.Host.CheckInstallation.DrbdInstallMethod")
                + text, i, method);
