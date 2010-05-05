@@ -35,13 +35,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.ServerHostKeyVerifier;
-import com.trilead.ssh2.InteractiveCallback;
-import com.trilead.ssh2.Session;
-import com.trilead.ssh2.ChannelCondition;
-import com.trilead.ssh2.KnownHosts;
-import com.trilead.ssh2.LocalPortForwarder;
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.ServerHostKeyVerifier;
+import ch.ethz.ssh2.InteractiveCallback;
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.ChannelCondition;
+import ch.ethz.ssh2.KnownHosts;
+import ch.ethz.ssh2.LocalPortForwarder;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**

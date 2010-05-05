@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.io.IOException;
 import java.io.File;
 import drbd.utilities.Tools;
-import com.trilead.ssh2.KnownHosts;
+import ch.ethz.ssh2.KnownHosts;
 import org.apache.commons.collections.map.MultiKeyMap;
 import java.util.List;
 import java.util.ArrayList;
