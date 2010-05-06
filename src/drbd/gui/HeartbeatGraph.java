@@ -516,6 +516,9 @@ public class HeartbeatGraph extends ResourceGraph {
             str = vertexToHostMap.get(v).toString();
         } else {
             final ServiceInfo si = (ServiceInfo) getInfo((Vertex) v);
+            if (si == null) {
+                return "";
+            }
             if (si.getService().isRemoved()) {
                 str = Tools.getString("HeartbeatGraph.Removing");
             } else if (vertexIsPresentList.contains(v)) {
@@ -1193,7 +1196,8 @@ public class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siRsc = hbConnectionInfo.getLastServiceInfoRsc();
         final ServiceInfo siWithRsc =
                                   hbConnectionInfo.getLastServiceInfoWithRsc();
-        if (siWithRsc.getService().isNew()) {
+        if (siWithRsc.getService().isNew()
+            || siRsc.getService().isNew()) {
             addOrder(null, siRsc, siWithRsc);
         } else {
             siRsc.addOrder(siWithRsc, dcHost, testOnly);
@@ -1370,6 +1374,9 @@ public class HeartbeatGraph extends ResourceGraph {
                              width);
         } else {
             final ServiceInfo si = (ServiceInfo) getInfo(v);
+            if (si == null) {
+                return;
+            }
             final List<Color> colors = si.getHostColors(tOnly);
             final int number = colors.size();
             if (number > 1) {

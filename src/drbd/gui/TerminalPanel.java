@@ -132,6 +132,10 @@ public class TerminalPanel extends JScrollPane {
     private static final String DEBUG_INC = "debuginc";
     /** Command to decrement debug level. */
     private static final String DEBUG_DEC = "debugdec";
+    /** Starts test 1. */
+    private static final String TEST_1 = "starttest1";
+    /** Register mouse movement. */
+    private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
     private static final Map<String, Integer> CHEATS_MAP =
                                      new LinkedHashMap<String, Integer>();
@@ -153,6 +157,8 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(MOVETEST_LAZY_LONG, 0);
         CHEATS_MAP.put(DEBUG_INC, 0);
         CHEATS_MAP.put(DEBUG_DEC, 0);
+        CHEATS_MAP.put(TEST_1, 0);
+        CHEATS_MAP.put(REGISTER_MOVEMENT, 0);
     }
 
 
@@ -680,6 +686,10 @@ public class TerminalPanel extends JScrollPane {
             Tools.incrementDebugLevel();
         } else if (DEBUG_DEC.equals(cheat)) {
             Tools.decrementDebugLevel();
+        } else if (TEST_1.equals(cheat)) {
+            RoboTest.startTest(1);
+        } else if (REGISTER_MOVEMENT.equals(cheat)) {
+            RoboTest.registerMovement();
         }
         nextCommand();
     }

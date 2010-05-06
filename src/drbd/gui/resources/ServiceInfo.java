@@ -3965,8 +3965,7 @@ public class ServiceInfo extends EditableInfo {
      * Returns list of items for service popup menu with actions that can
      * be executed on the heartbeat services.
      */
-    public List<UpdatableItem> createPopup(
-                              final List<UpdatableItem> registeredMenuItem) {
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
 
@@ -4009,7 +4008,6 @@ public class ServiceInfo extends EditableInfo {
                     }
                 };
             items.add((UpdatableItem) addGroupMenuItem);
-            registeredMenuItem.add((UpdatableItem) addGroupMenuItem);
 
             /* add new service and dependency*/
             final MyMenu addServiceMenuItem = getAddServiceMenuItem(
@@ -4018,7 +4016,6 @@ public class ServiceInfo extends EditableInfo {
                             false,
                             false);
             items.add((UpdatableItem) addServiceMenuItem);
-            registeredMenuItem.add((UpdatableItem) addServiceMenuItem);
 
             /* add existing service dependency*/
             final MyMenu existingServiceMenuItem = getExistingServiceMenuItem(
@@ -4027,7 +4024,6 @@ public class ServiceInfo extends EditableInfo {
                         false,
                         testOnly);
             items.add((UpdatableItem) existingServiceMenuItem);
-            registeredMenuItem.add((UpdatableItem) existingServiceMenuItem);
         }
         /* start resource */
         final MyMenuItem startMenuItem =
@@ -4061,7 +4057,6 @@ public class ServiceInfo extends EditableInfo {
         };
         addMouseOverListener(startMenuItem, startItemCallback);
         items.add((UpdatableItem) startMenuItem);
-        registeredMenuItem.add((UpdatableItem) startMenuItem);
 
         /* stop resource */
         final MyMenuItem stopMenuItem =
@@ -4095,7 +4090,6 @@ public class ServiceInfo extends EditableInfo {
         };
         addMouseOverListener(stopMenuItem, stopItemCallback);
         items.add((UpdatableItem) stopMenuItem);
-        registeredMenuItem.add((UpdatableItem) stopMenuItem);
 
         /* clean up resource */
         final MyMenuItem cleanupMenuItem =
@@ -4133,7 +4127,6 @@ public class ServiceInfo extends EditableInfo {
             };
         /* cleanup ignores CIB_file */
         items.add((UpdatableItem) cleanupMenuItem);
-        registeredMenuItem.add((UpdatableItem) cleanupMenuItem);
 
 
         /* manage resource */
@@ -4182,8 +4175,7 @@ public class ServiceInfo extends EditableInfo {
         };
         addMouseOverListener(manageMenuItem, manageItemCallback);
         items.add((UpdatableItem) manageMenuItem);
-        registeredMenuItem.add((UpdatableItem) manageMenuItem);
-        addMigrateMenuItems(items, registeredMenuItem);
+        addMigrateMenuItems(items);
         if (cloneInfo == null) {
             /* remove service */
             final MyMenuItem removeMenuItem = new MyMenuItem(
@@ -4233,7 +4225,6 @@ public class ServiceInfo extends EditableInfo {
             };
             addMouseOverListener(removeMenuItem, removeItemCallback);
             items.add((UpdatableItem) removeMenuItem);
-            registeredMenuItem.add((UpdatableItem) removeMenuItem);
         }
         /* view log */
         final MyMenuItem viewLogMenu = new MyMenuItem(
@@ -4261,7 +4252,6 @@ public class ServiceInfo extends EditableInfo {
                 l.showDialog();
             }
         };
-        registeredMenuItem.add(viewLogMenu);
         items.add(viewLogMenu);
         /* expert options */
         final MyMenu expertSubmenu = new MyMenu(
@@ -4274,17 +4264,14 @@ public class ServiceInfo extends EditableInfo {
             }
         };
         items.add(expertSubmenu);
-        addExpertMenu(expertSubmenu, registeredMenuItem);
-        registeredMenuItem.add(expertSubmenu);
+        addExpertMenu(expertSubmenu);
         return items;
     }
 
     /**
      * Adds migrate and unmigrate menu items.
      */
-    protected void addMigrateMenuItems(
-                                final List<UpdatableItem> items,
-                                final List<UpdatableItem> registeredMenuItem) {
+    protected void addMigrateMenuItems(final List<UpdatableItem> items) {
         /* migrate resource */
         final boolean testOnly = false;
         final ServiceInfo thisClass = this;
@@ -4350,7 +4337,6 @@ public class ServiceInfo extends EditableInfo {
             };
             addMouseOverListener(migrateMenuItem, migrateItemCallback);
             items.add((UpdatableItem) migrateMenuItem);
-            registeredMenuItem.add((UpdatableItem) migrateMenuItem);
         }
 
         /* unmigrate resource */
@@ -4392,15 +4378,12 @@ public class ServiceInfo extends EditableInfo {
         };
         addMouseOverListener(unmigrateMenuItem, unmigrateItemCallback);
         items.add((UpdatableItem) unmigrateMenuItem);
-        registeredMenuItem.add((UpdatableItem) unmigrateMenuItem);
     }
 
     /**
      * Adds "migrate from" and "force migrate" menuitems to the submenu.
      */
-    protected void addMoreMigrateMenuItems(
-                                final MyMenu submenu,
-                                final List<UpdatableItem> registeredMenuItem) {
+    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
         final boolean testOnly = false;
         final ServiceInfo thisClass = this;
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -4464,7 +4447,6 @@ public class ServiceInfo extends EditableInfo {
             };
             addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
             submenu.add(migrateFromMenuItem);
-            registeredMenuItem.add((UpdatableItem) migrateFromMenuItem);
         }
 
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -4532,20 +4514,17 @@ public class ServiceInfo extends EditableInfo {
             addMouseOverListener(forceMigrateMenuItem,
                                  forceMigrateItemCallback);
             submenu.add(forceMigrateMenuItem);
-            registeredMenuItem.add((UpdatableItem) forceMigrateMenuItem);
         }
     }
 
     /**
      * Adds expert submenu.
      */
-    public final void addExpertMenu(
-                                final MyMenu submenu,
-                                final List<UpdatableItem> registeredMenuItem) {
+    public final void addExpertMenu(final MyMenu submenu) {
         if (submenu.getItemCount() > 0) {
             return;
         }
-        addMoreMigrateMenuItems(submenu, registeredMenuItem);
+        addMoreMigrateMenuItems(submenu);
     }
 
 

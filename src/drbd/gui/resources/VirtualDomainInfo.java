@@ -124,9 +124,7 @@ class VirtualDomainInfo extends ServiceInfo {
     /**
      * Adds vnc viewer menu items.
      */
-    public final void addVncViewersToTheMenu(
-                                  final List<UpdatableItem> items,
-                                  final List<UpdatableItem> itemsToRegister) {
+    public final void addVncViewersToTheMenu(final List<UpdatableItem> items) {
         final boolean testOnly = false;
         if (Tools.getConfigData().isTightvnc()) {
             /* tight vnc test menu */
@@ -167,7 +165,6 @@ class VirtualDomainInfo extends ServiceInfo {
                     }
                 }
             };
-            itemsToRegister.add(tightvncViewerMenu);
             items.add(tightvncViewerMenu);
         }
 
@@ -210,7 +207,6 @@ class VirtualDomainInfo extends ServiceInfo {
                     }
                 }
             };
-            itemsToRegister.add(ultravncViewerMenu);
             items.add(ultravncViewerMenu);
         }
 
@@ -253,7 +249,6 @@ class VirtualDomainInfo extends ServiceInfo {
                     }
                 }
             };
-            itemsToRegister.add(realvncViewerMenu);
             items.add(realvncViewerMenu);
         }
     }
@@ -280,10 +275,9 @@ class VirtualDomainInfo extends ServiceInfo {
      * Returns list of items for service popup menu with actions that can
      * be executed on the pacemaker services.
      */
-    public List<UpdatableItem> createPopup(
-                                  final List<UpdatableItem> itemsToRegister) {
-        final List<UpdatableItem> items = super.createPopup(itemsToRegister);
-        addVncViewersToTheMenu(items, itemsToRegister);
+    public List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = super.createPopup();
+        addVncViewersToTheMenu(items);
         return items;
     }
 

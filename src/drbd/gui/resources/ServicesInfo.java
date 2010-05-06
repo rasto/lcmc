@@ -959,8 +959,7 @@ public class ServicesInfo extends EditableInfo {
      * Returns background popup. Click on background represents cluster as
      * whole.
      */
-    public final List<UpdatableItem> createPopup(
-                              final List<UpdatableItem> registeredMenuItem) {
+    public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
         /* add group */
@@ -996,7 +995,6 @@ public class ServicesInfo extends EditableInfo {
                 }
             };
         items.add((UpdatableItem) addGroupMenuItem);
-        registeredMenuItem.add((UpdatableItem) addGroupMenuItem);
 
         /* add service */
         final MyMenu addServiceMenuItem = new MyMenu(
@@ -1180,7 +1178,6 @@ public class ServicesInfo extends EditableInfo {
             }
         };
         items.add((UpdatableItem) addServiceMenuItem);
-        registeredMenuItem.add((UpdatableItem) addServiceMenuItem);
         /* remove all services. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),
@@ -1221,7 +1218,6 @@ public class ServicesInfo extends EditableInfo {
             }
         };
         items.add((UpdatableItem) removeMenuItem);
-        registeredMenuItem.add((UpdatableItem) removeMenuItem);
 
 
         /* view logs */
@@ -1243,7 +1239,6 @@ public class ServicesInfo extends EditableInfo {
                 }
             };
         items.add((UpdatableItem) viewLogsItem);
-        registeredMenuItem.add((UpdatableItem) viewLogsItem);
         return items;
     }
 

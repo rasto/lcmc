@@ -545,8 +545,7 @@ public class AllHostsInfo extends Info {
     /**
      * Creates the popup for all hosts.
      */
-    public final List<UpdatableItem> createPopup(
-                                final List<UpdatableItem> itemsToRegister) {
+    public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
@@ -568,7 +567,6 @@ public class AllHostsInfo extends Info {
                 }
             };
         items.add(newHostWizardItem);
-        itemsToRegister.add(newHostWizardItem);
         Tools.getGUIData().registerAddHostButton(newHostWizardItem);
         return items;
     }

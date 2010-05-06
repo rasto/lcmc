@@ -49,7 +49,7 @@ public class DistResource_suse_SLES11 extends
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "clusterlabs repo: 1.2.x/1.0.x" },
+         "clusterlabs repo: 1.0.x/1.2.x" },
         {"PmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://www.clusterlabs.org/rpm/opensuse-11.1/clusterlabs.repo && "

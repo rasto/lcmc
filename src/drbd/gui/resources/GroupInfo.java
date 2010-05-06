@@ -377,9 +377,8 @@ public class GroupInfo extends ServiceInfo {
     /**
      * Returns items for the group popup.
      */
-    public final List<UpdatableItem> createPopup(
-                            final List<UpdatableItem> registeredMenuItem) {
-        final List<UpdatableItem> items = super.createPopup(registeredMenuItem);
+    public final List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = super.createPopup();
         final boolean testOnly = false;
         /* add group service */
         final MyMenu addGroupServiceMenuItem = new MyMenu(
@@ -446,7 +445,6 @@ public class GroupInfo extends ServiceInfo {
             }
         };
         items.add(0, (UpdatableItem) addGroupServiceMenuItem);
-        registeredMenuItem.add((UpdatableItem) addGroupServiceMenuItem);
 
         /* group services */
         final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -469,24 +467,14 @@ public class GroupInfo extends ServiceInfo {
 
                     public void update() {
                         super.update();
-                        //SwingUtilities.invokeLater(new Runnable() {
-                        //    public void run() {
-                                removeAll();
-                        //    }
-                        //});
-                        for (final UpdatableItem u : gsi.createPopup(
-                                                        registeredMenuItem)) {
-                            //SwingUtilities.invokeLater(new Runnable() {
-                            //    public void run() {
-                                    add((JMenuItem) u);
-                                    u.update();
-                            //    }
-                            //});
+                        removeAll();
+                        for (final UpdatableItem u : gsi.createPopup()) {
+                            add((JMenuItem) u);
+                            u.update();
                         }
                     }
                 };
                 items.add((UpdatableItem) groupServicesMenu);
-                registeredMenuItem.add((UpdatableItem) groupServicesMenu);
             }
         }
         return items;

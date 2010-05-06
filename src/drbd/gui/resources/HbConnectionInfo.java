@@ -480,8 +480,7 @@ public class HbConnectionInfo extends EditableInfo {
      * Creates popup menu for heartbeat order and colocation dependencies.
      * These are the edges in the graph.
      */
-    public final List<UpdatableItem> createPopup(
-                              final List<UpdatableItem> registeredMenuItem) {
+    public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         final HbConnectionInfo thisClass = this;
@@ -521,7 +520,6 @@ public class HbConnectionInfo extends EditableInfo {
             }
         };
         addMouseOverListener(removeEdgeItem, removeEdgeCallback);
-        registeredMenuItem.add(removeEdgeItem);
         items.add(removeEdgeItem);
 
         /* remove/add order */
@@ -593,7 +591,6 @@ public class HbConnectionInfo extends EditableInfo {
             }
         };
         addMouseOverListener(removeOrderItem, removeOrderCallback);
-        registeredMenuItem.add(removeOrderItem);
         items.add(removeOrderItem);
 
         /* remove/add colocation */
@@ -672,7 +669,6 @@ public class HbConnectionInfo extends EditableInfo {
             }
         };
         addMouseOverListener(removeColocationItem, removeColocationCallback);
-        registeredMenuItem.add(removeColocationItem);
         items.add(removeColocationItem);
         return items;
     }

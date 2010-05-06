@@ -1116,8 +1116,7 @@ public class DrbdResourceInfo extends EditableInfo
     /**
      * Returns the list of items for the popup menu for drbd resource.
      */
-    public final List<UpdatableItem> createPopup(
-                              final List<UpdatableItem> registeredMenuItem) {
+    public final List<UpdatableItem> createPopup() {
         final boolean testOnly = false;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final DrbdResourceInfo thisClass = this;
@@ -1186,7 +1185,6 @@ public class DrbdResourceInfo extends EditableInfo
             }
         };
         addMouseOverListener(connectMenu, connectItemCallback);
-        registeredMenuItem.add(connectMenu);
         items.add(connectMenu);
 
         final MyMenuItem resumeSync = new MyMenuItem(
@@ -1227,7 +1225,6 @@ public class DrbdResourceInfo extends EditableInfo
                 }
             }
         };
-        registeredMenuItem.add(resumeSync);
         items.add(resumeSync);
 
         /* resolve split-brain */
@@ -1249,7 +1246,6 @@ public class DrbdResourceInfo extends EditableInfo
                 resolveSplitBrain();
             }
         };
-        registeredMenuItem.add(splitBrainMenu);
         items.add(splitBrainMenu);
 
         /* start online verification */
@@ -1272,7 +1268,6 @@ public class DrbdResourceInfo extends EditableInfo
                 verify(testOnly);
             }
         };
-        registeredMenuItem.add(verifyMenu);
         items.add(verifyMenu);
         /* remove resource */
         final MyMenuItem removeResMenu = new MyMenuItem(
@@ -1294,7 +1289,6 @@ public class DrbdResourceInfo extends EditableInfo
                 return !isUsedByCRM();
             }
         };
-        registeredMenuItem.add(removeResMenu);
         items.add(removeResMenu);
 
         /* view log */
@@ -1322,7 +1316,6 @@ public class DrbdResourceInfo extends EditableInfo
                 l.showDialog();
             }
         };
-        registeredMenuItem.add(viewLogMenu);
         items.add(viewLogMenu);
         return items;
     }
