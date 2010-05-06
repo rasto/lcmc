@@ -736,7 +736,7 @@ public class Info implements Comparable {
             mMenuListLock.release();
             if (size > maxMenuList) {
                 maxMenuList = size;
-                Tools.debug(this, "menu list size: " + maxMenuList, 0);
+                Tools.debug(this, "menu list size: " + maxMenuList, 2);
             }
         }
 
@@ -754,7 +754,7 @@ public class Info implements Comparable {
             mActionMenuListLock.release();
             if (aSize > maxMenuList) {
                 maxMenuList = aSize;
-                Tools.debug(this, "action menu list size: " + maxMenuList, 0);
+                Tools.debug(this, "action menu list size: " + maxMenuList, 2);
             }
         }
     }

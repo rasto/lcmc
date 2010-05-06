@@ -2298,4 +2298,14 @@ public class Host implements Serializable {
     public final int getIndex() {
         return index;
     }
+
+    /** This is part of testsuite, it checks cib. */
+    public final boolean checkTest(final int index) {
+        final String command = replaceVars("@GUI-HELPER@ gui-test "
+                                           + index + " 2>&1");
+        final SSH.SSHOutput out =
+                getSSH().execCommandAndWait(command, false, false, 60000);
+        Tools.info("test " + index + " " + out.getOutput());
+        return out.getExitCode() == 0;
+    }
 }

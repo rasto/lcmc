@@ -109,8 +109,8 @@ if ($option eq "all") {
 	get_cluster_metadata();
 } elsif ($option eq "get-cluster-versions") {
 	print get_cluster_versions();
-} elsif ($option eq "get-vm-info") {
-	get_vm_info();
+} elsif ($option eq "gui-test") {
+	gui_test(shift);
 } else {
 	die "unknown command";
 }
@@ -1319,4 +1319,35 @@ sub get_vm_info {
 	print "<vms md5=\"$md5\">\n";
 	print $out;
 	print "</vms>\n";
+}
+
+sub gui_test {
+	my $index = shift;
+	my $cib = `TERM=dumb /usr/sbin/crm configure show|sed 1,2d`;
+	$cib =~ s/^\s+//;
+	$cib =~ s/\s+$//;
+	my $ret = $?;
+	if ($ret != 0) {
+		exit $ret;
+	}
+	if (!open TEST, "/drbd-mc-test/test$index.xml") {
+		print "$!";
+		exit 2;
+	}
+	my $test = "";
+	{
+		local $/;
+		$test = <TEST>;
+	}
+	close TEST;
+	$test =~ s/^\s+//;
+	$test =~ s/\s+$//;
+	if ($cib eq $test) {
+		print "ok";
+		return 0;
+	}
+	my $diff = `TERM=dumb /usr/sbin/crm configure show|sed 1,2d>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error /drbd-mc-test/test$index.xml`;
+	print "error\n";
+	print $diff;
+	exit 1;
 }

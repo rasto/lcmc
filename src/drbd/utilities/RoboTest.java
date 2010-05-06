@@ -21,6 +21,7 @@
 
 package drbd.utilities;
 
+import drbd.data.Host;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -53,6 +54,9 @@ public final class RoboTest {
 
     /** Abort if mouse moved. */
     private static boolean abortWithMouseMovement() {
+        if (MouseInfo.getPointerInfo() == null) {
+            return false;
+        }
         final Point2D p = MouseInfo.getPointerInfo().getLocation();
         if (prevP != null
             && (Math.abs(p.getX() - prevP.getX()) > 200
@@ -246,7 +250,7 @@ public final class RoboTest {
     }
 
     /** Automatic tests. */
-    public static void startTest(final int index) {
+    public static void startTest(final int index, final Host host) {
         Tools.info("start test " + index + " in 3 seconds");
         final Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -261,9 +265,9 @@ public final class RoboTest {
                     return;
                 }
                 if (index == 1) {
-                    startTest1(robot);
+                    startTest1(robot, host);
                 } else if (index == 2) {
-                    startTest2(robot);
+                    startTest2(robot, host);
                 }
                 Tools.info("test " + index + " done");
             }
@@ -272,10 +276,13 @@ public final class RoboTest {
     }
 
     /** TEST 1. */
-    private static void startTest1(final Robot robot) {
+    private static void startTest1(final Robot robot, final Host host) {
+        if (!host.checkTest(1)) {
+            return;
+        }
         /* create IPaddr2 with 192.168.100.100 ip */
         final int ipX = 235;
-        final int ipY = 250;
+        final int ipY = 255;
         aborted = false;
         moveTo(robot, ipX, ipY);
         rightClick(robot); /* popup */
@@ -296,50 +303,48 @@ public final class RoboTest {
         leftClick(robot); /* apply */
         
         /* group with two dummy resources */
-//        final int gx = 275;
-        final int gx = 300;
+        final int gx = 230;
         final int gy = 374;
         moveTo(robot, gx, gy);
         rightClick(robot); /* popup */
         moveTo(robot, gx + 46, gy + 11);
         leftClick(robot); /* choose group */
-        Tools.sleep(2000);
+        Tools.sleep(5000);
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 520, gy + 22);
-        moveTo(robot, gx + 534, gy + 352); /* y value can vary */
+        moveTo(robot, gx + 540, gy + 22);
+//        moveTo(robot, gx + 544, gy + 352); /* y value can vary */
+        moveTo(robot, gx + 544, gy + 372); /* y value can vary */
         leftClick(robot); /* choose dummy */
         moveTo(robot, 809, 192); /* ptest */
         leftClick(robot); /*  apply */
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 5; i++) {
             /* another group resource */
             Tools.sleep(3000);
             moveTo(robot, gx + 46, gy + 11); 
             rightClick(robot); /* group popup */
-            Tools.sleep(2000);
+            Tools.sleep(2000 + i * 500);
             moveTo(robot, gx + 80, gy + 20);
             moveTo(robot, gx + 84, gy + 22);
-            moveTo(robot, gx + 520, gy + 22);
-            moveTo(robot, gx + 529, gy + 352); /* y value can vary */
+            moveTo(robot, gx + 540, gy + 22);
+            //moveTo(robot, gx + 549, gy + 352); /* y value can vary */
+            moveTo(robot, gx + 549, gy + 372); /* y value can vary */
             leftClick(robot); /* choose dummy */
+            Tools.sleep(i * 300);
             moveTo(robot, 809, 192); /* ptest */
             leftClick(robot); /* apply */
             Tools.sleep(1000);
         }
         /* constraints */
-        moveTo(robot, gx + 20, gy);
-        rightClick(robot); /* popup */
-        Tools.sleep(1000);
-        moveTo(robot, gx + 82, gy + 65);
-        moveTo(robot, gx + 305, gy + 72);
-        Tools.sleep(3000); /*  ptest */
-        leftClick(robot); /* start before */
-
+        final int popX = 343;
+        final int popY = 300;
+        addConstraint(robot, gx, gy, 9);
         Tools.sleep(5000);
-        /* constraints */
-        final int popX = 353;
-        final int popY = 280;
+        removeConstraint(robot, popX, popY);
+        Tools.sleep(5000);
+        addConstraint(robot, gx, gy, 9);
+        Tools.sleep(5000);
 
         removeOrder(robot, popX, popY);
         Tools.sleep(3000);
@@ -349,6 +354,33 @@ public final class RoboTest {
         Tools.sleep(3000);
         addColocation(robot, popX, popY);
         aborted = false;
+        if (!host.checkTest(10)) {
+            return;
+        }
+    }
+
+    /** Adds constraint from vertex. */
+    private static void addConstraint(final Robot robot,
+                                      final int x,
+                                      final int y,
+                                      final int with) {
+        moveTo(robot, x + 20, y);
+        rightClick(robot); /* popup */
+        Tools.sleep(3000);
+        moveTo(robot, x + 82, y + 65);
+        moveTo(robot, x + 305, y + 65 + with);
+        Tools.sleep(3000); /*  ptest */
+        leftClick(robot); /* start before */
+    }
+    /** Removes constraint. */
+    private static void removeConstraint(final Robot robot,
+                                         final int popX,
+                                         final int popY) {
+        moveTo(robot, popX, popY);
+        rightClick(robot); /* constraint popup */
+        moveTo(robot, popX + 70, popY + 20);
+        Tools.sleep(3000); /* ptest */
+        leftClick(robot); /* remove ord */
     }
 
     /** Removes order. */
@@ -390,13 +422,13 @@ public final class RoboTest {
                                       final int popY) {
         moveTo(robot, popX, popY);
         rightClick(robot); /* constraint popup */
-        moveTo(robot, popX + 70, popY + 100);
+        moveTo(robot, popX + 70, popY + 90);
         Tools.sleep(3000); /* ptest */
         leftClick(robot); /* add col */
     }
 
     /** TEST 1. */
-    private static void startTest2(final Robot robot) {
+    private static void startTest2(final Robot robot, final Host host) {
         aborted = false;
         /* filesystem/drbd */
         moveTo(robot, 577, 253);
@@ -453,7 +485,6 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        Tools.info("start mouse move test in 10 seconds");
         prevP = null;
         int xOffset = getOffset();
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
