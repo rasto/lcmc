@@ -42,6 +42,8 @@ public final class RoboTest {
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Previous position of the mouse. */
     private static Point2D prevP = null;
+    /** Whether the test was aborted. */
+    private static volatile boolean aborted = false;
     /**
      * Private constructor, cannot be instantiated.
      */
@@ -53,10 +55,11 @@ public final class RoboTest {
     private static boolean abortWithMouseMovement() {
         final Point2D p = MouseInfo.getPointerInfo().getLocation();
         if (prevP != null
-            && (Math.abs(p.getX() - prevP.getX()) > 50
-                || Math.abs(p.getY() - prevP.getY()) > 50)) {
+            && (Math.abs(p.getX() - prevP.getX()) > 200
+                || Math.abs(p.getY() - prevP.getY()) > 200)) {
             prevP = null;
             Tools.info("test aborted");
+            aborted = true;
             return true;
         }
         prevP = p;
@@ -155,14 +158,12 @@ public final class RoboTest {
                     return;
                 }
                 int xOffset = getOffset();
-                final Point2D origP =
-                            MouseInfo.getPointerInfo().getLocation();
+                final Point2D origP = MouseInfo.getPointerInfo().getLocation();
                 final int origX = (int) origP.getX();
                 final int origY = (int) origP.getY();
                 Tools.info("move mouse to the end position");
                 Tools.sleep(5000);
-                final Point2D endP =
-                            MouseInfo.getPointerInfo().getLocation();
+                final Point2D endP = MouseInfo.getPointerInfo().getLocation();
                 final int endX = (int) endP.getX();
                 final int endY = (int) endP.getY();
                 int destX = origX;
@@ -242,5 +243,288 @@ public final class RoboTest {
             }
         }
         return xOffset;
+    }
+
+    /** Automatic tests. */
+    public static void startTest(final int index) {
+        Tools.info("start test " + index + " in 3 seconds");
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Tools.sleep(3000);
+                Robot robot = null;
+                try {
+                    robot = new Robot(SCREEN_DEVICE);
+                } catch (final java.awt.AWTException e) {
+                    Tools.appWarning("Robot error");
+                }
+                if (robot == null) {
+                    return;
+                }
+                if (index == 1) {
+                    startTest1(robot);
+                } else if (index == 2) {
+                    startTest2(robot);
+                }
+                Tools.info("test " + index + " done");
+            }
+        });
+        thread.start();
+    }
+
+    /** TEST 1. */
+    private static void startTest1(final Robot robot) {
+        /* create IPaddr2 with 192.168.100.100 ip */
+        final int ipX = 235;
+        final int ipY = 250;
+        aborted = false;
+        moveTo(robot, ipX, ipY);
+        rightClick(robot); /* popup */
+        moveTo(robot, ipX + 57, ipY + 28);
+        moveTo(robot, ipX + 270, ipY + 28);
+        moveTo(robot, ipX + 267, ipY + 67);
+        leftClick(robot); /* choose ipaddr */
+        moveTo(robot, 1072, 405);
+        leftClick(robot); /* pull down */
+        moveTo(robot, 1044, 442);
+        leftClick(robot); /* choose */
+        Tools.sleep(1000);
+        press(robot, KeyEvent.VK_1);
+        press(robot, KeyEvent.VK_0);
+        press(robot, KeyEvent.VK_0);
+        moveTo(robot, 814, 189);
+        Tools.sleep(3000); /* ptest */
+        leftClick(robot); /* apply */
+        
+        /* group with two dummy resources */
+//        final int gx = 275;
+        final int gx = 300;
+        final int gy = 374;
+        moveTo(robot, gx, gy);
+        rightClick(robot); /* popup */
+        moveTo(robot, gx + 46, gy + 11);
+        leftClick(robot); /* choose group */
+        Tools.sleep(2000);
+        rightClick(robot); /* group popup */
+        moveTo(robot, gx + 80, gy + 20);
+        moveTo(robot, gx + 84, gy + 22);
+        moveTo(robot, gx + 520, gy + 22);
+        moveTo(robot, gx + 534, gy + 352); /* y value can vary */
+        leftClick(robot); /* choose dummy */
+        moveTo(robot, 809, 192); /* ptest */
+        leftClick(robot); /*  apply */
+        for (int i = 0; i < 1; i++) {
+            /* another group resource */
+            Tools.sleep(3000);
+            moveTo(robot, gx + 46, gy + 11); 
+            rightClick(robot); /* group popup */
+            Tools.sleep(2000);
+            moveTo(robot, gx + 80, gy + 20);
+            moveTo(robot, gx + 84, gy + 22);
+            moveTo(robot, gx + 520, gy + 22);
+            moveTo(robot, gx + 529, gy + 352); /* y value can vary */
+            leftClick(robot); /* choose dummy */
+            moveTo(robot, 809, 192); /* ptest */
+            leftClick(robot); /* apply */
+            Tools.sleep(1000);
+        }
+        /* constraints */
+        moveTo(robot, gx + 20, gy);
+        rightClick(robot); /* popup */
+        Tools.sleep(1000);
+        moveTo(robot, gx + 82, gy + 65);
+        moveTo(robot, gx + 305, gy + 72);
+        Tools.sleep(3000); /*  ptest */
+        leftClick(robot); /* start before */
+
+        Tools.sleep(5000);
+        /* constraints */
+        final int popX = 353;
+        final int popY = 280;
+
+        removeOrder(robot, popX, popY);
+        Tools.sleep(3000);
+        addOrder(robot, popX, popY);
+        Tools.sleep(3000);
+        removeColocation(robot, popX, popY);
+        Tools.sleep(3000);
+        addColocation(robot, popX, popY);
+        aborted = false;
+    }
+
+    /** Removes order. */
+    private static void removeOrder(final Robot robot,
+                                    final int popX,
+                                    final int popY) {
+        moveTo(robot, popX, popY);
+        rightClick(robot); /* constraint popup */
+        moveTo(robot, popX + 70, popY + 50);
+        Tools.sleep(3000); /* ptest */
+        leftClick(robot); /* remove ord */
+    }
+
+    /** Adds order. */
+    private static void addOrder(final Robot robot,
+                                 final int popX,
+                                 final int popY) {
+        moveTo(robot, popX, popY);
+        rightClick(robot); /* constraint popup */
+        moveTo(robot, popX + 70, popY + 50);
+        Tools.sleep(3000); /* ptest */
+        leftClick(robot); /* add ord */
+    }
+
+    /** Removes colocation. */
+    private static void removeColocation(final Robot robot,
+                                         final int popX,
+                                         final int popY) {
+        moveTo(robot, popX, popY);
+        rightClick(robot); /* constraint popup */
+        moveTo(robot, popX + 70, popY + 100);
+        Tools.sleep(3000); /* ptest */
+        leftClick(robot); /* remove col */
+    }
+
+    /** Adds colocation. */
+    private static void addColocation(final Robot robot,
+                                      final int popX,
+                                      final int popY) {
+        moveTo(robot, popX, popY);
+        rightClick(robot); /* constraint popup */
+        moveTo(robot, popX + 70, popY + 100);
+        Tools.sleep(3000); /* ptest */
+        leftClick(robot); /* add col */
+    }
+
+    /** TEST 1. */
+    private static void startTest2(final Robot robot) {
+        aborted = false;
+        /* filesystem/drbd */
+        moveTo(robot, 577, 253);
+        rightClick(robot); /* popup */
+        moveTo(robot, 609, 278);
+        moveTo(robot, 794, 283);
+        leftClick(robot); /* choose fs */
+        moveTo(robot, 1075, 406);
+        leftClick(robot); /* choose drbd */
+        moveTo(robot, 1043, 444);
+        leftClick(robot); /* choose drbd */
+        moveTo(robot, 1068, 439);
+        leftClick(robot); /* mount point */
+        moveTo(robot, 1039, 475);
+        leftClick(robot); /* mount point */
+        moveTo(robot, 815, 186);
+        leftClick(robot); /* apply */
+        Tools.sleep(2000);
+        aborted = false;
+    }
+
+    /** Press button. */
+    private static void press(final Robot robot, final int ke)  {
+        if (aborted) {
+            return;
+        }
+        robot.keyPress(ke);
+        Tools.sleep(10);
+        robot.keyRelease(ke);
+        Tools.sleep(10);
+    }
+
+    /** Left click. */
+    private static void leftClick(final Robot robot)  {
+        if (aborted) {
+            return;
+        }
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+        Tools.sleep(100);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+    }
+    /** Right click. */
+    private static void rightClick(final Robot robot)  {
+        if (aborted) {
+            return;
+        }
+        robot.mousePress(InputEvent.BUTTON3_MASK);
+        Tools.sleep(10);
+        robot.mouseRelease(InputEvent.BUTTON3_MASK);
+    }
+
+    /** Move to position. */
+    private static void moveTo(final Robot robot, int toX, int toY) {
+        if (aborted) {
+            return;
+        }
+        Tools.info("start mouse move test in 10 seconds");
+        prevP = null;
+        int xOffset = getOffset();
+        final Point2D origP = MouseInfo.getPointerInfo().getLocation();
+        final int origX = (int) origP.getX();
+        final int origY = (int) origP.getY();
+        final Point2D endP =
+                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+        final int endX = (int) endP.getX() + toX;
+        final int endY = (int) endP.getY() + toY;
+        int destX = endX;
+        int destY = endY;
+        while (true) {
+            final Point2D p = MouseInfo.getPointerInfo().getLocation();
+
+            final int x = (int) p.getX();
+            final int y = (int) p.getY();
+            int directionX = 0;
+            int directionY = 0;
+            if (x < destX) {
+                directionX = 1;
+            } else if (x > destX) {
+                directionX = -1;
+            }
+            if (y < destY) {
+                directionY = 1;
+            } else if (y > destY) {
+                directionY = -1;
+            }
+            if (directionY == 0 && directionX == 0) {
+                break;
+            }
+            robot.mouseMove((int) p.getX() + xOffset + directionX,
+                            (int) p.getY() + directionY);
+            Tools.sleep(5);
+            if (abortWithMouseMovement()) {
+                break;
+            }
+        }
+    }
+
+    /** Register movement. */
+    public static void registerMovement() {
+        Tools.info("start register movement in 3 seconds");
+        Tools.sleep(3000);
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Point2D prevP = new Point2D.Double(0, 0);
+                Point2D prevPrevP = new Point2D.Double(0, 0);
+                while (true) {
+                    final Point2D loc =
+                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+                    final Point2D pos = MouseInfo.getPointerInfo().getLocation();
+                    final Point2D newPos = new Point2D.Double(
+                                                       pos.getX() - loc.getX(),
+                                                       pos.getY() - loc.getY());
+                    Tools.sleep(200);
+                    if (newPos.equals(prevP) && !prevPrevP.equals(prevP)) {
+                        Tools.info("moveTo(robot, "
+                                    + (int) newPos.getX()
+                                    + ", "
+                                    + (int) newPos.getY() + ");");
+                    }
+                    prevPrevP = prevP;
+                    prevP = newPos;
+                    if (abortWithMouseMovement()) {
+                        break;
+                    }
+                }
+                Tools.info("stopped movement registering");
+            }
+        });
+        thread.start();
     }
 }
