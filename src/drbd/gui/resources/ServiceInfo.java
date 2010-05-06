@@ -819,6 +819,13 @@ public class ServiceInfo extends EditableInfo {
     public List<Host> getMigratedTo(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (Host host : getBrowser().getClusterHosts()) {
+            final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
+                                                 host.getName());
+            if (locationId == null
+                || (!locationId.startsWith("cli-prefer-")
+                    && !locationId.startsWith("cli-standby-"))) {
+                continue;
+            }
             final HostInfo hi = host.getBrowser().getHostInfo();
             final HostLocation hostLocation = cs.getScore(
                                                       getHeartbeatId(testOnly),
@@ -846,6 +853,13 @@ public class ServiceInfo extends EditableInfo {
     public List<Host> getMigratedFrom(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (Host host : getBrowser().getClusterHosts()) {
+            final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
+                                                       host.getName());
+            if (locationId == null
+                || (!locationId.startsWith("cli-prefer-")
+                    && !locationId.startsWith("cli-standby-"))) {
+                continue;
+            }
             final HostInfo hi = host.getBrowser().getHostInfo();
             final HostLocation hostLocation = cs.getScore(
                                                       getHeartbeatId(testOnly),
