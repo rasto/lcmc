@@ -756,38 +756,6 @@ public class GroupInfo extends ServiceInfo {
     }
 
     /**
-     * Returns to which hosts the services or the whole group is migrated.
-     */
-    public final List<Host> getMigratedTo(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        List<Host> hosts = super.getMigratedTo(testOnly);
-        if (resources == null) {
-            return null;
-        } else {
-            if (resources.isEmpty()) {
-                return null;
-            }
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null) {
-                    final List<Host> siHosts = si.getMigratedTo(testOnly);
-                    if (siHosts != null) {
-                        if (hosts == null) {
-                            hosts = new ArrayList<Host>();
-                        }
-                        hosts.addAll(siHosts);
-                    }
-                }
-            }
-        }
-        return hosts;
-    }
-
-    /**
      * Returns from which hosts the services or the whole group was migrated.
      */
     public final List<Host> getMigratedFrom(final boolean testOnly) {
