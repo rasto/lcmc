@@ -131,9 +131,6 @@ public abstract class EditableInfo extends Info {
      * Inits apply button.
      */
     public final void initApplyButton(final ButtonCallback buttonCallback) {
-        if (applyButton != null) {
-            Tools.appWarning("wrong call to initApplyButton: " + getName());
-        }
         if (oldApplyButton == null) {
             applyButton = new MyButton(
                     Tools.getString("Browser.ApplyResource"),

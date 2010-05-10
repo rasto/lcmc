@@ -1451,23 +1451,25 @@ public abstract class ResourceGraph {
                 /* move it, so that left side has the same position, if it is
                  * resized */
                 final Point2D pos = getVertexLocations().getLocation(v);
-                double x = pos.getX();
-                double y = pos.getY();
-                if (widthChanged) {
-                    setVertexWidth(v, shapeWidth);
-                    x = x - (oldShapeWidth - shapeWidth) / 2;
-                }
-                if (heightChanged) {
-                    setVertexHeight(v, shapeHeight);
-                    y = y - (oldShapeHeight - shapeHeight) / 2;
-                }
-                pos.setLocation(x, y);
-                getVertexLocations().setLocation(v, pos);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        scale();
+                if (pos != null) {
+                    double x = pos.getX();
+                    double y = pos.getY();
+                    if (widthChanged) {
+                        setVertexWidth(v, shapeWidth);
+                        x = x - (oldShapeWidth - shapeWidth) / 2;
                     }
-                });
+                    if (heightChanged) {
+                        setVertexHeight(v, shapeHeight);
+                        y = y - (oldShapeHeight - shapeHeight) / 2;
+                    }
+                    pos.setLocation(x, y);
+                    getVertexLocations().setLocation(v, pos);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            scale();
+                        }
+                    });
+                }
             }
             /* shape */
             super.paintShapeForVertex(g2d, v, shape);

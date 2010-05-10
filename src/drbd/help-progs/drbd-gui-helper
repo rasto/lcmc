@@ -312,9 +312,12 @@ sub get_device_mapper_hash {
         my $dir = "/dev/mapper";
         if (opendir(DIR, $dir)) {
                 for (grep { $_ !~ /^\./ && -b "$dir/$_" } readdir(DIR)) {
-                        my $out = `/sbin/dmsetup info $dir/$_`;
-                        my ($major, $minor) = $out =~ /^Major.*?(\d+)\D+(\d+)/m;
-                        $major_minor_hash{"$major:$minor"} = "$dir/$_";
+                        my $out = `/sbin/dmsetup info $dir/$_ 2>&1`;
+			if ($out) {
+                        	my ($major, $minor) =
+				   	$out =~ /^Major.*?(\d+)\D+(\d+)/m;
+                        	$major_minor_hash{"$major:$minor"} = "$dir/$_";
+			}
 
                 }
                 closedir DIR;
@@ -1323,7 +1326,7 @@ sub get_vm_info {
 
 sub gui_test {
 	my $index = shift;
-	my $cib = `TERM=dumb /usr/sbin/crm configure show|sed 1,2d`;
+	my $cib = `TERM=dumb /usr/sbin/crm configure show|sed 1,2d|grep -v 'expected-quorum-votes="2"'`;
 	$cib =~ s/^\s+//;
 	$cib =~ s/\s+$//;
 	my $ret = $?;
