@@ -2300,12 +2300,13 @@ public class Host implements Serializable {
     }
 
     /** This is part of testsuite, it checks cib. */
-    public final boolean checkTest(final int index) {
+    public final boolean checkTest(final String test, final int index) {
         final String command = replaceVars("@GUI-HELPER@ gui-test "
+                                           + test + " "
                                            + index + " 2>&1");
         final SSH.SSHOutput out =
                 getSSH().execCommandAndWait(command, false, false, 60000);
-        Tools.info("test " + index + " " + out.getOutput());
+        Tools.info(test + " " + index + " " + out.getOutput());
         return out.getExitCode() == 0;
     }
 }

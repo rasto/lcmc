@@ -27,6 +27,12 @@
 		<copy todir="${classes.dir}/help-progs">
 			<fileset dir="${src.dir}/drbd/help-progs"/>
 		</copy>
+		<tar tarfile="${src.dir}/drbd/drbd-mc-test.tar"
+		     basedir="${src.dir}/drbd/"
+		     includes="drbd-mc-test/**"/>
+		<move tofile="${classes.dir}/drbd-mc-test.tar"
+			file="${src.dir}/drbd/drbd-mc-test.tar"
+			overwrite="yes"/>
 		
 		<copy tofile="${classes.dir}/drbd/release.properties"
 		      file="release"

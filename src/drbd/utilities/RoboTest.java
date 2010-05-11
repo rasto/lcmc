@@ -279,7 +279,8 @@ public final class RoboTest {
 
     /** TEST 1. */
     private static void startTest1(final Robot robot, final Host host) {
-        host.checkTest(1);
+        host.getSSH().installTestFiles(1);
+        host.checkTest("test1", 1);
         /* create IPaddr2 with 192.168.100.100 ip */
         final int ipX = 235;
         final int ipY = 255;
@@ -313,6 +314,7 @@ public final class RoboTest {
         Tools.sleep(1000 * slowFactor);
         leftClick(robot); /* choose group */
         Tools.sleep(3000 * slowFactor);
+        host.checkTest("test1", 2);
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
@@ -339,26 +341,33 @@ public final class RoboTest {
             leftClick(robot); /* apply */
             Tools.sleep(1000 * slowFactor);
         }
+        host.checkTest("test1", 3);
         /* constraints */
         final int popX = 343;
         final int popY = 300;
         Tools.sleep(4000 * slowFactor);
         addConstraint(robot, gx, gy, 9);
         Tools.sleep(4000 * slowFactor);
+        host.checkTest("test1", 4);
         removeConstraint(robot, popX, popY);
         Tools.sleep(4000 * slowFactor);
+        host.checkTest("test1", 5);
         addConstraint(robot, gx, gy, 9);
         Tools.sleep(4000 * slowFactor);
+        host.checkTest("test1", 6);
 
         removeOrder(robot, popX, popY);
         Tools.sleep(4000 * slowFactor);
+        host.checkTest("test1", 7);
         addOrder(robot, popX, popY);
         Tools.sleep(4000 * slowFactor);
+        host.checkTest("test1", 8);
         removeColocation(robot, popX, popY);
         Tools.sleep(4000 * slowFactor);
+        host.checkTest("test1", 9);
         addColocation(robot, popX, popY);
         Tools.sleep(4000 * slowFactor);
-        host.checkTest(10);
+        host.checkTest("test1", 10);
         aborted = false;
     }
 

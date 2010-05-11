@@ -110,7 +110,7 @@ if ($option eq "all") {
 } elsif ($option eq "get-cluster-versions") {
 	print get_cluster_versions();
 } elsif ($option eq "gui-test") {
-	gui_test(shift);
+	gui_test(shift, shift);
 } else {
 	die "unknown command";
 }
@@ -1325,16 +1325,24 @@ sub get_vm_info {
 }
 
 sub gui_test {
+	my $testname = shift;
 	my $index = shift;
-	my $cib = `TERM=dumb /usr/sbin/crm configure show|sed 1,2d|grep -v 'expected-quorum-votes="2"'`;
+	my $crm_show = "TERM=dumb /usr/sbin/crm configure show|sed 1,2d"
+		       ."|grep -v 'expected-quorum-votes=\"2\"'"
+		       ."|grep -v 'last-lrm-refresh='";
+	my $cib = `$crm_show`;
+	$cib =~ s/\\$//mg;
 	$cib =~ s/^\s+//;
 	$cib =~ s/\s+$//;
 	my $ret = $?;
 	if ($ret != 0) {
 		exit $ret;
 	}
-	if (!open TEST, "/drbd-mc-test/test$index.xml") {
+	my $testfile = "/tmp/drbd-mc-test/$testname/test$index.crm";
+	if (!open TEST, $testfile) {
 		print "$!";
+		# .new can be used for new tests.
+		system("$crm_show>$testfile.new");
 		exit 2;
 	}
 	my $test = "";
@@ -1343,13 +1351,14 @@ sub gui_test {
 		$test = <TEST>;
 	}
 	close TEST;
+	$test =~ s/\\$//mg;
 	$test =~ s/^\s+//;
 	$test =~ s/\s+$//;
 	if ($cib eq $test) {
 		print "ok";
 		return 0;
 	}
-	my $diff = `TERM=dumb /usr/sbin/crm configure show|sed 1,2d>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error /drbd-mc-test/test$index.xml`;
+	my $diff = `$crm_show>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error $testfile`;
 	print "error\n";
 	print $diff;
 	exit 1;

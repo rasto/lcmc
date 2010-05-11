@@ -42,6 +42,8 @@ import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.KnownHosts;
 import ch.ethz.ssh2.LocalPortForwarder;
+import ch.ethz.ssh2.SCPClient;
+
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
@@ -1614,6 +1616,26 @@ public class SSH {
                     false);
             }
         }
+    }
+
+    /**
+     * Installs test suite on the remote host.
+     */
+    public final void installTestFiles(final int index) {
+        final String fileName = "drbd-mc-test.tar";
+        final SCPClient scpClient = new SCPClient(connection);
+        final String file = Tools.getFile("/" + fileName);
+        try {
+            scpClient.put(file.getBytes(), fileName, "/tmp");
+        } catch (IOException e) {
+            Tools.appError("could not copy: " + fileName, "", e);
+            return;
+        }
+        final SSHOutput ret = execCommandAndWait(
+                                       "tar xf /tmp/drbd-mc-test.tar -C /tmp/",
+                                       false,
+                                       false,
+                                       60);
     }
 
     /**
