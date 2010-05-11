@@ -37,6 +37,8 @@ import drbd.utilities.MyMenu;
 import java.util.Set;
 import java.util.List;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -233,9 +235,10 @@ public class CloneInfo extends ServiceInfo {
      */
     public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
         final List<Subtext> texts = new ArrayList<Subtext>();
-        final Set<String> notRunningOnNodes = new LinkedHashSet<String>();
+        final Map<String, String> notRunningOnNodes =
+                                        new LinkedHashMap<String, String>();
         for (final Host h : getBrowser().getClusterHosts()) {
-            notRunningOnNodes.add(h.getName());
+            notRunningOnNodes.put(h.getName().toLowerCase(), h.getName());
         }
         texts.add(new Subtext(toString(), null));
         final ServiceInfo cs = getContainedService();
@@ -273,7 +276,7 @@ public class CloneInfo extends ServiceInfo {
                 texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                       + getFailCountString(n, testOnly),
                                       colors.get(i)));
-                notRunningOnNodes.remove(n);
+                notRunningOnNodes.remove(n.toLowerCase());
                 i++;
             }
         }
@@ -293,7 +296,7 @@ public class CloneInfo extends ServiceInfo {
                     texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                           + getFailCountString(n, testOnly),
                                           colors.get(i)));
-                    notRunningOnNodes.remove(n);
+                    notRunningOnNodes.remove(n.toLowerCase());
                     i++;
                 }
             }
@@ -304,14 +307,16 @@ public class CloneInfo extends ServiceInfo {
                 texts.add(new Subtext("stopped", nColor));
             } else {
                 texts.add(new Subtext("not running on:", nColor));
-                for (final String n : notRunningOnNodes) {
+                for (final String n : notRunningOnNodes.keySet()) {
+                    final String hostName = notRunningOnNodes.get(n);
                     Color color = nColor;
-                    if (failedOnHost(n, testOnly)) {
+                    if (failedOnHost(hostName, testOnly)) {
                         color = null;
                     }
                     texts.add(new Subtext(ClusterBrowser.IDENT_4
-                                          + n
-                                          + getFailCountString(n, testOnly),
+                                          + hostName
+                                          + getFailCountString(hostName,
+                                                               testOnly),
                                           color));
                 }
             }

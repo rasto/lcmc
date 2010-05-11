@@ -1,44 +1,47 @@
-primitive res_Dummy_1 ocf:heartbeat:Dummy \
-	operations $id="res_Dummy_1-operations" \
-	op stop interval="0" timeout="20" \
-	op monitor interval="10" timeout="20" start-delay="0" \
+node host1
+node host2
+primitive res_Dummy_1 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_1-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
-primitive res_Dummy_2 ocf:heartbeat:Dummy \
-	operations $id="res_Dummy_2-operations" \
-	op stop interval="0" timeout="20" \
-	op monitor interval="10" timeout="20" start-delay="0" \
+primitive res_Dummy_2 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_2-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
-primitive res_Dummy_3 ocf:heartbeat:Dummy \
-	operations $id="res_Dummy_3-operations" \
-	op stop interval="0" timeout="20" \
-	op monitor interval="10" timeout="20" start-delay="0" \
+primitive res_Dummy_3 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_3-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
-primitive res_Dummy_4 ocf:heartbeat:Dummy \
-	operations $id="res_Dummy_4-operations" \
-	op stop interval="0" timeout="20" \
-	op monitor interval="10" timeout="20" start-delay="0" \
+primitive res_Dummy_4 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_4-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
-primitive res_Dummy_5 ocf:heartbeat:Dummy \
-	operations $id="res_Dummy_5-operations" \
-	op stop interval="0" timeout="20" \
-	op monitor interval="10" timeout="20" start-delay="0" \
+primitive res_Dummy_5 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_5-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
-primitive res_Dummy_6 ocf:heartbeat:Dummy \
-	operations $id="res_Dummy_6-operations" \
-	op stop interval="0" timeout="20" \
-	op monitor interval="10" timeout="20" start-delay="0" \
+primitive res_Dummy_6 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_6-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
-primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2 \
-	params ip="192.168.122.100" \
-	operations $id="res_IPaddr2_1-operations" \
-	op stop interval="0" timeout="20" \
-	op monitor interval="10" timeout="20" start-delay="0" \
+primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2 
+	params ip="192.168.122.100" 
+	operations $id="res_IPaddr2_1-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3 res_Dummy_4 res_Dummy_5 res_Dummy_6
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
-property $id="cib-bootstrap-options" \
-	dc-deadtime="60" \
-	cluster-delay="60" \
-	stonith-enabled="false" \
-	default-action-timeout="20" \
+order ord_grp_1_res_IPaddr2_1 inf: grp_1 res_IPaddr2_1
+property $id="cib-bootstrap-options" 
+	dc-deadtime="60" 
+	cluster-delay="60" 
+	stonith-enabled="false" 
+	default-action-timeout="20" 
 	stonith-timeout="60"

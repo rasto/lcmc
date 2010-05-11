@@ -2254,20 +2254,21 @@ public class CRMXML extends XML {
                 }
                 for (int j = 0; j < statusList.getLength(); j++) {
                     final Node setNode = statusList.item(j);
-                    if (TARGET_ROLE_STARTED.equals(setNode.getNodeName())) {
+                    if (TARGET_ROLE_STARTED.equalsIgnoreCase(
+                                                    setNode.getNodeName())) {
                         final String node = getText(setNode);
                         if (runningOnList == null) {
                             runningOnList = new ArrayList<String>();
                         }
                         runningOnList.add(node);
-                    } else if (TARGET_ROLE_MASTER.equals(
+                    } else if (TARGET_ROLE_MASTER.equalsIgnoreCase(
                                                       setNode.getNodeName())) {
                         final String node = getText(setNode);
                         if (masterOnList == null) {
                             masterOnList = new ArrayList<String>();
                         }
                         masterOnList.add(node);
-                    } else if (TARGET_ROLE_SLAVE.equals(
+                    } else if (TARGET_ROLE_SLAVE.equalsIgnoreCase(
                                                       setNode.getNodeName())) {
                         final String node = getText(setNode);
                         if (slaveOnList == null) {
@@ -2318,9 +2319,13 @@ public class CRMXML extends XML {
                         final Pattern p = Pattern.compile("(.*):(\\d+)$");
                         final Matcher m = p.matcher(resId);
                         if (m.matches()) {
-                            failedMap.put(uname, m.group(1), value);
+                            failedMap.put(uname.toLowerCase(),
+                                          m.group(1),
+                                          value);
                         } else {
-                            failedMap.put(uname, resId, value);
+                            failedMap.put(uname.toLowerCase(),
+                                          resId,
+                                          value);
                         }
                     }
                 }
@@ -2357,7 +2362,7 @@ public class CRMXML extends XML {
                 if (optionNode.getNodeName().equals("nvpair")) {
                     final String name = getAttribute(optionNode, "name");
                     final String value = getAttribute(optionNode, "value");
-                    nodeParametersMap.put(node, name, value);
+                    nodeParametersMap.put(node.toLowerCase(), name, value);
                 }
             }
         }
@@ -2823,9 +2828,9 @@ public class CRMXML extends XML {
                     if ("active".equals(ha)
                         && "member".equals(join)
                         && "true".equals(inCCM)) {
-                        nodeOnline.put(uname, "yes");
+                        nodeOnline.put(uname.toLowerCase(), "yes");
                     } else {
-                        nodeOnline.put(uname, "no");
+                        nodeOnline.put(uname.toLowerCase(), "no");
                     }
                     final NodeList nodeStates = nodeStateNode.getChildNodes();
                     for (int j = 0; j < nodeStates.getLength(); j++) {

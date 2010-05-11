@@ -423,17 +423,20 @@ public class ProgressIndicatorPanel extends JComponent
                         textPosX = (float) textPos.getX();
                         textPosY = (float) textPos.getY();
                     }
-                    layout.draw(g2,
-                                textPosX + x,
-                                textPosY + y);
                     if (textsRightMovement.contains(text)) {
-                        x = (int) (x + (((float) (10 + 15 * text.length())
-                                         / MAX_ALPHA_LEVEL)
-                                        * alpha));
+                        layout.draw(g2,
+                                    textPosX + x,
+                                    textPosY);
                     } else {
-                        y = (int) (y + (((float) 27 / MAX_ALPHA_LEVEL)
-                                        * alpha));
+                        layout.draw(g2,
+                                    textPosX,
+                                    textPosY + y);
                     }
+                    x = (int) (x + (((float) (10 + 15 * text.length())
+                                     / MAX_ALPHA_LEVEL)
+                                    * alpha));
+                    y = (int) (y + (((float) 27 / MAX_ALPHA_LEVEL)
+                                    * alpha));
                     if (bounds.getWidth() > barWidth) {
                         barWidth = bounds.getWidth() + 30;
                     }

@@ -36,7 +36,14 @@ primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
 	op start interval="0" timeout="20"
+primitive res_Stateful_1 ocf:heartbeat:Stateful 
+	operations $id="res_Stateful_1-operations" 
+	op stop interval="0" timeout="20" 
+	op monitor interval="10" timeout="20" start-delay="0" 
+	op start interval="0" timeout="20"
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3 res_Dummy_4 res_Dummy_5 res_Dummy_6
+ms ms_Stateful_1 res_Stateful_1 
+	meta clone-max="1" notify="true"
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
 order ord_grp_1_res_IPaddr2_1 inf: grp_1 res_IPaddr2_1
 property $id="cib-bootstrap-options" 

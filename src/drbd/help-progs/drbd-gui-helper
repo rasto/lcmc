@@ -110,7 +110,7 @@ if ($option eq "all") {
 } elsif ($option eq "get-cluster-versions") {
 	print get_cluster_versions();
 } elsif ($option eq "gui-test") {
-	gui_test(shift, shift);
+	gui_test(@ARGV);
 } else {
 	die "unknown command";
 }
@@ -750,7 +750,7 @@ sub get_resource_status {
 				} else {
 					if ($state =~ /\s/) {
 						($what, $on) =
-						  map {lc} split /\s+/, $state;
+						  	split /\s+/, $state;
 					} else {
 						$what = "started";
 						$on = $state;
@@ -782,7 +782,7 @@ sub get_resource_status {
 			 /Promote\s+(\S+)\s+\((\S+) -> \S+\s+(.*)\)/) {
 			# Promote from something, still that something
 			$res = $1;
-			$what = lc $2;
+			$what = $2;
 			$on = $3;
 			if ($res =~/(.*):\d+$/) {
 				$res = $1;
@@ -797,7 +797,7 @@ sub get_resource_status {
 			}
 			if ($state =~ /^(Stopped)/) {
 			} else {
-				($what, $on) = map {lc} split /\s+/, $state;
+				($what, $on) = split /\s+/, $state;
 			}
 			$unmanaged{$res}++;
 		}
@@ -1327,39 +1327,78 @@ sub get_vm_info {
 sub gui_test {
 	my $testname = shift;
 	my $index = shift;
-	my $crm_show = "TERM=dumb /usr/sbin/crm configure show|sed 1,2d"
+	my @hosts = @_;
+	my $crm_show = "TERM=dumb /usr/sbin/crm configure show"
 		       ."|grep -v 'expected-quorum-votes=\"2\"'"
 		       ."|grep -v 'last-lrm-refresh='";
+	my $crm_status = "TERM=dumb /usr/sbin/crm status|sed 1,3d";
 	my $cib = `$crm_show`;
-	$cib =~ s/\\$//mg;
-	$cib =~ s/^\s+//;
-	$cib =~ s/\s+$//;
 	my $ret = $?;
 	if ($ret != 0) {
 		exit $ret;
 	}
+	my $status = `$crm_status`;
+	$ret = $?;
+	if ($ret != 0) {
+		exit $ret;
+	}
+	for ($cib, $status) {
+		s/\\$//mg;
+		s/^\s+//;
+		s/\s+$//;
+		my $i = 1;
+		for my $host (@hosts) {
+			s/\b$host\b/host$i/g;
+			$i++;
+		}
+	}
 	my $testfile = "/tmp/drbd-mc-test/$testname/test$index.crm";
+	my $test = "";
 	if (!open TEST, $testfile) {
 		print "$!";
 		# .new can be used for new tests.
-		system("$crm_show>$testfile.new");
-		exit 2;
+		open TEST, ">$testfile.new" or print "$!";
+		print TEST $cib;
+		close TEST;
+	} else {
+		{
+			local $/;
+			$test = <TEST>;
+		}
+		close TEST;
 	}
-	my $test = "";
-	{
-		local $/;
-		$test = <TEST>;
+	my $statustestfile = "/tmp/drbd-mc-test/$testname/status$index.crm";
+	my $statustest = "";
+	if (!open STTEST, $statustestfile) {
+		print "$!";
+		open STTEST, ">$statustestfile.new" or print "$!";
+		print STTEST $status;
+		close STTEST;
+	} else {
+		{
+			local $/;
+			$statustest = <STTEST>;
+		}
+		close STTEST;
 	}
-	close TEST;
-	$test =~ s/\\$//mg;
-	$test =~ s/^\s+//;
-	$test =~ s/\s+$//;
+	for ($test, $statustest) {
+		s/\\$//mg;
+		s/^\s+//;
+		s/\s+$//;
+	}
 	if ($cib eq $test) {
-		print "ok";
-		return 0;
+		print "ok ";
+	} else {
+		my $diff = `$crm_show>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error $testfile`;
+		print "error\n";
+		print $diff;
 	}
-	my $diff = `$crm_show>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error $testfile`;
-	print "error\n";
-	print $diff;
+	if ($status eq $statustest) {
+		print "ok";
+	} else {
+		my $diff = `$crm_status>/tmp/drbd-mc.status.last.error; diff -ub /tmp/drbd-mc.status.last.error $statustestfile`;
+		print "error\n";
+		print $diff;
+	}
 	exit 1;
 }

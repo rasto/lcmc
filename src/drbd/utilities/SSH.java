@@ -476,7 +476,7 @@ public class SSH {
 
                         if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                                 /* A timeout occured. */
-                                System.out.println("timeout");
+                                Tools.info("SSH timeout");
                                 throw new IOException(
                                   "Timeout while waiting for data from peer.");
                         }

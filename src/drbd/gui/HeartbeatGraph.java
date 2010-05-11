@@ -674,10 +674,14 @@ public class HeartbeatGraph extends ResourceGraph {
         pickVertex(v);
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
-            getClusterBrowser().setRightComponentInView(hi);
+            if (hi != null) {
+                getClusterBrowser().setRightComponentInView(hi);
+            }
         } else {
             final ServiceInfo si = (ServiceInfo) getInfo(v);
-            si.selectMyself();
+            if (si != null) {
+                si.selectMyself();
+            }
         }
     }
 

@@ -1732,6 +1732,13 @@ public final class Tools {
     }
 
     /**
+     * Convenience sleep wrapper with float argument.
+     */
+    public static void sleep(final float ms) {
+        sleep((int) ms);
+    }
+
+    /**
      * Returns the latest version of this application.
      */
     public static String getLatestVersion() {

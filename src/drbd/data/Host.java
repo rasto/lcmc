@@ -2301,11 +2301,22 @@ public class Host implements Serializable {
 
     /** This is part of testsuite, it checks cib. */
     public final boolean checkTest(final String test, final int index) {
-        final String command = replaceVars("@GUI-HELPER@ gui-test "
-                                           + test + " "
-                                           + index + " 2>&1");
-        final SSH.SSHOutput out =
-                getSSH().execCommandAndWait(command, false, false, 60000);
+        final StringBuffer command = new StringBuffer(50);
+        command.append(replaceVars("@GUI-HELPER@"));
+        command.append(" gui-test ");
+        command.append(test);
+        command.append(' ');
+        command.append(index);
+        for (final Host host : getCluster().getHosts()) {
+            command.append(' ');
+            command.append(host.getName());
+        }
+        command.append(" 2>&1");
+        final SSH.SSHOutput out = getSSH().execCommandAndWait(
+                                                            command.toString(),
+                                                            false,
+                                                            false,
+                                                            60000);
         Tools.info(test + " " + index + " " + out.getOutput());
         return out.getExitCode() == 0;
     }

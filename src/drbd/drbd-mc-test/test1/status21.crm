@@ -1,0 +1,16 @@
+2 Nodes configured, 2 expected votes
+3 Resources configured.
+============
+
+Online: [ host1 host2 ]
+
+ res_IPaddr2_1	(ocf::heartbeat:IPaddr2):	Started host2
+ Resource Group: grp_1
+     res_Dummy_1	(ocf::heartbeat:Dummy):	Started host2
+     res_Dummy_2	(ocf::heartbeat:Dummy):	Started host2
+     res_Dummy_3	(ocf::heartbeat:Dummy):	Started host2
+     res_Dummy_4	(ocf::heartbeat:Dummy):	Started host2
+     res_Dummy_5	(ocf::heartbeat:Dummy):	Started host2
+     res_Dummy_6	(ocf::heartbeat:Dummy):	Started host2
+ Master/Slave Set: ms_Stateful_1
+     Masters: [ host2 ]
