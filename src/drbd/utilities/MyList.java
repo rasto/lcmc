@@ -37,6 +37,7 @@ import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
+
 /**
  * A Jlist with updatable tooltips.
  */
@@ -119,7 +120,7 @@ public class MyList extends JList implements ComponentWithTest {
 
     /** Returns location of the tooltip, so that it does not cover the menu
      * item. */
-    public Point getToolTipLocation(final MouseEvent event) {
+    public final Point getToolTipLocation(final MouseEvent event) {
         final Point screenLocation = getLocationOnScreen();
         final Rectangle sBounds = Tools.getScreenBounds(this);
         final Dimension size = toolTip.getPreferredSize();

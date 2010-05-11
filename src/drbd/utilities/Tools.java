@@ -55,7 +55,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
-import javax.swing.JList;
 import javax.swing.JTextArea;
 import javax.swing.DefaultListModel;
 import javax.swing.text.html.HTMLDocument;
@@ -85,6 +84,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -166,6 +167,8 @@ public final class Tools {
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
     /** Pattern that matches a number and unit. */
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
+    /** Random number generator. */
+    private static final Random RANDOM = new Random();
     /**
      * Private constructor.
      */
@@ -1344,11 +1347,14 @@ public final class Tools {
      * Starts progress indicator with specified text.
      */
     public static void startProgressIndicator(final String text) {
+        final boolean rightMovement = RANDOM.nextBoolean();
         if (text == null) {
             getGUIData().getMainGlassPane().start(
-                                    Tools.getString("Tools.ExecutingCommand"));
+                                    Tools.getString("Tools.ExecutingCommand"),
+                                    null,
+                                    rightMovement);
         } else {
-            getGUIData().getMainGlassPane().start(text);
+            getGUIData().getMainGlassPane().start(text, null, rightMovement);
         }
     }
 
@@ -1492,7 +1498,7 @@ public final class Tools {
     public static JScrollPane getScrollingMenu(
                         final MyMenu menu,
                         final DefaultListModel dlm,
-                        final JList list,
+                        final MyList list,
                         final Map<MyMenuItem, ButtonCallback> callbackHash) {
         prevScrollingMenuIndex = -1;
         list.setFixedCellHeight(25);
@@ -1515,6 +1521,9 @@ public final class Tools {
                     }
                 }
             }
+            public void mouseEntered(final MouseEvent evt) {
+                list.requestFocus();
+            }
 
             public void mousePressed(final MouseEvent evt) {
                 prevScrollingMenuIndex = -1;
@@ -1529,7 +1538,8 @@ public final class Tools {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 list.setSelectedIndex(index);
-                                menu.setPopupMenuVisible(false);
+                                setMenuVisible(menu, false);
+                                //menu.setPopupMenuVisible(false);
                                 menu.setSelected(false);
                             }
                         });
@@ -1582,6 +1592,36 @@ public final class Tools {
         final JScrollPane sp = new JScrollPane(list);
         sp.setViewportBorder(null);
         sp.setBorder(null);
+        list.addKeyListener(new KeyAdapter() {
+            public void keyTyped(final KeyEvent e) {
+                final char ch = e.getKeyChar();
+                if (ch == ' ' || ch == '\n') {
+                    final MyMenuItem item =
+                                       (MyMenuItem) list.getSelectedValue();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            //menu.setPopupMenuVisible(false);
+                            setMenuVisible(menu, false);
+                        }
+                    });
+                    if (item != null) {
+                        item.action();
+                    }
+                } else {
+                    if (Character.isLetterOrDigit(ch)) {
+                        final Thread t = new Thread(new Runnable() {
+                            public void run() {
+                                getGUIData().getMainGlassPane().start("" + ch,
+                                                                      null,
+                                                                      true);
+                                stopProgressIndicator("" + ch);
+                            }
+                        });
+                        t.start();
+                    }
+                }
+            }
+        });
         return sp;
     }
 
@@ -2112,7 +2152,46 @@ public final class Tools {
                             .setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    /** Sets the menu opaque, not opaque. */
+    /** Sets the menu and all its parents visible, not visible. */
+    public static void setMenuVisible(final JComponent menu,
+                                      final boolean visible) {
+        JComponent parent = (JComponent) menu.getParent();
+        if (parent instanceof javax.swing.JViewport) {
+            /* MyList */
+            parent = (JComponent) parent.getParent();
+            parent = (JComponent) parent.getParent();
+        }
+        if (parent instanceof JPopupMenu) {
+            JComponent inv = (JComponent) ((JPopupMenu) parent).getInvoker();
+            while (inv != null) {
+                final JComponent invP = (JComponent) inv.getParent();
+                if (!(invP instanceof JPopupMenu)) {
+                    break;
+                }
+                invP.setVisible(visible);
+                for (final java.awt.Component c : invP.getComponents()) {
+                    ((JComponent) c).setVisible(visible);
+                }
+                final JComponent pp = (JComponent) invP.getParent();
+                if (pp != null) {
+                    pp.setVisible(visible);
+                }
+                inv = (JComponent) ((JPopupMenu) invP).getInvoker();
+            }
+            menu.setVisible(visible);
+            parent.setVisible(visible);
+            final JComponent pp = (JComponent) parent.getParent();
+            if (pp != null) {
+                pp.setVisible(visible);
+            }
+            for (final java.awt.Component c : parent.getComponents()) {
+                ((JComponent) c).setVisible(visible);
+            }
+            parent.repaint();
+        }
+    }
+
+    /** Sets the menu and all its parents opaque, not opaque. */
     public static void setMenuOpaque(final JComponent menu,
                                       final boolean opaque) {
         JComponent parent = (JComponent) menu.getParent();

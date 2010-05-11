@@ -32,6 +32,9 @@ import drbd.utilities.MyButton;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -48,6 +51,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
@@ -99,9 +103,14 @@ public class ProgressIndicatorPanel extends JComponent
     private static final int RAMP_DELAY_STOP  = 1000;
     /** Alpha level of the veil. */
     private float shield     = 0.80f;
-    /** Message displayed below the circular shape. */
+    /** Message displayed. */
     private final Map<String, Integer> texts =
                                         new LinkedHashMap<String, Integer>();
+    /** Message positions or null. */
+    private final Map<String, Point2D> textsPositions =
+                                              new HashMap<String, Point2D>();
+    /** Message movement left to right. */
+    private final Set<String> textsRightMovement = new HashSet<String>();
     /** List of failed commands. */
     private final List<String> failuresMap = new LinkedList<String>();
     /** Amount of frames per second. */
@@ -190,7 +199,7 @@ public class ProgressIndicatorPanel extends JComponent
      */
     public final void failure(final String text) {
         failuresMap.add(text);
-        start(text);
+        start(text, null, false);
         stop(text);
     }
 
@@ -199,7 +208,8 @@ public class ProgressIndicatorPanel extends JComponent
      * rotating the shapes. This method handles the visibility
      * of the glass pane.
      */
-    public final void start(final String text) {
+    public final void start(final String text, final Point2D position,
+                            final boolean rightMovement) {
         try {
             mAnimatorLock.acquire();
         } catch (java.lang.InterruptedException e) {
@@ -214,11 +224,19 @@ public class ProgressIndicatorPanel extends JComponent
         }
         if (texts.containsKey(text)) {
             texts.put(text, MAX_ALPHA_LEVEL);
+            textsPositions.put(text, position);
+            if (rightMovement) {
+                textsRightMovement.add(text);
+            }
             mTextsLock.release();
             mAnimatorLock.release();
             return;
         }
         texts.put(text, MAX_ALPHA_LEVEL);
+        textsPositions.put(text, position);
+        if (rightMovement) {
+            textsRightMovement.add(text);
+        }
 
         if (texts.size() > 1) {
             mTextsLock.release();
@@ -371,6 +389,7 @@ public class ProgressIndicatorPanel extends JComponent
                 maxY = getHeight() / 2 - 30;
 
                 int y = 0;
+                int x = 0;
                 for (String text : texts.keySet()) {
                     if (text == null || text.length() == 0) {
                         continue;
@@ -393,11 +412,28 @@ public class ProgressIndicatorPanel extends JComponent
                                           f.getGreen(),
                                           f.getBlue(),
                                           alpha));
+                    final Point2D textPos = textsPositions.get(text);
+                    float textPosX;
+                    float textPosY;
+                    if (textPos == null) {
+                        textPosX = (float) (width - bounds.getWidth()) / 2;
+                        textPosY = (float) (maxY + layout.getLeading()
+                                    + 2 * layout.getAscent());
+                    } else {
+                        textPosX = (float) textPos.getX();
+                        textPosY = (float) textPos.getY();
+                    }
                     layout.draw(g2,
-                                (float) (width - bounds.getWidth()) / 2,
-                                (float) (maxY + layout.getLeading() + 2
-                                * layout.getAscent()) + y);
-                    y = (int) (y + (((float) 27 / MAX_ALPHA_LEVEL) * alpha));
+                                textPosX + x,
+                                textPosY + y);
+                    if (textsRightMovement.contains(text)) {
+                        x = (int) (x + (((float) (10 + 15 * text.length())
+                                         / MAX_ALPHA_LEVEL)
+                                        * alpha));
+                    } else {
+                        y = (int) (y + (((float) 27 / MAX_ALPHA_LEVEL)
+                                        * alpha));
+                    }
                     if (bounds.getWidth() > barWidth) {
                         barWidth = bounds.getWidth() + 30;
                     }
@@ -511,6 +547,8 @@ public class ProgressIndicatorPanel extends JComponent
                 }
                 for (final String text : toRemove) {
                     texts.remove(text);
+                    textsPositions.remove(text);
+                    textsRightMovement.remove(text);
                     failuresMap.remove(text);
                 }
 
