@@ -528,6 +528,17 @@ public class GroupInfo extends ServiceInfo {
      */
     public final void removeMyselfNoConfirm(final Host dcHost,
                                             final boolean testOnly) {
+        final List<ServiceInfo> children = new ArrayList<ServiceInfo>();
+        if (!testOnly) {
+            final Enumeration e = getNode().children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                child.getService().setRemoved(true);
+                children.add(child);
+            }
+        }
         if (getService().isNew()) {
             if (!testOnly) {
                 getService().setNew(false);
@@ -547,6 +558,14 @@ public class GroupInfo extends ServiceInfo {
                                cloneId, /* clone id */
                                master,
                                testOnly);
+        }
+        if (!testOnly) {
+            for (final ServiceInfo child : children) {
+                getBrowser().getHeartbeatIdList().remove(
+                                              child.getHeartbeatId(testOnly));
+                getBrowser().removeFromServiceInfoHash(child);
+                child.getService().doneRemoving();
+            }
         }
     }
 
