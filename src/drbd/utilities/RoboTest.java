@@ -46,7 +46,7 @@ public final class RoboTest {
     /** Whether the test was aborted. */
     private static volatile boolean aborted = false;
     /** Slow down the animation. */
-    private static final float slowFactor = 2f;
+    private static final float slowFactor = 10f;
     /**
      * Private constructor, cannot be instantiated.
      */
@@ -295,22 +295,22 @@ public final class RoboTest {
         leftClick(robot); /* pull down */
         moveTo(robot, 1044, 442);
         leftClick(robot); /* choose */
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         press(robot, KeyEvent.VK_1);
         press(robot, KeyEvent.VK_0);
         press(robot, KeyEvent.VK_0);
         moveTo(robot, 814, 189);
-        Tools.sleep(3000 * slowFactor); /* ptest */
+        Tools.sleep(3000); /* ptest */
         leftClick(robot); /* apply */
         
         /* group with dummy resources */
         final int gx = 230;
         final int gy = 374;
         moveTo(robot, gx, gy);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */
         moveTo(robot, gx + 46, gy + 11);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         leftClick(robot); /* choose group */
         Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 2); /* 2 */
@@ -318,10 +318,11 @@ public final class RoboTest {
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
         moveTo(robot, gx + 560, gy + 22);
-        Tools.sleep(2000 * slowFactor);
+        Tools.sleep(1000);
         chooseDummy(robot);
-        Tools.sleep(2000 * slowFactor);
+        Tools.sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
+        Tools.sleep(2000);
         leftClick(robot); /*  apply */
         for (int i = 0; i < 5; i++) {
             /* another group resource */
@@ -332,12 +333,13 @@ public final class RoboTest {
             moveTo(robot, gx + 80, gy + 20);
             moveTo(robot, gx + 84, gy + 22);
             moveTo(robot, gx + 560, gy + 22);
-            Tools.sleep(2000 * slowFactor);
+            Tools.sleep(1000);
             chooseDummy(robot);
-            Tools.sleep(i * 300 * slowFactor);
+            Tools.sleep(i * 300);
             moveTo(robot, 809, 192); /* ptest */
+            Tools.sleep(2000);
             leftClick(robot); /* apply */
-            Tools.sleep(1000 * slowFactor);
+            Tools.sleep(1000);
         }
         Tools.sleep(4000 * slowFactor);
         host.checkTest("test1", 3); /* 3 */
@@ -345,16 +347,16 @@ public final class RoboTest {
         final int popX = 343;
         final int popY = 300;
         addConstraint(robot, gx, gy, 9);
-        Tools.sleep(4000 * slowFactor);
+        Tools.sleep(5000 * slowFactor);
         host.checkTest("test1", 4); /* 4 */
 
         removeConstraint(robot, popX, popY);
         Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 5); /* 5 */
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
 
         addConstraint(robot, gx, gy, 9);
-        Tools.sleep(4000 * slowFactor);
+        Tools.sleep(5000 * slowFactor);
         host.checkTest("test1", 6); /* 6 */
 
         removeOrder(robot, popX, popY);
@@ -366,7 +368,7 @@ public final class RoboTest {
         host.checkTest("test1", 8);
 
         removeColocation(robot, popX, popY);
-        Tools.sleep(4000 * slowFactor);
+        Tools.sleep(5000 * slowFactor);
         host.checkTest("test1", 9);
 
         addColocation(robot, popX, popY);
@@ -383,7 +385,7 @@ public final class RoboTest {
         moveTo(robot, 812, 282);
         moveTo(robot, 832, 340);
         moveTo(robot, 1065, 342);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
 
         press(robot, KeyEvent.VK_S);
         Tools.sleep(200);
@@ -398,14 +400,14 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_F);
         Tools.sleep(200);
         press(robot, KeyEvent.VK_ENTER); /* choose Stateful */
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
 
         moveTo(robot, 812, 179);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         leftClick(robot); /* apply */
         Tools.sleep(4000 * slowFactor);
         host.checkTest("test1", 11);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         /* set clone max to 1 */
         moveTo(robot, 978, 381);
         leftClick(robot); /* Clone Max */
@@ -413,45 +415,61 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_LEFT); //TODO remove
         press(robot, KeyEvent.VK_BACK_SPACE); //TODO remove, once it's fixed
         moveTo(robot, 812, 179);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         leftClick(robot); /* apply */
-        Tools.sleep(4000 * slowFactor);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 12);
         stopResource(robot, statefulX, statefulY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 13);
         startResource(robot, statefulX, statefulY, 0);
+        Tools.sleep(10000 * slowFactor);
         host.checkTest("test1", 14);
         unmanageResource(robot, statefulX, statefulY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 15);
         manageResource(robot, statefulX, statefulY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 16);
 
         /* IP addr cont. */
         stopResource(robot, ipX, ipY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 17);
         startResource(robot, ipX, ipY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 18);
         unmanageResource(robot, ipX, ipY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 19);
         manageResource(robot, ipX, ipY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 20);
         migrateResource(robot, ipX, ipY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 21);
         unmigrateResource(robot, ipX, ipY, 0);
+        Tools.sleep(3000 * slowFactor);
         host.checkTest("test1", 22);
 
         /* Group cont. */
         stopResource(robot, gx, gy, 15);
+        Tools.sleep(10000 * slowFactor);
         host.checkTest("test1", 23);
         startResource(robot, gx, gy, 15);
+        Tools.sleep(8000 * slowFactor);
         host.checkTest("test1", 24);
         unmanageResource(robot, gx, gy, 15);
+        Tools.sleep(5000 * slowFactor);
         host.checkTest("test1", 25);
         manageResource(robot, gx, gy, 15);
+        Tools.sleep(5000 * slowFactor);
         host.checkTest("test1", 26);
         migrateResource(robot, gx, gy, 25);
+        Tools.sleep(5000 * slowFactor);
         host.checkTest("test1", 27);
         unmigrateResource(robot, gx, gy, 25);
+        Tools.sleep(5000 * slowFactor);
         host.checkTest("test1", 28);
 
         aborted = false;
@@ -478,12 +496,11 @@ public final class RoboTest {
                                      final int y,
                                      final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 130 + yFactor);
-        Tools.sleep(3000 * slowFactor); /*  ptest */
+        Tools.sleep(3000); /*  ptest */
         leftClick(robot); /* stop */
-        Tools.sleep(3000 * slowFactor);
     }
 
     /** Starts resource. */
@@ -492,12 +509,11 @@ public final class RoboTest {
                                      final int y,
                                      final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 80 + yFactor);
-        Tools.sleep(3000 * slowFactor); /*  ptest */
+        Tools.sleep(3000); /*  ptest */
         leftClick(robot); /* stop */
-        Tools.sleep(3000 * slowFactor);
     }
 
     /** Migrate resource. */
@@ -506,12 +522,11 @@ public final class RoboTest {
                                         final int y,
                                         final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 220 + yFactor);
-        Tools.sleep(3000 * slowFactor); /*  ptest */
+        Tools.sleep(3000); /*  ptest */
         leftClick(robot); /* stop */
-        Tools.sleep(3000 * slowFactor);
     }
 
     /** Unmigrate resource. */
@@ -520,12 +535,11 @@ public final class RoboTest {
                                           final int y,
                                           final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 260 + yFactor);
-        Tools.sleep(3000 * slowFactor); /*  ptest */
+        Tools.sleep(3000); /*  ptest */
         leftClick(robot); /* stop */
-        Tools.sleep(3000 * slowFactor);
     }
 
     /** Unmanage resource. */
@@ -534,12 +548,11 @@ public final class RoboTest {
                                          final int y,
                                          final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 200 + yFactor);
-        Tools.sleep(3000 * slowFactor); /*  ptest */
+        Tools.sleep(3000); /*  ptest */
         leftClick(robot); /* stop */
-        Tools.sleep(3000 * slowFactor);
     }
 
     /** Manage resource. */
@@ -548,12 +561,11 @@ public final class RoboTest {
                                          final int y,
                                          final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 200 + yFactor);
-        Tools.sleep(3000 * slowFactor); /*  ptest */
+        Tools.sleep(3000); /*  ptest */
         leftClick(robot); /* stop */
-        Tools.sleep(3000 * slowFactor);
     }
 
 
@@ -563,11 +575,11 @@ public final class RoboTest {
                                       final int y,
                                       final int with) {
         moveTo(robot, x + 50, y + 5);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* popup */ 
         moveTo(robot, x + 82, y + 65);
         moveTo(robot, x + 335, y + 65 + with);
-        Tools.sleep(3000 * slowFactor); /*  ptest */
+        Tools.sleep(3000); /*  ptest */
         leftClick(robot); /* start before */
     }
     /** Removes constraint. */
@@ -575,10 +587,10 @@ public final class RoboTest {
                                          final int popX,
                                          final int popY) {
         moveTo(robot, popX, popY);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* constraint popup */
         moveTo(robot, popX + 70, popY + 20);
-        Tools.sleep(3000 * slowFactor); /* ptest */
+        Tools.sleep(3000); /* ptest */
         leftClick(robot); /* remove ord */
     }
 
@@ -587,10 +599,10 @@ public final class RoboTest {
                                     final int popX,
                                     final int popY) {
         moveTo(robot, popX, popY);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* constraint popup */
         moveTo(robot, popX + 70, popY + 50);
-        Tools.sleep(3000 * slowFactor); /* ptest */
+        Tools.sleep(3000); /* ptest */
         leftClick(robot); /* remove ord */
     }
 
@@ -599,10 +611,10 @@ public final class RoboTest {
                                  final int popX,
                                  final int popY) {
         moveTo(robot, popX, popY);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* constraint popup */
         moveTo(robot, popX + 70, popY + 50);
-        Tools.sleep(3000 * slowFactor); /* ptest */
+        Tools.sleep(3000); /* ptest */
         leftClick(robot); /* add ord */
     }
 
@@ -611,10 +623,10 @@ public final class RoboTest {
                                          final int popX,
                                          final int popY) {
         moveTo(robot, popX, popY);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* constraint popup */
         moveTo(robot, popX + 70, popY + 100);
-        Tools.sleep(3000 * slowFactor); /* ptest */
+        Tools.sleep(3000); /* ptest */
         leftClick(robot); /* remove col */
     }
 
@@ -623,10 +635,10 @@ public final class RoboTest {
                                       final int popX,
                                       final int popY) {
         moveTo(robot, popX, popY);
-        Tools.sleep(1000 * slowFactor);
+        Tools.sleep(1000);
         rightClick(robot); /* constraint popup */
         moveTo(robot, popX + 70, popY + 90);
-        Tools.sleep(3000 * slowFactor); /* ptest */
+        Tools.sleep(3000); /* ptest */
         leftClick(robot); /* add col */
     }
 

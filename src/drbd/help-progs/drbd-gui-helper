@@ -1348,10 +1348,12 @@ sub gui_test {
 		s/\s+$//;
 		my $i = 1;
 		for my $host (@hosts) {
-			s/\b$host\b/host$i/g;
+			s/\b$host\b/host$i/gi;
 			$i++;
 		}
 	}
+	$cib =~ s/(node)\s+\$id=".*?"/$1/g;
+	$status =~ s/unknown( expected votes)/2$1/;
 	my $testfile = "/tmp/drbd-mc-test/$testname/test$index.crm";
 	my $test = "";
 	if (!open TEST, $testfile) {
@@ -1392,6 +1394,9 @@ sub gui_test {
 		my $diff = `$crm_show>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error $testfile`;
 		print "error\n";
 		print $diff;
+		open TEST, ">$testfile.error" or print "$!";
+		print TEST $cib;
+		close TEST;
 	}
 	if ($status eq $statustest) {
 		print "ok";
@@ -1399,6 +1404,9 @@ sub gui_test {
 		my $diff = `$crm_status>/tmp/drbd-mc.status.last.error; diff -ub /tmp/drbd-mc.status.last.error $statustestfile`;
 		print "error\n";
 		print $diff;
+		open STTEST, ">$statustestfile.error" or print "$!";
+		print STTEST $status;
+		close STTEST;
 	}
 	exit 1;
 }
