@@ -1132,7 +1132,9 @@ public class ClusterBrowser extends Browser {
                                    heartbeatGraph.repaint();
                                 }
                             } else {
-                                setClStatus(host, true);
+                                final String online =
+                                    clusterStatus.isOnlineNode(host.getName());
+                                setClStatus(host, "yes".equals(online));
                                 if (clusterStatus.parseStatus(status)) {
                                     Tools.debug(this,
                                                 "update cluster status: "
@@ -1206,7 +1208,9 @@ public class ClusterBrowser extends Browser {
             host.execClStatusCommand(
                  new ExecCallback() {
                      public void done(final String ans) {
-                         setClStatus(host, true);
+                         final String online =
+                                    clusterStatus.isOnlineNode(host.getName());
+                         setClStatus(host, "yes".equals(online));
                          firstTime.countDown();
                      }
 

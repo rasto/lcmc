@@ -2463,6 +2463,7 @@ public class CRMXML extends XML {
         String dc = null;
         final MultiKeyMap nodeParametersMap = new MultiKeyMap();
         final Node nodesNode = getChildNode(confNode, "nodes");
+        final Map<String, String> nodeOnline = new HashMap<String, String>();
         if (nodesNode != null) {
             final NodeList nodes = nodesNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
@@ -2477,6 +2478,9 @@ public class CRMXML extends XML {
                         dc = uname;
                     }
                     parseNode(uname, nodeNode, nodeParametersMap);
+                    if (!nodeOnline.containsKey(uname.toLowerCase())) {
+                        nodeOnline.put(uname.toLowerCase(), "no");
+                    }
                 }
             }
         }
@@ -2812,7 +2816,6 @@ public class CRMXML extends XML {
         }
 
         /* <status> */
-        final Map<String, String> nodeOnline = new HashMap<String, String>();
         final Node statusNode = getChildNode(cibNode, "status");
         if (statusNode != null) {
             /* <node_state ...> */
