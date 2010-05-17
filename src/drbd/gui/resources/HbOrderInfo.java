@@ -24,6 +24,7 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
+import drbd.gui.GuiComboBox;
 import drbd.data.Host;
 import drbd.data.CRMXML;
 import drbd.data.ClusterStatus;
@@ -100,7 +101,7 @@ public class HbOrderInfo extends EditableInfo
         resourceNode.put("first-action", firstAction);
         resourceNode.put("then-action", thenAction);
 
-        final String[] params = getBrowser().getCRMXML().getOrderParameters();
+        final String[] params = getParametersFromXML();
         if (params != null) {
             for (String param : params) {
                 String value = resourceNode.get(param);
@@ -114,6 +115,10 @@ public class HbOrderInfo extends EditableInfo
                 if ((value == null && value != oldValue)
                     || (value != null && !value.equals(oldValue))) {
                     getResource().setValue(param, value);
+                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    if (cb != null) {
+                        cb.setValue(value);
+                    }
                 }
             }
         }
@@ -170,7 +175,12 @@ public class HbOrderInfo extends EditableInfo
      * Returns lsit of all parameters as an array.
      */
     public final String[] getParametersFromXML() {
-        return getBrowser().getCRMXML().getOrderParameters();
+        if (serviceInfoParent.isConstraintPH()
+            || serviceInfoChild.isConstraintPH()) {
+            return getBrowser().getCRMXML().getRscSetOrderParameters();
+        } else {
+            return getBrowser().getCRMXML().getOrderParameters();
+        }
     }
 
     /**
@@ -261,12 +271,27 @@ public class HbOrderInfo extends EditableInfo
             }
         }
         if (changed) {
-            CRM.addOrder(dcHost,
-                         getService().getHeartbeatId(),
-                         serviceInfoParent.getHeartbeatId(testOnly),
-                         serviceInfoChild.getHeartbeatId(testOnly),
-                         attrs,
-                         testOnly);
+            final String ordId = getService().getHeartbeatId();
+            if (serviceInfoParent.isConstraintPH()
+                || serviceInfoChild.isConstraintPH()) {
+                final ClusterStatus clStatus = getBrowser().getClusterStatus();
+                CRM.setRscSet(dcHost,
+                              null,
+                              false,
+                              ordId,
+                              false,
+                              null,
+                              clStatus.getRscSetsOrd(ordId),
+                              attrs,
+                              testOnly);
+            } else {
+                CRM.addOrder(dcHost,
+                             ordId,
+                             serviceInfoParent.getHeartbeatId(testOnly),
+                             serviceInfoChild.getHeartbeatId(testOnly),
+                             attrs,
+                             testOnly);
+            }
         }
         if (!testOnly) {
             storeComboBoxValues(params);

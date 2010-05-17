@@ -24,6 +24,7 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
+import drbd.gui.GuiComboBox;
 import drbd.data.Host;
 import drbd.data.resources.Service;
 import drbd.data.ClusterStatus;
@@ -115,6 +116,10 @@ public class HbColocationInfo extends EditableInfo
                 if ((value == null && value != oldValue)
                     || (value != null && !value.equals(oldValue))) {
                     getResource().setValue(param, value);
+                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    if (cb != null) {
+                        cb.setValue(value);
+                    }
                 }
             }
         }
@@ -173,7 +178,12 @@ public class HbColocationInfo extends EditableInfo
      * Returns lsit of all parameters as an array.
      */
     public final String[] getParametersFromXML() {
-        return getBrowser().getCRMXML().getColocationParameters();
+        if (serviceInfoRsc.isConstraintPH()
+            || serviceInfoWithRsc.isConstraintPH()) {
+            return getBrowser().getCRMXML().getRscSetColocationParameters();
+        } else {
+            return getBrowser().getCRMXML().getColocationParameters();
+        }
     }
 
     /**
@@ -263,12 +273,27 @@ public class HbColocationInfo extends EditableInfo
             attrs.put(param, value);
         }
         if (changed) {
-            CRM.addColocation(dcHost,
-                              getService().getHeartbeatId(),
-                              serviceInfoRsc.getHeartbeatId(testOnly),
-                              serviceInfoWithRsc.getHeartbeatId(testOnly),
+            final String colId = getService().getHeartbeatId();
+            if (serviceInfoRsc.isConstraintPH()
+                || serviceInfoWithRsc.isConstraintPH()) {
+                final ClusterStatus clStatus = getBrowser().getClusterStatus();
+                CRM.setRscSet(dcHost,
+                              colId,
+                              false,
+                              null,
+                              false,
+                              clStatus.getRscSetsCol(colId),
+                              null,
                               attrs,
                               testOnly);
+            } else {
+                CRM.addColocation(dcHost,
+                                  colId,
+                                  serviceInfoRsc.getHeartbeatId(testOnly),
+                                  serviceInfoWithRsc.getHeartbeatId(testOnly),
+                                  attrs,
+                                  testOnly);
+            }
         }
         if (!testOnly) {
             storeComboBoxValues(params);

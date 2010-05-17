@@ -87,6 +87,8 @@ public class CRMXML extends XML {
                                               new HashMap<String, String[]>();
     /** List of parameters for colocations. */
     private final List<String> colParams = new ArrayList<String>();
+    /** List of parameters for colocation in resource sets. */
+    private final List<String> rscSetColParams = new ArrayList<String>();
     /** List of required parameters for colocations. */
     private final List<String> colRequiredParams = new ArrayList<String>();
     /** Map from colocation parameter to its short description. */
@@ -115,6 +117,8 @@ public class CRMXML extends XML {
 
     /** List of parameters for order. */
     private final List<String> ordParams = new ArrayList<String>();
+    /** List of parameters for order in resource sets. */
+    private final List<String> rscSetOrdParams = new ArrayList<String>();
     /** List of required parameters for orders. */
     private final List<String> ordRequiredParams = new ArrayList<String>();
     /** Map from order parameter to its short description. */
@@ -148,10 +152,10 @@ public class CRMXML extends XML {
     private final ResourceAgent pcmkClone;
     /** Predefined drbddisk as heartbeat service. */
     private final ResourceAgent hbDrbddisk =
-                        new ResourceAgent("drbddisk", "heartbeat", "heartbeat");
+                       new ResourceAgent("drbddisk", "heartbeat", "heartbeat");
     /** Predefined linbit::drbd as pacemaker service. */
     private final ResourceAgent hbLinbitDrbd =
-                                 new ResourceAgent("drbd", "linbit", "ocf");
+                                    new ResourceAgent("drbd", "linbit", "ocf");
     /** Mapfrom heartbeat service defined by name and class to the hearbeat
      * service object.
      */
@@ -760,6 +764,7 @@ public class CRMXML extends XML {
         paramColPossibleChoicesMS.put("with-rsc-role", ATTRIBUTE_ROLES_MS);
 
         colParams.add(SCORE_STRING);
+        rscSetColParams.add(SCORE_STRING);
         paramColShortDescMap.put(SCORE_STRING, "Score");
         paramColLongDescMap.put(SCORE_STRING, "Score");
         paramColTypeMap.put(SCORE_STRING, PARAM_TYPE_INTEGER);
@@ -790,6 +795,7 @@ public class CRMXML extends XML {
         paramOrdPossibleChoices.put("symmetrical", booleanValues);
 
         ordParams.add(SCORE_STRING);
+        rscSetOrdParams.add(SCORE_STRING);
         paramOrdShortDescMap.put(SCORE_STRING, "Score");
         paramOrdLongDescMap.put(SCORE_STRING, "Score");
         paramOrdTypeMap.put(SCORE_STRING, PARAM_TYPE_INTEGER);
@@ -2368,6 +2374,78 @@ public class CRMXML extends XML {
         }
     }
 
+    /** Parses resource sets. */
+    private void parseRscSets(
+                        final Node node,
+                        final String colId,
+                        final String ordId,
+                        final List<RscSet> rscSets,
+                        final List<RscSetConnectionData> rscSetConnections) {
+        final NodeList nodes = node.getChildNodes();
+        RscSet prevRscSet = null;
+        int rscSetCount = 0;
+        for (int i = 0; i < nodes.getLength(); i++) {
+            final Node rscSetNode = nodes.item(i);
+            if (rscSetNode.getNodeName().equals("resource_set")) {
+                final String id = getAttribute(rscSetNode, "id");
+                final String sequential = getAttribute(rscSetNode,
+                                                       "sequential");
+                final NodeList rscNodes = rscSetNode.getChildNodes();
+                final List<String> rscIds = new ArrayList<String>();
+                for (int j = 0; j < rscNodes.getLength(); j++) {
+                    final Node rscRefNode = rscNodes.item(j);
+                    if (rscRefNode.getNodeName().equals("resource_ref")) {
+                        final String rscId = getAttribute(rscRefNode, "id");
+                        rscIds.add(rscId);
+                    }
+                }
+                final RscSet rscSet = new RscSet(id, rscIds, sequential);
+                rscSets.add(rscSet);
+                if (prevRscSet != null) {
+                    RscSetConnectionData rscSetConnectionData;
+                    if (colId == null) {
+                        /* order */
+                        rscSetConnectionData =
+                                    new RscSetConnectionData(prevRscSet,
+                                                             rscSet,
+                                                             ordId,
+                                                             false);
+                    } else {
+                        /* colocation */
+                        rscSetConnectionData =
+                                    new RscSetConnectionData(rscSet,
+                                                             prevRscSet,
+                                                             colId,
+                                                             true);
+                    }
+                    rscSetConnections.add(rscSetConnectionData);
+                }
+                prevRscSet = rscSet;
+                rscSetCount++;
+            }
+        }
+        if (rscSetCount == 1) {
+            /* just one, dangling */
+            RscSetConnectionData rscSetConnectionData;
+            if (colId == null) {
+                /* order */
+                rscSetConnectionData =
+                            new RscSetConnectionData(prevRscSet,
+                                                     null,
+                                                     ordId,
+                                                     false);
+            } else {
+                /* colocation */
+                rscSetConnectionData =
+                            new RscSetConnectionData(prevRscSet,
+                                                     null,
+                                                     colId,
+                                                     true);
+            }
+            rscSetConnections.add(rscSetConnectionData);
+        }
+    }
+
     /**
      * Returns CibQuery object with information from the cib node.
      */
@@ -2648,13 +2726,19 @@ public class CRMXML extends XML {
 
         /* <constraints> */
         final Map<String, ColocationData> colocationIdMap =
-                                    new LinkedHashMap<String, ColocationData>();
+                                   new LinkedHashMap<String, ColocationData>();
         final Map<String, List<ColocationData>> colocationRscMap =
-                            new HashMap<String, List<ColocationData>>();
+                                   new HashMap<String, List<ColocationData>>();
         final Map<String, OrderData> orderIdMap =
-                                    new LinkedHashMap<String, OrderData>();
+                                        new LinkedHashMap<String, OrderData>();
+        final Map<String, List<RscSet>> orderIdRscSetsMap =
+                                           new HashMap<String, List<RscSet>>();
+        final Map<String, List<RscSet>> colocationIdRscSetsMap =
+                                           new HashMap<String, List<RscSet>>();
+        final List<RscSetConnectionData> rscSetConnections =
+                                         new ArrayList<RscSetConnectionData>();
         final Map<String, List<OrderData>> orderRscMap =
-                            new HashMap<String, List<OrderData>>();
+                                        new HashMap<String, List<OrderData>>();
         final Map<String, Map<String, HostLocation>> locationMap =
                               new HashMap<String, Map<String, HostLocation>>();
         final Map<String, List<String>> locationsIdMap =
@@ -2686,15 +2770,19 @@ public class CRMXML extends XML {
                 if (constraintNode.getNodeName().equals("rsc_colocation")) {
                     final String colId = getAttribute(constraintNode, "id");
                     final String rsc = getAttribute(constraintNode, rscString);
-                    final String rscRole = getAttribute(constraintNode,
-                                                            rscRoleString);
                     final String withRsc = getAttribute(constraintNode,
                                                         withRscString);
                     if (rsc == null || withRsc == null) {
-                        Tools.debug(this,
-                                    "ignoring rsc_colocation: " + colId, 2);
-                        continue;
+                        final List<RscSet> rscSets = new ArrayList<RscSet>();
+                        parseRscSets(constraintNode,
+                                     colId,
+                                     null,
+                                     rscSets,
+                                     rscSetConnections);
+                        colocationIdRscSetsMap.put(colId, rscSets);
                     }
+                    final String rscRole = getAttribute(constraintNode,
+                                                            rscRoleString);
                     final String withRscRole = getAttribute(constraintNode,
                                                             withRscRoleString);
                     final String score = getAttribute(constraintNode,
@@ -2714,24 +2802,30 @@ public class CRMXML extends XML {
                     withs.add(colocationData);
                     colocationRscMap.put(rsc, withs);
                 } else if (constraintNode.getNodeName().equals("rsc_order")) {
-                    final String ordId = getAttribute(constraintNode, "id");
                     String rscFirst = getAttribute(constraintNode,
                                                    firstString);
                     String rscThen = getAttribute(constraintNode,
                                                   thenString);
+                    final String ordId = getAttribute(constraintNode, "id");
                     if (rscFirst == null || rscThen == null) {
-                        Tools.debug(this, "ignoring rsc_order: " + ordId, 2);
-                        continue;
+                        final List<RscSet> rscSets = new ArrayList<RscSet>();
+                        parseRscSets(constraintNode,
+                                     null,
+                                     ordId,
+                                     rscSets,
+                                     rscSetConnections);
+                        orderIdRscSetsMap.put(ordId, rscSets);
                     }
                     final String score = getAttribute(constraintNode,
                                                       SCORE_STRING);
                     final String symmetrical = getAttribute(constraintNode,
-                                                               "symmetrical");
+                                                            "symmetrical");
                     String firstAction = getAttribute(constraintNode,
-                                                            firstActionString);
+                                                      firstActionString);
                     String thenAction = getAttribute(constraintNode,
-                                                           thenActionString);
-                    final String type = getAttribute(constraintNode, "type");
+                                                     thenActionString);
+                    final String type = getAttribute(constraintNode,
+                                                     "type");
                     if (type != null && "after".equals(type)) {
                         /* exchange resoruces */
                         final String rsc = rscFirst;
@@ -2860,6 +2954,9 @@ public class CRMXML extends XML {
         cibQueryData.setColocationId(colocationIdMap);
 
         cibQueryData.setOrderId(orderIdMap);
+        cibQueryData.setOrderIdRscSets(orderIdRscSetsMap);
+        cibQueryData.setColocationIdRscSets(colocationIdRscSetsMap);
+        cibQueryData.setRscSetConnections(rscSetConnections);
         cibQueryData.setOrderRsc(orderRscMap);
 
         cibQueryData.setLocation(locationMap);
@@ -2883,12 +2980,18 @@ public class CRMXML extends XML {
         return cibQueryData;
     }
 
-    /**
-     * Returns order parameters.
-     */
+    /** Returns order parameters. */
     public final String[] getOrderParameters() {
         if (ordParams != null) {
             return ordParams.toArray(new String[ordParams.size()]);
+        }
+        return null;
+    }
+
+    /** Returns order parameters for resource sets. */
+    public final String[] getRscSetOrderParameters() {
+        if (rscSetOrdParams != null) {
+            return rscSetOrdParams.toArray(new String[rscSetOrdParams.size()]);
         }
         return null;
     }
@@ -3033,6 +3136,14 @@ public class CRMXML extends XML {
     public final String[] getColocationParameters() {
         if (colParams != null) {
             return colParams.toArray(new String[colParams.size()]);
+        }
+        return null;
+    }
+
+    /** Returns colocation parameters for resource sets. */
+    public final String[] getRscSetColocationParameters() {
+        if (rscSetColParams != null) {
+            return rscSetColParams.toArray(new String[rscSetColParams.size()]);
         }
         return null;
     }
@@ -3309,6 +3420,115 @@ public class CRMXML extends XML {
         /** Returns order action for "then" resource. */
         public final String getThenAction() {
             return thenAction;
+        }
+    }
+
+    /** Class that holds resource set data. */
+    public final class RscSet {
+        /** Resource set id. */
+        private final String id;
+        /** Resources in this set. */
+        private final List<String> rscIds;
+        /** String whether the resource set is sequential or not. */
+        private final String sequential;
+
+        /** Creates new RscSet object. */
+        public RscSet(final String id,
+                      final List<String> rscIds,
+                      final String sequential) {
+            this.id = id;
+            this.rscIds = rscIds;
+            this.sequential = sequential;
+        }
+
+        /** Returns resource set id. */
+        public final String getId() {
+            return id;
+        }
+        /** Returns resources in this set. */
+        public final List<String> getRscIds() {
+            return rscIds;
+        }
+
+        /** Returns whether the resource set is sequential or not. */
+        public final String getSequential() {
+            return sequential;
+        }
+
+        /** Returns whether this resource set is subset of the supplied
+         * resource set. */
+        public final boolean isSubsetOf(final RscSet oRscSet) {
+            if (oRscSet == null) {
+                return true;
+            }
+            for (final String rscId : getRscIds()) {
+                if (!oRscSet.getRscIds().contains(rscId)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    /** Class that holds data between two resource sests. */
+    public final class RscSetConnectionData {
+        /** Resource set 1. */
+        final RscSet rscSet1;
+        /** Resource set 2. */
+        final RscSet rscSet2;
+        /** Colocation id. */
+        final String constraintId;
+        /** Whether it is colocation. */
+        final boolean colocation;
+
+        /** Creates new RscSetConnectionData object. */
+        public RscSetConnectionData(final RscSet rscSet1,
+                                    final RscSet rscSet2,
+                                    final String constraintId,
+                                    final boolean colocation) {
+            this.rscSet1 = rscSet1;
+            this.rscSet2 = rscSet2;
+            this.constraintId = constraintId;
+            this.colocation = colocation;
+        }
+
+        /** Returns resource set 1. */
+        public final RscSet getRscSet1() {
+            return rscSet1;
+        }
+
+        /** Returns resource set 2. */
+        public final RscSet getRscSet2() {
+            return rscSet2;
+        }
+
+        /** Returns order or colocation id. */
+        public final String getConstraintId() {
+            return constraintId;
+        }
+
+        /** Returns whether it is colocation. */
+        public final boolean isColocation() {
+            return colocation;
+        }
+
+        /** Returns whether the same palceholder should be used. */
+        public final boolean samePlaceholder(
+                                        final RscSetConnectionData oRdata) {
+            if (oRdata.isColocation() == colocation) {
+                return false;
+            }
+            final RscSet oRscSet1 = oRdata.getRscSet1();
+            final RscSet oRscSet2 = oRdata.getRscSet2();
+            if ((rscSet1 == oRscSet1
+                 || (rscSet1 != null && rscSet1.isSubsetOf(oRscSet1))
+                 || (oRscSet1 != null && oRscSet1.isSubsetOf(rscSet1)))
+                && (rscSet2 == oRscSet2
+                    || (rscSet2 != null && rscSet2.isSubsetOf(oRscSet2))
+                    || (oRscSet2 != null && oRscSet2.isSubsetOf(rscSet2)))) {
+                return true;
+            }
+            return false;
         }
     }
 }

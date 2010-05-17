@@ -62,6 +62,15 @@ public class CibQuery {
     /** Order id map. */
     private Map<String, CRMXML.OrderData> orderId =
                       new LinkedHashMap<String, CRMXML.OrderData>();
+    /** Order id to resource sets map. */
+    private Map<String, List<CRMXML.RscSet>> orderIdRscSets =
+                           new LinkedHashMap<String, List<CRMXML.RscSet>>();
+    /** Colocation id to resource sets map. */
+    private Map<String, List<CRMXML.RscSet>> colocationIdRscSets =
+                           new LinkedHashMap<String, List<CRMXML.RscSet>>();
+    /** All connections between resource sets. */
+    private List<CRMXML.RscSetConnectionData> rscSetConnections =
+                                  new ArrayList<CRMXML.RscSetConnectionData>();
     /** Node parameters map. */
     private MultiKeyMap nodeParameters;
     /** Location map. */
@@ -241,17 +250,47 @@ public class CibQuery {
         this.orderId = orderId;
     }
 
-    /**
-     * Returns id rsc map.
-     */
+    /** Sets the order map with resource id as a key with resource sets. */
+    public final void setOrderIdRscSets(
+                       final Map<String, List<CRMXML.RscSet>> orderIdRscSets) {
+        this.orderIdRscSets = orderIdRscSets;
+    }
+
+    /** Sets the order map with resource id as a key with resource sets. */
+    public final void setColocationIdRscSets(
+                  final Map<String, List<CRMXML.RscSet>> colocationIdRscSets) {
+        this.colocationIdRscSets = colocationIdRscSets;
+    }
+
+    /** Returns rscSetConnections. */
+    public final List<CRMXML.RscSetConnectionData> getRscSetConnections() {
+        return rscSetConnections;
+    }
+
+    /** Sets rscSetConnections. */
+    public final void setRscSetConnections(
+                   final List<CRMXML.RscSetConnectionData> rscSetConnections) {
+        this.rscSetConnections = rscSetConnections;
+    }
+
+    /** Returns id rsc map. */
     public final Map<String, CRMXML.OrderData> getOrderId() {
         return orderId;
     }
-    /**
-     * Returns order rsc map.
-     */
+
+    /** Returns order rsc map. */
     public final Map<String, List<CRMXML.OrderData>> getOrderRsc() {
         return orderRsc;
+    }
+
+    /** Returns colocation id rsc to resource set map. */
+    public final Map<String, List<CRMXML.RscSet>> getColocationIdRscSets() {
+        return colocationIdRscSets;
+    }
+
+    /** Returns order id rsc to resource set map. */
+    public final Map<String, List<CRMXML.RscSet>> getOrderIdRscSets() {
+        return orderIdRscSets;
     }
 
     /**

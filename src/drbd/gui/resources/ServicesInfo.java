@@ -567,7 +567,109 @@ public class ServicesInfo extends EditableInfo {
                               groupServiceIsPresent,
                               testOnly);
         }
+
         hg.clearColocationList();
+        hg.clearOrderList();
+        /* resource sets */
+        final List<CRMXML.RscSetConnectionData> rscSetConnections =
+                                               clStatus.getRscSetConnections();
+        if (rscSetConnections != null) {
+            int index = 1;
+            final Map<CRMXML.RscSetConnectionData, ConstraintPHInfo>
+               rdataToCphi =
+                  new HashMap<CRMXML.RscSetConnectionData, ConstraintPHInfo>();
+            for (final CRMXML.RscSetConnectionData rdata : rscSetConnections) {
+                final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
+                final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
+                if (rscSet1 != null
+                    && rscSet2 != null
+                    && "true".equals(rscSet1.getSequential())
+                    && "true".equals(rscSet2.getSequential())) {
+                    /* no placeholder */
+                } else {
+                    ConstraintPHInfo cphi = null;
+                    for (final CRMXML.RscSetConnectionData ordata
+                                                        : rscSetConnections) {
+                        if (ordata == rdata) {
+                            break;
+                        }
+                        if (rdata.samePlaceholder(ordata)) {
+                            cphi = rdataToCphi.get(ordata);
+                            rdataToCphi.remove(ordata); /* only the first one */
+                            cphi.setRscSetConnectionData(rdata);
+                            break;
+                        }
+                    }
+                    if (cphi == null) {
+                    /* placeholder */
+                        cphi =
+                        (ConstraintPHInfo) getBrowser().getServiceInfoFromId(
+                                                      ConstraintPHInfo.NAME,
+                                                      Integer.toString(index));
+                        if (cphi != null) {
+                            index++;
+                            rdataToCphi.put(rdata, cphi);
+                            cphi.resetRscSetConnectionData(rdata);
+                        }
+                    }
+                    if (cphi == null) {
+                        cphi = new ConstraintPHInfo(getBrowser(), rdata);
+                        //cphi.setId(Integer.toString(index));
+                        getBrowser().addNameToServiceInfoHash(cphi);
+                        hg.addConstraintPlaceholder(cphi,
+                                                    null, /* pos */
+                                                    false);
+                        rdataToCphi.put(rdata, cphi);
+                        index++;
+                    }
+                    hg.setVertexIsPresent(cphi);
+
+                    if (rdata.isColocation()) {
+                        /* colocation */
+                        if (rscSet1 != null) {
+                            for (final String rscId : rscSet1.getRscIds()) {
+                                final ServiceInfo si =
+                                   getBrowser().getServiceInfoFromCRMId(rscId);
+                                hg.addColocation(rdata.getConstraintId(),
+                                                 cphi,
+                                                 si);
+                            }
+                        }
+                        if (rscSet2 != null) {
+                            for (final String rscId : rscSet2.getRscIds()) {
+                                final ServiceInfo si =
+                                   getBrowser().getServiceInfoFromCRMId(rscId);
+                                hg.addColocation(rdata.getConstraintId(),
+                                                 si,
+                                                 cphi);
+                            }
+                        }
+                    } else {
+                        /* order */
+                        if (rscSet1 != null) {
+                            for (final String rscId : rscSet1.getRscIds()) {
+                                final ServiceInfo si =
+                                   getBrowser().getServiceInfoFromCRMId(rscId);
+                                hg.addOrder(rdata.getConstraintId(), si, cphi);
+                            }
+                        }
+                        if (rscSet2 != null) {
+                            for (final String rscId : rscSet2.getRscIds()) {
+                                final ServiceInfo si =
+                                   getBrowser().getServiceInfoFromCRMId(rscId);
+                                hg.addOrder(rdata.getConstraintId(), cphi, si);
+                            }
+                        }
+                    }
+                    if (cphi != null) {
+                        cphi.setUpdated(false);
+                        cphi.getService().setNew(false);
+                    }
+                }
+            }
+        }
+
+        /* colocations */
         final Map<String, List<CRMXML.ColocationData>> colocationMap =
                                                  clStatus.getColocationRscMap();
         for (final String rscId : colocationMap.keySet()) {
@@ -583,7 +685,7 @@ public class ServicesInfo extends EditableInfo {
             }
         }
 
-        hg.clearOrderList();
+        /* orders */
         final Map<String, List<CRMXML.OrderData>> orderMap =
                                                     clStatus.getOrderRscMap();
         for (final String rscFirstId : orderMap.keySet()) {
@@ -981,10 +1083,10 @@ public class ServicesInfo extends EditableInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    final StringInfo gi = new StringInfo(
-                                                ClusterBrowser.PM_GROUP_NAME,
-                                                ClusterBrowser.PM_GROUP_NAME,
-                                                getBrowser());
+                    //final StringInfo gi = new StringInfo(
+                    //                            ClusterBrowser.PM_GROUP_NAME,
+                    //                            ClusterBrowser.PM_GROUP_NAME,
+                    //                            getBrowser());
                     addServicePanel(getBrowser().getCRMXML().getHbGroup(),
                                     getPos(),
                                     true,
@@ -1178,6 +1280,44 @@ public class ServicesInfo extends EditableInfo {
             }
         };
         items.add((UpdatableItem) addServiceMenuItem);
+        /* add constraint placeholder */
+        final MyMenuItem addConstraintPlaceholder =
+            new MyMenuItem(Tools.getString(
+                                "ServicesInfo.AddConstraintPlaceholder"),
+                           null,
+                           Tools.getString(
+                             "ServicesInfo.AddConstraintPlaceholder.ToolTip"),
+                           ConfigData.AccessType.ADMIN,
+                           ConfigData.AccessType.OP) {
+                private static final long serialVersionUID = 1L;
+
+                public boolean enablePredicate() {
+                    return !getBrowser().clStatusFailed();
+                }
+
+                public void action() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getPopup().setVisible(false);
+                        }
+                    });
+                    final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+                    final ConstraintPHInfo cphi =
+                                      new ConstraintPHInfo(getBrowser(), null);
+                    cphi.getService().setNew(true);
+                    getBrowser().addNameToServiceInfoHash(cphi);
+                    hg.addConstraintPlaceholder(cphi,
+                                                getPos(),
+                                                testOnly);
+                    //getBrowser().getHeartbeatGraph().repaint();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            hg.scale();
+                        }
+                    });
+                }
+            };
+        items.add((UpdatableItem) addConstraintPlaceholder);
         /* remove all services. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),

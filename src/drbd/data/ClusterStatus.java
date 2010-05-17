@@ -308,6 +308,21 @@ public class ClusterStatus {
         return cibQueryMap.getOrderRsc();
     }
 
+    /** Returns connections between resource sets. */
+    public final List<CRMXML.RscSetConnectionData> getRscSetConnections() {
+        return cibQueryMap.getRscSetConnections();
+    }
+
+     /** Returns resource sets associated with the order id. */
+     public final List<CRMXML.RscSet> getRscSetsOrd(final String ordId) {
+        return cibQueryMap.getOrderIdRscSets().get(ordId);
+     }
+
+     /** Returns resource sets associated with the colocation id. */
+     public final List<CRMXML.RscSet> getRscSetsCol(final String colId) {
+        return cibQueryMap.getColocationIdRscSets().get(colId);
+     }
+
     /**
      * Returns heartbeat ids of all resource locations.
      */

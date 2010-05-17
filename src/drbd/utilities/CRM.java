@@ -382,6 +382,111 @@ public final class CRM {
         }
     }
 
+    /** Returns one resource set xml. */
+    private static String getOneRscSet(final String rscSetId,
+                                       final CRMXML.RscSet rscSet) {
+        final StringBuffer xml = new StringBuffer(120);
+        xml.append("<resource_set id=\"");
+        xml.append(rscSetId);
+        xml.append("\" sequential=\"");
+        xml.append(rscSet.getSequential());
+        xml.append("\">");
+        for (final String rscId : rscSet.getRscIds()) {
+            xml.append("<resource_ref id=\"");
+            xml.append(rscId);
+            xml.append("\"/>");
+        }
+        xml.append("</resource_set>");
+        return xml.toString();
+    }
+
+    /** Sets resource set. */
+    public static boolean setRscSet(final Host host,
+                                    final String colId,
+                                    final boolean createCol,
+                                    final String ordId,
+                                    final boolean createOrd,
+                                    final List<CRMXML.RscSet> rscSetsCol,
+                                    final List<CRMXML.RscSet> rscSetsOrd,
+                                    final Map<String, String> attrs,
+                                    final boolean testOnly) {
+        if (colId != null) {
+            String cibadminOpt;
+            if (createCol) {
+                cibadminOpt = "-C";
+            } else {
+                cibadminOpt = "-R";
+            }
+            boolean ret = setRscSetConstraint(host,
+                                              "rsc_colocation",
+                                              colId,
+                                              rscSetsCol,
+                                              attrs,
+                                              cibadminOpt,
+                                              testOnly);
+            if (!ret) {
+                return false;
+            }
+        }
+        if (ordId != null) {
+            String cibadminOpt;
+            if (createOrd) {
+                cibadminOpt = "-C";
+            } else {
+                cibadminOpt = "-R";
+            }
+            return setRscSetConstraint(host,
+                                       "rsc_order",
+                                       ordId,
+                                       rscSetsOrd,
+                                       attrs,
+                                       cibadminOpt,
+                                       testOnly);
+        }
+        return true;
+    }
+
+    /** Sets resource set that is either colocation or order. */
+    private static boolean setRscSetConstraint(
+                                         final Host host,
+                                         final String tag,
+                                         final String constraintId,
+                                         final List<CRMXML.RscSet> rscSets,
+                                         final Map<String, String> ordAttrs,
+                                         final String cibadminOpt,
+                                         final boolean testOnly) {
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append("'<");
+        xml.append(tag);
+        xml.append(" id=\"");
+        xml.append(constraintId);
+        for (String attr : ordAttrs.keySet()) {
+            final String value = ordAttrs.get(attr);
+            if ("".equals(value)) {
+                continue;
+            }
+            xml.append("\" " + attr + "=\"");
+            xml.append(value);
+        }
+        xml.append("\">");
+        int rsId = 0;
+        for (final CRMXML.RscSet rscSet : rscSets) {
+            xml.append(getOneRscSet(constraintId + "-" + rsId, rscSet));
+            rsId++;
+        }
+        xml.append("</");
+        xml.append(tag);
+        xml.append(">'");
+
+
+        final String command = getCibCommand(cibadminOpt,
+                                             "constraints",
+                                             xml.toString());
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+
     /**
      * Returns xml for location xml.
      */

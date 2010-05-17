@@ -756,9 +756,7 @@ public abstract class ResourceGraph {
      */
     public abstract String getEdgeToolTip(final Edge edge);
 
-    /**
-     * Returns the width of the service vertex shape.
-     */
+    /** Returns the width of the service vertex shape. */
     protected final int getVertexWidth(final Vertex v) {
         if (vertexWidth.containsKey(v)) {
             return vertexWidth.get(v);
@@ -767,9 +765,7 @@ public abstract class ResourceGraph {
         }
     }
 
-    /**
-     * Returns the height of the service vertex shape.
-     */
+    /** Returns the height of the service vertex shape. */
     protected final int getVertexHeight(final Vertex v) {
         if (vertexHeight.containsKey(v)) {
             return vertexHeight.get(v);
@@ -778,47 +774,34 @@ public abstract class ResourceGraph {
         }
     }
 
-    /**
-     * Returns the default vertex width.
-     */
+    /** Returns the default vertex width. */
     protected int getDefaultVertexWidth(final Vertex v) {
         return 1;
     }
 
-    /**
-     * Returns the default vertex height.
-     */
+    /** Returns the default vertex height. */
     protected int getDefaultVertexHeight(final Vertex v) {
         return 1;
     }
 
-    /**
-     * Sets the vertex width.
-     */
-    protected final void setVertexWidth(final Vertex v, final int size) {
+    /** Sets the vertex width. */
+    protected void setVertexWidth(final Vertex v, final int size) {
         vertexWidth.put(v, size);
     }
 
-    /**
-     * Sets the vertex height.
-     */
-    protected final void setVertexHeight(final Vertex v, final int size) {
+    /** Sets the vertex height. */
+    protected void setVertexHeight(final Vertex v, final int size) {
         vertexHeight.put(v, size);
     }
 
-    /**
-     * Returns aspect ratio of the vertex v.
-     */
-    protected final float getVertexAspectRatio(final Vertex v) {
-
+    /** Returns aspect ratio of the vertex v. */
+    protected float getVertexAspectRatio(final Vertex v) {
         return (float) getVertexHeight(v) / (float) getVertexWidth(v);
     }
 
-    /**
-     * Returns shape of the vertex v.
-     */
+    /** Returns shape of the vertex v. */
     protected Shape getVertexShape(final Vertex v,
-                                         final VertexShapeFactory factory) {
+                                   final VertexShapeFactory factory) {
         return factory.getEllipse(v);
     }
 
@@ -1135,11 +1118,14 @@ public abstract class ResourceGraph {
         }
     }
 
-    /**
-     * Retuns border paint color for vertex v.
-     */
+    /** Retuns border paint color for vertex v. */
     protected final Paint getVertexDrawPaint(final Vertex v) {
         return Tools.getDefaultColor("ResourceGraph.DrawPaint");
+    }
+
+    /** Retuns border paint color of not picked vertex v, null for no border. */
+    protected Paint getVertexDrawPaintNotPicked(final Vertex v) {
+        return null;
     }
 
     /**
@@ -1200,7 +1186,12 @@ public abstract class ResourceGraph {
             if (pi.isPicked(v)) {
                 return getVertexDrawPaint(v);
             } else {
-                return getFillPaint(v);
+                final Paint drawPaintNotPicked = getVertexDrawPaintNotPicked(v);
+                if (drawPaintNotPicked == null) {
+                    return getFillPaint(v);
+                } else {
+                    return drawPaintNotPicked;
+                }
             }
         }
 
@@ -1371,13 +1362,19 @@ public abstract class ResourceGraph {
                                               final Shape shape) {
             int shapeWidth = getDefaultVertexWidth(v);
             int shapeHeight = getDefaultVertexHeight(v);
+            /* icons */
+            final List<ImageIcon> icons = getIconsForVertex(v, isTestOnly());
             /* main text */
             final String mainText = getMainText(v, isTestOnly());
             TextLayout mainTextLayout = null;
             if (mainText != null && !mainText.equals("")) {
                 mainTextLayout = getVertexTextLayout(g2d, mainText, 1);
+                int iconWidth = 64;
+                if (icons == null) {
+                    iconWidth = 4;
+                }
                 final int mainTextWidth =
-                              (int) mainTextLayout.getBounds().getWidth() + 64;
+                       (int) mainTextLayout.getBounds().getWidth() + iconWidth;
                 if (mainTextWidth > shapeWidth) {
                     shapeWidth = mainTextWidth;
                 }
@@ -1456,11 +1453,11 @@ public abstract class ResourceGraph {
                     double y = pos.getY();
                     if (widthChanged) {
                         setVertexWidth(v, shapeWidth);
-                        x = x - (oldShapeWidth - shapeWidth) / 2;
+                        x = x - (oldShapeWidth - getVertexWidth(v)) / 2;
                     }
                     if (heightChanged) {
                         setVertexHeight(v, shapeHeight);
-                        y = y - (oldShapeHeight - shapeHeight) / 2;
+                        y = y - (oldShapeHeight - getVertexHeight(v)) / 2;
                     }
                     pos.setLocation(x, y);
                     getVertexLocations().setLocation(v, pos);
@@ -1481,7 +1478,6 @@ public abstract class ResourceGraph {
             drawInside(v, g2d, x, y, shape);
 
             /* icon */
-            final List<ImageIcon> icons = getIconsForVertex(v, isTestOnly());
             if (icons != null) {
                 for (final ImageIcon icon : icons) {
                     icon.setDescription("sdf");

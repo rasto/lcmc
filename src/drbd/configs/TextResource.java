@@ -1468,6 +1468,12 @@ public class TextResource extends
         {"ClusterBrowser.OperationsSameAs",
          "Same As"},
 
+        {"ServicesInfo.AddConstraintPlaceholder",
+          "Add Constraint Placeholder"},
+
+        {"ServicesInfo.AddConstraintPlaceholder.ToolTip",
+          "Add constraint placeholder to create a resource set."},
+
         {"PtestData.ToolTip",
          "What happens when you apply it:"},
 
@@ -1858,6 +1864,19 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.ResumeOn",
          "Resume on "},
+
+        {"ConstraintPHInfo.confirmRemove.Title",
+         "Remove Constraint Placeholder"},
+
+        {"ConstraintPHInfo.confirmRemove.Description",
+         "This placeholder with all constraints will be removed. "
+         + "Are you sure?"},
+
+        {"ConstraintPHInfo.confirmRemove.Yes",
+         "Remove"},
+
+        {"ConstraintPHInfo.confirmRemove.No",
+         "Cancel"},
 
         {"ConfigData.OpMode.RO",
          "Read-Only"},

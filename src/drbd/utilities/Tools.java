@@ -2265,5 +2265,4 @@ public final class Tools {
         sBounds.height -= (screenInsets.top + screenInsets.bottom);
         return sBounds;
     }
-
 }

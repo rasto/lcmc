@@ -339,6 +339,7 @@ public class GUIData  {
         //TODO: lock addHostButtonList
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                // TODO: need lock for addHostButtonList 
                 for (JComponent addHostButton : addHostButtonList) {
                     addHostButton.setEnabled(enable);
                 }
