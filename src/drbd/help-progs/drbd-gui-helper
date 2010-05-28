@@ -225,7 +225,7 @@ sub get_used {
 	my $lvm_devs = shift;
 	my $drbd_devs = shift;
 	my %dev_to_used;
-	for (`/bin/df -Pl`) {
+	for (`/bin/df -Pl 2>/dev/null`) {
 		if (m!(\S+)\s+\d+\s+\d+\s+\d+\s+(\d+)%\s+!) {
 			my ($dev, $used) = ($1, $2);
 			if ($$drbd_devs{$dev}) {
@@ -449,7 +449,7 @@ sub get_disk_info {
 	
 	print join "", map { $_->[0] } 
 	  sort { 
-	   ($a->[1] =~ /(^\D+)/)[0] cmp ($b->[1]  =~ /(^\D+)/)[0] 
+	   (($a->[1] =~ /(^\D+)/)[0] || "") cmp (($b->[1]  =~ /(^\D+)/)[0] || "")
 				||
 	   (($a->[1] =~ /(\d+$)/)[0] || 0) <=> (($b->[1]  =~ /(\d+$)/)[0] || 0) 
 	  } map { [$_, /([^\/]+?) /] } @info;
