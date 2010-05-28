@@ -1015,7 +1015,11 @@ public abstract class ResourceGraph {
      * Removes info from the graph.
      */
     protected void removeInfo(final Info i) {
-        graph.removeVertex(getVertex(i));
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                graph.removeVertex(getVertex(i));
+            }
+        });
         getVertexLocations().reset();
     }
 
@@ -1738,10 +1742,15 @@ public abstract class ResourceGraph {
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        try {
-            getGraph().removeEdge(testEdge);
-        } catch (final Exception ee) {
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    getGraph().removeEdge(testEdge);
+                } catch (final Exception ignore) {
+                    /* ignore */
+                }
+            }
+        });
         mTestEdgeLock.release();
 
     }
@@ -1759,12 +1768,16 @@ public abstract class ResourceGraph {
         if (!gotlock) {
             return;
         }
-        try {
-            if (testEdge != null) {
-                getGraph().removeEdge(testEdge);
-            }
-        } catch (final Exception e) {
-            /* ignore */
+        if (testEdge != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        getGraph().removeEdge(testEdge);
+                    } catch (final Exception e) {
+                        /* ignore */
+                    }
+                }
+            });
         }
         if (!isTestAnimation()) {
             mTestEdgeLock.release();

@@ -579,12 +579,12 @@ public class ServicesInfo extends EditableInfo {
                rdataToCphi =
                   new HashMap<CRMXML.RscSetConnectionData, ConstraintPHInfo>();
             for (final CRMXML.RscSetConnectionData rdata : rscSetConnections) {
-                final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
-                final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
-                if (rscSet1 != null
-                    && rscSet2 != null
-                    && "true".equals(rscSet1.getSequential())
-                    && "true".equals(rscSet2.getSequential())) {
+                //System.out.println("connection: " + rdata.getConstraintId()
+                //    + " is col: " + rdata.isColocation());
+                if (rdata.getRscSet1() != null
+                    && rdata.getRscSet2() != null
+                    && "true".equals(rdata.getRscSet1().getSequential())
+                    && "true".equals(rdata.getRscSet2().getSequential())) {
                     /* no placeholder */
                 } else {
                     ConstraintPHInfo cphi = null;
@@ -594,14 +594,20 @@ public class ServicesInfo extends EditableInfo {
                             break;
                         }
                         if (rdata.samePlaceholder(ordata)) {
+                            //System.out.println("connection: "
+                            //    + rdata.getConstraintId()
+                            //    + " is col: " + rdata.isColocation()
+                            //    + " same ph: " + ordata.getConstraintId()
+                            //    + " is o col: " + ordata.isColocation());
+
                             cphi = rdataToCphi.get(ordata);
                             rdataToCphi.remove(ordata); /* only the first one */
-                            cphi.setRscSetConnectionData(rdata);
+                            cphi.setRscSetConnectionData(rdata); //*
                             break;
                         }
                     }
                     if (cphi == null) {
-                    /* placeholder */
+                        /* placeholder */
                         cphi =
                         (ConstraintPHInfo) getBrowser().getServiceInfoFromId(
                                                       ConstraintPHInfo.NAME,
@@ -624,6 +630,8 @@ public class ServicesInfo extends EditableInfo {
                     }
                     hg.setVertexIsPresent(cphi);
 
+                    final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
+                    final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
                     if (rdata.isColocation()) {
                         /* colocation */
                         if (rscSet1 != null) {
@@ -663,7 +671,9 @@ public class ServicesInfo extends EditableInfo {
                     }
                     if (cphi != null) {
                         cphi.setUpdated(false);
-                        cphi.getService().setNew(false);
+                        if (!testOnly) {
+                            cphi.getService().setNew(false);
+                        }
                     }
                 }
             }

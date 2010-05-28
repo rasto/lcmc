@@ -3468,14 +3468,29 @@ public class CRMXML extends XML {
             }
             return true;
         }
+
+        /** Returns whether this resource set is equal to the supplied
+         * resource set. The order of ids doesn't matter. */
+        public final boolean equals(final RscSet oRscSet) {
+            if (oRscSet == null
+                || oRscSet.getRscIds().size() != getRscIds().size()) {
+                return false;
+            }
+            for (final String rscId : getRscIds()) {
+                if (!oRscSet.getRscIds().contains(rscId)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     /** Class that holds data between two resource sests. */
     public final class RscSetConnectionData {
         /** Resource set 1. */
-        final RscSet rscSet1;
+        RscSet rscSet1;
         /** Resource set 2. */
-        final RscSet rscSet2;
+        RscSet rscSet2;
         /** Colocation id. */
         final String constraintId;
         /** Whether it is colocation. */
@@ -3521,14 +3536,25 @@ public class CRMXML extends XML {
             final RscSet oRscSet1 = oRdata.getRscSet1();
             final RscSet oRscSet2 = oRdata.getRscSet2();
             if ((rscSet1 == oRscSet1
-                 || (rscSet1 != null && rscSet1.isSubsetOf(oRscSet1))
-                 || (oRscSet1 != null && oRscSet1.isSubsetOf(rscSet1)))
+                 || rscSet1 == null
+                 || oRscSet1 == null
+                 || rscSet1.isSubsetOf(oRscSet1)
+                 || oRscSet1.isSubsetOf(rscSet1))
                 && (rscSet2 == oRscSet2
-                    || (rscSet2 != null && rscSet2.isSubsetOf(oRscSet2))
-                    || (oRscSet2 != null && oRscSet2.isSubsetOf(rscSet2)))) {
+                    || rscSet2 == null 
+                    || oRscSet2 == null
+                    || rscSet2.isSubsetOf(oRscSet2)
+                    || oRscSet2.isSubsetOf(rscSet2))) {
                 return true;
             }
             return false;
+        }
+
+        /** Reverse resource sets. */
+        public void reverse() {
+            final RscSet old1 = rscSet1;
+            rscSet1 = rscSet2;
+            rscSet2 = old1;
         }
     }
 }

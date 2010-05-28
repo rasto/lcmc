@@ -97,8 +97,56 @@ public class ConstraintPHInfo extends ServiceInfo {
     public final void setRscSetConnectionData(
                     final CRMXML.RscSetConnectionData rscSetConnectionData) {
         if (rscSetConnectionData.isColocation()) {
+            if (rscSetConnectionDataCol != null) {
+                //System.out.println(
+                //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
+                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
+                //if (rscSetConnectionData.getRscSet1() != null) {
+                //    System.out.println("rsc1 ids: "
+                //           + rscSetConnectionData.getRscSet1().getRscIds());
+                //}
+                //if (rscSetConnectionData.getRscSet2() != null) {
+                //    System.out.println(", rsc2 ids: "
+                //           + rscSetConnectionDataCol.getRscSet2().getRscIds());
+                //}
+                if (rscSetConnectionData.getRscSet2() == null
+                    && rscSetConnectionData.getRscSet1() != null
+                    && rscSetConnectionDataCol.getRscSet2() != null
+                    && (rscSetConnectionData.getRscSet1().isSubsetOf(
+                                     rscSetConnectionDataCol.getRscSet2())
+                        || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
+                                     rscSetConnectionData.getRscSet1()))) {
+                    //System.out.println("reverse col");
+                    /* upside down */
+                    rscSetConnectionData.reverse();
+                }
+            }
             this.rscSetConnectionDataCol = rscSetConnectionData;
         } else {
+            if (rscSetConnectionDataOrd != null) {
+                //System.out.println(
+                //  "set rsc1: " + rscSetConnectionData.getRscSet1()
+                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
+                //if (rscSetConnectionData.getRscSet1() != null) {
+                //    System.out.println("rsc1 ids: "
+                //           + rscSetConnectionData.getRscSet1().getRscIds());
+                //}
+                //if (rscSetConnectionData.getRscSet2() != null) {
+                //    System.out.println(", rsc2 ids: "
+                //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
+                //}
+                if (rscSetConnectionData.getRscSet2() == null
+                    && rscSetConnectionData.getRscSet1() != null
+                    && rscSetConnectionDataOrd.getRscSet2() != null
+                    && (rscSetConnectionData.getRscSet1().isSubsetOf(
+                                     rscSetConnectionDataOrd.getRscSet2())
+                        || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
+                                     rscSetConnectionData.getRscSet1()))) {
+                    //System.out.println("reverse ord");
+                    /* upside down */
+                    rscSetConnectionData.reverse();
+                }
+            }
             this.rscSetConnectionDataOrd = rscSetConnectionData;
         }
     }
@@ -107,9 +155,65 @@ public class ConstraintPHInfo extends ServiceInfo {
     public final void resetRscSetConnectionData(
                     final CRMXML.RscSetConnectionData rscSetConnectionData) {
         if (rscSetConnectionData.isColocation()) {
+            if (rscSetConnectionDataCol != null) {
+                //System.out.println(
+                //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
+                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
+                //if (rscSetConnectionDataCol.getRscSet1() != null) {
+                //    System.out.println("rsc1 ids: "
+                //           + rscSetConnectionData.getRscSet1().getRscIds());
+                //}
+                //if (rscSetConnectionDataCol.getRscSet2() != null) {
+                //    System.out.println(", rsc2 ids: "
+                //           + rscSetConnectionDataCol.getRscSet2().getRscIds());
+                //}
+                if (rscSetConnectionData.getRscSet2() == null
+                    && rscSetConnectionData.getRscSet1() != null
+                    && rscSetConnectionDataCol.getRscSet2() != null
+                    && (rscSetConnectionData.getRscSet1().isSubsetOf(
+                                     rscSetConnectionDataCol.getRscSet2())
+                        || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
+                                     rscSetConnectionData.getRscSet1()))) {
+                    //System.out.println("reverse col");
+                    /* upside down */
+                    rscSetConnectionData.reverse();
+                }
+            }
+            //if (rscSetConnectionDataCol != null) {
+            //    if (rscSetConnectionDataCol.getRscSet1() == null
+            //        && rscSetConnectionDataCol.getRscSet2() != null) {
+            //        System.out.println("reverse");
+            //        /* upside down */
+            //        rscSetConnectionData.reverse();
+            //    }
+            //}
             this.rscSetConnectionDataCol = rscSetConnectionData;
             this.rscSetConnectionDataOrd = null;
         } else {
+            if (rscSetConnectionDataOrd != null) {
+                //System.out.println(
+                //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
+                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
+                //if (rscSetConnectionDataOrd.getRscSet1() != null) {
+                //    System.out.println("rsc1 ids: "
+                //           + rscSetConnectionData.getRscSet1().getRscIds());
+                //}
+                //if (rscSetConnectionDataOrd.getRscSet2() != null) {
+                //    System.out.println(", rsc2 ids: "
+                //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
+                //}
+                if (rscSetConnectionData.getRscSet2() == null
+                    && rscSetConnectionData.getRscSet1() != null
+                    && rscSetConnectionDataOrd.getRscSet2() != null
+                    && (rscSetConnectionData.getRscSet1().isSubsetOf(
+                                     rscSetConnectionDataOrd.getRscSet2())
+                        || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
+                                     rscSetConnectionData.getRscSet1()))) {
+                    //System.out.println("reverse ord");
+                    /* upside down */
+                    rscSetConnectionData.reverse();
+                }
+            }
             this.rscSetConnectionDataOrd = rscSetConnectionData;
             this.rscSetConnectionDataCol = null;
         }

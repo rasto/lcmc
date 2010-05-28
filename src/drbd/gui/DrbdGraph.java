@@ -219,7 +219,11 @@ public class DrbdGraph extends ResourceGraph {
                         removeDrbdResource(dri);
                         dri.removeFromHashes();
                     }
-                    getGraph().removeVertex(bdv);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getGraph().removeVertex(bdv);
+                        }
+                    });
                     removeInfo(bdv);
                     removeVertex(bdi);
                     getVertexToMenus().remove(bdv);
@@ -264,7 +268,15 @@ public class DrbdGraph extends ResourceGraph {
     public final void removeDrbdResource(final DrbdResourceInfo dri) {
         final MyEdge e = (MyEdge) drbdResourceToEdgeMap.get(dri);
         e.reset();
-        getGraph().removeEdge(e);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    getGraph().removeEdge(e);
+                } catch (final Exception ignore) {
+                    /* ignore */
+                }
+            }
+        });
     }
 
     /**
