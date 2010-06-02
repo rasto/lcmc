@@ -109,6 +109,8 @@ if ($option eq "all") {
 	get_cluster_metadata();
 } elsif ($option eq "get-cluster-versions") {
 	print get_cluster_versions();
+} elsif ($option eq "get-vm-info") {
+	get_vm_info();
 } elsif ($option eq "gui-test") {
 	gui_test(@ARGV);
 } else {
