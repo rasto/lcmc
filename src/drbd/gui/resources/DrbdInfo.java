@@ -300,11 +300,14 @@ public class DrbdInfo extends EditableInfo {
         return getBrowser().getDrbdXML().getAccessType(param);
     }
 
-    /**
-     * Returns whether the parameter is of the integer type.
-     */
+    /** Returns whether the parameter is of the integer type. */
     protected final boolean isInteger(final String param) {
         return getBrowser().getDrbdXML().isInteger(param);
+    }
+
+    /** Returns whether the parameter is of the label type. */
+    protected final boolean isLabel(final String param) {
+        return getBrowser().getDrbdXML().isLabel(param);
     }
 
     /**

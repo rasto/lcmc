@@ -2007,12 +2007,16 @@ public class ServiceInfo extends EditableInfo {
         return crmXML.isMetaAttr(resourceAgent, param);
     }
 
-    /**
-     * Returns true if the specified parameter is integer.
-     */
+    /** Returns true if the specified parameter is integer. */
     protected boolean isInteger(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isInteger(resourceAgent, param);
+    }
+
+    /** Returns true if the specified parameter is label. */
+    protected boolean isLabel(final String param) {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        return crmXML.isLabel(resourceAgent, param);
     }
 
     /**
@@ -3550,6 +3554,14 @@ public class ServiceInfo extends EditableInfo {
                                                          testOnly)) {
             /* edge added */
             if (isConstraintPH() || serviceInfo.isConstraintPH()) {
+                if (isConstraintPH() && getService().isNew()) {
+                    if (!colocationOnly) {
+                        ((ConstraintPHInfo) this).setReversedOrder();
+                    }
+                    if (!orderOnly) {
+                        ((ConstraintPHInfo) this).setReversedColocation();
+                    }
+                }
                 addConstraintWithPlaceholder(serviceInfo,
                                              colocationOnly,
                                              orderOnly,
@@ -3967,6 +3979,7 @@ public class ServiceInfo extends EditableInfo {
     private MyMenu getExistingServiceMenuItem(final String name,
                                               final boolean colocationOnly,
                                               final boolean orderOnly,
+                                              final boolean enableForNew,
                                               final boolean testOnly) {
         final ServiceInfo thisClass = this;
         return new MyMenu(name,
@@ -3977,7 +3990,8 @@ public class ServiceInfo extends EditableInfo {
             public boolean enablePredicate() {
                 return !getBrowser().clStatusFailed()
                        && !getService().isRemoved()
-                       && !getService().isNew();
+                       && (enableForNew || !getService().isNew());
+                       //TODO: enableForNew should be always enabled
             }
 
             public void update() {
@@ -4027,6 +4041,7 @@ public class ServiceInfo extends EditableInfo {
                            Tools.getString("ClusterBrowser.Hb.ColOnlySubmenu"),
                            true,
                            false,
+                           false,
                            testOnly);
                     add(colOnlyItem);
 
@@ -4035,6 +4050,7 @@ public class ServiceInfo extends EditableInfo {
                            Tools.getString("ClusterBrowser.Hb.OrdOnlySubmenu"),
                            false,
                            true,
+                           false,
                            testOnly);
                     add(ordOnlyItem);
                     final Thread thread = new Thread(new Runnable() {
@@ -4295,6 +4311,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Adds menu items with dependend services and groups. */
     protected void addDependencyMenuItems(final List<UpdatableItem> items,
+                                          final boolean enableForNew,
                                           final boolean testOnly) { 
         /* add new group and dependency*/
         final MyMenuItem addGroupMenuItem =
@@ -4348,6 +4365,7 @@ public class ServiceInfo extends EditableInfo {
                     Tools.getString("ClusterBrowser.Hb.AddStartBefore"),
                     false,
                     false,
+                    enableForNew,
                     testOnly);
         items.add((UpdatableItem) existingServiceMenuItem);
     }
@@ -4361,7 +4379,7 @@ public class ServiceInfo extends EditableInfo {
         final boolean testOnly = false;
 
         if (cloneInfo == null) {
-            addDependencyMenuItems(items, testOnly);
+            addDependencyMenuItems(items, false, testOnly);
         }
         /* start resource */
         final MyMenuItem startMenuItem =

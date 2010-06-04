@@ -53,6 +53,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class describes a connection between two heartbeat services.
@@ -64,6 +65,8 @@ public class HbConnectionInfo extends EditableInfo {
     /** Constraints. */
     private final List<HbConstraintInterface> constraints =
                                    new ArrayList<HbConstraintInterface>();
+    /** constraints lock. */
+    private final Mutex mConstraintsLock = new Mutex();
     /** Resource 1 in colocation constraint (the last one). */
     private ServiceInfo lastServiceInfoRsc = null;
     /** Resource 2 in colocation constraint (the last one). */
@@ -199,10 +202,13 @@ public class HbConnectionInfo extends EditableInfo {
         return false;
     }
 
-    /**
-     * Returns true if the specified parameter is integer.
-     */
+    /** Returns true if the specified parameter is integer. */
     protected final boolean isInteger(final String param) {
+        return false;
+    }
+
+    /** Returns true if the specified parameter is label. */
+    protected final boolean isLabel(final String param) {
         return false;
     }
 
@@ -252,9 +258,15 @@ public class HbConnectionInfo extends EditableInfo {
      * Applies the changes to the constraints.
      */
     public final void apply(final Host dcHost, final boolean testOnly) {
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             c.apply(dcHost, testOnly);
         }
+        mConstraintsLock.release();
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -271,6 +283,11 @@ public class HbConnectionInfo extends EditableInfo {
     public final boolean checkResourceFields(final String param,
                                              final String[] params) {
         boolean correct = true;
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             final boolean cor = c.checkResourceFieldsCorrect(
                                                   param,
@@ -290,6 +307,7 @@ public class HbConnectionInfo extends EditableInfo {
                 break;
             }
         }
+        mConstraintsLock.release();
         return correct && changed;
     }
 
@@ -396,6 +414,11 @@ public class HbConnectionInfo extends EditableInfo {
         /* params */
         final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
         EditableInfo firstConstraint = null;
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             if (firstConstraint == null) {
                 firstConstraint = (EditableInfo) c;
@@ -434,6 +457,7 @@ public class HbConnectionInfo extends EditableInfo {
                         ClusterBrowser.SERVICE_FIELD_WIDTH,
                         null);
         }
+        mConstraintsLock.release();
 
         applyButton.addActionListener(
             new ActionListener() {
@@ -680,6 +704,11 @@ public class HbConnectionInfo extends EditableInfo {
         final List<HbConstraintInterface> constraintsToRemove =
                                     new ArrayList<HbConstraintInterface>();
         boolean changed = false;
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             if (c.isOrder() == isOrder) {
                 constraintsToRemove.add(c);
@@ -694,6 +723,7 @@ public class HbConnectionInfo extends EditableInfo {
            }
            constraints.remove(c);
         }
+        mConstraintsLock.release();
         infoPanel = null;
         if (changed) {
             selectMyself();
@@ -742,7 +772,13 @@ public class HbConnectionInfo extends EditableInfo {
         orderIds.put(ordId, oi);
         oi.getService().setHeartbeatId(ordId);
         oi.setParameters();
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         constraints.add(oi);
+        mConstraintsLock.release();
         infoPanel = null;
         selectMyself();
     }
@@ -775,7 +811,13 @@ public class HbConnectionInfo extends EditableInfo {
         colocationIds.put(colId, ci);
         ci.getService().setHeartbeatId(colId);
         ci.setParameters();
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         constraints.add(ci);
+        mConstraintsLock.release();
         infoPanel = null;
         selectMyself();
     }
@@ -880,15 +922,26 @@ public class HbConnectionInfo extends EditableInfo {
      */
     public final void updateAdvancedPanels() {
         super.updateAdvancedPanels();
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             c.updateAdvancedPanels();
         }
+        mConstraintsLock.release();
     }
 
     /**
      * Returns whether this resource is resource 1 in colocation constraint.
      */
     public final boolean isWithRsc(final ServiceInfo si) {
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             if (!c.isOrder()) {
                 ServiceInfo rsc2 = ((HbColocationInfo) c).getRscInfo2();
@@ -897,10 +950,12 @@ public class HbConnectionInfo extends EditableInfo {
                     rsc2 = gi;
                 }
                 if (rsc2.equals(si)) {
+                    mConstraintsLock.release();
                     return true;
                 }
             }
         }
+        mConstraintsLock.release();
         return true;
     }
 
@@ -911,6 +966,11 @@ public class HbConnectionInfo extends EditableInfo {
     private boolean isTwoDirections(final boolean isOrder) {
         ServiceInfo allRsc1 = null;
         ServiceInfo allRsc2 = null;
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             if (c.isOrder() == isOrder) {
                 ServiceInfo rsc1 = c.getRscInfo1();
@@ -926,15 +986,18 @@ public class HbConnectionInfo extends EditableInfo {
                 if (allRsc1 == null) {
                     allRsc1 = rsc1;
                 } else if (!rsc1.equals(allRsc1)) {
+                    mConstraintsLock.release();
                     return true;
                 }
                 if (allRsc2 == null) {
                     allRsc2 = rsc2;
                 } else if (!rsc2.equals(allRsc2)) {
+                    mConstraintsLock.release();
                     return true;
                 }
             }
         }
+        mConstraintsLock.release();
         return false;
     }
 
@@ -949,13 +1012,20 @@ public class HbConnectionInfo extends EditableInfo {
     }
     /** Returns whether this service has a colocation or order. */
     public final boolean hasColocationOrOrder(final ServiceInfo si) {
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConstraintInterface c : constraints) {
             final ServiceInfo rsc1 = c.getRscInfo1();
             final ServiceInfo rsc2 = c.getRscInfo2();
             if (si.equals(rsc1) || si.equals(rsc2)) {
+                mConstraintsLock.release();
                 return true;
             }
         }
+        mConstraintsLock.release();
         return false;
     }
 }

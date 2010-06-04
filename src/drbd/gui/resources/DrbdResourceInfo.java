@@ -443,11 +443,14 @@ public class DrbdResourceInfo extends EditableInfo
         return getBrowser().getDrbdXML().getAccessType(param);
     }
 
-    /**
-     * Returns whether this drbd parameter is of integer type.
-     */
+    /** Returns whether this drbd parameter is of integer type. */
     protected final boolean isInteger(final String param) {
         return getBrowser().getDrbdXML().isInteger(param);
+    }
+
+    /** Returns whether this drbd parameter is of label type. */
+    protected final boolean isLabel(final String param) {
+        return getBrowser().getDrbdXML().isLabel(param);
     }
 
     /**

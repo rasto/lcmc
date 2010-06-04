@@ -74,6 +74,8 @@ public abstract class EditableInfo extends Info {
     protected abstract boolean isAdvanced(String param);
     /** Returns access type of this parameter. */
     protected abstract ConfigData.AccessType getAccessType(String param);
+    /** Returns whether this parameter is of label type. */
+    protected abstract boolean isLabel(String param);
     /** Returns whether this parameter is of the integer type. */
     protected abstract boolean isInteger(String param);
     /** Returns whether this parameter is of the time type. */
@@ -580,6 +582,8 @@ public abstract class EditableInfo extends Info {
         } else if (isTimeType(param)) {
             type = GuiComboBox.Type.TEXTFIELDWITHUNIT;
             units = getTimeUnits();
+        } else if (isLabel(param)) {
+            type = GuiComboBox.Type.LABELFIELD;
         }
         final GuiComboBox paramCb = new GuiComboBox(
                                                 initValue,

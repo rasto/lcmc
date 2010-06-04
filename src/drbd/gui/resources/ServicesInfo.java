@@ -159,11 +159,13 @@ public class ServicesInfo extends EditableInfo {
         return getBrowser().getCRMXML().checkGlobalParam(param, newValue);
     }
 
-    /**
-     * Returns whether the global parameter is of the integer type.
-     */
+    /** Returns whether the global parameter is of the integer type. */
     protected final boolean isInteger(final String param) {
         return getBrowser().getCRMXML().isGlobalInteger(param);
+    }
+    /** Returns whether the global parameter is of the label type. */
+    protected final boolean isLabel(final String param) {
+        return getBrowser().getCRMXML().isGlobalLabel(param);
     }
 
     /**
@@ -579,8 +581,8 @@ public class ServicesInfo extends EditableInfo {
                rdataToCphi =
                   new HashMap<CRMXML.RscSetConnectionData, ConstraintPHInfo>();
             for (final CRMXML.RscSetConnectionData rdata : rscSetConnections) {
-                //System.out.println("connection: " + rdata.getConstraintId()
-                //    + " is col: " + rdata.isColocation());
+                System.out.println("connection: " + rdata.getConstraintId()
+                    + " is col: " + rdata.isColocation());
                 if (rdata.getRscSet1() != null
                     && rdata.getRscSet2() != null
                     && "true".equals(rdata.getRscSet1().getSequential())
@@ -594,11 +596,11 @@ public class ServicesInfo extends EditableInfo {
                             break;
                         }
                         if (rdata.samePlaceholder(ordata)) {
-                            //System.out.println("connection: "
-                            //    + rdata.getConstraintId()
-                            //    + " is col: " + rdata.isColocation()
-                            //    + " same ph: " + ordata.getConstraintId()
-                            //    + " is o col: " + ordata.isColocation());
+                            System.out.println("connection: "
+                                + rdata.getConstraintId()
+                                + " is col: " + rdata.isColocation()
+                                + " same ph: " + ordata.getConstraintId()
+                                + " is o col: " + ordata.isColocation());
 
                             cphi = rdataToCphi.get(ordata);
                             rdataToCphi.remove(ordata); /* only the first one */
@@ -615,7 +617,7 @@ public class ServicesInfo extends EditableInfo {
                         if (cphi != null) {
                             index++;
                             rdataToCphi.put(rdata, cphi);
-                            cphi.resetRscSetConnectionData(rdata);
+                            cphi.setRscSetConnectionData(rdata);
                         }
                     }
                     if (cphi == null) {

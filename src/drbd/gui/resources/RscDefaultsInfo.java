@@ -217,12 +217,16 @@ public class RscDefaultsInfo extends EditableInfo {
         return true;
     }
 
-    /**
-     * Returns true if the specified parameter is integer.
-     */
+    /** Returns true if the specified parameter is integer. */
     protected final boolean isInteger(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsInteger(param);
+    }
+
+    /** Returns true if the specified parameter is label. */
+    protected final boolean isLabel(final String param) {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        return crmXML.isRscDefaultsLabel(param);
     }
 
     /**

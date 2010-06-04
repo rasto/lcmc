@@ -1364,10 +1364,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return true;
     }
 
-    /**
-     * Returns true if the specified parameter is integer.
-     */
+    /** Returns true if the specified parameter is integer. */
     protected final boolean isInteger(final String param) {
+        return false;
+    }
+
+    /** Returns true if the specified parameter is a label. */
+    protected final boolean isLabel(final String param) {
         return false;
     }
 

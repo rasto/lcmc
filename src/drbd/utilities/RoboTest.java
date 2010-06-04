@@ -270,6 +270,8 @@ public final class RoboTest {
                     startTest1(robot, host);
                 } else if (index == 2) {
                     startTest2(robot, host);
+                } else if (index == 3) {
+                    startTest3(robot, host);
                 }
                 Tools.info("test " + index + " done");
             }
@@ -475,6 +477,19 @@ public final class RoboTest {
         aborted = false;
     }
 
+    /** TEST 2. */
+    private static void startTest2(final Robot robot, final Host host) {
+        host.getSSH().installTestFiles(1);
+        host.checkTest("test2", 2);
+        /* create IPaddr2 with 192.168.100.100 ip */
+        final int ipX = 235;
+        final int ipY = 255;
+        aborted = false;
+        moveTo(robot, ipX, ipY);
+        rightClick(robot); /* popup */
+        aborted = false;
+    }
+
     /** Choose dummy resource. */
     private static void chooseDummy(final Robot robot) {
         press(robot, KeyEvent.VK_D);
@@ -642,8 +657,8 @@ public final class RoboTest {
         leftClick(robot); /* add col */
     }
 
-    /** TEST 1. */
-    private static void startTest2(final Robot robot, final Host host) {
+    /** TEST 2. */
+    private static void startTest3(final Robot robot, final Host host) {
         aborted = false;
         /* filesystem/drbd */
         moveTo(robot, 577, 253);

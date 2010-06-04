@@ -65,6 +65,12 @@ public class ConstraintPHInfo extends ServiceInfo {
     private CRMXML.RscSetConnectionData rscSetConnectionDataCol = null;
     /** Resource set connection data for order. */
     private CRMXML.RscSetConnectionData rscSetConnectionDataOrd = null;
+    /** Whether the direction of colocation was reversed, meaning it is from
+     * this placeholder, when it was new. */
+    private boolean reversedCol = false;
+    /** Whether the direction of order was reversed, meaning it is from this
+     * placeholder, when it was new. */
+    private boolean reversedOrd = false;
 
     /**
      * Prepares a new <code>ConstraintPHInfo</code> object.
@@ -97,7 +103,10 @@ public class ConstraintPHInfo extends ServiceInfo {
     public final void setRscSetConnectionData(
                     final CRMXML.RscSetConnectionData rscSetConnectionData) {
         if (rscSetConnectionData.isColocation()) {
-            if (rscSetConnectionDataCol != null) {
+            if (reversedCol) {
+                rscSetConnectionData.reverse();
+                reversedCol = false;
+            } else if (rscSetConnectionDataCol != null) {
                 //System.out.println(
                 //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
                 //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
@@ -116,25 +125,28 @@ public class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataCol.getRscSet2())
                         || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
-                    //System.out.println("reverse col");
+                    System.out.println("reverse col");
                     /* upside down */
                     rscSetConnectionData.reverse();
                 }
             }
             this.rscSetConnectionDataCol = rscSetConnectionData;
         } else {
-            if (rscSetConnectionDataOrd != null) {
-                //System.out.println(
-                //  "set rsc1: " + rscSetConnectionData.getRscSet1()
-                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
-                //if (rscSetConnectionData.getRscSet1() != null) {
-                //    System.out.println("rsc1 ids: "
-                //           + rscSetConnectionData.getRscSet1().getRscIds());
-                //}
-                //if (rscSetConnectionData.getRscSet2() != null) {
-                //    System.out.println(", rsc2 ids: "
-                //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
-                //}
+            if (reversedOrd) {
+                rscSetConnectionData.reverse();
+                reversedOrd = false;
+            } else if (rscSetConnectionDataOrd != null) {
+                System.out.println(
+                  "set rsc1: " + rscSetConnectionData.getRscSet1()
+                  + ", rsc2: " + rscSetConnectionData.getRscSet2());
+                if (rscSetConnectionData.getRscSet1() != null) {
+                    System.out.println("rsc1 ids: "
+                           + rscSetConnectionData.getRscSet1().getRscIds());
+                }
+                if (rscSetConnectionDataOrd.getRscSet2() != null) {
+                    System.out.println(", rsc2 ids: "
+                           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
+                }
                 if (rscSetConnectionData.getRscSet2() == null
                     && rscSetConnectionData.getRscSet1() != null
                     && rscSetConnectionDataOrd.getRscSet2() != null
@@ -142,7 +154,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataOrd.getRscSet2())
                         || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
-                    //System.out.println("reverse ord");
+                    System.out.println("reverse ord");
                     /* upside down */
                     rscSetConnectionData.reverse();
                 }
@@ -151,73 +163,73 @@ public class ConstraintPHInfo extends ServiceInfo {
         }
     }
 
-    /** Resets resource set connection data, setting the other one to null. */
-    public final void resetRscSetConnectionData(
-                    final CRMXML.RscSetConnectionData rscSetConnectionData) {
-        if (rscSetConnectionData.isColocation()) {
-            if (rscSetConnectionDataCol != null) {
-                //System.out.println(
-                //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
-                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
-                //if (rscSetConnectionDataCol.getRscSet1() != null) {
-                //    System.out.println("rsc1 ids: "
-                //           + rscSetConnectionData.getRscSet1().getRscIds());
-                //}
-                //if (rscSetConnectionDataCol.getRscSet2() != null) {
-                //    System.out.println(", rsc2 ids: "
-                //           + rscSetConnectionDataCol.getRscSet2().getRscIds());
-                //}
-                if (rscSetConnectionData.getRscSet2() == null
-                    && rscSetConnectionData.getRscSet1() != null
-                    && rscSetConnectionDataCol.getRscSet2() != null
-                    && (rscSetConnectionData.getRscSet1().isSubsetOf(
-                                     rscSetConnectionDataCol.getRscSet2())
-                        || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
-                                     rscSetConnectionData.getRscSet1()))) {
-                    //System.out.println("reverse col");
-                    /* upside down */
-                    rscSetConnectionData.reverse();
-                }
-            }
-            //if (rscSetConnectionDataCol != null) {
-            //    if (rscSetConnectionDataCol.getRscSet1() == null
-            //        && rscSetConnectionDataCol.getRscSet2() != null) {
-            //        System.out.println("reverse");
-            //        /* upside down */
-            //        rscSetConnectionData.reverse();
-            //    }
-            //}
-            this.rscSetConnectionDataCol = rscSetConnectionData;
-            this.rscSetConnectionDataOrd = null;
-        } else {
-            if (rscSetConnectionDataOrd != null) {
-                //System.out.println(
-                //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
-                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
-                //if (rscSetConnectionDataOrd.getRscSet1() != null) {
-                //    System.out.println("rsc1 ids: "
-                //           + rscSetConnectionData.getRscSet1().getRscIds());
-                //}
-                //if (rscSetConnectionDataOrd.getRscSet2() != null) {
-                //    System.out.println(", rsc2 ids: "
-                //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
-                //}
-                if (rscSetConnectionData.getRscSet2() == null
-                    && rscSetConnectionData.getRscSet1() != null
-                    && rscSetConnectionDataOrd.getRscSet2() != null
-                    && (rscSetConnectionData.getRscSet1().isSubsetOf(
-                                     rscSetConnectionDataOrd.getRscSet2())
-                        || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
-                                     rscSetConnectionData.getRscSet1()))) {
-                    //System.out.println("reverse ord");
-                    /* upside down */
-                    rscSetConnectionData.reverse();
-                }
-            }
-            this.rscSetConnectionDataOrd = rscSetConnectionData;
-            this.rscSetConnectionDataCol = null;
-        }
-    }
+    ///** Resets resource set connection data, setting the other one to null. */
+    //public final void resetRscSetConnectionData(
+    //                final CRMXML.RscSetConnectionData rscSetConnectionData) {
+    //    if (rscSetConnectionData.isColocation()) {
+    //        if (rscSetConnectionDataCol != null) {
+    //            System.out.println(
+    //              "reset rsc1: " + rscSetConnectionData.getRscSet1()
+    //              + ", rsc2: " + rscSetConnectionData.getRscSet2());
+    //            if (rscSetConnectionDataCol.getRscSet1() != null) {
+    //                System.out.println("rsc1 ids: "
+    //                       + rscSetConnectionData.getRscSet1().getRscIds());
+    //            }
+    //            if (rscSetConnectionDataCol.getRscSet2() != null) {
+    //                System.out.println(", rsc2 ids: "
+    //                       + rscSetConnectionDataCol.getRscSet2().getRscIds());
+    //            }
+    //            if (rscSetConnectionData.getRscSet2() == null
+    //                && rscSetConnectionData.getRscSet1() != null
+    //                && rscSetConnectionDataCol.getRscSet2() != null
+    //                && (rscSetConnectionData.getRscSet1().isSubsetOf(
+    //                                 rscSetConnectionDataCol.getRscSet2())
+    //                    || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
+    //                                 rscSetConnectionData.getRscSet1()))) {
+    //                System.out.println("reverse col");
+    //                /* upside down */
+    //                rscSetConnectionData.reverse();
+    //            }
+    //        }
+    //        //if (rscSetConnectionDataCol != null) {
+    //        //    if (rscSetConnectionDataCol.getRscSet1() == null
+    //        //        && rscSetConnectionDataCol.getRscSet2() != null) {
+    //        //        System.out.println("reverse");
+    //        //        /* upside down */
+    //        //        rscSetConnectionData.reverse();
+    //        //    }
+    //        //}
+    //        this.rscSetConnectionDataCol = rscSetConnectionData;
+    //        this.rscSetConnectionDataOrd = null;
+    //    } else {
+    //        if (rscSetConnectionDataOrd != null) {
+    //            //System.out.println(
+    //            //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
+    //            //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
+    //            //if (rscSetConnectionDataOrd.getRscSet1() != null) {
+    //            //    System.out.println("rsc1 ids: "
+    //            //           + rscSetConnectionData.getRscSet1().getRscIds());
+    //            //}
+    //            //if (rscSetConnectionDataOrd.getRscSet2() != null) {
+    //            //    System.out.println(", rsc2 ids: "
+    //            //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
+    //            //}
+    //            if (rscSetConnectionData.getRscSet2() == null
+    //                && rscSetConnectionData.getRscSet1() != null
+    //                && rscSetConnectionDataOrd.getRscSet2() != null
+    //                && (rscSetConnectionData.getRscSet1().isSubsetOf(
+    //                                 rscSetConnectionDataOrd.getRscSet2())
+    //                    || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
+    //                                 rscSetConnectionData.getRscSet1()))) {
+    //                System.out.println("reverse ord");
+    //                /* upside down */
+    //                rscSetConnectionData.reverse();
+    //            }
+    //        }
+    //        this.rscSetConnectionDataOrd = rscSetConnectionData;
+    //        this.rscSetConnectionDataCol = null;
+    //    }
+    //}
 
     ///** Returns browser object of this info. */
     //protected final ClusterBrowser getBrowser() {
@@ -607,11 +619,6 @@ public class ConstraintPHInfo extends ServiceInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
-        //if (firstConstraint != null) {
-        //newPanel.add(firstConstraint.getMoreOptionsPanel(
-        //                          ClusterBrowser.SERVICE_LABEL_WIDTH
-        //                          + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
-        //}
         newPanel.add(new JScrollPane(mainPanel));
         newPanel.setMinimumSize(new Dimension(
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
@@ -633,7 +640,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
-        addDependencyMenuItems(items, testOnly);
+        addDependencyMenuItems(items, true, testOnly);
         /* remove the placeholder and all constraints associated with it. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                     "Remove",
@@ -689,10 +696,18 @@ public class ConstraintPHInfo extends ServiceInfo {
                 getBrowser().getHeartbeatGraph().killRemovedVertices();
             }
         } else {
-            //getBrowser().getHeartbeatGraph().removeOrder(
-            //                             thisClass,
-            //                             getBrowser().getDCHost(),
-            //                             true);
+            if (rscSetConnectionDataCol != null) {
+                final String colId = rscSetConnectionDataCol.getConstraintId();
+                if (colId != null) {
+                    CRM.removeColocation(dcHost, colId, testOnly);
+                }
+            }
+            if (rscSetConnectionDataOrd != null) {
+                final String ordId = rscSetConnectionDataOrd.getConstraintId();
+                if (ordId != null) {
+                    CRM.removeOrder(dcHost, ordId, testOnly);
+                }
+            }
         }
         if (!testOnly) {
             getBrowser().removeFromServiceInfoHash(this);
@@ -701,11 +716,6 @@ public class ConstraintPHInfo extends ServiceInfo {
             //getBrowser().reloadAllComboBoxes(this);
         }
     }
-
-    ///** Returns panel with graph. */
-    //public JPanel getGraphicalView() {
-    //    return getBrowser().getHeartbeatGraph().getGraphPanel();
-    //}
 
     /** Removes this placeholder from the crm with confirmation dialog. */
     public final void removeMyself(final boolean testOnly) {
@@ -740,5 +750,17 @@ public class ConstraintPHInfo extends ServiceInfo {
     /** Whether this class is a constraint placeholder. */
     public final boolean isConstraintPH() {
         return true;
+    }
+
+    /** Sets whether the direction of order was reversed, meaning it is from
+     * this placeholder, when it was new. */
+    public final void setReversedOrder() {
+        reversedOrd = true;
+    }
+
+    /** Sets whether the direction of colocation was reversed, meaning it is
+     * from this placeholder, when it was new. */
+    public final void setReversedColocation() {
+        reversedCol = true;
     }
 }

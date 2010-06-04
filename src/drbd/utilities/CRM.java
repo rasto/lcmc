@@ -411,6 +411,9 @@ public final class CRM {
                                     final Map<String, String> attrs,
                                     final boolean testOnly) {
         if (colId != null) {
+            if (rscSetsCol.isEmpty()) {
+                return removeColocation(host, colId, testOnly);
+            }
             String cibadminOpt;
             if (createCol) {
                 cibadminOpt = "-C";
@@ -429,6 +432,9 @@ public final class CRM {
             }
         }
         if (ordId != null) {
+            if (rscSetsOrd.isEmpty()) {
+                return removeOrder(host, ordId, testOnly);
+            }
             String cibadminOpt;
             if (createOrd) {
                 cibadminOpt = "-C";

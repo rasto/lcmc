@@ -474,10 +474,16 @@ public class BlockDevInfo extends EditableInfo {
         return ConfigData.AccessType.ADMIN;
     }
 
+    /** Returns whether this type is integer. */
     protected final boolean isInteger(final String param) {
         if (DRBD_NI_PORT_PARAM.equals(param)) {
             return true;
         }
+        return false;
+    }
+
+    /** Returns whether this type is a label. */
+    protected final boolean isLabel(final String param) {
         return false;
     }
 

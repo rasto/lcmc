@@ -417,12 +417,15 @@ public class DrbdXML extends XML {
         return correctValue;
     }
 
-    /**
-     * Returns whether parameter expects integer value.
-     */
+    /** Returns whether parameter expects integer value. */
     public final boolean isInteger(final String param) {
         final String type = paramTypeMap.get(param);
         return "numeric".equals(type);
+    }
+
+    /** Returns whether parameter is read only. */
+    public final boolean isLabel(final String param) {
+        return false;
     }
 
     /**

@@ -648,7 +648,11 @@ public abstract class ResourceGraph {
         //TODO: it may hang here, check it
         if (changed) {
             somethingChangedReset();
-            visualizationViewer.restart();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    visualizationViewer.restart();
+                }
+            });
         }
         visualizationViewer.repaint();
     }
