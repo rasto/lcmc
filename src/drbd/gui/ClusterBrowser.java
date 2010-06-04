@@ -1664,7 +1664,7 @@ public class ClusterBrowser extends Browser {
             Thread.currentThread().interrupt();
         }
         final Map<String, ServiceInfo> idToInfoHash =
-                                                nameToServiceInfoHash.get(name);
+                                               nameToServiceInfoHash.get(name);
         if (idToInfoHash == null) {
             mNameToServiceLock.release();
             return null;
@@ -1705,7 +1705,7 @@ public class ClusterBrowser extends Browser {
      */
     public final List<ServiceInfo> getExistingServiceList(final ServiceInfo p) {
         final List<ServiceInfo> existingServiceList =
-                                               new ArrayList<ServiceInfo>();
+                                                  new ArrayList<ServiceInfo>();
         try {
             mNameToServiceLock.acquire();
         } catch (InterruptedException e) {
@@ -1747,7 +1747,7 @@ public class ClusterBrowser extends Browser {
             Thread.currentThread().interrupt();
         }
         final Map<String, ServiceInfo> idToInfoHash =
-                        nameToServiceInfoHash.get(service.getName());
+                                 nameToServiceInfoHash.get(service.getName());
         if (idToInfoHash != null) {
             idToInfoHash.remove(service.getId());
         }
@@ -1852,7 +1852,8 @@ public class ClusterBrowser extends Browser {
                + cs.getService().getId();
         }
         if (idToInfoHash == null) {
-            idToInfoHash = new HashMap<String, ServiceInfo>();
+            idToInfoHash = new TreeMap<String, ServiceInfo>(
+                                                String.CASE_INSENSITIVE_ORDER);
             if (service.getId() == null) {
                 if (csPmId == null) {
                     service.setId("1");

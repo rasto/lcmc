@@ -65,11 +65,15 @@ public class ConstraintPHInfo extends ServiceInfo {
     private CRMXML.RscSetConnectionData rscSetConnectionDataCol = null;
     /** Resource set connection data for order. */
     private CRMXML.RscSetConnectionData rscSetConnectionDataOrd = null;
-    /** Whether the direction of colocation was reversed, meaning it is from
+    /** Whether the direction of colocation should be reversed, meaning it is
+     * from this placeholder, when it was new. */
+    private boolean reverseCol = false;
+    /** Whether the direction of order should be reversed, meaning it is from
      * this placeholder, when it was new. */
+    private boolean reverseOrd = false;
+    /** Whether the colocation was reversed. */
     private boolean reversedCol = false;
-    /** Whether the direction of order was reversed, meaning it is from this
-     * placeholder, when it was new. */
+    /** Whether the order was reversed. */
     private boolean reversedOrd = false;
 
     /**
@@ -94,18 +98,41 @@ public class ConstraintPHInfo extends ServiceInfo {
         return rscSetConnectionDataCol;
     }
 
+    ///** Sets resource set colocation data to null, if last dangling connection
+    // * was removed. */
+    //public final void resetRscSetConnectionDataCol() {
+    //    if (rscSetConnectionDataCol.getRscSet1() == null
+    //        || rscSetConnectionDataCol.getRscSet2() == null) {
+    //        rscSetConnectionDataCol = null;
+    //    }
+    //}
+
     /** Returns resource set order data. */
     public final CRMXML.RscSetConnectionData getRscSetConnectionDataOrd() {
         return rscSetConnectionDataOrd;
     }
 
+
+    ///** Sets resource set order data to null, if last dangling connection was
+    // * removed. */
+    //public final void resetRscSetConnectionDataOrd() {
+    //    if (rscSetConnectionDataOrd.getRscSet1() == null
+    //        || rscSetConnectionDataOrd.getRscSet2() == null) {
+    //        rscSetConnectionDataOrd = null;
+    //    }
+    //}
+
     /** Sets resource set connection data. */
     public final void setRscSetConnectionData(
                     final CRMXML.RscSetConnectionData rscSetConnectionData) {
         if (rscSetConnectionData.isColocation()) {
-            if (reversedCol) {
-                rscSetConnectionData.reverse();
-                reversedCol = false;
+            if (reverseCol) {
+                if (rscSetConnectionData.getRscSet2() == null
+                    && rscSetConnectionData.getRscSet1() != null) {
+                    reversedCol = true;
+                    rscSetConnectionData.reverse();
+                    reverseCol = false;
+                }
             } else if (rscSetConnectionDataCol != null) {
                 //System.out.println(
                 //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
@@ -127,26 +154,34 @@ public class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionData.getRscSet1()))) {
                     System.out.println("reverse col");
                     /* upside down */
+                    reversedCol = true;
                     rscSetConnectionData.reverse();
                 }
+            } else {
+                reversedCol = false;
             }
             this.rscSetConnectionDataCol = rscSetConnectionData;
         } else {
-            if (reversedOrd) {
-                rscSetConnectionData.reverse();
-                reversedOrd = false;
+            if (reverseOrd) {
+                if (rscSetConnectionData.getRscSet2() == null
+                    && rscSetConnectionData.getRscSet1() != null) {
+                    reversedOrd = true;
+                    rscSetConnectionData.reverse();
+                    reverseOrd = false;
+                    System.out.println("reverse ord");
+                }
             } else if (rscSetConnectionDataOrd != null) {
-                System.out.println(
-                  "set rsc1: " + rscSetConnectionData.getRscSet1()
-                  + ", rsc2: " + rscSetConnectionData.getRscSet2());
-                if (rscSetConnectionData.getRscSet1() != null) {
-                    System.out.println("rsc1 ids: "
-                           + rscSetConnectionData.getRscSet1().getRscIds());
-                }
-                if (rscSetConnectionDataOrd.getRscSet2() != null) {
-                    System.out.println(", rsc2 ids: "
-                           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
-                }
+                //System.out.println(
+                //  "set rsc1: " + rscSetConnectionData.getRscSet1()
+                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
+                //if (rscSetConnectionData.getRscSet1() != null) {
+                //    System.out.println("rsc1 ids: "
+                //           + rscSetConnectionData.getRscSet1().getRscIds());
+                //}
+                //if (rscSetConnectionDataOrd.getRscSet2() != null) {
+                //    System.out.println(", rsc2 ids: "
+                //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
+                //}
                 if (rscSetConnectionData.getRscSet2() == null
                     && rscSetConnectionData.getRscSet1() != null
                     && rscSetConnectionDataOrd.getRscSet2() != null
@@ -154,10 +189,13 @@ public class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataOrd.getRscSet2())
                         || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
+                    reversedOrd = true;
                     System.out.println("reverse ord");
                     /* upside down */
                     rscSetConnectionData.reverse();
                 }
+            } else {
+                reversedOrd = false;
             }
             this.rscSetConnectionDataOrd = rscSetConnectionData;
         }
@@ -754,13 +792,23 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Sets whether the direction of order was reversed, meaning it is from
      * this placeholder, when it was new. */
-    public final void setReversedOrder() {
-        reversedOrd = true;
+    public final void reverseOrder() {
+        reverseOrd = true;
     }
 
     /** Sets whether the direction of colocation was reversed, meaning it is
      * from this placeholder, when it was new. */
-    public final void setReversedColocation() {
-        reversedCol = true;
+    public final void reverseColocation() {
+        reverseCol = true;
+    }
+
+    /** Returns whether the colocation was reversed. */
+    public final boolean isReversedCol() {
+        return reversedCol;
+    }
+
+    /** Returns whether the order was reversed. */
+    public final boolean isReversedOrd() {
+        return reversedOrd;
     }
 }

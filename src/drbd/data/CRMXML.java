@@ -3545,10 +3545,20 @@ public class CRMXML extends XML {
             return rscSet1;
         }
 
+        ///** Sets resource set 1. */
+        //public final void setRscSet1(final RscSet rscSet1) {
+        //    this.rscSet1 = rscSet1;
+        //}
+
         /** Returns resource set 2. */
         public final RscSet getRscSet2() {
             return rscSet2;
         }
+
+        ///** Sets resource set 2. */
+        //public final void setRscSet2(final RscSet rscSet2) {
+        //    this.rscSet2 = rscSet2;
+        //}
 
         /** Returns order or colocation id. */
         public final String getConstraintId() {
@@ -3580,14 +3590,33 @@ public class CRMXML extends XML {
                     || oRscSet2.isSubsetOf(rscSet2))) {
                 return true;
             }
+            if ((rscSet1 == null
+                 || oRscSet2 == null
+                 || rscSet1.isSubsetOf(oRscSet2)
+                 || oRscSet2.isSubsetOf(rscSet1))
+                && (rscSet2 == null
+                    || oRscSet1 == null
+                    || rscSet2.isSubsetOf(oRscSet1)
+                    || oRscSet1.isSubsetOf(rscSet2))) {
+                return true;
+            }
             return false;
         }
 
         /** Reverse resource sets. */
-        public void reverse() {
+        public final void reverse() {
             final RscSet old1 = rscSet1;
             rscSet1 = rscSet2;
             rscSet2 = old1;
+        }
+
+        /** Returns whether it is an empty connection. */
+        public final boolean isEmpty() {
+            if ((rscSet1 == null || rscSet1.getRscIds().isEmpty())
+                && (rscSet2 == null || rscSet2.getRscIds().isEmpty())) {
+                return true;
+            }
+            return false;
         }
     }
 }

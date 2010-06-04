@@ -581,8 +581,6 @@ public class ServicesInfo extends EditableInfo {
                rdataToCphi =
                   new HashMap<CRMXML.RscSetConnectionData, ConstraintPHInfo>();
             for (final CRMXML.RscSetConnectionData rdata : rscSetConnections) {
-                System.out.println("connection: " + rdata.getConstraintId()
-                    + " is col: " + rdata.isColocation());
                 if (rdata.getRscSet1() != null
                     && rdata.getRscSet2() != null
                     && "true".equals(rdata.getRscSet1().getSequential())
@@ -596,12 +594,6 @@ public class ServicesInfo extends EditableInfo {
                             break;
                         }
                         if (rdata.samePlaceholder(ordata)) {
-                            System.out.println("connection: "
-                                + rdata.getConstraintId()
-                                + " is col: " + rdata.isColocation()
-                                + " same ph: " + ordata.getConstraintId()
-                                + " is o col: " + ordata.isColocation());
-
                             cphi = rdataToCphi.get(ordata);
                             rdataToCphi.remove(ordata); /* only the first one */
                             cphi.setRscSetConnectionData(rdata); //*

@@ -3070,9 +3070,15 @@ public class ServiceInfo extends EditableInfo {
             CRMXML.RscSetConnectionData rdata;
             if (isConstraintPH()) {
                 rdata = ((ConstraintPHInfo) this).getRscSetConnectionDataOrd();
+                //if (!testOnly) {
+                //    ((ConstraintPHInfo) this).resetRscSetConnectionDataOrd();
+                //}
             } else {
                 rdata = ((ConstraintPHInfo) parent)
                                                 .getRscSetConnectionDataOrd();
+                //if (!testOnly) {
+                //    ((ConstraintPHInfo) parent).resetRscSetConnectionDataOrd();
+                //}
             }
             /** resource set */
             final String ordId = rdata.getConstraintId();
@@ -3082,6 +3088,7 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 idToRemove = getService().getHeartbeatId();
             }
+            CRMXML.RscSet modifiedRscSet = null;
             for (final CRMXML.RscSet rscSet
                               : clStatus.getRscSetsOrd(ordId)) {
                 if (rscSet == rdata.getRscSet1()
@@ -3090,6 +3097,7 @@ public class ServiceInfo extends EditableInfo {
                                           new ArrayList<String>();
                     newRscIds.addAll(rscSet.getRscIds());
                     newRscIds.remove(idToRemove);
+                    modifiedRscSet = rscSet;
                     if (!newRscIds.isEmpty()) {
                         final CRMXML.RscSet newRscSet =
                                 getBrowser().getCRMXML().new RscSet(
@@ -3108,6 +3116,9 @@ public class ServiceInfo extends EditableInfo {
             if (od != null) {
                 final String score = od.getScore();
                 attrs.put(CRMXML.SCORE_STRING, score);
+            }
+            if (!testOnly && modifiedRscSet != null) {
+                modifiedRscSet.getRscIds().remove(idToRemove);
             }
             CRM.setRscSet(getBrowser().getDCHost(),
                           null,
@@ -3159,6 +3170,12 @@ public class ServiceInfo extends EditableInfo {
             setUpdated(true);
         }
         if (isConstraintPH() || parent.isConstraintPH()) {
+            if (isConstraintPH() && ((ConstraintPHInfo) this).isReversedCol()) {
+                ((ConstraintPHInfo) this).reverseOrder();
+            } else if (parent.isConstraintPH()
+                       && ((ConstraintPHInfo) parent).isReversedCol()) {
+                ((ConstraintPHInfo) parent).reverseOrder();
+            }
             parent.addConstraintWithPlaceholder(this, false, true, testOnly);
         } else {
             final String parentHbId = parent.getHeartbeatId(testOnly);
@@ -3200,9 +3217,15 @@ public class ServiceInfo extends EditableInfo {
             CRMXML.RscSetConnectionData rdata;
             if (isConstraintPH()) {
                 rdata = ((ConstraintPHInfo) this).getRscSetConnectionDataCol();
+                //if (!testOnly) {
+                //    ((ConstraintPHInfo) this).resetRscSetConnectionDataCol();
+                //}
             } else {
                 rdata = ((ConstraintPHInfo) parent)
                                                 .getRscSetConnectionDataCol();
+                //if (!testOnly) {
+                //    ((ConstraintPHInfo) parent).resetRscSetConnectionDataCol();
+                //}
             }
             /** resource set */
             final String colId = rdata.getConstraintId();
@@ -3212,6 +3235,7 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 idToRemove = getService().getHeartbeatId();
             }
+            CRMXML.RscSet modifiedRscSet = null;
             for (final CRMXML.RscSet rscSet
                               : clStatus.getRscSetsCol(colId)) {
                 if (rscSet == rdata.getRscSet1()
@@ -3220,6 +3244,7 @@ public class ServiceInfo extends EditableInfo {
                                           new ArrayList<String>();
                     newRscIds.addAll(rscSet.getRscIds());
                     newRscIds.remove(idToRemove);
+                    modifiedRscSet = rscSet;
                     if (!newRscIds.isEmpty()) {
                         final CRMXML.RscSet newRscSet =
                                 getBrowser().getCRMXML().new RscSet(
@@ -3238,6 +3263,9 @@ public class ServiceInfo extends EditableInfo {
             if (cd != null) {
                 final String score = cd.getScore();
                 attrs.put(CRMXML.SCORE_STRING, score);
+            }
+            if (!testOnly && modifiedRscSet != null) {
+                modifiedRscSet.getRscIds().remove(idToRemove);
             }
             CRM.setRscSet(getBrowser().getDCHost(),
                           colId,
@@ -3281,13 +3309,18 @@ public class ServiceInfo extends EditableInfo {
             parent.setUpdated(true);
             setUpdated(true);
         }
-        //if (isConstraintPH()) {
-        //    parent.addConstraintWithPlaceholder(this, true, false, testOnly);
         if (isConstraintPH() || parent.isConstraintPH()) {
+            if (isConstraintPH() && ((ConstraintPHInfo) this).isReversedOrd()) {
+                ((ConstraintPHInfo) this).reverseColocation();
+            } else if (parent.isConstraintPH()
+                       && ((ConstraintPHInfo) parent).isReversedOrd()) {
+                ((ConstraintPHInfo) parent).reverseColocation();
+            }
             addConstraintWithPlaceholder(parent, true, false, testOnly);
         } else {
             final String parentHbId = parent.getHeartbeatId(testOnly);
-            final Map<String, String> attrs = new LinkedHashMap<String, String>();
+            final Map<String, String> attrs =
+                                        new LinkedHashMap<String, String>();
             attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
             if (parent.getCloneInfo() != null
                 && parent.getCloneInfo().getService().isMaster()) {
@@ -3383,7 +3416,7 @@ public class ServiceInfo extends EditableInfo {
             idToAdd = serviceInfo.getService().getHeartbeatId();
         }
         if (!orderOnly) {
-            if (rdataCol == null) {
+            if (rdataCol == null || rdataCol.isEmpty()) {
                 final List<String> rscIds = new ArrayList<String>();
                 rscIds.add(idToAdd);
                 if (serviceInfo.isConstraintPH()) {
@@ -3414,22 +3447,26 @@ public class ServiceInfo extends EditableInfo {
                 } else {
                    toRscSet = rdataCol.getRscSet2();
                 }
-                for (final CRMXML.RscSet rscSet
-                                             : clStatus.getRscSetsCol(colId)) {
-                    if (rscSet == toRscSet) {
-                        final List<String> newRscIds = new ArrayList<String>();
-                        newRscIds.addAll(rscSet.getRscIds());
+                final List<CRMXML.RscSet> rscSetsColList =
+                                                 clStatus.getRscSetsCol(colId);
+                if (rscSetsColList != null) {
+                    for (final CRMXML.RscSet rscSet : rscSetsColList) {
+                        if (rscSet == toRscSet) {
+                            final List<String> newRscIds =
+                                                       new ArrayList<String>();
+                            newRscIds.addAll(rscSet.getRscIds());
 
-                        newRscIds.add(idToAdd);
-                        final CRMXML.RscSet newRscSet =
-                            getBrowser().getCRMXML().new RscSet(
+                            newRscIds.add(idToAdd);
+                            final CRMXML.RscSet newRscSet =
+                                getBrowser().getCRMXML().new RscSet(
                                                        rscSet.getId(),
                                                        newRscIds,
                                                        rscSet.getSequential());
-                        rscSetsCol.add(newRscSet);
-                        colRscSetAdded = true;
-                    } else {
-                        rscSetsCol.add(rscSet);
+                            rscSetsCol.add(newRscSet);
+                            colRscSetAdded = true;
+                        } else {
+                            rscSetsCol.add(rscSet);
+                        }
                     }
                 }
                 if (!colRscSetAdded) {
@@ -3452,7 +3489,7 @@ public class ServiceInfo extends EditableInfo {
         }
         
         if (!colocationOnly) {
-            if (rdataOrd == null) {
+            if (rdataOrd == null || rdataOrd.isEmpty()) {
                 final List<String> rscIds = new ArrayList<String>();
                 rscIds.add(idToAdd);
                 if (serviceInfo.isConstraintPH()) {
@@ -3475,6 +3512,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             } else {
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
+
                 ordId = rdataOrd.getConstraintId();
                 boolean ordRscSetAdded = false;
                 CRMXML.RscSet toRscSet;
@@ -3483,22 +3521,26 @@ public class ServiceInfo extends EditableInfo {
                 } else {
                    toRscSet = rdataOrd.getRscSet2();
                 }
-                for (final CRMXML.RscSet rscSet
-                                             : clStatus.getRscSetsOrd(ordId)) {
-                    if (rscSet == toRscSet) {
-                        final List<String> newRscIds = new ArrayList<String>();
-                        newRscIds.addAll(rscSet.getRscIds());
+                final List<CRMXML.RscSet> rscSetsOrdList =
+                                                 clStatus.getRscSetsOrd(ordId);
+                if (rscSetsOrdList != null) {
+                    for (final CRMXML.RscSet rscSet : rscSetsOrdList) {
+                        if (rscSet == toRscSet) {
+                            final List<String> newRscIds =
+                                                       new ArrayList<String>();
+                            newRscIds.addAll(rscSet.getRscIds());
 
-                        newRscIds.add(idToAdd);
-                        final CRMXML.RscSet newRscSet =
-                            getBrowser().getCRMXML().new RscSet(
+                            newRscIds.add(idToAdd);
+                            final CRMXML.RscSet newRscSet =
+                                getBrowser().getCRMXML().new RscSet(
                                                        rscSet.getId(),
                                                        newRscIds,
                                                        rscSet.getSequential());
-                        rscSetsOrd.add(newRscSet);
-                        ordRscSetAdded = true;
-                    } else {
-                        rscSetsOrd.add(rscSet);
+                            rscSetsOrd.add(newRscSet);
+                            ordRscSetAdded = true;
+                        } else {
+                            rscSetsOrd.add(rscSet);
+                        }
                     }
                 }
                 if (!ordRscSetAdded) {
@@ -3556,10 +3598,10 @@ public class ServiceInfo extends EditableInfo {
             if (isConstraintPH() || serviceInfo.isConstraintPH()) {
                 if (isConstraintPH() && getService().isNew()) {
                     if (!colocationOnly) {
-                        ((ConstraintPHInfo) this).setReversedOrder();
+                        ((ConstraintPHInfo) this).reverseOrder();
                     }
                     if (!orderOnly) {
-                        ((ConstraintPHInfo) this).setReversedColocation();
+                        ((ConstraintPHInfo) this).reverseColocation();
                     }
                 }
                 addConstraintWithPlaceholder(serviceInfo,
@@ -4041,7 +4083,7 @@ public class ServiceInfo extends EditableInfo {
                            Tools.getString("ClusterBrowser.Hb.ColOnlySubmenu"),
                            true,
                            false,
-                           false,
+                           enableForNew,
                            testOnly);
                     add(colOnlyItem);
 
@@ -4050,7 +4092,7 @@ public class ServiceInfo extends EditableInfo {
                            Tools.getString("ClusterBrowser.Hb.OrdOnlySubmenu"),
                            false,
                            true,
-                           false,
+                           enableForNew,
                            testOnly);
                     add(ordOnlyItem);
                     final Thread thread = new Thread(new Runnable() {

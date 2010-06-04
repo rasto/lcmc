@@ -1061,7 +1061,7 @@ public final class CRM {
         String orderId;
         String cibadminOpt;
         if (ordId == null) {
-            cibadminOpt = "-C"; /* replace */
+            cibadminOpt = "-C"; /* create */
             orderId = "ord_" + parentHbId + "_" + heartbeatId;
         } else {
             cibadminOpt = "-R"; /* replace */

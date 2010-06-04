@@ -5,7 +5,7 @@ primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2
 	operations $id="res_IPaddr2_1-operations" 
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
+	op start interval="0" timeout="200"
 property $id="cib-bootstrap-options" 
 	dc-deadtime="60" 
 	cluster-delay="60" 

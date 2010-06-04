@@ -2300,23 +2300,38 @@ public class Host implements Serializable {
     }
 
     /** This is part of testsuite, it checks cib. */
-    public final boolean checkTest(final String test, final int index) {
+    public final boolean checkTest(final String test, final double index) {
         final StringBuffer command = new StringBuffer(50);
         command.append(replaceVars("@GUI-HELPER@"));
         command.append(" gui-test ");
         command.append(test);
         command.append(' ');
-        command.append(index);
+        final String indexString =
+                            Double.toString(index).replaceFirst("\\.0+$", "");
+        
+        command.append(indexString);
         for (final Host host : getCluster().getHosts()) {
             command.append(' ');
             command.append(host.getName());
         }
         command.append(" 2>&1");
-        final SSH.SSHOutput out = getSSH().execCommandAndWait(
-                                                            command.toString(),
-                                                            false,
-                                                            false,
-                                                            60000);
+        int i = 0;
+        SSH.SSHOutput out = null;
+        while (i < 8) {
+            out = getSSH().execCommandAndWait(command.toString(),
+                                              false,
+                                              false,
+                                              60000);
+            /* 10 - no such file */
+            if (out.getExitCode() == 0 || out.getExitCode() == 10) {
+                break;
+            }
+            i++;
+            Tools.sleep(i * 2000);
+        }
+        if (i > 0) {
+            Tools.info(test + " " + index + " tries: " + (i + 1));
+        }
         Tools.info(test + " " + index + " " + out.getOutput());
         return out.getExitCode() == 0;
     }

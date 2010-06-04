@@ -4,44 +4,29 @@ primitive res_Dummy_1 ocf:heartbeat:Dummy
 	operations $id="res_Dummy_1-operations" 
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
+	op start interval="0" timeout="200"
 primitive res_Dummy_2 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_2-operations" 
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
+	op start interval="0" timeout="200"
 primitive res_Dummy_3 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_3-operations" 
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
-primitive res_Dummy_4 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_4-operations" 
-	op stop interval="0" timeout="20" 
-	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
-primitive res_Dummy_5 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_5-operations" 
-	op stop interval="0" timeout="20" 
-	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
-primitive res_Dummy_6 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_6-operations" 
-	op stop interval="0" timeout="20" 
-	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
+	op start interval="0" timeout="200"
 primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2 
 	params ip="192.168.122.100" 
 	operations $id="res_IPaddr2_1-operations" 
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
+	op start interval="0" timeout="200"
 primitive res_Stateful_1 ocf:heartbeat:Stateful 
 	operations $id="res_Stateful_1-operations" 
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
-	op start interval="0" timeout="20"
-group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3 res_Dummy_4 res_Dummy_5 res_Dummy_6
+	op start interval="0" timeout="200"
+group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 ms ms_Stateful_1 res_Stateful_1 
 	meta clone-max="1" notify="true"
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1

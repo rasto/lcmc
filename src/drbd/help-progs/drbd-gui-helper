@@ -1332,8 +1332,11 @@ sub gui_test {
 	my @hosts = @_;
 	my $crm_show = "TERM=dumb /usr/sbin/crm configure show"
 		       ."|grep -v 'expected-quorum-votes=\"2\"'"
+		       ."|grep -v 'unknown-expected-votes'"
+		       ."|grep -v 'dc-version=\"'"
+		       ."|grep -v 'cluster-infrastructure=\"'"
 		       ."|grep -v 'last-lrm-refresh='";
-	my $crm_status = "TERM=dumb /usr/sbin/crm status|sed 1,3d";
+	my $crm_status = "TERM=dumb /usr/sbin/crm status|sed 1,5d";
 	my $cib = `$crm_show`;
 	my $ret = $?;
 	if ($ret != 0) {
@@ -1358,12 +1361,14 @@ sub gui_test {
 	$status =~ s/unknown( expected votes)/2$1/;
 	my $testfile = "/tmp/drbd-mc-test/$testname/test$index.crm";
 	my $test = "";
+	my $notestfile;
 	if (!open TEST, $testfile) {
 		print "$!";
 		# .new can be used for new tests.
 		open TEST, ">$testfile.new" or print "$!";
 		print TEST $cib;
 		close TEST;
+		$notestfile++;
 	} else {
 		{
 			local $/;
@@ -1373,17 +1378,22 @@ sub gui_test {
 	}
 	my $statustestfile = "/tmp/drbd-mc-test/$testname/status$index.crm";
 	my $statustest = "";
+	my $nostatusfile;
 	if (!open STTEST, $statustestfile) {
 		print "$!";
 		open STTEST, ">$statustestfile.new" or print "$!";
 		print STTEST $status;
 		close STTEST;
+		$nostatusfile++;
 	} else {
 		{
 			local $/;
 			$statustest = <STTEST>;
 		}
 		close STTEST;
+	}
+	if ($nostatusfile || $notestfile) {
+		exit 10;
 	}
 	for ($test, $statustest) {
 		s/\\$//mg;
@@ -1395,20 +1405,29 @@ sub gui_test {
 	} else {
 		my $diff = `$crm_show>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error $testfile`;
 		print "error\n";
+		print "$cib\n";
+		print "-------------\n";
+		print "$test\n";
+		print "-------------\n";
 		print $diff;
 		open TEST, ">$testfile.error" or print "$!";
 		print TEST $cib;
 		close TEST;
+		exit 1;
 	}
 	if ($status eq $statustest) {
 		print "ok";
 	} else {
 		my $diff = `$crm_status>/tmp/drbd-mc.status.last.error; diff -ub /tmp/drbd-mc.status.last.error $statustestfile`;
 		print "error\n";
+		print "$status\n";
+		print "-------------\n";
+		print "$statustest\n";
+		print "-------------\n";
 		print $diff;
 		open STTEST, ">$statustestfile.error" or print "$!";
 		print STTEST $status;
 		close STTEST;
+		exit 2;
 	}
-	exit 1;
 }

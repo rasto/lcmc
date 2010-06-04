@@ -65,6 +65,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
@@ -93,6 +94,8 @@ public class HeartbeatGraph extends ResourceGraph {
     /** Map from hb connection info to the edge. */
     private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
                                 new LinkedHashMap<HbConnectionInfo, Edge>();
+    /** Pcmk connection lock. */
+    private final Mutex mHbConnectionLock = new Mutex();
     /** Map from the vertex to the host. */
     private final Map<Vertex, HostInfo> vertexToHostMap =
                                          new LinkedHashMap<Vertex, HostInfo>();
@@ -371,40 +374,50 @@ public class HeartbeatGraph extends ResourceGraph {
 
         //ServiceInfo colRsc = null;
         //ServiceInfo colWithRsc = null;
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         MyEdge edge = (MyEdge) vP.findEdge(v);
 
         if (edge == null) {
             edge = (MyEdge) v.findEdge(vP);
             if (edge != null) {
-            edge.reverse();
+                edge.reverse();
+            }
+        } else {
+            edge.reset();
         }
-    } else {
-        edge.reset();
+        HbConnectionInfo hbci;
+        if (edge == null) {
+            hbci = getClusterBrowser().getNewHbConnectionInfo();
+            edge = (MyEdge) getGraph().addEdge(new MyEdge(vP, v));
+            edgeToHbconnectionMap.put(edge, hbci);
+            hbconnectionToEdgeMap.put(hbci, edge);
+        } else {
+            hbci = edgeToHbconnectionMap.get(edge);
+        }
+        mHbConnectionLock.release();
+        if (hbci != null) {
+            hbci.addOrder(ordId, parent, serviceInfo);
+            if (!edgeIsOrderList.contains(edge)) {
+                edgeIsOrderList.add(edge);
+            }
+        }
     }
-    HbConnectionInfo hbci;
-    if (edge == null) {
-        hbci = getClusterBrowser().getNewHbConnectionInfo();
-        edge = (MyEdge) getGraph().addEdge(new MyEdge(vP, v));
-        //if (colRsc != null) {
-        //    edgeIsColocationList.add(edge);
-        //    hbci.addColocation(null, colRsc, colWithRsc);
-        //}
-        edgeToHbconnectionMap.put(edge, hbci);
-        hbconnectionToEdgeMap.put(hbci, edge);
-    } else {
-        hbci = edgeToHbconnectionMap.get(edge);
-    }
-    hbci.addOrder(ordId, parent, serviceInfo);
-    if (!edgeIsOrderList.contains(edge)) {
-        edgeIsOrderList.add(edge);
-    }
-}
 
-/**
- * Reverse the edge.
- */
-public final void reverse(final HbConnectionInfo hbConnectionInfo) {
+    /**
+     * Reverse the edge.
+     */
+    public final void reverse(final HbConnectionInfo hbConnectionInfo) {
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final Edge e = hbconnectionToEdgeMap.get(hbConnectionInfo);
+        mHbConnectionLock.release();
         if (e != null && edgeIsColocationList.contains(e)) {
             ((MyEdge) e).reverse();
         }
@@ -462,6 +475,11 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
         if (vWithRsc == null || vRsc == null) {
             return;
         }
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         MyEdge edge = (MyEdge) vWithRsc.findEdge(vRsc);
         if (edge == null) {
             edge = (MyEdge) vRsc.findEdge(vWithRsc);
@@ -475,9 +493,12 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
         } else {
             hbci = edgeToHbconnectionMap.get(edge);
         }
-        hbci.addColocation(colId, rsc, withRsc);
-        if (!edgeIsColocationList.contains(edge)) {
-            edgeIsColocationList.add(edge);
+        mHbConnectionLock.release();
+        if (hbci != null) {
+            hbci.addColocation(colId, rsc, withRsc);
+            if (!edgeIsColocationList.contains(edge)) {
+                edgeIsColocationList.add(edge);
+            }
         }
     }
 
@@ -879,8 +900,16 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
         }
         final Vertex v1 = (Vertex) p.getSecond();
         final Vertex v2 = (Vertex) p.getFirst();
-        final double s1X = getVertexLocations().getLocation(v1).getX();
-        final double s2X = getVertexLocations().getLocation(v2).getX();
+        double s1X = 0;
+        double s2X = 0;
+        final Point2D loc1 = getVertexLocations().getLocation(v1);
+        if (loc1 != null) {
+            s1X = loc1.getX();
+        }
+        final Point2D loc2 = getVertexLocations().getLocation(v2);
+        if (loc2 != null) {
+            s2X = loc2.getX();
+        }
         final StringBuffer sb = new StringBuffer(15);
         if (edgeIsColocation) {
             final boolean left = hbci.isWithRsc(s2);
@@ -1017,12 +1046,18 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
                     }
                 }
             });
+            try {
+                mHbConnectionLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
             edgeToHbconnectionMap.remove(e);
             if (hbci != null) {
                 hbconnectionToEdgeMap.remove(hbci);
                 hbci.removeMyself(testOnly);
             }
+            mHbConnectionLock.release();
         }
     }
 
@@ -1209,7 +1244,13 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
                                        final boolean testOnly) {
         final ServiceInfo siP = hbci.getLastServiceInfoParent();
         final ServiceInfo siC = hbci.getLastServiceInfoChild();
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final Edge edge = hbconnectionToEdgeMap.get(hbci);
+        mHbConnectionLock.release();
         if (edgeIsOrderList.contains(edge)) {
             siC.removeOrder(siP, dcHost, testOnly);
         }
@@ -1244,7 +1285,13 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
                                   final boolean testOnly) {
         final ServiceInfo siP = hbci.getLastServiceInfoParent();
         final ServiceInfo siC = hbci.getLastServiceInfoChild();
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final Edge edge = hbconnectionToEdgeMap.get(hbci);
+        mHbConnectionLock.release();
         if (edgeIsOrderList.contains(edge)) {
             if (!testOnly) {
                 edgeIsOrderList.remove(edge);
@@ -1280,7 +1327,13 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
             siRsc.addOrder(siWithRsc, dcHost, testOnly);
         }
         if (testOnly) {
+            try {
+                mHbConnectionLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+            mHbConnectionLock.release();
             addExistingTestEdge(edge);
         }
     }
@@ -1293,7 +1346,13 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
                                        final boolean testOnly) {
         final ServiceInfo siRsc = hbci.getLastServiceInfoRsc();
         final ServiceInfo siWithRsc = hbci.getLastServiceInfoWithRsc();
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final Edge edge = hbconnectionToEdgeMap.get(hbci);
+        mHbConnectionLock.release();
         if (edgeIsColocationList.contains(edge)) {
             if (!testOnly) {
                 edgeIsColocationList.remove(edge);
@@ -1325,7 +1384,13 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
             siP.addColocation(siC, dcHost, testOnly);
         }
         if (testOnly) {
+            try {
+                mHbConnectionLock.acquire();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+            mHbConnectionLock.release();
             addExistingTestEdge(edge);
         }
     }
@@ -1334,7 +1399,13 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
      * Returns whether this hb connection is order.
      */
     public final boolean isOrder(final HbConnectionInfo hbConnectionInfo) {
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+        mHbConnectionLock.release();
         return edgeIsOrderList.contains(edge);
     }
 
@@ -1342,7 +1413,13 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
      * Returns whether this hb connection is colocation.
      */
     public final boolean isColocation(final HbConnectionInfo hbConnectionInfo) {
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+        mHbConnectionLock.release();
         return edgeIsColocationList.contains(edge);
     }
 
@@ -1521,9 +1598,15 @@ public final void reverse(final HbConnectionInfo hbConnectionInfo) {
     public final List<HbConnectionInfo> getAllHbConnections() {
         final List<HbConnectionInfo> allConnections =
                                             new ArrayList<HbConnectionInfo>();
+        try {
+            mHbConnectionLock.acquire();
+        } catch (final InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         for (final HbConnectionInfo hbci : hbconnectionToEdgeMap.keySet()) {
             allConnections.add(hbci);
         }
+        mHbConnectionLock.release();
         return allConnections;
     }
 
