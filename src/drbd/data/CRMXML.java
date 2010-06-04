@@ -175,6 +175,8 @@ public class CRMXML extends XML {
     private static final String PARAM_TYPE_BOOLEAN = "boolean";
     /** Integer parameter type. */
     private static final String PARAM_TYPE_INTEGER = "integer";
+    /** Label parameter type. */
+    private static final String PARAM_TYPE_LABEL = "label";
     /** String parameter type. */
     private static final String PARAM_TYPE_STRING = "string";
     /** Time parameter type. */
@@ -688,6 +690,14 @@ public class CRMXML extends XML {
                 "crmd-integration-timeout",
                 "crmd-finalization-timeout"
             };
+            globalParams.add("dc-version");
+            paramGlobalShortDescMap.put("dc-version", "DC Version");
+            paramGlobalTypeMap.put("dc-version", PARAM_TYPE_LABEL);
+            globalParams.add("cluster-infrastructure");
+            paramGlobalShortDescMap.put("cluster-infrastructure",
+                                        "Cluster Infrastructure");
+            paramGlobalTypeMap.put("cluster-infrastructure", PARAM_TYPE_LABEL);
+
             globalNotAdvancedParams.add("no-quorum-policy");
             globalNotAdvancedParams.add("maintenance-mode");
             paramGlobalAccessTypes.put("maintenance-mode",
@@ -1079,13 +1089,18 @@ public class CRMXML extends XML {
         return ra.isParamMetaAttr(param);
     }
 
-    /**
-     * Returns whether the parameter expects an integer value.
-     */
+    /** Returns whether the parameter expects an integer value. */
     public final boolean isInteger(final ResourceAgent ra,
                                    final String param) {
         final String type = getParamType(ra, param);
         return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /** Returns whether the parameter is read only label value. */
+    public final boolean isLabel(final ResourceAgent ra,
+                                 final String param) {
+        final String type = getParamType(ra, param);
+        return PARAM_TYPE_LABEL.equals(type);
     }
 
     /**
@@ -1097,12 +1112,16 @@ public class CRMXML extends XML {
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
-    /**
-     * Returns whether the global parameter expects an integer value.
-     */
+    /** Returns whether the global parameter expects an integer value. */
     public final boolean isGlobalInteger(final String param) {
         final String type = getGlobalParamType(param);
         return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /** Returns whether the global parameter expects a label value. */
+    public final boolean isGlobalLabel(final String param) {
+        final String type = getGlobalParamType(param);
+        return PARAM_TYPE_LABEL.equals(type);
     }
 
     /**
@@ -1278,13 +1297,18 @@ public class CRMXML extends XML {
         return false;
     }
 
-    /**
-     * Checks if the meta attr parameter is integer.
-     */
+    /** Checks if the meta attr parameter is integer. */
     public final boolean isRscDefaultsInteger(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /** Returns whether meta attr parameter is label. */
+    public final boolean isRscDefaultsLabel(final String param) {
+        final String newParam = convertRscDefaultsParam(param);
+        final String type = getRscDefaultsType(newParam);
+        return PARAM_TYPE_LABEL.equals(type);
     }
 
     /**
@@ -1696,6 +1720,7 @@ public class CRMXML extends XML {
         /* get <resource-agent> */
         final NodeList resAgents = metadataNode.getChildNodes();
         final String[] booleanValues = PCMK_BOOLEAN_VALUES;
+
         for (int i = 0; i < resAgents.getLength(); i++) {
             final Node resAgentNode = resAgents.item(i);
             if (!resAgentNode.getNodeName().equals("resource-agent")) {
@@ -3060,12 +3085,16 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Returns whether the order parameter expects an integer value.
-     */
+    /** Returns whether the order parameter expects an integer value. */
     public final boolean isOrderInteger(final String param) {
         final String type = getOrderParamType(param);
         return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /** Returns whether the order parameter expects a label value. */
+    public final boolean isOrderLabel(final String param) {
+        final String type = getOrderParamType(param);
+        return PARAM_TYPE_LABEL.equals(type);
     }
 
     /**
@@ -3212,12 +3241,16 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Returns whether the colocation parameter expects an integer value.
-     */
+    /** Returns whether the colocation parameter expects an integer value. */
     public final boolean isColocationInteger(final String param) {
         final String type = getColocationParamType(param);
         return PARAM_TYPE_INTEGER.equals(type);
+    }
+
+    /** Returns whether the colocation parameter expects a label value. */
+    public final boolean isColocationLabel(final String param) {
+        final String type = getColocationParamType(param);
+        return PARAM_TYPE_LABEL.equals(type);
     }
 
     /**
