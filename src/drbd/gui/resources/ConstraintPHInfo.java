@@ -152,7 +152,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataCol.getRscSet2())
                         || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
-                    System.out.println("reverse col");
+                    //System.out.println("reverse col");
                     /* upside down */
                     reversedCol = true;
                     rscSetConnectionData.reverse();
@@ -168,7 +168,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                     reversedOrd = true;
                     rscSetConnectionData.reverse();
                     reverseOrd = false;
-                    System.out.println("reverse ord");
+                    ////System.out.println("reverse ord");
                 }
             } else if (rscSetConnectionDataOrd != null) {
                 //System.out.println(
@@ -190,7 +190,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                         || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
                     reversedOrd = true;
-                    System.out.println("reverse ord");
+                    //System.out.println("reverse ord");
                     /* upside down */
                     rscSetConnectionData.reverse();
                 }

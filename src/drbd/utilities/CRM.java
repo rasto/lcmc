@@ -86,11 +86,12 @@ public final class CRM {
                  "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
                  + "if [ ! -e $file ]; then /usr/sbin/cibadmin -Ql > $file;fi;"
                  + "export CIB_file=$file; ";
-            return Tools.execCommand(host,
+            SSH.SSHOutput out = Tools.execCommand(host,
                                      testCmd + command,
                                      null,
                                      false,
                                      SSH.DEFAULT_COMMAND_TIMEOUT);
+            return out;
         } else {
             return Tools.execCommandProgressIndicator(
                                     host,
@@ -122,7 +123,7 @@ public final class CRM {
                             + "/usr/sbin/ptest -VVV -S -x $file 2>&1;echo '"
                             + PTEST_END_DELIM
                             + "';cat $file 2>/dev/null;"
-                            + "mv $file{,.last} 2>/dev/null";
+                            + "mv -f $file{,.last} 2>/dev/null";
         final SSH.SSHOutput output = Tools.execCommand(
                                                 host,
                                                 command,

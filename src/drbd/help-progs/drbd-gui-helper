@@ -1357,6 +1357,8 @@ sub gui_test {
 			$i++;
 		}
 	}
+	$status =~
+	 s/(Online: \[\s+)(.*?)(\s+\])/$1.(join " ", sort split " ", "$2").$3/e;
 	$cib =~ s/(node)\s+\$id=".*?"/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
 	my $testfile = "/tmp/drbd-mc-test/$testname/test$index.crm";
@@ -1403,31 +1405,25 @@ sub gui_test {
 	if ($cib eq $test) {
 		print "ok ";
 	} else {
-		my $diff = `$crm_show>/tmp/drbd-mc.last.error; diff -ub /tmp/drbd-mc.last.error $testfile`;
-		print "error\n";
-		print "$cib\n";
-		print "-------------\n";
-		print "$test\n";
-		print "-------------\n";
-		print $diff;
 		open TEST, ">$testfile.error" or print "$!";
 		print TEST $cib;
 		close TEST;
+		my $diff = `diff -ub $testfile $testfile.error`;
+		print "error\n";
+		print "-------------\n";
+		print $diff;
 		exit 1;
 	}
 	if ($status eq $statustest) {
 		print "ok";
 	} else {
-		my $diff = `$crm_status>/tmp/drbd-mc.status.last.error; diff -ub /tmp/drbd-mc.status.last.error $statustestfile`;
-		print "error\n";
-		print "$status\n";
-		print "-------------\n";
-		print "$statustest\n";
-		print "-------------\n";
-		print $diff;
 		open STTEST, ">$statustestfile.error" or print "$!";
 		print STTEST $status;
 		close STTEST;
+		my $diff = `diff -ub $statustestfile $statustestfile.error`;
+		print "error\n";
+		print "-------------\n";
+		print $diff;
 		exit 2;
 	}
 }

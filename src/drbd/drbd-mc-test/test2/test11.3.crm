@@ -1,0 +1,31 @@
+node host1
+node host2
+primitive res_Dummy_1 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_1-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0"
+primitive res_Dummy_2 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_2-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0"
+primitive res_Dummy_3 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_3-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0"
+primitive res_Dummy_4 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_4-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0"
+colocation c1 inf: ( res_Dummy_1 ) ( res_Dummy_3 res_Dummy_4 )
+order o1 inf: ( res_Dummy_3 res_Dummy_4 ) ( res_Dummy_1 )
+property $id="cib-bootstrap-options" 
+	dc-deadtime="60" 
+	cluster-delay="60" 
+	stonith-enabled="false" 
+	default-action-timeout="20" 
+	stonith-timeout="60" 
+	no-quorum-policy="ignore"

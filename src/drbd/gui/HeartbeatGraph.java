@@ -645,6 +645,7 @@ public class HeartbeatGraph extends ResourceGraph {
                                        false, /* TODO: colocation only */
                                        false, /* order only */
                                        true,
+                                       getClusterBrowser().getDCHost(),
                                        tOnly);
                     repaint();
                 }
@@ -1012,7 +1013,10 @@ public class HeartbeatGraph extends ResourceGraph {
                             (ServiceInfo) getInfo((Vertex) p.getSecond());
             final ServiceInfo s2 =
                             (ServiceInfo) getInfo((Vertex) p.getFirst());
-            if (s1.getService().isNew() || s2.getService().isNew()) {
+            if (s1 == null
+                || s1.getService().isNew()
+                || s2 == null
+                || s2.getService().isNew()) {
                 continue;
             }
             if (!edgeIsOrderList.contains(e)) {
@@ -1098,7 +1102,8 @@ public class HeartbeatGraph extends ResourceGraph {
             } else {
                 if (!vertexIsPresentList.contains(v)) {
                     final ServiceInfo si = (ServiceInfo) getInfo(v);
-                    if (!si.getService().isNew()
+                    if (si != null
+                        && !si.getService().isNew()
                         && !getClusterBrowser().clStatusFailed()) {
 
                         si.setUpdated(false);

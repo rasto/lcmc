@@ -93,6 +93,8 @@ import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections.map.LinkedMap;
+
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -293,7 +295,8 @@ public class ClusterBrowser extends Browser {
                                                   HB_OP_META_DATA,
                                                   HB_OP_VALIDATE_ALL};
     /** Not advanced operations. */
-    public static final MultiKeyMap HB_OP_NOT_ADVANCED = new MultiKeyMap();
+    public static final MultiKeyMap HB_OP_NOT_ADVANCED = MultiKeyMap.decorate(
+                                                              new LinkedMap());
     static {
         HB_OP_NOT_ADVANCED.put(HB_OP_START, HB_PAR_TIMEOUT, 1);
         HB_OP_NOT_ADVANCED.put(HB_OP_STOP, HB_PAR_TIMEOUT, 1);
@@ -310,7 +313,7 @@ public class ClusterBrowser extends Browser {
     }
     /** Parameters for the hb operations. */
     private final Map<String, List<String>> crmOperationParams =
-                                           new HashMap<String, List<String>>();
+                                     new LinkedHashMap<String, List<String>>();
     /** All parameters for the hb operations, so that it is possible to create
      * arguments for up_rsc_full_ops. */
     public static final String[] HB_OPERATION_PARAM_LIST = {HB_PAR_DESC,

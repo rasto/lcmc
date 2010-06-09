@@ -2629,11 +2629,12 @@ public class ServiceInfo extends EditableInfo {
     private Map<String, Map<String, String>> getOperations(
                                                 final String heartbeatId) {
         final Map<String, Map<String, String>> operations =
-                                  new HashMap<String, Map<String, String>>();
+                              new LinkedHashMap<String, Map<String, String>>();
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (final String op : ClusterBrowser.HB_OPERATIONS) {
-            final Map<String, String> opHash = new HashMap<String, String>();
+            final Map<String, String> opHash =
+                                           new LinkedHashMap<String, String>();
             String opId = cs.getOpId(heartbeatId, op);
             if (opId == null) {
                 /* generate one */
@@ -2641,6 +2642,7 @@ public class ServiceInfo extends EditableInfo {
             }
             /* operations have different kind of default, that is
              * recommended, but not used by default. */
+            boolean firstTime = true;
             for (final String param : ClusterBrowser.HB_OPERATION_PARAM_LIST) {
                 boolean atLeastOneValue = false;
                 if (getBrowser().getCRMOperationParams().get(op).contains(
@@ -2659,17 +2661,24 @@ public class ServiceInfo extends EditableInfo {
                         value = "0";
                     }
                     if (value != null && !"".equals(value)) {
-                        if (cb != null) {
-                            atLeastOneValue = true;
+                        //if (cb != null) {
+                        //    atLeastOneValue = true;
+                        //}
+                        if (cb != null && firstTime) {
+                            opHash.put("id", opId);
+                            opHash.put("name", op);
+                            firstTime = false;
+                            operations.put(op, opHash);
                         }
                         opHash.put(param, value);
                     }
                 }
-                if (atLeastOneValue && !opHash.isEmpty()) {
-                    operations.put(op, opHash);
-                    opHash.put("id", opId);
-                    opHash.put("name", op);
-                }
+                //if (atLeastOneValue && !opHash.isEmpty()) {
+                //    operations.put(op, opHash);
+                //} else {
+                //    opHash.remove("id");
+                //    opHash.remove("name");
+                //}
             }
         }
         return operations;
@@ -3120,7 +3129,7 @@ public class ServiceInfo extends EditableInfo {
             if (!testOnly && modifiedRscSet != null) {
                 modifiedRscSet.getRscIds().remove(idToRemove);
             }
-            CRM.setRscSet(getBrowser().getDCHost(),
+            CRM.setRscSet(dcHost,
                           null,
                           false,
                           ordId,
@@ -3176,7 +3185,11 @@ public class ServiceInfo extends EditableInfo {
                        && ((ConstraintPHInfo) parent).isReversedCol()) {
                 ((ConstraintPHInfo) parent).reverseOrder();
             }
-            parent.addConstraintWithPlaceholder(this, false, true, testOnly);
+            parent.addConstraintWithPlaceholder(this,
+                                                false,
+                                                true,
+                                                dcHost,
+                                                testOnly);
         } else {
             final String parentHbId = parent.getHeartbeatId(testOnly);
             final Map<String, String> attrs = new LinkedHashMap<String, String>();
@@ -3267,7 +3280,7 @@ public class ServiceInfo extends EditableInfo {
             if (!testOnly && modifiedRscSet != null) {
                 modifiedRscSet.getRscIds().remove(idToRemove);
             }
-            CRM.setRscSet(getBrowser().getDCHost(),
+            CRM.setRscSet(dcHost,
                           colId,
                           false,
                           null,
@@ -3316,7 +3329,11 @@ public class ServiceInfo extends EditableInfo {
                        && ((ConstraintPHInfo) parent).isReversedOrd()) {
                 ((ConstraintPHInfo) parent).reverseColocation();
             }
-            addConstraintWithPlaceholder(parent, true, false, testOnly);
+            addConstraintWithPlaceholder(parent,
+                                         true,
+                                         false,
+                                         dcHost,
+                                         testOnly);
         } else {
             final String parentHbId = parent.getHeartbeatId(testOnly);
             final Map<String, String> attrs =
@@ -3386,6 +3403,7 @@ public class ServiceInfo extends EditableInfo {
                         colocationOnly,
                         orderOnly,
                         reloadNode,
+                        getBrowser().getDCHost(),
                         testOnly);
         return newServiceInfo;
     }
@@ -3394,6 +3412,7 @@ public class ServiceInfo extends EditableInfo {
     private void addConstraintWithPlaceholder(final ServiceInfo serviceInfo,
                                               final boolean colocationOnly,
                                               final boolean orderOnly,
+                                              final Host dcHost,
                                               final boolean testOnly) {
         boolean createCol = false;
         boolean createOrd = false;
@@ -3563,7 +3582,7 @@ public class ServiceInfo extends EditableInfo {
         }
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
-        CRM.setRscSet(getBrowser().getDCHost(),
+        CRM.setRscSet(dcHost,
                       colId,
                       createCol,
                       ordId,
@@ -3583,6 +3602,7 @@ public class ServiceInfo extends EditableInfo {
                                 final boolean colocationOnly,
                                 final boolean orderOnly,
                                 final boolean reloadNode,
+                                final Host dcHost,
                                 final boolean testOnly) {
         final ResourceAgent ra = serviceInfo.getResourceAgent();
         if (ra != null) {
@@ -3607,6 +3627,7 @@ public class ServiceInfo extends EditableInfo {
                 addConstraintWithPlaceholder(serviceInfo,
                                              colocationOnly,
                                              orderOnly,
+                                             dcHost,
                                              testOnly);
             } else {
                 final String parentId = getHeartbeatId(testOnly);
@@ -3638,7 +3659,7 @@ public class ServiceInfo extends EditableInfo {
                 }
                 if (!getService().isNew()
                     && !serviceInfo.getService().isNew()) {
-                    CRM.setOrderAndColocation(getBrowser().getDCHost(),
+                    CRM.setOrderAndColocation(dcHost,
                                               heartbeatId,
                                               new String[]{parentId},
                                               colAttrsList,
@@ -3989,6 +4010,7 @@ public class ServiceInfo extends EditableInfo {
                                         colocationOnly,
                                         orderOnly,
                                         true,
+                                        getBrowser().getDCHost(),
                                         testOnly);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -4009,6 +4031,7 @@ public class ServiceInfo extends EditableInfo {
                                                        colocationOnly,
                                                        orderOnly,
                                                        true,
+                                                       dcHost,
                                                        true); /* test only */
                                    }
                                };

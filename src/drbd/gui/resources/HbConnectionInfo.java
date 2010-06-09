@@ -538,7 +538,7 @@ public class HbConnectionInfo extends EditableInfo {
                 if (!isNew()) {
                     getBrowser().getHeartbeatGraph().removeConnection(
                                                       thisClass,
-                                                      getBrowser().getDCHost(),
+                                                      dcHost,
                                                       true);
                 }
             }
@@ -598,7 +598,7 @@ public class HbConnectionInfo extends EditableInfo {
                     if (getBrowser().getHeartbeatGraph().isOrder(thisClass)) {
                         getBrowser().getHeartbeatGraph().removeOrder(
                                                      thisClass,
-                                                     getBrowser().getDCHost(),
+                                                     dcHost,
                                                      true);
                     } else {
                         /* there is colocation constraint so let's get the
@@ -608,7 +608,7 @@ public class HbConnectionInfo extends EditableInfo {
                                  getLastServiceInfoWithRsc());
                         getBrowser().getHeartbeatGraph().addOrder(
                                                       thisClass,
-                                                      getBrowser().getDCHost(),
+                                                      dcHost,
                                                       true);
                     }
                 }
@@ -675,7 +675,7 @@ public class HbConnectionInfo extends EditableInfo {
                                                                 thisClass)) {
                         getBrowser().getHeartbeatGraph().removeColocation(
                                                        thisClass,
-                                                       getBrowser().getDCHost(),
+                                                       dcHost,
                                                        true);
                     } else {
                         /* add colocation */
@@ -686,7 +686,7 @@ public class HbConnectionInfo extends EditableInfo {
                                       getLastServiceInfoChild());
                         getBrowser().getHeartbeatGraph().addColocation(
                                                        thisClass,
-                                                       getBrowser().getDCHost(),
+                                                       dcHost,
                                                        true);
                     }
                 }
