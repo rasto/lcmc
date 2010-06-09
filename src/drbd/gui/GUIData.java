@@ -65,9 +65,13 @@ public class GUIData  {
     private MainMenu mainMenu;
     /** Browser that appears if there are no clusters. */
     private EmptyBrowser emptyBrowser;
+    /** 'Add Cluster" buttons list lock. */
+    private final Mutex mAddClusterButtonListLock = new Mutex();
     /** 'Add Cluster' buttons. */
     private final List<JComponent> addClusterButtonList =
                                                    new ArrayList<JComponent>();
+    /** 'Add Host" buttons list lock. */
+    private final Mutex mAddHostButtonListLock = new Mutex();
     /** 'Add Host' buttons. */
     private final List<JComponent> addHostButtonList =
                                                    new ArrayList<JComponent>();
@@ -279,11 +283,17 @@ public class GUIData  {
      */
     public final void registerAddClusterButton(
                                            final JComponent addClusterButton) {
+        try {
+            mAddClusterButtonListLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         if (!addClusterButtonList.contains(addClusterButton)) {
             addClusterButtonList.add(addClusterButton);
             addClusterButton.setEnabled(
                              Tools.getConfigData().danglingHostsCount() >= 1);
         }
+        mAddClusterButtonListLock.release();
     }
 
     /**
@@ -292,9 +302,15 @@ public class GUIData  {
      */
     public final void registerAddHostButton(
                                            final JComponent addHostButton) {
+        try {
+            mAddHostButtonListLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         if (!addHostButtonList.contains(addHostButton)) {
             addHostButtonList.add(addHostButton);
         }
+        mAddHostButtonListLock.release();
     }
 
     /**
@@ -302,7 +318,13 @@ public class GUIData  {
      */
     public final void unregisterAddClusterButton(
                                            final JComponent addClusterButton) {
+        try {
+            mAddClusterButtonListLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         addClusterButtonList.remove(addClusterButton);
+        mAddClusterButtonListLock.release();
     }
 
     /**
@@ -314,9 +336,15 @@ public class GUIData  {
                             Tools.getConfigData().danglingHostsCount() >= 1;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                for (JComponent addClusterButton : addClusterButtonList) {
+                try {
+                    mAddClusterButtonListLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                for (final JComponent addClusterButton : addClusterButtonList) {
                     addClusterButton.setEnabled(enabled);
                 }
+                mAddClusterButtonListLock.release();
             }
         });
     }
@@ -327,9 +355,15 @@ public class GUIData  {
     public final void enableAddClusterButtons(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                try {
+                    mAddClusterButtonListLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 for (JComponent addClusterButton : addClusterButtonList) {
                     addClusterButton.setEnabled(enable);
                 }
+                mAddClusterButtonListLock.release();
             }
         });
     }
@@ -338,13 +372,17 @@ public class GUIData  {
      * Enable/Disable all 'Add Host' buttons.
      */
     public final void enableAddHostButtons(final boolean enable) {
-        //TODO: lock addHostButtonList
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                // TODO: need lock for addHostButtonList 
+                try {
+                    mAddHostButtonListLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 for (JComponent addHostButton : addHostButtonList) {
                     addHostButton.setEnabled(enable);
                 }
+                mAddHostButtonListLock.release();
             }
         });
     }
