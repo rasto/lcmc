@@ -142,6 +142,14 @@ public class TerminalPanel extends JScrollPane {
     private static final String TEST_4 = "starttest4";
     /** Starts test 5. */
     private static final String TEST_5 = "starttest5";
+    /** Starts test 6. */
+    private static final String TEST_6 = "starttest6";
+    /** Starts test 7. */
+    private static final String TEST_7 = "starttest7";
+    /** Starts test 8. */
+    private static final String TEST_8 = "starttest8";
+    /** Starts test 9. */
+    private static final String TEST_9 = "starttest9";
     /** Register mouse movement. */
     private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
@@ -170,6 +178,10 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(TEST_3, 0);
         CHEATS_MAP.put(TEST_4, 0);
         CHEATS_MAP.put(TEST_5, 0);
+        CHEATS_MAP.put(TEST_6, 0);
+        CHEATS_MAP.put(TEST_7, 0);
+        CHEATS_MAP.put(TEST_8, 0);
+        CHEATS_MAP.put(TEST_9, 0);
         CHEATS_MAP.put(REGISTER_MOVEMENT, 0);
     }
 
@@ -708,6 +720,14 @@ public class TerminalPanel extends JScrollPane {
             RoboTest.startTest(4, host);
         } else if (TEST_5.equals(cheat)) {
             RoboTest.startTest(5, host);
+        } else if (TEST_6.equals(cheat)) {
+            RoboTest.startTest(6, host);
+        } else if (TEST_7.equals(cheat)) {
+            RoboTest.startTest(7, host);
+        } else if (TEST_8.equals(cheat)) {
+            RoboTest.startTest(8, host);
+        } else if (TEST_9.equals(cheat)) {
+            RoboTest.startTest(9, host);
         } else if (REGISTER_MOVEMENT.equals(cheat)) {
             RoboTest.registerMovement();
         }

@@ -501,16 +501,17 @@ public class ProgressIndicatorPanel extends JComponent
 
                 final long time = System.currentTimeMillis();
                 if (lRampUp) {
-                    alphaLevel +=
-                          (int) (MAX_ALPHA_LEVEL * (time - start) / rampDelay);
-                    if (alphaLevel >= MAX_ALPHA_LEVEL) {
-                        alphaLevel = MAX_ALPHA_LEVEL;
+                    int newAlphaLevel = alphaLevel 
+                        + (int) (MAX_ALPHA_LEVEL * (time - start) / rampDelay);
+                    if (newAlphaLevel >= MAX_ALPHA_LEVEL) {
+                        newAlphaLevel = MAX_ALPHA_LEVEL;
                     }
+                    alphaLevel = newAlphaLevel;
                 } else {
-                    alphaLevel -= (int) (MAX_ALPHA_LEVEL
+                    int newAlphaLevel = alphaLevel - (int) (MAX_ALPHA_LEVEL
                                   * (time - start) / RAMP_DELAY_STOP);
-                    if (alphaLevel <= 0) {
-                        alphaLevel = 0;
+                    if (newAlphaLevel <= 0) {
+                        newAlphaLevel = 0;
                         try {
                             mTextsLock.acquire();
                         } catch (java.lang.InterruptedException e) {
@@ -523,6 +524,7 @@ public class ProgressIndicatorPanel extends JComponent
                             mTextsLock.release();
                         }
                     }
+                    alphaLevel = newAlphaLevel;
                 }
 
 

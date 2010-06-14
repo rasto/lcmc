@@ -648,11 +648,11 @@ public abstract class ResourceGraph {
         //TODO: it may hang here, check it
         if (changed) {
             somethingChangedReset();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+            //SwingUtilities.invokeLater(new Runnable() {
+            //    public void run() {
                     visualizationViewer.restart();
-                }
-            });
+            //    }
+            //});
         }
         visualizationViewer.repaint();
     }
@@ -761,7 +761,7 @@ public abstract class ResourceGraph {
     public abstract String getEdgeToolTip(final Edge edge);
 
     /** Returns the width of the service vertex shape. */
-    protected final int getVertexWidth(final Vertex v) {
+    protected int getVertexWidth(final Vertex v) {
         if (vertexWidth.containsKey(v)) {
             return vertexWidth.get(v);
         } else {
@@ -770,7 +770,7 @@ public abstract class ResourceGraph {
     }
 
     /** Returns the height of the service vertex shape. */
-    protected final int getVertexHeight(final Vertex v) {
+    protected int getVertexHeight(final Vertex v) {
         if (vertexHeight.containsKey(v)) {
             return vertexHeight.get(v);
         } else {
@@ -1019,11 +1019,11 @@ public abstract class ResourceGraph {
      * Removes info from the graph.
      */
     protected void removeInfo(final Info i) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+        //SwingUtilities.invokeLater(new Runnable() {
+        //    public void run() {
                 graph.removeVertex(getVertex(i));
-            }
-        });
+        //    }
+        //});
         getVertexLocations().reset();
     }
 
@@ -1746,17 +1746,15 @@ public abstract class ResourceGraph {
         } catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    getGraph().removeEdge(testEdge);
-                } catch (final Exception ignore) {
-                    /* ignore */
-                }
+        try {
+            if (testEdge != null) {
+                getGraph().removeEdge(testEdge);
+                testEdge = null;
             }
-        });
+        } catch (final Exception ignore) {
+            /* ignore */
+        }
         mTestEdgeLock.release();
-
     }
 
     /**
@@ -1773,15 +1771,11 @@ public abstract class ResourceGraph {
             return;
         }
         if (testEdge != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        getGraph().removeEdge(testEdge);
-                    } catch (final Exception e) {
-                        /* ignore */
-                    }
-                }
-            });
+            try {
+                getGraph().removeEdge(testEdge);
+            } catch (final Exception e) {
+                /* ignore */
+            }
         }
         if (!isTestAnimation()) {
             mTestEdgeLock.release();

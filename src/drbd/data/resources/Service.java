@@ -99,9 +99,7 @@ public class Service extends Resource {
         return id;
     }
 
-    /**
-     * Sets heartbeat id and gui id without the service name part.
-     */
+    /** Sets heartbeat id and gui id without the service name part. */
     public final void setHeartbeatId(final String crmId) {
         this.crmId = crmId;
         if (GROUP_NAME.equals(getName())) {
@@ -226,7 +224,7 @@ public class Service extends Resource {
      * Sets that the service was done being removed.
      */
     public final void doneRemoving() {
-        this.removing = removing;
+        this.removing = false;
     }
 
     /**

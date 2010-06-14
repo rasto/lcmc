@@ -1623,7 +1623,11 @@ public class SSH {
      */
     public final void installTestFiles(final int index) {
         final String fileName = "drbd-mc-test.tar";
-        final SCPClient scpClient = new SCPClient(connection);
+        final Connection conn = connection;
+        if (conn == null) {
+            return;
+        }
+        final SCPClient scpClient = new SCPClient(conn);
         final String file = Tools.getFile("/" + fileName);
         try {
             scpClient.put(file.getBytes(), fileName, "/tmp");

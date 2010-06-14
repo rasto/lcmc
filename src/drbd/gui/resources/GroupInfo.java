@@ -108,15 +108,17 @@ public class GroupInfo extends ServiceInfo {
         */
         final String heartbeatId = getHeartbeatId(testOnly);
         if (getService().isNew()) {
-            final String[] parents =
+            final List<ServiceInfo> parents =
                              getBrowser().getHeartbeatGraph().getParents(this);
             final List<Map<String, String>> colAttrsList =
                                        new ArrayList<Map<String, String>>();
             final List<Map<String, String>> ordAttrsList =
                                        new ArrayList<Map<String, String>>();
-            for (final String parentId : parents) {
-                final ServiceInfo parentInfo =
-                                getBrowser().getServiceInfoFromCRMId(parentId);
+            final List<String> parentIds = new ArrayList<String>();
+            for (final ServiceInfo parentInfo : parents) {
+                final String parentId =
+                                    parentInfo.getService().getHeartbeatId();
+                parentIds.add(parentId);
                 final Map<String, String> colAttrs =
                                        new LinkedHashMap<String, String>();
                 final Map<String, String> ordAttrs =
@@ -133,7 +135,8 @@ public class GroupInfo extends ServiceInfo {
             }
             CRM.setOrderAndColocation(dcHost,
                                       heartbeatId,
-                                      parents,
+                                      parentIds.toArray(
+                                                new String [parentIds.size()]),
                                       colAttrsList,
                                       ordAttrsList,
                                       testOnly);

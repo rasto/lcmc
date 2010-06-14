@@ -30,8 +30,9 @@ import drbd.gui.MainPanel;
 import drbd.gui.MainMenu;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.ProgressIndicatorPanel;
-import drbd.utilities.Tools;
 import drbd.data.ConfigData;
+import drbd.utilities.Tools;
+import drbd.utilities.RoboTest;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -322,6 +323,10 @@ public final class DrbdMC extends JPanel {
                 } else if ("--fast".equals(arg)) {
                     /* undocumented */
                     fps = fps * 2;
+                } else if ("--restore-mouse".equals(arg)) {
+                    /* restore mouse if it is stuck in pressed state, during
+                     * robot tests. */
+                    RoboTest.restoreMouse();
                 }
             }
             Tools.getConfigData().setAnimFPS(fps);

@@ -576,100 +576,160 @@ public class ServicesInfo extends EditableInfo {
         final List<CRMXML.RscSetConnectionData> rscSetConnections =
                                                clStatus.getRscSetConnections();
         if (rscSetConnections != null) {
-            int index = 1;
             final Map<CRMXML.RscSetConnectionData, ConstraintPHInfo>
-               rdataToCphi =
-                  new HashMap<CRMXML.RscSetConnectionData, ConstraintPHInfo>();
+             rdataToCphi =
+             new LinkedHashMap<CRMXML.RscSetConnectionData, ConstraintPHInfo>();
+            getBrowser().lockNameToServiceInfo();
+            final Map<String, ServiceInfo> idToInfoHash =
+                 getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
+            final List<ConstraintPHInfo> preNewCphis =
+                                            new ArrayList<ConstraintPHInfo>();
+            if (idToInfoHash != null) {
+                for (final String id : idToInfoHash.keySet()) {
+                    final ConstraintPHInfo cphi =
+                                       (ConstraintPHInfo) idToInfoHash.get(id);
+                    final CRMXML.RscSetConnectionData rdataOrd =
+                                            cphi.getRscSetConnectionDataOrd();
+                    final CRMXML.RscSetConnectionData rdataCol =
+                                            cphi.getRscSetConnectionDataCol();
+                    if (cphi.getService().isNew()) {
+                        preNewCphis.add(cphi);
+                    }
+                    if (rdataOrd != null && !rdataOrd.isEmpty()) {
+                        rdataToCphi.put(rdataOrd, cphi);
+                    }
+                    if (rdataCol != null && !rdataCol.isEmpty()) {
+                        rdataToCphi.put(rdataCol, cphi);
+                    }
+                }
+            }
+            getBrowser().unlockNameToServiceInfo();
+            final List<ConstraintPHInfo> newCphis =
+                                            new ArrayList<ConstraintPHInfo>();
             for (final CRMXML.RscSetConnectionData rdata : rscSetConnections) {
-                if (rdata.getRscSet1() != null
-                    && rdata.getRscSet2() != null
-                    && "true".equals(rdata.getRscSet1().getSequential())
-                    && "true".equals(rdata.getRscSet2().getSequential())) {
-                    /* no placeholder */
-                } else {
-                    ConstraintPHInfo cphi = null;
-                    for (final CRMXML.RscSetConnectionData ordata
-                                                        : rscSetConnections) {
-                        if (ordata == rdata) {
-                            break;
-                        }
-                        if (rdata.samePlaceholder(ordata)) {
-                            cphi = rdataToCphi.get(ordata);
-                            rdataToCphi.remove(ordata); /* only the first one */
-                            cphi.setRscSetConnectionData(rdata); //*
-                            break;
-                        }
-                    }
-                    if (cphi == null) {
-                        /* placeholder */
-                        cphi =
-                        (ConstraintPHInfo) getBrowser().getServiceInfoFromId(
-                                                      ConstraintPHInfo.NAME,
-                                                      Integer.toString(index));
-                        if (cphi != null) {
-                            index++;
-                            rdataToCphi.put(rdata, cphi);
-                            cphi.setRscSetConnectionData(rdata);
-                        }
-                    }
-                    if (cphi == null) {
-                        cphi = new ConstraintPHInfo(getBrowser(), rdata);
-                        //cphi.setId(Integer.toString(index));
-                        getBrowser().addNameToServiceInfoHash(cphi);
-                        hg.addConstraintPlaceholder(cphi,
-                                                    null, /* pos */
-                                                    false);
-                        rdataToCphi.put(rdata, cphi);
-                        index++;
-                    }
-                    hg.setVertexIsPresent(cphi);
+                ConstraintPHInfo cphi = null;
+                PcmkRscSetsInfo prsi = null;
 
-                    final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
-                    final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
-                    if (rdata.isColocation()) {
-                        /* colocation */
-                        if (rscSet1 != null) {
-                            for (final String rscId : rscSet1.getRscIds()) {
-                                final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(rscId);
-                                hg.addColocation(rdata.getConstraintId(),
-                                                 cphi,
-                                                 si);
-                            }
-                        }
-                        if (rscSet2 != null) {
-                            for (final String rscId : rscSet2.getRscIds()) {
-                                final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(rscId);
-                                hg.addColocation(rdata.getConstraintId(),
-                                                 si,
-                                                 cphi);
-                            }
-                        }
-                    } else {
-                        /* order */
-                        if (rscSet1 != null) {
-                            for (final String rscId : rscSet1.getRscIds()) {
-                                final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(rscId);
-                                hg.addOrder(rdata.getConstraintId(), si, cphi);
-                            }
-                        }
-                        if (rscSet2 != null) {
-                            for (final String rscId : rscSet2.getRscIds()) {
-                                final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(rscId);
-                                hg.addOrder(rdata.getConstraintId(), cphi, si);
-                            }
-                        }
+                for (final CRMXML.RscSetConnectionData ordata
+                                                  : rdataToCphi.keySet()) {
+                    if (ordata == rdata) {
+                        continue;
                     }
-                    if (cphi != null) {
-                        cphi.setUpdated(false);
-                        if (!testOnly) {
-                            cphi.getService().setNew(false);
+                    if (rdata.equals(ordata)
+                        || rdata.equalsReversed(ordata)) {
+                        cphi = rdataToCphi.get(ordata);
+                        cphi.setRscSetConnectionData(rdata);
+                        break;
+                    }
+                }
+                if (cphi == null) {
+                    for (final CRMXML.RscSetConnectionData ordata
+                                                  : rdataToCphi.keySet()) {
+                        if (ordata == rdata) {
+                            cphi = rdataToCphi.get(ordata);
+                            break;
+                        }
+                        if (rdataToCphi.get(ordata).sameConstraintId(rdata)) {
+                            /* use the same rsc set info object */
+                            prsi = rdataToCphi.get(ordata).getPcmkRscSetsInfo();
+                        }
+                        if (rdataToCphi.get(ordata).getService().isNew()
+                            || (rdata.samePlaceholder(ordata)
+                                && rdataToCphi.get(ordata).sameConstraintId(
+                                                                 rdata))) {
+                            cphi = rdataToCphi.get(ordata);
+                            //cphi.getService().setNew(false);
+                            cphi.setRscSetConnectionData(rdata); //*
+                            prsi = cphi.getPcmkRscSetsInfo();
+                            if (prsi != null) {
+                                if (rdata.isColocation()) {
+                                    prsi.addColocation(
+                                                   rdata.getConstraintId(),
+                                                   cphi);
+                                } else {
+                                    prsi.addOrder(rdata.getConstraintId(),
+                                                  cphi);
+                                }
+                            }
+                            break;
                         }
                     }
                 }
+                if (cphi == null) {
+                    /* placeholder */
+                    if (!preNewCphis.isEmpty()) {
+                        cphi = preNewCphis.remove(0);
+                        rdataToCphi.put(rdata, cphi);
+                        cphi.setRscSetConnectionData(rdata);
+                    }
+                }
+                if (cphi == null) {
+                    cphi = new ConstraintPHInfo(getBrowser(), rdata);
+                    if (prsi == null) {
+                        prsi = new PcmkRscSetsInfo(getBrowser());
+                    }
+                    if (rdata.isColocation()) {
+                        prsi.addColocation(rdata.getConstraintId(), cphi);
+                    } else {
+                        prsi.addOrder(rdata.getConstraintId(), cphi);
+                    }
+                    cphi.setPcmkRscSetsInfo(prsi);
+                    getBrowser().addNameToServiceInfoHash(cphi);
+                    newCphis.add(cphi); /* have to add it later,
+                                           so that ids are correct. */
+                    rdataToCphi.put(rdata, cphi);
+                }
+                hg.setVertexIsPresent(cphi);
+
+                final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
+                final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
+                if (rdata.isColocation()) {
+                    /* colocation */
+                    if (rscSet1 != null) {
+                        for (final String rscId : rscSet1.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(rscId);
+                            hg.addColocation(rdata.getConstraintId(),
+                                             cphi,
+                                             si);
+                        }
+                    }
+                    if (rscSet2 != null) {
+                        for (final String rscId : rscSet2.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(rscId);
+                            hg.addColocation(rdata.getConstraintId(),
+                                             si,
+                                             cphi);
+                        }
+                    }
+                } else {
+                    /* order */
+                    if (rscSet1 != null) {
+                        for (final String rscId : rscSet1.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(rscId);
+                            hg.addOrder(rdata.getConstraintId(), si, cphi);
+                        }
+                    }
+                    if (rscSet2 != null) {
+                        for (final String rscId : rscSet2.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(rscId);
+                            hg.addOrder(rdata.getConstraintId(), cphi, si);
+                        }
+                    }
+                }
+                if (!testOnly && cphi != null) {
+                    cphi.setUpdated(false);
+                    cphi.getService().setNew(false);
+                }
+            }
+
+            for (final ConstraintPHInfo cphi : newCphis) {
+                hg.addConstraintPlaceholder(cphi,
+                                            null, /* pos */
+                                            false);
             }
         }
 
@@ -753,10 +813,26 @@ public class ServicesInfo extends EditableInfo {
                 }
             }
         }
-        hg.killRemovedEdges();
-        hg.killRemovedVertices();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                hg.killRemovedEdges();
+                /** Set placeholders to "new", if they have no connections. */
+                final Map<String, ServiceInfo> idToInfoHash =
+                   getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
+                if (idToInfoHash != null) {
+                    for (final String id : idToInfoHash.keySet()) {
+                        final ConstraintPHInfo cphi =
+                                       (ConstraintPHInfo) idToInfoHash.get(id);
+                        if (!cphi.getService().isNew() && cphi.isEmpty()) {
+                            //cphi.setPcmkRscSetsInfo(
+                            //                new PcmkRscSetsInfo(getBrowser()));
+                            cphi.getService().setNew(true);
+                            //cphi.selectMyself();
+                            //cphi.setInfoPanel(null);
+                        }
+                    }
+                }
+                hg.killRemovedVertices();
                 hg.scale();
             }
         });
@@ -787,9 +863,7 @@ public class ServicesInfo extends EditableInfo {
         return null;
     }
 
-    /**
-     * Creates rsc_defaults panel.
-     */
+    /** Creates rsc_defaults panel. */
     private void addRscDefaultsPanel(final JPanel optionsPanel,
                                      final int leftWidth,
                                      final int rightWidth) {
@@ -803,9 +877,7 @@ public class ServicesInfo extends EditableInfo {
                       null);
     }
 
-    /**
-     * Returns editable info panel for global crm config.
-     */
+    /** Returns editable info panel for global crm config. */
     public final JComponent getInfoPanel() {
         /* if don't have hb status we don't have all the info we need here.
          * TODO: OR we need to get hb status only once
@@ -949,9 +1021,7 @@ public class ServicesInfo extends EditableInfo {
         return infoPanel;
     }
 
-    /**
-     * Returns heartbeat graph.
-     */
+    /** Returns heartbeat graph. */
     public final JPanel getGraphicalView() {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
@@ -1054,9 +1124,7 @@ public class ServicesInfo extends EditableInfo {
         hg.reloadServiceMenus();
     }
 
-    /**
-     * Returns 'add service' list for graph popup menu.
-     */
+    /** Returns 'add service' list for graph popup menu. */
     public final List<ResourceAgent> getAddServiceList(final String cl) {
         return getBrowser().globalGetAddServiceList(cl);
     }
@@ -1314,6 +1382,9 @@ public class ServicesInfo extends EditableInfo {
                                                 getPos(),
                                                 testOnly);
                     //getBrowser().getHeartbeatGraph().repaint();
+                    final PcmkRscSetsInfo prsi =
+                                      new PcmkRscSetsInfo(getBrowser(), cphi);
+                    cphi.setPcmkRscSetsInfo(prsi);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             hg.scale();

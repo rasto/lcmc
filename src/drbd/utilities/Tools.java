@@ -27,6 +27,7 @@ import drbd.data.Cluster;
 import drbd.data.Clusters;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.Info;
+import drbd.gui.resources.ServiceInfo;
 import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
 import drbd.data.CRMXML;
@@ -347,10 +348,14 @@ public final class Tools {
                              final String msg,
                              final int level) {
         if (level <= debugLevel) {
+            String from = "";
+            if (object != null) {
+                from = " (" + object.getClass().getName() + ")";
+            }
             System.out.println(DEBUG_STRING
                                + "(" + level + ") "
                                + msg
-                               + " (" + object.getClass().getName() + ")");
+                               + from);
         }
     }
 
@@ -2264,5 +2269,26 @@ public final class Tools {
         sBounds.width -= (screenInsets.left + screenInsets.right);
         sBounds.height -= (screenInsets.top + screenInsets.bottom);
         return sBounds;
+    }
+
+    /** Compares two Lists with services if thery are equal. The order does not
+     * matter. */
+    public static boolean serviceInfoListEquals(final List<ServiceInfo> l1,
+                                                final List<ServiceInfo> l2) {
+        if (l1 == l2) {
+            return true;
+        }
+        if (l1 == null || l2 == null) {
+            return false;
+        }
+        if (l1.size() != l2.size()) {
+            return false;
+        }
+        for (final ServiceInfo s1 : l1) {
+            if (!l2.contains(s1)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -1757,6 +1757,13 @@ public class ClusterBrowser extends Browser {
         mNameToServiceLock.release();
     }
 
+    /** Returns nameToServiceInfoHash for the specified service. 
+     *  You must lock it when you use it. */
+    public final Map<String, ServiceInfo> getNameToServiceInfoHash(
+                                                        final String name) {
+        return nameToServiceInfoHash.get(name);
+    }
+
     /**
      * Adds heartbeat id from service to the list. If service does not have an
      * id it is generated.
@@ -2437,5 +2444,18 @@ public class ClusterBrowser extends Browser {
             hbci.checkResourceFields(null, hbci.getParametersFromXML());
             hbci.updateAdvancedPanels();
         }
+    }
+
+
+    /** Returns when at least one resource in the list of resouces can be
+        promoted. */
+    public final boolean isOneMaster(final List<String> rscs) {
+        for (final String id : rscs) {
+            final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
+            if (si.getService().isMaster()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

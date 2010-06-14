@@ -916,4 +916,9 @@ public abstract class EditableInfo extends Info {
         }
         moreOptionsPanel.setVisible(advanced && !expertMode);
     }
+
+    /** Returns apply button. */
+    public final MyButton getApplyButton() {
+        return applyButton;
+    }
 }

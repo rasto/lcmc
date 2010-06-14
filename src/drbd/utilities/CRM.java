@@ -93,6 +93,7 @@ public final class CRM {
                                      SSH.DEFAULT_COMMAND_TIMEOUT);
             return out;
         } else {
+            Tools.debug(null, "CRM.java: crm command: " + command, 0);
             return Tools.execCommandProgressIndicator(
                                     host,
                                     command,
@@ -385,12 +386,34 @@ public final class CRM {
 
     /** Returns one resource set xml. */
     private static String getOneRscSet(final String rscSetId,
-                                       final CRMXML.RscSet rscSet) {
+                                       final CRMXML.RscSet rscSet,
+                                       Map<String, String> attrs) {
         final StringBuffer xml = new StringBuffer(120);
         xml.append("<resource_set id=\"");
         xml.append(rscSetId);
-        xml.append("\" sequential=\"");
-        xml.append(rscSet.getSequential());
+        if (attrs == null) {
+            attrs = new LinkedHashMap<String, String>();
+            final String colocationRole = rscSet.getColocationRole();
+            if (colocationRole != null) {
+                attrs.put("role", colocationRole);
+            }
+            final String orderAction = rscSet.getOrderAction();
+            if (orderAction != null) {
+                attrs.put("action", orderAction);
+            }
+            String sequential = rscSet.getSequential();
+            if (sequential != null) {
+                attrs.put("sequential", sequential);
+            }
+        } 
+        for (final String attr : attrs.keySet()) {
+            final String value = attrs.get(attr);
+            if ("".equals(value)) {
+                continue;
+            }
+            xml.append("\" " + attr + "=\"");
+            xml.append(value);
+        }
         xml.append("\">");
         for (final String rscId : rscSet.getRscIds()) {
             xml.append("<resource_ref id=\"");
@@ -407,12 +430,16 @@ public final class CRM {
                                     final boolean createCol,
                                     final String ordId,
                                     final boolean createOrd,
-                                    final List<CRMXML.RscSet> rscSetsCol,
-                                    final List<CRMXML.RscSet> rscSetsOrd,
+                                    final Map<
+                                           CRMXML.RscSet,
+                                           Map<String, String>> rscSetsColAttrs,
+                                    final Map<
+                                           CRMXML.RscSet,
+                                           Map<String, String>> rscSetsOrdAttrs,
                                     final Map<String, String> attrs,
                                     final boolean testOnly) {
         if (colId != null) {
-            if (rscSetsCol.isEmpty()) {
+            if (rscSetsColAttrs.isEmpty()) {
                 return removeColocation(host, colId, testOnly);
             }
             String cibadminOpt;
@@ -424,7 +451,7 @@ public final class CRM {
             boolean ret = setRscSetConstraint(host,
                                               "rsc_colocation",
                                               colId,
-                                              rscSetsCol,
+                                              rscSetsColAttrs,
                                               attrs,
                                               cibadminOpt,
                                               testOnly);
@@ -433,7 +460,7 @@ public final class CRM {
             }
         }
         if (ordId != null) {
-            if (rscSetsOrd.isEmpty()) {
+            if (rscSetsOrdAttrs.isEmpty()) {
                 return removeOrder(host, ordId, testOnly);
             }
             String cibadminOpt;
@@ -445,7 +472,7 @@ public final class CRM {
             return setRscSetConstraint(host,
                                        "rsc_order",
                                        ordId,
-                                       rscSetsOrd,
+                                       rscSetsOrdAttrs,
                                        attrs,
                                        cibadminOpt,
                                        testOnly);
@@ -455,36 +482,41 @@ public final class CRM {
 
     /** Sets resource set that is either colocation or order. */
     private static boolean setRscSetConstraint(
-                                         final Host host,
-                                         final String tag,
-                                         final String constraintId,
-                                         final List<CRMXML.RscSet> rscSets,
-                                         final Map<String, String> ordAttrs,
-                                         final String cibadminOpt,
-                                         final boolean testOnly) {
+                    final Host host,
+                    final String tag,
+                    final String constraintId,
+                    final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs,
+                    final Map<String, String> attrs,
+                    final String cibadminOpt,
+                    final boolean testOnly) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<");
         xml.append(tag);
         xml.append(" id=\"");
         xml.append(constraintId);
-        for (String attr : ordAttrs.keySet()) {
-            final String value = ordAttrs.get(attr);
-            if ("".equals(value)) {
-                continue;
+        if (attrs != null) {
+            for (final String attr : attrs.keySet()) {
+                final String value = attrs.get(attr);
+                if (value == null || "".equals(value)) {
+                    continue;
+                }
+                xml.append("\" " + attr + "=\"");
+                xml.append(value);
             }
-            xml.append("\" " + attr + "=\"");
-            xml.append(value);
         }
         xml.append("\">");
         int rsId = 0;
-        for (final CRMXML.RscSet rscSet : rscSets) {
-            xml.append(getOneRscSet(constraintId + "-" + rsId, rscSet));
-            rsId++;
+        for (final CRMXML.RscSet rscSet : rscSetsAttrs.keySet()) {
+            if (rscSet != null) {
+                xml.append(getOneRscSet(constraintId + "-" + rsId,
+                                        rscSet,
+                                        rscSetsAttrs.get(rscSet)));
+                rsId++;
+            }
         }
         xml.append("</");
         xml.append(tag);
         xml.append(">'");
-
 
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
@@ -492,7 +524,6 @@ public final class CRM {
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
     }
-
 
     /**
      * Returns xml for location xml.

@@ -1357,9 +1357,12 @@ sub gui_test {
 			$i++;
 		}
 	}
+	$cib =~ s/(start-delay="\d+") (timeout="\d+")/$2 $1/g;
 	$status =~
 	 s/(Online: \[\s+)(.*?)(\s+\])/$1.(join " ", sort split " ", "$2").$3/e;
 	$cib =~ s/(node)\s+\$id=".*?"/$1/g;
+	# sort node lines
+	$cib =~ s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
 	$status =~ s/unknown( expected votes)/2$1/;
 	my $testfile = "/tmp/drbd-mc-test/$testname/test$index.crm";
 	my $test = "";

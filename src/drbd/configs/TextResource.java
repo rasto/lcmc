@@ -339,9 +339,7 @@ public class TextResource extends
          "Checking if DRBD, Pacemaker and other important "
          + "components are already installed. If not, you can press "
          + "one of the 'Install' buttons to install them. You can check "
-         + "for DRBD upgrade as well if installed DRBD was detected. "
-         + "Installing or upgrading of DRBD via binary packages is "
-         + "possible only if you have support contract with LINBIT.<br>"
+         + "for DRBD upgrade as well if installed DRBD was detected.<br>"
          + "You can also choose a <b>Pacemaker</b> installation method. "
          + "The newest packages for many different distributions are in "
          + "Clusterlabs repositories."},
@@ -836,7 +834,6 @@ public class TextResource extends
         {"Dialog.About.Description",
          "<b>DRBD Management Console by Rasto Levrinc "
          + "(rasto@linbit.com).</b><br>"
-         + "(C)opyright 2007-2010 by LINBIT HA-Solutions GmbH.<br>"
          + "(C)opyright 2007-2010 by Rasto Levrinc.<br>"
          + "Please visit the website "
          + "http://www.drbd.org/mc/management-console/<br>"

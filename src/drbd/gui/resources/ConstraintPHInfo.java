@@ -29,10 +29,13 @@ import drbd.data.CRMXML;
 import drbd.data.ClusterStatus;
 import drbd.data.resources.Service;
 import drbd.data.ConfigData;
+import drbd.data.PtestData;
+import drbd.data.Subtext;
 import drbd.utilities.CRM;
 import drbd.utilities.Tools;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.ButtonCallback;
 
 import javax.swing.JScrollPane;
 import javax.swing.JPanel;
@@ -46,12 +49,15 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Color;
+import java.util.concurrent.CountDownLatch;
 
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Component;
 import java.awt.BorderLayout;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * Object that holds an order constraint information.
@@ -60,7 +66,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** Name of this object. */
-    public final static String NAME = "PH";
+    public final static String NAME = "Placeholder";
     /** Resource set connection data for colocation. */
     private CRMXML.RscSetConnectionData rscSetConnectionDataCol = null;
     /** Resource set connection data for order. */
@@ -75,6 +81,11 @@ public class ConstraintPHInfo extends ServiceInfo {
     private boolean reversedCol = false;
     /** Whether the order was reversed. */
     private boolean reversedOrd = false;
+    /** Resource set info object for this placeholder. More placeholders can
+     * have on resource set info object. */
+    private PcmkRscSetsInfo pcmkRscSetsInfo = null;
+    /** Rsc set info object lock. */
+    private final Mutex mPcmkRscSetsLock = new Mutex();
 
     /**
      * Prepares a new <code>ConstraintPHInfo</code> object.
@@ -90,7 +101,6 @@ public class ConstraintPHInfo extends ServiceInfo {
                 this.rscSetConnectionDataOrd = rscSetConnectionData;
             }
         }
-        //setResource(new Service("constraintplaceholder"));
     }
 
     /** Returns resource set colocation data. */
@@ -98,29 +108,25 @@ public class ConstraintPHInfo extends ServiceInfo {
         return rscSetConnectionDataCol;
     }
 
-    ///** Sets resource set colocation data to null, if last dangling connection
-    // * was removed. */
-    //public final void resetRscSetConnectionDataCol() {
-    //    if (rscSetConnectionDataCol.getRscSet1() == null
-    //        || rscSetConnectionDataCol.getRscSet2() == null) {
-    //        rscSetConnectionDataCol = null;
-    //    }
-    //}
-
     /** Returns resource set order data. */
     public final CRMXML.RscSetConnectionData getRscSetConnectionDataOrd() {
         return rscSetConnectionDataOrd;
     }
 
 
-    ///** Sets resource set order data to null, if last dangling connection was
-    // * removed. */
-    //public final void resetRscSetConnectionDataOrd() {
-    //    if (rscSetConnectionDataOrd.getRscSet1() == null
-    //        || rscSetConnectionDataOrd.getRscSet2() == null) {
-    //        rscSetConnectionDataOrd = null;
-    //    }
-    //}
+    /** Sets connection data to zero. */
+    public final void resetRscSetConnectionData() {
+        final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
+        if (rodata != null 
+            && rodata.isEmpty()) {
+            rscSetConnectionDataOrd = null;
+        }
+        final CRMXML.RscSetConnectionData rcdata = rscSetConnectionDataCol;
+        if (rcdata != null 
+            && rcdata.isEmpty()) {
+            rscSetConnectionDataCol = null;
+        }
+    }
 
     /** Sets resource set connection data. */
     public final void setRscSetConnectionData(
@@ -134,17 +140,6 @@ public class ConstraintPHInfo extends ServiceInfo {
                     reverseCol = false;
                 }
             } else if (rscSetConnectionDataCol != null) {
-                //System.out.println(
-                //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
-                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
-                //if (rscSetConnectionData.getRscSet1() != null) {
-                //    System.out.println("rsc1 ids: "
-                //           + rscSetConnectionData.getRscSet1().getRscIds());
-                //}
-                //if (rscSetConnectionData.getRscSet2() != null) {
-                //    System.out.println(", rsc2 ids: "
-                //           + rscSetConnectionDataCol.getRscSet2().getRscIds());
-                //}
                 if (rscSetConnectionData.getRscSet2() == null
                     && rscSetConnectionData.getRscSet1() != null
                     && rscSetConnectionDataCol.getRscSet2() != null
@@ -152,7 +147,6 @@ public class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataCol.getRscSet2())
                         || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
-                    //System.out.println("reverse col");
                     /* upside down */
                     reversedCol = true;
                     rscSetConnectionData.reverse();
@@ -165,23 +159,16 @@ public class ConstraintPHInfo extends ServiceInfo {
             if (reverseOrd) {
                 if (rscSetConnectionData.getRscSet2() == null
                     && rscSetConnectionData.getRscSet1() != null) {
+                    Tools.debug(this, "force reverse ord", 3);
+                    Tools.debug(this,
+                                " data rscset1: "
+                                + rscSetConnectionData.getRscSet1().getRscIds(),
+                                3);
                     reversedOrd = true;
                     rscSetConnectionData.reverse();
                     reverseOrd = false;
-                    ////System.out.println("reverse ord");
                 }
             } else if (rscSetConnectionDataOrd != null) {
-                //System.out.println(
-                //  "set rsc1: " + rscSetConnectionData.getRscSet1()
-                //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
-                //if (rscSetConnectionData.getRscSet1() != null) {
-                //    System.out.println("rsc1 ids: "
-                //           + rscSetConnectionData.getRscSet1().getRscIds());
-                //}
-                //if (rscSetConnectionDataOrd.getRscSet2() != null) {
-                //    System.out.println(", rsc2 ids: "
-                //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
-                //}
                 if (rscSetConnectionData.getRscSet2() == null
                     && rscSetConnectionData.getRscSet1() != null
                     && rscSetConnectionDataOrd.getRscSet2() != null
@@ -189,126 +176,60 @@ public class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataOrd.getRscSet2())
                         || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
+                    Tools.debug(this, "data rscset1: "
+                                      + rscSetConnectionData.getRscSet1(), 3);
+                    if (rscSetConnectionData.getRscSet1() != null) {
+                        Tools.debug(
+                            this,
+                            "data rscset1 ids: "
+                            + rscSetConnectionData.getRscSet1().getRscIds(),
+                            3);
+                    }
+
+                    Tools.debug(this, "data rscset2: "
+                                      + rscSetConnectionData.getRscSet2(), 3);
+                    if (rscSetConnectionData.getRscSet2() != null) {
+                        Tools.debug(
+                              this,
+                              "data rscset2 ids: "
+                              + rscSetConnectionData.getRscSet2().getRscIds(),
+                              3);
+                    }
+
+                    Tools.debug(this,
+                                "ord rscset1: "
+                                + rscSetConnectionDataOrd.getRscSet1(),
+                                3);
+                    if (rscSetConnectionDataOrd.getRscSet1() != null) {
+                        Tools.debug(
+                           this,
+                           "ord rscset1 ids: "
+                           + rscSetConnectionDataOrd.getRscSet1().getRscIds(),
+                           3);
+                    }
+
+                    Tools.debug(this,
+                                "ord rscset2: "
+                                + rscSetConnectionDataOrd.getRscSet2(),
+                                3);
+                    if (rscSetConnectionDataOrd.getRscSet2() != null) {
+                        Tools.debug(
+                           this,
+                           "ord rscset2 ids: "
+                           + rscSetConnectionDataOrd.getRscSet2().getRscIds(),
+                           3);
+                    }
+                    Tools.debug(this, "reverse ord", 3);
                     reversedOrd = true;
-                    //System.out.println("reverse ord");
                     /* upside down */
                     rscSetConnectionData.reverse();
                 }
             } else {
                 reversedOrd = false;
             }
+
             this.rscSetConnectionDataOrd = rscSetConnectionData;
         }
-    }
-
-    ///** Resets resource set connection data, setting the other one to null. */
-    //public final void resetRscSetConnectionData(
-    //                final CRMXML.RscSetConnectionData rscSetConnectionData) {
-    //    if (rscSetConnectionData.isColocation()) {
-    //        if (rscSetConnectionDataCol != null) {
-    //            System.out.println(
-    //              "reset rsc1: " + rscSetConnectionData.getRscSet1()
-    //              + ", rsc2: " + rscSetConnectionData.getRscSet2());
-    //            if (rscSetConnectionDataCol.getRscSet1() != null) {
-    //                System.out.println("rsc1 ids: "
-    //                       + rscSetConnectionData.getRscSet1().getRscIds());
-    //            }
-    //            if (rscSetConnectionDataCol.getRscSet2() != null) {
-    //                System.out.println(", rsc2 ids: "
-    //                       + rscSetConnectionDataCol.getRscSet2().getRscIds());
-    //            }
-    //            if (rscSetConnectionData.getRscSet2() == null
-    //                && rscSetConnectionData.getRscSet1() != null
-    //                && rscSetConnectionDataCol.getRscSet2() != null
-    //                && (rscSetConnectionData.getRscSet1().isSubsetOf(
-    //                                 rscSetConnectionDataCol.getRscSet2())
-    //                    || rscSetConnectionDataCol.getRscSet2().isSubsetOf(
-    //                                 rscSetConnectionData.getRscSet1()))) {
-    //                System.out.println("reverse col");
-    //                /* upside down */
-    //                rscSetConnectionData.reverse();
-    //            }
-    //        }
-    //        //if (rscSetConnectionDataCol != null) {
-    //        //    if (rscSetConnectionDataCol.getRscSet1() == null
-    //        //        && rscSetConnectionDataCol.getRscSet2() != null) {
-    //        //        System.out.println("reverse");
-    //        //        /* upside down */
-    //        //        rscSetConnectionData.reverse();
-    //        //    }
-    //        //}
-    //        this.rscSetConnectionDataCol = rscSetConnectionData;
-    //        this.rscSetConnectionDataOrd = null;
-    //    } else {
-    //        if (rscSetConnectionDataOrd != null) {
-    //            //System.out.println(
-    //            //  "reset rsc1: " + rscSetConnectionData.getRscSet1()
-    //            //  + ", rsc2: " + rscSetConnectionData.getRscSet2());
-    //            //if (rscSetConnectionDataOrd.getRscSet1() != null) {
-    //            //    System.out.println("rsc1 ids: "
-    //            //           + rscSetConnectionData.getRscSet1().getRscIds());
-    //            //}
-    //            //if (rscSetConnectionDataOrd.getRscSet2() != null) {
-    //            //    System.out.println(", rsc2 ids: "
-    //            //           + rscSetConnectionDataOrd.getRscSet2().getRscIds());
-    //            //}
-    //            if (rscSetConnectionData.getRscSet2() == null
-    //                && rscSetConnectionData.getRscSet1() != null
-    //                && rscSetConnectionDataOrd.getRscSet2() != null
-    //                && (rscSetConnectionData.getRscSet1().isSubsetOf(
-    //                                 rscSetConnectionDataOrd.getRscSet2())
-    //                    || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
-    //                                 rscSetConnectionData.getRscSet1()))) {
-    //                System.out.println("reverse ord");
-    //                /* upside down */
-    //                rscSetConnectionData.reverse();
-    //            }
-    //        }
-    //        this.rscSetConnectionDataOrd = rscSetConnectionData;
-    //        this.rscSetConnectionDataCol = null;
-    //    }
-    //}
-
-    ///** Returns browser object of this info. */
-    //protected final ClusterBrowser getBrowser() {
-    //    return (ClusterBrowser) super.getBrowser();
-    //}
-
-
-    /** Sets the order's parameters. */
-    public final void setParameters() {
-    //    final ClusterStatus clStatus = getBrowser().getClusterStatus();
-    //    final String ordId = getService().getHeartbeatId();
-    //    final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
-
-    //    final String score = orderData.getScore();
-    //    final String symmetrical = orderData.getSymmetrical();
-    //    final String firstAction = orderData.getFirstAction();
-    //    final String thenAction = orderData.getThenAction();
-
-    //    final Map<String, String> resourceNode = new HashMap<String, String>();
-    //    resourceNode.put(CRMXML.SCORE_STRING, score);
-    //    resourceNode.put("symmetrical", symmetrical);
-    //    resourceNode.put("first-action", firstAction);
-    //    resourceNode.put("then-action", thenAction);
-
-    //    final String[] params = getBrowser().getCRMXML().getOrderParameters();
-    //    if (params != null) {
-    //        for (String param : params) {
-    //            String value = resourceNode.get(param);
-    //            if (value == null) {
-    //                value = getParamDefault(param);
-    //            }
-    //            if ("".equals(value)) {
-    //                value = null;
-    //            }
-    //            final String oldValue = getParamSaved(param);
-    //            if ((value == null && value != oldValue)
-    //                || (value != null && !value.equals(oldValue))) {
-    //                getResource().setValue(param, value);
-    //            }
-    //        }
-    //    }
     }
 
     /**
@@ -316,10 +237,6 @@ public class ConstraintPHInfo extends ServiceInfo {
      * tool tips.
      */
     protected final String getParamLongDesc(final String param) {
-    //    final String text =
-    //                    getBrowser().getCRMXML().getOrderParamLongDesc(param);
-    //    return text.replaceAll("@FIRST-RSC@", serviceInfoParent.toString())
-    //               .replaceAll("@THEN-RSC@", serviceInfoChild.toString());
         return null;
     }
 
@@ -327,7 +244,6 @@ public class ConstraintPHInfo extends ServiceInfo {
      * Returns short description of the parameter, that is used as * label.
      */
     protected final String getParamShortDesc(final String param) {
-        //return getBrowser().getCRMXML().getOrderParamShortDesc(param);
         return null;
     }
 
@@ -337,7 +253,6 @@ public class ConstraintPHInfo extends ServiceInfo {
      */
     protected final boolean checkParam(final String param,
                                        final String newValue) {
-        //return getBrowser().getCRMXML().checkOrderParam(param, newValue);
         return true;
     }
 
@@ -345,23 +260,16 @@ public class ConstraintPHInfo extends ServiceInfo {
      * Returns default for this parameter.
      */
     protected final String getParamDefault(final String param) {
-        //return getBrowser().getCRMXML().getOrderParamDefault(param);
         return "default";
     }
 
-    /**
-     * Returns preferred value for this parameter.
-     */
+    /** Returns preferred value for this parameter. */
     protected final String getParamPreferred(final String param) {
-        //return getBrowser().getCRMXML().getOrderParamPreferred(param);
         return null;
     }
 
-    /**
-     * Returns lsit of all parameters as an array.
-     */
+    /** Returns lsit of all parameters as an array. */
     public final String[] getParametersFromXML() {
-        //return getBrowser().getCRMXML().getOrderParameters();
         return new String[]{};
     }
 
@@ -370,34 +278,16 @@ public class ConstraintPHInfo extends ServiceInfo {
      * down menu.
      */
     protected final Object[] getParamPossibleChoices(final String param) {
-        //if ("first-action".equals(param)) {
-        //    return getBrowser().getCRMXML().getOrderParamPossibleChoices(
-        //                        param,
-        //                        serviceInfoParent.getService().isMaster());
-        //} else if ("then-action".equals(param)) {
-        //    return getBrowser().getCRMXML().getOrderParamPossibleChoices(
-        //                        param,
-        //                        serviceInfoChild.getService().isMaster());
-        //} else {
-        //    return getBrowser().getCRMXML().getOrderParamPossibleChoices(param,
-        //                                                                 false);
-        //}
         return null;
     }
 
-    /**
-     * Returns parameter type, boolean etc.
-     */
+    /** Returns parameter type, boolean etc. */
     protected final String getParamType(final String param) {
-        //return getBrowser().getCRMXML().getOrderParamType(param);
         return null;
     }
 
-    /**
-     * Returns section to which the global belongs.
-     */
+    /** Returns section to which the global belongs. */
     protected final String getSection(final String param) {
-        //return getBrowser().getCRMXML().getOrderSection(param);
         return null;
     }
 
@@ -406,31 +296,21 @@ public class ConstraintPHInfo extends ServiceInfo {
      * checkbox.
      */
     protected final boolean isCheckBox(final String param) {
-        //return getBrowser().getCRMXML().isOrderBoolean(param);
         return false;
     }
 
-    /**
-     * Returns true if the specified parameter is of time type.
-     */
+    /** Returns true if the specified parameter is of time type. */
     protected final boolean isTimeType(final String param) {
-        //return getBrowser().getCRMXML().isOrderTimeType(param);
         return false;
     }
 
-    /**
-     * Returns true if the specified parameter is integer.
-     */
+    /** Returns true if the specified parameter is integer. */
     protected final boolean isInteger(final String param) {
-        //return getBrowser().getCRMXML().isOrderInteger(param);
         return false;
     }
 
-    /**
-     * Returns true if the specified parameter is required.
-     */
+    /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
-        //return getBrowser().getCRMXML().isOrderRequired(param);
         return true;
     }
 
@@ -440,46 +320,12 @@ public class ConstraintPHInfo extends ServiceInfo {
      */
     public final boolean checkResourceFields(final String param,
                                              final String[] params) {
-        //return connectionInfo.checkResourceFields(param, null);
         return true;
     }
 
-    /**
-     * Applies changes to the order parameters.
-     */
+    /** Applies changes to the placeholder. */
     public final void apply(final Host dcHost, final boolean testOnly) {
-        final String[] params = getParametersFromXML();
-        //final Map<String, String> attrs = new LinkedHashMap<String, String>();
-        //boolean changed = false;
-        //for (final String param : params) {
-        //    final String value = getComboBoxValue(param);
-        //    if (!value.equals(getParamSaved(param))) {
-        //        changed = true;
-        //    }
-        //    if (!value.equals(getParamDefault(param))) {
-        //        attrs.put(param, value);
-        //    }
-        //}
-        //if (changed) {
-        //    CRM.addOrder(dcHost,
-        //                 getService().getHeartbeatId(),
-        //                 serviceInfoParent.getHeartbeatId(testOnly),
-        //                 serviceInfoChild.getHeartbeatId(testOnly),
-        //                 attrs,
-        //                 testOnly);
-        //}
-        //if (!testOnly) {
-        //    storeComboBoxValues(params);
-        //    checkResourceFields(null, params);
-        //}
     }
-
-    ///**
-    // * Returns service that belongs to this info object.
-    // */
-    //public final Service getService() {
-    //    return (Service) getResource();
-    //}
 
     /** Returns whether this parameter is advanced. */
     protected final boolean isAdvanced(final String param) {
@@ -493,180 +339,38 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns name of this placeholder. */
     public final String toString() {
-        return getName() +  "(" + getService().getId() + ")";
+        return getName() +  " (" + getService().getId() + ")";
     }
 
-    public final JComponent getInfoPanel() {
-        if (infoPanel != null) {
-            return infoPanel;
+    /**
+     * Returns id of the service, which is heartbeatId.
+     * TODO: this id is used for stored position info, should be named
+     * differently.
+     */
+    public String getId() {
+        String ordId = "";
+        String colId = "";
+        final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
+        if (rodata != null) {
+            ordId = rodata.getConstraintId() + "-" + rodata.getConnectionPos();
         }
-        //final ButtonCallback buttonCallback = new ButtonCallback() {
-        //    private volatile boolean mouseStillOver = false;
+        final CRMXML.RscSetConnectionData rcdata = rscSetConnectionDataCol;
+        if (rcdata != null) {
+            colId = rcdata.getConstraintId() + "-" + rcdata.getConnectionPos();
+        }
+        return "ph_" + ordId + "_" + colId;
+    }
 
-        //    /**
-        //     * Whether the whole thing should be enabled.
-        //     */
-        //    public final boolean isEnabled() {
-        //        final Host dcHost = getBrowser().getDCHost();
-        //        if (dcHost == null) {
-        //            return false;
-        //        }
-        //        final String pmV = dcHost.getPacemakerVersion();
-        //        final String hbV = dcHost.getHeartbeatVersion();
-        //        if (pmV == null
-        //            && hbV != null
-        //            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-        //            return false;
-        //        }
-        //        return true;
-        //    }
-
-        //    public final void mouseOut() {
-        //        if (!isEnabled()) {
-        //            return;
-        //        }
-        //        mouseStillOver = false;
-        //        getBrowser().getHeartbeatGraph().stopTestAnimation(applyButton);
-        //        applyButton.setToolTipText(null);
-        //    }
-
-        //    public final void mouseOver() {
-        //        if (!isEnabled()) {
-        //            return;
-        //        }
-        //        mouseStillOver = true;
-        //        applyButton.setToolTipText(
-        //                                ClusterBrowser.STARTING_PTEST_TOOLTIP);
-        //        applyButton.setToolTipBackground(Tools.getDefaultColor(
-        //                            "ClusterBrowser.Test.Tooltip.Background"));
-        //        Tools.sleep(250);
-        //        if (!mouseStillOver) {
-        //            return;
-        //        }
-        //        mouseStillOver = false;
-        //        final CountDownLatch startTestLatch = new CountDownLatch(1);
-        //        getBrowser().getHeartbeatGraph().startTestAnimation(
-        //                                                    applyButton,
-        //                                                    startTestLatch);
-        //        final Host dcHost = getBrowser().getDCHost();
-        //        getBrowser().ptestLockAcquire();
-        //        final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        //        clStatus.setPtestData(null);
-        //        apply(dcHost, true);
-        //        final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-        //        applyButton.setToolTipText(ptestData.getToolTip());
-        //        clStatus.setPtestData(ptestData);
-        //        getBrowser().ptestLockRelease();
-        //        startTestLatch.countDown();
-        //    }
-        //};
-        //initApplyButton(buttonCallback);
-        //for (final String col : colocationIds.keySet()) {
-        //    colocationIds.get(col).applyButton = applyButton;
-        //}
-        //for (final String ord : orderIds.keySet()) {
-        //    orderIds.get(ord).applyButton = applyButton;
-        //}
-        final JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
-        final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
-        buttonPanel.setMinimumSize(new Dimension(0, 50));
-        buttonPanel.setPreferredSize(new Dimension(0, 50));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-
-        final JPanel optionsPanel = new JPanel();
-        optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        mainPanel.add(buttonPanel);
-
-        /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        final JMenu serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
-
-        /* params */
-        final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
-        //EditableInfo firstConstraint = null;
-        //for (final HbConstraintInterface c : constraints) {
-        //    if (firstConstraint == null) {
-        //        firstConstraint = (EditableInfo) c;
-        //    }
-        //    final String[] params = c.getParametersFromXML();
-        //    /* heartbeat id */
-        //    final JPanel panel = getParamPanel(c.getName());
-        //    panel.setLayout(new SpringLayout());
-        //    final int rows = 3;
-        //    c.addLabelField(panel,
-        //                    Tools.getString("ClusterBrowser.HeartbeatId"),
-        //                    c.getService().getHeartbeatId(),
-        //                    ClusterBrowser.SERVICE_LABEL_WIDTH,
-        //                    ClusterBrowser.SERVICE_FIELD_WIDTH,
-        //                    height);
-        //    c.addLabelField(panel,
-        //                    c.getRsc1Name(),
-        //                    c.getRsc1(),
-        //                    ClusterBrowser.SERVICE_LABEL_WIDTH,
-        //                    ClusterBrowser.SERVICE_FIELD_WIDTH,
-        //                    height);
-        //    c.addLabelField(panel,
-        //                    c.getRsc2Name(),
-        //                    c.getRsc2(),
-        //                    ClusterBrowser.SERVICE_LABEL_WIDTH,
-        //                    ClusterBrowser.SERVICE_FIELD_WIDTH,
-        //                    height);
-        //    SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
-        //                                    1, 1,        /* initX, initY */
-        //                                    1, 1);       /* xPad, yPad */
-
-        //    optionsPanel.add(panel);
-        //    c.addParams(optionsPanel,
-        //                params,
-        //                ClusterBrowser.SERVICE_LABEL_WIDTH,
-        //                ClusterBrowser.SERVICE_FIELD_WIDTH,
-        //                null);
-        //}
-
-        //applyButton.addActionListener(
-        //    new ActionListener() {
-        //        public void actionPerformed(final ActionEvent e) {
-        //            final Thread thread = new Thread(new Runnable() {
-        //                public void run() {
-        //                    getBrowser().clStatusLock();
-        //                    apply(getBrowser().getDCHost(), false);
-        //                    getBrowser().clStatusUnlock();
-        //                }
-        //            });
-        //            thread.start();
-        //        }
-        //    }
-        //);
-
-        /* apply button */
-        //addApplyButton(buttonPanel);
-        //applyButton.setEnabled(checkResourceFields(null, null));
-        mainPanel.add(optionsPanel);
-
-        final JPanel newPanel = new JPanel();
-        newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
-        newPanel.add(buttonPanel);
-        newPanel.add(new JScrollPane(mainPanel));
-        newPanel.setMinimumSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
-        newPanel.setPreferredSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
-        infoPanel = newPanel;
-        infoPanelDone();
-        return infoPanel;
+    /** Return information panel. */
+    public final JComponent getInfoPanel() {
+        try {
+            mPcmkRscSetsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
+        mPcmkRscSetsLock.release();
+        return prsi.getInfoPanel(this);
     }
 
     /** Returns tool tip for the placeholder. */
@@ -723,35 +427,55 @@ public class ConstraintPHInfo extends ServiceInfo {
     /** Removes the placeholder without confirmation dialog. */
     protected final void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
-        if (!testOnly) {
-            setUpdated(true);
-            getService().setRemoved(true);
-        }
-
         if (getService().isNew()) {
             if (!testOnly) {
+                setUpdated(true);
+                getService().setRemoved(true);
+                final HbConnectionInfo[] hbcis =
+                       getBrowser().getHeartbeatGraph().getHbConnections(this);
+                for (final HbConnectionInfo hbci : hbcis) {
+                    getBrowser().getHeartbeatGraph().removeOrder(hbci,
+                                                                 dcHost,
+                                                                 testOnly);
+                    getBrowser().getHeartbeatGraph().removeColocation(hbci,
+                                                                      dcHost,
+                                                                      testOnly);
+                }
                 getService().setNew(false);
-                getBrowser().getHeartbeatGraph().killRemovedVertices();
+                getBrowser().removeFromServiceInfoHash(this);
+                infoPanel = null;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getBrowser().getHeartbeatGraph().killRemovedVertices();
+                        getService().doneRemoving();
+                    }
+                });
             }
         } else {
-            if (rscSetConnectionDataCol != null) {
-                final String colId = rscSetConnectionDataCol.getConstraintId();
-                if (colId != null) {
-                    CRM.removeColocation(dcHost, colId, testOnly);
-                }
-            }
             if (rscSetConnectionDataOrd != null) {
                 final String ordId = rscSetConnectionDataOrd.getConstraintId();
                 if (ordId != null) {
                     CRM.removeOrder(dcHost, ordId, testOnly);
                 }
             }
-        }
-        if (!testOnly) {
-            getBrowser().removeFromServiceInfoHash(this);
-            infoPanel = null;
-            getService().doneRemoving();
-            //getBrowser().reloadAllComboBoxes(this);
+            if (rscSetConnectionDataCol != null) {
+                final String colId = rscSetConnectionDataCol.getConstraintId();
+                if (colId != null) {
+                    CRM.removeColocation(dcHost, colId, testOnly);
+                }
+            }
+            if (!testOnly) {
+                setUpdated(true);
+                getService().setRemoved(true);
+                getBrowser().removeFromServiceInfoHash(this);
+                infoPanel = null;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getBrowser().getHeartbeatGraph().killRemovedVertices();
+                        getService().doneRemoving();
+                    }
+                });
+            }
         }
     }
 
@@ -811,4 +535,527 @@ public class ConstraintPHInfo extends ServiceInfo {
     public final boolean isReversedOrd() {
         return reversedOrd;
     }
+
+    /** Adds constraint to or from placeholder. */
+    protected List<CRMXML.RscSet> addConstraintWithPlaceholder(
+                                      final List<ServiceInfo> servicesAll,
+                                      final List<ServiceInfo> servicesFrom,
+                                      final boolean colocationOnly,
+                                      final boolean orderOnly,
+                                      final Host dcHost,
+                                      final boolean force,
+                                      final boolean testOnly) {
+        boolean createCol = false;
+        boolean createOrd = false;
+        String colId = null;
+        String ordId = null;
+        final CRMXML.RscSetConnectionData rdataCol =
+                                                getRscSetConnectionDataCol();
+        final CRMXML.RscSetConnectionData rdataOrd =
+                                                getRscSetConnectionDataOrd();
+        CRMXML.RscSet colRscSet1 = null; 
+        CRMXML.RscSet colRscSet2 = null;
+        CRMXML.RscSet ordRscSet1 = null;
+        CRMXML.RscSet ordRscSet2 = null;
+
+        if (rdataCol != null) {
+            if (!orderOnly) {
+                colId = rdataCol.getConstraintId();
+            }
+            colRscSet1 = rdataCol.getRscSet1();
+            colRscSet2 = rdataCol.getRscSet2();
+        }
+        if (rdataOrd != null) {
+            if (!colocationOnly) {
+                ordId = rdataOrd.getConstraintId();
+            }
+            ordRscSet1 = rdataOrd.getRscSet1();
+            ordRscSet2 = rdataOrd.getRscSet2();
+        }
+        if (servicesFrom.size() == 0) {
+            if (!colocationOnly) {
+                reverseOrder();
+            }
+            if (!orderOnly) {
+                reverseColocation();
+            }
+        }
+        CRMXML.RscSet outOrdRscSet1 = null;
+        CRMXML.RscSet outOrdRscSet2 = null;
+        CRMXML.RscSet outColRscSet1 = null;
+        CRMXML.RscSet outColRscSet2 = null;
+        for (final ServiceInfo serviceInfo : servicesAll) {
+            boolean isFrom = servicesFrom.contains(serviceInfo);
+            final String idToAdd = serviceInfo.getService().getHeartbeatId();
+            if (!orderOnly) {
+                final ClusterStatus clStatus = getBrowser().getClusterStatus();
+                /* colocation */
+                if (colId == null) {
+                    final List<String> rscIds = new ArrayList<String>();
+                    rscIds.add(idToAdd);
+                    int colIdInt = Integer.parseInt(getService().getId());
+                    colId = "c" + colIdInt;
+                    while (clStatus.getRscSetsCol(colId) != null) {
+                        colIdInt++;
+                        colId = "c" + colIdInt;
+                    }
+                    createCol = true;
+                    if (isFrom) {
+                        colRscSet2 = getBrowser().getCRMXML().new RscSet(
+                                                       colId,
+                                                       new ArrayList<String>(),
+                                                       "false",
+                                                       null,
+                                                       null);
+                        colRscSet1 = getBrowser().getCRMXML().new RscSet(
+                                                                      colId,
+                                                                      rscIds,
+                                                                      "false",
+                                                                      null,
+                                                                      null);
+                        outColRscSet1 = colRscSet1;
+                    } else {
+                        colRscSet2 = getBrowser().getCRMXML().new RscSet(
+                                                                      colId,
+                                                                      rscIds,
+                                                                      "false",
+                                                                      null,
+                                                                      null);
+                        colRscSet1 = getBrowser().getCRMXML().new RscSet(
+                                                       colId,
+                                                       new ArrayList<String>(),
+                                                       "false",
+                                                       null,
+                                                       null);
+                        outColRscSet2 = colRscSet2;
+                    }
+                } else {
+                    boolean colRscSetAdded = false;
+                    CRMXML.RscSet toRscSet;
+                    if (isFrom) {
+                        if (outColRscSet1 == null) {
+                            toRscSet = colRscSet1;
+                        } else {
+                            toRscSet = outColRscSet1;
+                        }
+                    } else {
+                        if (outColRscSet2 == null) {
+                            toRscSet = colRscSet2;
+                        } else {
+                            toRscSet = outColRscSet2;
+                        }
+                    }
+                    final List<CRMXML.RscSet> rscSetsColList =
+                                                 clStatus.getRscSetsCol(colId);
+                    if (rscSetsColList != null) {
+                        for (final CRMXML.RscSet rscSet : rscSetsColList) {
+                            if (rscSet.equals(toRscSet)) {
+                                final List<String> newRscIds =
+                                                       new ArrayList<String>();
+                                newRscIds.addAll(rscSet.getRscIds());
+
+                                newRscIds.add(0, idToAdd);
+                                final CRMXML.RscSet newRscSet =
+                                    getBrowser().getCRMXML().new RscSet(
+                                                   rscSet.getId(),
+                                                   newRscIds,
+                                                   rscSet.getSequential(),
+                                                   rscSet.getOrderAction(),
+                                                   rscSet.getColocationRole());
+                                if (isFrom) {
+                                    outColRscSet1 = newRscSet;
+                                } else {
+                                    outColRscSet2 = newRscSet;
+                                }
+                                colRscSetAdded = true;
+                            } else {
+                                if (isFrom) {
+                                    outColRscSet2 = rscSet;
+                                } else {
+                                    outColRscSet1 = rscSet;
+                                }
+                            }
+                        }
+                    }
+                    if (!colRscSetAdded) {
+                        final List<String> newRscIds = new ArrayList<String>();
+                                getBrowser().getCRMXML().new RscSet(
+                                                   colId,
+                                                   new ArrayList<String>(),
+                                                   "false",
+                                                   null,
+                                                   null);
+                        final CRMXML.RscSet newRscSet;
+                        if (toRscSet == null) {
+                            newRscSet =
+                                getBrowser().getCRMXML().new RscSet(
+                                                   colId,
+                                                   newRscIds,
+                                                   "false",
+                                                   null,
+                                                   null);
+                        } else {
+                            newRscIds.addAll(toRscSet.getRscIds());
+                            newRscSet =
+                                getBrowser().getCRMXML().new RscSet(
+                                               toRscSet.getId(),
+                                               newRscIds,
+                                               toRscSet.getSequential(),
+                                               toRscSet.getOrderAction(),
+                                               toRscSet.getColocationRole());
+                        }
+                        newRscSet.addRscId(idToAdd);
+                        if (isFrom) {
+                            outColRscSet1 = newRscSet;
+                        } else {
+                            outColRscSet2 = newRscSet;
+                        }
+                    }
+                }
+            }
+            
+            if (!colocationOnly) {
+                /* order */
+                final ClusterStatus clStatus = getBrowser().getClusterStatus();
+                if (ordId == null) {
+                    final List<String> rscIds = new ArrayList<String>();
+                    rscIds.add(idToAdd);
+                    int ordIdInt = Integer.parseInt(getService().getId());
+                    ordId = "o" + ordIdInt;
+                    while (clStatus.getRscSetsOrd(ordId) != null) {
+                        ordIdInt++;
+                        ordId = "o" + ordIdInt;
+                    }
+                    createOrd = true;
+                    if (isFrom) {
+                        ordRscSet1 = getBrowser().getCRMXML().new RscSet(
+                                                                      ordId,
+                                                                      rscIds,
+                                                                      "false",
+                                                                      null,
+                                                                      null);
+                        ordRscSet2 = getBrowser().getCRMXML().new RscSet(
+                                                      ordId,
+                                                      new ArrayList<String>(),
+                                                      "false",
+                                                      null,
+                                                      null);
+                        outOrdRscSet1 = ordRscSet1;
+                    } else {
+                        ordRscSet1 = getBrowser().getCRMXML().new RscSet(
+                                                      ordId,
+                                                      new ArrayList<String>(),
+                                                      "false",
+                                                      null,
+                                                      null);
+                        ordRscSet2 = getBrowser().getCRMXML().new RscSet(
+                                                                      ordId,
+                                                                      rscIds,
+                                                                      "false",
+                                                                      null,
+                                                                      null);
+                        outOrdRscSet2 = ordRscSet2;
+                    }
+                } else {
+                    boolean ordRscSetAdded = false;
+                    CRMXML.RscSet toRscSet;
+                    if (isFrom) {
+                        if (outOrdRscSet1 == null) {
+                            toRscSet = ordRscSet1;
+                        } else {
+                            toRscSet = outOrdRscSet1;
+                        }
+                    } else {
+                        if (outOrdRscSet2 == null) {
+                            toRscSet = ordRscSet2;
+                        } else {
+                            toRscSet = outOrdRscSet2;
+                        }
+                    }
+                    final List<CRMXML.RscSet> rscSetsOrdList =
+                                                 clStatus.getRscSetsOrd(ordId);
+                    if (rscSetsOrdList != null) {
+                        for (final CRMXML.RscSet rscSet : rscSetsOrdList) {
+                            if (rscSet.equals(toRscSet)) {
+                                final List<String> newRscIds =
+                                                       new ArrayList<String>();
+                                newRscIds.addAll(rscSet.getRscIds());
+
+                                newRscIds.add(idToAdd);
+                                final CRMXML.RscSet newRscSet =
+                                    getBrowser().getCRMXML().new RscSet(
+                                                   rscSet.getId(),
+                                                   newRscIds,
+                                                   rscSet.getSequential(),
+                                                   rscSet.getOrderAction(),
+                                                   rscSet.getColocationRole());
+                                if (isFrom) {
+                                    outOrdRscSet1 = newRscSet;
+                                } else {
+                                    outOrdRscSet2 = newRscSet;
+                                }
+                                ordRscSetAdded = true;
+                            } else {
+                                if (isFrom) {
+                                    outOrdRscSet2 = rscSet;
+                                } else {
+                                    outOrdRscSet1 = rscSet;
+                                }
+                            }
+                        }
+                    }
+                    if (!ordRscSetAdded) {
+                        final List<String> newRscIds = new ArrayList<String>();
+                        CRMXML.RscSet newRscSet;
+                        if (toRscSet == null) {
+                            newRscSet =
+                                getBrowser().getCRMXML().new RscSet(
+                                                   ordId,
+                                                   newRscIds,
+                                                   "false",
+                                                   null,
+                                                   null);
+                        } else {
+                            newRscIds.addAll(toRscSet.getRscIds());
+                            newRscSet =
+                                getBrowser().getCRMXML().new RscSet(
+                                               toRscSet.getId(),
+                                               newRscIds,
+                                               toRscSet.getSequential(),
+                                               toRscSet.getOrderAction(),
+                                               toRscSet.getColocationRole());
+                        }
+                        newRscSet.addRscId(idToAdd);
+                        if (isFrom) {
+                            outOrdRscSet1 = newRscSet;
+                        } else {
+                            outOrdRscSet2 = newRscSet;
+                        }
+                    }
+                }
+            }
+        }
+        if (!testOnly) {
+            setUpdated(false);
+        }
+        final List<CRMXML.RscSet> sets = new ArrayList<CRMXML.RscSet>();
+        sets.add(outColRscSet2);
+        sets.add(outColRscSet1);
+        sets.add(outOrdRscSet1);
+        sets.add(outOrdRscSet2);
+        if (force) {
+            final Map<String, String> attrs =
+                                          new LinkedHashMap<String, String>();
+            attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
+            final Map<CRMXML.RscSet, Map<String, String>> rscSetsColAttrs =
+                       new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
+            final Map<CRMXML.RscSet, Map<String, String>> rscSetsOrdAttrs =
+                       new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
+                                                
+            rscSetsColAttrs.put(outColRscSet2, null);
+            rscSetsColAttrs.put(outColRscSet1, null);
+            rscSetsOrdAttrs.put(outOrdRscSet1, null);
+            rscSetsOrdAttrs.put(outOrdRscSet2, null);
+            CRM.setRscSet(dcHost,
+                          colId,
+                          createCol,
+                          ordId,
+                          createOrd,
+                          rscSetsColAttrs,
+                          rscSetsOrdAttrs,
+                          attrs,
+                          testOnly);
+        }
+        return sets;
+    }
+
+    /** Whether the id of this constraint is the same or there is no id in this
+     * object. */
+    public final boolean sameConstraintId(
+                                final CRMXML.RscSetConnectionData otherRdata) {
+        if (otherRdata.isColocation()) {
+            final CRMXML.RscSetConnectionData rdataCol =
+                                                       rscSetConnectionDataCol;
+            return rdataCol == null
+                   || rdataCol.getConstraintId() == null
+                   || rdataCol.getConstraintId().equals(
+                                                 otherRdata.getConstraintId());
+        } else {
+            final CRMXML.RscSetConnectionData rdataOrd =
+                                                       rscSetConnectionDataOrd;
+            return rdataOrd == null
+                   || rdataOrd.getConstraintId() == null
+                   || rdataOrd.getConstraintId().equals(
+                                                 otherRdata.getConstraintId());
+        }
+    }
+
+    /** Sets rsc sets info object. */
+    public final void setPcmkRscSetsInfo(
+                                     final PcmkRscSetsInfo pcmkRscSetsInfo) {
+        try {
+            mPcmkRscSetsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        if (this.pcmkRscSetsInfo != pcmkRscSetsInfo) {
+            this.pcmkRscSetsInfo = pcmkRscSetsInfo;
+            infoPanel = null;
+        }
+        mPcmkRscSetsLock.release();
+    }
+
+    /** Gets rsc sets info object. */
+    public final PcmkRscSetsInfo getPcmkRscSetsInfo() {
+        try {
+            mPcmkRscSetsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
+        mPcmkRscSetsLock.release();
+        return prsi;
+    }
+
+    /** Hide/Show advanced panels. */
+    public final void updateAdvancedPanels() {
+        super.updateAdvancedPanels();
+        try {
+            mPcmkRscSetsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
+        mPcmkRscSetsLock.release();
+        if (prsi != null) {
+            prsi.updateAdvancedPanels();
+        }
+    }
+
+    /** Returns whether the placeholder has any connections at all. */
+    public final boolean isEmpty() {
+        final CRMXML.RscSetConnectionData rdataOrd =
+                                            getRscSetConnectionDataOrd();
+        final CRMXML.RscSetConnectionData rdataCol =
+                                            getRscSetConnectionDataCol();
+        return (rdataOrd == null || rdataOrd.isEmpty())
+                && (rdataCol == null || rdataCol.isEmpty());
+    }
+
+    /** Returns attributes for resource_set tag */
+    public final void getAttributes(
+                  final boolean isCol,
+                  final boolean first,
+                  final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs) {
+        CRMXML.RscSetConnectionData rscd;
+        if (isCol) {
+            rscd = rscSetConnectionDataCol;
+        } else {
+            rscd = rscSetConnectionDataOrd;
+        }
+        if (rscd == null) {
+            return;
+        }
+        final Map<String, String> attrs = new LinkedHashMap<String, String>();
+        CRMXML.RscSet rscSet;
+        if (first) {
+            rscSet = rscd.getRscSet1();
+        } else {
+            rscSet = rscd.getRscSet2();
+        }
+        rscSetsAttrs.put(rscSet, null);
+    }
+
+    /** Returns resource that is next in sequence in the resource set. */
+    public final ServiceInfo nextInSequence(final ServiceInfo si,
+                                            final boolean isCol) {
+        CRMXML.RscSetConnectionData rscd;
+        if (isCol) {
+            rscd = rscSetConnectionDataCol;
+        } else {
+            rscd = rscSetConnectionDataOrd;
+        }
+        if (rscd == null) {
+            return null;
+        }
+        for (final CRMXML.RscSet rscSet
+                : new CRMXML.RscSet[]{rscd.getRscSet1(), rscd.getRscSet2()}) {
+            if (rscSet == null) {
+                continue;
+            }
+            if (!rscSet.isSequential()) {
+                continue;
+            }
+            final List<String> ids = rscSet.getRscIds();
+            for (int i = 0; i < ids.size(); i++) {
+                if (ids.get(i).equals(si.getHeartbeatId(true))) {
+                    if (i < ids.size() - 1) {
+                        return getBrowser().getServiceInfoFromCRMId(
+                                                               ids.get(i + 1));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Returns resource that is before in sequence in the resource set. */
+    public final ServiceInfo prevInSequence(final ServiceInfo si,
+                                            final boolean isCol) {
+        CRMXML.RscSetConnectionData rscd;
+        if (isCol) {
+            rscd = rscSetConnectionDataCol;
+        } else {
+            rscd = rscSetConnectionDataOrd;
+        }
+        if (rscd == null) {
+            return null;
+        }
+        for (final CRMXML.RscSet rscSet
+                : new CRMXML.RscSet[]{rscd.getRscSet1(), rscd.getRscSet2()}) {
+            if (rscSet == null) {
+                continue;
+            }
+            if (!rscSet.isSequential()) {
+                continue;
+            }
+            final List<String> ids = rscSet.getRscIds();
+            for (int i = ids.size() - 1; i >= 0; i--) {
+                if (ids.get(i).equals(si.getHeartbeatId(true))) {
+                    if (i > 0) {
+                        return getBrowser().getServiceInfoFromCRMId(
+                                                               ids.get(i - 1));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Returns the main text that appears in the graph. */
+    public String getMainTextForGraph() {
+        return getService().getId();
+    }
+
+    /** Returns text that appears above the icon in the graph. */
+    public String getIconTextForGraph(final boolean testOnly) {
+        return "    PH";
+    }
+    /** Returns text with lines as array that appears in the cluster graph. */
+    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+        return null;
+    }
+    ///** Returns text with lines as array that appears in the cluster graph. */
+    //public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    //    Color color;
+    //    if (getService().isNew()) {
+    //        color = Tools.getDefaultColor(
+    //                               "HeartbeatGraph.FillPaintUnconfigured");
+    //    } else {
+    //        color = Tools.getDefaultColor(
+    //                               "HeartbeatGraph.FillPaintPlaceHolder");
+    //    }
+    //    return new Subtext[]{new Subtext("rsc set", color)};
+    //                                     
+    //}
 }

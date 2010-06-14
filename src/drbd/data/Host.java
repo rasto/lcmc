@@ -2301,6 +2301,7 @@ public class Host implements Serializable {
 
     /** This is part of testsuite, it checks cib. */
     public final boolean checkTest(final String test, final double index) {
+        Tools.sleep(1500);
         final StringBuffer command = new StringBuffer(50);
         command.append(replaceVars("@GUI-HELPER@"));
         command.append(" gui-test ");

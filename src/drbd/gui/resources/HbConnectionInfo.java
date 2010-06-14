@@ -240,33 +240,18 @@ public class HbConnectionInfo extends EditableInfo {
         return lastServiceInfoRsc;
     }
 
-    /**
-     * Returns resource 2 in colocation constraint.
-     */
+    /** Returns resource 2 in colocation constraint. */
     public final ServiceInfo getLastServiceInfoWithRsc() {
         return lastServiceInfoWithRsc;
     }
 
-    /**
-     * Returns heartbeat graphical view.
-     */
+    /** Returns heartbeat graphical view. */
     public final JPanel getGraphicalView() {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
 
-    /**
-     * Applies the changes to the constraints.
-     */
-    public final void apply(final Host dcHost, final boolean testOnly) {
-        try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        for (final HbConstraintInterface c : constraints) {
-            c.apply(dcHost, testOnly);
-        }
-        mConstraintsLock.release();
+    /** Applies the changes to the constraints. */
+    public void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -275,13 +260,25 @@ public class HbConnectionInfo extends EditableInfo {
                 }
             });
         }
+        final List<HbConstraintInterface> constraintsCopy
+                                    = new ArrayList<HbConstraintInterface>();
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        for (final HbConstraintInterface c : constraints) {
+            constraintsCopy.add(c);
+        }
+        mConstraintsLock.release();
+        for (final HbConstraintInterface c : constraintsCopy) {
+            c.apply(dcHost, testOnly);
+        }
     }
 
-    /**
-     * Check order and colocation constraints.
-     */
-    public final boolean checkResourceFields(final String param,
-                                             final String[] params) {
+    /** Check order and colocation constraints. */
+    public boolean checkResourceFields(final String param,
+                                       final String[] params) {
         boolean correct = true;
         try {
             mConstraintsLock.acquire();
@@ -311,6 +308,36 @@ public class HbConnectionInfo extends EditableInfo {
         return correct && changed;
     }
 
+    /** Returns panal with user visible info. */
+    protected JPanel getLabels(final HbConstraintInterface c) {
+        final JPanel panel = getParamPanel(c.getName());
+        panel.setLayout(new SpringLayout());
+        final int rows = 3;
+        final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+        c.addLabelField(panel,
+                        Tools.getString("ClusterBrowser.HeartbeatId"),
+                        c.getService().getHeartbeatId(),
+                        ClusterBrowser.SERVICE_LABEL_WIDTH,
+                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        height);
+        c.addLabelField(panel,
+                        c.getRsc1Name(),
+                        c.getRsc1(),
+                        ClusterBrowser.SERVICE_LABEL_WIDTH,
+                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        height);
+        c.addLabelField(panel,
+                        c.getRsc2Name(),
+                        c.getRsc2(),
+                        ClusterBrowser.SERVICE_LABEL_WIDTH,
+                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        height);
+        SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
+                                        1, 1,        /* initX, initY */
+                                        1, 1);       /* xPad, yPad */
+        return panel;
+    }
+
     /**
      * Returns info panel for hb connection (order and/or colocation
      * constraint.
@@ -323,9 +350,7 @@ public class HbConnectionInfo extends EditableInfo {
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
 
-            /**
-             * Whether the whole thing should be enabled.
-             */
+            /** Whether the whole thing should be enabled. */
             public final boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
                 if (dcHost == null) {
@@ -412,7 +437,6 @@ public class HbConnectionInfo extends EditableInfo {
         buttonPanel.add(mb, BorderLayout.EAST);
 
         /* params */
-        final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
         EditableInfo firstConstraint = null;
         try {
             mConstraintsLock.acquire();
@@ -424,31 +448,7 @@ public class HbConnectionInfo extends EditableInfo {
                 firstConstraint = (EditableInfo) c;
             }
             final String[] params = c.getParametersFromXML();
-            /* heartbeat id */
-            final JPanel panel = getParamPanel(c.getName());
-            panel.setLayout(new SpringLayout());
-            final int rows = 3;
-            c.addLabelField(panel,
-                            Tools.getString("ClusterBrowser.HeartbeatId"),
-                            c.getService().getHeartbeatId(),
-                            ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH,
-                            height);
-            c.addLabelField(panel,
-                            c.getRsc1Name(),
-                            c.getRsc1(),
-                            ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH,
-                            height);
-            c.addLabelField(panel,
-                            c.getRsc2Name(),
-                            c.getRsc2(),
-                            ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH,
-                            height);
-            SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
-                                            1, 1,        /* initX, initY */
-                                            1, 1);       /* xPad, yPad */
+            final JPanel panel = getLabels(c);
 
             optionsPanel.add(panel);
             c.addParams(optionsPanel,
@@ -458,7 +458,6 @@ public class HbConnectionInfo extends EditableInfo {
                         null);
         }
         mConstraintsLock.release();
-
         applyButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -527,6 +526,9 @@ public class HbConnectionInfo extends EditableInfo {
                                                       thisClass,
                                                       getBrowser().getDCHost(),
                                                       testOnly);
+                //if (!testOnly) {
+                //    setPlaceholders();
+                //}
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
@@ -574,6 +576,9 @@ public class HbConnectionInfo extends EditableInfo {
                                                      thisClass,
                                                      getBrowser().getDCHost(),
                                                      testOnly);
+                    //if (!testOnly) {
+                    //    setPlaceholders();
+                    //}
                 } else {
                     /* there is colocation constraint so let's get the
                      * endpoints from it. */
@@ -648,6 +653,9 @@ public class HbConnectionInfo extends EditableInfo {
                                                    thisClass,
                                                    getBrowser().getDCHost(),
                                                    testOnly);
+                    //if (!testOnly) {
+                    //    setPlaceholders();
+                    //}
                 } else {
                     /* add colocation */
                     /* there is order constraint so let's get the endpoints
@@ -783,9 +791,7 @@ public class HbConnectionInfo extends EditableInfo {
         selectMyself();
     }
 
-    /**
-     * Adds a new colocation.
-     */
+    /** Adds a new colocation. */
     public final void addColocation(final String colId,
                                     final ServiceInfo serviceInfoRsc,
                                     final ServiceInfo serviceInfoWithRsc) {
@@ -917,9 +923,7 @@ public class HbConnectionInfo extends EditableInfo {
         return ConfigData.AccessType.ADMIN;
     }
 
-    /**
-     * Hide/Show advanced panels.
-     */
+    /** Hide/Show advanced panels. */
     public final void updateAdvancedPanels() {
         super.updateAdvancedPanels();
         try {
@@ -1010,6 +1014,7 @@ public class HbConnectionInfo extends EditableInfo {
     public final boolean isColocationTwoDirections() {
         return isTwoDirections(false);
     }
+
     /** Returns whether this service has a colocation or order. */
     public final boolean hasColocationOrOrder(final ServiceInfo si) {
         try {
@@ -1027,5 +1032,51 @@ public class HbConnectionInfo extends EditableInfo {
         }
         mConstraintsLock.release();
         return false;
+    }
+
+    ///** Set placeholder to new, so they don't get removed. */
+    //public final void setPlaceholders() {
+    //    try {
+    //        mConstraintsLock.acquire();
+    //    } catch (InterruptedException e) {
+    //        Thread.currentThread().interrupt();
+    //    }
+    //    for (final HbConstraintInterface c : constraints) {
+    //        final ServiceInfo rsc1 = c.getRscInfo1();
+    //        final ServiceInfo rsc2 = c.getRscInfo2();
+    //        if (rsc1.isConstraintPH()) {
+    //            final PcmkRscSetsInfo prsi =
+    //                            ((ConstraintPHInfo) rsc1).getPcmkRscSetsInfo();
+    //            prsi.setInfoPanel(null);
+    //            prsi.selectMyself();
+    //            //rsc1.getService().setNew(true);
+    //        }
+    //        if (rsc2.isConstraintPH()) {
+    //            final PcmkRscSetsInfo prsi =
+    //                            ((ConstraintPHInfo) rsc2).getPcmkRscSetsInfo();
+    //            prsi.setInfoPanel(null);
+    //            prsi.selectMyself();
+    //        }
+    //    }
+    //    mConstraintsLock.release();
+    //}
+
+    /** Returns colocation attributes knowing the col id. */
+    public final Map<String, String> getColocationAttributes(
+                                                        final String colId) {
+        HbColocationInfo hci = colocationIds.get(colId);
+        if (hci != null) {
+            return hci.getAttributes();
+        }
+        return null;
+    }
+
+    /** Returns order attributes knowing the ord id. */
+    public final Map<String, String> getOrderAttributes(final String ordId) {
+        HbOrderInfo hoi = orderIds.get(ordId);
+        if (hoi != null) {
+            return hoi.getAttributes();
+        }
+        return null;
     }
 }

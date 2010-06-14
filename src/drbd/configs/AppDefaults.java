@@ -167,8 +167,10 @@ public class AppDefaults extends
         {"ResourceGraph.PickedPaint",        Color.RED },
 
         {"ResourceGraph.EdgeDrawPaint", new Color(1, 1, 1) }, /* almost black */
+        {"ResourceGraph.EdgeDrawPaintNew",        new Color(200, 200, 200) },
         {"ResourceGraph.EdgeDrawPaintBrighter",   new Color(128, 128, 128) },
-        {"ResourceGraph.EdgePickedPaint",         new Color(64, 64, 128) },
+        {"ResourceGraph.EdgePickedPaint",         new Color(160, 160, 255) },
+        {"ResourceGraph.EdgePickedPaintNew",      new Color(200, 200, 200) },
         {"ResourceGraph.EdgePickedPaintBrighter", new Color(160, 160, 255) },
         {"ResourceGraph.EdgeDrawPaintRemoved",    new Color(128, 64, 64) },
         {"ResourceGraph.EdgePickedPaintRemoved",  new Color(255, 64, 64) },

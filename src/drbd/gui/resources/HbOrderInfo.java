@@ -35,6 +35,8 @@ import drbd.utilities.CRM;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import javax.swing.SwingUtilities;
 
 /**
  * Object that holds an order constraint information.
@@ -88,18 +90,40 @@ public class HbOrderInfo extends EditableInfo
     public final void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String ordId = getService().getHeartbeatId();
-        final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
-
-        final String score = orderData.getScore();
-        final String symmetrical = orderData.getSymmetrical();
-        final String firstAction = orderData.getFirstAction();
-        final String thenAction = orderData.getThenAction();
-
         final Map<String, String> resourceNode = new HashMap<String, String>();
-        resourceNode.put(CRMXML.SCORE_STRING, score);
-        resourceNode.put("symmetrical", symmetrical);
-        resourceNode.put("first-action", firstAction);
-        resourceNode.put("then-action", thenAction);
+
+        if (serviceInfoParent == null || serviceInfoChild == null) {
+            /* rsc set placeholder */
+            final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
+            final String score = orderData.getScore();
+            resourceNode.put(CRMXML.SCORE_STRING, score);
+        } else if (serviceInfoParent.isConstraintPH()
+                   || serviceInfoChild.isConstraintPH()) {
+            /* rsc set edge */
+            ConstraintPHInfo cphi;
+            CRMXML.RscSet rscSet;
+            if (serviceInfoParent.isConstraintPH()) {
+                cphi = (ConstraintPHInfo) serviceInfoParent;
+                rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
+            } else {
+                cphi = (ConstraintPHInfo) serviceInfoChild;
+                rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
+            }
+            resourceNode.put("sequential", rscSet.getSequential());
+            resourceNode.put("action", rscSet.getOrderAction());
+        } else {
+            final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
+
+            final String score = orderData.getScore();
+            final String symmetrical = orderData.getSymmetrical();
+            final String firstAction = orderData.getFirstAction();
+            final String thenAction = orderData.getThenAction();
+
+            resourceNode.put(CRMXML.SCORE_STRING, score);
+            resourceNode.put("symmetrical", symmetrical);
+            resourceNode.put("first-action", firstAction);
+            resourceNode.put("then-action", thenAction);
+        }
 
         final String[] params = getParametersFromXML();
         if (params != null) {
@@ -137,8 +161,12 @@ public class HbOrderInfo extends EditableInfo
     protected final String getParamLongDesc(final String param) {
         final String text =
                         getBrowser().getCRMXML().getOrderParamLongDesc(param);
-        return text.replaceAll("@FIRST-RSC@", serviceInfoParent.toString())
-                   .replaceAll("@THEN-RSC@", serviceInfoChild.toString());
+        if (serviceInfoParent != null && serviceInfoChild != null) {
+            return text.replaceAll("@FIRST-RSC@", serviceInfoParent.toString())
+                       .replaceAll("@THEN-RSC@", serviceInfoChild.toString());
+        } else {
+            return text;
+        }
     }
 
     /**
@@ -171,16 +199,32 @@ public class HbOrderInfo extends EditableInfo
         return getBrowser().getCRMXML().getOrderParamPreferred(param);
     }
 
-    /**
-     * Returns lsit of all parameters as an array.
-     */
+    /** Returns lsit of all parameters as an array. */
     public final String[] getParametersFromXML() {
-        if (serviceInfoParent.isConstraintPH()
-            || serviceInfoChild.isConstraintPH()) {
+        if (serviceInfoParent == null || serviceInfoChild == null) {
+            /* rsc set order */
             return getBrowser().getCRMXML().getRscSetOrderParameters();
+        } else if (serviceInfoParent.isConstraintPH()
+                   || serviceInfoChild.isConstraintPH()) {
+            /* when rsc set edges are clicked */
+            return getBrowser().getCRMXML().getRscSetOrdConnectionParameters();
         } else {
             return getBrowser().getCRMXML().getOrderParameters();
         }
+    }
+
+    /** Returns when at least one resource in rsc set can be promoted. */
+    private final boolean isRscSetMaster() {
+        ConstraintPHInfo cphi;
+        CRMXML.RscSet rscSet;
+        if (serviceInfoParent.isConstraintPH()) {
+            cphi = (ConstraintPHInfo) serviceInfoParent;
+            rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
+        } else {
+            cphi = (ConstraintPHInfo) serviceInfoChild;
+            rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
+        }
+        return getBrowser().isOneMaster(rscSet.getRscIds());
     }
 
     /**
@@ -188,7 +232,12 @@ public class HbOrderInfo extends EditableInfo
      * down menu.
      */
     protected final Object[] getParamPossibleChoices(final String param) {
-        if ("first-action".equals(param)) {
+        if ("action".equals(param)) {
+            /* rsc set */
+            return getBrowser().getCRMXML().getOrderParamPossibleChoices(
+                                                            param,
+                                                            isRscSetMaster());
+        } else if ("first-action".equals(param)) {
             return getBrowser().getCRMXML().getOrderParamPossibleChoices(
                                 param,
                                 serviceInfoParent.getService().isMaster());
@@ -257,10 +306,29 @@ public class HbOrderInfo extends EditableInfo
         return connectionInfo.checkResourceFields(param, null);
     }
 
-    /**
-     * Applies changes to the order parameters.
-     */
+    /** Returns attributes of this colocation. */
+    final Map<String, String> getAttributes() {
+        final String[] params = getParametersFromXML();
+        final Map<String, String> attrs = new LinkedHashMap<String, String>();
+        for (final String param : params) {
+            final String value = getComboBoxValue(param);
+            if (!value.equals(getParamDefault(param))) {
+                attrs.put(param, value);
+            }
+        }
+        return attrs;
+    }
+
+    /** Applies changes to the order parameters. */
     public final void apply(final Host dcHost, final boolean testOnly) {
+        if (!testOnly) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    applyButton.setEnabled(false);
+                    applyButton.setToolTipText(null);
+                }
+            });
+        }
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = false;
@@ -275,17 +343,48 @@ public class HbOrderInfo extends EditableInfo
         }
         if (changed) {
             final String ordId = getService().getHeartbeatId();
-            if (serviceInfoParent.isConstraintPH()
-                || serviceInfoChild.isConstraintPH()) {
+            if (serviceInfoParent == null || serviceInfoChild == null) {
+                /* rsc set order */
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
+                final PcmkRscSetsInfo prsi = (PcmkRscSetsInfo) connectionInfo;
                 CRM.setRscSet(dcHost,
                               null,
                               false,
                               ordId,
                               false,
                               null,
-                              clStatus.getRscSetsOrd(ordId),
+                              prsi.getAllAttributes(dcHost,
+                                                    null,
+                                                    null,
+                                                    false,
+                                                    testOnly),
                               attrs,
+                              testOnly);
+            } else if (serviceInfoParent.isConstraintPH()
+                       || serviceInfoChild.isConstraintPH()) {
+                ConstraintPHInfo cphi;
+                CRMXML.RscSet rscSet;
+                if (serviceInfoParent.isConstraintPH()) {
+                    cphi = (ConstraintPHInfo) serviceInfoParent;
+                    rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
+                } else {
+                    cphi = (ConstraintPHInfo) serviceInfoChild;
+                    rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
+                }
+                final PcmkRscSetsInfo prsi = cphi.getPcmkRscSetsInfo();
+
+                CRM.setRscSet(dcHost,
+                              null,
+                              false,
+                              ordId,
+                              false,
+                              null,
+                              prsi.getAllAttributes(dcHost,
+                                                    rscSet,
+                                                    attrs,
+                                                    false,
+                                                    testOnly),
+                              prsi.getOrderAttributes(ordId),
                               testOnly);
             } else {
                 CRM.addOrder(dcHost,
@@ -295,10 +394,10 @@ public class HbOrderInfo extends EditableInfo
                              attrs,
                              testOnly);
             }
-        }
-        if (!testOnly) {
-            storeComboBoxValues(params);
-            checkResourceFields(null, params);
+            if (!testOnly) {
+                storeComboBoxValues(params);
+                checkResourceFields(null, params);
+            }
         }
     }
 
