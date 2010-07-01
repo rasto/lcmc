@@ -626,9 +626,7 @@ public class HeartbeatGraph extends ResourceGraph {
         return str;
     }
 
-    /**
-     * Returns shape of the service vertex.
-     */
+    /** Returns shape of the service vertex. */
     protected final Shape getVertexShape(final Vertex v,
                                    final VertexShapeFactory factory) {
         if (vertexToHostMap.containsKey(v)) {
@@ -1727,7 +1725,7 @@ public class HeartbeatGraph extends ResourceGraph {
     /** Returns the width of the service vertex shape. */
     protected final int getDefaultVertexWidth(final Vertex v) {
         if (vertexToConstraintPHMap.containsKey(v)) {
-            return 70;
+            return 50;
         } else {
             return super.getDefaultVertexWidth(v);
         }
@@ -1741,32 +1739,5 @@ public class HeartbeatGraph extends ResourceGraph {
     /** Sets the vertex height. */
     protected final void setVertexHeight(final Vertex v, final int size) {
         super.setVertexHeight(v, size);
-    }
-
-    ///** Returns aspect ratio of the vertex v. */
-    //protected float getVertexAspectRatio(final Vertex v) {
-    //    if (vertexToConstraintPHMap.containsKey(v)) {
-    //        return 1;
-    //    } else {
-    //        return super.getVertexAspectRatio(v);
-    //    }
-    //}
-
-    /** Returns the height of the service vertex shape. */
-    protected int getVertexHeight(final Vertex v) {
-        if (vertexToConstraintPHMap.containsKey(v)) {
-            return 55;
-        } else {
-            return super.getVertexHeight(v);
-        }
-    }
-
-    /** Returns the width of the service vertex shape. */
-    protected final int getVertexWidth(final Vertex v) {
-        if (vertexToConstraintPHMap.containsKey(v)) {
-            return 55;
-        } else {
-            return super.getVertexWidth(v);
-        }
     }
 }

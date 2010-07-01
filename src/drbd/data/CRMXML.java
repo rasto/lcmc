@@ -530,7 +530,6 @@ public class CRMXML extends XML {
         }
         final String output = ret.getOutput();
         if (output == null) {
-            //Tools.appError("heartbeat ocf output is null");
             return;
         }
         final String[] lines = output.split("\\r?\\n");
@@ -3724,20 +3723,10 @@ public class CRMXML extends XML {
             return rscSet1;
         }
 
-        ///** Sets resource set 1. */
-        //public final void setRscSet1(final RscSet rscSet1) {
-        //    this.rscSet1 = rscSet1;
-        //}
-
         /** Returns resource set 2. */
         public final RscSet getRscSet2() {
             return rscSet2;
         }
-
-        ///** Sets resource set 2. */
-        //public final void setRscSet2(final RscSet rscSet2) {
-        //    this.rscSet2 = rscSet2;
-        //}
 
         /** Returns order or constraint id. */
         public final String getConstraintId() {

@@ -959,7 +959,7 @@ public final class RoboTest {
 
     /** TEST 4. */
     private static void startTest4(final Robot robot, final Host host) {
-        slowFactor = 0.1f;
+        slowFactor = 0.5f;
         host.getSSH().installTestFiles(2);
         aborted = false;
         final int dummy1X = 235;
@@ -986,15 +986,15 @@ public final class RoboTest {
         final int ph2X = 445;
         final int ph2Y = 473;
 
-        //disableStonith(robot, host);
-        //host.checkTest("test4", 1);
-        ///* create 6 dummies */
-        //chooseDummy(robot, dummy1X, dummy1Y);
-        //chooseDummy(robot, dummy2X, dummy2Y);
-        //chooseDummy(robot, dummy3X, dummy3Y);
-        //chooseDummy(robot, dummy4X, dummy4Y);
-        //chooseDummy(robot, dummy5X, dummy5Y);
-        //chooseDummy(robot, dummy6X, dummy6Y);
+        disableStonith(robot, host);
+        host.checkTest("test4", 1);
+        /* create 6 dummies */
+        chooseDummy(robot, dummy1X, dummy1Y);
+        chooseDummy(robot, dummy2X, dummy2Y);
+        chooseDummy(robot, dummy3X, dummy3Y);
+        chooseDummy(robot, dummy4X, dummy4Y);
+        chooseDummy(robot, dummy5X, dummy5Y);
+        chooseDummy(robot, dummy6X, dummy6Y);
 
         /* 2 placeholders */
         while (true) {

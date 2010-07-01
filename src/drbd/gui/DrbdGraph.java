@@ -904,9 +904,7 @@ public class DrbdGraph extends ResourceGraph {
 
     }
 
-    /**
-     * Returns id that is used for saving of the vertex positions to a file.
-     */
+    /** Returns id that is used for saving of the vertex positions to a file. */
     protected final String getId(final Info i) {
         final Vertex v = getVertex(i);
         String hiId = "";
@@ -917,9 +915,7 @@ public class DrbdGraph extends ResourceGraph {
         return "dr=" + hiId + i.getId();
     }
 
-    /**
-     * Returns the default vertex width.
-     */
+    /** Returns the default vertex width. */
     protected final int getDefaultVertexWidth(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             return VERTEX_SIZE_BD;

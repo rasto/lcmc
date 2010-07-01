@@ -20,7 +20,7 @@ primitive res_Dummy_4 ocf:heartbeat:Dummy
 	op start interval="0" timeout="200" 
 	op stop interval="0" timeout="192" 
 	op monitor interval="121" timeout="154" start-delay="0"
-colocation c1 inf: ( res_Dummy_1 res_Dummy_2 ) ( res_Dummy_3 res_Dummy_4 )
+colocation c1 inf: ( res_Dummy_2 res_Dummy_1 ) ( res_Dummy_4 res_Dummy_3 )
 order o1 inf: ( res_Dummy_3 res_Dummy_4 ) ( res_Dummy_1 )
 property $id="cib-bootstrap-options" 
 	dc-deadtime="60" 

@@ -1039,7 +1039,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns text that appears above the icon in the graph. */
     public String getIconTextForGraph(final boolean testOnly) {
-        return "    PH";
+        return "   PH";
     }
     /** Returns text with lines as array that appears in the cluster graph. */
     public Subtext[] getSubtextsForGraph(final boolean testOnly) {

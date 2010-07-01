@@ -638,8 +638,7 @@ public class ServicesInfo extends EditableInfo {
                                 && rdataToCphi.get(ordata).sameConstraintId(
                                                                  rdata))) {
                             cphi = rdataToCphi.get(ordata);
-                            //cphi.getService().setNew(false);
-                            cphi.setRscSetConnectionData(rdata); //*
+                            cphi.setRscSetConnectionData(rdata);
                             prsi = cphi.getPcmkRscSetsInfo();
                             if (prsi != null) {
                                 if (rdata.isColocation()) {
@@ -774,17 +773,6 @@ public class ServicesInfo extends EditableInfo {
                                     }
                                 }
                             }
-                            //final List<String> colIds =
-                            //               colocationMap.get(rscFirstId);
-                            //// TODO: race here
-                            //if (colIds != null) {
-                            //    for (String colId : colIds) {
-                            //        if (colId != null
-                            //            && colId.equals(rscThenId)) {
-                            //            setFilesystemWithDrbd(siP, si);
-                            //        }
-                            //    }
-                            //}
                         }
                         hg.addOrder(data.getId(), siP, si);
                     }
@@ -824,11 +812,7 @@ public class ServicesInfo extends EditableInfo {
                         final ConstraintPHInfo cphi =
                                        (ConstraintPHInfo) idToInfoHash.get(id);
                         if (!cphi.getService().isNew() && cphi.isEmpty()) {
-                            //cphi.setPcmkRscSetsInfo(
-                            //                new PcmkRscSetsInfo(getBrowser()));
                             cphi.getService().setNew(true);
-                            //cphi.selectMyself();
-                            //cphi.setInfoPanel(null);
                         }
                     }
                 }
@@ -1155,10 +1139,6 @@ public class ServicesInfo extends EditableInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    //final StringInfo gi = new StringInfo(
-                    //                            ClusterBrowser.PM_GROUP_NAME,
-                    //                            ClusterBrowser.PM_GROUP_NAME,
-                    //                            getBrowser());
                     addServicePanel(getBrowser().getCRMXML().getHbGroup(),
                                     getPos(),
                                     true,
@@ -1381,7 +1361,6 @@ public class ServicesInfo extends EditableInfo {
                     hg.addConstraintPlaceholder(cphi,
                                                 getPos(),
                                                 testOnly);
-                    //getBrowser().getHeartbeatGraph().repaint();
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);

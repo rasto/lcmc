@@ -526,9 +526,6 @@ public class HbConnectionInfo extends EditableInfo {
                                                       thisClass,
                                                       getBrowser().getDCHost(),
                                                       testOnly);
-                //if (!testOnly) {
-                //    setPlaceholders();
-                //}
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
@@ -576,9 +573,6 @@ public class HbConnectionInfo extends EditableInfo {
                                                      thisClass,
                                                      getBrowser().getDCHost(),
                                                      testOnly);
-                    //if (!testOnly) {
-                    //    setPlaceholders();
-                    //}
                 } else {
                     /* there is colocation constraint so let's get the
                      * endpoints from it. */
@@ -653,9 +647,6 @@ public class HbConnectionInfo extends EditableInfo {
                                                    thisClass,
                                                    getBrowser().getDCHost(),
                                                    testOnly);
-                    //if (!testOnly) {
-                    //    setPlaceholders();
-                    //}
                 } else {
                     /* add colocation */
                     /* there is order constraint so let's get the endpoints
@@ -1033,33 +1024,6 @@ public class HbConnectionInfo extends EditableInfo {
         mConstraintsLock.release();
         return false;
     }
-
-    ///** Set placeholder to new, so they don't get removed. */
-    //public final void setPlaceholders() {
-    //    try {
-    //        mConstraintsLock.acquire();
-    //    } catch (InterruptedException e) {
-    //        Thread.currentThread().interrupt();
-    //    }
-    //    for (final HbConstraintInterface c : constraints) {
-    //        final ServiceInfo rsc1 = c.getRscInfo1();
-    //        final ServiceInfo rsc2 = c.getRscInfo2();
-    //        if (rsc1.isConstraintPH()) {
-    //            final PcmkRscSetsInfo prsi =
-    //                            ((ConstraintPHInfo) rsc1).getPcmkRscSetsInfo();
-    //            prsi.setInfoPanel(null);
-    //            prsi.selectMyself();
-    //            //rsc1.getService().setNew(true);
-    //        }
-    //        if (rsc2.isConstraintPH()) {
-    //            final PcmkRscSetsInfo prsi =
-    //                            ((ConstraintPHInfo) rsc2).getPcmkRscSetsInfo();
-    //            prsi.setInfoPanel(null);
-    //            prsi.selectMyself();
-    //        }
-    //    }
-    //    mConstraintsLock.release();
-    //}
 
     /** Returns colocation attributes knowing the col id. */
     public final Map<String, String> getColocationAttributes(

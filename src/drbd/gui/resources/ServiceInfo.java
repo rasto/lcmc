@@ -2663,9 +2663,6 @@ public class ServiceInfo extends EditableInfo {
                         value = "0";
                     }
                     if (value != null && !"".equals(value)) {
-                        //if (cb != null) {
-                        //    atLeastOneValue = true;
-                        //}
                         if (cb != null && firstTime) {
                             opHash.put("id", opId);
                             opHash.put("name", op);
@@ -2675,12 +2672,6 @@ public class ServiceInfo extends EditableInfo {
                         opHash.put(param, value);
                     }
                 }
-                //if (atLeastOneValue && !opHash.isEmpty()) {
-                //    operations.put(op, opHash);
-                //} else {
-                //    opHash.remove("id");
-                //    opHash.remove("name");
-                //}
             }
         }
         return operations;
@@ -2919,14 +2910,6 @@ public class ServiceInfo extends EditableInfo {
                     if (parentInfo.isConstraintPH()) {
                         boolean colocationOnly = false;
                         boolean orderOnly = false;
-                        //if (isConstraintPH() && getService().isNew()) {
-                        //    if (!colocationOnly) {
-                        //        ((ConstraintPHInfo) this).reverseOrder();
-                        //    }
-                        //    if (!orderOnly) {
-                        //        ((ConstraintPHInfo) this).reverseColocation();
-                        //    }
-                        //}
                         final List<ServiceInfo> with =
                                                  new ArrayList<ServiceInfo>();
                         with.add(this);
@@ -3175,7 +3158,6 @@ public class ServiceInfo extends EditableInfo {
             }
             if (!testOnly) {
                 ///* so that it will not be removed */
-                //cphi.getService().setNew(true);
                 cphi.setUpdated(false);
             }
             if (CRM.setRscSet(dcHost,
@@ -3355,7 +3337,6 @@ public class ServiceInfo extends EditableInfo {
                 attrs.put(CRMXML.SCORE_STRING, score);
             }
             if (!testOnly) {
-                //cphi.getService().setNew(true);
                 cphi.setUpdated(false);
             }
             if (CRM.setRscSet(dcHost,

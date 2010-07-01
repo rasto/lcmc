@@ -93,7 +93,7 @@ public final class CRM {
                                      SSH.DEFAULT_COMMAND_TIMEOUT);
             return out;
         } else {
-            Tools.debug(null, "CRM.java: crm command: " + command, 0);
+            Tools.debug(null, "CRM.java: crm command: " + command, 1);
             return Tools.execCommandProgressIndicator(
                                     host,
                                     command,
