@@ -280,7 +280,14 @@ public final class DrbdMC extends JPanel {
                 } else if ("--keep-helper".equals(arg)) {
                     Tools.debug(null, "--keep-helper option specified");
                     Tools.getConfigData().setKeepHelper(true);
+                } else if ("--version".equals(arg)) {
+                    System.out.println("DRBD MANAGEMENT CONSOLE "
+                                       + Tools.getRelease()
+                                       + " by Rasto Levrinc");
+                    System.exit(0);
                 } else if ("--help".equals(arg)) {
+                    System.out.println("DRBD MANAGEMENT CONSOLE: "
+                                       + Tools.getRelease());
                     System.out.println("--help, print this help.");
                     System.out.println("--keep-helper, do not overwrite "
                                        + "the drbd-gui-helper program.");
