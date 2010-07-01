@@ -717,7 +717,7 @@ public class GuiComboBox extends JPanel {
 
                     if ("".equals(value)) {
                         mValueLock.release();
-                        return null;
+                        return "";
                     }
                 } else {
                     value = cb.getSelectedItem();
