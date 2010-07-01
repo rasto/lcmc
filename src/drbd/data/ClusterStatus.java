@@ -364,7 +364,8 @@ public class ClusterStatus {
      * Returns location id for specified resource and host.
      */
     public final String getLocationId(final String rsc, final String node) {
-        return (String) cibQueryMap.getResHostToLocId().get(rsc, node);
+        return (String) cibQueryMap.getResHostToLocId().get(rsc,
+                                                            node.toLowerCase());
     }
 
     /**
@@ -531,7 +532,7 @@ public class ClusterStatus {
      public final String getFailCount(final String node,
                                       final String res,
                                       final boolean testOnly) {
-         return cibQueryMap.getFailCount(node, res);
+         return cibQueryMap.getFailCount(node.toLowerCase(), res);
      }
 
      /**
@@ -549,7 +550,7 @@ public class ClusterStatus {
         if (nodeParams == null) {
             return null;
         } else {
-            return (String) nodeParams.get(node, param);
+            return (String) nodeParams.get(node.toLowerCase(), param);
         }
     }
 
