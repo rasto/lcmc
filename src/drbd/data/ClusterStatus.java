@@ -364,8 +364,8 @@ public class ClusterStatus {
      * Returns location id for specified resource and host.
      */
     public final String getLocationId(final String rsc, final String node) {
-        return (String) cibQueryMap.getResHostToLocId().get(rsc,
-                                                            node.toLowerCase());
+        /* node should not have to be in lower case. */
+        return (String) cibQueryMap.getResHostToLocId().get(rsc, node);
     }
 
     /**
