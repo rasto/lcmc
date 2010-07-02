@@ -563,12 +563,13 @@ public abstract class EditableInfo extends Info {
         String regexp = null;
         Map<String, String> abbreviations = new HashMap<String, String>();
         if (isInteger(param)) {
-            regexp = "^(-?(\\d*|" + CRMXML.INFINITY_STRING
+            regexp = "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
                      + "|" + CRMXML.DISABLED_STRING
                      + "))|@NOTHING_SELECTED@$";
             abbreviations = new HashMap<String, String>();
             abbreviations.put("i", CRMXML.INFINITY_STRING);
             abbreviations.put("I", CRMXML.INFINITY_STRING);
+            abbreviations.put("+", CRMXML.PLUS_INFINITY_STRING);
             abbreviations.put("d", CRMXML.DISABLED_STRING);
             abbreviations.put("D", CRMXML.DISABLED_STRING);
         }

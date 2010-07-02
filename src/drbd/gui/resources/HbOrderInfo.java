@@ -458,7 +458,8 @@ public class HbOrderInfo extends EditableInfo
         final String score = data.getScore();
         if (score == null) {
             return 0;
-        } else if (CRMXML.INFINITY_STRING.equals(score)) {
+        } else if (CRMXML.INFINITY_STRING.equals(score)
+                   || CRMXML.PLUS_INFINITY_STRING.equals(score)) {
             return 1000000;
         } else if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
             return -1000000;

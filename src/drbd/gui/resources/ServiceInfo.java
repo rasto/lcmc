@@ -838,7 +838,8 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if (CRMXML.INFINITY_STRING.equals(score)
+            if ((CRMXML.INFINITY_STRING.equals(score)
+                 || CRMXML.PLUS_INFINITY_STRING.equals(score))
                 && "eq".equals(op)) {
                 final List<Host> hosts = new ArrayList<Host>();
                 hosts.add(host);
@@ -1315,6 +1316,7 @@ public class ServiceInfo extends EditableInfo {
             final Map<String, String> abbreviations =
                                              new HashMap<String, String>();
             abbreviations.put("i", CRMXML.INFINITY_STRING);
+            abbreviations.put("+", CRMXML.PLUS_INFINITY_STRING);
             abbreviations.put("I", CRMXML.INFINITY_STRING);
             abbreviations.put("a", "ALWAYS");
             abbreviations.put("n", "NEVER");
@@ -1326,10 +1328,11 @@ public class ServiceInfo extends EditableInfo {
                                              "ALWAYS",
                                              "NEVER",
                                              CRMXML.INFINITY_STRING,
-                                             CRMXML.MINUS_INFINITY_STRING},
+                                             CRMXML.MINUS_INFINITY_STRING,
+                                             CRMXML.INFINITY_STRING},
                                 null, /* units */
                                 null, /* type */
-                                "^(-?(\\d*|" + CRMXML.INFINITY_STRING
+                                "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
                                 + "))|ALWAYS|NEVER|@NOTHING_SELECTED@$",
                                 rightWidth,
                                 abbreviations,

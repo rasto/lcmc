@@ -222,6 +222,8 @@ public class CRMXML extends XML {
     private static final String TARGET_ROLE_SLAVE = "slave";
     /** INFINITY keyword. */
     public static final String INFINITY_STRING = "INFINITY";
+    /** Alternative INFINITY keyword. */
+    public static final String PLUS_INFINITY_STRING = "+INFINITY";
     /** -INFINITY keyword. */
     public static final String MINUS_INFINITY_STRING = "-INFINITY";
     /** Choices for integer fields. */
@@ -230,7 +232,8 @@ public class CRMXML extends XML {
                                                     "2",
                                                     "100",
                                                     INFINITY_STRING,
-                                                    MINUS_INFINITY_STRING};
+                                                    MINUS_INFINITY_STRING,
+                                                    PLUS_INFINITY_STRING};
     /** Name of the stonith timeout instance attribute. */
     private static final String STONITH_TIMEOUT_INSTANCE_ATTR =
                                                             "stonith-timeout";
@@ -1408,7 +1411,7 @@ public class CRMXML extends XML {
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
-                        Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
+                 Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
@@ -1445,7 +1448,7 @@ public class CRMXML extends XML {
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
-                        Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
+                Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
@@ -3202,7 +3205,7 @@ public class CRMXML extends XML {
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
-                        Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
+                 Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
@@ -3369,7 +3372,7 @@ public class CRMXML extends XML {
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
-                         Pattern.compile("^-?(\\d*|" + INFINITY_STRING + ")$");
+                 Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;

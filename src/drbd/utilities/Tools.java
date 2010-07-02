@@ -1282,26 +1282,6 @@ public final class Tools {
     }
 
     /**
-     * converts score to the score as used in the heartbeat.
-     *
-     * @param score
-     *          score, that is to be converted
-     *
-     * @return score as used in the heartbeat
-     */
-    public static String scoreToHBString(final String score) {
-        String str = "";
-        if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
-            str = "-infinity";
-        } else if (CRMXML.INFINITY_STRING.equals(score)) {
-            str = "infinity";
-        } else {
-            str = score;
-        }
-        return str;
-    }
-
-    /**
      * Convert text to html.
      *
      * @param text

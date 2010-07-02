@@ -1045,17 +1045,4 @@ public class ConstraintPHInfo extends ServiceInfo {
     public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         return null;
     }
-    ///** Returns text with lines as array that appears in the cluster graph. */
-    //public Subtext[] getSubtextsForGraph(final boolean testOnly) {
-    //    Color color;
-    //    if (getService().isNew()) {
-    //        color = Tools.getDefaultColor(
-    //                               "HeartbeatGraph.FillPaintUnconfigured");
-    //    } else {
-    //        color = Tools.getDefaultColor(
-    //                               "HeartbeatGraph.FillPaintPlaceHolder");
-    //    }
-    //    return new Subtext[]{new Subtext("rsc set", color)};
-    //                                     
-    //}
 }
