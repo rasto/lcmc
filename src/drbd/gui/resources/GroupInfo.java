@@ -86,7 +86,6 @@ public class GroupInfo extends ServiceInfo {
             if (oldHeartbeatId != null) {
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
                                                                oldHeartbeatId);
-                getBrowser().getHeartbeatIdList().remove(oldHeartbeatId);
             }
             if (getService().isNew()) {
                 final String id = getComboBoxValue(GUI_ID);
@@ -95,8 +94,8 @@ public class GroupInfo extends ServiceInfo {
                     getTypeRadioGroup().setEnabled(false);
                 }
             }
-            getBrowser().addToHeartbeatIdList(this);
             getBrowser().addNameToServiceInfoHash(this);
+            getBrowser().addToHeartbeatIdList(this);
         }
 
         /*
@@ -208,7 +207,7 @@ public class GroupInfo extends ServiceInfo {
                     newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
-        //getBrowser().addToHeartbeatIdList(newServiceInfo);
+        getBrowser().addToHeartbeatIdList(newServiceInfo);
         final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
@@ -564,8 +563,6 @@ public class GroupInfo extends ServiceInfo {
         }
         if (!testOnly) {
             for (final ServiceInfo child : children) {
-                getBrowser().getHeartbeatIdList().remove(
-                                              child.getHeartbeatId(testOnly));
                 getBrowser().removeFromServiceInfoHash(child);
                 child.getService().doneRemoving();
             }
@@ -632,9 +629,7 @@ public class GroupInfo extends ServiceInfo {
         return false;
     }
 
-    /**
-     * Returns whether one of the services on one of the hosts failed.
-     */
+    /** Returns whether one of the services on one of the hosts failed. */
     public final boolean isOneFailedCount(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(

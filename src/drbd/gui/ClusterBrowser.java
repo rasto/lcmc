@@ -147,9 +147,6 @@ public class ClusterBrowser extends Browser {
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo =
                                           new HashMap<String, ServiceInfo>();
-    /** List of heartbeat ids of all services. */
-    private final List<String> heartbeatIdList = new ArrayList<String>();
-
     /** Heartbeat graph. */
     private final HeartbeatGraph heartbeatGraph;
     /** Drbd graph. */
@@ -1796,33 +1793,18 @@ public class ClusterBrowser extends Browser {
             String newPmId;
             if (id == null) {
                 /* first time, no pm id is set */
-                int i = 1;
-                //while (heartbeatIdList.contains(pmId + Integer.toString(i))) {
-                //    i++;
-                //}
-                newPmId = pmId + Integer.toString(i);
-                si.getService().setId(Integer.toString(i));
+                newPmId = pmId + "1";
+                si.getService().setId("1");
             } else {
                 newPmId = pmId + id;
                 si.getService().setHeartbeatId(newPmId);
             }
-            //heartbeatIdList.add(newPmId);
             heartbeatIdToServiceInfo.put(newPmId, si);
         } else {
-            //if (!heartbeatIdList.contains(pmId)) {
-            //    heartbeatIdList.add(pmId);
-            //}
             if (heartbeatIdToServiceInfo.get(pmId) == null) {
                 heartbeatIdToServiceInfo.put(pmId, si);
             }
         }
-    }
-
-    /**
-     * Returns heartbeat id list.
-     */
-    public final List<String> getHeartbeatIdList() {
-        return heartbeatIdList;
     }
 
     /**

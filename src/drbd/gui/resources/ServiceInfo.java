@@ -2109,8 +2109,6 @@ public class ServiceInfo extends EditableInfo {
                                                                     cloneInfo);
             getBrowser().getHeartbeatIdToServiceInfo().remove(
                                     cloneInfo.getService().getHeartbeatId());
-            getBrowser().getHeartbeatIdList().remove(
-                                     cloneInfo.getService().getHeartbeatId());
             getBrowser().removeFromServiceInfoHash(cloneInfo);
             cloneInfo = null;
             infoPanel = null;
@@ -2764,7 +2762,6 @@ public class ServiceInfo extends EditableInfo {
             if (oldHeartbeatId != null) {
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
                                                                oldHeartbeatId);
-                getBrowser().getHeartbeatIdList().remove(oldHeartbeatId);
             }
             if (getService().isNew()) {
                 final String id = getComboBoxValue(GUI_ID);
@@ -2773,8 +2770,8 @@ public class ServiceInfo extends EditableInfo {
                     typeRadioGroup.setEnabled(false);
                 }
             }
-            getBrowser().addToHeartbeatIdList(this);
             getBrowser().addNameToServiceInfoHash(this);
+            getBrowser().addToHeartbeatIdList(this);
         }
         if (!testOnly) {
             addResourceBefore(dcHost, testOnly);
@@ -3864,7 +3861,6 @@ public class ServiceInfo extends EditableInfo {
     public void removeInfo() {
         getBrowser().getHeartbeatIdToServiceInfo().remove(
                                                 getService().getHeartbeatId());
-        getBrowser().getHeartbeatIdList().remove(getService().getHeartbeatId());
         getBrowser().removeFromServiceInfoHash(this);
         super.removeMyself(false);
     }
@@ -4666,8 +4662,7 @@ public class ServiceInfo extends EditableInfo {
                                     runningOnNodes.get(0).toLowerCase();
                         return !getBrowser().clStatusFailed()
                                && getService().isAvailable()
-                               && !hostName.toLowerCase().equals(
-                                         runningOnNode)
+                               && !hostName.toLowerCase().equals(runningOnNode)
                                && host.isClStatus();
                     }
 
