@@ -3742,7 +3742,7 @@ public class ServiceInfo extends EditableInfo {
             cloneInfo.removeMyselfNoConfirm(dcHost, testOnly);
         }
 
-        if (getService().isNew()) {
+        if (getService().isNew() && groupInfo == null) {
             if (!testOnly) {
                 getService().setNew(false);
                 getBrowser().getHeartbeatGraph().killRemovedVertices();
@@ -3779,42 +3779,51 @@ public class ServiceInfo extends EditableInfo {
                     /* get group id only if there is only one resource in a
                      * group.
                      */
-                    final String group = groupInfo.getHeartbeatId(testOnly);
-                    final Enumeration e = groupInfo.getNode().children();
-                    while (e.hasMoreElements()) {
-                        final DefaultMutableTreeNode n =
-                                  (DefaultMutableTreeNode) e.nextElement();
-                        final ServiceInfo child =
-                                           (ServiceInfo) n.getUserObject();
-                        child.getService().setModified(true);
-                        child.getService().doneModifying();
-                    }
-                    if (cs.getGroupResources(group, testOnly).size() == 1) {
+                    if (getService().isNew()) {
                         if (!testOnly) {
-                            groupInfo.getService().setRemoved(true);
+                            super.removeMyself(false);
                         }
-                        groupInfo.removeMyselfNoConfirmFromChild(dcHost,
-                                                                 testOnly);
-                        groupId = group;
-                        groupInfo.getService().doneRemoving();
+                    } else {
+                        final String group = groupInfo.getHeartbeatId(testOnly);
+                        final Enumeration e = groupInfo.getNode().children();
+                        while (e.hasMoreElements()) {
+                            final DefaultMutableTreeNode n =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                            final ServiceInfo child =
+                                               (ServiceInfo) n.getUserObject();
+                            child.getService().setModified(true);
+                            child.getService().doneModifying();
+                        }
+                        if (cs.getGroupResources(group, testOnly).size() == 1) {
+                            if (!testOnly) {
+                                groupInfo.getService().setRemoved(true);
+                            }
+                            groupInfo.removeMyselfNoConfirmFromChild(dcHost,
+                                                                     testOnly);
+                            groupId = group;
+                            groupInfo.getService().doneRemoving();
+                        }
                     }
                     groupInfo.resetPopup();
                 }
-                String cloneId = null;
-                boolean master = false;
-                if (cloneInfo != null) {
-                    cloneId = cloneInfo.getHeartbeatId(testOnly);
-                    master = cloneInfo.getService().isMaster();
-                }
-                final boolean ret = CRM.removeResource(dcHost,
-                                                       getHeartbeatId(testOnly),
-                                                       groupId,
-                                                       cloneId,
-                                                       master,
-                                                       testOnly);
-                if (!testOnly && !ret) {
-                    Tools.progressIndicatorFailed(dcHost.getName(),
-                                                  "removing failed");
+                if (!getService().isNew()) {
+                    String cloneId = null;
+                    boolean master = false;
+                    if (cloneInfo != null) {
+                        cloneId = cloneInfo.getHeartbeatId(testOnly);
+                        master = cloneInfo.getService().isMaster();
+                    }
+                    final boolean ret = CRM.removeResource(
+                                                      dcHost,
+                                                      getHeartbeatId(testOnly),
+                                                      groupId,
+                                                      cloneId,
+                                                      master,
+                                                      testOnly);
+                    if (!testOnly && !ret) {
+                        Tools.progressIndicatorFailed(dcHost.getName(),
+                                                      "removing failed");
+                    }
                 }
             }
         }
@@ -4535,7 +4544,7 @@ public class ServiceInfo extends EditableInfo {
                         || getService().isRemoved()) {
                         return false;
                     }
-                    if (groupInfo == null) {
+                    if (groupInfo == null || getService().isNew()) {
                         return true;
                     }
                     final ClusterStatus cs = getBrowser().getClusterStatus();

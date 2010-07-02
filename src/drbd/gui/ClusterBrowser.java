@@ -1743,6 +1743,7 @@ public class ClusterBrowser extends Browser {
      *              service info object
      */
     public final void removeFromServiceInfoHash(final ServiceInfo serviceInfo) {
+        // TODO: it comes here twice sometimes
         final Service service = serviceInfo.getService();
         try {
             mNameToServiceLock.acquire();
@@ -1796,21 +1797,21 @@ public class ClusterBrowser extends Browser {
             if (id == null) {
                 /* first time, no pm id is set */
                 int i = 1;
-                while (heartbeatIdList.contains(pmId + Integer.toString(i))) {
-                    i++;
-                }
+                //while (heartbeatIdList.contains(pmId + Integer.toString(i))) {
+                //    i++;
+                //}
                 newPmId = pmId + Integer.toString(i);
                 si.getService().setId(Integer.toString(i));
             } else {
                 newPmId = pmId + id;
                 si.getService().setHeartbeatId(newPmId);
             }
-            heartbeatIdList.add(newPmId);
+            //heartbeatIdList.add(newPmId);
             heartbeatIdToServiceInfo.put(newPmId, si);
         } else {
-            if (!heartbeatIdList.contains(pmId)) {
-                heartbeatIdList.add(pmId);
-            }
+            //if (!heartbeatIdList.contains(pmId)) {
+            //    heartbeatIdList.add(pmId);
+            //}
             if (heartbeatIdToServiceInfo.get(pmId) == null) {
                 heartbeatIdToServiceInfo.put(pmId, si);
             }
@@ -1843,8 +1844,7 @@ public class ClusterBrowser extends Browser {
      * contains a hash with id as a key and ServiceInfo as a value.
      */
     public final void addNameToServiceInfoHash(final ServiceInfo serviceInfo) {
-        /* add to the hash with service name and id as
-         * keys */
+        /* add to the hash with service name and id as keys */
         final Service service = serviceInfo.getService();
         try {
             mNameToServiceLock.acquire();
@@ -1856,10 +1856,7 @@ public class ClusterBrowser extends Browser {
         String csPmId = null;
         final ServiceInfo cs = serviceInfo.getContainedService();
         if (cs != null) {
-            csPmId =
-               cs.getService().getName()
-               + "_"
-               + cs.getService().getId();
+            csPmId = cs.getService().getName() + "_" + cs.getService().getId();
         }
         if (idToInfoHash == null) {
             idToInfoHash = new TreeMap<String, ServiceInfo>(
