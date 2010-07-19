@@ -34,9 +34,7 @@ import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenu;
 
-import java.util.Set;
 import java.util.List;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;

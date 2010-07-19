@@ -25,24 +25,12 @@ import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.SpringUtilities;
 import drbd.data.Host;
-import drbd.data.PtestData;
-import drbd.data.ClusterStatus;
-import drbd.data.ConfigData;
 import drbd.data.CRMXML;
-import drbd.utilities.UpdatableItem;
-import drbd.utilities.ButtonCallback;
 import drbd.utilities.Tools;
 import drbd.utilities.CRM;
-import drbd.utilities.MyMenuItem;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.SwingUtilities;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JScrollPane;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SpringLayout;
 import java.util.List;
 import java.util.ArrayList;
@@ -51,12 +39,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**

@@ -59,7 +59,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;

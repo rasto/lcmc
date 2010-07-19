@@ -949,9 +949,7 @@ public class SSH {
      * cannot befound in the in-memory database.
      */
     class AdvancedVerifier implements ServerHostKeyVerifier {
-        /**
-         * Verifies the keys.
-         */
+        /** Verifies the keys. */
         public boolean verifyServerHostKey(final String hostname,
                                            final int port,
                                            final String serverHostKeyAlgorithm,
@@ -962,7 +960,6 @@ public class SSH {
             final StringBuffer message = new StringBuffer(200);
 
             /* Check database */
-
             final int result =
                         Tools.getConfigData().getKnownHosts().verifyHostkey(
                                                       hostname,
@@ -1142,25 +1139,19 @@ public class SSH {
         /** Cancel the connecting. */
         private boolean cancelIt = false;
 
-        /**
-         * Prepares a new <code>ConnectionThread</code> object.
-         */
+        /** Prepares a new <code>ConnectionThread</code> object. */
         public ConnectionThread() {
             super();
             username = host.getFirstUsername();
             hostname = host.getFirstIp();
         }
 
-        /**
-         * Cancel the connecting.
-         */
+        /** Cancel the connecting. */
         public void cancel() {
             cancelIt = true;
         }
 
-        /**
-         * Start connection in the thread.
-         */
+        /** Start connection in the thread. */
         public void run() {
             if (callback != null && isConnected()) {
                 callback.done(1);

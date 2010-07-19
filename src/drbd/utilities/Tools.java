@@ -30,7 +30,6 @@ import drbd.gui.resources.Info;
 import drbd.gui.resources.ServiceInfo;
 import drbd.gui.ClusterBrowser;
 import drbd.data.DrbdGuiXML;
-import drbd.data.CRMXML;
 import drbd.gui.GUIData;
 import drbd.gui.dialog.ConfirmDialog;
 

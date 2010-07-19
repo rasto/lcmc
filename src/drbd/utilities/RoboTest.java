@@ -29,7 +29,6 @@ import java.awt.MouseInfo;
 import java.awt.geom.Point2D;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.lang.Math;
 
 /**
  * This class is used to test the GUI.
