@@ -382,8 +382,8 @@ public abstract class WizardDialog extends ConfigDialog {
      * buttons and adds retry button.
      */
     public final void printErrorAndRetry(String text,
-                                   final String ans,
-                                   final int exitCode) {
+                                         final String ans,
+                                         final int exitCode) {
         if (ans != null) {
             text += "\n" + Tools.getString("Dialog.Dialog.PrintErrorAndRetry")
                  + exitCode + "\n" + ans;

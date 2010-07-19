@@ -218,7 +218,7 @@ public class HbColocationInfo extends EditableInfo
     }
 
     /** Returns when at least one resource in rsc set can be promoted. */
-    private final boolean isRscSetMaster() {
+    private boolean isRscSetMaster() {
         ConstraintPHInfo cphi;
         CRMXML.RscSet rscSet;
         if (serviceInfoRsc.isConstraintPH()) {
@@ -312,7 +312,7 @@ public class HbColocationInfo extends EditableInfo
     }
 
     /** Returns attributes of this colocation. */
-    final Map<String, String> getAttributes() {
+    protected final Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = true;

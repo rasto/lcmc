@@ -47,7 +47,7 @@ public final class DRBD {
     /** Output of the drbd test. */
     private static volatile String drbdtestOutput = null;
     /** DRBD test lock. */
-    private static final Mutex mDRBDtestLock = new Mutex();
+    private static final Mutex M_DRBD_TEST_LOCK = new Mutex();
 
     /**
      * Private constructor, cannot be instantiated.
@@ -70,12 +70,12 @@ public final class DRBD {
                                              final boolean outputVisible,
                                              final boolean testOnly) {
         try {
-            mDRBDtestLock.acquire();
+            M_DRBD_TEST_LOCK.acquire();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         drbdtestOutput = null;
-        mDRBDtestLock.release();
+        M_DRBD_TEST_LOCK.release();
         if (testOnly) {
             if (command.indexOf("@DRYRUN@") < 0) {
                 /* it would be very bad */
@@ -94,12 +94,12 @@ public final class DRBD {
                                                 false,
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             try {
-                mDRBDtestLock.acquire();
+                M_DRBD_TEST_LOCK.acquire();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             drbdtestOutput = output.getOutput();
-            mDRBDtestLock.release();
+            M_DRBD_TEST_LOCK.release();
 
             return output;
         } else {
@@ -128,12 +128,12 @@ public final class DRBD {
      */
     public static String getDRBDtest() {
         try {
-            mDRBDtestLock.acquire();
+            M_DRBD_TEST_LOCK.acquire();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         final String out = drbdtestOutput;
-        mDRBDtestLock.release();
+        M_DRBD_TEST_LOCK.release();
         return out;
     }
 

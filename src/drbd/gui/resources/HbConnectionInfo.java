@@ -1028,7 +1028,7 @@ public class HbConnectionInfo extends EditableInfo {
     /** Returns colocation attributes knowing the col id. */
     public final Map<String, String> getColocationAttributes(
                                                         final String colId) {
-        HbColocationInfo hci = colocationIds.get(colId);
+        final HbColocationInfo hci = colocationIds.get(colId);
         if (hci != null) {
             return hci.getAttributes();
         }
@@ -1037,7 +1037,7 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Returns order attributes knowing the ord id. */
     public final Map<String, String> getOrderAttributes(final String ordId) {
-        HbOrderInfo hoi = orderIds.get(ordId);
+        final HbOrderInfo hoi = orderIds.get(ordId);
         if (hoi != null) {
             return hoi.getAttributes();
         }

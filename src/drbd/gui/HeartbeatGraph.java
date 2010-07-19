@@ -404,7 +404,7 @@ public class HeartbeatGraph extends ResourceGraph {
         } catch (final InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        MyEdge edge = null; 
+        MyEdge edge = null;
         try {
             edge = (MyEdge) vP.findEdge(v);
 

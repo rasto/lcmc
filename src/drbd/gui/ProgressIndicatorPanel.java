@@ -501,7 +501,7 @@ public class ProgressIndicatorPanel extends JComponent
 
                 final long time = System.currentTimeMillis();
                 if (lRampUp) {
-                    int newAlphaLevel = alphaLevel 
+                    int newAlphaLevel = alphaLevel
                         + (int) (MAX_ALPHA_LEVEL * (time - start) / rampDelay);
                     if (newAlphaLevel >= MAX_ALPHA_LEVEL) {
                         newAlphaLevel = MAX_ALPHA_LEVEL;

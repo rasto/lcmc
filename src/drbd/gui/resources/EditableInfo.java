@@ -112,7 +112,7 @@ public abstract class EditableInfo extends Info {
     private final List<JPanel> advancedOnlySectionList =
                                                       new ArrayList<JPanel>();
     /** More options panel. */
-    final JPanel moreOptionsPanel = new JPanel();
+    private final JPanel moreOptionsPanel = new JPanel();
 
     /** How much of the info is used. */
     public int getUsed() {
@@ -129,9 +129,7 @@ public abstract class EditableInfo extends Info {
         super(name, browser);
     }
 
-    /**
-     * Inits apply button.
-     */
+    /** Inits apply button. */
     public final void initApplyButton(final ButtonCallback buttonCallback) {
         if (oldApplyButton == null) {
             applyButton = new MyButton(
@@ -147,18 +145,14 @@ public abstract class EditableInfo extends Info {
         }
     }
 
-    /**
-     * Creates apply button and adds it to the panel.
-     */
+    /** Creates apply button and adds it to the panel. */
     protected final void addApplyButton(final JPanel panel) {
         panel.add(applyButton, BorderLayout.WEST);
         Tools.getGUIData().getMainFrame().getRootPane().setDefaultButton(
                                                               applyButton);
     }
 
-    /**
-     * Adds jlabel field with tooltip.
-     */
+    /** Adds jlabel field with tooltip. */
     public final void addLabelField(final JPanel panel,
                                     final String left,
                                     final String right,
@@ -222,10 +216,14 @@ public abstract class EditableInfo extends Info {
      * type and advanced mode setting.
      */
     private class PanelPart {
+        /** Section of this panel part. */
         private final String section;
+        /** Access type of this panel part. */
         private final ConfigData.AccessType accessType;
+        /** Whether it is an advanced panel part. */
         private final boolean advanced;
 
+        /** Creates new panel part object. */
         public PanelPart(final String section,
                          final ConfigData.AccessType accessType,
                          final boolean advanced) {
@@ -234,22 +232,23 @@ public abstract class EditableInfo extends Info {
             this.advanced = advanced;
         }
 
+        /** Returns a section to which this panel part belongs. */
         public final String getSection() {
             return section;
         }
 
+        /** Returns access type of this panel part. */
         public final ConfigData.AccessType getAccessType() {
             return accessType;
         }
 
+        /** Whether this panel part has advanced options. */
         public final boolean isAdvanced() {
             return advanced;
         }
     }
 
-    /**
-     * Adds parameters to the panel.
-     */
+    /** Adds parameters to the panel. */
     public final void addParams(final JPanel optionsPanel,
                                 final String[] params,
                                 final int leftWidth,
@@ -264,9 +263,7 @@ public abstract class EditableInfo extends Info {
                   sameAsFields);
     }
 
-    /**
-     * Adds parameters to the panel.
-     */
+    /** Adds parameters to the panel. */
     private void addParams(final JPanel optionsPanel,
                            final String prefix,
                            final String[] params,
@@ -450,9 +447,7 @@ public abstract class EditableInfo extends Info {
                                     && !Tools.getConfigData().getExpertMode());
     }
 
-    /**
-     * Returns a more panel with "more options are available" message.
-     */
+    /** Returns a more panel with "more options are available" message. */
     protected final JPanel getMoreOptionsPanel(final int width) {
         final JLabel l = new JLabel(
                               Tools.getString("EditableInfo.MoreOptions"));
@@ -470,9 +465,7 @@ public abstract class EditableInfo extends Info {
         return moreOptionsPanel;
     }
 
-    /**
-     * Checks ands sets paramter fields.
-     */
+    /** Checks ands sets paramter fields. */
     private void checkParameterFields(final GuiComboBox paramCb,
                                       final GuiComboBox realParamCb,
                                       final String param,
@@ -506,9 +499,7 @@ public abstract class EditableInfo extends Info {
         thread.start();
     }
 
-    /**
-     * Get stored value in the combo box.
-     */
+    /** Get stored value in the combo box. */
     protected final String getComboBoxValue(final String param) {
         final GuiComboBox cb = paramComboBoxGet(param, null);
         if (cb == null) {
@@ -527,9 +518,7 @@ public abstract class EditableInfo extends Info {
         return value;
     }
 
-    /**
-     * Stores values in the combo boxes in the component c.
-     */
+    /** Stores values in the combo boxes in the component c. */
     protected final void storeComboBoxValues(final String[] params) {
         for (String param : params) {
             final String value = getComboBoxValue(param);
@@ -541,9 +530,7 @@ public abstract class EditableInfo extends Info {
         }
     }
 
-    /**
-     * Returns combo box for one parameter.
-     */
+    /** Returns combo box for one parameter. */
     protected GuiComboBox getParamComboBox(final String param,
                                            final String prefix,
                                            final int width) {
@@ -623,39 +610,27 @@ public abstract class EditableInfo extends Info {
         return ret;
     }
 
-    /**
-     * Sets the cache for the result of the parameter check.
-     */
+    /** Sets the cache for the result of the parameter check. */
     protected final void setCheckParamCache(final String param,
                                             final boolean correctValue) {
         paramCorrectValueMap.put(param, correctValue);
     }
 
-    /**
-     * Returns default value of a parameter.
-     */
+    /** Returns default value of a parameter. */
     protected abstract String getParamDefault(String param);
 
-    /**
-     * Returns saved value of a parameter.
-     */
+    /** Returns saved value of a parameter. */
     protected String getParamSaved(final String param) {
         return getResource().getValue(param);
     }
 
-    /**
-     * Returns preferred value of a parameter.
-     */
+    /** Returns preferred value of a parameter. */
     protected abstract String getParamPreferred(String param);
 
-    /**
-     * Returns short description of a parameter.
-     */
+    /** Returns short description of a parameter. */
     protected abstract String getParamShortDesc(String param);
 
-    /**
-     * Returns long description of a parameter.
-     */
+    /** Returns long description of a parameter. */
     protected abstract String getParamLongDesc(String param);
 
     /**
@@ -860,25 +835,19 @@ public abstract class EditableInfo extends Info {
         return changedValue;
     }
 
-    /**
-     * Return JLabel object for the combobox.
-     */
+    /** Return JLabel object for the combobox. */
     protected final JLabel getLabel(final GuiComboBox cb) {
         //TODO: labelMap can be removed. cb.getLabel()
         return labelMap.get(cb);
     }
 
-    /**
-     * Removes this editable object and clealrs the parameter hashes.
-     */
+    /** Removes this editable object and clealrs the parameter hashes. */
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
         paramComboBoxClear();
     }
 
-    /**
-     * Waits till the info panel is done for the first time.
-     */
+    /** Waits till the info panel is done for the first time. */
     public final void waitForInfoPanel() {
         try {
             infoPanelLatch.await();
@@ -887,23 +856,17 @@ public abstract class EditableInfo extends Info {
         }
     }
 
-    /**
-     * Should be called after info panel is done.
-     */
+    /** Should be called after info panel is done. */
     public final void infoPanelDone() {
         infoPanelLatch.countDown();
     }
 
-    /**
-     * Adds a panel to the advanced list.
-     */
+    /** Adds a panel to the advanced list. */
     protected final void addToAdvancedList(final JPanel p) {
         advancedPanelList.add(p);
     }
 
-    /**
-     * Hide/Show advanced panels.
-     */
+    /** Hide/Show advanced panels. */
     public void updateAdvancedPanels() {
         final boolean expertMode = Tools.getConfigData().getExpertMode();
         boolean advanced = false;

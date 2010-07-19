@@ -65,6 +65,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.Locale;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -2647,7 +2648,6 @@ public class ServiceInfo extends EditableInfo {
              * recommended, but not used by default. */
             boolean firstTime = true;
             for (final String param : ClusterBrowser.HB_OPERATION_PARAM_LIST) {
-                boolean atLeastOneValue = false;
                 if (getBrowser().getCRMOperationParams().get(op).contains(
                                                                        param)) {
                     if (cloneInfo == null
@@ -2908,8 +2908,8 @@ public class ServiceInfo extends EditableInfo {
                             getBrowser().getHeartbeatGraph().getParents(this);
                 for (final ServiceInfo parentInfo : parents) {
                     if (parentInfo.isConstraintPH()) {
-                        boolean colocationOnly = false;
-                        boolean orderOnly = false;
+                        final boolean colocationOnly = false;
+                        final boolean orderOnly = false;
                         final List<ServiceInfo> with =
                                                  new ArrayList<ServiceInfo>();
                         with.add(this);
@@ -3242,7 +3242,8 @@ public class ServiceInfo extends EditableInfo {
                                               testOnly);
         } else {
             final String childHbId = child.getHeartbeatId(testOnly);
-            final Map<String, String> attrs = new LinkedHashMap<String, String>();
+            final Map<String, String> attrs =
+                                          new LinkedHashMap<String, String>();
             attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
             if (child.getCloneInfo() != null
                 && child.getCloneInfo().getService().isMaster()) {
@@ -4305,7 +4306,7 @@ public class ServiceInfo extends EditableInfo {
     /** Adds menu items with dependend services and groups. */
     protected void addDependencyMenuItems(final List<UpdatableItem> items,
                                           final boolean enableForNew,
-                                          final boolean testOnly) { 
+                                          final boolean testOnly) {
         /* add new group and dependency*/
         final MyMenuItem addGroupMenuItem =
             new MyMenuItem(Tools.getString(
@@ -4659,10 +4660,11 @@ public class ServiceInfo extends EditableInfo {
                             return false;
                         }
                         final String runningOnNode =
-                                    runningOnNodes.get(0).toLowerCase();
+                                runningOnNodes.get(0).toLowerCase(Locale.US);
                         return !getBrowser().clStatusFailed()
                                && getService().isAvailable()
-                               && !hostName.toLowerCase().equals(runningOnNode)
+                               && !hostName.toLowerCase(Locale.US).equals(
+                                                                 runningOnNode)
                                && host.isClStatus();
                     }
 
@@ -4769,11 +4771,11 @@ public class ServiceInfo extends EditableInfo {
                             return false;
                         }
                         final String runningOnNode =
-                                    runningOnNodes.get(0).toLowerCase();
+                                runningOnNodes.get(0).toLowerCase(Locale.US);
                         return !getBrowser().clStatusFailed()
                                && getService().isAvailable()
-                               && hostName.toLowerCase().equals(
-                                         runningOnNode)
+                               && hostName.toLowerCase(Locale.US).equals(
+                                                                 runningOnNode)
                                && host.isClStatus();
                     }
 
@@ -4833,11 +4835,11 @@ public class ServiceInfo extends EditableInfo {
                             return false;
                         }
                         final String runningOnNode =
-                                    runningOnNodes.get(0).toLowerCase();
+                                runningOnNodes.get(0).toLowerCase(Locale.US);
                         return !getBrowser().clStatusFailed()
                                && getService().isAvailable()
-                               && !hostName.toLowerCase().equals(
-                                         runningOnNode)
+                               && !hostName.toLowerCase(Locale.US).equals(
+                                                                 runningOnNode)
                                && host.isClStatus();
                     }
 

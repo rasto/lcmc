@@ -39,6 +39,7 @@ import java.util.Comparator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Collections;
+import java.util.Locale;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
 
@@ -1918,7 +1919,7 @@ public class CRMXML extends XML {
                     final String name = getAttribute(maNode, "name");
                     String value = getAttribute(maNode, "value");
                     if (TARGET_ROLE_META_ATTR.equals(name)) {
-                        value = value.toLowerCase();
+                        value = value.toLowerCase(Locale.US);
                     }
                     rscDefaultsParams.put(name, value);
                     rscDefaultsParamsNvpairIds.put(name, nvpairId);
@@ -2029,9 +2030,7 @@ public class CRMXML extends XML {
         if (operationsNode != null) {
             final String operationsIdRef = getAttribute(operationsNode,
                                                         "id-ref");
-            if (operationsIdRef != null) {
-                operationsIdRefs.put(crmId, operationsIdRef);
-            } else {
+            if (operationsIdRef == null) {
                 final String operationsId = getAttribute(operationsNode, "id");
                 operationsIdMap.put(crmId, operationsId);
                 operationsIdtoCRMId.put(operationsId, crmId);
@@ -2058,6 +2057,8 @@ public class CRMXML extends XML {
                         opIds.put(name, opId);
                     }
                 }
+            } else {
+                operationsIdRefs.put(crmId, operationsIdRef);
             }
         }
 
@@ -2066,9 +2067,7 @@ public class CRMXML extends XML {
                                                 "meta_attributes");
         if (metaAttrsNode != null) {
             final String metaAttrsIdRef = getAttribute(metaAttrsNode, "id-ref");
-            if (metaAttrsIdRef != null) {
-                metaAttrsIdRefs.put(crmId, metaAttrsIdRef);
-            } else {
+            if (metaAttrsIdRef == null) {
                 final String metaAttrsId = getAttribute(metaAttrsNode, "id");
                 metaAttrsIdMap.put(crmId, metaAttrsId);
                 metaAttrsIdToCRMId.put(metaAttrsId, crmId);
@@ -2090,12 +2089,14 @@ public class CRMXML extends XML {
                         final String name = getAttribute(maNode, "name");
                         String value = getAttribute(maNode, "value");
                         if (TARGET_ROLE_META_ATTR.equals(name)) {
-                            value = value.toLowerCase();
+                            value = value.toLowerCase(Locale.US);
                         }
                         params.put(name, value);
                         nvpairIds.put(name, nvpairId);
                     }
                 }
+            } else {
+                metaAttrsIdRefs.put(crmId, metaAttrsIdRef);
             }
         }
     }
@@ -2163,9 +2164,7 @@ public class CRMXML extends XML {
                                                 "meta_attributes");
         if (metaAttrsNode != null) {
             final String metaAttrsIdRef = getAttribute(metaAttrsNode, "id-ref");
-            if (metaAttrsIdRef != null) {
-                metaAttrsIdRefs.put(groupId, metaAttrsIdRef);
-            } else {
+            if (metaAttrsIdRef == null) {
                 final String metaAttrsId = getAttribute(metaAttrsNode, "id");
                 metaAttrsIdMap.put(groupId, metaAttrsId);
                 metaAttrsIdToCRMId.put(metaAttrsId, groupId);
@@ -2187,12 +2186,14 @@ public class CRMXML extends XML {
                         final String name = getAttribute(maNode, "name");
                         String value = getAttribute(maNode, "value");
                         if (TARGET_ROLE_META_ATTR.equals(name)) {
-                            value = value.toLowerCase();
+                            value = value.toLowerCase(Locale.US);
                         }
                         params.put(name, value);
                         nvpairIds.put(name, nvpairId);
                     }
                 }
+            } else {
+                metaAttrsIdRefs.put(groupId, metaAttrsIdRef);
             }
         }
     }
@@ -2393,11 +2394,11 @@ public class CRMXML extends XML {
                         final Pattern p = Pattern.compile("(.*):(\\d+)$");
                         final Matcher m = p.matcher(resId);
                         if (m.matches()) {
-                            failedMap.put(uname.toLowerCase(),
+                            failedMap.put(uname.toLowerCase(Locale.US),
                                           m.group(1),
                                           value);
                         } else {
-                            failedMap.put(uname.toLowerCase(),
+                            failedMap.put(uname.toLowerCase(Locale.US),
                                           resId,
                                           value);
                         }
@@ -2436,7 +2437,9 @@ public class CRMXML extends XML {
                 if (optionNode.getNodeName().equals("nvpair")) {
                     final String name = getAttribute(optionNode, "name");
                     final String value = getAttribute(optionNode, "value");
-                    nodeParametersMap.put(node.toLowerCase(), name, value);
+                    nodeParametersMap.put(node.toLowerCase(Locale.US),
+                                          name,
+                                          value);
                 }
             }
         }
@@ -2636,8 +2639,8 @@ public class CRMXML extends XML {
                         dc = uname;
                     }
                     parseNode(uname, nodeNode, nodeParametersMap);
-                    if (!nodeOnline.containsKey(uname.toLowerCase())) {
-                        nodeOnline.put(uname.toLowerCase(), "no");
+                    if (!nodeOnline.containsKey(uname.toLowerCase(Locale.US))) {
+                        nodeOnline.put(uname.toLowerCase(Locale.US), "no");
                     }
                 }
             }
@@ -3005,9 +3008,9 @@ public class CRMXML extends XML {
                     if ("active".equals(ha)
                         && "member".equals(join)
                         && "true".equals(inCCM)) {
-                        nodeOnline.put(uname.toLowerCase(), "yes");
+                        nodeOnline.put(uname.toLowerCase(Locale.US), "yes");
                     } else {
-                        nodeOnline.put(uname.toLowerCase(), "no");
+                        nodeOnline.put(uname.toLowerCase(Locale.US), "no");
                     }
                     final NodeList nodeStates = nodeStateNode.getChildNodes();
                     for (int j = 0; j < nodeStates.getLength(); j++) {
@@ -3542,9 +3545,9 @@ public class CRMXML extends XML {
         private final Mutex mRscIdsLock = new Mutex();
         /** String whether the resource set is sequential or not. */
         private final String sequential;
-        /** order action */
+        /** order action. */
         private final String orderAction;
-        /** colocation role */
+        /** colocation role. */
         private final String colocationRole;
 
         /** Creates new RscSet object. */
@@ -3561,11 +3564,11 @@ public class CRMXML extends XML {
         }
 
         /** Returns resource set id. */
-        public final String getId() {
+        public String getId() {
             return id;
         }
         /** Returns resources in this set. */
-        public final List<String> getRscIds() {
+        public List<String> getRscIds() {
             final List<String> copy = new ArrayList<String>();
             try {
                 mRscIdsLock.acquire();
@@ -3580,13 +3583,13 @@ public class CRMXML extends XML {
         }
 
         /** Returns whether the resource set is sequential or not. */
-        public final String getSequential() {
+        public String getSequential() {
             return sequential;
         }
 
         /** Returns whether this resource set is subset of the supplied
          * resource set. */
-        public final boolean isSubsetOf(final RscSet oRscSet) {
+        public boolean isSubsetOf(final RscSet oRscSet) {
             if (oRscSet == null) {
                 return false;
             }
@@ -3612,7 +3615,7 @@ public class CRMXML extends XML {
 
         /** Returns whether this resource set is equal to the supplied
          * resource set. The order of ids doesn't matter. */
-        public final boolean equals(final RscSet oRscSet) {
+        public boolean equals(final RscSet oRscSet) {
             if (oRscSet == null) {
                 return false;
             }
@@ -3637,7 +3640,7 @@ public class CRMXML extends XML {
         }
 
         /** Removes one id from rsc ids. */
-        public final void removeRscId(final String id) {
+        public void removeRscId(final String id) {
             try {
                 mRscIdsLock.acquire();
             } catch (InterruptedException ie) {
@@ -3648,7 +3651,7 @@ public class CRMXML extends XML {
         }
 
         /** Adds one id to rsc ids. */
-        public final void addRscId(final String id) {
+        public void addRscId(final String id) {
             try {
                 mRscIdsLock.acquire();
             } catch (InterruptedException ie) {
@@ -3659,7 +3662,7 @@ public class CRMXML extends XML {
         }
 
         /** Return whether rsc ids are empty. */
-        public final boolean isRscIdsEmpty() {
+        public boolean isRscIdsEmpty() {
             try {
                 mRscIdsLock.acquire();
             } catch (InterruptedException ie) {
@@ -3671,26 +3674,27 @@ public class CRMXML extends XML {
         }
 
         /** String represantation of the resources set. */
-        public final String toString() {
+        public String toString() {
             final StringBuffer s = new StringBuffer(20);
             s.append("rscset id: ");
             s.append(id);
-            s.append(" ids: " + rscIds);
+            s.append(" ids: ");
+            s.append(rscIds);
             return s.toString();
         }
 
         /** Returns order action. */
-        public final String getOrderAction() {
+        public String getOrderAction() {
             return orderAction;
         }
 
         /** Returns colocation role. */
-        public final String getColocationRole() {
+        public String getColocationRole() {
             return colocationRole;
         }
 
         /** Returns whether the resouce set is sequential. */
-        public final boolean isSequential() {
+        public boolean isSequential() {
             return sequential == null || "true".equals(sequential);
         }
     }
@@ -3698,15 +3702,15 @@ public class CRMXML extends XML {
     /** Class that holds data between two resource sests. */
     public final class RscSetConnectionData {
         /** Resource set 1. */
-        RscSet rscSet1;
+        private RscSet rscSet1;
         /** Resource set 2. */
-        RscSet rscSet2;
+        private RscSet rscSet2;
         /** Colocation id. */
-        String constraintId;
+        private String constraintId;
         /** Position in the resoruce set. */
-        final int connectionPos;
+        private final int connectionPos;
         /** Whether it is colocation. */
-        final boolean colocation;
+        private final boolean colocation;
 
         /** Creates new RscSetConnectionData object. */
         public RscSetConnectionData(final RscSet rscSet1,
@@ -3722,32 +3726,32 @@ public class CRMXML extends XML {
         }
 
         /** Returns resource set 1. */
-        public final RscSet getRscSet1() {
+        public RscSet getRscSet1() {
             return rscSet1;
         }
 
         /** Returns resource set 2. */
-        public final RscSet getRscSet2() {
+        public RscSet getRscSet2() {
             return rscSet2;
         }
 
         /** Returns order or constraint id. */
-        public final String getConstraintId() {
+        public String getConstraintId() {
             return constraintId;
         }
 
         /** Returns order or constraint id. */
-        public final void setConstraintId(final String constraintId) {
+        public void setConstraintId(final String constraintId) {
             this.constraintId = constraintId;
         }
 
         /** Returns whether it is colocation. */
-        public final boolean isColocation() {
+        public boolean isColocation() {
             return colocation;
         }
 
         /** Returns whether two resource sets are equal. */
-        private final boolean rscSetsAreEqual(final RscSet set1,
+        private boolean rscSetsAreEqual(final RscSet set1,
                                               final RscSet set2) {
             if (set1 == set2) {
                 return true;
@@ -3758,7 +3762,8 @@ public class CRMXML extends XML {
             return set1.equals(set2);
         }
 
-        public final boolean equals(final RscSetConnectionData oRdata) {
+        /** Whether the two resource sets are equal. */
+        public boolean equals(final RscSetConnectionData oRdata) {
             final RscSet oRscSet1 = oRdata.getRscSet1();
             final RscSet oRscSet2 = oRdata.getRscSet2();
             return oRdata.isColocation() == colocation
@@ -3766,7 +3771,9 @@ public class CRMXML extends XML {
                    && rscSetsAreEqual(rscSet2, oRscSet2);
         }
 
-        public final boolean equalsReversed(final RscSetConnectionData oRdata) {
+        /** Whether the two resource sets are equal,
+            even if they are reversed. */
+        public boolean equalsReversed(final RscSetConnectionData oRdata) {
             final RscSet oRscSet1 = oRdata.getRscSet1();
             final RscSet oRscSet2 = oRdata.getRscSet2();
             return oRdata.isColocation() == colocation
@@ -3779,8 +3786,7 @@ public class CRMXML extends XML {
         }
 
         /** Returns whether the same palceholder should be used. */
-        public final boolean samePlaceholder(
-                                        final RscSetConnectionData oRdata) {
+        public boolean samePlaceholder(final RscSetConnectionData oRdata) {
             if (oRdata.isColocation() == colocation) {
                 /* exactly the same */
                 return equals(oRdata);
@@ -3806,7 +3812,7 @@ public class CRMXML extends XML {
                     return true;
                 }
             }
-            if ((rscSet1 == oRscSet2 
+            if ((rscSet1 == oRscSet2
                  || rscSet1 == null
                  || oRscSet2 == null
                  || rscSet1.isSubsetOf(oRscSet2)
@@ -3828,14 +3834,14 @@ public class CRMXML extends XML {
         }
 
         /** Reverse resource sets. */
-        public final void reverse() {
+        public void reverse() {
             final RscSet old1 = rscSet1;
             rscSet1 = rscSet2;
             rscSet2 = old1;
         }
 
         /** Returns whether it is an empty connection. */
-        public final boolean isEmpty() {
+        public boolean isEmpty() {
             if ((rscSet1 == null || rscSet1.isRscIdsEmpty())
                 && (rscSet2 == null || rscSet2.isRscIdsEmpty())) {
                 return true;
@@ -3844,13 +3850,13 @@ public class CRMXML extends XML {
         }
 
         /** Returns connection position. */
-        public final int getConnectionPos() {
+        public int getConnectionPos() {
             return connectionPos;
         }
 
         /** String represantation of the resource set data. */
-        public final String toString() {
-            final StringBuffer s = new StringBuffer(20);
+        public String toString() {
+            final StringBuffer s = new StringBuffer(100);
             s.append("rsc set conn id: ");
             s.append(constraintId);
             if (colocation) {
@@ -3864,8 +3870,7 @@ public class CRMXML extends XML {
             } else {
                 s.append(rscSet1.toString());
             }
-            s.append(") ");
-            s.append("\n   (rscset2: ");
+            s.append(") \n   (rscset2: ");
             if (rscSet2 == null) {
                 s.append("null");
             } else {

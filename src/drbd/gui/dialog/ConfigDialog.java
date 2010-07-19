@@ -508,7 +508,7 @@ public abstract class ConfigDialog {
         try {
             dialogGate.await();
         } catch (InterruptedException ignored) {
-            /* ignored */
+            Thread.currentThread().interrupt();
         }
 
         if (optionPaneAnswer instanceof String) {

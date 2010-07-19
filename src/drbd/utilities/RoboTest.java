@@ -312,7 +312,7 @@ public final class RoboTest {
                     final int i = 1;
                     final long startTime = System.currentTimeMillis();
                     Tools.info("test" + index + " no " + i);
-                    startTest3(robot, host);
+                    startTest3(robot);
                     final int secs = (int) (System.currentTimeMillis()
                                              - startTime) / 1000;
                     Tools.info("test" + index + " no " + i + ", secs: "
@@ -390,6 +390,15 @@ public final class RoboTest {
         moveTo(robot, ipX + 270, ipY + 28);
         moveTo(robot, ipX + 267, ipY + 67);
         leftClick(robot); /* choose ipaddr */
+        removeService(robot, ipX, ipY, -15);
+        /* again */
+        moveTo(robot, ipX, ipY);
+        rightClick(robot); /* popup */
+        moveTo(robot, ipX + 57, ipY + 28);
+        moveTo(robot, ipX + 270, ipY + 28);
+        moveTo(robot, ipX + 267, ipY + 67);
+        leftClick(robot); /* choose ipaddr */
+
         moveTo(robot, 1072, 405);
         leftClick(robot); /* pull down */
         moveTo(robot, 1044, 442);
@@ -412,6 +421,79 @@ public final class RoboTest {
         sleep(1000);
         leftClick(robot); /* choose group */
         sleep(3000);
+        /* remove it */
+        removeService(robot, gx, gy, 0);
+
+        moveTo(robot, gx, gy);
+        sleep(1000);
+        rightClick(robot); /* popup */
+        moveTo(robot, gx + 46, gy + 11);
+        sleep(1000);
+        leftClick(robot); /* choose group */
+        sleep(3000);
+
+        rightClick(robot); /* group popup */
+        moveTo(robot, gx + 80, gy + 20);
+        moveTo(robot, gx + 84, gy + 22);
+        moveTo(robot, gx + 560, gy + 22);
+        sleep(1000);
+        typeDummy(robot);
+        sleep(1000);
+
+        /* remove it */
+        removeService(robot, gx, gy, 0);
+
+        /* group with dummy resources, once again */
+        moveTo(robot, gx, gy);
+        sleep(1000);
+        rightClick(robot); /* popup */
+        moveTo(robot, gx + 46, gy + 11);
+        sleep(1000);
+        leftClick(robot); /* choose group */
+        sleep(3000);
+        rightClick(robot); /* group popup */
+        moveTo(robot, gx + 80, gy + 20);
+        moveTo(robot, gx + 84, gy + 22);
+        moveTo(robot, gx + 560, gy + 22);
+        sleep(1000);
+        typeDummy(robot);
+        sleep(1000);
+
+        moveTo(robot, 125, 328);
+        sleep(1000);
+        rightClick(robot);
+        sleep(1000);
+        moveTo(robot, 150, 560);
+        leftClick(robot); /* remove service */
+        removeService(robot, gx, gy, 0);
+
+        /* group with dummy resources, once again */
+        moveTo(robot, gx, gy);
+        sleep(1000);
+        rightClick(robot); /* popup */
+        moveTo(robot, gx + 46, gy + 11);
+        sleep(1000);
+        leftClick(robot); /* choose group */
+        sleep(3000);
+        rightClick(robot); /* group popup */
+        moveTo(robot, gx + 80, gy + 20);
+        moveTo(robot, gx + 84, gy + 22);
+        moveTo(robot, gx + 560, gy + 22);
+        sleep(1000);
+        typeDummy(robot);
+        sleep(1000);
+
+        removeService(robot, gx, gy, 0);
+
+
+        /* once again */
+        moveTo(robot, gx, gy);
+        sleep(1000);
+        rightClick(robot); /* popup */
+        moveTo(robot, gx + 46, gy + 11);
+        sleep(1000);
+        leftClick(robot); /* choose group */
+        sleep(3000);
         host.checkTest("test1", 2); /* 2 */
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
@@ -420,6 +502,7 @@ public final class RoboTest {
         sleep(1000);
         typeDummy(robot);
         sleep(1000);
+        
         setTimeouts(robot);
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
@@ -427,7 +510,7 @@ public final class RoboTest {
         for (int i = 0; i < 2; i++) {
             /* another group resource */
             sleep(3000);
-            moveTo(robot, gx + 46, gy + 11); 
+            moveTo(robot, gx + 46, gy + 11);
             rightClick(robot); /* group popup */
             sleep(2000 + i * 500);
             moveTo(robot, gx + 80, gy + 20);
@@ -650,9 +733,7 @@ public final class RoboTest {
         /* set clone max to 1 */
         moveTo(robot, 978, 381);
         leftClick(robot); /* Clone Max */
-        press(robot, KeyEvent.VK_1); // TODO: should be backspace, 1
-        press(robot, KeyEvent.VK_LEFT); //TODO remove
-        press(robot, KeyEvent.VK_BACK_SPACE); //TODO remove, once it's fixed
+        press(robot, KeyEvent.VK_BACK_SPACE);
         setTimeouts(robot);
         moveTo(robot, 812, 179);
         sleep(3000);
@@ -797,8 +878,8 @@ public final class RoboTest {
         sleep(5000);
         host.checkTest("test2", 4);
 
-        int dum1PopX = dummy1X + 130;
-        int dum1PopY = dummy1Y + 50;
+        final int dum1PopX = dummy1X + 130;
+        final int dum1PopY = dummy1Y + 50;
         for (int i = 0; i < 1; i++) {
             removeOrder(robot, dum1PopX, dum1PopY);
             sleep(4000);
@@ -822,8 +903,8 @@ public final class RoboTest {
         sleep(5000);
         host.checkTest("test2", 9);
 
-        int dum3PopX = dummy3X + 130;
-        int dum3PopY = dummy3Y - 50;
+        final int dum3PopX = dummy3X + 130;
+        final int dum3PopY = dummy3Y - 50;
         for (int i = 0; i < 2; i++) {
             removeColocation(robot, dum3PopX, dum3PopY);
             sleep(4000);
@@ -851,8 +932,8 @@ public final class RoboTest {
         host.checkTest("test2", 11);
 
         /* ph -> dummy2 */
-        int dum2PopX = dummy2X - 10;
-        int dum2PopY = dummy2Y + 70;
+        final int dum2PopX = dummy2X - 10;
+        final int dum2PopY = dummy2Y + 70;
         removeConstraint(robot, dum2PopX, dum2PopY);
         sleep(4000);
         host.checkTest("test2", 11.1);
@@ -884,8 +965,8 @@ public final class RoboTest {
         host.checkTest("test2", 11.5);
 
         /* dummy4 -> ph */
-        int dum4PopX = dummy4X - 40;
-        int dum4PopY = dummy4Y - 10;
+        final int dum4PopX = dummy4X - 40;
+        final int dum4PopY = dummy4Y - 10;
         removeConstraint(robot, dum4PopX, dum4PopY);
         sleep(4000);
         host.checkTest("test2", 11.6);
@@ -926,7 +1007,7 @@ public final class RoboTest {
         sleep(4000);
         host.checkTest("test2", 11.91);
         /* remove one dummy */
-        removeService(robot, dummy1X, dummy1Y);
+        removeService(robot, dummy1X, dummy1Y, 0);
         sleep(5000);
         host.checkTest("test2", 12);
         if (maybe()) {
@@ -941,14 +1022,14 @@ public final class RoboTest {
             host.checkTest("test2", 13);
 
             /* remove rest of the dummies */
-            removeService(robot, dummy2X, dummy2Y);
+            removeService(robot, dummy2X, dummy2Y, 0);
             sleep(5000);
             host.checkTest("test2", 14);
-            removeService(robot, dummy3X, dummy3Y);
-            removeService(robot, dummy3X, dummy3Y);
+            removeService(robot, dummy3X, dummy3Y, 0);
+            removeService(robot, dummy3X, dummy3Y, 0);
             sleep(5000);
             host.checkTest("test2", 15);
-            removeService(robot, dummy4X, dummy4Y);
+            removeService(robot, dummy4X, dummy4Y, 0);
             sleep(5000);
             host.checkTest("test2", 16);
         } else {
@@ -1142,9 +1223,9 @@ public final class RoboTest {
 
         chooseDummy(robot, dummy1X, dummy1Y);
         //host.checkTest("test5", 2);
-        int dum1PopX = dummy1X + 70;
-        int dum1PopY = dummy1Y + 60;
-        while(true) {
+        final int dum1PopX = dummy1X + 70;
+        final int dum1PopY = dummy1Y + 60;
+        while (true) {
             addConstraint(robot, ph1X, ph1Y, 5, false, -1);
             Tools.sleep(2000);
             removeConstraint(robot, dum1PopX, dum1PopY);
@@ -1174,7 +1255,7 @@ public final class RoboTest {
         moveTo(robot, 1105, 298);
         leftPress(robot); /* scroll bar */
         moveTo(robot, 1105, 550);
-        leftRelease(robot); 
+        leftRelease(robot);
         moveTo(robot, 956, 520);
         leftClick(robot); /* start timeout */
         press(robot, KeyEvent.VK_2);
@@ -1214,7 +1295,7 @@ public final class RoboTest {
 
         leftPress(robot); /* scroll bar back */
         moveTo(robot, 1105, 150);
-        leftRelease(robot); 
+        leftRelease(robot);
     }
 
     /** Sleep for x milliseconds * slowFactor + some random time. */
@@ -1223,7 +1304,7 @@ public final class RoboTest {
         Tools.sleep((int) (x * slowFactor * Math.random()));
     }
 
-    /** Returns maybe true */
+    /** Returns maybe true. */
     private static boolean maybe() {
         if (Math.random() < 0.5) {
             return true;
@@ -1231,7 +1312,7 @@ public final class RoboTest {
         return false;
     }
 
-    /** Create dummy resource */
+    /** Create dummy resource. */
     private static void chooseDummy(final Robot robot,
                                     final int x,
                                     final int y) {
@@ -1252,20 +1333,21 @@ public final class RoboTest {
         leftClick(robot); /* apply */
         sleep(2000);
     }
-    
-    /* Removes service. */
+
+    /** Removes service. */
     private static void removeService(final Robot robot,
                                       final int x,
-                                      final int y) {
+                                      final int y,
+                                      final int corr) {
         moveTo(robot, x + 20, y);
         rightClick(robot);
         sleep(1000);
-        moveTo(robot, x + 40 , y + 250);
+        moveTo(robot, x + 40 , y + 250 + corr);
         leftClick(robot);
         confirmRemove(robot);
     }
 
-    /* Removes placeholder. */
+    /** Removes placeholder. */
     private static void removePlaceHolder(final Robot robot,
                                           final int x,
                                           final int y) {
@@ -1379,7 +1461,7 @@ public final class RoboTest {
         leftClick(robot); /* stop */
     }
 
-    /** Go to the group service menu */
+    /** Go to the group service menu. */
     private static void groupServiceMenu(final Robot robot,
                                          final int x,
                                          final int y,
@@ -1404,9 +1486,9 @@ public final class RoboTest {
         moveTo(robot, x + 20, y + 5);
         sleep(1000);
         if (group) {
-            rightClickGroup(robot); /* popup */ 
+            rightClickGroup(robot); /* popup */
         } else {
-            rightClick(robot); /* popup */ 
+            rightClick(robot); /* popup */
         }
         if (groupService >= 0) {
             groupServiceMenu(robot, x, y, groupService);
@@ -1439,9 +1521,9 @@ public final class RoboTest {
         moveTo(robot, x + 20, y + 5);
         sleep(1000);
         if (group) {
-            rightClickGroup(robot); /* popup */ 
+            rightClickGroup(robot); /* popup */
         } else {
-            rightClick(robot); /* popup */ 
+            rightClick(robot); /* popup */
         }
         moveTo(robot, x + 82, y + 50 + groupcor);
         moveTo(robot, x + 335, y + 50 + groupcor);
@@ -1470,9 +1552,9 @@ public final class RoboTest {
         moveTo(robot, x + 20, y + 5);
         sleep(1000);
         if (group) {
-            rightClickGroup(robot); /* popup */ 
+            rightClickGroup(robot); /* popup */
         } else {
-            rightClick(robot); /* popup */ 
+            rightClick(robot); /* popup */
         }
         moveTo(robot, x + 82, y + 50 + groupcor);
         moveTo(robot, x + 335, y + 50 + groupcor);
@@ -1546,7 +1628,7 @@ public final class RoboTest {
     }
 
     /** TEST 2. */
-    private static void startTest3(final Robot robot, final Host host) {
+    private static void startTest3(final Robot robot) {
         aborted = false;
         /* filesystem/drbd */
         moveTo(robot, 577, 253);
@@ -1623,12 +1705,14 @@ public final class RoboTest {
     }
 
     /** Move to position. */
-    private static void moveTo(final Robot robot, int toX, int toY) {
+    private static void moveTo(final Robot robot,
+                               final int toX,
+                               final int toY) {
         if (aborted) {
             return;
         }
         prevP = null;
-        int xOffset = getOffset();
+        final int xOffset = getOffset();
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
         final int origX = (int) origP.getX();
         final int origY = (int) origP.getY();
@@ -1640,8 +1724,8 @@ public final class RoboTest {
             robot.mouseMove(endX, endY);
             return;
         }
-        int destX = endX;
-        int destY = endY;
+        final int destX = endX;
+        final int destY = endY;
         while (true) {
             if (MouseInfo.getPointerInfo() == null) {
                 return;
@@ -1685,10 +1769,11 @@ public final class RoboTest {
                 while (true) {
                     final Point2D loc =
                        Tools.getGUIData().getMainFrame().getLocationOnScreen();
-                    final Point2D pos = MouseInfo.getPointerInfo().getLocation();
+                    final Point2D pos =
+                                      MouseInfo.getPointerInfo().getLocation();
                     final Point2D newPos = new Point2D.Double(
-                                                       pos.getX() - loc.getX(),
-                                                       pos.getY() - loc.getY());
+                                                      pos.getX() - loc.getX(),
+                                                      pos.getY() - loc.getY());
                     Tools.sleep(200);
                     if (newPos.equals(prevP) && !prevPrevP.equals(prevP)) {
                         Tools.info("moveTo(robot, "

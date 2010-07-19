@@ -47,10 +47,8 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * Object that holds an order constraint information.
  */
 public class ConstraintPHInfo extends ServiceInfo {
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
     /** Name of this object. */
-    public final static String NAME = "Placeholder";
+    public static final String NAME = "Placeholder";
     /** Resource set connection data for colocation. */
     private CRMXML.RscSetConnectionData rscSetConnectionDataCol = null;
     /** Resource set connection data for order. */
@@ -101,13 +99,11 @@ public class ConstraintPHInfo extends ServiceInfo {
     /** Sets connection data to zero. */
     public final void resetRscSetConnectionData() {
         final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
-        if (rodata != null 
-            && rodata.isEmpty()) {
+        if (rodata != null && rodata.isEmpty()) {
             rscSetConnectionDataOrd = null;
         }
         final CRMXML.RscSetConnectionData rcdata = rscSetConnectionDataCol;
-        if (rcdata != null 
-            && rcdata.isEmpty()) {
+        if (rcdata != null && rcdata.isEmpty()) {
             rscSetConnectionDataCol = null;
         }
     }
@@ -427,7 +423,6 @@ public class ConstraintPHInfo extends ServiceInfo {
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
-                infoPanel = null;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getBrowser().getHeartbeatGraph().killRemovedVertices();
@@ -452,7 +447,6 @@ public class ConstraintPHInfo extends ServiceInfo {
                 setUpdated(true);
                 getService().setRemoved(true);
                 getBrowser().removeFromServiceInfoHash(this);
-                infoPanel = null;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getBrowser().getHeartbeatGraph().killRemovedVertices();
@@ -537,7 +531,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                                                 getRscSetConnectionDataCol();
         final CRMXML.RscSetConnectionData rdataOrd =
                                                 getRscSetConnectionDataOrd();
-        CRMXML.RscSet colRscSet1 = null; 
+        CRMXML.RscSet colRscSet1 = null;
         CRMXML.RscSet colRscSet2 = null;
         CRMXML.RscSet ordRscSet1 = null;
         CRMXML.RscSet ordRscSet2 = null;
@@ -556,7 +550,7 @@ public class ConstraintPHInfo extends ServiceInfo {
             ordRscSet1 = rdataOrd.getRscSet1();
             ordRscSet2 = rdataOrd.getRscSet2();
         }
-        if (servicesFrom.size() == 0) {
+        if (servicesFrom.isEmpty()) {
             if (!colocationOnly) {
                 reverseOrder();
             }
@@ -569,7 +563,7 @@ public class ConstraintPHInfo extends ServiceInfo {
         CRMXML.RscSet outColRscSet1 = null;
         CRMXML.RscSet outColRscSet2 = null;
         for (final ServiceInfo serviceInfo : servicesAll) {
-            boolean isFrom = servicesFrom.contains(serviceInfo);
+            final boolean isFrom = servicesFrom.contains(serviceInfo);
             final String idToAdd = serviceInfo.getService().getHeartbeatId();
             if (!orderOnly) {
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
@@ -697,7 +691,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                     }
                 }
             }
-            
+
             if (!colocationOnly) {
                 /* order */
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
@@ -835,7 +829,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
             final Map<CRMXML.RscSet, Map<String, String>> rscSetsOrdAttrs =
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
-                                                
+
             rscSetsColAttrs.put(outColRscSet2, null);
             rscSetsColAttrs.put(outColRscSet1, null);
             rscSetsOrdAttrs.put(outOrdRscSet1, null);
@@ -884,7 +878,6 @@ public class ConstraintPHInfo extends ServiceInfo {
         }
         if (this.pcmkRscSetsInfo != pcmkRscSetsInfo) {
             this.pcmkRscSetsInfo = pcmkRscSetsInfo;
-            infoPanel = null;
         }
         mPcmkRscSetsLock.release();
     }
@@ -926,7 +919,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 && (rdataCol == null || rdataCol.isEmpty());
     }
 
-    /** Returns attributes for resource_set tag */
+    /** Returns attributes for resource_set tag. */
     public final void getAttributes(
                   final boolean isCol,
                   final boolean first,

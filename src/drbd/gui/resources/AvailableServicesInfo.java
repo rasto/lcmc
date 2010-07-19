@@ -26,6 +26,7 @@ import drbd.gui.ClusterBrowser;
 import drbd.utilities.MyButton;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * This class holds the information about available resource agent classes.
@@ -51,7 +52,7 @@ public class AvailableServicesInfo extends HbCategoryInfo {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final String cl : ClusterBrowser.HB_CLASSES) {
-            final MyButton className = new MyButton(cl.toUpperCase());
+            final MyButton className = new MyButton(cl.toUpperCase(Locale.US));
             rows.add(new Object[]{className,
                                   ClusterBrowser.HB_CLASS_MENU.get(cl)});
         }
@@ -63,7 +64,7 @@ public class AvailableServicesInfo extends HbCategoryInfo {
      */
     protected final void rowClicked(final String tableName, final String key) {
         final ResourceAgentClassInfo raci =
-                               getBrowser().getClassInfoMap(key.toLowerCase());
+                     getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
         if (raci != null) {
             raci.selectMyself();
         }

@@ -732,7 +732,7 @@ public class Info implements Comparable {
                 i.setPos(pos);
                 i.update();
             }
-            int size = menuList.size();
+            final int size = menuList.size();
             mMenuListLock.release();
             if (size > maxMenuList) {
                 maxMenuList = size;
@@ -750,7 +750,7 @@ public class Info implements Comparable {
                 i.setPos(pos);
                 i.update();
             }
-            int aSize = actionMenuList.size();
+            final int aSize = actionMenuList.size();
             mActionMenuListLock.release();
             if (aSize > maxMenuList) {
                 maxMenuList = aSize;

@@ -1677,7 +1677,8 @@ public class SSH {
         final int index = remoteFilename.lastIndexOf('/');
         if (index > 0) {
             final String dir = remoteFilename.substring(0, index + 1);
-            commands.append("mkdir -p " + dir);
+            commands.append("mkdir -p ");
+            commands.append(dir);
             commands.append(';');
         }
         if  (!isConnected()) {

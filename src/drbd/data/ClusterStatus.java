@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
@@ -514,7 +515,7 @@ public class ClusterStatus {
      * "yes", "no" or null if it is unknown.
      */
     public final String isOnlineNode(final String node) {
-        return cibQueryMap.getNodeOnline().get(node.toLowerCase());
+        return cibQueryMap.getNodeOnline().get(node.toLowerCase(Locale.US));
     }
 
     /**
@@ -522,7 +523,7 @@ public class ClusterStatus {
      * "yes", "no" or null if it is unknown.
      */
     public final void setOnlineNode(final String node, final String online) {
-        cibQueryMap.getNodeOnline().put(node.toLowerCase(), online);
+        cibQueryMap.getNodeOnline().put(node.toLowerCase(Locale.US), online);
     }
 
 
@@ -532,7 +533,7 @@ public class ClusterStatus {
      public final String getFailCount(final String node,
                                       final String res,
                                       final boolean testOnly) {
-         return cibQueryMap.getFailCount(node.toLowerCase(), res);
+         return cibQueryMap.getFailCount(node.toLowerCase(Locale.US), res);
      }
 
      /**
@@ -550,7 +551,7 @@ public class ClusterStatus {
         if (nodeParams == null) {
             return null;
         } else {
-            return (String) nodeParams.get(node.toLowerCase(), param);
+            return (String) nodeParams.get(node.toLowerCase(Locale.US), param);
         }
     }
 

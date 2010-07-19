@@ -161,7 +161,7 @@ public class GuiComboBox extends JPanel {
                        final Object[] items,
                        final Unit[] units,
                        final Type type,
-                       String regexp,
+                       final String regexp,
                        final int width,
                        final Map<String, String> abbreviations,
                        final ConfigData.AccessType enableAccessType) {

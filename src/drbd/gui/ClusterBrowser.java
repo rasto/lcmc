@@ -91,6 +91,7 @@ import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
+import java.util.Locale;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.collections.map.LinkedMap;
@@ -1549,9 +1550,9 @@ public class ClusterBrowser extends Browser {
     public final boolean isStandby(final Host host, final boolean testOnly) {
         // TODO: make it more efficient
         return "on".equals(clusterStatus.getNodeParameter(
-                                                   host.getName().toLowerCase(),
-                                                   "standby",
-                                                   testOnly));
+                                       host.getName().toLowerCase(Locale.US),
+                                       "standby",
+                                       testOnly));
     }
 
     /**
@@ -1755,7 +1756,7 @@ public class ClusterBrowser extends Browser {
         mNameToServiceLock.release();
     }
 
-    /** Returns nameToServiceInfoHash for the specified service. 
+    /** Returns nameToServiceInfoHash for the specified service.
      *  You must lock it when you use it. */
     public final Map<String, ServiceInfo> getNameToServiceInfoHash(
                                                         final String name) {

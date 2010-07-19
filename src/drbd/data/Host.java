@@ -2309,7 +2309,6 @@ public class Host implements Serializable {
         command.append(' ');
         final String indexString =
                             Double.toString(index).replaceFirst("\\.0+$", "");
-        
         command.append(indexString);
         for (final Host host : getCluster().getHosts()) {
             command.append(' ');

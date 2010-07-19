@@ -779,7 +779,7 @@ public class CheckInstallation extends DialogHost {
                    getHost().getDistString("DrbdInst.install.method." + index);
             if (method == null) {
                 method = "";
-            } 
+            }
             final InstallMethods drbdInstallMethod = new InstallMethods(
               Tools.getString("Dialog.Host.CheckInstallation.DrbdInstallMethod")
                + text, i, method);

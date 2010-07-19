@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import javax.swing.JComponent;
@@ -236,7 +237,8 @@ public class CloneInfo extends ServiceInfo {
         final Map<String, String> notRunningOnNodes =
                                         new LinkedHashMap<String, String>();
         for (final Host h : getBrowser().getClusterHosts()) {
-            notRunningOnNodes.put(h.getName().toLowerCase(), h.getName());
+            notRunningOnNodes.put(h.getName().toLowerCase(Locale.US),
+                                  h.getName());
         }
         texts.add(new Subtext(toString(), null));
         final ServiceInfo cs = getContainedService();
@@ -274,7 +276,7 @@ public class CloneInfo extends ServiceInfo {
                 texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                       + getFailCountString(n, testOnly),
                                       colors.get(i)));
-                notRunningOnNodes.remove(n.toLowerCase());
+                notRunningOnNodes.remove(n.toLowerCase(Locale.US));
                 i++;
             }
         }
@@ -294,7 +296,7 @@ public class CloneInfo extends ServiceInfo {
                     texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                           + getFailCountString(n, testOnly),
                                           colors.get(i)));
-                    notRunningOnNodes.remove(n.toLowerCase());
+                    notRunningOnNodes.remove(n.toLowerCase(Locale.US));
                     i++;
                 }
             }

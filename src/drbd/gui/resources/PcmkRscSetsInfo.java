@@ -46,13 +46,9 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * It can be order, colocation or both.
  */
 public class PcmkRscSetsInfo extends HbConnectionInfo {
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
     /** Placeholders. */
     private final Set<ConstraintPHInfo> constraintPHInfos =
                                           new LinkedHashSet<ConstraintPHInfo>();
-    /** Selected placeholder. */
-    private ConstraintPHInfo selectedConstaintPHInfo = null;
     /** constraints lock. */
     private final Mutex mConstraintPHLock = new Mutex();
 
@@ -102,7 +98,6 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     /** Returns info panel. */
     public final JComponent getInfoPanel(
                                     final ConstraintPHInfo constraintPHInfo) {
-        selectedConstaintPHInfo = constraintPHInfo;
         return super.getInfoPanel();
     }
 
@@ -144,7 +139,9 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
         } else {
             for (int i = allCphis.size() - 1; i >= 0; i--) {
                 for (final Boolean first : new Boolean[]{true, false}) {
-                    allCphis.get(i).getAttributes(isColocation, first, rscSetsAttrs);
+                    allCphis.get(i).getAttributes(isColocation,
+                                                  first,
+                                                  rscSetsAttrs);
                 }
             }
         }
@@ -250,7 +247,6 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
                         rscSetsCol.add(childSets.get(1)); /* col2 */
                         rscSetsOrd.add(0, childSets.get(2)); /* ord1 */
                     }
-                    
                 } else {
                     rscSetsCol.add(sets.get(1)); /* col2 */
                     rscSetsOrd.add(0, sets.get(2)); /* ord2 */

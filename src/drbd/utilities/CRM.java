@@ -86,11 +86,12 @@ public final class CRM {
                  "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
                  + "if [ ! -e $file ]; then /usr/sbin/cibadmin -Ql > $file;fi;"
                  + "export CIB_file=$file; ";
-            SSH.SSHOutput out = Tools.execCommand(host,
-                                     testCmd + command,
-                                     null,
-                                     false,
-                                     SSH.DEFAULT_COMMAND_TIMEOUT);
+            final SSH.SSHOutput out = Tools.execCommand(
+                                                 host,
+                                                 testCmd + command,
+                                                 null,
+                                                 false,
+                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             return out;
         } else {
             Tools.debug(null, "CRM.java: crm command: " + command, 1);
@@ -401,11 +402,11 @@ public final class CRM {
             if (orderAction != null) {
                 attrs.put("action", orderAction);
             }
-            String sequential = rscSet.getSequential();
+            final String sequential = rscSet.getSequential();
             if (sequential != null) {
                 attrs.put("sequential", sequential);
             }
-        } 
+        }
         for (final String attr : attrs.keySet()) {
             final String value = attrs.get(attr);
             if ("".equals(value)) {
@@ -448,13 +449,13 @@ public final class CRM {
             } else {
                 cibadminOpt = "-R";
             }
-            boolean ret = setRscSetConstraint(host,
-                                              "rsc_colocation",
-                                              colId,
-                                              rscSetsColAttrs,
-                                              attrs,
-                                              cibadminOpt,
-                                              testOnly);
+            final boolean ret = setRscSetConstraint(host,
+                                                    "rsc_colocation",
+                                                    colId,
+                                                    rscSetsColAttrs,
+                                                    attrs,
+                                                    cibadminOpt,
+                                                    testOnly);
             if (!ret) {
                 return false;
             }

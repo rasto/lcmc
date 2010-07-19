@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -718,7 +719,7 @@ public class DrbdXML extends XML {
                         String option = getText(optionInfo);
                         if (!"s".equals(option)) {
                             /* "s" is an exception */
-                            option = option.toUpperCase();
+                            option = option.toUpperCase(Locale.US);
                         }
                         paramDefaultUnitMap.put(name, option);
                     } else if ("desc".equals(tag)) {

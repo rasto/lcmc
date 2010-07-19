@@ -756,12 +756,4 @@ public class DrbdInfo extends EditableInfo {
             getBrowser().resetFilesystems();
         }
     }
-
-    /**
-     * Removes this drbd info.
-     * TODO: is not called yet
-     */
-    public void removeMyself(final boolean testOnly) {
-        super.removeMyself(testOnly);
-    }
 }

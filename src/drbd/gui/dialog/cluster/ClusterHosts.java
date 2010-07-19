@@ -71,8 +71,8 @@ public class ClusterHosts extends DialogCluster {
     /** Host not checked icon. */
     private static final ImageIcon HOST_UNCHECKED_ICON = Tools.createImageIcon(
             Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
-    /** Whether the scrolling pane was already moved. */
-    private volatile boolean alreadyMoved = false;
+    ///** Whether the scrolling pane was already moved. */
+    //private volatile boolean alreadyMoved = false;
 
     /**
      * Prepares a new <code>ClusterHosts</code> object.
@@ -285,9 +285,7 @@ public class ClusterHosts extends DialogCluster {
         return sp;
     }
 
-    /**
-     * Workaround so that flow layout scrolls right.
-     */
+    /** Workaround so that flow layout scrolls right. */
     private class ScrollableFlowPanel extends JPanel
                                              implements Scrollable {
         private static final long serialVersionUID = 1L;
