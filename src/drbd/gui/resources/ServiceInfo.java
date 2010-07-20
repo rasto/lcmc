@@ -2993,7 +2993,8 @@ public class ServiceInfo extends EditableInfo {
                         continue;
                     }
                     final String value = gInfo.getComboBoxValue(param);
-                    if (value.equals(gInfo.getParamDefault(param))) {
+                    if (value == null
+                        || value.equals(gInfo.getParamDefault(param))) {
                         continue;
                     }
                     if (!"".equals(value)) {
