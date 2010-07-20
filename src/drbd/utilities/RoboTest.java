@@ -459,7 +459,7 @@ public final class RoboTest {
         typeDummy(robot);
         sleep(1000);
 
-        moveTo(robot, 125, 328);
+        moveTo(robot, 125, 320);
         sleep(1000);
         rightClick(robot);
         sleep(1000);
@@ -529,8 +529,82 @@ public final class RoboTest {
         host.checkTest("test1", 3); /* 3 */
         /* constraints */
         addConstraint(robot, gx, gy, 0, true, -1);
+        host.checkTest("test1", 3.1); /* 3.1 */
+
+        /* same as */
+        moveTo(robot, 125, 345);
+        sleep(1000);
+        leftClick(robot);
+        sleep(1000);
+        moveTo(robot, 1078 , 612);
+        leftClick(robot);
+        sleep(1000);
+        moveTo(robot, 1078 , 670);
+        leftClick(robot); /* choose another dummy */
+        sleep(1000);
+        moveTo(robot, 809, 192); /* ptest */
+        sleep(4000);
+        leftClick(robot); /* apply */
+        sleep(4000);
+        host.checkTest("test1", 3.2); /* 3.2 */
+
+        moveTo(robot, 1078 , 612);
+        leftClick(robot);
+        sleep(1000);
+        moveTo(robot, 1078 , 642);
+        leftClick(robot); /* choose "nothing selected */
+        sleep(1000);
+        moveTo(robot, 809, 192); /* ptest */
+        sleep(4000);
+        leftClick(robot); /* apply */
         sleep(5000);
         host.checkTest("test1", 4); /* 4 */
+
+        /* locations */
+        moveTo(robot, ipX + 20, ipY);
+        leftClick(robot); /* choose ip */
+        setLocation(robot, new Integer[]{KeyEvent.VK_I});
+        sleep(3000);
+        host.checkTest("test1", 4.1); /* 4.1 */
+
+        setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_MINUS,
+                                         KeyEvent.VK_I});
+        
+        sleep(3000);
+        host.checkTest("test1", 4.2); /* 4.2 */
+
+        setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_PLUS});
+        sleep(3000);
+        host.checkTest("test1", 4.3); /* 4.3 */
+
+        setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE,
+                                         KeyEvent.VK_BACK_SPACE});
+        sleep(3000);
+        host.checkTest("test1", 4.4); /* 4.4 */
 
         removeConstraint(robot, popX, popY);
         sleep(3000);
@@ -1233,6 +1307,28 @@ public final class RoboTest {
 
     }
 
+    /** Sets location. */
+    private static void setLocation(final Robot robot, final Integer[] events) {
+        moveTo(robot, 1041 , 615);
+        leftClick(robot);
+        sleep(1000);
+        for (final int ev : events) {
+            if (ev == KeyEvent.VK_PLUS) {
+                robot.keyPress(KeyEvent.VK_SHIFT);
+                sleep(200);
+            }
+            press(robot, ev);
+            sleep(200);
+            if (ev == KeyEvent.VK_PLUS) {
+                robot.keyRelease(KeyEvent.VK_SHIFT);
+                sleep(200);
+            }
+        }
+        moveTo(robot, 809, 192); /* ptest */
+        sleep(4000);
+        leftClick(robot); /* apply */
+        sleep(2000);
+    }
 
     /** Choose dummy resource. */
     private static void typeDummy(final Robot robot) {
