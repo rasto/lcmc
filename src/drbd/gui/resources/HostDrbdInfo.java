@@ -351,7 +351,7 @@ public class HostDrbdInfo extends Info {
                                             "asdf",
                                             host.getPmColors()[0]);
                     if (newColor != null) {
-                        host.setColor(newColor);
+                        host.setSavedColor(newColor);
                     }
                 }
             };

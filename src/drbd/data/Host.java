@@ -130,7 +130,9 @@ public class Host implements Serializable {
     private Map<String, BlockDevice> blockDevices =
                                       new LinkedHashMap<String, BlockDevice>();
     /** Color of this host in graphs. */
-    private Color color;
+    private Color defaultColor;
+    /** Color of this host in graphs. */
+    private Color savedColor;
     /** Thread where drbd status command is running. */
     private ExecCommandThread drbdStatusThread = null;
     /** Thread where hb status command is running. */
@@ -256,20 +258,26 @@ public class Host implements Serializable {
      * Returns color objects of this host for drbd graph.
      */
     public final Color[] getDrbdColors() {
-        if (color == null) {
-            color = Tools.getDefaultColor("Host.DefaultColor");
+        if (defaultColor == null) {
+            defaultColor = Tools.getDefaultColor("Host.DefaultColor");
         }
+        Color col;
         Color secColor;
+        if (savedColor == null) {
+            col = defaultColor;
+        } else {
+            col = savedColor;
+        }
         if (!isConnected()) {
             secColor = Tools.getDefaultColor("Host.ErrorColor");
         } else {
             if (isDrbdStatus() && isDrbdLoaded()) {
-                return new Color[]{color};
+                return new Color[]{col};
             } else {
                 secColor = Tools.getDefaultColor("Host.NoStatusColor");
             }
         }
-        return new Color[]{color, secColor};
+        return new Color[]{col, secColor};
     }
 
 
@@ -277,27 +285,42 @@ public class Host implements Serializable {
      * Returns color objects of this host.
      */
     public final Color[] getPmColors() {
-        if (color == null) {
-            color = Tools.getDefaultColor("Host.DefaultColor");
+        if (defaultColor == null) {
+            defaultColor = Tools.getDefaultColor("Host.DefaultColor");
         }
+        Color col;
         Color secColor;
+        if (savedColor == null) {
+            col = defaultColor;
+        } else {
+            col = savedColor;
+        }
         if (!isConnected()) {
             secColor = Tools.getDefaultColor("Host.ErrorColor");
         } else {
             if (isClStatus()) {
-                return new Color[]{color};
+                return new Color[]{col};
             } else {
                 secColor = Tools.getDefaultColor("Host.NoStatusColor");
             }
         }
-        return new Color[]{color, secColor};
+        return new Color[]{col, secColor};
     }
 
-    /**
-     * Sets color of the host.
-     */
-    public final void setColor(final Color color) {
-        this.color = color;
+    /** Sets color of the host. */
+    public final void setColor(final Color defaultColor) {
+        this.defaultColor = defaultColor;
+        if (savedColor == null) {
+            savedColor = defaultColor;
+        }
+        if (terminalPanel != null) {
+            terminalPanel.resetPromptColor();
+        }
+    }
+
+    /** Sets color of the host, when it was saved. */
+    public final void setSavedColor(final Color savedColor) {
+        this.savedColor = savedColor;
         if (terminalPanel != null) {
             terminalPanel.resetPromptColor();
         }
@@ -2330,5 +2353,22 @@ public class Host implements Serializable {
         }
         Tools.info(test + " " + index + " " + out.getOutput());
         return out.getExitCode() == 0;
+    }
+
+    /** Returns color of this host. Null if it is default color. */
+    final public String getColor() {
+        if (defaultColor == savedColor) {
+            return null;
+        }
+        return Integer.toString(savedColor.getRGB());
+    }
+
+    /** Returns color of this host. Don't if it is default color. */
+    final public void setSavedColor(final String colorString) {
+        try {
+            savedColor = new Color(Integer.parseInt(colorString));
+        } catch (java.lang.NumberFormatException e) {
+            /* ignore it */
+        }
     }
 }

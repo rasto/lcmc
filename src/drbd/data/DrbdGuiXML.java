@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.awt.Color;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -65,6 +66,8 @@ public class DrbdGuiXML extends XML {
     private static final String HOST_NAME_ATTR = "name";
     /** Host ssh port attribute string. */
     private static final String HOST_SSHPORT_ATTR = "ssh";
+    /** Host color attribute string. */
+    private static final String HOST_COLOR_ATTR = "color";
     /** Host use sudo attribute string. */
     private static final String HOST_USESUDO_ATTR = "sudo";
     /** Cluster name attribute string. */
@@ -111,10 +114,14 @@ public class DrbdGuiXML extends XML {
             final String username = host.getUsername();
             final String sshPort = host.getSSHPort();
             final Boolean useSudo = host.isUseSudo();
+            final String color = host.getColor();
             final Element hostNode = (Element) hosts.appendChild(
                                         doc.createElement(HOST_NODE_STRING));
             hostNode.setAttribute(HOST_NAME_ATTR, hostName);
             hostNode.setAttribute(HOST_SSHPORT_ATTR, sshPort);
+            if (color != null) {
+                hostNode.setAttribute(HOST_COLOR_ATTR, color);
+            }
             if (useSudo != null && useSudo) {
                 hostNode.setAttribute(HOST_USESUDO_ATTR, "true");
             }
@@ -244,6 +251,9 @@ public class DrbdGuiXML extends XML {
                             final String sshPort =
                                                 getAttribute(hostNode,
                                                              HOST_SSHPORT_ATTR);
+                            final String color =
+                                                getAttribute(hostNode,
+                                                             HOST_COLOR_ATTR);
                             final String useSudo =
                                                 getAttribute(hostNode,
                                                              HOST_USESUDO_ATTR);
@@ -259,6 +269,9 @@ public class DrbdGuiXML extends XML {
                                 host.setSSHPort(sshPort);
                                 Tools.getConfigData().setLastEnteredSSHPort(
                                                                       sshPort);
+                            }
+                            if (color != null) {
+                                host.setSavedColor(color);
                             }
                             Boolean sudo = false;
                             if (sudo != null) {
