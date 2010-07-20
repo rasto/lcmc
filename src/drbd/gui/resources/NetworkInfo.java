@@ -49,9 +49,9 @@ public class NetworkInfo extends Info {
      * Returns network info.
      */
     public final String getInfo() {
-        final String ret = "Net info: " + getNetwork().getName() + "\n"
-                           + "     IPs: " + getNetwork().getIps()  + "\n"
-                           + "Net mask: " + getNetwork().getNetMask()
+        final String ret = "Network: " + getNetwork().getName()
+                           + "\n    IPs: " + getNetwork().getIps()
+                           + "\nNetmask: " + getNetwork().getNetMask()
                            + "\n";
         return ret;
     }

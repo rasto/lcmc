@@ -77,7 +77,7 @@ class IPaddrInfo extends ServiceInfo {
         cb.selectSubnet();
         if (ret) {
             final String ip = cb.getStringValue();
-            if (!Tools.checkIp(ip)) {
+            if (!Tools.isIp(ip)) {
                 ret = false;
             }
         }

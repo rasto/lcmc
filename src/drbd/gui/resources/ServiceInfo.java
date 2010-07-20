@@ -1881,7 +1881,7 @@ public class ServiceInfo extends EditableInfo {
                                  final String newValue) {
         if (param.equals("ip")
             && newValue != null
-            && !Tools.checkIp(newValue)) {
+            && !Tools.isIp(newValue)) {
             return false;
         }
         final CRMXML crmXML = getBrowser().getCRMXML();

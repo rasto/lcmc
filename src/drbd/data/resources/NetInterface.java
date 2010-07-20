@@ -92,55 +92,69 @@ public class NetInterface extends Resource {
         this.netMask = netMask;
     }
 
-    /**
-     * Returns mac address.
-     */
+    /** Returns mac address. */
     public final String getMacAddr() {
         return macAddr;
     }
 
-    /**
-     * Returns ip.
-     */
+    /** Returns ip. */
     public final String getIp() {
         return ip;
     }
 
-    /**
-     * Returns network mask.
-     */
-    public final String getNetMask() {
+    /** Returns network mask. */
+    public final String getNetmask() {
         return netMask;
     }
 
+    ///**
+    // * Returns network ip. The ip has '*' instead of bytes, that are
+    // * not part of the network. e.g. 192.168.1.1 and mask 255.255.255.0 gives
+    // * 192.168.1.*
+    // */
+    //public final String getNetworkIp() {
+    //    if (netMask == null) {
+    //        return null;
+    //    }
+    //    final String[] ipParts = ip.split("\\.");
+    //    final String[] netMaskParts = netMask.split("\\.");
+    //    if (ipParts.length != 4 && netMaskParts.length != 4) {
+    //        return "";
+    //    }
+    //    final String[] networkIpParts = new String[4];
+    //    for (int i = 0; i < 4; i++) {
+    //        if (netMaskParts[i].equals("255")) {
+    //            networkIpParts[i] = ipParts[i];
+    //        } else {
+    //            networkIpParts[i] = "*";
+    //        }
+    //    }
+    //    return Tools.join(".", networkIpParts);
+    //}
+
     /**
-     * Returns network ip. The ip has '*' instead of bytes, that are
-     * not part of the network. e.g. 192.168.1.1 and mask 255.255.255.0 gives
-     * 192.168.1.*
+     * Returns first ip in the network. 
+     * e.g. 192.168.1.1 and mask 255.255.255.0 gives * 192.168.1.0.
      */
     public final String getNetworkIp() {
-        final String[] ipParts = ip.split("\\.");
         if (netMask == null) {
             return null;
         }
+        final String[] ipParts = ip.split("\\.");
         final String[] netMaskParts = netMask.split("\\.");
         String[] networkIpParts = new String[4];
         if (ipParts.length != 4 && netMaskParts.length != 4) {
             return "";
         }
         for (int i = 0; i < 4; i++) {
-            if (netMaskParts[i].equals("255")) {
-                networkIpParts[i] = ipParts[i];
-            } else {
-                networkIpParts[i] = "*";
-            }
+            networkIpParts[i] = Integer.toString(
+                                         Integer.parseInt(ipParts[i])
+                                         & Integer.parseInt(netMaskParts[i]));
         }
         return Tools.join(".", networkIpParts);
     }
 
-    /**
-     * Returns value for parameter.
-     */
+    /** Returns value for parameter. */
     public final String getValue(final String parameter) {
         if ("ip".equals(parameter)) {
             return ip;
@@ -153,9 +167,7 @@ public class NetInterface extends Resource {
         }
     }
 
-    /**
-     * Returns bindnetaddr.
-     */
+    /** Returns bindnetaddr. */
     public final String getBindnetaddr() {
         final String[] ipParts = ip.split("\\.");
         if (netMask == null) {

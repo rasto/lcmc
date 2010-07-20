@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import java.awt.Color;
 import java.awt.Window;
@@ -232,20 +233,23 @@ public class Cluster {
      * Gets networks that are common on all hosts in the cluster.
      */
     public final Network[] getCommonNetworks() {
-        List<String> networksIntersection = null;
+        Map<String, String> networksIntersection = null;
         for (final Host host : hosts) {
             networksIntersection =
                             host.getNetworksIntersection(networksIntersection);
         }
 
         final List<Network> commonNetworks = new ArrayList<Network>();
-        for (final String netIp : networksIntersection) {
+        for (final String netIp : networksIntersection.keySet()) {
             final List<String> ips = new ArrayList<String>();
             for (final Host host : hosts) {
                 ips.addAll(host.getIpsFromNetwork(netIp));
             }
+            final String netMask = networksIntersection.get(netIp);
             final Network network =
-                    new Network(netIp, ips.toArray(new String[ips.size()]));
+                            new Network(netIp,
+                                        ips.toArray(new String[ips.size()]),
+                                        netMask);
             commonNetworks.add(network);
         }
 

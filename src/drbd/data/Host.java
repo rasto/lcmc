@@ -466,39 +466,35 @@ public class Host implements Serializable {
     /**
      * Returns network ips as array list.
      */
-    public final List<String> getNetworkIps() {
-        final List<String> networkIps = new ArrayList<String>();
+    public final Map<String, String> getNetworkIps() {
+        final Map<String, String> networkIps =
+                                         new LinkedHashMap<String, String>();
         for (final NetInterface ni : netInterfaces.values()) {
             final String netIp = ni.getNetworkIp();
-            if (!networkIps.contains(netIp)) {
-                networkIps.add(netIp);
-            }
+            networkIps.put(netIp, ni.getNetmask());
         }
         return networkIps;
     }
 
-    /**
-     * Returns list of networks that exist on all hosts.
-     */
-    public final List<String> getNetworksIntersection(
-                                        final List<String> otherNetworkIps) {
-        final List<String> networksIntersection = new ArrayList<String>();
+    /** Returns list of networks that exist on all hosts. */
+    public final Map<String, String> getNetworksIntersection(
+                                   final Map<String, String> otherNetworkIps) {
         if (otherNetworkIps == null) {
             return getNetworkIps();
         }
+        final Map<String, String> networksIntersection =
+                                           new LinkedHashMap<String, String>();
         for (final NetInterface ni : netInterfaces.values()) {
             final String networkIp = ni.getNetworkIp();
-            if (otherNetworkIps.contains(networkIp)
-                && !networksIntersection.contains(networkIp)) {
-                networksIntersection.add(networkIp);
+            if (otherNetworkIps.containsKey(networkIp)
+                && !networksIntersection.containsKey(networkIp)) {
+                networksIntersection.put(networkIp, ni.getNetmask());
             }
         }
         return networksIntersection;
     }
 
-    /**
-     * Returns ips that belong the the network.
-     */
+    /** Returns ips that belong the the network. */
     public final List<String> getIpsFromNetwork(final String netIp) {
         final List<String> networkIps = new ArrayList<String>();
         for (final NetInterface ni : netInterfaces.values()) {

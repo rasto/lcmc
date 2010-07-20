@@ -47,29 +47,12 @@ public class Network extends Resource {
      * @param ips
      *          ips that are in the network
      */
-    public Network(final String name, final String[] ips) {
+    public Network(final String name,
+                   final String[] ips,
+                   final String netMask) {
         super(name);
         this.ips = ips;
-        this.netMask = convertNetMaskFromNetworkIp(name);
-    }
-
-    /**
-     * Converts ip with '*' instead of ip parts, to the netmask format.
-     */
-    private String convertNetMaskFromNetworkIp(final String networkIp) {
-        String[] netMaskParts = new String[4];
-        final String[] networkIpParts = networkIp.split("\\.");
-        if (networkIpParts.length != 4) {
-            return "";
-        }
-        for (int i = 0; i < 4; i++) {
-            if (networkIpParts[i].equals("*")) {
-                netMaskParts[i] = "0";
-            } else {
-                netMaskParts[i] = "255";
-            }
-        }
-        return Tools.join(".", netMaskParts);
+        this.netMask = netMask;
     }
 
     /**

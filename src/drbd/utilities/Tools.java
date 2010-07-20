@@ -678,7 +678,7 @@ public final class Tools {
      *
      * @return whether string is ip or not.
      */
-    public static boolean checkIp(final String ipString) {
+    public static boolean isIp(final String ipString) {
         boolean wasValid = true;
         // Inet4Address ip;
         Pattern pattern = null;

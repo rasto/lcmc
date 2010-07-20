@@ -1109,8 +1109,14 @@ public class GuiComboBox extends JPanel {
             case COMBOBOX:
                 final JTextComponent tc = getTextComponent();
                 final String ip = tc.getText();
-                final int pos = ip.indexOf('*');
-                if (pos >= 0) {
+                int p = ip.length() - 2;
+                while (p >= 0
+                       && Tools.isIp(ip)
+                       && ".0".equals(ip.substring(p, p + 2))) {
+                    p -= 2;
+                }
+                final int pos = p + 3;
+                if (pos >= 0 && pos < ip.length()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             tc.select(pos, ip.length());
