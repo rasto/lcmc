@@ -2357,13 +2357,13 @@ public class Host implements Serializable {
 
     /** Returns color of this host. Null if it is default color. */
     final public String getColor() {
-        if (defaultColor == savedColor) {
+        if (savedColor == null || defaultColor == savedColor) {
             return null;
         }
         return Integer.toString(savedColor.getRGB());
     }
 
-    /** Returns color of this host. Don't if it is default color. */
+    /** Sets color of this host. Don't if it is default color. */
     final public void setSavedColor(final String colorString) {
         try {
             savedColor = new Color(Integer.parseInt(colorString));
