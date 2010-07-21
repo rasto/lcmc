@@ -285,6 +285,7 @@ public final class RoboTest {
                     return;
                 }
                 if (index == 1) {
+                    /* pacemaker */
                     int i = 1;
                     while (!aborted) {
                         final long startTime = System.currentTimeMillis();
@@ -297,6 +298,7 @@ public final class RoboTest {
                         i++;
                     }
                 } else if (index == 2) {
+                    /* resource sets */
                     int i = 1;
                     while (!aborted) {
                         final long startTime = System.currentTimeMillis();
@@ -309,6 +311,7 @@ public final class RoboTest {
                         i++;
                     }
                 } else if (index == 3) {
+                    /* pacemaker drbd */
                     final int i = 1;
                     final long startTime = System.currentTimeMillis();
                     Tools.info("test" + index + " no " + i);
@@ -318,6 +321,7 @@ public final class RoboTest {
                     Tools.info("test" + index + " no " + i + ", secs: "
                                + secs);
                 } else if (index == 4) {
+                    /* placeholders 6 dummies */
                     final int i = 1;
                     final long startTime = System.currentTimeMillis();
                     Tools.info("test" + index + " no " + i);
@@ -329,6 +333,7 @@ public final class RoboTest {
                 } else if (index == 5) {
                     int i = 1;
                     while (true) {
+                        /* pacemaker */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index + " no " + i);
                         startTest5(robot, host);
@@ -341,6 +346,7 @@ public final class RoboTest {
                 } else if (index == 6) {
                     int i = 1;
                     while (true) {
+                        /* pacemaker */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index + " no " + i);
                         startTest6(robot, host);
@@ -351,6 +357,7 @@ public final class RoboTest {
                         i++;
                     }
                 } else if (index == 9) {
+                    /* all pacemaker tests */
                     int i = 1;
                     while (true) {
                         final long startTime = System.currentTimeMillis();
@@ -463,7 +470,7 @@ public final class RoboTest {
         sleep(1000);
         rightClick(robot);
         sleep(1000);
-        moveTo(robot, 150, 560);
+        moveTo(robot, 150, 555);
         leftClick(robot); /* remove service */
         removeService(robot, gx, gy, 0);
 
@@ -808,6 +815,8 @@ public final class RoboTest {
         moveTo(robot, 978, 381);
         leftClick(robot); /* Clone Max */
         press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(200);
+        press(robot, KeyEvent.VK_1);
         setTimeouts(robot);
         moveTo(robot, 812, 179);
         sleep(3000);
@@ -889,10 +898,6 @@ public final class RoboTest {
 
     /** Disable stonith if it is enabled. */
     private static void disableStonith(final Robot robot, final Host host) {
-        moveTo(robot, 8, 788);
-        leftClick(robot); /* expand terminal area */
-        moveTo(robot, 70, 250);
-        leftClick(robot); /* choose cluster */
         moveTo(robot, 271, 250);
         leftClick(robot); /* global options */
         final String stonith = host.getCluster().getBrowser()
@@ -1723,7 +1728,7 @@ public final class RoboTest {
         leftClick(robot); /* add col */
     }
 
-    /** TEST 2. */
+    /** TEST 3. */
     private static void startTest3(final Robot robot) {
         aborted = false;
         /* filesystem/drbd */

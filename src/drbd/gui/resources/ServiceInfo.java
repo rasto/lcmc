@@ -3727,12 +3727,13 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         final String rscId = getHeartbeatId(testOnly);
-        CRM.cleanupResource(dcHost,
-                            rscId,
-                            dirtyHosts.toArray(new Host[dirtyHosts.size()]),
-                            testOnly);
         final Set<String> failedClones = cs.getFailedClones(rscId, testOnly);
-        if (failedClones != null) {
+        if (failedClones == null) {
+            CRM.cleanupResource(dcHost,
+                                rscId,
+                                dirtyHosts.toArray(new Host[dirtyHosts.size()]),
+                                testOnly);
+        } else {
             for (final String fc : failedClones) {
                 CRM.cleanupResource(
                                 dcHost,

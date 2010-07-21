@@ -1353,7 +1353,7 @@ sub gui_test {
 		s/\s+$//;
 		my $i = 1;
 		for my $host (@hosts) {
-			s/\b$host\b/host$i/gi;
+			s/$host\b/host$i/gi;
 			$i++;
 		}
 	}
