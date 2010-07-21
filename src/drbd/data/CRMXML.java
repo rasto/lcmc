@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -2364,10 +2364,12 @@ public class CRMXML extends XML {
     /**
      * Parses the transient attributes.
      */
-    private void parseTransientAttributes(final String uname,
-                                          final Node transientAttrNode,
-                                          final MultiKeyMap failedMap,
-                                          final String hbV) {
+    private void parseTransientAttributes(
+                              final String uname,
+                              final Node transientAttrNode,
+                              final MultiKeyMap failedMap,
+                              final Map<String, Set<String>> failedClonesMap,
+                              final String hbV) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(transientAttrNode,
                                                    "instance_attributes");
@@ -2391,15 +2393,21 @@ public class CRMXML extends XML {
                     if (name.indexOf(FAIL_COUNT_PREFIX) == 0) {
                         final String resId =
                                     name.substring(FAIL_COUNT_PREFIX.length());
+                        failedMap.put(uname.toLowerCase(Locale.US),
+                                      resId,
+                                      value);
                         final Pattern p = Pattern.compile("(.*):(\\d+)$");
                         final Matcher m = p.matcher(resId);
                         if (m.matches()) {
+                            final String crmId = m.group(1);
+                            Set<String> clones = failedClonesMap.get(crmId);
+                            if (clones == null) {
+                                clones = new LinkedHashSet<String>();
+                                failedClonesMap.put(crmId, clones);
+                            }
+                            clones.add(m.group(2));
                             failedMap.put(uname.toLowerCase(Locale.US),
-                                          m.group(1),
-                                          value);
-                        } else {
-                            failedMap.put(uname.toLowerCase(Locale.US),
-                                          resId,
+                                          crmId,
                                           value);
                         }
                     }
@@ -2659,7 +2667,7 @@ public class CRMXML extends XML {
                                     new HashMap<String, Map<String, String>>();
         final Map<String, ResourceAgent> resourceTypeMap =
                                       new HashMap<String, ResourceAgent>();
-        final Set<String> orphanedList = new HashSet<String>();
+        final Set<String> orphanedList = new LinkedHashSet<String>();
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
         final MultiKeyMap operationsMap = new MultiKeyMap();
@@ -2677,6 +2685,8 @@ public class CRMXML extends XML {
                                                  new HashMap<String, String>();
         final List<String> masterList = new ArrayList<String>();
         final MultiKeyMap failedMap = new MultiKeyMap();
+        final Map<String, Set<String>> failedClonesMap =
+                                     new LinkedHashMap<String, Set<String>>();
         groupsToResourcesMap.put("none", new ArrayList<String>());
 
         final NodeList primitivesGroups = resourcesNode.getChildNodes();
@@ -3022,6 +3032,7 @@ public class CRMXML extends XML {
                             parseTransientAttributes(uname,
                                                      nodeStateChild,
                                                      failedMap,
+                                                     failedClonesMap,
                                                      hbV);
                         }
                     }
@@ -3034,7 +3045,8 @@ public class CRMXML extends XML {
                                      resList,
                                      resourceTypeMap,
                                      parametersMap,
-                                     orphanedList);
+                                     orphanedList,
+                                     failedClonesMap);
                         }
                     }
                 }
@@ -3071,6 +3083,7 @@ public class CRMXML extends XML {
         cibQueryData.setCloneToResource(cloneToResourceMap);
         cibQueryData.setMasterList(masterList);
         cibQueryData.setFailed(failedMap);
+        cibQueryData.setFailedClones(failedClonesMap);
         cibQueryData.setRscDefaultsId(rscDefaultsId);
         cibQueryData.setRscDefaultsParams(rscDefaultsParams);
         cibQueryData.setRscDefaultsParamsNvpairIds(rscDefaultsParamsNvpairIds);
@@ -3425,20 +3438,33 @@ public class CRMXML extends XML {
                        final List<String> resList,
                        final Map<String, ResourceAgent> resourceTypeMap,
                        final Map<String, Map<String, String>> parametersMap,
-                       final Set<String> orphanedList) {
+                       final Set<String> orphanedList,
+                       final Map<String, Set<String>> failedClonesMap) {
         
         final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
         final NodeList lrmResources = lrmResourcesNode.getChildNodes();
         for (int j = 0; j < lrmResources.getLength(); j++) {
             final Node rscNode = lrmResources.item(j);
             if ("lrm_resource".equals(rscNode.getNodeName())) {
-                String crmId = getAttribute(rscNode, "id");
+                final String resId = getAttribute(rscNode, "id");
                 final Pattern p = Pattern.compile("(.*):(\\d+)$");
-                final Matcher m = p.matcher(crmId);
+                final Matcher m = p.matcher(resId);
+                String crmId;
                 if (m.matches()) {
                     crmId = m.group(1);
+                    if (!resourceTypeMap.containsKey(crmId)) {
+                        Set<String> clones = failedClonesMap.get(crmId);
+                        if (clones == null) {
+                            clones = new LinkedHashSet<String>();
+                            failedClonesMap.put(crmId, clones);
+                        }
+                        clones.add(m.group(2));
+                    }
+                } else {
+                    crmId = resId;
                 }
                 if (!resourceTypeMap.containsKey(crmId)) {
+                    /* it is orphaned */
                     final String raClass = getAttribute(rscNode, "class");
                     String provider = getAttribute(rscNode, "provider");
                     if (provider == null) {

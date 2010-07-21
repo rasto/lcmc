@@ -66,6 +66,7 @@ import java.util.TreeSet;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.Locale;
+import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -480,7 +481,6 @@ public class ServiceInfo extends EditableInfo {
         final String[] params = crmXML.getParameters(resourceAgent,
                                                      getService().isMaster());
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        getService().setOrphaned(cs.isOrphaned(getHeartbeatId(false)));
         if (params != null) {
             boolean allMetaAttrsAreDefaultValues = true;
             boolean allSavedMetaAttrsAreDefaultValues = true;
@@ -684,6 +684,7 @@ public class ServiceInfo extends EditableInfo {
         }
         mSavedOperationsLock.release();
         getService().setAvailable();
+        getService().setOrphaned(cs.isOrphaned(getHeartbeatId(false)));
     }
 
     /** Returns the main text that appears in the graph. */
@@ -3725,11 +3726,21 @@ public class ServiceInfo extends EditableInfo {
                 dirtyHosts.add(host);
             }
         }
+        final String rscId = getHeartbeatId(testOnly);
         CRM.cleanupResource(dcHost,
-                            getHeartbeatId(testOnly),
-                            dirtyHosts.toArray(
-                                      new Host[dirtyHosts.size()]),
+                            rscId,
+                            dirtyHosts.toArray(new Host[dirtyHosts.size()]),
                             testOnly);
+        final Set<String> failedClones = cs.getFailedClones(rscId, testOnly);
+        if (failedClones != null) {
+            for (final String fc : failedClones) {
+                CRM.cleanupResource(
+                                dcHost,
+                                rscId + ":" + fc,
+                                dirtyHosts.toArray(new Host[dirtyHosts.size()]),
+                                testOnly);
+            }
+        }
     }
 
     /**

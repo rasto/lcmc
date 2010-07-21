@@ -114,6 +114,9 @@ public class CibQuery {
     private String dc = null;
     /** Map from nodename and resource to the fail-count. */
     private MultiKeyMap failed = new MultiKeyMap();
+    /** Map from rsc id to list of clone ids for failed clones. */
+    private Map<String, Set<String>> failedClones =
+                                      new LinkedHashMap<String, Set<String>>();
     /** rsc_defaults meta attributes id. */
     private String rscDefaultsId = null;
     /** rsc_defaults parameters with values. */
@@ -534,23 +537,28 @@ public class CibQuery {
         return dc;
     }
 
-    /**
-     * Sets failed map.
-     */
+    /** Sets failed map. */
     public final void setFailed(final MultiKeyMap failed) {
         this.failed = failed;
     }
 
-    /**
-     * Returns failed map.
-     */
+    /** Returns failed map. */
     public final MultiKeyMap getFailed() {
         return failed;
     }
 
-    /**
-     * Returns fail-count. It can be "INFINITY"
-     */
+    /** Sets failed clone map. */
+    public final void setFailedClones(
+                                final Map<String, Set<String>> failedClones) {
+        this.failedClones = failedClones;
+    }
+
+    /** Returns failed clone map. */
+    public final Map<String, Set<String>> getFailedClones() {
+        return failedClones;
+    }
+
+    /** Returns fail-count. It can be "INFINITY" */
      public final String getFailCount(final String node, final String res) {
          return (String) failed.get(node, res);
      }

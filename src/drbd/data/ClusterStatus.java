@@ -530,13 +530,17 @@ public class ClusterStatus {
     }
 
 
-    /**
-     * Returns fail count of the service on the specified node.
-     */
+    /** Returns fail count of the service on the specified node. */
      public final String getFailCount(final String node,
                                       final String res,
                                       final boolean testOnly) {
          return cibQueryMap.getFailCount(node.toLowerCase(Locale.US), res);
+     }
+
+     /** Returns failed clones for the specified resource. */
+     public final Set<String> getFailedClones(final String res,
+                                              final boolean testOnly) {
+         return cibQueryMap.getFailedClones().get(res);
      }
 
      /**
