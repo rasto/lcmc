@@ -48,6 +48,8 @@ public class Service extends Resource {
     private boolean modified = false;
     /** Whether the service is being modified. */
     private boolean modifying = false;
+    /** Whether the service is orphaned. */
+    private boolean orphaned = false;
     /** Heartbeat class:  heartbeat, ocf, lsb. */
     private String resourceClass = null;
     /** Whether this service master when it is clone. */
@@ -259,7 +261,12 @@ public class Service extends Resource {
      * just created, it was just removed or modified.
      */
     public final boolean isAvailable() {
-        return !newService && !modified && !removed && !modifying && !removing;
+        return !newService
+               && !modified
+               && !removed
+               && !modifying
+               && !removing
+               && !orphaned;
     }
 
     /**
@@ -294,5 +301,15 @@ public class Service extends Resource {
     /** Sets whether it is a stonith device. */
     public final void setStonith(final boolean stonith) {
         this.stonith = stonith;
+    }
+
+    /** Returns whether this service is orphaned. */
+    public final boolean isOrphaned() {
+        return orphaned;
+    }
+
+    /** Sets whether this service is orphaned. */
+    public final void setOrphaned(final boolean orphaned) {
+        this.orphaned = orphaned;
     }
 }

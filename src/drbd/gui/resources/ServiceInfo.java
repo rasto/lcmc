@@ -176,6 +176,9 @@ public class ServiceInfo extends EditableInfo {
     /** Unmigrate icon. */
     private static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.UnmigrateIcon"));
+    /** Orphaned subtext. */
+    private static final Subtext ORPHANED_SUBTEXT =
+                                         new Subtext("(ORPHANED)", Color.RED);
     /** Unmanaged subtext. */
     private static final Subtext UNMANAGED_SUBTEXT =
                                          new Subtext("(unmanaged)", Color.RED);
@@ -465,9 +468,7 @@ public class ServiceInfo extends EditableInfo {
         return null;
     }
 
-    /**
-     * Sets service parameters with values from resourceNode hash.
-     */
+    /** Sets service parameters with values from resourceNode hash. */
     public void setParameters(final Map<String, String> resourceNode) {
         final boolean infoPanelOk = isInfoPanelOk();
         final CRMXML crmXML = getBrowser().getCRMXML();
@@ -479,6 +480,7 @@ public class ServiceInfo extends EditableInfo {
         final String[] params = crmXML.getParameters(resourceAgent,
                                                      getService().isMaster());
         final ClusterStatus cs = getBrowser().getClusterStatus();
+        getService().setOrphaned(cs.isOrphaned(getHeartbeatId(false)));
         if (params != null) {
             boolean allMetaAttrsAreDefaultValues = true;
             boolean allSavedMetaAttrsAreDefaultValues = true;
@@ -3716,8 +3718,10 @@ public class ServiceInfo extends EditableInfo {
             setUpdated(true);
         }
         final List<Host> dirtyHosts = new ArrayList<Host>();
+        final ClusterStatus cs = getBrowser().getClusterStatus();
         for (final Host host : getBrowser().getClusterHosts()) {
-            if (getFailCount(host.getName(), testOnly) != null) {
+            if (getFailCount(host.getName(), testOnly) != null
+                || getService().isOrphaned()) {
                 dirtyHosts.add(host);
             }
         }
@@ -4463,8 +4467,9 @@ public class ServiceInfo extends EditableInfo {
 
                 public boolean enablePredicate() {
                     return !getBrowser().clStatusFailed()
-                           && getService().isAvailable()
-                           && isOneFailedCount(testOnly);
+                           && ((getService().isAvailable()
+                                && isOneFailedCount(testOnly))
+                               || getService().isOrphaned());
                 }
 
                 public void action() {
@@ -4930,7 +4935,9 @@ public class ServiceInfo extends EditableInfo {
      * Returns text that appears in the corner of the graph.
      */
     public Subtext getRightCornerTextForGraph(final boolean testOnly) {
-        if (!isManaged(testOnly)) {
+        if (getService().isOrphaned()) {
+            return ORPHANED_SUBTEXT;
+        } else if (!isManaged(testOnly)) {
             return UNMANAGED_SUBTEXT;
         } else if (getMigratedTo(testOnly) != null
                    || getMigratedFrom(testOnly) != null) {

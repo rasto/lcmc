@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
@@ -48,6 +49,8 @@ public class CibQuery {
     private Map<String, Map<String, String>> parametersNvpairsIds;
     /** Map with resource type. */
     private Map<String, ResourceAgent> resourceType;
+    /** List with orphaned resources. */
+    private Set<String> orphanedList;
     /** Map with resource instance_attributes id. */
     private Map<String, String> resourceInstanceAttrId;
     /** Colocation rsc map. */
@@ -169,24 +172,28 @@ public class CibQuery {
         return parametersNvpairsIds;
     }
 
-    /**
-     * Sets the resource type map.
-     */
+    /** Sets the resource type map. */
     public final void setResourceType(
                             final Map<String, ResourceAgent> resourceType) {
         this.resourceType = resourceType;
     }
 
-    /**
-     * Returns the resource type map.
-     */
+    /** Sets the list with orphaned resources. */
+    public final void setOrphaned(final Set<String> orphanedList) {
+        this.orphanedList = orphanedList;
+    }
+
+    /** Returns the resource type map. */
     public final Map<String, ResourceAgent> getResourceType() {
         return resourceType;
     }
 
-    /**
-     * Sets the resource instance_attributes id map.
-     */
+    /** Returns list with orphaned resources. */
+    public final Set<String> getOrphaned() {
+        return orphanedList;
+    }
+
+    /** Sets the resource instance_attributes id map. */
     public final void setResourceInstanceAttrId(
                             final Map<String, String> resourceInstanceAttrId) {
         this.resourceInstanceAttrId = resourceInstanceAttrId;

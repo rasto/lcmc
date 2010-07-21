@@ -35,6 +35,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -1983,11 +1985,9 @@ public class CRMXML extends XML {
               final Map<String, String> metaAttrsIdRefs,
               final Map<String, String> metaAttrsIdToCRMId,
               final boolean stonith) {
-        final Map<String, String> params =
-                                        new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<String, String>();
         parametersMap.put(crmId, params);
-        final Map<String, String> nvpairIds =
-                                        new HashMap<String, String>();
+        final Map<String, String> nvpairIds = new HashMap<String, String>();
         parametersNvpairsIdsMap.put(crmId, nvpairIds);
         final String hbV = host.getHeartbeatVersion();
         final String pcmkV = host.getPacemakerVersion();
@@ -2659,6 +2659,7 @@ public class CRMXML extends XML {
                                     new HashMap<String, Map<String, String>>();
         final Map<String, ResourceAgent> resourceTypeMap =
                                       new HashMap<String, ResourceAgent>();
+        final Set<String> orphanedList = new HashSet<String>();
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
         final MultiKeyMap operationsMap = new MultiKeyMap();
@@ -3013,6 +3014,7 @@ public class CRMXML extends XML {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "no");
                     }
                     final NodeList nodeStates = nodeStateNode.getChildNodes();
+                    /* transient attributes. */
                     for (int j = 0; j < nodeStates.getLength(); j++) {
                         final Node nodeStateChild = nodeStates.item(j);
                         if ("transient_attributes".equals(
@@ -3023,6 +3025,18 @@ public class CRMXML extends XML {
                                                      hbV);
                         }
                     }
+                    final List<String> resList =
+                                  groupsToResourcesMap.get("none");
+                    for (int j = 0; j < nodeStates.getLength(); j++) {
+                        final Node nodeStateChild = nodeStates.item(j);
+                        if ("lrm".equals(nodeStateChild.getNodeName())) {
+                            parseLRM(nodeStateChild,
+                                     resList,
+                                     resourceTypeMap,
+                                     parametersMap,
+                                     orphanedList);
+                        }
+                    }
                 }
             }
         }
@@ -3031,6 +3045,7 @@ public class CRMXML extends XML {
         cibQueryData.setParameters(parametersMap);
         cibQueryData.setParametersNvpairsIds(parametersNvpairsIdsMap);
         cibQueryData.setResourceType(resourceTypeMap);
+        cibQueryData.setOrphaned(orphanedList);
         cibQueryData.setResourceInstanceAttrId(resourceInstanceAttrIdMap);
 
         cibQueryData.setColocationRsc(colocationRscMap);
@@ -3402,6 +3417,43 @@ public class CRMXML extends XML {
     /** Returns whether linbit::drbd ra is present. */
     public final boolean isLinbitDrbdPresent() {
         return linbitDrbdPresent;
+    }
+
+    /* Get resources that were removed but are in LRM. */
+    public final void parseLRM(
+                       final Node lrmNode,
+                       final List<String> resList,
+                       final Map<String, ResourceAgent> resourceTypeMap,
+                       final Map<String, Map<String, String>> parametersMap,
+                       final Set<String> orphanedList) {
+        
+        final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
+        final NodeList lrmResources = lrmResourcesNode.getChildNodes();
+        for (int j = 0; j < lrmResources.getLength(); j++) {
+            final Node rscNode = lrmResources.item(j);
+            if ("lrm_resource".equals(rscNode.getNodeName())) {
+                String crmId = getAttribute(rscNode, "id");
+                final Pattern p = Pattern.compile("(.*):(\\d+)$");
+                final Matcher m = p.matcher(crmId);
+                if (m.matches()) {
+                    crmId = m.group(1);
+                }
+                if (!resourceTypeMap.containsKey(crmId)) {
+                    final String raClass = getAttribute(rscNode, "class");
+                    String provider = getAttribute(rscNode, "provider");
+                    if (provider == null) {
+                        provider = "heartbeat";
+                    }
+                    final String type = getAttribute(rscNode, "type");
+                    orphanedList.add(crmId);
+                    resourceTypeMap.put(crmId, getResourceAgent(type,
+                                                                provider,
+                                                                raClass));
+                    resList.add(crmId);
+                    parametersMap.put(crmId, new HashMap<String, String>());
+                }
+            }
+        }
     }
 
     /** Class that holds colocation data. */
@@ -3880,4 +3932,6 @@ public class CRMXML extends XML {
             return s.toString();
         }
     }
+
+
 }

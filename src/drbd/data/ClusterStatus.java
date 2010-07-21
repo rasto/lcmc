@@ -263,11 +263,14 @@ public class ClusterStatus {
         return cibQueryMap.getCloneToResource().containsKey(cloneId);
     }
 
-    /**
-     * Returns type of the service, e.g. IPAddr
-     */
+    /** Returns type of the service, e.g. IPAddr */
     public final ResourceAgent getResourceType(final String hbId) {
         return cibQueryMap.getResourceType().get(hbId);
+    }
+
+    /** Returns whether resource is an orphaned resource. */
+    public final boolean isOrphaned(final String pcmkId) {
+        return cibQueryMap.getOrphaned().contains(pcmkId);
     }
 
     /**
