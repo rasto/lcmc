@@ -3997,7 +3997,8 @@ public class ServiceInfo extends EditableInfo {
             public boolean enablePredicate() {
                 return !getBrowser().clStatusFailed()
                        && !getService().isRemoved()
-                       && (enableForNew || !getService().isNew());
+                       && (enableForNew || !getService().isNew())
+                       && !getService().isOrphaned();
                        //TODO: enableForNew should be always enabled
             }
 
@@ -4090,7 +4091,8 @@ public class ServiceInfo extends EditableInfo {
             public boolean enablePredicate() {
                 return !getBrowser().clStatusFailed()
                        && !getService().isRemoved()
-                       && !getService().isNew();
+                       && !getService().isNew()
+                       && !getService().isOrphaned();
             }
 
             public void update() {
@@ -4336,7 +4338,8 @@ public class ServiceInfo extends EditableInfo {
                 public boolean enablePredicate() {
                     return !getBrowser().clStatusFailed()
                            && !getService().isRemoved()
-                           && !getService().isNew();
+                           && !getService().isNew()
+                           && !getService().isOrphaned();
                 }
 
                 public void action() {
@@ -4478,9 +4481,8 @@ public class ServiceInfo extends EditableInfo {
 
                 public boolean enablePredicate() {
                     return !getBrowser().clStatusFailed()
-                           && ((getService().isAvailable()
-                                && isOneFailedCount(testOnly))
-                               || getService().isOrphaned());
+                           && getService().isAvailable()
+                           && isOneFailedCount(testOnly);
                 }
 
                 public void action() {
@@ -4576,7 +4578,11 @@ public class ServiceInfo extends EditableInfo {
                             getPopup().setVisible(false);
                         }
                     });
-                    removeMyself(false);
+                    if (getService().isOrphaned()) {
+                        cleanupResource(getBrowser().getDCHost(), testOnly);
+                    } else {
+                        removeMyself(false);
+                    }
                     getBrowser().getHeartbeatGraph().repaint();
                 }
             };

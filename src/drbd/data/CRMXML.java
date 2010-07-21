@@ -2537,14 +2537,12 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Returns CibQuery object with information from the cib node.
-     */
+    /** Returns CibQuery object with information from the cib node. */
     public final CibQuery parseCibQuery(final String query) {
         final Document document = getXMLDocument(query);
         final CibQuery cibQueryData = new CibQuery();
         if (document == null) {
-            Tools.appWarning("cib error");
+            Tools.appWarning("cib error: " + query);
             return cibQueryData;
         }
 
@@ -3452,14 +3450,12 @@ public class CRMXML extends XML {
                 String crmId;
                 if (m.matches()) {
                     crmId = m.group(1);
-                    if (!resourceTypeMap.containsKey(crmId)) {
-                        Set<String> clones = failedClonesMap.get(crmId);
-                        if (clones == null) {
-                            clones = new LinkedHashSet<String>();
-                            failedClonesMap.put(crmId, clones);
-                        }
-                        clones.add(m.group(2));
+                    Set<String> clones = failedClonesMap.get(crmId);
+                    if (clones == null) {
+                        clones = new LinkedHashSet<String>();
+                        failedClonesMap.put(crmId, clones);
                     }
+                    clones.add(m.group(2));
                 } else {
                     crmId = resId;
                 }
