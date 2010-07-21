@@ -115,6 +115,7 @@ public class BlockDev extends DrbdConfig {
                 } else {
                     getDrbdResourceInfo().setHaveToCreateMD(true);
                 }
+                getDrbdResourceInfo().getBrowser().reloadAllComboBoxes(null);
             } catch (Exceptions.DrbdConfigException dce) {
                 Tools.appError("config failed");
             }

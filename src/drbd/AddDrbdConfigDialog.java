@@ -60,12 +60,14 @@ public class AddDrbdConfigDialog {
                 dialog.cancelDialog();
                 canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
+                dri.getBrowser().reloadAllComboBoxes(null);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
+        dri.getBrowser().reloadAllComboBoxes(null);
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();
     }

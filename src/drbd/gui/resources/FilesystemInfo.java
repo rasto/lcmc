@@ -184,6 +184,9 @@ class FilesystemInfo extends ServiceInfo {
                         && fstypeParamCb != null) {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
+                                if (!(e.getItem() instanceof Info)) {
+                                    return;
+                                }
                                 final Info item = (Info) e.getItem();
                                 if (item.getStringValue() == null
                                     || "".equals(item.getStringValue())) {
@@ -213,9 +216,7 @@ class FilesystemInfo extends ServiceInfo {
             null);
     }
 
-    /**
-     * Returns editable element for the parameter.
-     */
+    /** Returns editable element for the parameter. */
     protected GuiComboBox getParamComboBox(final String param,
                                            final String prefix,
                                            final int width) {
@@ -402,11 +403,37 @@ class FilesystemInfo extends ServiceInfo {
         return -1;
     }
 
-    /**
-     * Sets whether the old style drbddisk is preferred.
-     */
+    /** Sets whether the old style drbddisk is preferred. */
     public final void setDrbddiskIsPreferred(
                                            final boolean drbddiskIsPreferred) {
         this.drbddiskIsPreferred = drbddiskIsPreferred;
+    }
+
+    /** Reload combo boxes. */
+    public void reloadComboBoxes() {
+        super.reloadComboBoxes();
+        final DrbdResourceInfo selectedInfo =
+                          getBrowser().getDrbdDevHash().get(
+                                            getParamSaved(FS_RES_PARAM_DEV));
+        String selectedValue = null;
+        if (selectedInfo == null) {
+            selectedValue = getParamSaved(FS_RES_PARAM_DEV);
+        } else {
+            selectedValue = selectedInfo.toString();
+        }
+        Info defaultValue = null;
+        if (selectedValue == null || "".equals(selectedValue)) {
+            defaultValue = new StringInfo(
+                       Tools.getString("ClusterBrowser.SelectBlockDevice"),
+                       "",
+                       getBrowser());
+        }
+        final Info[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue,
+                                                                  getName());
+        if (blockDeviceParamCb != null) {
+            final String value = blockDeviceParamCb.getStringValue();
+            blockDeviceParamCb.reloadComboBox(value,
+                                              commonBlockDevInfos);
+        }
     }
 }

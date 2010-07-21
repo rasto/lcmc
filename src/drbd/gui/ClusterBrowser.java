@@ -1272,9 +1272,7 @@ public class ClusterBrowser extends Browser {
         return crmXML.getServices(cl);
     }
 
-    /**
-     * Updates common block devices.
-     */
+    /** Updates common block devices. */
     public final void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             DefaultMutableTreeNode resource;
@@ -2282,9 +2280,7 @@ public class ClusterBrowser extends Browser {
         return drbdResHash;
     }
 
-    /**
-     * Reloads all combo boxes that need to be reloaded.
-     */
+    /** Reloads all combo boxes that need to be reloaded. */
     public final void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
         try {
             mNameToServiceLock.acquire();

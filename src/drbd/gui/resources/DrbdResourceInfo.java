@@ -108,16 +108,12 @@ public class DrbdResourceInfo extends EditableInfo
         return getDrbdResource().getDevice();
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    public final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /**
-     * Returns menu icon for drbd resource.
-     */
+    /** Returns menu icon for drbd resource. */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
         return null;
     }
@@ -931,9 +927,7 @@ public class DrbdResourceInfo extends EditableInfo
         getBrowser().reload(getBrowser().getDrbdNode());
     }
 
-    /**
-     * Returns string of the drbd resource.
-     */
+    /** Returns string of the drbd resource. */
     public final String toString() {
         String name = getName();
         if (name == null || "".equals(name)) {

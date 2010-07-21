@@ -5085,9 +5085,7 @@ public class ServiceInfo extends EditableInfo {
         return savedOperation;
     }
 
-    /**
-     * Reload combo boxes.
-     */
+    /** Reload combo boxes. */
     public void reloadComboBoxes() {
         if (sameAsOperationsCB != null) {
             String defaultOpIdRef = null;
