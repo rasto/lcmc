@@ -74,7 +74,7 @@ public class DrbdResourceInfo extends EditableInfo
     /**
      * Whether the block device is used by heartbeat via Filesystem service.
      */
-    private boolean isUsedByCRM;
+    private ServiceInfo isUsedByCRM;
     /** Cache for getInfoPanel method. */
     private JComponent infoPanel = null;
     /** Whether the meta-data has to be created or not. */
@@ -1050,30 +1050,22 @@ public class DrbdResourceInfo extends EditableInfo
         }
     }
 
-    /**
-     * Sets that this drbd resource is used by hb.
-     */
-    public final void setUsedByCRM(final boolean isUsedByCRM) {
+    /** Sets that this drbd resource is used by hb. */
+    public final void setUsedByCRM(final ServiceInfo isUsedByCRM) {
         this.isUsedByCRM = isUsedByCRM;
     }
 
-    /**
-     * Returns whether this drbd resource is used by crm.
-     */
+    /** Returns whether this drbd resource is used by crm. */
     public final boolean isUsedByCRM() {
-        return isUsedByCRM;
+        return isUsedByCRM != null;
     }
 
-    /**
-     * Returns common file systems.
-     */
+    /** Returns common file systems. */
     public final StringInfo[] getCommonFileSystems(final String defaultValue) {
         return getBrowser().getCommonFileSystems(defaultValue);
     }
 
-    /**
-     * Returns both hosts of the drbd connection, sorted alphabeticaly.
-     */
+    /** Returns both hosts of the drbd connection, sorted alphabeticaly. */
     public final Host[] getHosts() {
         final Host h1 = blockDevInfo1.getHost();
         final Host h2 = blockDevInfo2.getHost();
@@ -1084,24 +1076,18 @@ public class DrbdResourceInfo extends EditableInfo
         }
     }
 
-    /**
-     * Starts resolve split brain dialog.
-     */
+    /** Starts resolve split brain dialog. */
     public final void resolveSplitBrain() {
         final AddDrbdSplitBrainDialog adrd = new AddDrbdSplitBrainDialog(this);
         adrd.showDialogs();
     }
 
-    /**
-     * Starts online verification.
-     */
+    /** Starts online verification. */
     public final void verify(final boolean testOnly) {
         blockDevInfo1.verify(testOnly);
     }
 
-    /**
-     * Returns whether the specified host has this drbd resource.
-     */
+    /** Returns whether the specified host has this drbd resource. */
     public final boolean resourceInHost(final Host host) {
         if (blockDevInfo1.getHost() == host
             || blockDevInfo2.getHost() == host) {
@@ -1110,9 +1096,7 @@ public class DrbdResourceInfo extends EditableInfo
         return false;
     }
 
-    /**
-     * Returns the list of items for the popup menu for drbd resource.
-     */
+    /** Returns the list of items for the popup menu for drbd resource. */
     public final List<UpdatableItem> createPopup() {
         final boolean testOnly = false;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -1136,6 +1120,10 @@ public class DrbdResourceInfo extends EditableInfo
             }
 
             public boolean enablePredicate() {
+                if (!Tools.getConfigData().getExpertMode()
+                    && isUsedByCRM()) {
+                    return false;
+                }
                 return !isSyncing();
             }
 

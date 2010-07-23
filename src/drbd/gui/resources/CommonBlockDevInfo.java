@@ -84,9 +84,9 @@ public class CommonBlockDevInfo extends HbCategoryInfo
     /**
      * Sets this block device on all nodes ass used by crm.
      */
-    public final void setUsedByCRM(final boolean isUsedByCRM) {
+    public final void setUsedByCRM(final ServiceInfo isUsedByCRM) {
         for (BlockDevice bd : blockDevices) {
-            bd.setUsedByCRM(isUsedByCRM);
+            bd.setUsedByCRM(isUsedByCRM != null);
         }
     }
 

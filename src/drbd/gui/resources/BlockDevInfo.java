@@ -1086,6 +1086,10 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
+                        return false;
+                    }
                     return !getBlockDevice().isSyncing();
                 }
 
@@ -1133,6 +1137,10 @@ public class BlockDevInfo extends EditableInfo {
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
+                        return false;
+                    }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
                     return !getBlockDevice().isSyncing()
@@ -1194,6 +1202,10 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
+                        return false;
+                    }
                     return getBlockDevice().isSecondary();
                 }
 
@@ -1221,6 +1233,10 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
+                        return false;
+                    }
                     return getBlockDevice().isPrimary();
                 }
 
@@ -1244,6 +1260,10 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
+                        return false;
+                    }
                     return true;
                 }
 
@@ -1265,6 +1285,10 @@ public class BlockDevInfo extends EditableInfo {
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
+                        return false;
+                    }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
                     return !getBlockDevice().isSyncing()
@@ -1300,6 +1324,10 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
+                        return false;
+                    }
                     return getBlockDevice().isSyncing();
                 }
 
@@ -1327,6 +1355,10 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
+                        return false;
+                    }
                     return !getBlockDevice().isSyncing();
                 }
 
@@ -1348,6 +1380,10 @@ public class BlockDevInfo extends EditableInfo {
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
+                        return false;
+                    }
+                    if (!Tools.getConfigData().getExpertMode()
+                        && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
                     return !getBlockDevice().isSyncing()

@@ -99,7 +99,26 @@ class LinbitDrbdInfo extends ServiceInfo {
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         if (dri != null) {
-            dri.setUsedByCRM(false);
+            dri.setUsedByCRM(null);
+        }
+    }
+    /** Sets service parameters with values from resourceNode hash. */
+    public void setParameters(final Map<String, String> resourceNode) {
+        super.setParameters(resourceNode);
+        final DrbdResourceInfo dri =
+                        getBrowser().getDrbdResHash().get(getResourceName());
+        if (dri != null) {
+            if (isManaged(false) && !getService().isOrphaned()) {
+                dri.setUsedByCRM(this);
+            } else {
+                dri.setUsedByCRM(null);
+            }
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    dri.updateMenus(null);
+                }
+            });
+            t.start();
         }
     }
 }

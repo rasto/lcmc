@@ -31,7 +31,7 @@ public interface CommonDeviceInterface {
     /** Returns the device name. */
     String getDevice();
     /** Sets whether the device is used by crm. */
-    void setUsedByCRM(boolean isUsedByCRM);
+    void setUsedByCRM(ServiceInfo isUsedByCRM);
     /** Returns whether the device is used by crm. */
     boolean isUsedByCRM();
     /** Returns the last created filesystem. */

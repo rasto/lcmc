@@ -215,6 +215,21 @@ class FilesystemInfo extends ServiceInfo {
             },
             null);
     }
+    ///** Sets service parameters with values from resourceNode hash. */
+    //public void setParameters(final Map<String, String> resourceNode) {
+    //    super.setParameters(resourceNode);
+    //    //final DrbdResourceInfo dri = getBrowser().getDrbdDevHash().get(
+    //    //                                     getParamSaved(FS_RES_PARAM_DEV));
+    //    //if (dri != null) {
+    //    //    dri.setUsedByCRM(true);
+    //    //    final Thread t = new Thread(new Runnable() {
+    //    //        public void run() {
+    //    //            dri.updateMenus(null);
+    //    //        }
+    //    //    });
+    //    //    t.start();
+    //    //}
+    //}
 
     /** Returns editable element for the parameter. */
     protected GuiComboBox getParamComboBox(final String param,
@@ -365,7 +380,12 @@ class FilesystemInfo extends ServiceInfo {
             } else {
                 oldDri.removeLinbitDrbd(this, dcHost, testOnly);
             }
-            oldDri.setUsedByCRM(false);
+            //oldDri.setUsedByCRM(false);
+            //final Thread t = new Thread(new Runnable() {
+            //    public void run() {
+            //        oldDri.updateMenus(null);
+            //    }
+            //});
             if (oldDrbddisk) {
                 setDrbddiskInfo(null);
             } else {
@@ -373,7 +393,13 @@ class FilesystemInfo extends ServiceInfo {
             }
         }
         if (newDri != null) {
-            newDri.setUsedByCRM(true);
+            //newDri.setUsedByCRM(true);
+            //final Thread t = new Thread(new Runnable() {
+            //    public void run() {
+            //        newDri.updateMenus(null);
+            //    }
+            //});
+            //t.start();
             if (oldDrbddisk) {
                 newDri.addDrbdDisk(this, dcHost, testOnly);
             } else {
