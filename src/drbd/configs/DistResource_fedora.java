@@ -41,6 +41,7 @@ public class DistResource_fedora extends
         {"version:Fedora release 10*", "10"},
         {"version:Fedora release 11*", "11"},
         {"version:Fedora release 12*", "12"},
+        {"version:Fedora release 13*", "13"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
@@ -48,11 +49,20 @@ public class DistResource_fedora extends
         {"DrbdInst.install",
          "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
-        {"HbPmInst.install.text.2",
-         "the fedora way: HB 2.1.x (obsolete)" },
+        /* DRBD native */
+        {"DrbdInst.install.text.1",
+         "the Fedora way"},
 
-        {"HbPmInst.install.2",
-         "/usr/bin/yum -y install heartbeat"},
+        {"DrbdInst.install.1",
+         "yum -y install drbd-utils drbd-udev"},
+        {"DrbdInst.install.method.1",       ""},
+
+        /* Heartbeat/Pacemaker native */
+        {"HbPmInst.install.text.1",
+         "the Fedora way: 1.1.x/3.0.x"},
+
+        {"HbPmInst.install.1",
+         "yum -y install pacemaker heartbeat drbd-pacemaker"},
         /* at least fedora 10 and fedora11 in version 2.1.3 and 2.14 has different
            ocf path. */
         {"Heartbeat.2.1.4.getOCFParameters",
@@ -71,6 +81,15 @@ public class DistResource_fedora extends
          + "@GUI-HELPER@ get-old-style-resources;"
          + "@GUI-HELPER@ get-lsb-resources"},
 
+        /* Corosync/Pacemaker native */
+        {"PmInst.install.1",
+         "yum -y install pacemaker corosync drbd-pacemaker"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"},
         /* corosync/pacemaker from source */
         {"PmInst.install.text.9",
          "from source: latest/1.2.x"},

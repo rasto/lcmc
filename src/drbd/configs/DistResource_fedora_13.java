@@ -24,9 +24,9 @@ package drbd.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for fedora 10.
+ * Here are commands for fedora 13.
  */
-public class DistResource_fedora_10 extends
+public class DistResource_fedora_13 extends
             java.util.ListResourceBundle {
 
     /** Get contents. */
@@ -36,19 +36,42 @@ public class DistResource_fedora_10 extends
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support", "fedora-10"},
-        {"distribution", "redhat"},
+        {"Support", "fedora-13"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
-        /* Corosync/Openais/Pacemaker clusterlabs*/
+        {"DrbdInst.install",
+         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
+
         {"PmInst.install.text.1",
+         "the Fedora way: 1.0.x/1.2.x" },
+
+        /* Corosync/Openais/Pacemaker clusterlabs */
+        {"PmInst.install.text.2",
          "clusterlabs repo: 1.0.x/1.2.x" },
 
-        {"PmInst.install.1",
+        {"PmInst.install.2",
+         "yum -y wget; wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/fedora-13/clusterlabs.repo && "
+         + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi)"
+         + " && (/sbin/chkconfig --del heartbeat;"
+         + " /sbin/chkconfig --level 2345 corosync on"
+         + " && /sbin/chkconfig --level 016 corosync off)"},
+
+        /* Next Corosync/Openais/Pacemaker clusterlabs */
+        {"PmInst.install.text.3",
+         "clusterlabs test repo: 1.1.x/1.2.x" },
+
+        {"PmInst.install.staging.3", "true"},
+
+        {"PmInst.install.3",
          "wget -N -nd -P /etc/yum.repos.d/"
-         + " http://www.clusterlabs.org/rpm/fedora-10/clusterlabs.repo && "
+         + " http://www.clusterlabs.org/rpm-next/fedora-13/clusterlabs.repo && "
          + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker corosync"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
@@ -59,28 +82,32 @@ public class DistResource_fedora_10 extends
          + " && /sbin/chkconfig --level 016 corosync off)"},
 
         /* Heartbeat/Pacemaker clusterlabs*/
-        {"HbPmInst.install.text.1",
+        {"HbPmInst.install.text.2",
          "clusterlabs repo: 1.0.x/3.0.x" },
 
-        {"HbPmInst.install.1",
-         "wget -N -nd -P /etc/yum.repos.d/"
-         + " http://www.clusterlabs.org/rpm/fedora-10/clusterlabs.repo && "
+        {"HbPmInst.install.2",
+         "yum -y install wget; wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm/fedora-13/clusterlabs.repo && "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker heartbeat"
          + " && /sbin/chkconfig --del corosync;"
          + " /sbin/chkconfig --level 2345 heartbeat on"
          + " && /sbin/chkconfig --level 016 heartbeat off"},
 
-        /* Heartbeat/Pacemaker native */
-        {"HbPmInst.install.text.2",
-         "the fedora way: HB 2.1.x (obsolete)" },
+        /* Next Heartbeat/Pacemaker clusterlabs*/
+        {"HbPmInst.install.text.3",
+         "clusterlabs test repo: 1.1.x/3.0.x" },
 
-        {"HbPmInst.install.2",
-         "/usr/bin/yum -y install heartbeat"},
+        {"HbPmInst.install.staging.3", "true"},
 
-        /* no native drbd */
-        {"DrbdInst.install.text.1",
-         ""},
+        {"HbPmInst.install.3",
+         "yum -y install wget; wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm-next/fedora-13/clusterlabs.repo && "
+         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+         + " -x heartbeat-2.1* install pacemaker heartbeat"
+         + " && /sbin/chkconfig --del corosync;"
+         + " /sbin/chkconfig --level 2345 heartbeat on"
+         + " && /sbin/chkconfig --level 016 heartbeat off"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -94,11 +121,9 @@ public class DistResource_fedora_10 extends
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
          + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
          /* it installs eather kernel-devel- or kernel-PAE-devel-, etc. */
-         /* the fedora 10 does not keep old devel packages.
-          */
          + "/usr/bin/yum -y install kernel`uname -r|"
-         + " grep -o '\\.PAE\\|\\.xen\\|\\.kdump'"
-         + "|tr . -`-devel-`uname -r|sed 's/\\.\\(PAE\\|xen\\|kdump\\)$//'` "
+         + " grep -o '\\.PAEdebug\\|\\.PAE'"
+         + "|tr . -`-devel-`uname -r|sed 's/\\.\\(PAEdebug\\|PAE\\)$//'` "
          + "|tee -a /dev/tty|grep 'No package'>/dev/null;"
          + "(if [ \"$?\" == 0 ]; then "
          + "echo \"you need to find and install kernel-devel-`uname -r`.rpm "
@@ -113,7 +138,6 @@ public class DistResource_fedora_10 extends
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 }

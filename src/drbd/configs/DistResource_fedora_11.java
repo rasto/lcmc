@@ -73,6 +73,17 @@ public class DistResource_fedora_11 extends
          + " /sbin/chkconfig --level 2345 heartbeat on"
          + " && /sbin/chkconfig --level 016 heartbeat off"},
 
+        /* Heartbeat/Pacemaker native */
+        {"HbPmInst.install.text.2",
+         "the fedora way: HB 2.1.x (obsolete)" },
+
+        {"HbPmInst.install.2",
+         "/usr/bin/yum -y install heartbeat"},
+
+        /* no native drbd */
+        {"DrbdInst.install.text.1",
+         ""},
+
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
          "from the source tarball"},
