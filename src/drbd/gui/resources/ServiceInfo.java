@@ -179,6 +179,9 @@ public class ServiceInfo extends EditableInfo {
                             Tools.getDefault("HeartbeatGraph.UnmigrateIcon"));
     /** Orphaned subtext. */
     private static final Subtext ORPHANED_SUBTEXT =
+                                         new Subtext("(ORPHANED)", null);
+    /** Orphaned with fail-count subtext. */
+    private static final Subtext ORPHANED_FAILED_SUBTEXT =
                                          new Subtext("(ORPHANED)", Color.RED);
     /** Unmanaged subtext. */
     private static final Subtext UNMANAGED_SUBTEXT =
@@ -270,6 +273,9 @@ public class ServiceInfo extends EditableInfo {
     public boolean checkResourceFieldsCorrect(final String param,
                                               final String[] params) {
         boolean ret = true;
+        if (getService().isOrphaned()) {
+            return false;
+        }
         if (cloneInfo != null
             && !cloneInfo.checkResourceFieldsCorrect(
                                          param,
@@ -684,7 +690,16 @@ public class ServiceInfo extends EditableInfo {
         }
         mSavedOperationsLock.release();
         getService().setAvailable();
-        getService().setOrphaned(cs.isOrphaned(getHeartbeatId(false)));
+        if (cs.isOrphaned(getHeartbeatId(false))) {
+            getService().setOrphaned(true);
+            getService().setNew(false);
+            final CloneInfo ci = cloneInfo;
+            if (ci != null) {
+                ci.getService().setNew(false);
+            }
+        } else {
+            getService().setOrphaned(false);
+        }
     }
 
     /** Returns the main text that appears in the graph. */
@@ -3721,10 +3736,7 @@ public class ServiceInfo extends EditableInfo {
         final List<Host> dirtyHosts = new ArrayList<Host>();
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (final Host host : getBrowser().getClusterHosts()) {
-            if (getFailCount(host.getName(), testOnly) != null
-                || getService().isOrphaned()) {
-                dirtyHosts.add(host);
-            }
+            dirtyHosts.add(host);
         }
         final String rscId = getHeartbeatId(testOnly);
         final Set<String> failedClones = cs.getFailedClones(rscId, testOnly);
@@ -3744,17 +3756,17 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Removes the service without confirmation dialog.
-     */
+    /** Removes the service without confirmation dialog. */
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
             getService().setRemoved(true);
         }
-        if (cloneInfo != null) {
-            cloneInfo.removeMyselfNoConfirm(dcHost, testOnly);
+        final CloneInfo ci = cloneInfo;
+        if (ci != null) {
+            ci.removeMyselfNoConfirm(dcHost, testOnly);
+            cloneInfo = null;
         }
 
         if (getService().isNew() && groupInfo == null) {
@@ -3768,12 +3780,15 @@ public class ServiceInfo extends EditableInfo {
                 final HbConnectionInfo[] hbcis =
                        getBrowser().getHeartbeatGraph().getHbConnections(this);
                 for (final HbConnectionInfo hbci : hbcis) {
-                    getBrowser().getHeartbeatGraph().removeOrder(hbci,
-                                                                 dcHost,
-                                                                 testOnly);
-                    getBrowser().getHeartbeatGraph().removeColocation(hbci,
+                    if (hbci != null) {
+                        getBrowser().getHeartbeatGraph().removeOrder(hbci,
+                                                                     dcHost,
+                                                                     testOnly);
+                        getBrowser().getHeartbeatGraph().removeColocation(
+                                                                      hbci,
                                                                       dcHost,
                                                                       testOnly);
+                    }
                 }
 
                 for (final String locId : cs.getLocationIds(
@@ -3824,9 +3839,9 @@ public class ServiceInfo extends EditableInfo {
                 if (!getService().isNew()) {
                     String cloneId = null;
                     boolean master = false;
-                    if (cloneInfo != null) {
-                        cloneId = cloneInfo.getHeartbeatId(testOnly);
-                        master = cloneInfo.getService().isMaster();
+                    if (ci != null) {
+                        cloneId = ci.getHeartbeatId(testOnly);
+                        master = ci.getService().isMaster();
                     }
                     final boolean ret = CRM.removeResource(
                                                       dcHost,
@@ -3835,6 +3850,7 @@ public class ServiceInfo extends EditableInfo {
                                                       cloneId,
                                                       master,
                                                       testOnly);
+                    cleanupResource(dcHost, testOnly);
                     if (!testOnly && !ret) {
                         Tools.progressIndicatorFailed(dcHost.getName(),
                                                       "removing failed");
@@ -4558,7 +4574,8 @@ public class ServiceInfo extends EditableInfo {
 
                 public boolean enablePredicate() {
                     if (getBrowser().clStatusFailed()
-                        || getService().isRemoved()) {
+                        || getService().isRemoved()
+                        || isRunning(testOnly)) {
                         return false;
                     }
                     if (groupInfo == null || getService().isNew()) {
@@ -4954,7 +4971,11 @@ public class ServiceInfo extends EditableInfo {
      */
     public Subtext getRightCornerTextForGraph(final boolean testOnly) {
         if (getService().isOrphaned()) {
-            return ORPHANED_SUBTEXT;
+            if (isFailed(testOnly)) {
+                return ORPHANED_FAILED_SUBTEXT;
+            } else {
+                return ORPHANED_SUBTEXT;
+            }
         } else if (!isManaged(testOnly)) {
             return UNMANAGED_SUBTEXT;
         } else if (getMigratedTo(testOnly) != null
@@ -4968,7 +4989,9 @@ public class ServiceInfo extends EditableInfo {
     public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         Color color = null;
         final List<Subtext> texts = new ArrayList<Subtext>();
-        if (isFailed(testOnly)) {
+        if (getService().isOrphaned()) {
+            texts.add(new Subtext("...", null));
+        } else if (isFailed(testOnly)) {
             texts.add(new Subtext("not running:", null));
         } else if (isStopped(testOnly)) {
             texts.add(new Subtext("stopped",
@@ -5045,6 +5068,8 @@ public class ServiceInfo extends EditableInfo {
         final Host dcHost = getBrowser().getDCHost();
         if (getService().isNew()) {
             return "new...";
+        } else if (getService().isOrphaned()) {
+            return "";
         } else if (isStarted(testOnly)) {
             if (isRunning(testOnly)) {
                 final List<Host> migratedTo = getMigratedTo(testOnly);

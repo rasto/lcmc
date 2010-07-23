@@ -308,9 +308,7 @@ public class ConfigData implements Serializable {
         this.expertMode = expertMode;
     }
 
-    /**
-     * Gets expert mode.
-     */
+    /** Gets expert mode. */
     public final boolean getExpertMode() {
         return expertMode;
     }

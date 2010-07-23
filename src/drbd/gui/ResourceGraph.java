@@ -1689,10 +1689,12 @@ public abstract class ResourceGraph {
                                 final double y,
                                 final Color color,
                                 final int alpha) {
-        g2d.setColor(new Color(color.getRed(),
-                               color.getGreen(),
-                               color.getBlue(),
-                               alpha));
+        if (color != null) {
+            g2d.setColor(new Color(color.getRed(),
+                                   color.getGreen(),
+                                   color.getBlue(),
+                                   alpha));
+        }
         textLayout.draw(g2d, (float) x, (float) y);
     }
 

@@ -765,7 +765,11 @@ public class CheckInstallation extends DialogHost {
             final String text =
                       getHost().getDistString("DrbdInst.install.text." + index);
             if (text == null || text.equals("")) {
-                break;
+                if (i > 9) {
+                    break;
+                }
+                i++;
+                continue;
             }
             final String staging =
                   getHost().getDistString("DrbdInst.install.staging." + index);

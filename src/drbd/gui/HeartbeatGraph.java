@@ -864,7 +864,7 @@ public class HeartbeatGraph extends ResourceGraph {
             } else {
                 // TODO fillpaint.placeholder
                 return Tools.getDefaultColor(
-                                       "HeartbeatGraph.FillPaintPlaceHolder");
+                                        "HeartbeatGraph.FillPaintPlaceHolder");
             }
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
@@ -874,7 +874,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (getClusterBrowser().allHostsDown()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (si.isFailed(tOnly) || si.getService().isOrphaned()) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
+            return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (!si.isRunning(tOnly)) {
             return ClusterBrowser.FILL_PAINT_STOPPED;
         } else if (getClusterBrowser().clStatusFailed()) {
@@ -1248,7 +1248,7 @@ public class HeartbeatGraph extends ResourceGraph {
         } else {
             icons.add(SERVICE_RUNNING_ICON);
         }
-        if (!si.isManaged(testOnly)) {
+        if (!si.isManaged(testOnly) || si.getService().isOrphaned()) {
             icons.add(SERVICE_UNMANAGED_ICON);
         }
         if (si.getMigratedTo(testOnly) != null

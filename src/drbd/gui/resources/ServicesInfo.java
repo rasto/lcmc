@@ -309,16 +309,9 @@ public class ServicesInfo extends EditableInfo {
         if (siP.getResourceAgent().isLinbitDrbd()) {
             /* linbit::drbd -> Filesystem */
             ((FilesystemInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
-            dri = getBrowser().getDrbdResHash().get(
-                                    ((LinbitDrbdInfo) siP).getResourceName());
         } else {
             /* drbddisk -> Filesystem */
             ((FilesystemInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
-            dri = getBrowser().getDrbdResHash().get(
-                                       ((DrbddiskInfo) siP).getResourceName());
-        }
-        if (dri != null) {
-            dri.setUsedByCRM(true);
         }
     }
 
@@ -513,6 +506,7 @@ public class ServicesInfo extends EditableInfo {
                     addServicePanel(newSi, p, false, false, testOnly);
                 }
             } else {
+                getBrowser().addNameToServiceInfoHash(newSi);
                 setParametersHash.put(newSi, resourceNode);
             }
             newSi.getService().setNew(false);
@@ -1404,7 +1398,11 @@ public class ServicesInfo extends EditableInfo {
                     for (ServiceInfo si
                             : getBrowser().getExistingServiceList(null)) {
                         if (si.getGroupInfo() == null) {
-                            si.removeMyselfNoConfirm(dcHost, false);
+                            if (si.getService().isOrphaned()) {
+                                si.cleanupResource(dcHost, false);
+                            } else if (!si.isRunning(false)) {
+                                si.removeMyselfNoConfirm(dcHost, false);
+                            }
                         }
                     }
                     getBrowser().getHeartbeatGraph().repaint();
