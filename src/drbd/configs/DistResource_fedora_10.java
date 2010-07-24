@@ -50,7 +50,7 @@ public class DistResource_fedora_10 extends
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://www.clusterlabs.org/rpm/fedora-10/clusterlabs.repo && "
          + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker corosync"
+         + " -x heartbeat-2.1* -x stonith install pacemaker corosync"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi)"

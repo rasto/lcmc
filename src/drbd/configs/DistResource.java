@@ -61,7 +61,7 @@ public class DistResource extends
 
         /* DrbdCheck.version has exit code != 0 if nothing is installed */
         {"DrbdCheck.version",
-         "/sbin/drbdadm help | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
+         "/sbin/drbdadm help 2>/dev/null | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
 
         {"HbCheck.version",
          "@GUI-HELPER@ get-cluster-versions"},
