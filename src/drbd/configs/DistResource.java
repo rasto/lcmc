@@ -251,8 +251,10 @@ public class DistResource extends
          + "chmod o-x /sbin/drbdmeta;"
          + "chmod u+s /sbin/drbdmeta;"},
 
-        {"CRM.standByOn",      "/usr/sbin/crm_standby -U @HOST@ -v on"},
-        {"CRM.standByOff",     "/usr/sbin/crm_standby -U @HOST@ -v off"},
+        {"CRM.standByOn",
+         "/usr/sbin/crm_attribute -N @HOST@ -n standby -v on -l forever"},
+        {"CRM.standByOff",
+         "/usr/sbin/crm_attribute -N @HOST@ -n standby -v off -l forever"},
 
         {"OpenAIS.getAisConfig",     "cat /etc/ais/openais.conf"},
         {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
