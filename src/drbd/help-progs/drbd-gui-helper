@@ -1203,12 +1203,21 @@ sub get_cluster_versions {
 	my $cs_prog = "/usr/sbin/corosync";
 	my $cs_version = "";
 	my $cs_script = "corosync";
+	my $corosync_1_2_5_file = "/tmp/corosync-1.2.5-beware";
 	if (-e $cs_prog) {
-		($cs_version) = `$cs_prog -v` =~ /'(\d+\.\d+\.\d+)'/;
-		if (!$cs_version) {	
-			$cs_version =
-			`grep -m 1 -a -o '/BUILD/corosync-[^/]*' /usr/sbin/corosync|sed s/.*-// 2>/dev/null` || "";
-			chomp $cs_version;
+		if (-e $corosync_1_2_5_file) {
+			$cs_version = "1.2.5!";
+		} else {
+			($cs_version) = `$cs_prog -v` =~ /'(\d+\.\d+\.\d+)'/;
+			if ($cs_version && "1.2.5" eq $cs_version) {
+				# workaround so that corosync 1.2.5 does not fill up
+				# shared momory.
+				if (open TMP, ">$corosync_1_2_5_file") {
+					close TMP;
+				}	
+			} else {
+				unlink $corosync_1_2_5_file;
+			}
 		}
 		if (!$cs_version) {
 			$cs_version = "ok";
