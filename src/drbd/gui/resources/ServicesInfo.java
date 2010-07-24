@@ -1374,6 +1374,10 @@ public class ServicesInfo extends EditableInfo {
                 ConfigData.AccessType.ADMIN) {
             private static final long serialVersionUID = 1L;
 
+            public boolean visiblePredicate() {
+                return Tools.getConfigData().getExpertMode();
+            }
+
             public boolean enablePredicate() {
                 return !getBrowser().clStatusFailed()
                        && !getBrowser().getExistingServiceList(null).isEmpty();
