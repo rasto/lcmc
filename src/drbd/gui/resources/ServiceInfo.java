@@ -4573,12 +4573,15 @@ public class ServiceInfo extends EditableInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
+                    if (getService().isNew()) {
+                        return true;
+                    }
                     if (getBrowser().clStatusFailed()
                         || getService().isRemoved()
                         || isRunning(testOnly)) {
                         return false;
                     }
-                    if (groupInfo == null || getService().isNew()) {
+                    if (groupInfo == null) {
                         return true;
                     }
                     final ClusterStatus cs = getBrowser().getClusterStatus();
