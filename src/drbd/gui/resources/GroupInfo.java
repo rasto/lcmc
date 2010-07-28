@@ -560,6 +560,9 @@ public class GroupInfo extends ServiceInfo {
                                cloneId, /* clone id */
                                master,
                                testOnly);
+            for (final ServiceInfo child : children) {
+                child.cleanupResource(dcHost, testOnly);
+            }
         }
         if (!testOnly) {
             for (final ServiceInfo child : children) {
