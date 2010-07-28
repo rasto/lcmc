@@ -1204,8 +1204,10 @@ public class ServicesInfo extends EditableInfo {
                     ldMenuItem.setPos(pos);
                     add(ldMenuItem);
                 }
-                if (crmXML.isDrbddiskPresent()) { /* just skip it,
-                                                     if it is not */
+                if (crmXML.isDrbddiskPresent()
+                    && (getBrowser().isDrbddiskPreferred()
+                        || getBrowser().atLeastOneDrbddisk()
+                        || !crmXML.isLinbitDrbdPresent())) {
                     final ResourceAgent drbddiskService =
                                                 crmXML.getHbDrbddisk();
                     final MyMenuItem ddMenuItem = new MyMenuItem(

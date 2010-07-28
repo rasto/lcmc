@@ -1910,21 +1910,27 @@ public class ClusterBrowser extends Browser {
            Tools.getString("ClusterBrowser.confirmHbDrbd.No"));
     }
 
+    /** Returns whether drbddisk RA is preferred. */
+    public final boolean isDrbddiskPreferred() {
+        final Host dcHost = getDCHost();
+        final String hbV = dcHost.getHeartbeatVersion();
+        final String pmV = dcHost.getPacemakerVersion();
+        return (pmV == null
+                && hbV != null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0);
+    }
+
     /**
      * Returns true if user wants the linbit:drbd even, for old version of
      * hb or simply true if we have pacemaker.
      */
     public final boolean linbitDrbdConfirmDialog() {
-        // TODO: warn about drbd < 8.3.3 as well
-        final Host dcHost = getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (isDrbddiskPreferred()) {
             final String desc =
                 Tools.getString("ClusterBrowser.confirmLinbitDrbd.Description");
 
+            final Host dcHost = getDCHost();
+            final String hbV = dcHost.getHeartbeatVersion();
             return Tools.confirmDialog(
                Tools.getString("ClusterBrowser.confirmLinbitDrbd.Title"),
                desc.replaceAll("@VERSION@", hbV),
