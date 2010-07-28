@@ -377,6 +377,15 @@ public final class RoboTest {
         thread.start();
     }
 
+    /** Check test. */
+    private static void checkTest(final Host host,
+                                  final String test,
+                                  final double no) {
+        if (!aborted) {
+            host.checkTest(test, no);
+        }
+    }
+
     /** TEST 1. */
     private static void startTest1(final Robot robot, final Host host) {
         slowFactor = 0.2f;
@@ -389,21 +398,23 @@ public final class RoboTest {
         final int gy = 374;
         final int popX = 343;
         final int popY = 300;
+        final int statefulX = 500;
+        final int statefulY = 255;
         disableStonith(robot, host);
-        host.checkTest("test1", 1);
+        checkTest(host, "test1", 1);
         moveTo(robot, ipX, ipY);
         rightClick(robot); /* popup */
         moveTo(robot, ipX + 57, ipY + 28);
         moveTo(robot, ipX + 270, ipY + 28);
-        moveTo(robot, ipX + 267, ipY + 67);
+        moveTo(robot, ipX + 267, ipY + 52);
         leftClick(robot); /* choose ipaddr */
-        removeService(robot, ipX, ipY, -15);
+        removeResource(robot, ipX, ipY, -15);
         /* again */
         moveTo(robot, ipX, ipY);
         rightClick(robot); /* popup */
         moveTo(robot, ipX + 57, ipY + 28);
         moveTo(robot, ipX + 270, ipY + 28);
-        moveTo(robot, ipX + 267, ipY + 67);
+        moveTo(robot, ipX + 267, ipY + 52);
         leftClick(robot); /* choose ipaddr */
 
         moveTo(robot, 1072, 405);
@@ -429,7 +440,7 @@ public final class RoboTest {
         leftClick(robot); /* choose group */
         sleep(3000);
         /* remove it */
-        removeService(robot, gx, gy, 0);
+        removeResource(robot, gx, gy, 0);
 
         moveTo(robot, gx, gy);
         sleep(1000);
@@ -448,7 +459,7 @@ public final class RoboTest {
         sleep(1000);
 
         /* remove it */
-        removeService(robot, gx, gy, 0);
+        removeResource(robot, gx, gy, 0);
 
         /* group with dummy resources, once again */
         moveTo(robot, gx, gy);
@@ -470,9 +481,9 @@ public final class RoboTest {
         sleep(1000);
         rightClick(robot);
         sleep(1000);
-        moveTo(robot, 150, 555);
+        moveTo(robot, 150, 552);
         leftClick(robot); /* remove service */
-        removeService(robot, gx, gy, 0);
+        removeResource(robot, gx, gy, 0);
 
         /* group with dummy resources, once again */
         moveTo(robot, gx, gy);
@@ -490,7 +501,7 @@ public final class RoboTest {
         typeDummy(robot);
         sleep(1000);
 
-        removeService(robot, gx, gy, 0);
+        removeResource(robot, gx, gy, 0);
 
 
         /* once again */
@@ -501,7 +512,7 @@ public final class RoboTest {
         sleep(1000);
         leftClick(robot); /* choose group */
         sleep(3000);
-        host.checkTest("test1", 2); /* 2 */
+        checkTest(host, "test1", 2); /* 2 */
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
@@ -533,10 +544,10 @@ public final class RoboTest {
             sleep(1000);
         }
         sleep(4000);
-        host.checkTest("test1", 3); /* 3 */
+        checkTest(host, "test1", 3); /* 3 */
         /* constraints */
         addConstraint(robot, gx, gy, 0, true, -1);
-        host.checkTest("test1", 3.1); /* 3.1 */
+        checkTest(host, "test1", 3.1); /* 3.1 */
 
         /* same as */
         moveTo(robot, 125, 345);
@@ -553,7 +564,7 @@ public final class RoboTest {
         sleep(4000);
         leftClick(robot); /* apply */
         sleep(4000);
-        host.checkTest("test1", 3.2); /* 3.2 */
+        checkTest(host, "test1", 3.2); /* 3.2 */
 
         moveTo(robot, 1078 , 612);
         leftClick(robot);
@@ -565,14 +576,14 @@ public final class RoboTest {
         sleep(4000);
         leftClick(robot); /* apply */
         sleep(5000);
-        host.checkTest("test1", 4); /* 4 */
+        checkTest(host, "test1", 4); /* 4 */
 
         /* locations */
         moveTo(robot, ipX + 20, ipY);
         leftClick(robot); /* choose ip */
         setLocation(robot, new Integer[]{KeyEvent.VK_I});
         sleep(3000);
-        host.checkTest("test1", 4.1); /* 4.1 */
+        checkTest(host, "test1", 4.1); /* 4.1 */
 
         setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -586,7 +597,7 @@ public final class RoboTest {
                                          KeyEvent.VK_I});
         
         sleep(3000);
-        host.checkTest("test1", 4.2); /* 4.2 */
+        checkTest(host, "test1", 4.2); /* 4.2 */
 
         setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -599,7 +610,7 @@ public final class RoboTest {
                                          KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_PLUS});
         sleep(3000);
-        host.checkTest("test1", 4.3); /* 4.3 */
+        checkTest(host, "test1", 4.3); /* 4.3 */
 
         setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -611,185 +622,183 @@ public final class RoboTest {
                                          KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE});
         sleep(3000);
-        host.checkTest("test1", 4.4); /* 4.4 */
+        checkTest(host, "test1", 4.4); /* 4.4 */
 
         removeConstraint(robot, popX, popY);
         sleep(3000);
-        host.checkTest("test1", 5); /* 5 */
+        checkTest(host, "test1", 5); /* 5 */
         sleep(1000);
 
         addConstraint(robot, gx, gy, 9, true, -1);
         sleep(5000);
-        host.checkTest("test1", 6); /* 6 */
+        checkTest(host, "test1", 6); /* 6 */
 
         removeOrder(robot, popX, popY);
         sleep(4000);
-        host.checkTest("test1", 7);
+        checkTest(host, "test1", 7);
 
         addOrder(robot, popX, popY);
         sleep(4000);
-        host.checkTest("test1", 8);
+        checkTest(host, "test1", 8);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 9);
+        checkTest(host, "test1", 9);
 
         addColocation(robot, popX, popY);
         sleep(4000);
-        host.checkTest("test1", 10);
+        checkTest(host, "test1", 10);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.1);
+        checkTest(host, "test1", 10.1);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.2);
+        checkTest(host, "test1", 10.2);
 
         addConstraintOrderOnly(robot, gx, gy, 0, 25, 0, true, -1);
         sleep(4000);
-        host.checkTest("test1", 10.3);
+        checkTest(host, "test1", 10.3);
 
         addColocation(robot, popX, popY);
         sleep(4000);
-        host.checkTest("test1", 10.4);
+        checkTest(host, "test1", 10.4);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.5);
+        checkTest(host, "test1", 10.5);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.6);
+        checkTest(host, "test1", 10.6);
 
         addConstraintColocationOnly(robot, gx, gy, 0, 25, 0, true, -1);
         sleep(4000);
-        host.checkTest("test1", 10.7);
+        checkTest(host, "test1", 10.7);
 
         addOrder(robot, popX, popY);
         sleep(4000);
-        host.checkTest("test1", 10.8);
+        checkTest(host, "test1", 10.8);
 
         removeConstraint(robot, popX, popY);
         sleep(4000);
-        host.checkTest("test1", 10.9);
+        checkTest(host, "test1", 10.9);
 
         addConstraint(robot, ipX, ipY, 0, false, -1);
         sleep(5000);
-        host.checkTest("test1", 10.91);
+        checkTest(host, "test1", 10.91);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.92);
+        checkTest(host, "test1", 10.92);
 
         addOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.93);
+        checkTest(host, "test1", 10.93);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.94);
+        checkTest(host, "test1", 10.94);
 
         addColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.95);
+        checkTest(host, "test1", 10.95);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.96);
+        checkTest(host, "test1", 10.96);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.97);
+        checkTest(host, "test1", 10.97);
 
         addConstraintColocationOnly(robot, ipX, ipY, 0, 100, 0, false, -1);
         sleep(5000);
-        host.checkTest("test1", 10.98);
+        checkTest(host, "test1", 10.98);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 10.99);
+        checkTest(host, "test1", 10.99);
 
         addConstraintOrderOnly(robot, ipX, ipY, 0, 100, 0, false, -1);
         sleep(5000);
-        host.checkTest("test1", 11);
+        checkTest(host, "test1", 11);
 
         addColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.1);
+        checkTest(host, "test1", 11.1);
 
         removeConstraint(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.2);
+        checkTest(host, "test1", 11.2);
 
         addConstraint(robot, ipX, ipY, 60, false, -1);
         sleep(5000);
-        host.checkTest("test1", 11.3);
+        checkTest(host, "test1", 11.3);
         stopResource(robot, ipX, ipY, 0);
         sleep(5000);
-        host.checkTest("test1", 11.4);
+        checkTest(host, "test1", 11.4);
         resetStartStopResource(robot, ipX, ipY);
         sleep(5000);
-        host.checkTest("test1", 11.5);
+        checkTest(host, "test1", 11.5);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.51);
+        checkTest(host, "test1", 11.51);
 
         addColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.52);
+        checkTest(host, "test1", 11.52);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.53);
+        checkTest(host, "test1", 11.53);
 
         addOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.54);
+        checkTest(host, "test1", 11.54);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.55);
+        checkTest(host, "test1", 11.55);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.56);
+        checkTest(host, "test1", 11.56);
 
         addConstraintOrderOnly(robot, ipX, ipY, 0, 100, 55, false, -1);
         sleep(5000);
-        host.checkTest("test1", 11.57);
+        checkTest(host, "test1", 11.57);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.58);
+        checkTest(host, "test1", 11.58);
 
         addConstraintColocationOnly(robot, ipX, ipY, 0, 100, 55, false, -1);
         sleep(5000);
-        host.checkTest("test1", 11.59);
+        checkTest(host, "test1", 11.59);
 
         addOrder(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.6);
+        checkTest(host, "test1", 11.6);
 
         removeConstraint(robot, popX, popY);
         sleep(5000);
-        host.checkTest("test1", 11.7);
+        checkTest(host, "test1", 11.7);
 
         addConstraint(robot, gx, gy, 9, true, -1);
         sleep(5000);
-        host.checkTest("test1", 11.8);
+        checkTest(host, "test1", 11.8);
 
         /** Add m/s Stateful resource */
-        final int statefulX = 500;
-        final int statefulY = 255;
         moveTo(robot, statefulX, statefulY);
         rightClick(robot); /* popup */
         moveTo(robot, 637, 263);
         moveTo(robot, 637, 283);
         moveTo(robot, 912, 282);
-        moveTo(robot, 932, 340);
-        moveTo(robot, 1165, 342);
+        moveTo(robot, 932, 325);
+        moveTo(robot, 1165, 325);
         sleep(1000);
 
         press(robot, KeyEvent.VK_S);
@@ -822,69 +831,83 @@ public final class RoboTest {
         sleep(3000);
         leftClick(robot); /* apply */
         sleep(3000);
-        host.checkTest("test1", 12);
+        checkTest(host, "test1", 12);
         stopResource(robot, statefulX, statefulY, 0);
         sleep(3000);
-        host.checkTest("test1", 13);
+        checkTest(host, "test1", 13);
         startResource(robot, statefulX, statefulY, 0);
         sleep(10000);
-        host.checkTest("test1", 14);
+        checkTest(host, "test1", 14);
         unmanageResource(robot, statefulX, statefulY, 0);
         sleep(3000);
-        host.checkTest("test1", 15);
+        checkTest(host, "test1", 15);
         manageResource(robot, statefulX, statefulY, 0);
         sleep(3000);
-        host.checkTest("test1", 16);
+        checkTest(host, "test1", 16);
 
         /* IP addr cont. */
         stopResource(robot, ipX, ipY, 0);
         sleep(3000);
-        host.checkTest("test1", 17);
+        checkTest(host, "test1", 17);
         startResource(robot, ipX, ipY, 0);
         sleep(3000);
-        host.checkTest("test1", 18);
+        checkTest(host, "test1", 18);
         unmanageResource(robot, ipX, ipY, 0);
         sleep(3000);
-        host.checkTest("test1", 19);
+        checkTest(host, "test1", 19);
         manageResource(robot, ipX, ipY, 0);
         sleep(3000);
-        host.checkTest("test1", 20);
+        checkTest(host, "test1", 20);
         migrateResource(robot, ipX, ipY, 0);
         sleep(3000);
-        host.checkTest("test1", 21);
+        checkTest(host, "test1", 21);
         unmigrateResource(robot, ipX, ipY, 0);
         sleep(3000);
-        host.checkTest("test1", 22);
+        checkTest(host, "test1", 22);
 
         /* Group cont. */
         stopResource(robot, gx, gy, 15);
         sleep(10000);
-        host.checkTest("test1", 23);
+        checkTest(host, "test1", 23);
         startResource(robot, gx, gy, 15);
         sleep(8000);
-        host.checkTest("test1", 24);
+        checkTest(host, "test1", 24);
         unmanageResource(robot, gx, gy, 15);
         sleep(5000);
-        host.checkTest("test1", 25);
+        checkTest(host, "test1", 25);
         manageResource(robot, gx, gy, 15);
         sleep(5000);
-        host.checkTest("test1", 26);
+        checkTest(host, "test1", 26);
         migrateResource(robot, gx, gy, 25);
         sleep(5000);
-        host.checkTest("test1", 27);
+        checkTest(host, "test1", 27);
         unmigrateResource(robot, gx, gy, 25);
         sleep(5000);
-        host.checkTest("test1", 28);
-
-        removeEverything(robot);
-
-        Tools.sleep(10000);
-        host.checkTest("test1", 1);
+        checkTest(host, "test1", 28);
+        stopResource(robot, ipX,ipY, 0);
+        stopResource(robot, gx, gy, 15);
+        stopResource(robot, statefulX, statefulY, 0);
+        sleep(5000);
+        checkTest(host, "test1", 29);
+        if (maybe()) {
+            removeEverything(robot);
+        } else {
+            removeResource(robot, ipX, ipY, -15);
+            removeResource(robot, gx, gy, 0);
+            removeResource(robot, statefulX, statefulY, -15);
+        }
+        if (!aborted) {
+            Tools.sleep(10000);
+        }
+        checkTest(host, "test1", 1);
     }
 
 
     /** Remove everything. */
     private static void removeEverything(final Robot robot) {
+        moveTo(robot, 335, 129); /* advanced */
+        leftClick(robot);
+        sleep(2000);
         moveTo(robot, 271, 568);
         rightClick(robot); /* popup */
         sleep(3000);
@@ -893,6 +916,8 @@ public final class RoboTest {
         leftClick(robot);
         confirmRemove(robot);
         sleep(3000);
+        leftClick(robot);
+        moveTo(robot, 335, 129); /* not advanced */
         leftClick(robot);
     }
 
@@ -932,13 +957,13 @@ public final class RoboTest {
         final int phY = 390;
 
         disableStonith(robot, host);
-        host.checkTest("test2", 1);
+        checkTest(host, "test2", 1);
         /* create 4 dummies */
         chooseDummy(robot, dummy1X, dummy1Y);
         chooseDummy(robot, dummy2X, dummy2Y);
         chooseDummy(robot, dummy3X, dummy3Y);
         chooseDummy(robot, dummy4X, dummy4Y);
-        host.checkTest("test2", 2);
+        checkTest(host, "test2", 2);
 
         /* placeholder */
         moveTo(robot, phX, phY);
@@ -947,7 +972,7 @@ public final class RoboTest {
         moveTo(robot, phX + 30 , phY + 45);
         sleep(2000);
         leftClick(robot);
-        host.checkTest("test2", 3);
+        checkTest(host, "test2", 3);
         /* constraints */
         addConstraint(robot, phX, phY, 0, false, -1); /* with dummy 1 */
         sleep(2000);
@@ -955,7 +980,7 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot); /*  apply */
         sleep(5000);
-        host.checkTest("test2", 4);
+        checkTest(host, "test2", 4);
 
         final int dum1PopX = dummy1X + 130;
         final int dum1PopY = dummy1Y + 50;
@@ -963,24 +988,24 @@ public final class RoboTest {
             removeOrder(robot, dum1PopX, dum1PopY);
             sleep(4000);
 
-            host.checkTest("test2", 5);
+            checkTest(host, "test2", 5);
 
             addOrder(robot, dum1PopX, dum1PopY);
             sleep(4000);
-            host.checkTest("test2", 6);
+            checkTest(host, "test2", 6);
 
             removeColocation(robot, dum1PopX, dum1PopY);
             sleep(5000);
-            host.checkTest("test2", 7);
+            checkTest(host, "test2", 7);
 
             addColocation(robot, dum1PopX, dum1PopY);
             sleep(4000);
-            host.checkTest("test2", 8);
+            checkTest(host, "test2", 8);
         }
 
         addConstraint(robot, dummy3X, dummy3Y, 80, false, -1); /* with ph */
         sleep(5000);
-        host.checkTest("test2", 9);
+        checkTest(host, "test2", 9);
 
         final int dum3PopX = dummy3X + 130;
         final int dum3PopY = dummy3Y - 50;
@@ -988,34 +1013,34 @@ public final class RoboTest {
             removeColocation(robot, dum3PopX, dum3PopY);
             sleep(4000);
 
-            host.checkTest("test2", 9.1);
+            checkTest(host, "test2", 9.1);
 
             addColocation(robot, dum3PopX, dum3PopY);
             sleep(4000);
-            host.checkTest("test2", 9.2);
+            checkTest(host, "test2", 9.2);
 
             removeOrder(robot, dum3PopX, dum3PopY);
             sleep(5000);
-            host.checkTest("test2", 9.3);
+            checkTest(host, "test2", 9.3);
 
             addOrder(robot, dum3PopX, dum3PopY);
             sleep(4000);
-            host.checkTest("test2", 9.4);
+            checkTest(host, "test2", 9.4);
         }
 
         addConstraint(robot, phX, phY, 0, false, -1); /* with dummy 2 */
         sleep(5000);
-        host.checkTest("test2", 10);
+        checkTest(host, "test2", 10);
         addConstraint(robot, dummy4X, dummy4Y, 80, false, -1); /* with ph */
         sleep(5000);
-        host.checkTest("test2", 11);
+        checkTest(host, "test2", 11);
 
         /* ph -> dummy2 */
         final int dum2PopX = dummy2X - 10;
         final int dum2PopY = dummy2Y + 70;
         removeConstraint(robot, dum2PopX, dum2PopY);
         sleep(4000);
-        host.checkTest("test2", 11.1);
+        checkTest(host, "test2", 11.1);
         addConstraintOrderOnly(robot,
                                phX,
                                phY,
@@ -1025,10 +1050,10 @@ public final class RoboTest {
                                false,
                                -1); /* with dummy 2 */
         sleep(4000);
-        host.checkTest("test2", 11.2);
+        checkTest(host, "test2", 11.2);
         removeOrder(robot, dum2PopX, dum2PopY);
         sleep(4000);
-        host.checkTest("test2", 11.3);
+        checkTest(host, "test2", 11.3);
         addConstraintColocationOnly(robot,
                                     phX,
                                     phY,
@@ -1038,17 +1063,17 @@ public final class RoboTest {
                                     false,
                                     -1); /* with dummy 2 */
         sleep(4000);
-        host.checkTest("test2", 11.4);
+        checkTest(host, "test2", 11.4);
         addOrder(robot, dum2PopX, dum2PopY);
         sleep(4000);
-        host.checkTest("test2", 11.5);
+        checkTest(host, "test2", 11.5);
 
         /* dummy4 -> ph */
         final int dum4PopX = dummy4X - 40;
         final int dum4PopY = dummy4Y - 10;
         removeConstraint(robot, dum4PopX, dum4PopY);
         sleep(4000);
-        host.checkTest("test2", 11.6);
+        checkTest(host, "test2", 11.6);
         moveTo(robot, dummy4X + 20, dummy4Y + 5);
         sleep(1000);
         rightClick(robot); /* workaround for the next popup not working. */
@@ -1064,10 +1089,10 @@ public final class RoboTest {
                                     false,
                                     -1); /* with ph */
         sleep(4000);
-        host.checkTest("test2", 11.7);
+        checkTest(host, "test2", 11.7);
         removeColocation(robot, dum4PopX, dum4PopY);
         sleep(4000);
-        host.checkTest("test2", 11.8);
+        checkTest(host, "test2", 11.8);
         moveTo(robot, dummy4X + 20, dummy4Y + 5);
         sleep(1000);
         rightClick(robot); /* workaround for the next popup not working. */
@@ -1081,14 +1106,14 @@ public final class RoboTest {
                                false,
                                -1); /* ph 2 */
         sleep(4000);
-        host.checkTest("test2", 11.9);
+        checkTest(host, "test2", 11.9);
         addColocation(robot, dum4PopX, dum4PopY);
         sleep(4000);
-        host.checkTest("test2", 11.91);
+        checkTest(host, "test2", 11.91);
         /* remove one dummy */
-        removeService(robot, dummy1X, dummy1Y, 0);
+        removeResource(robot, dummy1X, dummy1Y, 0);
         sleep(5000);
-        host.checkTest("test2", 12);
+        checkTest(host, "test2", 12);
         if (maybe()) {
             /* remove placeholder */
             moveTo(robot, phX , phY);
@@ -1098,19 +1123,19 @@ public final class RoboTest {
             leftClick(robot);
             confirmRemove(robot);
             sleep(5000);
-            host.checkTest("test2", 13);
+            checkTest(host, "test2", 13);
 
             /* remove rest of the dummies */
-            removeService(robot, dummy2X, dummy2Y, 0);
+            removeResource(robot, dummy2X, dummy2Y, 0);
             sleep(5000);
-            host.checkTest("test2", 14);
-            removeService(robot, dummy3X, dummy3Y, 0);
-            removeService(robot, dummy3X, dummy3Y, 0);
+            checkTest(host, "test2", 14);
+            removeResource(robot, dummy3X, dummy3Y, 0);
+            removeResource(robot, dummy3X, dummy3Y, 0);
             sleep(5000);
-            host.checkTest("test2", 15);
-            removeService(robot, dummy4X, dummy4Y, 0);
+            checkTest(host, "test2", 15);
+            removeResource(robot, dummy4X, dummy4Y, 0);
             sleep(5000);
-            host.checkTest("test2", 16);
+            checkTest(host, "test2", 16);
         } else {
             removeEverything(robot);
         }
@@ -1146,7 +1171,7 @@ public final class RoboTest {
         final int ph2Y = 473;
 
         disableStonith(robot, host);
-        host.checkTest("test4", 1);
+        checkTest(host, "test4", 1);
         /* create 6 dummies */
         chooseDummy(robot, dummy1X, dummy1Y);
         chooseDummy(robot, dummy2X, dummy2Y);
@@ -1170,7 +1195,7 @@ public final class RoboTest {
         moveTo(robot, ph2X + 30 , ph2Y + 45);
         sleep(2000);
         leftClick(robot);
-        host.checkTest("test4", 2);
+        checkTest(host, "test4", 2);
 
         /* constraints */
         addConstraint(robot, dummy5X, dummy5Y, 160, false, -1); /* with ph2 */
@@ -1184,7 +1209,7 @@ public final class RoboTest {
 
         addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 1 */
         addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 2 */
-        host.checkTest("test4", 3);
+        checkTest(host, "test4", 3);
 
         /* TEST test */
         removePlaceHolder(robot, ph1X, ph1Y);
@@ -1209,7 +1234,7 @@ public final class RoboTest {
 
         //disableStonith(robot, host);
         /* create 2 dummies */
-        host.checkTest("test5", 1);
+        checkTest(host, "test5", 1);
 
         /* placeholders */
         moveTo(robot, ph1X, ph1Y);
@@ -1221,7 +1246,7 @@ public final class RoboTest {
 
         chooseDummy(robot, dummy1X, dummy1Y);
         chooseDummy(robot, dummy2X, dummy2Y);
-        //host.checkTest("test5", 2);
+        //checkTest(host, "test5", 2);
 
         addConstraint(robot, dummy2X, dummy2Y, 35, false, -1);
         addConstraint(robot, ph1X, ph1Y, 5, false, -1);
@@ -1233,12 +1258,12 @@ public final class RoboTest {
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
         leftClick(robot); /*  apply */
-        host.checkTest("test5", 3);
+        checkTest(host, "test5", 3);
 
         leftClick(robot); /*  apply */
         removeEverything(robot);
         sleep(5000);
-        host.checkTest("test5", 4);
+        checkTest(host, "test5", 4);
         //int dum1PopX = dummy1X + 70;
         //int dum1PopY = dummy1Y + 60;
         ///* constraints */
@@ -1253,10 +1278,10 @@ public final class RoboTest {
         //    sleep(2000);
         //    leftClick(robot); /*  apply */
 
-        //    host.checkTest("test5", 2);
+        //    checkTest(host, "test5", 2);
 
         //    removeConstraint(robot, dum1PopX, dum1PopY);
-        //    host.checkTest("test5", 3);
+        //    checkTest(host, "test5", 3);
 
         //    addConstraint(robot, ph1X, ph1Y, 5, false, -1);
 
@@ -1268,10 +1293,10 @@ public final class RoboTest {
         //    sleep(2000);
         //    leftClick(robot); /*  apply */
 
-        //    host.checkTest("test5", 4);
+        //    checkTest(host, "test5", 4);
 
         //    removeConstraint(robot, dum1PopX, dum1PopY);
-        //    host.checkTest("test5", 3);
+        //    checkTest(host, "test5", 3);
         //    Tools.info("i: " + i);
         //}
     }
@@ -1290,7 +1315,7 @@ public final class RoboTest {
 
         //disableStonith(robot, host);
         /* create 2 dummies */
-        //host.checkTest("test5", 1);
+        //checkTest(host, "test5", 1);
 
         /* placeholders */
         moveTo(robot, ph1X, ph1Y);
@@ -1301,12 +1326,14 @@ public final class RoboTest {
         leftClick(robot);
 
         chooseDummy(robot, dummy1X, dummy1Y);
-        //host.checkTest("test5", 2);
+        //checkTest(host, "test5", 2);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
         while (true) {
             addConstraint(robot, ph1X, ph1Y, 5, false, -1);
-            Tools.sleep(2000);
+            if (!aborted) {
+                Tools.sleep(2000);
+            }
             removeConstraint(robot, dum1PopX, dum1PopY);
         }
 
@@ -1401,8 +1428,10 @@ public final class RoboTest {
 
     /** Sleep for x milliseconds * slowFactor + some random time. */
     private static void sleep(final int x) {
-        Tools.sleep((int) (x * slowFactor));
-        Tools.sleep((int) (x * slowFactor * Math.random()));
+        if (!aborted) {
+            Tools.sleep((int) (x * slowFactor));
+            Tools.sleep((int) (x * slowFactor * Math.random()));
+        }
     }
 
     /** Returns maybe true. */
@@ -1423,8 +1452,8 @@ public final class RoboTest {
         sleep(1000);
         moveTo(robot, x + 57, y + 28);
         moveTo(robot, x + 290, y + 28);
-        moveTo(robot, x + 290, y + 87);
-        moveTo(robot, x + 560, y + 87);
+        moveTo(robot, x + 290, y + 72);
+        moveTo(robot, x + 560, y + 72);
         sleep(2000);
         typeDummy(robot);
         sleep(2000);
@@ -1436,10 +1465,10 @@ public final class RoboTest {
     }
 
     /** Removes service. */
-    private static void removeService(final Robot robot,
-                                      final int x,
-                                      final int y,
-                                      final int corr) {
+    private static void removeResource(final Robot robot,
+                                       final int x,
+                                       final int y,
+                                       final int corr) {
         moveTo(robot, x + 20, y);
         rightClick(robot);
         sleep(1000);
