@@ -46,6 +46,7 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.Dimension;
 
 import javax.swing.plaf.TextUI;
 
@@ -290,7 +291,11 @@ public class TerminalPanel extends JScrollPane {
         append(prompt(), promptColor);
         terminalArea.setEditable(true);
         getViewport().add(terminalArea, BorderLayout.PAGE_END);
-
+        setPreferredSize(new Dimension(
+                    Short.MAX_VALUE,
+                    Tools.getDefaultInt("MainPanel.TerminalPanelHeight")));
+        setMinimumSize(getPreferredSize());
+        setMaximumSize(getPreferredSize());
     }
 
     /**

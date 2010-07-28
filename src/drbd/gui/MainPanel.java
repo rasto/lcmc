@@ -57,11 +57,6 @@ public class MainPanel extends JPanel {
         super(new BorderLayout());
         // TODO: not new Host() but null
         final TerminalPanel terminalPanel = new TerminalPanel(new Host());
-        terminalPanel.setPreferredSize(new Dimension(
-                    Short.MAX_VALUE,
-                    Tools.getDefaultInt("MainPanel.TerminalPanelHeight")));
-        terminalPanel.setMinimumSize(terminalPanel.getPreferredSize());
-        terminalPanel.setMaximumSize(terminalPanel.getPreferredSize());
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                                     new ClustersPanel(),
                                                     terminalPanel);

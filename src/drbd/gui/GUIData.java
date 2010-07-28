@@ -163,16 +163,15 @@ public class GUIData  {
         if (!terminalPanel.equals(oldTerminalPanel)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    terminalPanel.setPreferredSize(new Dimension(
-                        Short.MAX_VALUE,
-                        Tools.getDefaultInt("MainPanel.TerminalPanelHeight")));
-                    terminalPanel.setMinimumSize(
-                                             terminalPanel.getPreferredSize());
-                    terminalPanel.setMaximumSize(
-                                             terminalPanel.getPreferredSize());
                     final int loc = terminalSplitPane.getDividerLocation();
                     terminalSplitPane.setBottomComponent(terminalPanel);
-                    terminalSplitPane.setDividerLocation(loc);
+                    if (loc > Tools.getDefaultInt("DrbdMC.height") - 100) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                Tools.getGUIData().expandTerminalSplitPane(1);
+                            }
+                        });
+                    }
                 }
             });
         }
