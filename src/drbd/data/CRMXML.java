@@ -626,7 +626,7 @@ public class CRMXML extends XML {
         paramGlobalLongDescMap.put("default-action-timeout",
                                 "Transition Timeout");
         paramGlobalTypeMap.put("default-action-timeout", PARAM_TYPE_INTEGER);
-        paramGlobalDefaultMap.put("default-action-timeout", "20s");
+        paramGlobalDefaultMap.put("default-action-timeout", "20");
         paramGlobalPossibleChoices.put("default-action-timeout",
                                        INTEGER_VALUES);
         globalRequiredParams.add("default-action-timeout");
@@ -1813,10 +1813,16 @@ public class CRMXML extends XML {
                     if (contentParamNode != null) {
                         final String type = getAttribute(contentParamNode,
                                                          "type");
-                        final String defaultValue = getAttribute(
-                                                           contentParamNode,
+                        String defaultValue = getAttribute(contentParamNode,
                                                            "default");
                         paramGlobalTypeMap.put(param, type);
+                        if (PARAM_TYPE_TIME.equals(type)) {
+                            final Pattern p = Pattern.compile("^(\\d+)s$");
+                            final Matcher m = p.matcher(defaultValue);
+                            if (m.matches()) {
+                                defaultValue = m.group(1);
+                            }
+                        }
                         if (!"expected-quorum-votes".equals(param)) {
                             // TODO: workaround
                             paramGlobalDefaultMap.put(param, defaultValue);
