@@ -707,10 +707,14 @@ public class CRMXML extends XML {
             globalParams.add("dc-version");
             paramGlobalShortDescMap.put("dc-version", "DC Version");
             paramGlobalTypeMap.put("dc-version", PARAM_TYPE_LABEL);
+            paramGlobalAccessTypes.put("dc-version",
+                                       ConfigData.AccessType.NEVER);
             globalParams.add("cluster-infrastructure");
             paramGlobalShortDescMap.put("cluster-infrastructure",
                                         "Cluster Infrastructure");
             paramGlobalTypeMap.put("cluster-infrastructure", PARAM_TYPE_LABEL);
+            paramGlobalAccessTypes.put("cluster-infrastructure",
+                                       ConfigData.AccessType.NEVER);
 
             globalNotAdvancedParams.add("no-quorum-policy");
             globalNotAdvancedParams.add("maintenance-mode");

@@ -581,10 +581,12 @@ public class GuiComboBox extends JPanel {
      */
     public final void setToolTipText(String text) {
         toolTipText = text;
-        final boolean accessible =
+        if (enableAccessType != ConfigData.AccessType.NEVER) {
+            final boolean accessible =
                          Tools.getConfigData().isAccessible(enableAccessType);
-        if (!accessible) {
-            text = text + getDisabledTooltip();
+            if (!accessible) {
+                text = text + getDisabledTooltip();
+            }
         }
         if (type == Type.TEXTFIELDWITHUNIT) {
             textFieldPart.setToolTipText("<html>" + text + "</html>");

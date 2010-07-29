@@ -266,7 +266,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
                    && Tools.getConfigData().isAccessible(visibleAccessType));
-        if (isVisible() && !accessible) {
+        if (isVisible()
+            && !accessible
+            && enableAccessType != ConfigData.AccessType.NEVER) {
             setToolTipText("<html><b>"
                            + getText()
                            + " (disabled)</b><br>available in \""

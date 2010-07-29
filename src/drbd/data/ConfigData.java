@@ -45,7 +45,7 @@ public class ConfigData implements Serializable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** access type. */
-    public static enum AccessType { RO, OP, ADMIN, GOD };
+    public static enum AccessType { RO, OP, ADMIN, GOD, NEVER };
     /** Read only operating mode. */
     private static final String OP_MODE_RO =
                                         Tools.getString("ConfigData.OpMode.RO");
