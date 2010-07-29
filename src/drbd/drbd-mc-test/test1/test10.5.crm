@@ -24,9 +24,5 @@ primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
 property $id="cib-bootstrap-options" 
-	dc-deadtime="60" 
-	cluster-delay="60" 
 	stonith-enabled="false" 
-	default-action-timeout="20" 
-	stonith-timeout="60" 
 	no-quorum-policy="ignore"

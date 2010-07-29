@@ -23,9 +23,5 @@ primitive res_Dummy_4 ocf:heartbeat:Dummy
 colocation c1 inf: _rsc_set_ ( res_Dummy_1 )
 order o1 inf: _rsc_set_ ( res_Dummy_1 )
 property $id="cib-bootstrap-options" 
-	dc-deadtime="60" 
-	cluster-delay="60" 
 	stonith-enabled="false" 
-	default-action-timeout="20" 
-	stonith-timeout="60" 
 	no-quorum-policy="ignore"

@@ -885,7 +885,9 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 28);
         stopResource(robot, ipX,ipY, 0);
+        sleep(5000);
         stopResource(robot, gx, gy, 15);
+        sleep(5000);
         stopResource(robot, statefulX, statefulY, 0);
         sleep(5000);
         checkTest(host, "test1", 29);
@@ -931,9 +933,9 @@ public final class RoboTest {
             moveTo(robot, 944, 298);
             leftClick(robot); /* disable stonith */
         }
-        moveTo(robot, 1073, 357);
+        moveTo(robot, 1073, 337);
         leftClick(robot); /* no quorum policy */
-        moveTo(robot, 1058, 390);
+        moveTo(robot, 1058, 350);
         leftClick(robot); /* ignore */
         moveTo(robot, 828, 183);
         sleep(2000);
@@ -1111,9 +1113,19 @@ public final class RoboTest {
         sleep(4000);
         checkTest(host, "test2", 11.91);
         /* remove one dummy */
-        removeResource(robot, dummy1X, dummy1Y, 0);
+        stopResource(robot, dummy1X, dummy1Y, 0);
+        sleep(5000);
+        checkTest(host, "test2", 11.92);
+        removeResource(robot, dummy1X, dummy1Y, -15);
         sleep(5000);
         checkTest(host, "test2", 12);
+        stopResource(robot, dummy2X, dummy2Y, 0);
+        sleep(5000);
+        stopResource(robot, dummy3X, dummy3Y, 0);
+        sleep(5000);
+        stopResource(robot, dummy4X, dummy4Y, 0);
+        sleep(5000);
+        checkTest(host, "test2", 12.5);
         if (maybe()) {
             /* remove placeholder */
             moveTo(robot, phX , phY);
@@ -1126,19 +1138,18 @@ public final class RoboTest {
             checkTest(host, "test2", 13);
 
             /* remove rest of the dummies */
-            removeResource(robot, dummy2X, dummy2Y, 0);
+            removeResource(robot, dummy2X, dummy2Y, -15);
             sleep(5000);
             checkTest(host, "test2", 14);
-            removeResource(robot, dummy3X, dummy3Y, 0);
-            removeResource(robot, dummy3X, dummy3Y, 0);
+            removeResource(robot, dummy3X, dummy3Y, -15);
             sleep(5000);
             checkTest(host, "test2", 15);
-            removeResource(robot, dummy4X, dummy4Y, 0);
+            removeResource(robot, dummy4X, dummy4Y, -15);
             sleep(5000);
-            checkTest(host, "test2", 16);
         } else {
             removeEverything(robot);
         }
+        checkTest(host, "test2", 16);
     }
 
     /** TEST 4. */

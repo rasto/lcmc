@@ -3,6 +3,3 @@
 ============
 
 Online: [ host1 host2 ]
-
- res_Dummy_3	(ocf::heartbeat:Dummy):	Started host1
- res_Dummy_4	(ocf::heartbeat:Dummy):	Started host2
