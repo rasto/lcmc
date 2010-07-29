@@ -319,6 +319,9 @@ public class ServiceInfo extends EditableInfo {
      */
     public boolean checkResourceFieldsChanged(final String param,
                                               final String[] params) {
+        if (getService().isNew()) {
+            return true;
+        }
         boolean changed = false;
         if (super.checkResourceFieldsChanged(param, params)) {
             changed = true;
