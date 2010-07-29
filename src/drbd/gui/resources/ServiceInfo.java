@@ -2111,7 +2111,11 @@ public class ServiceInfo extends EditableInfo {
                                                                      cloneInfo,
                                                                      this);
             } else {
-                getBrowser().getServicesNode().remove(oldCI.getNode());
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getBrowser().getServicesNode().remove(oldCI.getNode());
+                    }
+                });
                 getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
                                                                      cloneInfo,
                                                                      oldCI);
@@ -2120,8 +2124,12 @@ public class ServiceInfo extends EditableInfo {
             infoPanel = null;
             selectMyself();
         } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
-            cloneInfo.getNode().remove(getNode());
-            getBrowser().getServicesNode().remove(cloneInfo.getNode());
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    cloneInfo.getNode().remove(getNode());
+                    getBrowser().getServicesNode().remove(cloneInfo.getNode());
+                }
+            });
             getBrowser().getServicesNode().add(getNode());
             getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
                                                                     this,
