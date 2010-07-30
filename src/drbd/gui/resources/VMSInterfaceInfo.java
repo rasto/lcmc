@@ -25,17 +25,15 @@ import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
-import drbd.data.VMSXML.DiskData;
+import drbd.data.VMSXML.InterfaceData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
-import drbd.data.LinuxFile;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
-import drbd.utilities.VIRSH;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -64,9 +62,9 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 /**
- * This class holds info about Virtual Disks.
+ * This class holds info about Virtual Interfaces.
  */
-public class VMSDiskInfo extends EditableInfo {
+public class VMSInterfaceInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** VMS virtual domain info object. */
@@ -75,13 +73,11 @@ public class VMSDiskInfo extends EditableInfo {
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                                  Tools.getDefault("BackIcon"));
     /** Parameters. */
-    private static final String[] PARAMETERS = {DiskData.TYPE,
-                                                DiskData.DEVICE,
-                                                DiskData.TARGET_DEVICE,
-                                                DiskData.SOURCE_FILE,
-                                                DiskData.SOURCE_DEVICE,
-                                                DiskData.TARGET_BUS,
-                                                DiskData.READONLY};
+    private static final String[] PARAMETERS = {InterfaceData.TYPE,
+                                                InterfaceData.MAC_ADDRESS,
+                                                InterfaceData.SOURCE_BRIDGE,
+                                                InterfaceData.TARGET_DEV,
+                                                InterfaceData.MODEL_TYPE};
     /** Section map. */
     private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
@@ -94,21 +90,15 @@ public class VMSDiskInfo extends EditableInfo {
     /** Field type. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
-    static {
-        FIELD_TYPES.put(DiskData.SOURCE_FILE,
-                        GuiComboBox.Type.TEXTFIELDWITHBUTTON);
-    }
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
-        SHORTNAME_MAP.put(DiskData.TYPE, "Type");
-        SHORTNAME_MAP.put(DiskData.DEVICE, "Device");
-        SHORTNAME_MAP.put(DiskData.TARGET_DEVICE, "Target Device");
-        SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "Source File");
-        SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Source Device");
-        SHORTNAME_MAP.put(DiskData.TARGET_BUS, "Target Bus");
-        SHORTNAME_MAP.put(DiskData.READONLY, "Readonly");
+        SHORTNAME_MAP.put(InterfaceData.TYPE, "Type");
+        SHORTNAME_MAP.put(InterfaceData.MAC_ADDRESS, "Mac Address");
+        SHORTNAME_MAP.put(InterfaceData.SOURCE_BRIDGE, "Source Bridge");
+        SHORTNAME_MAP.put(InterfaceData.TARGET_DEV, "Target Device");
+        SHORTNAME_MAP.put(InterfaceData.MODEL_TYPE, "Model Type");
     }
 
     /** Default name. */
@@ -120,17 +110,9 @@ public class VMSDiskInfo extends EditableInfo {
     /** Default location for libvirt images. */
     private static final String LIBVIRT_IMAGE_LOCATION =
                                              "/var/lib/libvirt/images/";
-    /** Pattern that parses stat output. */
-    private static final Pattern STAT_PATTERN = Pattern.compile(
-                                                       "(.).{9}\\s+(\\d+)\\s+"
-                                                       + "(\\d+)\\s+"
-                                                       + "(\\d+) (.*)$");
-    /** Cache for files. */
-    private final Map<String, LinuxFile> linuxFileCache =
-                                            new HashMap<String, LinuxFile>();
-    /** Creates the VMSDiskInfo object. */
-    public VMSDiskInfo(final String name, final Browser browser,
-                       final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Creates the VMSInterfaceInfo object. */
+    public VMSInterfaceInfo(final String name, final Browser browser,
+                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser);
         setResource(new Resource(name));
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
@@ -156,7 +138,8 @@ public class VMSDiskInfo extends EditableInfo {
             mainPanel.add(headerTable.getTableHeader());
             mainPanel.add(headerTable);
         }
-        mainPanel.add(getTablePanel("Disk", vmsVirtualDomainInfo.DISK_TABLE));
+        mainPanel.add(getTablePanel("Interfaces",
+                                    vmsVirtualDomainInfo.INTERFACES_TABLE));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
@@ -236,7 +219,7 @@ public class VMSDiskInfo extends EditableInfo {
 
     /** Returns service icon in the menu. */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return BlockDevInfo.HARDDISK_ICON;
+        return NetInfo.NET_I_ICON;
     }
 
     /** Returns long description of the specified parameter. */
@@ -276,7 +259,7 @@ public class VMSDiskInfo extends EditableInfo {
     protected final String getSection(final String param) {
         final String sm = SECTION_MAP.get(param);
         if (sm == null) {
-            return "Disk Options";
+            return "Interface Options";
         }
         return sm;
     }
@@ -346,16 +329,16 @@ public class VMSDiskInfo extends EditableInfo {
         return HAS_UNIT.containsKey(param) && HAS_UNIT.get(param);
     }
 
-    /** Returns units. */
-    protected final Unit[] getUnits() {
-        return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
-                   new Unit("K", "K", "KiByte", "KiBytes"),
-                   new Unit("M", "M", "MiByte", "MiBytes"),
-                   new Unit("G",  "G",  "GiByte",      "GiBytes"),
-                   new Unit("T",  "T",  "TiByte",      "TiBytes")
-       };
-    }
+    ///** Returns units. */
+    //protected final Unit[] getUnits() {
+    //    return new Unit[]{
+    //               //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
+    //               new Unit("K", "K", "KiByte", "KiBytes"),
+    //               new Unit("M", "M", "MiByte", "MiBytes"),
+    //               new Unit("G",  "G",  "GiByte",      "GiBytes"),
+    //               new Unit("T",  "T",  "TiByte",      "TiBytes")
+    //   };
+    //}
 
     /** Returns the default unit for the parameter. */
     protected final String getDefaultUnit(final String param) {
@@ -371,13 +354,12 @@ public class VMSDiskInfo extends EditableInfo {
     protected final Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo.getMainTableData();
-        } else if (VMSVirtualDomainInfo.DISK_TABLE.equals(tableName)) {
-            return new Object[][]{vmsVirtualDomainInfo.getDiskDataRow(
-                                            getName(),
-                                            null,
-                                            vmsVirtualDomainInfo.getDisks(),
-                                            true)};
-        //} else if (INTERFACES_TABLE.equals(tableName)) {
+        } else if (VMSVirtualDomainInfo.INTERFACES_TABLE.equals(tableName)) {
+            return new Object[][]{vmsVirtualDomainInfo.getInterfaceDataRow(
+                                        getName(),
+                                        null,
+                                        vmsVirtualDomainInfo.getInterfaces(),
+                                        true)};
         }
         return new Object[][]{};
     }
@@ -419,7 +401,6 @@ public class VMSDiskInfo extends EditableInfo {
     protected final boolean isAdvanced(final String param) {
         return false;
     }
-
     /** Returns access type of this parameter. */
     protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
@@ -436,10 +417,11 @@ public class VMSDiskInfo extends EditableInfo {
 
     /** Updates parameters. */
     public final void updateParameters() {
-        final Map<String, DiskData> disks = vmsVirtualDomainInfo.getDisks();
-        if (disks != null) {
-            final DiskData diskData = disks.get(getName());
-            if (diskData != null) {
+        final Map<String, InterfaceData> interfaces =
+                                        vmsVirtualDomainInfo.getInterfaces();
+        if (interfaces != null) {
+            final InterfaceData interfaceData = interfaces.get(getName());
+            if (interfaceData != null) {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
@@ -448,7 +430,7 @@ public class VMSDiskInfo extends EditableInfo {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
                             final String savedValue =
-                                               diskData.getValue(param);
+                                               interfaceData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
                             }
@@ -465,7 +447,7 @@ public class VMSDiskInfo extends EditableInfo {
             }
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.DISK_TABLE);
+        updateTable(VMSVirtualDomainInfo.INTERFACES_TABLE);
     }
 
     /** Get first host that has this vm and is connected. */
@@ -477,189 +459,5 @@ public class VMSDiskInfo extends EditableInfo {
             }
         }
         return null;
-    }
-
-    /** Returns cached file object. */
-    public final LinuxFile getLinuxDir(final String dir, final Host host) {
-        LinuxFile ret = linuxFileCache.get(dir);
-        if (ret == null) {
-            ret = new LinuxFile(this, host, dir, "d", 0, 0);
-            linuxFileCache.put(dir, ret);
-        }
-        return ret;
-    }
-
-    /** Returns file system view that allows remote browsing. */
-    private FileSystemView getFileSystemView(final Host host) {
-        final VMSDiskInfo thisClass = this;
-        return new FileSystemView() {
-            public final File[] getRoots() {
-                return new LinuxFile[]{getLinuxDir("/", host)};
-            }
-
-            public final boolean isRoot(final File f) {
-                final String path = Tools.getUnixPath(f.toString());
-                if ("/".equals(path)) {
-                    return true;
-                }
-                return false;
-            }
-
-            public final File createNewFolder(final File containingDir) {
-                return null;
-            }
-
-            public final File getHomeDirectory() {
-                return getLinuxDir(LIBVIRT_IMAGE_LOCATION, host);
-            }
-
-            public final Boolean isTraversable(final File f) {
-                final LinuxFile lf = linuxFileCache.get(f.toString());
-                if (lf != null) {
-                    return lf.isDirectory();
-                }
-                return true;
-            }
-
-            public final File getParentDirectory(final File dir) {
-                return getLinuxDir(dir.getParent(), host);
-            }
-
-            public final File[] getFiles(final File dir,
-                                         final boolean useFileHiding) {
-                final StringBuffer dirSB = new StringBuffer(dir.toString());
-                if ("/".equals(dir.toString())) {
-                    dirSB.append('*');
-                } else {
-                    dirSB.append("/*");
-                }
-                final SSH.SSHOutput out =
-                        Tools.execCommandProgressIndicator(
-                                      host,
-                                      "stat -c \"%A %a %Y %s %n\" "
-                                      + dirSB.toString()
-                                      + " 2>/dev/null",
-                                      null,
-                                      false,
-                                      "executing...",
-                                      SSH.DEFAULT_COMMAND_TIMEOUT);
-                final List<LinuxFile> files = new ArrayList<LinuxFile>();
-                if (out.getExitCode() == 0) {
-                    for (final String line : out.getOutput().split("\r\n")) {
-                        final Matcher m = STAT_PATTERN.matcher(line);
-                        if (m.matches()) {
-                            final String type = m.group(1);
-                            final long lastModified =
-                                           Long.parseLong(m.group(3)) * 1000;
-                            final long size = Long.parseLong(m.group(4));
-                            final String filename = m.group(5);
-                            LinuxFile lf = linuxFileCache.get(filename);
-                            if (lf == null) {
-                                lf = new LinuxFile(thisClass,
-                                                   host,
-                                                   filename,
-                                                   type,
-                                                   lastModified,
-                                                   size);
-                                linuxFileCache.put(filename, lf);
-                            } else {
-                                lf.update(type, lastModified, size);
-                            }
-                            files.add(lf);
-                        } else {
-                            Tools.appWarning("could not match: " + line);
-                        }
-                    }
-                }
-                return files.toArray(new LinuxFile[files.size()]);
-            }
-        };
-    }
-
-    /** Starts file chooser. */
-    private void startFileChooser(final GuiComboBox paramCb) {
-        final Host host = getFirstConnectedHost();
-        if (host == null) {
-            Tools.appError("Connection to host lost.");
-            return;
-        }
-        final VMSDiskInfo thisClass = this;
-        final JFileChooser fc = new JFileChooser(
-                                    getLinuxDir(LIBVIRT_IMAGE_LOCATION, host),
-                                    getFileSystemView(host)) {
-            /** Serial version UID. */
-            private static final long serialVersionUID = 1L;
-                public final void setCurrentDirectory(final File dir) {
-                    super.setCurrentDirectory(new LinuxFile(
-                                                    thisClass,
-                                                    host,
-                                                    dir.toString(),
-                                                    "d",
-                                                    0,
-                                                    0));
-                }
-
-            };
-        fc.setBackground(ClusterBrowser.STATUS_BACKGROUND);
-        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
-        fc.setDialogTitle(Tools.getString("VMSDiskInfo.FileChooserTitle")
-                          + host.getName());
-//        fc.setApproveButtonText(Tools.getString("VMSDiskInfo.Approve"));
-        fc.setApproveButtonToolTipText(
-                               Tools.getString("VMSDiskInfo.Approve.ToolTip"));
-        fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
-        final int ret = fc.showDialog(
-                                       Tools.getGUIData().getMainFrame(),
-                                       Tools.getString("VMSDiskInfo.Approve"));
-        linuxFileCache.clear();
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            if (fc.getSelectedFile() != null) {
-                final String name = fc.getSelectedFile().getAbsolutePath();
-                paramCb.setValue(name);
-            }
-        }
-    }
-
-    /** Returns combo box for parameter. */
-    protected final GuiComboBox getParamComboBox(final String param,
-                                                 final String prefix,
-                                                 final int width) {
-        if (DiskData.SOURCE_FILE.equals(param)) {
-            /* get networks */
-            final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
-            final String regexp = "[^/]$";
-            final MyButton fileChooserBtn = new MyButton("Browse...");
-            final GuiComboBox paramCb = new GuiComboBox(sourceFile,
-                                      null,
-                                      null, /* units */
-                                      GuiComboBox.Type.TEXTFIELDWITHBUTTON,
-                                      regexp,
-                                      width,
-                                      null, /* abbrv */
-                                      getAccessType(param),
-                                      fileChooserBtn);
-            if (Tools.isWindows()) {
-                /* does not work on windows and I tries, ultimatly because
-                   FilePane.usesShellFolder(fc) in BasicFileChooserUI returns
-                   true and it is not possible to descent into a directory.
-                   TODO: It may work in the future.
-                */
-                paramCb.setTFButtonEnabled(false);
-            }
-            fileChooserBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread t = new Thread(new Runnable() {
-                        public void run() {
-                            startFileChooser(paramCb);
-                        }
-                    });
-                    t.start();
-                }
-            });
-            paramComboBoxAdd(param, prefix, paramCb);
-            return paramCb;
-        } else {
-          return super.getParamComboBox(param, prefix, width);
-        }
     }
 }

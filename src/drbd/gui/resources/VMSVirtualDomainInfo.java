@@ -96,13 +96,22 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private final StringBuffer dots = new StringBuffer(".....");
     /** Disk to info hash lock. */
     private final Mutex mDiskToInfoLock = new Mutex();
-    /** Map from key to vms virtual domain info object. */
+    /** Map from key to vms disk info object. */
     private final Map<String, VMSDiskInfo> diskToInfo =
                                            new HashMap<String, VMSDiskInfo>();
-    /** Map from target string in the table to vms virtual domain info object.
+    /** Map from target string in the table to vms disk info object.
      */
     private volatile Map<String, VMSDiskInfo> diskKeyToInfo =
                                            new HashMap<String, VMSDiskInfo>();
+    /** Interface to info hash lock. */
+    private final Mutex mInterfaceToInfoLock = new Mutex();
+    /** Map from key to vms interface info object. */
+    private final Map<String, VMSInterfaceInfo> interfaceToInfo =
+                                       new HashMap<String, VMSInterfaceInfo>();
+    /** Map from target string in the table to vms interface info object.
+     */
+    private volatile Map<String, VMSInterfaceInfo> interfaceKeyToInfo =
+                                       new HashMap<String, VMSInterfaceInfo>();
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
@@ -258,6 +267,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                                 (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSDiskInfo)) {
+                continue;
+            }
             final VMSDiskInfo vmsdi =
                               (VMSDiskInfo) node.getUserObject();
             if (diskNames.contains(vmsdi.toString())) {
@@ -289,6 +301,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             while (eee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
                                 (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSDiskInfo)) {
+                    continue;
+                }
                 final VMSDiskInfo vmsdi =
                                         (VMSDiskInfo) node.getUserObject();
                 if (disk.compareTo(vmsdi.getName()) < 0) {
@@ -309,6 +324,87 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             vmsdi.updateParameters();
             final DefaultMutableTreeNode resource =
                                         new DefaultMutableTreeNode(vmsdi);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            i++;
+            nodeChanged = true;
+        }
+        return nodeChanged;
+    }
+
+    /** Updates interface nodes. Returns whether the node changed. */
+    private boolean updateInterfaceNodes() {
+        final Map<String, InterfaceData> interfaces = getInterfaces();
+        final List<String> interfaceNames  = new ArrayList<String>();
+        if (interfaces != null) {
+            for (final String i : interfaces.keySet()) {
+                interfaceNames.add(i);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSInterfaceInfo)) {
+                continue;
+            }
+            final VMSInterfaceInfo vmsii =
+                                      (VMSInterfaceInfo) node.getUserObject();
+            if (interfaceNames.contains(vmsii.toString())) {
+                /* keeping */
+                interfaceNames.remove(vmsii.toString());
+                vmsii.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mInterfaceToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                interfaceToInfo.remove(vmsii.toString());
+                mInterfaceToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        for (final String interf : interfaceNames) {
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSInterfaceInfo)) {
+                    continue;
+                }
+                final VMSInterfaceInfo vmsii =
+                                        (VMSInterfaceInfo) node.getUserObject();
+                if (interf.compareTo(vmsii.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm interface */
+            final VMSInterfaceInfo vmsii =
+                             new VMSInterfaceInfo(interf, getBrowser(), this);
+            try {
+                mInterfaceToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            interfaceToInfo.put(interf, vmsii);
+            mInterfaceToInfoLock.release();
+            vmsii.updateParameters();
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmsii);
             getBrowser().setNode(resource);
             getNode().insert(resource, i);
             i++;
@@ -467,8 +563,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         updateTable(DISK_TABLE);
         updateTable(INTERFACES_TABLE);
         /* disks */
-        final boolean nodeChanged = updateDiskNodes();
-        if (nodeChanged) {
+        final boolean interfaceNodeChanged = updateInterfaceNodes();
+        final boolean diskNodeChanged = updateDiskNodes();
+        if (diskNodeChanged || interfaceNodeChanged) {
             getBrowser().reload(getNode());
         }
         //final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
@@ -1333,16 +1430,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return true;
     }
 
-    /**
-     * Returns parameters.
-     */
+    /** Returns parameters. */
     public final String[] getParametersFromXML() {
         return VM_PARAMETERS;
     }
 
-    /**
-     * Returns possible choices for drop down lists.
-     */
+    /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
         if (VMSXML.VM_PARAM_BOOT.equals(param)) {
             return POSSIBLE_VALUES.get(param);
@@ -1350,16 +1443,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return null;
     }
 
-    /**
-     * Returns section to which the specified parameter belongs.
-     */
+    /** Returns section to which the specified parameter belongs. */
     protected final String getSection(final String param) {
         return SECTION_MAP.get(param);
     }
 
-    /**
-     * Returns true if the specified parameter is required.
-     */
+    /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
         return true;
     }
@@ -1374,37 +1463,27 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return false;
     }
 
-    /**
-     * Returns true if the specified parameter is of time type.
-     */
+    /** Returns true if the specified parameter is of time type. */
     protected final boolean isTimeType(final String param) {
         return false;
     }
 
-    /**
-     * Returns whether parameter is checkbox.
-     */
+    /** Returns whether parameter is checkbox. */
     protected final boolean isCheckBox(final String param) {
         return false;
     }
 
-    /**
-     * Returns the type of the parameter.
-     */
+    /** Returns the type of the parameter. */
     protected final String getParamType(final String param) {
         return "undef"; // TODO:
     }
 
-    /**
-     * Returns type of the field.
-     */
+    /** Returns type of the field. */
     protected final GuiComboBox.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
-    /**
-     * Applies the changes.
-     */
+    /** Applies the changes. */
     public final void apply(final boolean testOnly) {
         if (testOnly) {
             return;
@@ -1429,16 +1508,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         checkResourceFields(null, params);
     }
 
-    /**
-     * Returns whether this parameter has a unit prefix.
-     */
+    /** Returns whether this parameter has a unit prefix. */
     protected final boolean hasUnitPrefix(final String param) {
         return HAS_UNIT_PREFIX.containsKey(param) && HAS_UNIT_PREFIX.get(param);
     }
 
-    /**
-     * Returns units.
-     */
+    /** Returns units. */
     protected final Unit[] getUnits() {
         return new Unit[]{
                    //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
@@ -1449,30 +1524,22 @@ public class VMSVirtualDomainInfo extends EditableInfo {
        };
     }
 
-    /**
-     * Returns the default unit for the parameter.
-     */
+    /** Returns the default unit for the parameter. */
     protected final String getDefaultUnit(final String param) {
         return DEFAULT_UNIT.get(param);
     }
 
-    /**
-     * Returns HTML string on which hosts the vm is defined.
-     */
+    /** Returns HTML string on which hosts the vm is defined. */
     public final String getDefinedOnString() {
         return definedOnString;
     }
 
-    /**
-     * Returns HTML string on which hosts the vm is running.
-     */
+    /** Returns HTML string on which hosts the vm is running. */
     public final String getRunningOnString() {
         return runningOnString;
     }
 
-    /**
-     * Returns columns for the table.
-     */
+    /** Returns columns for the table. */
     protected final String[] getColumnNames(final String tableName) {
         if (HEADER_TABLE.equals(tableName)) {
             return new String[]{"Name", "Defined on", "Status", "Memory"};
@@ -1484,9 +1551,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return new String[]{};
     }
 
-    /**
-     * Returns data for the table.
-     */
+    /** Returns data for the table. */
     protected final Object[][] getTableData(final String tableName) {
         if (HEADER_TABLE.equals(tableName)) {
             return getMainTableData();
@@ -1498,9 +1563,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return new Object[][]{};
     }
 
-    /**
-     * Returns data for the main table.
-     */
+    /** Returns data for the main table. */
     protected final Object[][] getMainTableData() {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final String domainName = getDomainName();
@@ -1602,11 +1665,39 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /**
-     * Returns data for the interface table.
-     */
-    private Object[][] getInterfaceTableData() {
-        final List<Object[]> rows = new ArrayList<Object[]>();
+    /** Get one row of the table. */
+    final protected Object[] getInterfaceDataRow(
+                                final String mac,
+                                final Map<String, VMSInterfaceInfo> iToInfo,
+                                final Map<String, InterfaceData> interfaces,
+                                boolean opaque) {
+        final InterfaceData interfaceData = interfaces.get(mac);
+        final StringBuffer interf = new StringBuffer(20);
+        interf.append(mac);
+        final String dev = interfaceData.getTargetDev();
+        if (dev != null) {
+            interf.append(' ');
+            interf.append(dev);
+        }
+        if (iToInfo != null) {
+            final VMSInterfaceInfo vii = interfaceToInfo.get(mac);
+            iToInfo.put(interf.toString(), vii);
+        }
+        final MyButton iLabel = new MyButton(interf.toString(),
+                                             NetInfo.NET_I_ICON_LARGE);
+        iLabel.setOpaque(opaque);
+        final StringBuffer source = new StringBuffer(20);
+        final String s = interfaceData.getSourceBridge();
+        if (s != null) {
+            source.append(interfaceData.getType());
+            source.append(" : ");
+            source.append(s);
+        }
+        return new Object[]{iLabel, source.toString()};
+    }
+
+    /** Returns all interfaces. */
+    protected final Map<String, InterfaceData> getInterfaces() {
         Map<String, InterfaceData> interfaces = null;
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
@@ -1615,36 +1706,35 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 break;
             }
         }
+        return interfaces;
+    }
+
+    /** Returns data for the interface table. */
+    private Object[][] getInterfaceTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, InterfaceData> interfaces = getInterfaces();
+        final Map<String, VMSInterfaceInfo> iToInfo =
+                                      new HashMap<String, VMSInterfaceInfo>();
         if (interfaces != null) {
             for (final String mac : interfaces.keySet()) {
-                final InterfaceData interfaceData = interfaces.get(mac);
-                final StringBuffer interf = new StringBuffer(20);
-                interf.append(mac);
-                final String dev = interfaceData.getTargetDev();
-                if (dev != null) {
-                    interf.append(' ');
-                    interf.append(dev);
-                }
-                final MyButton iLabel = new MyButton(interf.toString(),
-                                                     NetInfo.NET_I_ICON_LARGE);
-                iLabel.setOpaque(true);
-                final StringBuffer source = new StringBuffer(20);
-                final String s = interfaceData.getSourceBridge();
-                if (s != null) {
-                    source.append(interfaceData.getType());
-                    source.append(" : ");
-                    source.append(s);
-                }
-                rows.add(new Object[]{iLabel,
-                                      source.toString()});
+                final Object[] row = getInterfaceDataRow(mac,
+                                                         iToInfo,
+                                                         interfaces,
+                                                         false);
+                rows.add(row);
             }
         }
+        try {
+            mInterfaceToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        interfaceKeyToInfo = iToInfo;
+        mInterfaceToInfoLock.release();
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /**
-     * Execute when row in the table was clicked.
-     */
+    /** Execute when row in the table was clicked. */
     protected final void rowClicked(final String tableName, final String key) {
         if (HEADER_TABLE.equals(tableName)) {
             getBrowser().getVMSInfo().selectMyself();
@@ -1659,12 +1749,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             if (vdi != null) {
                 vdi.selectMyself();
             }
+        } else if (INTERFACES_TABLE.equals(tableName)) {
+            try {
+                mInterfaceToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSInterfaceInfo vii = interfaceKeyToInfo.get(key);
+            mInterfaceToInfoLock.release();
+            if (vii != null) {
+                vii.selectMyself();
+            }
         }
     }
 
-    /**
-     * Retrurns color for some rows.
-     */
+    /** Retrurns color for some rows. */
     protected final Color getTableRowColor(final String tableName,
                                            final String key) {
         if (HEADER_TABLE.equals(tableName)) {
@@ -1673,9 +1772,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return Browser.PANEL_BACKGROUND;
     }
 
-    /**
-     * Alignment for the specified column.
-     */
+    /** Alignment for the specified column. */
     protected final int getTableColumnAlignment(final String tableName,
                                                 final int column) {
 
@@ -1692,6 +1789,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return this;
         } else if (DISK_TABLE.equals(tableName)) {
             return diskToInfo.get(key);
+        } else if (INTERFACES_TABLE.equals(tableName)) {
+            return interfaceToInfo.get(key);
         }
         return null;
     }
@@ -1700,6 +1799,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     protected final boolean isAdvanced(final String param) {
         return false;
     }
+
     /** Returns access type of this parameter. */
     protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;

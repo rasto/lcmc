@@ -107,9 +107,7 @@ public class VMSXML extends XML {
         this.host = host;
     }
 
-    /**
-     * Updates data.
-     */
+    /** Updates data. */
     public final boolean update() {
         final String command = host.getDistCommand("VMSXML.GetData",
                                                    (ConvertCmdCallback) null);
@@ -446,9 +444,7 @@ public class VMSXML extends XML {
         return interfacesMap.get(name);
     }
 
-    /**
-     * Class that holds data about virtual disks.
-     */
+    /** Class that holds data about virtual disks. */
     public class DiskData {
         /** Type: file, block... */
         private final String type;
@@ -553,9 +549,7 @@ public class VMSXML extends XML {
         }
     }
 
-    /**
-     * Class that holds data about virtual interfaces.
-     */
+    /** Class that holds data about virtual interfaces. */
     public class InterfaceData {
         /** Type: bridge... */
         private final String type;
@@ -567,20 +561,37 @@ public class VMSXML extends XML {
         private final String targetDev;
         /** Model type: virtio... */
         private final String modelType;
+        /** Name value pairs. */
+        private final Map<String, String> valueMap =
+                                                new HashMap<String, String>();
 
-        /**
-         * Creates new InterfaceData object.
-         */
+        /** Type. */
+        public static final String TYPE = "type";
+        /** Mac address. */
+        public static final String MAC_ADDRESS = "mac_address";
+        /** Source bridge. */
+        public static final String SOURCE_BRIDGE = "source_bridge";
+        /** Target dev. */
+        public static final String TARGET_DEV = "target_dev";
+        /** Model type. */
+        public static final String MODEL_TYPE = "model_type";
+
+        /** Creates new InterfaceData object. */
         public InterfaceData(final String type,
                              final String macAddress,
                              final String sourceBridge,
                              final String targetDev,
                              final String modelType) {
             this.type = type;
+            valueMap.put(TYPE, type);
             this.macAddress = macAddress;
+            valueMap.put(MAC_ADDRESS, macAddress);
             this.sourceBridge = sourceBridge;
+            valueMap.put(SOURCE_BRIDGE, sourceBridge);
             this.targetDev = targetDev;
+            valueMap.put(TARGET_DEV, targetDev);
             this.modelType = modelType;
+            valueMap.put(MODEL_TYPE, modelType);
         }
 
         /** Returns type. */
@@ -606,6 +617,11 @@ public class VMSXML extends XML {
         /** Returns model type. */
         public final String getModelType() {
             return modelType;
+        }
+
+        /** Returns value of this parameter. */
+        public final String getValue(final String param) {
+            return valueMap.get(param);
         }
     }
 }
