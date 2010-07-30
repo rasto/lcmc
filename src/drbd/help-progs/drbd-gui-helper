@@ -1356,7 +1356,7 @@ sub gui_test {
 	if ($ret != 0) {
 		exit $ret;
 	}
-	for ($cib, $status) {
+	for ($cib) {
 		s/\\$//mg;
 		s/^\s+//;
 		s/\s+$//;
@@ -1366,9 +1366,20 @@ sub gui_test {
 			$i++;
 		}
 	}
+	if ($status =~ /Online: \[\s+(.*?)\s+\]/) {
+		my @status_hosts = split /\s+/, $1;
+		for ($status) {
+			s/\\$//mg;
+			s/^\s+//;
+			s/\s+$//;
+			my $i = 1;
+			for my $host (@status_hosts) {
+				s/$host\b/host$i/gi;
+				$i++;
+			}
+		}
+	}
 	$cib =~ s/(start-delay="\d+") (timeout="\d+")/$2 $1/g;
-	$status =~
-	 s/(Online: \[\s+)(.*?)(\s+\])/$1.(join " ", sort split " ", "$2").$3/e;
 	$cib =~ s/(node)\s+\$id=".*?"/$1/g;
 	# sort node lines
 	$cib =~ s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;

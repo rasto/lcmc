@@ -1120,11 +1120,11 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test2", 12);
         stopResource(robot, dummy2X, dummy2Y, 0);
-        sleep(5000);
+        sleep(10000);
         stopResource(robot, dummy3X, dummy3Y, 0);
-        sleep(5000);
+        sleep(10000);
         stopResource(robot, dummy4X, dummy4Y, 0);
-        sleep(5000);
+        sleep(10000);
         checkTest(host, "test2", 12.5);
         if (maybe()) {
             /* remove placeholder */
