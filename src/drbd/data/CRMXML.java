@@ -3469,7 +3469,8 @@ public class CRMXML extends XML {
                 } else {
                     crmId = resId;
                 }
-                if (!resourceTypeMap.containsKey(crmId)) {
+                if (Tools.getConfigData().getExpertMode()
+                    && !resourceTypeMap.containsKey(crmId)) {
                     /* it is orphaned */
                     final String raClass = getAttribute(rscNode, "class");
                     String provider = getAttribute(rscNode, "provider");

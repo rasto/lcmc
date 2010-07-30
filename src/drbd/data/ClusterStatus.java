@@ -58,6 +58,8 @@ public class ClusterStatus {
     private String oldStatus = null;
     /** Old cib in string. */
     private String oldCib = null;
+    /** Old expert mode. */
+    private boolean oldExpertMode = false;
     /** Host. */
     private final Host host;
 
@@ -583,9 +585,12 @@ public class ClusterStatus {
             } else if ("cibadmin".equals(cmd)) {
                 final String cib =
                        Tools.join("\n", data.toArray(new String[data.size()]));
-                if (!cib.equals(oldCib)) {
+                final boolean expertMode =
+                                        Tools.getConfigData().getExpertMode(); 
+                if (!cib.equals(oldCib) || oldExpertMode != expertMode) {
                     Tools.debug(this, "cib update: " + host.getName(), 1);
                     oldCib = cib;
+                    oldExpertMode = expertMode;
                     parseCibQuery(cib);
                     return true;
                 }
