@@ -1079,12 +1079,12 @@ public class Info implements Comparable {
         if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
-                final Object[][] data = getTableData(tableName);
-                Tools.debug(this, "update table in: " + getName(), 1);
-                final TableRowSorter sorter =
-                                        (TableRowSorter) table.getRowSorter();
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        final Object[][] data = getTableData(tableName);
+                        Tools.debug(this, "update table in: " + getName(), 1);
+                        final TableRowSorter sorter =
+                                        (TableRowSorter) table.getRowSorter();
                         final List sortKeys = sorter.getSortKeys();
                         tableModel.setDataVector(data, colNames);
                         sorter.setSortKeys(sortKeys);

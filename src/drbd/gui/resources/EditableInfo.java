@@ -300,7 +300,12 @@ public abstract class EditableInfo extends Info {
                 panel.setBackground(Browser.PANEL_BACKGROUND);
                 if (advanced) {
                     advancedPanelList.add(panel);
-                    panel.setVisible(Tools.getConfigData().getExpertMode());
+                    final JPanel p = panel;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            p.setVisible(Tools.getConfigData().getExpertMode());
+                        }
+                    });
                 }
                 panelPartsMap.put(section, accessType, advanced, panel);
                 panelPartsList.add(new PanelPart(section,
@@ -440,11 +445,21 @@ public abstract class EditableInfo extends Info {
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
                 advancedOnlySectionList.add(sectionPanel);
-                sectionPanel.setVisible(Tools.getConfigData().getExpertMode());
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        sectionPanel.setVisible(
+                                        Tools.getConfigData().getExpertMode());
+                    }
+                });
             }
         }
-        moreOptionsPanel.setVisible(advanced
-                                    && !Tools.getConfigData().getExpertMode());
+        final boolean a = advanced;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                moreOptionsPanel.setVisible(
+                                  a && !Tools.getConfigData().getExpertMode());
+            }
+        });
     }
 
     /** Returns a more panel with "more options are available" message. */
@@ -871,14 +886,27 @@ public abstract class EditableInfo extends Info {
         final boolean expertMode = Tools.getConfigData().getExpertMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
-            apl.setVisible(expertMode);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    apl.setVisible(expertMode);
+                }
+            });
             advanced = true;
         }
         for (final JPanel p : advancedOnlySectionList) {
-            p.setVisible(expertMode);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    p.setVisible(expertMode);
+                }
+            });
             advanced = true;
         }
-        moreOptionsPanel.setVisible(advanced && !expertMode);
+        final boolean a = advanced;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                moreOptionsPanel.setVisible(a && !expertMode);
+            }
+        });
     }
 
     /** Returns apply button. */
