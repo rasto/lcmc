@@ -26,10 +26,12 @@ package drbd.data;
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
 import drbd.utilities.SSH;
+import drbd.utilities.VIRSH;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -40,6 +42,15 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.apache.commons.collections.map.MultiKeyMap;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPath;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.TransformerFactory;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -57,6 +68,15 @@ public class VMSXML extends XML {
     /** Map from configs to names. */
     private final Map<String, String> configsMap =
                                             new HashMap<String, String>();
+    /** Map from names to configs. */
+    private final Map<String, String> namesConfigsMap =
+                                            new HashMap<String, String>();
+    /** Map from network configs to names. */
+    private final Map<String, String> netConfigsMap =
+                                            new HashMap<String, String>();
+    /** Map from network names to configs. */
+    private final Map<String, String> netNamesConfigsMap =
+                                            new HashMap<String, String>();
     /** Map from names to vcpus. */
     private final MultiKeyMap parameterValues = new MultiKeyMap();
     /** Hash of domains and their remote ports. */
@@ -73,10 +93,13 @@ public class VMSXML extends XML {
                                                 new HashMap<String, Boolean>();
     /** Map from domain name and target device to the disk data. */
     private final Map<String, Map<String, DiskData>> disksMap =
-                             new HashMap<String, Map<String, DiskData>>();
+                           new LinkedHashMap<String, Map<String, DiskData>>();
     /** Map from domain name and mac address to the interface data. */
     private final Map<String, Map<String, InterfaceData>> interfacesMap =
-                             new HashMap<String, Map<String, InterfaceData>>();
+                       new LinkedHashMap<String, Map<String, InterfaceData>>();
+    /** Map from domain name and network name to the network data. */
+    private final Map<String, NetworkData> networkMap =
+                                    new LinkedHashMap<String, NetworkData>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
@@ -98,6 +121,59 @@ public class VMSXML extends XML {
     public static final String VM_PARAM_BOOT = "boot";
     /** VM field: autostart. */
     public static final String VM_PARAM_AUTOSTART = "autostart";
+    /** Network field: name. */
+    public static final String NET_PARAM_NAME = "name";
+    /** Network field: uuid. */
+    public static final String NET_PARAM_UUID = "uuid";
+    /** Network field: autostart. */
+    public static final String NET_PARAM_AUTOSTART = "autostart";
+    /** Map from paramater to its xml tag. */
+    public static final Map<String, String> INTERFACE_TAG_MAP =
+                                             new HashMap<String, String>();
+    /** Map from paramater to its xml attribute. */
+    public static final Map<String, String> INTERFACE_ATTRIBUTE_MAP =
+                                             new HashMap<String, String>();
+    /** Map from paramater to its xml tag. */
+    public static final Map<String, String> DISK_TAG_MAP =
+                                             new HashMap<String, String>();
+    /** Map from paramater to its xml attribute. */
+    public static final Map<String, String> DISK_ATTRIBUTE_MAP =
+                                             new HashMap<String, String>();
+
+    static {
+        INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
+
+        INTERFACE_TAG_MAP.put(InterfaceData.MAC_ADDRESS, "mac");
+        INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.MAC_ADDRESS, "address");
+        INTERFACE_TAG_MAP.put(InterfaceData.SOURCE_NETWORK, "source");
+        INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.SOURCE_NETWORK, "network");
+        INTERFACE_TAG_MAP.put(InterfaceData.SOURCE_BRIDGE, "source");
+        INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.SOURCE_BRIDGE, "bridge");
+        INTERFACE_TAG_MAP.put(InterfaceData.TARGET_DEV, "target");
+        INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.TARGET_DEV, "dev");
+        INTERFACE_TAG_MAP.put(InterfaceData.MODEL_TYPE, "mode");
+        INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.MODEL_TYPE, "type");
+
+        DISK_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
+
+        DISK_TAG_MAP.put(DiskData.TARGET_DEVICE, "target");
+        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_DEVICE, "device");
+        DISK_TAG_MAP.put(DiskData.SOURCE_FILE, "source");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_FILE, "file");
+        DISK_TAG_MAP.put(DiskData.SOURCE_DEVICE, "source");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_DEVICE, "device");
+        DISK_TAG_MAP.put(DiskData.TARGET_BUS, "target");
+        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_BUS, "bus");
+
+        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_TYPE, "device");
+
+        DISK_TAG_MAP.put(DiskData.READONLY, "readonly");
+    }
+
+    /** XML document lock. */
+    private final Mutex mXMLDocumentLock = new Mutex();
+    /** XML document. */
+    private Document xmlDocument = null;
 
     /**
      * Prepares a new <code>VMSXML</code> object.
@@ -105,6 +181,220 @@ public class VMSXML extends XML {
     public VMSXML(final Host host) {
         super();
         this.host = host;
+    }
+
+    /** Returns xml node of the specified domain. */
+    private Node getDomainNode(final String domainName) {
+        try {
+            mXMLDocumentLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final Document document = xmlDocument;
+        mXMLDocumentLock.release();
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        Node domainNode = null;
+        try {
+            final String path = "//vms/vm[@name='"
+                                + domainName
+                                + "']/config/domain";
+            final NodeList domainNodes = (NodeList) xpath.evaluate(
+                                                       path,
+                                                       document,
+                                                       XPathConstants.NODESET);
+            if (domainNodes.getLength() == 1) {
+                domainNode = domainNodes.item(0);
+            } else if (domainNodes.getLength() >= 1) {
+                Tools.appError(domainNodes.getLength()
+                               + " supposedly unique "
+                               + domainName
+                               + " configs.");
+                return null;
+            } else {
+                Tools.appWarning("could not find xml for " + domainName);
+                return null;
+            }
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return null;
+        }
+        return domainNode;
+    }
+
+    /** Convert xml node to the string. */
+    private void saveDomainXML(final String configName, final Node node) {
+        String xml = null;
+        try {
+            Transformer transformer =
+                            TransformerFactory.newInstance().newTransformer();
+            final StreamResult res = new StreamResult(new StringWriter());
+            final DOMSource src = new DOMSource(node);
+            transformer.transform(src, res);
+            xml = res.getWriter().toString();
+        } catch (final javax.xml.transform.TransformerException e) {
+            e.printStackTrace();
+            return;
+        }
+        if (xml != null) {
+            host.getSSH().scp(xml, configName, "0644", true);
+        }
+    }
+
+    /** Modify disk XML. */
+    public final void modifyDiskXML(final String domainName,
+                                    final String targetDev,
+                                    final Map<String, String> parametersMap) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            final String diskPath = "//domain/devices/disk";
+            final NodeList nodes = (NodeList) xpath.evaluate(
+                                                       diskPath,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+            Element diskNode = null;
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node mn = getChildNode(nodes.item(i), "target");
+                if (targetDev.equals(getAttribute(mn, "dev"))) {
+                    diskNode = (Element) nodes.item(i);
+                }
+            }
+            if (diskNode != null) {
+                for (final String param : parametersMap.keySet()) {
+                    final String value = parametersMap.get(param);
+                    if (!DISK_TAG_MAP.containsKey(param)
+                        && DISK_ATTRIBUTE_MAP.containsKey(param)) {
+                        /* disk attribute */
+                        final Node attributeNode = 
+                                    diskNode.getAttributes().getNamedItem(
+                                               DISK_ATTRIBUTE_MAP.get(param));
+                        if (attributeNode == null) {
+                            diskNode.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
+                                                  value);
+                        } else {
+                            attributeNode.setNodeValue(value);
+                        }
+                        continue;
+                    }
+                    Element node = (Element) getChildNode(
+                                                    diskNode,
+                                                    DISK_TAG_MAP.get(param));
+                    if ((DISK_ATTRIBUTE_MAP.containsKey(param)
+                         || "True".equals(value))
+                        && node == null) {
+                        node = (Element) diskNode.appendChild(
+                              domainNode.getOwnerDocument().createElement(
+                                                      DISK_TAG_MAP.get(param)));
+                    } else if (!DISK_ATTRIBUTE_MAP.containsKey(param)
+                               && "False".equals(value)
+                               && node != null) {
+                        diskNode.removeChild(node);
+                    }
+                    if (DISK_ATTRIBUTE_MAP.containsKey(param)) {
+                        final Node attributeNode = 
+                                    node.getAttributes().getNamedItem(
+                                                DISK_ATTRIBUTE_MAP.get(param));
+                        if (attributeNode == null) {
+                            node.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
+                                              value);
+
+                        } else {
+                            attributeNode.setNodeValue(value);
+                        }
+                    }
+                }
+            }
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return;
+        }
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
+    }
+
+    /** Modify interface XML. */
+    public final void modifyInterfaceXML(
+                                     final String domainName,
+                                     final String macAddress,
+                                     final Map<String, String> parametersMap) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            final String interfacePath = "//domain/devices/interface";
+            final NodeList nodes = (NodeList) xpath.evaluate(
+                                                       interfacePath,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+            Element interfaceNode = null;
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node mn = getChildNode(nodes.item(i), "mac");
+                if (macAddress.equals(getAttribute(mn, "address"))) {
+                    interfaceNode = (Element) nodes.item(i);
+                }
+            }
+            if (interfaceNode != null) {
+                for (final String param : parametersMap.keySet()) {
+                    if (!INTERFACE_TAG_MAP.containsKey(param)
+                        && INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
+                        /* interface attribute */
+                        final Node attributeNode = 
+                                interfaceNode.getAttributes().getNamedItem(
+                                           INTERFACE_ATTRIBUTE_MAP.get(param));
+                        if (attributeNode == null) {
+                            interfaceNode.setAttribute(
+                                           INTERFACE_ATTRIBUTE_MAP.get(param),
+                                           parametersMap.get(param));
+                        } else {
+                            attributeNode.setNodeValue( 
+                                                    parametersMap.get(param));
+                        }
+                        continue;
+                    }
+                    Element node = (Element) getChildNode(
+                                                interfaceNode,
+                                                INTERFACE_TAG_MAP.get(param));
+                    if (node == null) {
+                        node = (Element) interfaceNode.appendChild(
+                                domainNode.getOwnerDocument().createElement(
+                                                INTERFACE_TAG_MAP.get(param)));
+                    }
+                    if (INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
+                        final Node attributeNode = 
+                                node.getAttributes().getNamedItem(
+                                           INTERFACE_ATTRIBUTE_MAP.get(param));
+                        if (attributeNode == null) {
+                            node.setAttribute(
+                                            INTERFACE_ATTRIBUTE_MAP.get(param),
+                                            parametersMap.get(param));
+                        } else {
+                            attributeNode.setNodeValue(
+                                                    parametersMap.get(param));
+                        }
+                    }
+                }
+            }
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return;
+        }
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
     }
 
     /** Updates data. */
@@ -125,6 +415,13 @@ public class VMSXML extends XML {
             return false;
         }
         final Document document = getXMLDocument(output);
+        try {
+            mXMLDocumentLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        xmlDocument = document;
+        mXMLDocumentLock.release();
         if (document == null) {
             return false;
         }
@@ -137,50 +434,90 @@ public class VMSXML extends XML {
         host.setVMInfoMD5(md5);
         final NodeList vms = vmsNode.getChildNodes();
         for (int i = 0; i < vms.getLength(); i++) {
-            final Node vmNode = vms.item(i);
-            if ("vm".equals(vmNode.getNodeName())) {
-                updateVM(vmNode);
+            final Node node = vms.item(i);
+            if ("net".equals(node.getNodeName())) {
+                updateNetworks(node);
+            }
+            if ("vm".equals(node.getNodeName())) {
+                updateVM(node);
             }
         }
         return true;
     }
 
-    /**
-     * Updates one vm.
-     */
-    private void updateVM(final Node vmNode) {
+    /** Updates one network. */
+    private void updateNetworks(final Node netNode) {
         /* one vm */
-        if (vmNode == null) {
+        if (netNode == null) {
             return;
         }
-        final Node infoNode = getChildNode(vmNode, "info");
-        final String name = getAttribute(vmNode, VM_PARAM_NAME);
-        final String config = getAttribute(vmNode, "config");
-        configsMap.put(config, name);
-        final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
-        if (autostart == null) {
-            parameterValues.put(name, VM_PARAM_AUTOSTART, "false");
-        } else {
-            parameterValues.put(name, VM_PARAM_AUTOSTART, autostart);
-        }
-        if (infoNode != null) {
-            parseInfo(name, getText(infoNode));
-        }
-        final Node vncdisplayNode = getChildNode(vmNode, "vncdisplay");
-        remotePorts.put(name, -1);
-        if (vncdisplayNode != null) {
-            final String vncdisplay = getText(vncdisplayNode).trim();
-            final Matcher m = DISPLAY_PATTERN.matcher(vncdisplay);
-            if (m.matches()) {
-                remotePorts.put(name, Integer.parseInt(m.group(1)) + 5900);
-            }
-        }
-        parseConfig(getChildNode(vmNode, "config"), name);
+        final String name = getAttribute(netNode, VM_PARAM_NAME);
+        final String config = getAttribute(netNode, "config");
+        netConfigsMap.put(config, name);
+        netNamesConfigsMap.put(name, config);
+        final String autostartString = getAttribute(netNode,
+                                                    NET_PARAM_AUTOSTART);
+        parseNetConfig(getChildNode(netNode, "network"), name, autostartString);
     }
 
-    /**
-     * Parses the libvirt config file.
-     */
+    /** Parses the libvirt network config file. */
+    private void parseNetConfig(final Node networkNode,
+                                final String nameInFilename,
+                                final String autostartString) {
+        if (networkNode == null) {
+            return;
+        }
+        boolean autostart = false;
+        if (autostartString != null && "true".equals(autostartString)) {
+            autostart = true;
+        }
+        final NodeList options = networkNode.getChildNodes();
+        String name = null;
+        String uuid = null;
+        String forwardMode = null;
+        String bridgeName = null;
+        String bridgeSTP = null;
+        String bridgeDelay = null;
+        String bridgeForwardDelay = null;
+        for (int i = 0; i < options.getLength(); i++) {
+            final Node optionNode = options.item(i);
+            final String nodeName = optionNode.getNodeName();
+            if (NET_PARAM_NAME.equals(nodeName)) {
+                name = getText(optionNode);
+                if (!name.equals(nameInFilename)) {
+                    Tools.appWarning("unexpected name: " + name
+                                     + " != " + nameInFilename);
+                    return;
+                }
+            } else if (NET_PARAM_UUID.equals(nodeName)) {
+                uuid = getText(optionNode);
+            } else if ("forward".equals(nodeName)) {
+                forwardMode = getAttribute(optionNode, "mode");
+            } else if ("bridge".equals(nodeName)) {
+                bridgeName = getAttribute(optionNode, "name");
+                bridgeSTP = getAttribute(optionNode, "stp");
+                bridgeDelay = getAttribute(optionNode, "delay");
+                bridgeForwardDelay = getAttribute(optionNode, "forwardDelay");
+            } else if (!"#text".equals(nodeName)) {
+                Tools.appWarning("unknown network option: "
+                                 + nodeName);
+            }
+        }
+        if (name != null) {
+            final NetworkData networkData = new NetworkData(name,
+                                                            uuid,
+                                                            autostart,
+                                                            forwardMode,
+                                                            bridgeName,
+                                                            bridgeSTP,
+                                                            bridgeDelay,
+                                                            bridgeForwardDelay);
+
+            networkMap.put(name, networkData);
+        }
+    }
+
+    /** Parses the libvirt config file. */
     private void parseConfig(final Node configNode,
                              final String nameInFilename) {
         if (configNode == null) {
@@ -283,18 +620,19 @@ public class VMSXML extends XML {
                             }
                         }
                         if (targetDev != null) {
-                            final DiskData diskData = new DiskData(type,
-                                                                   device,
-                                                                   targetDev,
-                                                                   sourceFile,
-                                                                   sourceDev,
-                                                                   targetBus,
-                                                                   readonly);
+                            final DiskData diskData =
+                                         new DiskData(type,
+                                                      targetDev,
+                                                      sourceFile,
+                                                      sourceDev,
+                                                      targetBus + "/" + device,
+                                                      readonly);
                             devMap.put(targetDev, diskData);
                         }
                     } else if ("interface".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
                         String macAddress = null;
+                        String sourceNetwork = null;
                         String sourceBridge = null;
                         String targetDev = null;
                         String modelType = null;
@@ -305,6 +643,8 @@ public class VMSXML extends XML {
                             if ("source".equals(nodeName)) {
                                 sourceBridge = getAttribute(optionNode,
                                                             "bridge");
+                                sourceNetwork = getAttribute(optionNode,
+                                                             "network");
                             } else if ("target".equals(nodeName)) {
                                 targetDev = getAttribute(optionNode, "dev");
                             } else if ("mac".equals(nodeName)) {
@@ -321,6 +661,7 @@ public class VMSXML extends XML {
                             final InterfaceData interfaceData =
                                               new InterfaceData(type,
                                                                 macAddress,
+                                                                sourceNetwork,
                                                                 sourceBridge,
                                                                 targetDev,
                                                                 modelType);
@@ -335,6 +676,38 @@ public class VMSXML extends XML {
         if (!tabletOk) {
             Tools.appWarning("you should enable input type tablet for " + name);
         }
+    }
+
+    /** Updates one vm. */
+    private void updateVM(final Node vmNode) {
+        /* one vm */
+        if (vmNode == null) {
+            return;
+        }
+        final Node infoNode = getChildNode(vmNode, "info");
+        final String name = getAttribute(vmNode, VM_PARAM_NAME);
+        final String config = getAttribute(vmNode, "config");
+        configsMap.put(config, name);
+        namesConfigsMap.put(name, config);
+        final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
+        if (autostart == null) {
+            parameterValues.put(name, VM_PARAM_AUTOSTART, "false");
+        } else {
+            parameterValues.put(name, VM_PARAM_AUTOSTART, autostart);
+        }
+        if (infoNode != null) {
+            parseInfo(name, getText(infoNode));
+        }
+        final Node vncdisplayNode = getChildNode(vmNode, "vncdisplay");
+        remotePorts.put(name, -1);
+        if (vncdisplayNode != null) {
+            final String vncdisplay = getText(vncdisplayNode).trim();
+            final Matcher m = DISPLAY_PATTERN.matcher(vncdisplay);
+            if (m.matches()) {
+                remotePorts.put(name, Integer.parseInt(m.group(1)) + 5900);
+            }
+        }
+        parseConfig(getChildNode(vmNode, "config"), name);
     }
 
     /**
@@ -437,27 +810,129 @@ public class VMSXML extends XML {
         return disksMap.get(name);
     }
 
-    /**
-     * Returns interface data.
-     */
+    /** Returns interface data. */
     public final Map<String, InterfaceData> getInterfaces(final String name) {
         return interfacesMap.get(name);
+    }
+
+    /** Returns array of networks. */
+    public final String[] getNetworks() {
+        final Set<String> networks = networkMap.keySet();
+        return networks.toArray(new String[networks.size()]);
+    }
+
+    /** Class that holds data about networks. */
+    public class NetworkData {
+        /** Name value pairs. */
+        private final Map<String, String> valueMap =
+                                                new HashMap<String, String>();
+        /** Name of the network. */
+        private final String name;
+        /** UUID of the network. */
+        private final String uuid;
+        /** Autostart. */
+        private final boolean autostart;
+        /** Forward mode. */
+        private final String forwardMode;
+        /** Bridge name. */
+        private final String bridgeName;
+        /** Bridge STP. */
+        private final String bridgeSTP;
+        /** Bridge delay. */
+        private final String bridgeDelay;
+        /** Bridge forward delay. */
+        private final String bridgeForwardDelay;
+
+        /** Autostart. */
+        public static final String AUTOSTART = "autostart";
+        /** Forward mode. */
+        public static final String FORWARD_MODE = "forward_mode";
+        /** Bridge name. */
+        public static final String BRIDGE_NAME = "bridge_name";
+        /** Bridge STP. */
+        public static final String BRIDGE_STP = "bridge_stp";
+        /** Bridge delay. */
+        public static final String BRIDGE_DELAY = "bridge_delay";
+        /** Bridge forward delay. */
+        public static final String BRIDGE_FORWARD_DELAY = "bridge_forward_delay";
+
+        /** Creates new NetworkData object. */
+        public NetworkData(final String name,
+                           final String uuid,
+                           final boolean autostart,
+                           final String forwardMode,
+                           final String bridgeName,
+                           final String bridgeSTP,
+                           final String bridgeDelay,
+                           final String bridgeForwardDelay) {
+            this.name = name;
+            this.uuid = uuid;
+            this.autostart = autostart;
+            if (autostart) {
+                valueMap.put(AUTOSTART, "true");
+            } else {
+                valueMap.put(AUTOSTART, "false");
+            }
+            this.forwardMode = forwardMode;
+            valueMap.put(FORWARD_MODE, forwardMode);
+            this.bridgeName = bridgeName;
+            valueMap.put(BRIDGE_NAME, bridgeName);
+            this.bridgeSTP = bridgeSTP;
+            valueMap.put(BRIDGE_STP, bridgeSTP);
+            this.bridgeDelay = bridgeDelay;
+            valueMap.put(BRIDGE_DELAY, bridgeDelay);
+            this.bridgeForwardDelay = bridgeForwardDelay;
+            valueMap.put(BRIDGE_FORWARD_DELAY, bridgeForwardDelay);
+        }
+
+        /** Whether it is autostart. */
+        public final boolean isAutostart() {
+            return autostart;
+        }
+
+        /** Returns forward mode. */
+        public final String getForwardMode() {
+            return forwardMode;
+        }
+
+        /** Returns bridge name. */
+        public final String getBridgeName() {
+            return bridgeName;
+        }
+
+        /** Returns bridge STP. */
+        public final String getBridgeSTP() {
+            return bridgeSTP;
+        }
+
+        /** Returns bridge delay. */
+        public final String getBridgeDelay() {
+            return bridgeDelay;
+        }
+
+        /** Returns bridge forward delay. */
+        public final String getBridgeForwardDelay() {
+            return bridgeForwardDelay;
+        }
+
+        /** Returns value of this parameter. */
+        public final String getValue(final String param) {
+            return valueMap.get(param);
+        }
     }
 
     /** Class that holds data about virtual disks. */
     public class DiskData {
         /** Type: file, block... */
         private final String type;
-        /** Device: disk, cdrom... */
-        private final String device;
         /** Target device: hda, hdb, hdc, sda... */
         private final String targetDev;
         /** Source file. */
         private final String sourceFile;
         /** Source device: /dev/drbd0... */
         private final String sourceDev;
-        /** Target bus: ide. */
-        private final String targetBus;
+        /** Target bus: ide... and type: disk..., delimited with, */
+        private final String targetBusType;
         /** Whether the disk is read only. */
         private final boolean readonly;
         /** Name value pairs. */
@@ -465,16 +940,18 @@ public class VMSXML extends XML {
                                                 new HashMap<String, String>();
         /** Type. */
         public static final String TYPE = "type";
-        /** Device. */
-        public static final String DEVICE = "device";
         /** Target device string. */
         public static final String TARGET_DEVICE = "target_device";
         /** Source file. */
         public static final String SOURCE_FILE = "source_file";
         /** Source dev. */
         public static final String SOURCE_DEVICE = "source_dev";
+        /** Target bus and type. */
+        public static final String TARGET_BUS_TYPE = "target_bus_type";
         /** Target bus. */
         public static final String TARGET_BUS = "target_bus";
+        /** Target type. */
+        public static final String TARGET_TYPE = "target_type";
         /** Readonly. */
         public static final String READONLY = "readonly";
 
@@ -482,40 +959,32 @@ public class VMSXML extends XML {
          * Creates new DiskData object.
          */
         public DiskData(final String type,
-                        final String device,
                         final String targetDev,
                         final String sourceFile,
                         final String sourceDev,
-                        final String targetBus,
+                        final String targetBusType,
                         final boolean readonly) {
             this.type = type;
             valueMap.put(TYPE, type);
-            this.device = device;
-            valueMap.put(DEVICE, device);
             this.targetDev = targetDev;
             valueMap.put(TARGET_DEVICE, targetDev);
             this.sourceFile = sourceFile;
             valueMap.put(SOURCE_FILE, sourceFile);
             this.sourceDev = sourceDev;
             valueMap.put(SOURCE_DEVICE, sourceDev);
-            this.targetBus = targetBus;
-            valueMap.put(TARGET_BUS, targetBus);
+            this.targetBusType = targetBusType;
+            valueMap.put(TARGET_BUS_TYPE, targetBusType);
             this.readonly = readonly;
             if (readonly) {
-                valueMap.put(READONLY, "true");
+                valueMap.put(READONLY, "True");
             } else {
-                valueMap.put(READONLY, "false");
+                valueMap.put(READONLY, "False");
             }
         }
 
         /** Returns type. */
         public final String getType() {
             return type;
-        }
-
-        /** Returns device. */
-        public final String getDevice() {
-            return device;
         }
 
         /** Returns target device. */
@@ -534,8 +1003,8 @@ public class VMSXML extends XML {
         }
 
         /** Returns target bus. */
-        public final String getTargetBus() {
-            return targetBus;
+        public final String getTargetBusType() {
+            return targetBusType;
         }
 
         /** Returns whether the disk is read only. */
@@ -551,10 +1020,12 @@ public class VMSXML extends XML {
 
     /** Class that holds data about virtual interfaces. */
     public class InterfaceData {
-        /** Type: bridge... */
+        /** Type: network, bridge... */
         private final String type;
         /** Mac address. */
         private final String macAddress;
+        /** Source network: default, ... */
+        private final String sourceNetwork;
         /** Source bridge: br0... */
         private final String sourceBridge;
         /** Target dev: vnet0... */
@@ -569,16 +1040,18 @@ public class VMSXML extends XML {
         public static final String TYPE = "type";
         /** Mac address. */
         public static final String MAC_ADDRESS = "mac_address";
+        /** Source network. */
+        public static final String SOURCE_NETWORK = "source_network";
         /** Source bridge. */
         public static final String SOURCE_BRIDGE = "source_bridge";
         /** Target dev. */
         public static final String TARGET_DEV = "target_dev";
         /** Model type. */
         public static final String MODEL_TYPE = "model_type";
-
         /** Creates new InterfaceData object. */
         public InterfaceData(final String type,
                              final String macAddress,
+                             final String sourceNetwork,
                              final String sourceBridge,
                              final String targetDev,
                              final String modelType) {
@@ -586,6 +1059,8 @@ public class VMSXML extends XML {
             valueMap.put(TYPE, type);
             this.macAddress = macAddress;
             valueMap.put(MAC_ADDRESS, macAddress);
+            this.sourceNetwork = sourceNetwork;
+            valueMap.put(SOURCE_NETWORK, sourceNetwork);
             this.sourceBridge = sourceBridge;
             valueMap.put(SOURCE_BRIDGE, sourceBridge);
             this.targetDev = targetDev;
@@ -602,6 +1077,11 @@ public class VMSXML extends XML {
         /** Returns mac address. */
         public final String getMacAddress() {
             return macAddress;
+        }
+
+        /** Returns source network. */
+        public final String getSourceNetwork() {
+            return sourceBridge;
         }
 
         /** Returns source bridge. */

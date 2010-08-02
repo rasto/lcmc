@@ -899,10 +899,12 @@ public class HbConnectionInfo extends EditableInfo {
         super.selectMyself();
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                         getBrowser().getTree().getLastSelectedPathComponent();
-        final Info prev = (Info) node.getUserObject();
-        // TODO: do this differently, don't need to select it, only reload
-        getBrowser().setRightComponentInView(this); /* just to reload */
-        getBrowser().setRightComponentInView(prev); /* back were we were */
+        if (node != null) {
+            // TODO: do this differently, don't need to select it, only reload
+            final Info prev = (Info) node.getUserObject();
+            getBrowser().setRightComponentInView(this); /* just to reload */
+            getBrowser().setRightComponentInView(prev); /* back were we were */
+        }
     }
 
     /** Returns whether this parameter is advanced. */

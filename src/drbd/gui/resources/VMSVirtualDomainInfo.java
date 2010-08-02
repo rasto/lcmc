@@ -1616,9 +1616,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return new Object[]{targetDev, "unknown"};
         }
         final StringBuffer target = new StringBuffer(10);
-        target.append(diskData.getTargetBus());
-        target.append(' ');
-        target.append(diskData.getDevice());
+        target.append(diskData.getTargetBusType());
         target.append(" : /dev/");
         target.append(targetDev);
         if (dkti != null) {

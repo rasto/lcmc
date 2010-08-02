@@ -28,6 +28,7 @@ import drbd.data.VMSXML;
 import drbd.data.VMSXML.InterfaceData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
+import drbd.data.resources.NetInterface;
 import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
@@ -69,12 +70,20 @@ public class VMSInterfaceInfo extends EditableInfo {
     private JComponent infoPanel = null;
     /** VMS virtual domain info object. */
     private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
+    /** Source network combo box, so that it can be disabled, depending on
+     * type. */
+    private GuiComboBox sourceNetworkCB = null;
+    /** Source bridge combo box, so that it can be disabled, depending on
+     * type. */
+    private GuiComboBox sourceBridgeCB = null;
+    /** Source bridge combo box, so that it can be disabled, depending on
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                                  Tools.getDefault("BackIcon"));
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
+                                                InterfaceData.SOURCE_NETWORK,
                                                 InterfaceData.SOURCE_BRIDGE,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
@@ -94,8 +103,11 @@ public class VMSInterfaceInfo extends EditableInfo {
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
+        FIELD_TYPES.put(InterfaceData.TYPE,
+                        GuiComboBox.Type.RADIOGROUP);
         SHORTNAME_MAP.put(InterfaceData.TYPE, "Type");
         SHORTNAME_MAP.put(InterfaceData.MAC_ADDRESS, "Mac Address");
+        SHORTNAME_MAP.put(InterfaceData.SOURCE_NETWORK, "Source Network");
         SHORTNAME_MAP.put(InterfaceData.SOURCE_BRIDGE, "Source Bridge");
         SHORTNAME_MAP.put(InterfaceData.TARGET_DEV, "Target Device");
         SHORTNAME_MAP.put(InterfaceData.MODEL_TYPE, "Model Type");
@@ -110,6 +122,15 @@ public class VMSInterfaceInfo extends EditableInfo {
     /** Default location for libvirt images. */
     private static final String LIBVIRT_IMAGE_LOCATION =
                                              "/var/lib/libvirt/images/";
+    static {
+        POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE, 
+                            new String[]{"default",
+                                         "e1000",
+                                         "ne2k_pci",
+                                         "pcnet",
+                                         "rtl8139",
+                                         "virtio"});
+    }
     /** Creates the VMSInterfaceInfo object. */
     public VMSInterfaceInfo(final String name, final Browser browser,
                             final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
@@ -249,10 +270,25 @@ public class VMSInterfaceInfo extends EditableInfo {
 
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
-        if (VMSXML.VM_PARAM_BOOT.equals(param)) {
-            return POSSIBLE_VALUES.get(param);
+        if (InterfaceData.SOURCE_NETWORK.equals(param)) {
+            for (final Host h : getBrowser().getClusterHosts()) {
+                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                if (vmsxml != null) {
+                    return vmsxml.getNetworks();
+                }
+            }
+        } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
+            for (final Host h : getBrowser().getClusterHosts()) {
+                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                if (vmsxml != null) {
+                    final List<String> bridges = h.getBridges();
+                    return bridges.toArray(new String[bridges.size()]);
+                }
+            }
+        } else if (InterfaceData.TYPE.equals(param)) {
+            return new String[]{"network", "bridge"};
         }
-        return null;
+        return POSSIBLE_VALUES.get(param);
     }
 
     /** Returns section to which the specified parameter belongs. */
@@ -294,6 +330,14 @@ public class VMSInterfaceInfo extends EditableInfo {
         return "undef"; // TODO:
     }
 
+    /** Returns the regexp of the parameter. */
+    protected final String getParamRegexp(final String param) {
+        if (VMSXML.InterfaceData.MAC_ADDRESS.equals(param)) {
+            return "^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$";
+        }
+        return null;
+    }
+
     /** Returns type of the field. */
     protected final GuiComboBox.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
@@ -311,16 +355,35 @@ public class VMSInterfaceInfo extends EditableInfo {
         });
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
+        String type = null;
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
+            if (InterfaceData.TYPE.equals(param)) {
+                type = value;
+            }
+            if ("network".equals(type)
+                && InterfaceData.SOURCE_BRIDGE.equals(param)) {
+                getResource().setValue(param, null);
+                continue;
+            } else if ("bridge".equals(type)
+                && InterfaceData.SOURCE_NETWORK.equals(param)) {
+                getResource().setValue(param, null);
+                continue;
+            }
             if (!Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
             }
         }
-        //VIRSH.setParameters(getBrowser().getClusterHosts(),
-        //                    domainName(),
-        //                    parameters);
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null) {
+                vmsxml.modifyInterfaceXML(vmsVirtualDomainInfo.getDomainName(),
+                                          getName(),
+                                          parameters);
+                getBrowser().periodicalVMSUpdate(h);
+            }
+        }
         checkResourceFields(null, params);
     }
 
@@ -409,10 +472,40 @@ public class VMSInterfaceInfo extends EditableInfo {
     /** Returns true if the value of the parameter is ok. */
     protected final boolean checkParam(final String param,
                                        final String newValue) {
+        if (InterfaceData.TYPE.equals(param)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (sourceNetworkCB != null) {
+                        sourceNetworkCB.setVisible("network".equals(newValue));
+                    } 
+                    if (sourceBridgeCB != null) {
+                        sourceBridgeCB.setVisible("bridge".equals(newValue));
+                    }
+                }
+            });
+        }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
         return true;
+    }
+    /** Returns combo box for parameter. */
+    protected final GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
+        final GuiComboBox paramCB = super.getParamComboBox(param,
+                                                           prefix,
+                                                           width);
+        if (InterfaceData.TYPE.equals(param)) {
+            paramCB.setAlwaysEditable(false);
+        } else if (InterfaceData.SOURCE_NETWORK.equals(param)) {
+            sourceNetworkCB = paramCB;
+            paramCB.setAlwaysEditable(false);
+        } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
+            sourceBridgeCB = paramCB;
+            paramCB.setAlwaysEditable(false);
+        }
+        return paramCB;
     }
 
     /** Updates parameters. */

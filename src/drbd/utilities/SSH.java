@@ -1684,13 +1684,16 @@ public class SSH {
         if  (!isConnected()) {
             return;
         }
+        String modeString = null;
+        if (mode != null) {
+            modeString = ";chmod " + mode + " " + remoteFilename;
+        }
         final Thread t = execCommand(
                             commands.toString()
                             + "echo \""
                             + host.escapeQuotes(fileContent, 1)
                             + "\">" + remoteFilename
-                            + ";"
-                            + "chmod " + mode + " " + remoteFilename,
+                            + modeString,
                             new ExecCallback() {
                                 public void done(final String ans) {
                                     /* ok */

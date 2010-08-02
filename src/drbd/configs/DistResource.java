@@ -351,5 +351,8 @@ public class DistResource extends
 
         {"VIRSH.Resume",
          "virsh resume @DOMAIN@"},
+
+        {"VIRSH.Define",
+         "virsh define @CONFIG@"},
     };
 }

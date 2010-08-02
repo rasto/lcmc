@@ -886,17 +886,17 @@ public final class RoboTest {
         checkTest(host, "test1", 28);
         stopResource(robot, ipX,ipY, 0);
         sleep(5000);
-        stopResource(robot, gx, gy, 15);
+        stopGroup(robot, gx, gy, 15);
         sleep(5000);
-        stopResource(robot, statefulX, statefulY, 0);
+        stopGroup(robot, statefulX, statefulY, 0);
         sleep(5000);
         checkTest(host, "test1", 29);
         if (maybe()) {
             removeEverything(robot);
         } else {
             removeResource(robot, ipX, ipY, -15);
-            removeResource(robot, gx, gy, 0);
-            removeResource(robot, statefulX, statefulY, -15);
+            removeGroup(robot, gx, gy, 0);
+            removeGroup(robot, statefulX, statefulY, -15);
         }
         if (!aborted) {
             Tools.sleep(10000);
@@ -1123,6 +1123,8 @@ public final class RoboTest {
         sleep(10000);
         stopResource(robot, dummy3X, dummy3Y, 0);
         sleep(10000);
+        stopResource(robot, dummy3X, dummy3Y, 0);
+        sleep(10000);
         stopResource(robot, dummy4X, dummy4Y, 0);
         sleep(10000);
         checkTest(host, "test2", 12.5);
@@ -1135,7 +1137,6 @@ public final class RoboTest {
             leftClick(robot);
             confirmRemove(robot);
             sleep(5000);
-            checkTest(host, "test2", 13);
 
             /* remove rest of the dummies */
             removeResource(robot, dummy2X, dummy2Y, -15);
@@ -1488,6 +1489,19 @@ public final class RoboTest {
         confirmRemove(robot);
     }
 
+    /** Removes group. */
+    private static void removeGroup(final Robot robot,
+                                    final int x,
+                                    final int y,
+                                    final int corr) {
+        moveTo(robot, x + 20, y);
+        rightClick(robot);
+        sleep(60000);
+        moveTo(robot, x + 40 , y + 250 + corr);
+        leftClick(robot);
+        confirmRemove(robot);
+    }
+
     /** Removes placeholder. */
     private static void removePlaceHolder(final Robot robot,
                                           final int x,
@@ -1517,6 +1531,19 @@ public final class RoboTest {
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 130 + yFactor);
         sleep(6000); /* ptest */
+        leftClick(robot); /* stop */
+    }
+
+    /** Stops group. */
+    private static void stopGroup(final Robot robot,
+                                  final int x,
+                                  final int y,
+                                  final int yFactor) {
+        moveTo(robot, x + 50, y + 5);
+        sleep(1000);
+        rightClick(robot); /* popup */
+        moveTo(robot, x + 140, y + 130 + yFactor);
+        sleep(120000); /* ptest */
         leftClick(robot); /* stop */
     }
 

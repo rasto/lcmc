@@ -40,6 +40,8 @@ public class NetInterface extends Resource {
     private String macAddr = null;
     /** Net mask. */
     private String netMask = null;
+    /** Whether it is a bridge. */
+    private final boolean bridge;
 
     /**
      * Prepares a new <code>NetInterface</code> object.
@@ -67,6 +69,11 @@ public class NetInterface extends Resource {
         if (cols.length > 3) {
             this.netMask = cols[3];
         }
+        if (cols.length > 4 && "bridge".equals(cols[4])) {
+            this.bridge = true;
+        } else {
+            this.bridge = false;
+        }
         setName(iface);
     }
 
@@ -85,11 +92,13 @@ public class NetInterface extends Resource {
     public NetInterface(final String iface,
                         final String ip,
                         final String macAddr,
-                        final String netMask) {
+                        final String netMask,
+                        final boolean bridge) {
         super(iface);
         this.ip      = ip;
         this.macAddr = macAddr;
         this.netMask = netMask;
+        this.bridge = bridge;
     }
 
     /** Returns mac address. */
@@ -184,5 +193,10 @@ public class NetInterface extends Resource {
                                           & Integer.parseInt(netMaskParts[i]));
         }
         return Tools.join(".", networkIpParts);
+    }
+
+    /** Returns whether it is a bridge. */
+    public final boolean isBridge() {
+        return bridge;
     }
 }

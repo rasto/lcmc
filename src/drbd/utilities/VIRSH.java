@@ -134,9 +134,7 @@ public final class VIRSH {
         return execCommand(new Host[]{host}, command, true);
     }
 
-    /**
-     * Shuts down virtual domain.
-     */
+    /** Shuts down virtual domain. */
     public static boolean shutdown(final Host host, final String domain) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
@@ -185,6 +183,16 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Resume",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
+    }
+
+    /** Defines virtual domain. It rereads the config from XML, but does not
+     * start the domain like "create" would. */
+    public static boolean define(final Host host, final String config) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@CONFIG@", config);
+        final String command = host.getDistCommand("VIRSH.Define",
                                                    replaceHash);
         return execCommand(new Host[]{host}, command, true);
     }

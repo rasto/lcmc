@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.Color;
@@ -92,7 +94,16 @@ public abstract class EditableInfo extends Info {
         return null;
     }
     /** Returns the name of the type. */
-    protected abstract String getParamType(String param);
+    protected abstract String getParamType(final String param);
+    /** Returns the regexp of the parameter. */
+    protected String getParamRegexp(String param) {
+        if (isInteger(param)) {
+            return "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
+                   + "|" + CRMXML.DISABLED_STRING
+                   + "))|@NOTHING_SELECTED@$";
+        }
+        return null;
+    }
     /** Returns the possible choices for pull down menus if applicable. */
     protected abstract Object[] getParamPossibleChoices(String param);
     /** Returns array of all parameters. */
@@ -562,12 +573,9 @@ public abstract class EditableInfo extends Info {
         } else {
             initValue = value;
         }
-        String regexp = null;
+        String regexp = getParamRegexp(param);
         Map<String, String> abbreviations = new HashMap<String, String>();
         if (isInteger(param)) {
-            regexp = "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
-                     + "|" + CRMXML.DISABLED_STRING
-                     + "))|@NOTHING_SELECTED@$";
             abbreviations = new HashMap<String, String>();
             abbreviations.put("i", CRMXML.INFINITY_STRING);
             abbreviations.put("I", CRMXML.INFINITY_STRING);
@@ -609,6 +617,20 @@ public abstract class EditableInfo extends Info {
      * the values are invalid or none of the parameters have changed.
      */
     protected abstract boolean checkParam(String param, String newValue);
+
+    /** Checks whether this value matches the regexp of this field. */
+    protected final boolean checkRegexp(String param, String newValue) {
+        final String regexp = getParamRegexp(param);
+        if (regexp != null) {
+            final Pattern p = Pattern.compile(regexp);
+            final Matcher m = p.matcher(newValue);
+            if (m.matches()) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    } 
 
     /**
      * Checks parameter, but use cached value. This is useful if some other
@@ -763,7 +785,8 @@ public abstract class EditableInfo extends Info {
                             newValue = ((Info) wo).getStringValue();
                         }
                     }
-                    final boolean check = checkParam(otherParam, newValue);
+                    final boolean check = checkParam(otherParam, newValue)
+                                          && checkRegexp(otherParam, newValue);
                     if (check) {
                         if (isTimeType(otherParam)
                             || hasUnitPrefix(otherParam)) {

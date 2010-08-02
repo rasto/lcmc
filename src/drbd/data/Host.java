@@ -432,17 +432,24 @@ public class Host implements Serializable {
         ips.put(hop, ipsForHop);
     }
 
-    /**
-     * Returns net interfaces.
-     */
+    /** Returns net interfaces. */
     public final NetInterface[] getNetInterfaces() {
         return netInterfaces.values().toArray(
                                     new NetInterface[netInterfaces.size()]);
     }
 
-    /**
-     * Returns blockDevices.
-     */
+    /** Get net interfaces that are bridges. */
+    public final List<String> getBridges() {
+        final List<String> bridges = new ArrayList<String>();
+        for (final NetInterface ni : netInterfaces.values()) {
+            if (ni.isBridge()) {
+                bridges.add(ni.getName());
+            }
+        }
+        return bridges;
+    }
+
+    /** Returns blockDevices. */
     public final BlockDevice[] getBlockDevices() {
         return blockDevices.values().toArray(
                                     new BlockDevice[blockDevices.size()]);

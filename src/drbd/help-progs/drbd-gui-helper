@@ -127,6 +127,17 @@ sub net_info_error {
 	exit 1;
 }
 
+# Returns all bridges as an array.
+sub get_bridges {
+	my %bridges;
+	for (`/usr/sbin/brctl show 2>/dev/null`) {
+		next if /^\s*bridge\s+name/;
+		next if /^\s/;
+		$bridges{(split)[0]}++;
+	}
+	return \%bridges;
+}
+
 # get_net_info()
 #
 # parses ifconfig output and prints out interface, ip and mac address one
@@ -136,10 +147,11 @@ sub get_net_info {
 	my $mac  = "";
 	my $ip   = "";
 	my $mask = "";
+	my $bridges = get_bridges();
 	for (`/sbin/ifconfig`) {
 		if (!$dev) {
 			($dev) = /^(\S+)/ or net_info_error("no dev");
-			last if $dev eq "lo";
+			next if $dev eq "lo";
 			($mac) = /\sHWaddr\s+(\S+)/ or net_info_error("no mac address ($dev)");
 		} else {
 			if (/^\s+inet addr:(\S+).*?\s+Mask:(\S+)/) {
@@ -148,8 +160,13 @@ sub get_net_info {
 			}
 		}
 		if (/^$/) {
-			if ($dev && $ip && $mac && $mask) {
-				print "$dev $ip $mac $mask\n";
+			if ($dev && $dev ne "lo" && $ip && $mac && $mask) {
+				print "$dev $ip $mac $mask";
+				if ($$bridges{$dev}) {
+					print " bridge\n";
+				} else {
+					print "\n";
+				}
 			}
 			$dev = "";
 		}
@@ -1294,7 +1311,37 @@ sub get_cluster_versions {
 	       ."drbd-loaded:$drbd_loaded\n"
 }
 
+sub get_vm_networks {
+	my %autostart;
+	for (`ls /etc/libvirt/qemu/networks/autostart/*.xml 2>/dev/null`) {
+		my ($name) = /([^\/]+).xml/;
+		next if !$name;
+		$autostart{$name}++;
+	}
+	my $out = "";
+	for (`ls /etc/libvirt/qemu/networks/*.xml 2>/dev/null`) {
+		my ($name) = /([^\/]+).xml/;
+		next if !$name;
+		chomp;
+		my $config = `/usr/bin/virsh net-dumpxml $name 2>/dev/null`
+			      || "";
+		if ($config) {
+			$out.= "<net name=\"$name\" config=\"$_\"";
+			if ($autostart{$name}) {
+				$out.= ' autostart="True"';
+			} else {
+				$out.= ' autostart="False"';
+			}
+			$out.= ">\n";
+			$out.= $config;
+			$out.= "</net>\n";
+		}
+	}
+	return $out;
+}
+
 sub get_vm_info {
+	my $networks = get_vm_networks();
 	my %autostart;
 	for (`ls /etc/libvirt/qemu/autostart/*.xml 2>/dev/null`) {
 		my ($name) = /([^\/]+).xml/;
@@ -1331,6 +1378,9 @@ sub get_vm_info {
 	}
 	my $md5 = md5_hex($out);
 	print "<vms md5=\"$md5\">\n";
+	if ($networks) {
+		print $networks;
+	}
 	print $out;
 	print "</vms>\n";
 }

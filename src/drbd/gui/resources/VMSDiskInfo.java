@@ -49,6 +49,9 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -71,16 +74,22 @@ public class VMSDiskInfo extends EditableInfo {
     private JComponent infoPanel = null;
     /** VMS virtual domain info object. */
     private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
+    /** Source file combo box, so that it can be disabled, depending on type. */
+    private GuiComboBox sourceFileCB = null;
+    /** Source block combo box, so that it can be disabled, depending on type.*/
+    private GuiComboBox sourceDeviceCB = null;
+    /** Target device combo box, that needs to be reloaded if target type has
+     * changed. */
+    private GuiComboBox targetDeviceCB = null;
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                                  Tools.getDefault("BackIcon"));
     /** Parameters. */
     private static final String[] PARAMETERS = {DiskData.TYPE,
-                                                DiskData.DEVICE,
                                                 DiskData.TARGET_DEVICE,
                                                 DiskData.SOURCE_FILE,
                                                 DiskData.SOURCE_DEVICE,
-                                                DiskData.TARGET_BUS,
+                                                DiskData.TARGET_BUS_TYPE,
                                                 DiskData.READONLY};
     /** Section map. */
     private static final Map<String, String> SECTION_MAP =
@@ -94,20 +103,28 @@ public class VMSDiskInfo extends EditableInfo {
     /** Field type. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
+    /** Target devices depending on the target type. */
+    private static final Map<String, String[]> TARGET_DEVICES_MAP =
+                                           new HashMap<String, String[]>();
     static {
+        FIELD_TYPES.put(DiskData.TYPE,
+                        GuiComboBox.Type.RADIOGROUP);
         FIELD_TYPES.put(DiskData.SOURCE_FILE,
                         GuiComboBox.Type.TEXTFIELDWITHBUTTON);
+        FIELD_TYPES.put(DiskData.READONLY,
+                        GuiComboBox.Type.CHECKBOX);
+        FIELD_TYPES.put(DiskData.TARGET_DEVICE,
+                        GuiComboBox.Type.COMBOBOX);
     }
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
         SHORTNAME_MAP.put(DiskData.TYPE, "Type");
-        SHORTNAME_MAP.put(DiskData.DEVICE, "Device");
         SHORTNAME_MAP.put(DiskData.TARGET_DEVICE, "Target Device");
         SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "Source File");
         SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Source Device");
-        SHORTNAME_MAP.put(DiskData.TARGET_BUS, "Target Bus");
+        SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Target Type");
         SHORTNAME_MAP.put(DiskData.READONLY, "Readonly");
     }
 
@@ -125,6 +142,31 @@ public class VMSDiskInfo extends EditableInfo {
                                                        "(.).{9}\\s+(\\d+)\\s+"
                                                        + "(\\d+)\\s+"
                                                        + "(\\d+) (.*)$");
+    static {
+        POSSIBLE_VALUES.put(DiskData.TYPE, new String[]{"file", "block"});
+        POSSIBLE_VALUES.put(
+                    DiskData.TARGET_BUS_TYPE, 
+                    new StringInfo[]{
+                       new StringInfo("IDE disk",    "ide/disk",    null),
+                       new StringInfo("IDE cdrom",   "ide/cdrom",    null),
+                       new StringInfo("Floppy disk", "fdc/floppy", null),
+                       new StringInfo("SCSI disk",   "scsi/disk",   null),
+                       new StringInfo("USB disk",    "usb/disk",    null),
+                       new StringInfo("Virtio Disk", "virtio/disk", null)});
+        DEFAULTS_MAP.put(DiskData.READONLY, "False");
+        TARGET_DEVICES_MAP.put("ide/disk",
+                               new String[]{"hda", "hdb", "hdd"});
+        TARGET_DEVICES_MAP.put("ide/cdrom",
+                               new String[]{"hdc"});
+        TARGET_DEVICES_MAP.put("fdc/floppy",
+                               new String[]{"fda"});
+        TARGET_DEVICES_MAP.put("scsi/disk",
+                               new String[]{"sda", "sdb", "sdc", "sdd"});
+        TARGET_DEVICES_MAP.put("usb/disk",
+                               new String[]{"sda", "sdb", "sdc", "sdd"});
+        TARGET_DEVICES_MAP.put("virtio/disk",
+                               new String[]{"vda", "vdb", "vdc", "vdd", "vde"});
+    }
     /** Cache for files. */
     private final Map<String, LinuxFile> linuxFileCache =
                                             new HashMap<String, LinuxFile>();
@@ -266,10 +308,24 @@ public class VMSDiskInfo extends EditableInfo {
 
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
-        if (VMSXML.VM_PARAM_BOOT.equals(param)) {
-            return POSSIBLE_VALUES.get(param);
+        if (DiskData.SOURCE_DEVICE.equals(param)) {
+            for (final Host h : getBrowser().getClusterHosts()) {
+                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                final Set<String> bds = new TreeSet<String>();
+                if (vmsxml != null) {
+                    for (final BlockDevInfo bdi
+                            : h.getBrowser().getBlockDevInfos()) {
+                        if (bdi.getBlockDevice().isDrbd()) {
+                            bds.add(bdi.getDrbdResourceInfo().getDevice());
+                        } else {
+                            bds.add(bdi.getName());
+                        }
+                    }
+                    return bds.toArray(new String[bds.size()]);
+                }
+            }
         }
-        return null;
+        return POSSIBLE_VALUES.get(param);
     }
 
     /** Returns section to which the specified parameter belongs. */
@@ -328,16 +384,45 @@ public class VMSDiskInfo extends EditableInfo {
         });
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
+        String type = null;
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
+            if (DiskData.TYPE.equals(param)) {
+                type = value;
+            } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
+                final String[] values = value.split("/");
+                if (values.length == 2) {
+                    parameters.put(DiskData.TARGET_BUS, values[0]);
+                    parameters.put(DiskData.TARGET_TYPE, values[1]);
+                } else {
+                    Tools.appWarning("cannot parse: " + param + " = " + value);
+                }
+                getResource().setValue(param, value);
+                continue;
+            }
+            if ("file".equals(type)
+                && DiskData.SOURCE_DEVICE.equals(param)) {
+                getResource().setValue(param, null);
+                continue;
+            } else if ("block".equals(type)
+                && DiskData.SOURCE_FILE.equals(param)) {
+                getResource().setValue(param, null);
+                continue;
+            }
             if (!Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
             }
         }
-        //VIRSH.setParameters(getBrowser().getClusterHosts(),
-        //                    domainName(),
-        //                    parameters);
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null) {
+                vmsxml.modifyDiskXML(vmsVirtualDomainInfo.getDomainName(),
+                                     getName(),
+                                     parameters);
+                getBrowser().periodicalVMSUpdate(h);
+            }
+        }
         checkResourceFields(null, params);
     }
 
@@ -428,6 +513,35 @@ public class VMSDiskInfo extends EditableInfo {
     /** Returns true if the value of the parameter is ok. */
     protected final boolean checkParam(final String param,
                                        final String newValue) {
+        if (DiskData.TYPE.equals(param)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (sourceFileCB != null) {
+                        sourceFileCB.setVisible("file".equals(newValue));
+                    } 
+                    if (sourceDeviceCB != null) {
+                        sourceDeviceCB.setVisible("block".equals(newValue));
+                    }
+                }
+            });
+        } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
+            if (targetDeviceCB != null) {
+                final Set<String> devices = new LinkedHashSet<String>();
+                for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
+                    // TODO: remove the ones that are in use
+                    devices.add(dev);
+                }
+                final String saved = getParamSaved(DiskData.TARGET_DEVICE);
+                String selected = null;
+                if (!devices.add(saved)) {
+                    /* it was there */
+                    selected = saved;
+                }
+                targetDeviceCB.reloadComboBox(
+                                selected,
+                                devices.toArray(new String[devices.size()]));
+            }
+        }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
@@ -577,7 +691,7 @@ public class VMSDiskInfo extends EditableInfo {
     }
 
     /** Starts file chooser. */
-    private void startFileChooser(final GuiComboBox paramCb) {
+    private void startFileChooser(final GuiComboBox paramCB) {
         final Host host = getFirstConnectedHost();
         if (host == null) {
             Tools.appError("Connection to host lost.");
@@ -615,7 +729,7 @@ public class VMSDiskInfo extends EditableInfo {
         if (ret == JFileChooser.APPROVE_OPTION) {
             if (fc.getSelectedFile() != null) {
                 final String name = fc.getSelectedFile().getAbsolutePath();
-                paramCb.setValue(name);
+                paramCB.setValue(name);
             }
         }
     }
@@ -625,11 +739,10 @@ public class VMSDiskInfo extends EditableInfo {
                                                  final String prefix,
                                                  final int width) {
         if (DiskData.SOURCE_FILE.equals(param)) {
-            /* get networks */
             final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
             final String regexp = "[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
-            final GuiComboBox paramCb = new GuiComboBox(sourceFile,
+            final GuiComboBox paramCB = new GuiComboBox(sourceFile,
                                       null,
                                       null, /* units */
                                       GuiComboBox.Type.TEXTFIELDWITHBUTTON,
@@ -638,28 +751,39 @@ public class VMSDiskInfo extends EditableInfo {
                                       null, /* abbrv */
                                       getAccessType(param),
                                       fileChooserBtn);
+            sourceFileCB = paramCB;
             if (Tools.isWindows()) {
                 /* does not work on windows and I tries, ultimatly because
                    FilePane.usesShellFolder(fc) in BasicFileChooserUI returns
                    true and it is not possible to descent into a directory.
                    TODO: It may work in the future.
                 */
-                paramCb.setTFButtonEnabled(false);
+                paramCB.setTFButtonEnabled(false);
             }
             fileChooserBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread t = new Thread(new Runnable() {
                         public void run() {
-                            startFileChooser(paramCb);
+                            startFileChooser(paramCB);
                         }
                     });
                     t.start();
                 }
             });
-            paramComboBoxAdd(param, prefix, paramCb);
-            return paramCb;
+            paramComboBoxAdd(param, prefix, paramCB);
+            return paramCB;
         } else {
-          return super.getParamComboBox(param, prefix, width);
+            final GuiComboBox paramCB =
+                                 super.getParamComboBox(param, prefix, width);
+            if (DiskData.TYPE.equals(param)
+                || DiskData.TARGET_BUS_TYPE.equals(param)) {
+                paramCB.setAlwaysEditable(false);
+            } else if (DiskData.SOURCE_DEVICE.equals(param)) {
+                sourceDeviceCB = paramCB;
+            } else if (DiskData.TARGET_DEVICE.equals(param)) {
+                targetDeviceCB = paramCB;
+            }
+            return paramCB;
         }
     }
 }
