@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 
@@ -265,8 +267,8 @@ public class HostBrowser extends Browser {
     /**
      * Return list of block device info objects.
      */
-    public final List<BlockDevInfo> getBlockDevInfos() {
-        final List<BlockDevInfo> blockDevInfos = new ArrayList<BlockDevInfo>();
+    public final Set<BlockDevInfo> getBlockDevInfos() {
+        final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
         try {
             mBlockDevInfosLock.acquire();
         } catch (InterruptedException e) {

@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -1031,7 +1033,7 @@ public class BlockDevInfo extends EditableInfo {
                         public final void update() {
                             super.update();
                             removeAll();
-                            List<BlockDevInfo> blockDevInfos =
+                            Set<BlockDevInfo> blockDevInfos =
                                         oHost.getBrowser().getBlockDevInfos();
                             List<BlockDevInfo> blockDevInfosS =
                                                 new ArrayList<BlockDevInfo>();
@@ -1556,4 +1558,22 @@ public class BlockDevInfo extends EditableInfo {
         }
         b.setDRBDtestData(drbdtestData);
     }
+
+    /** Compares ignoring case and using drbd device names if available. */
+    public final int compareTo(final Object o) {
+        String name;
+        String oName;
+        if (getBlockDevice().isDrbd()) {
+            name = getDrbdResourceInfo().getDevice();
+        } else {
+            name = getName();
+        }
+        if (((BlockDevInfo) o).getBlockDevice().isDrbd()) {
+            oName = ((BlockDevInfo) o).getDrbdResourceInfo().getDevice();
+        } else {
+            oName = ((BlockDevInfo) o).getName();
+        }
+        return name.compareToIgnoreCase(oName);
+    }
+
 }

@@ -834,10 +834,8 @@ public class Info implements Comparable {
         });
     }
 
-    /**
-     * Compares ignoring case.
-     */
-    public final int compareTo(final Object o) {
+    /** Compares ignoring case. */
+    public int compareTo(final Object o) {
         return toString().compareToIgnoreCase(o.toString());
     }
 
