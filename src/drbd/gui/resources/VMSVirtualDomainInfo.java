@@ -272,9 +272,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
             final VMSDiskInfo vmsdi =
                               (VMSDiskInfo) node.getUserObject();
-            if (diskNames.contains(vmsdi.toString())) {
+            if (diskNames.contains(vmsdi.getName())) {
                 /* keeping */
-                diskNames.remove(vmsdi.toString());
+                diskNames.remove(vmsdi.getName());
                 vmsdi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
@@ -283,7 +283,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
-                diskToInfo.remove(vmsdi.toString());
+                diskToInfo.remove(vmsdi.getName());
                 mDiskToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
@@ -353,9 +353,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
             final VMSInterfaceInfo vmsii =
                                       (VMSInterfaceInfo) node.getUserObject();
-            if (interfaceNames.contains(vmsii.toString())) {
+            if (interfaceNames.contains(vmsii.getName())) {
                 /* keeping */
-                interfaceNames.remove(vmsii.toString());
+                interfaceNames.remove(vmsii.getName());
                 vmsii.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
@@ -364,7 +364,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
-                interfaceToInfo.remove(vmsii.toString());
+                interfaceToInfo.remove(vmsii.getName());
                 mInterfaceToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
@@ -643,7 +643,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         final MyButton overviewButton = new MyButton("VMs Overview",
                                                      BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(150, 50));
+        overviewButton.setPreferredSize(new Dimension(200, 50));
         overviewButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 getBrowser().getVMSInfo().selectMyself();
@@ -1685,9 +1685,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                              NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
         final StringBuffer source = new StringBuffer(20);
-        final String s = interfaceData.getSourceBridge();
+        final String type = interfaceData.getType();
+        String s;
+        if ("network".equals(type)) {
+            s = interfaceData.getSourceNetwork();
+        } else {
+            s = interfaceData.getSourceBridge();
+        }
         if (s != null) {
-            source.append(interfaceData.getType());
+            source.append(type);
             source.append(" : ");
             source.append(s);
         }

@@ -798,6 +798,9 @@ public class Info implements Comparable {
      */
     protected final void addMouseOverListener(final Component c,
                                               final ButtonCallback bc) {
+        if (bc == null) {
+            return;
+        }
         c.addMouseListener(new MouseListener() {
             public void mouseClicked(final MouseEvent e) {
                 /* do nothing */

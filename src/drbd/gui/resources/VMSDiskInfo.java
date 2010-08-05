@@ -36,6 +36,8 @@ import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
 import drbd.utilities.VIRSH;
+import drbd.utilities.MyMenuItem;
+import drbd.utilities.MyList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -142,6 +144,10 @@ public class VMSDiskInfo extends EditableInfo {
                                                        "(.).{9}\\s+(\\d+)\\s+"
                                                        + "(\\d+)\\s+"
                                                        + "(\\d+) (.*)$");
+    /** A map from target bus and type as it is saved to the string
+     * representation that appears in the menus. */
+    private static final Map<String, String> TARGET_BUS_TYPES =
+                                                 new HashMap<String, String>();
     static {
         POSSIBLE_VALUES.put(DiskData.TYPE, new String[]{"file", "block"});
         POSSIBLE_VALUES.put(
@@ -153,6 +159,10 @@ public class VMSDiskInfo extends EditableInfo {
                        new StringInfo("SCSI disk",   "scsi/disk",   null),
                        new StringInfo("USB disk",    "usb/disk",    null),
                        new StringInfo("Virtio Disk", "virtio/disk", null)});
+        for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
+                                                  DiskData.TARGET_BUS_TYPE)) {
+            TARGET_BUS_TYPES.put(tbt.getStringValue(), tbt.toString());
+        }
         DEFAULTS_MAP.put(DiskData.READONLY, "False");
         TARGET_DEVICES_MAP.put("ide/disk",
                                new String[]{"hda", "hdb", "hdd"});
@@ -236,7 +246,7 @@ public class VMSDiskInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         final MyButton overviewButton = new MyButton("VM Host Overview",
                                                      BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(150, 50));
+        overviewButton.setPreferredSize(new Dimension(200, 50));
         overviewButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 vmsVirtualDomainInfo.selectMyself();
@@ -268,12 +278,6 @@ public class VMSDiskInfo extends EditableInfo {
         applyButton.setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;
         return infoPanel;
-    }
-
-    /** Returns list of menu items for VM. */
-    public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        return items;
     }
 
     /** Returns service icon in the menu. */
@@ -312,6 +316,7 @@ public class VMSDiskInfo extends EditableInfo {
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 final Set<String> bds = new TreeSet<String>();
+                bds.add("");
                 if (vmsxml != null) {
                     for (final BlockDevInfo bdi
                             : h.getBrowser().getBlockDevInfos()) {
@@ -420,10 +425,11 @@ public class VMSDiskInfo extends EditableInfo {
                 vmsxml.modifyDiskXML(vmsVirtualDomainInfo.getDomainName(),
                                      getName(),
                                      parameters);
-                getBrowser().periodicalVMSUpdate(h);
             }
         }
-        checkResourceFields(null, params);
+        for (final Host h : getBrowser().getClusterHosts()) {
+            getBrowser().periodicalVMSUpdate(h);
+        }
     }
 
     /** Returns whether this parameter has a unit prefix. */
@@ -527,6 +533,7 @@ public class VMSDiskInfo extends EditableInfo {
         } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
             if (targetDeviceCB != null) {
                 final Set<String> devices = new LinkedHashSet<String>();
+                devices.add(null);
                 for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
                     // TODO: remove the ones that are in use
                     devices.add(dev);
@@ -535,8 +542,8 @@ public class VMSDiskInfo extends EditableInfo {
                 String selected = null;
                 if (!devices.add(saved)) {
                     /* it was there */
-                    selected = saved;
                 }
+                selected = saved;
                 targetDeviceCB.reloadComboBox(
                                 selected,
                                 devices.toArray(new String[devices.size()]));
@@ -785,5 +792,93 @@ public class VMSDiskInfo extends EditableInfo {
             }
             return paramCB;
         }
+    }
+
+    /** Returns list of menu items. */
+    public final List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final boolean testOnly = false;
+        /* remove service */
+        final MyMenuItem removeMenuItem = new MyMenuItem(
+                    Tools.getString("VMSDiskInfo.Menu.Remove"),
+                    ClusterBrowser.REMOVE_ICON,
+                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    ConfigData.AccessType.ADMIN,
+                    ConfigData.AccessType.OP) {
+            private static final long serialVersionUID = 1L;
+
+            public boolean enablePredicate() {
+                if (getResource().isNew()) {
+                    return true;
+                }
+                return true;
+            }
+
+            public void action() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getPopup().setVisible(false);
+                    }
+                });
+                removeMyself(false);
+            }
+        };
+        addMouseOverListener(removeMenuItem, null);
+        items.add((UpdatableItem) removeMenuItem);
+        return items;
+    }
+
+    /** Removes this disk from the libvirt with confirmation dialog. */
+    public void removeMyself(final boolean testOnly) {
+        if (getResource().isNew()) {
+            removeMyselfNoConfirm(testOnly);
+            getResource().setNew(false);
+            return;
+        }
+        String desc = Tools.getString("VMSDiskInfo.confirmRemove.Description");
+
+        desc  = desc.replaceAll("@DISK@", toString());
+        if (Tools.confirmDialog(
+               Tools.getString("VMSDiskInfo.confirmRemove.Title"),
+               desc,
+               Tools.getString("VMSDiskInfo.confirmRemove.Yes"),
+               Tools.getString("VMSDiskInfo.confirmRemove.No"))) {
+            removeMyselfNoConfirm(testOnly);
+            getResource().setNew(false);
+        }
+    }
+
+    /** Removes this disk without confirmation dialog. */
+    protected void removeMyselfNoConfirm(final boolean testOnly) {
+        if (testOnly) {
+            return;
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null) {
+                vmsxml.removeDiskXML(vmsVirtualDomainInfo.getDomainName(),
+                                     getName());
+            }
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            getBrowser().periodicalVMSUpdate(h);
+        }
+    }
+
+    /** Returns string representation. */
+    public String toString() {
+        final StringBuffer s = new StringBuffer(30);
+        s.append(getName());
+        s.append(" (");
+        final String saved = getParamSaved(DiskData.TARGET_BUS_TYPE);
+        if (saved == null) {
+            s.append("new...");
+        } else if (TARGET_BUS_TYPES.containsKey(saved)) {
+            s.append(TARGET_BUS_TYPES.get(saved));
+        } else {
+            s.append(saved);
+        }
+        s.append(')');
+        return s.toString();
     }
 }

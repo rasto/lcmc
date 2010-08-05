@@ -126,6 +126,8 @@ public class ClusterBrowser extends Browser {
     private DefaultMutableTreeNode servicesNode;
     /** Menu's drbd node. */
     private DefaultMutableTreeNode drbdNode;
+    /** Update VMS lock. */
+    private final Mutex mUpdateVMSlock = new Mutex();
     /** Menu's VMs node. */
     private DefaultMutableTreeNode vmsNode = null;
     /** Common file systems on all cluster nodes. */
@@ -1339,13 +1341,17 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Updates VM nodes.
-     */
+    /** Updates VM nodes. */
     public final void updateVMS() {
+        try {
+            if (!mUpdateVMSlock.attempt(0)) {
+                return;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         DefaultMutableTreeNode resource;
         Tools.debug(this, "VM status update", 1);
-
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
             final VMSXML vxml = getVMSXML(host);
@@ -1384,6 +1390,7 @@ public class ClusterBrowser extends Browser {
         }
 
         if (vmsNode == null) {
+            mUpdateVMSlock.release();
             return;
         }
 
@@ -1420,6 +1427,7 @@ public class ClusterBrowser extends Browser {
         if (vmsi != null) {
             vmsi.updateTable(VMSInfo.MAIN_TABLE);
         }
+        mUpdateVMSlock.release();
     }
 
     /**

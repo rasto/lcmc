@@ -105,13 +105,15 @@ public class VMSInfo extends CategoryInfo {
             }
             final VMSVirtualDomainInfo vmsvdi =
                         getBrowser().findVMSVirtualDomainInfo(domainName);
-            dti.put(domainName, vmsvdi);
-            final MyButton domainNameLabel = new MyButton(domainName,
-                                                          hostIcon);
-            rows.add(new Object[]{domainNameLabel,
-                                  vmsvdi.getDefinedOnString(),
-                                  vmsvdi.getRunningOnString(),
-                                  vmsvdi.getResource().getValue("memory")});
+            if (vmsvdi != null) {
+                dti.put(domainName, vmsvdi);
+                final MyButton domainNameLabel = new MyButton(domainName,
+                                                              hostIcon);
+                rows.add(new Object[]{domainNameLabel,
+                                      vmsvdi.getDefinedOnString(),
+                                      vmsvdi.getRunningOnString(),
+                                      vmsvdi.getResource().getValue("memory")});
+            }
         }
         domainToInfo = dti;
         domainToColor = dtc;

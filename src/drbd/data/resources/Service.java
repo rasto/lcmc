@@ -38,8 +38,6 @@ public class Service extends Resource {
     private String id = null;
     /** Heartbeat id of this service. */
     private String crmId = null;
-    /** Whether the service is newly allocated. */
-    private boolean newService = false;
     /** Whether the service is removed. */
     private boolean removed = false;
     /** Whether the service is being removed. */
@@ -191,23 +189,7 @@ public class Service extends Resource {
         setValue("id", id);
     }
 
-    /**
-     * Sets whether the service is newly allocated.
-     */
-    public final void setNew(final boolean newService) {
-        this.newService = newService;
-    }
-
-    /**
-     * Returns whether the service is newly allocated.
-     */
-    public final boolean isNew() {
-        return newService;
-    }
-
-    /**
-     * Sets whether the service was removed.
-     */
+    /** Sets whether the service was removed. */
     public final void setRemoved(final boolean removed) {
         this.removed = removed;
         if (removed) {
@@ -215,9 +197,7 @@ public class Service extends Resource {
         }
     }
 
-    /**
-     * Returns whether the service was removed.
-     */
+    /** Returns whether the service was removed. */
     public final boolean isRemoved() {
         return removed || removing;
     }
@@ -251,7 +231,7 @@ public class Service extends Resource {
      * confirmed from the heartbeat.
      */
     public final void setAvailable() {
-        newService      = false;
+        setNew(false);
         modified = false;
         removed  = false;
     }
@@ -261,7 +241,7 @@ public class Service extends Resource {
      * just created, it was just removed or modified.
      */
     public final boolean isAvailable() {
-        return !newService
+        return !isNew()
                && !modified
                && !removed
                && !modifying

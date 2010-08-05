@@ -1904,6 +1904,38 @@ public class TextResource extends
         {"VMSDiskInfo.Approve.ToolTip",
          "Select this image."},
 
+        {"VMSDiskInfo.Menu.Remove",
+         "Remove"},
+
+        {"VMSDiskInfo.confirmRemove.Title",
+         "Remove Virtual Disk"},
+
+        {"VMSDiskInfo.confirmRemove.Description",
+         "Virtual disk \"@DISK@\" will be removed. "
+         + "Are you sure?"},
+
+        {"VMSDiskInfo.confirmRemove.Yes",
+         "Remove"},
+
+        {"VMSDiskInfo.confirmRemove.No",
+         "Cancel"},
+
+        {"VMSInterfaceInfo.Menu.Remove",
+         "Remove"},
+
+        {"VMSInterfaceInfo.confirmRemove.Title",
+         "Remove Virtual Interface"},
+
+        {"VMSInterfaceInfo.confirmRemove.Description",
+         "Virtual interface \"@INTERFACE@\" will be removed. "
+         + "Are you sure?"},
+
+        {"VMSInterfaceInfo.confirmRemove.Yes",
+         "Remove"},
+
+        {"VMSInterfaceInfo.confirmRemove.No",
+         "Cancel"},
+
         {"EmptyViewPanel.HelpText",
 "<h3>Welcome to the DRBD Management Console</h3>"
 + "by Rasto Levrinc."

@@ -53,9 +53,7 @@ public class StringInfo extends Info {
         return getName();
     }
 
-    /**
-     * Returns the string that is used internally.
-     */
+    /** Returns the string that is used internally. */
     public final String getStringValue() {
         return string;
     }

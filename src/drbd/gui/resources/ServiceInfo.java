@@ -3877,9 +3877,7 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Removes this service from the crm with confirmation dialog.
-     */
+    /** Removes this service from the crm with confirmation dialog. */
     public void removeMyself(final boolean testOnly) {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
@@ -4673,9 +4671,7 @@ public class ServiceInfo extends EditableInfo {
         return items;
     }
 
-    /**
-     * Adds migrate and unmigrate menu items.
-     */
+    /** Adds migrate and unmigrate menu items. */
     protected void addMigrateMenuItems(final List<UpdatableItem> items) {
         /* migrate resource */
         final boolean testOnly = false;

@@ -51,6 +51,8 @@ public class Resource {
     private final Map<String, String> preferredValueMap =
                                                 new HashMap<String, String>();
 
+    /** Whether the resource is newly allocated. */
+    private boolean newResource = false;
     /**
      * Prepares a new <code>Resource</code> object.
      *
@@ -139,18 +141,14 @@ public class Resource {
         return possibleChoices;
     }
 
-    /**
-     * Sets possible choices for parameter combo box.
-     */
+    /** Sets possible choices for parameter combo box. */
     public final void setPossibleChoices(final String param,
                                    final Object[] possibleChoices) {
         possibleChoicesMap.remove(param);
         possibleChoicesMap.put(param, possibleChoices);
     }
 
-    /**
-     * Returns possible choices for parameter combo box.
-     */
+    /** Returns possible choices for parameter combo box. */
     public Object[] getPossibleChoices(final String param) {
         final List<Object> possibleChoices =
                              getPossibleChoices(param,
@@ -158,33 +156,35 @@ public class Resource {
         return possibleChoices.toArray(new Object[possibleChoices.size()]);
     }
 
-    /**
-     * Sets default value for the parameter.
-     */
+    /** Sets default value for the parameter. */
     public final void setDefaultValue(final String param,
                                       final String defaultValue) {
         defaultValueMap.put(param, defaultValue);
     }
 
-    /**
-     * Returns default value for the parameter.
-     */
+    /** Returns default value for the parameter. */
     public final String getDefaultValue(final String param) {
         return defaultValueMap.get(param);
     }
 
-    /**
-     * Sets preferred value for the parameter.
-     */
+    /** Sets preferred value for the parameter. */
     public final void setPreferredValue(final String param,
                                         final String preferredValue) {
         preferredValueMap.put(param, preferredValue);
     }
 
-    /**
-     * Returns the preferred value for the parameter.
-     */
+    /** Returns the preferred value for the parameter. */
     public final String getPreferredValue(final String param) {
         return preferredValueMap.get(param);
+    }
+
+    /** Sets whether the service is newly allocated. */
+    public final void setNew(final boolean newResource) {
+        this.newResource = newResource;
+    }
+
+    /** Returns whether the service is newly allocated. */
+    public final boolean isNew() {
+        return newResource;
     }
 }

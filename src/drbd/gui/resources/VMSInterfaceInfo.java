@@ -35,6 +35,8 @@ import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
+import drbd.utilities.MyMenuItem;
+import drbd.utilities.MyList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -124,7 +126,8 @@ public class VMSInterfaceInfo extends EditableInfo {
                                              "/var/lib/libvirt/images/";
     static {
         POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE, 
-                            new String[]{"default",
+                            new String[]{null,
+                                         "default",
                                          "e1000",
                                          "ne2k_pci",
                                          "pcnet",
@@ -198,7 +201,7 @@ public class VMSInterfaceInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         final MyButton overviewButton = new MyButton("VM Host Overview",
                                                      BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(150, 50));
+        overviewButton.setPreferredSize(new Dimension(200, 50));
         overviewButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 vmsVirtualDomainInfo.selectMyself();
@@ -230,12 +233,6 @@ public class VMSInterfaceInfo extends EditableInfo {
         applyButton.setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;
         return infoPanel;
-    }
-
-    /** Returns list of menu items for VM. */
-    public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        return items;
     }
 
     /** Returns service icon in the menu. */
@@ -274,7 +271,9 @@ public class VMSInterfaceInfo extends EditableInfo {
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
-                    return vmsxml.getNetworks();
+                    final List<String> networks = vmsxml.getNetworks();
+                    networks.add(0, null);
+                    return networks.toArray(new String[networks.size()]);
                 }
             }
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
@@ -282,6 +281,7 @@ public class VMSInterfaceInfo extends EditableInfo {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
                     final List<String> bridges = h.getBridges();
+                    bridges.add(0, null);
                     return bridges.toArray(new String[bridges.size()]);
                 }
             }
@@ -552,5 +552,105 @@ public class VMSInterfaceInfo extends EditableInfo {
             }
         }
         return null;
+    }
+
+    /** Removes this interface from the libvirt with confirmation dialog. */
+    public void removeMyself(final boolean testOnly) {
+        if (getResource().isNew()) {
+            removeMyselfNoConfirm(testOnly);
+            getResource().setNew(false);
+            return;
+        }
+        String desc = Tools.getString(
+                                "VMSInterfaceInfo.confirmRemove.Description");
+
+        desc  = desc.replaceAll("@INTERFACE@", toString());
+        if (Tools.confirmDialog(
+               Tools.getString("VMSInterfaceInfo.confirmRemove.Title"),
+               desc,
+               Tools.getString("VMSInterfaceInfo.confirmRemove.Yes"),
+               Tools.getString("VMSInterfaceInfo.confirmRemove.No"))) {
+            removeMyselfNoConfirm(testOnly);
+            getResource().setNew(false);
+        }
+    }
+
+    /** Removes this interface without confirmation dialog. */
+    protected void removeMyselfNoConfirm(final boolean testOnly) {
+        if (testOnly) {
+            return;
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null) {
+                vmsxml.removeInterfaceXML(vmsVirtualDomainInfo.getDomainName(),
+                                          getName());
+            }
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            getBrowser().periodicalVMSUpdate(h);
+        }
+    }
+
+    /** Returns list of menu items. */
+    public final List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final boolean testOnly = false;
+        /* remove service */
+        final MyMenuItem removeMenuItem = new MyMenuItem(
+                    Tools.getString("VMSInterfaceInfo.Menu.Remove"),
+                    ClusterBrowser.REMOVE_ICON,
+                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    ConfigData.AccessType.ADMIN,
+                    ConfigData.AccessType.OP) {
+            private static final long serialVersionUID = 1L;
+
+            public boolean enablePredicate() {
+                if (getResource().isNew()) {
+                    return true;
+                }
+                return true;
+            }
+
+            public void action() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getPopup().setVisible(false);
+                    }
+                });
+                removeMyself(false);
+            }
+        };
+        addMouseOverListener(removeMenuItem, null);
+        items.add((UpdatableItem) removeMenuItem);
+        return items;
+    }
+
+    /** Returns string representation. */
+    public String toString() {
+        final StringBuffer s = new StringBuffer(30);
+        String source;
+        if ("network".equals(getParamSaved(InterfaceData.TYPE))) {
+            source = getParamSaved(InterfaceData.SOURCE_NETWORK);
+        } else {
+            source = getParamSaved(InterfaceData.SOURCE_BRIDGE);
+        }
+        if (source == null) {
+            s.append("new...");
+        } else {
+            s.append(source);
+        }
+
+        final String saved = getParamSaved(InterfaceData.MAC_ADDRESS);
+        if (saved != null) {
+            s.append(" (");
+            if (saved.length() > 8) {
+                s.append(saved.substring(8));
+            } else {
+                s.append(saved);
+            }
+            s.append(')');
+        }
+        return s.toString();
     }
 }

@@ -151,17 +151,17 @@ public class VMSXML extends XML {
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.SOURCE_BRIDGE, "bridge");
         INTERFACE_TAG_MAP.put(InterfaceData.TARGET_DEV, "target");
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.TARGET_DEV, "dev");
-        INTERFACE_TAG_MAP.put(InterfaceData.MODEL_TYPE, "mode");
+        INTERFACE_TAG_MAP.put(InterfaceData.MODEL_TYPE, "model");
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.MODEL_TYPE, "type");
 
         DISK_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
 
         DISK_TAG_MAP.put(DiskData.TARGET_DEVICE, "target");
-        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_DEVICE, "device");
+        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_DEVICE, "dev");
         DISK_TAG_MAP.put(DiskData.SOURCE_FILE, "source");
         DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_FILE, "file");
         DISK_TAG_MAP.put(DiskData.SOURCE_DEVICE, "source");
-        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_DEVICE, "device");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_DEVICE, "dev");
         DISK_TAG_MAP.put(DiskData.TARGET_BUS, "target");
         DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_BUS, "bus");
 
@@ -320,6 +320,43 @@ public class VMSXML extends XML {
         host.setVMInfoMD5(null);
     }
 
+    /** Remove disk XML. */
+    public final void removeDiskXML(final String domainName,
+                                    final String targetDev) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            final String diskPath = "//domain/devices/disk";
+            final NodeList nodes = (NodeList) xpath.evaluate(
+                                                       diskPath,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+            Element diskNode = null;
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node mn = getChildNode(nodes.item(i), "target");
+                if (targetDev.equals(getAttribute(mn, "dev"))) {
+                    diskNode = (Element) nodes.item(i);
+                }
+            }
+            if (diskNode != null) {
+                diskNode.getParentNode().removeChild(diskNode);
+            }
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return;
+        }
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
+    }
+
     /** Modify interface XML. */
     public final void modifyInterfaceXML(
                                      final String domainName,
@@ -387,6 +424,43 @@ public class VMSXML extends XML {
                         }
                     }
                 }
+            }
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return;
+        }
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
+    }
+
+    /** Remove interface XML. */
+    public final void removeInterfaceXML(final String domainName,
+                                         final String macAddress) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            final String interfacePath = "//domain/devices/interface";
+            final NodeList nodes = (NodeList) xpath.evaluate(
+                                                       interfacePath,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+            Element interfaceNode = null;
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node mn = getChildNode(nodes.item(i), "mac");
+                if (macAddress.equals(getAttribute(mn, "address"))) {
+                    interfaceNode = (Element) nodes.item(i);
+                }
+            }
+            if (interfaceNode != null) {
+                interfaceNode.getParentNode().removeChild(interfaceNode);
             }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
@@ -816,9 +890,8 @@ public class VMSXML extends XML {
     }
 
     /** Returns array of networks. */
-    public final String[] getNetworks() {
-        final Set<String> networks = networkMap.keySet();
-        return networks.toArray(new String[networks.size()]);
+    public final List<String> getNetworks() {
+        return new ArrayList<String>(networkMap.keySet());
     }
 
     /** Class that holds data about networks. */
@@ -1081,7 +1154,7 @@ public class VMSXML extends XML {
 
         /** Returns source network. */
         public final String getSourceNetwork() {
-            return sourceBridge;
+            return sourceNetwork;
         }
 
         /** Returns source bridge. */
