@@ -35,9 +35,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
-import drbd.utilities.VIRSH;
 import drbd.utilities.MyMenuItem;
-import drbd.utilities.MyList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -52,6 +50,8 @@ import javax.swing.SwingConstants;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 import java.util.TreeSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -71,11 +71,7 @@ import java.io.File;
 /**
  * This class holds info about Virtual Disks.
  */
-public class VMSDiskInfo extends EditableInfo {
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
-    /** VMS virtual domain info object. */
-    private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
+public class VMSDiskInfo extends VMSHardwareInfo {
     /** Source file combo box, so that it can be disabled, depending on type. */
     private GuiComboBox sourceFileCB = null;
     /** Source block combo box, so that it can be disabled, depending on type.*/
@@ -83,25 +79,35 @@ public class VMSDiskInfo extends EditableInfo {
     /** Target device combo box, that needs to be reloaded if target type has
      * changed. */
     private GuiComboBox targetDeviceCB = null;
-    /** Back to overview icon. */
-    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
-                                                 Tools.getDefault("BackIcon"));
+    /** Driver name combo box. */
+    private GuiComboBox driverNameCB = null;
+    /** Driver type combo box. */
+    private GuiComboBox driverTypeCB = null;
+    /** Readonly combo box. */
+    private GuiComboBox readonlyCB = null;
+    /** Previous value of target bus and type. So that we know if it changed. */
+    private String prevTargetBusType = null;
+    /** Previous value of the type (file or block). */
+    private String prevType = null;
     /** Parameters. */
     private static final String[] PARAMETERS = {DiskData.TYPE,
                                                 DiskData.TARGET_DEVICE,
                                                 DiskData.SOURCE_FILE,
                                                 DiskData.SOURCE_DEVICE,
                                                 DiskData.TARGET_BUS_TYPE,
-                                                DiskData.READONLY};
-    /** Section map. */
-    private static final Map<String, String> SECTION_MAP =
-                                                 new HashMap<String, String>();
-    /** Default units. */
-    private static final Map<String, String> DEFAULT_UNIT =
-                                                new HashMap<String, String>();
-    /** If it has units. */
-    private static final Map<String, Boolean> HAS_UNIT =
-                                                new HashMap<String, Boolean>();
+                                                DiskData.DRIVER_NAME,
+                                                DiskData.DRIVER_TYPE,
+                                                DiskData.READONLY,
+                                                DiskData.SHAREABLE};
+    /** Whether the parameter is editable only in advanced mode. */
+    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
+        new HashSet<String>(Arrays.asList(new String[]{
+                                                DiskData.TARGET_DEVICE,
+                                                DiskData.DRIVER_NAME,
+                                                DiskData.DRIVER_TYPE}));
+    /** Whether the parameter is required. */
+    private static final Set<String> IS_REQUIRED =
+        new HashSet<String>(Arrays.asList(new String[]{DiskData.TYPE}));
     /** Field type. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
@@ -115,6 +121,8 @@ public class VMSDiskInfo extends EditableInfo {
                         GuiComboBox.Type.TEXTFIELDWITHBUTTON);
         FIELD_TYPES.put(DiskData.READONLY,
                         GuiComboBox.Type.CHECKBOX);
+        FIELD_TYPES.put(DiskData.SHAREABLE,
+                        GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(DiskData.TARGET_DEVICE,
                         GuiComboBox.Type.COMBOBOX);
     }
@@ -127,10 +135,16 @@ public class VMSDiskInfo extends EditableInfo {
         SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "Source File");
         SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Source Device");
         SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Target Type");
+        SHORTNAME_MAP.put(DiskData.DRIVER_NAME, "Driver Name");
+        SHORTNAME_MAP.put(DiskData.DRIVER_TYPE, "Driver Type");
         SHORTNAME_MAP.put(DiskData.READONLY, "Readonly");
+        SHORTNAME_MAP.put(DiskData.SHAREABLE, "Shareable");
     }
 
-    /** Default name. */
+    /** Preferred values. */
+    private static final Map<String, String> PREFERRED_MAP =
+                                                 new HashMap<String, String>();
+    /** Defaults. */
     private static final Map<String, String> DEFAULTS_MAP =
                                                  new HashMap<String, String>();
     /** Possible values. */
@@ -151,7 +165,7 @@ public class VMSDiskInfo extends EditableInfo {
     static {
         POSSIBLE_VALUES.put(DiskData.TYPE, new String[]{"file", "block"});
         POSSIBLE_VALUES.put(
-                    DiskData.TARGET_BUS_TYPE, 
+                    DiskData.TARGET_BUS_TYPE,
                     new StringInfo[]{
                        new StringInfo("IDE disk",    "ide/disk",    null),
                        new StringInfo("IDE cdrom",   "ide/cdrom",    null),
@@ -164,12 +178,13 @@ public class VMSDiskInfo extends EditableInfo {
             TARGET_BUS_TYPES.put(tbt.getStringValue(), tbt.toString());
         }
         DEFAULTS_MAP.put(DiskData.READONLY, "False");
+        DEFAULTS_MAP.put(DiskData.SHAREABLE, "False");
         TARGET_DEVICES_MAP.put("ide/disk",
                                new String[]{"hda", "hdb", "hdd"});
         TARGET_DEVICES_MAP.put("ide/cdrom",
                                new String[]{"hdc"});
         TARGET_DEVICES_MAP.put("fdc/floppy",
-                               new String[]{"fda"});
+                               new String[]{"fda", "fdb", "fdc", "fdd"});
         TARGET_DEVICES_MAP.put("scsi/disk",
                                new String[]{"sda", "sdb", "sdc", "sdd"});
         TARGET_DEVICES_MAP.put("usb/disk",
@@ -180,104 +195,16 @@ public class VMSDiskInfo extends EditableInfo {
     /** Cache for files. */
     private final Map<String, LinuxFile> linuxFileCache =
                                             new HashMap<String, LinuxFile>();
+
     /** Creates the VMSDiskInfo object. */
     public VMSDiskInfo(final String name, final Browser browser,
                        final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
-        super(name, browser);
-        setResource(new Resource(name));
-        this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
+        super(name, browser, vmsVirtualDomainInfo);
     }
 
-    /** Returns browser object of this info. */
-    protected final ClusterBrowser getBrowser() {
-        return (ClusterBrowser) super.getBrowser();
-    }
-
-    /** Returns info panel. */
-    public final JComponent getInfoPanel() {
-        if (infoPanel != null) {
-            return infoPanel;
-        }
-        final boolean abExisted = applyButton != null;
-        /* main, button and options panels */
-        final JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JTable headerTable = getTable(vmsVirtualDomainInfo.HEADER_TABLE);
-        if (headerTable != null) {
-            mainPanel.add(headerTable.getTableHeader());
-            mainPanel.add(headerTable);
-        }
-        mainPanel.add(getTablePanel("Disk", vmsVirtualDomainInfo.DISK_TABLE));
-
-        final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
-        buttonPanel.setMinimumSize(new Dimension(0, 50));
-        buttonPanel.setPreferredSize(new Dimension(0, 50));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-
-        final JPanel optionsPanel = new JPanel(
-                                        new FlowLayout(FlowLayout.LEFT, 0, 20));
-        optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-
-        final String[] params = getParametersFromXML();
-        initApplyButton(null);
-        /* add item listeners to the apply button. */
-        if (!abExisted) {
-            applyButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                apply(false);
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
-        }
-        final JPanel extraButtonPanel =
-                           new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        extraButtonPanel.setBackground(Browser.STATUS_BACKGROUND);
-        buttonPanel.add(extraButtonPanel);
-        addApplyButton(buttonPanel);
-        final MyButton overviewButton = new MyButton("VM Host Overview",
-                                                     BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(200, 50));
-        overviewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                vmsVirtualDomainInfo.selectMyself();
-            }
-        });
-        extraButtonPanel.add(overviewButton);
-        addParams(optionsPanel,
-                  params,
-                  ClusterBrowser.SERVICE_LABEL_WIDTH,
-                  ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
-                  null);
-        /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        JMenu serviceCombo;
-        serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
-
-        mainPanel.add(optionsPanel);
-        final JPanel newPanel = new JPanel();
-        newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
-        newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(
-                                  ClusterBrowser.SERVICE_LABEL_WIDTH
-                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
-        newPanel.add(new JScrollPane(mainPanel));
-        applyButton.setEnabled(checkResourceFields(null, params));
-        infoPanel = newPanel;
-        return infoPanel;
+    /** Adds disk table with only this disk to the main panel. */
+    protected void addHardwareTable(final JPanel mainPanel) {
+       mainPanel.add(getTablePanel("Disk", VMSVirtualDomainInfo.DISK_TABLE));
     }
 
     /** Returns service icon in the menu. */
@@ -297,7 +224,7 @@ public class VMSDiskInfo extends EditableInfo {
 
     /** Returns preferred value for specified parameter. */
     protected final String getParamPreferred(final String param) {
-        return null;
+        return PREFERRED_MAP.get(param);
     }
 
     /** Returns default value for specified parameter. */
@@ -335,16 +262,21 @@ public class VMSDiskInfo extends EditableInfo {
 
     /** Returns section to which the specified parameter belongs. */
     protected final String getSection(final String param) {
-        final String sm = SECTION_MAP.get(param);
-        if (sm == null) {
-            return "Disk Options";
-        }
-        return sm;
+        return "Disk Options";
     }
 
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
-        return false;
+        if (DiskData.SOURCE_FILE.equals(param)
+            || DiskData.SOURCE_DEVICE.equals(param)) {
+            if ("ide/cdrom".equals(prevTargetBusType)
+                || "fdc/floppy".equals(prevTargetBusType)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return IS_REQUIRED.contains(param);
     }
 
     /** Returns true if the specified parameter is integer. */
@@ -419,91 +351,41 @@ public class VMSDiskInfo extends EditableInfo {
                 getResource().setValue(param, value);
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
-                vmsxml.modifyDiskXML(vmsVirtualDomainInfo.getDomainName(),
-                                     getName(),
-                                     parameters);
+        if (!testOnly) {
+            for (final Host h : getBrowser().getClusterHosts()) {
+                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                if (vmsxml != null) {
+                    vmsxml.modifyDiskXML(
+                                    getVMSVirtualDomainInfo().getDomainName(),
+                                    getName(),
+                                    parameters);
+                }
             }
+            getResource().setNew(false);
+            setName(getParamSaved(DiskData.TARGET_DEVICE));
         }
         for (final Host h : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
-    }
-
-    /** Returns whether this parameter has a unit prefix. */
-    protected final boolean hasUnitPrefix(final String param) {
-        return HAS_UNIT.containsKey(param) && HAS_UNIT.get(param);
-    }
-
-    /** Returns units. */
-    protected final Unit[] getUnits() {
-        return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
-                   new Unit("K", "K", "KiByte", "KiBytes"),
-                   new Unit("M", "M", "MiByte", "MiBytes"),
-                   new Unit("G",  "G",  "GiByte",      "GiBytes"),
-                   new Unit("T",  "T",  "TiByte",      "TiBytes")
-       };
-    }
-
-    /** Returns the default unit for the parameter. */
-    protected final String getDefaultUnit(final String param) {
-        return DEFAULT_UNIT.get(param);
-    }
-
-    /** Returns columns for the table. */
-    protected final String[] getColumnNames(final String tableName) {
-        return vmsVirtualDomainInfo.getColumnNames(tableName);
+        checkResourceFields(null, params);
+        getBrowser().reload(getNode());
     }
 
     /** Returns data for the table. */
     protected final Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo.getMainTableData();
+            return getVMSVirtualDomainInfo().getMainTableData();
         } else if (VMSVirtualDomainInfo.DISK_TABLE.equals(tableName)) {
-            return new Object[][]{vmsVirtualDomainInfo.getDiskDataRow(
-                                            getName(),
-                                            null,
-                                            vmsVirtualDomainInfo.getDisks(),
-                                            true)};
-        //} else if (INTERFACES_TABLE.equals(tableName)) {
+            if (getResource().isNew()) {
+                return new Object[][]{};
+            }
+            return new Object[][]{getVMSVirtualDomainInfo().getDiskDataRow(
+                                        getName(),
+                                        null,
+                                        getVMSVirtualDomainInfo().getDisks(),
+                                        true)};
         }
         return new Object[][]{};
-    }
-
-    /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName, final String key) {
-        vmsVirtualDomainInfo.selectMyself();
-    }
-
-    /** Retrurns color for some rows. */
-    protected final Color getTableRowColor(final String tableName,
-                                           final String key) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo.getTableRowColor(tableName, key);
-        }
-        return Browser.PANEL_BACKGROUND;
-    }
-
-    /** Alignment for the specified column. */
-    protected final int getTableColumnAlignment(final String tableName,
-                                                final int column) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo.getTableColumnAlignment(tableName,
-                                                                column);
-        }
-        return SwingConstants.LEFT;
-    }
-
-    /** Returns info object for this row. */
-    protected final Info getTableInfo(final String tableName,
-                                      final String key) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo;
-        }
-        return null;
     }
 
     /** Returns whether this parameter is advanced. */
@@ -520,33 +402,60 @@ public class VMSDiskInfo extends EditableInfo {
     protected final boolean checkParam(final String param,
                                        final String newValue) {
         if (DiskData.TYPE.equals(param)) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if (sourceFileCB != null) {
-                        sourceFileCB.setVisible("file".equals(newValue));
-                    } 
-                    if (sourceDeviceCB != null) {
-                        sourceDeviceCB.setVisible("block".equals(newValue));
+            if (sourceFileCB != null) {
+                sourceFileCB.setVisible("file".equals(newValue));
+            }
+            if (sourceDeviceCB != null) {
+                sourceDeviceCB.setVisible("block".equals(newValue));
+            }
+            if (driverTypeCB != null
+                && !newValue.equals(prevType)) {
+                if (prevType != null
+                    || getParamSaved(DiskData.DRIVER_TYPE) == null) {
+                    if ("file".equals(newValue)) {
+                        driverTypeCB.setValue("raw");
+                    } else {
+                        driverTypeCB.setValue("");
                     }
                 }
-            });
+            }
+            prevType = newValue;
         } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
-            if (targetDeviceCB != null) {
+            if (targetDeviceCB != null && !newValue.equals(prevTargetBusType)) {
                 final Set<String> devices = new LinkedHashSet<String>();
                 devices.add(null);
                 for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
-                    // TODO: remove the ones that are in use
-                    devices.add(dev);
+                    if (!getVMSVirtualDomainInfo().isDevice(dev)) {
+                        devices.add(dev);
+                    }
                 }
                 final String saved = getParamSaved(DiskData.TARGET_DEVICE);
                 String selected = null;
                 if (!devices.add(saved)) {
                     /* it was there */
                 }
-                selected = saved;
+                if (prevTargetBusType == null && saved != null) {
+                    selected = saved;
+                } else if (devices.size() > 1) {
+                    selected = devices.toArray(new String[0])[1];
+                }
                 targetDeviceCB.reloadComboBox(
                                 selected,
                                 devices.toArray(new String[devices.size()]));
+                if (prevTargetBusType != null
+                    || getParamSaved(DiskData.DRIVER_NAME) == null) {
+                    driverNameCB.setValue("qemu");
+                    if ("ide/cdrom".equals(newValue)) {
+                        readonlyCB.setValue("True");
+                    } else {
+                        readonlyCB.setValue("False");
+                    }
+                }
+                prevTargetBusType = newValue;
+                checkResourceFields(DiskData.SOURCE_FILE,
+                                    getParametersFromXML());
+                checkResourceFields(DiskData.SOURCE_DEVICE,
+                                    getParametersFromXML());
             }
         }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
@@ -554,10 +463,17 @@ public class VMSDiskInfo extends EditableInfo {
         }
         return true;
     }
+    
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+         return !IS_ENABLED_ONLY_IN_ADVANCED.contains(param)
+                || Tools.getConfigData().getExpertMode();
+    }
 
     /** Updates parameters. */
     public final void updateParameters() {
-        final Map<String, DiskData> disks = vmsVirtualDomainInfo.getDisks();
+        final Map<String, DiskData> disks =
+                                        getVMSVirtualDomainInfo().getDisks();
         if (disks != null) {
             final DiskData diskData = disks.get(getName());
             if (diskData != null) {
@@ -587,17 +503,6 @@ public class VMSDiskInfo extends EditableInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.DISK_TABLE);
-    }
-
-    /** Get first host that has this vm and is connected. */
-    private Host getFirstConnectedHost() {
-        for (final Host h : getBrowser().getClusterHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null && h.isConnected()) {
-                return h;
-            }
-        }
-        return null;
     }
 
     /** Returns cached file object. */
@@ -667,6 +572,9 @@ public class VMSDiskInfo extends EditableInfo {
                 final List<LinuxFile> files = new ArrayList<LinuxFile>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {
+                        if ("".equals(line.trim())) {
+                            continue;
+                        }
                         final Matcher m = STAT_PATTERN.matcher(line);
                         if (m.matches()) {
                             final String type = m.group(1);
@@ -785,79 +693,34 @@ public class VMSDiskInfo extends EditableInfo {
             if (DiskData.TYPE.equals(param)
                 || DiskData.TARGET_BUS_TYPE.equals(param)) {
                 paramCB.setAlwaysEditable(false);
-            } else if (DiskData.SOURCE_DEVICE.equals(param)) {
+            } else if (sourceDeviceCB == null
+                       && DiskData.SOURCE_DEVICE.equals(param)) {
                 sourceDeviceCB = paramCB;
-            } else if (DiskData.TARGET_DEVICE.equals(param)) {
+            } else if (targetDeviceCB == null
+                       && DiskData.TARGET_DEVICE.equals(param)) {
                 targetDeviceCB = paramCB;
+            } else if (driverNameCB == null
+                       && DiskData.DRIVER_NAME.equals(param)) {
+                driverNameCB = paramCB;
+            } else if (driverTypeCB == null
+                       && DiskData.DRIVER_TYPE.equals(param)) {
+                driverTypeCB = paramCB;
+            } else if (readonlyCB == null
+                       && DiskData.READONLY.equals(param)) {
+                readonlyCB = paramCB;
             }
             return paramCB;
         }
     }
 
-    /** Returns list of menu items. */
-    public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
-        /* remove service */
-        final MyMenuItem removeMenuItem = new MyMenuItem(
-                    Tools.getString("VMSDiskInfo.Menu.Remove"),
-                    ClusterBrowser.REMOVE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    ConfigData.AccessType.ADMIN,
-                    ConfigData.AccessType.OP) {
-            private static final long serialVersionUID = 1L;
-
-            public boolean enablePredicate() {
-                if (getResource().isNew()) {
-                    return true;
-                }
-                return true;
-            }
-
-            public void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
-                removeMyself(false);
-            }
-        };
-        addMouseOverListener(removeMenuItem, null);
-        items.add((UpdatableItem) removeMenuItem);
-        return items;
-    }
-
-    /** Removes this disk from the libvirt with confirmation dialog. */
-    public void removeMyself(final boolean testOnly) {
-        if (getResource().isNew()) {
-            removeMyselfNoConfirm(testOnly);
-            getResource().setNew(false);
-            return;
-        }
-        String desc = Tools.getString("VMSDiskInfo.confirmRemove.Description");
-
-        desc  = desc.replaceAll("@DISK@", toString());
-        if (Tools.confirmDialog(
-               Tools.getString("VMSDiskInfo.confirmRemove.Title"),
-               desc,
-               Tools.getString("VMSDiskInfo.confirmRemove.Yes"),
-               Tools.getString("VMSDiskInfo.confirmRemove.No"))) {
-            removeMyselfNoConfirm(testOnly);
-            getResource().setNew(false);
-        }
-    }
-
     /** Removes this disk without confirmation dialog. */
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
-            return;
-        }
+    protected final void removeMyselfNoConfirm(final boolean testOnly) {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                vmsxml.removeDiskXML(vmsVirtualDomainInfo.getDomainName(),
-                                     getName());
+                vmsxml.removeDiskXML(
+                                getVMSVirtualDomainInfo().getDomainName(),
+                                getName());
             }
         }
         for (final Host h : getBrowser().getClusterHosts()) {
@@ -868,7 +731,11 @@ public class VMSDiskInfo extends EditableInfo {
     /** Returns string representation. */
     public String toString() {
         final StringBuffer s = new StringBuffer(30);
-        s.append(getName());
+        final String name = getName();
+        if (name == null) {
+            return "new disk...";
+        }
+        s.append(name);
         s.append(" (");
         final String saved = getParamSaved(DiskData.TARGET_BUS_TYPE);
         if (saved == null) {

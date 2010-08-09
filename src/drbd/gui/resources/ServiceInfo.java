@@ -2021,6 +2021,11 @@ public class ServiceInfo extends EditableInfo {
         return crmXML.isAdvanced(resourceAgent, param);
     }
 
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+        return true;
+    }
+
     /** Returns access type of this parameter. */
     protected ConfigData.AccessType getAccessType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
@@ -3466,9 +3471,7 @@ public class ServiceInfo extends EditableInfo {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
 
-    /**
-     * Adds service panel to the position 'pos'.
-     */
+    /** Adds service panel to the position 'pos'. */
     public ServiceInfo addServicePanel(final ResourceAgent newRA,
                                        final Point2D pos,
                                        final boolean colocationOnly,
@@ -4006,9 +4009,7 @@ public class ServiceInfo extends EditableInfo {
         callbackHash.put(mmi, mmiCallback);
     }
 
-    /**
-     * Returns existing service manu item.
-     */
+    /** Returns existing service manu item. */
     private MyMenu getExistingServiceMenuItem(final String name,
                                               final boolean colocationOnly,
                                               final boolean orderOnly,
@@ -4102,9 +4103,7 @@ public class ServiceInfo extends EditableInfo {
         };
     }
 
-    /**
-     * Adds new Service and dependence.
-     */
+    /** Adds new Service and dependence. */
     private MyMenu getAddServiceMenuItem(final boolean testOnly,
                                          final String name,
                                          final boolean colocationOnly,

@@ -295,9 +295,15 @@ public class DrbdInfo extends EditableInfo {
         }
         return getBrowser().getDrbdXML().isAdvanced(param);
     }
+
     /** Returns access type of this parameter. */
     protected final ConfigData.AccessType getAccessType(final String param) {
         return getBrowser().getDrbdXML().getAccessType(param);
+    }
+
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+        return true;
     }
 
     /** Returns whether the parameter is of the integer type. */

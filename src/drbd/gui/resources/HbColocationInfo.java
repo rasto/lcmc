@@ -472,6 +472,12 @@ public class HbColocationInfo extends EditableInfo
     protected final boolean isAdvanced(final String param) {
         return true;
     }
+
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+        return true;
+    }
+
     /** Returns access type of this parameter. */
     protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;

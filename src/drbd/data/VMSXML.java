@@ -164,10 +164,16 @@ public class VMSXML extends XML {
         DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_DEVICE, "dev");
         DISK_TAG_MAP.put(DiskData.TARGET_BUS, "target");
         DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_BUS, "bus");
+        DISK_TAG_MAP.put(DiskData.DRIVER_NAME, "driver");
+        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_NAME, "name");
+        DISK_TAG_MAP.put(DiskData.DRIVER_TYPE, "driver");
+        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_TYPE, "type");
 
         DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_TYPE, "device");
 
         DISK_TAG_MAP.put(DiskData.READONLY, "readonly");
+
+        DISK_TAG_MAP.put(DiskData.SHAREABLE, "shareable");
     }
 
     /** XML document lock. */
@@ -236,7 +242,26 @@ public class VMSXML extends XML {
             return;
         }
         if (xml != null) {
-            host.getSSH().scp(xml, configName, "0644", true);
+            host.getSSH().scp(xml, configName, "0600", true);
+        }
+    }
+
+    /** Return devices node. */
+    private Node getDevicesNode(final XPath xpath, final Node domainNode) {
+        final String devicesPath = "devices";
+        try {
+            final NodeList devicesNodes = (NodeList) xpath.evaluate(
+                                                       devicesPath,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+            if (devicesNodes.getLength() != 1) {
+                Tools.appWarning("devices nodes: " + devicesNodes.getLength());
+                return null;
+            }
+            return devicesNodes.item(0);
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return null;
         }
     }
 
@@ -253,58 +278,70 @@ public class VMSXML extends XML {
             return;
         }
         final XPath xpath = XPathFactory.newInstance().newXPath();
+        final Node devicesNode = getDevicesNode(xpath, domainNode);
+        if (devicesNode == null) {
+            return;
+        }
         try {
-            final String diskPath = "//domain/devices/disk";
+            final String diskPath = "devices/disk";
             final NodeList nodes = (NodeList) xpath.evaluate(
                                                        diskPath,
                                                        domainNode,
                                                        XPathConstants.NODESET);
             Element diskNode = null;
-            for (int i = 0; i < nodes.getLength(); i++) {
-                final Node mn = getChildNode(nodes.item(i), "target");
-                if (targetDev.equals(getAttribute(mn, "dev"))) {
-                    diskNode = (Element) nodes.item(i);
+            if (targetDev != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = getChildNode(nodes.item(i), "target");
+                    if (targetDev.equals(getAttribute(mn, "dev"))) {
+                        diskNode = (Element) nodes.item(i);
+                    }
                 }
             }
-            if (diskNode != null) {
-                for (final String param : parametersMap.keySet()) {
-                    final String value = parametersMap.get(param);
-                    if (!DISK_TAG_MAP.containsKey(param)
-                        && DISK_ATTRIBUTE_MAP.containsKey(param)) {
-                        /* disk attribute */
-                        final Node attributeNode = 
-                                    diskNode.getAttributes().getNamedItem(
-                                               DISK_ATTRIBUTE_MAP.get(param));
-                        if (attributeNode == null) {
-                            diskNode.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
-                                                  value);
-                        } else {
-                            attributeNode.setNodeValue(value);
-                        }
-                        continue;
-                    }
-                    Element node = (Element) getChildNode(
-                                                    diskNode,
-                                                    DISK_TAG_MAP.get(param));
-                    if ((DISK_ATTRIBUTE_MAP.containsKey(param)
-                         || "True".equals(value))
-                        && node == null) {
-                        node = (Element) diskNode.appendChild(
-                              domainNode.getOwnerDocument().createElement(
-                                                      DISK_TAG_MAP.get(param)));
-                    } else if (!DISK_ATTRIBUTE_MAP.containsKey(param)
-                               && "False".equals(value)
-                               && node != null) {
-                        diskNode.removeChild(node);
-                    }
-                    if (DISK_ATTRIBUTE_MAP.containsKey(param)) {
-                        final Node attributeNode = 
-                                    node.getAttributes().getNamedItem(
-                                                DISK_ATTRIBUTE_MAP.get(param));
-                        if (attributeNode == null) {
-                            node.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
+            if (diskNode == null) {
+                diskNode = (Element) devicesNode.appendChild(
+                          domainNode.getOwnerDocument().createElement("disk"));
+            }
+            for (final String param : parametersMap.keySet()) {
+                final String value = parametersMap.get(param);
+                if (!DISK_TAG_MAP.containsKey(param)
+                    && DISK_ATTRIBUTE_MAP.containsKey(param)) {
+                    /* disk attribute */
+                    final Node attributeNode =
+                                diskNode.getAttributes().getNamedItem(
+                                           DISK_ATTRIBUTE_MAP.get(param));
+                    if (attributeNode == null) {
+                        diskNode.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
                                               value);
+                    } else {
+                        attributeNode.setNodeValue(value);
+                    }
+                    continue;
+                }
+                Element node = (Element) getChildNode(
+                                                diskNode,
+                                                DISK_TAG_MAP.get(param));
+                if ((DISK_ATTRIBUTE_MAP.containsKey(param)
+                     || "True".equals(value))
+                    && node == null) {
+                    node = (Element) diskNode.appendChild(
+                          domainNode.getOwnerDocument().createElement(
+                                                  DISK_TAG_MAP.get(param)));
+                } else if (!DISK_ATTRIBUTE_MAP.containsKey(param)
+                           && "False".equals(value)
+                           && node != null) {
+                    diskNode.removeChild(node);
+                }
+                if (DISK_ATTRIBUTE_MAP.containsKey(param)) {
+                    final Node attributeNode =
+                                node.getAttributes().getNamedItem(
+                                            DISK_ATTRIBUTE_MAP.get(param));
+                    if (attributeNode == null) {
+                        node.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
+                                          value);
 
+                    } else {
+                        if ("".equals(value)) {
+                            node.removeAttribute(DISK_ATTRIBUTE_MAP.get(param));
                         } else {
                             attributeNode.setNodeValue(value);
                         }
@@ -333,7 +370,7 @@ public class VMSXML extends XML {
         }
         final XPath xpath = XPathFactory.newInstance().newXPath();
         try {
-            final String diskPath = "//domain/devices/disk";
+            final String diskPath = "devices/disk";
             final NodeList nodes = (NodeList) xpath.evaluate(
                                                        diskPath,
                                                        domainNode,
@@ -371,57 +408,65 @@ public class VMSXML extends XML {
             return;
         }
         final XPath xpath = XPathFactory.newInstance().newXPath();
+        final Node devicesNode = getDevicesNode(xpath, domainNode);
+        if (devicesNode == null) {
+            return;
+        }
         try {
-            final String interfacePath = "//domain/devices/interface";
+            final String interfacePath = "devices/interface";
             final NodeList nodes = (NodeList) xpath.evaluate(
                                                        interfacePath,
                                                        domainNode,
                                                        XPathConstants.NODESET);
             Element interfaceNode = null;
-            for (int i = 0; i < nodes.getLength(); i++) {
-                final Node mn = getChildNode(nodes.item(i), "mac");
-                if (macAddress.equals(getAttribute(mn, "address"))) {
-                    interfaceNode = (Element) nodes.item(i);
+            if (macAddress != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = getChildNode(nodes.item(i), "mac");
+                    if (macAddress.equals(getAttribute(mn, "address"))) {
+                        interfaceNode = (Element) nodes.item(i);
+                    }
                 }
             }
-            if (interfaceNode != null) {
-                for (final String param : parametersMap.keySet()) {
-                    if (!INTERFACE_TAG_MAP.containsKey(param)
-                        && INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
-                        /* interface attribute */
-                        final Node attributeNode = 
-                                interfaceNode.getAttributes().getNamedItem(
-                                           INTERFACE_ATTRIBUTE_MAP.get(param));
-                        if (attributeNode == null) {
-                            interfaceNode.setAttribute(
-                                           INTERFACE_ATTRIBUTE_MAP.get(param),
-                                           parametersMap.get(param));
-                        } else {
-                            attributeNode.setNodeValue( 
-                                                    parametersMap.get(param));
-                        }
-                        continue;
+            if (interfaceNode == null) {
+                interfaceNode = (Element) devicesNode.appendChild(
+                    domainNode.getOwnerDocument().createElement("interface"));
+            }
+            for (final String param : parametersMap.keySet()) {
+                if (!INTERFACE_TAG_MAP.containsKey(param)
+                    && INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
+                    /* interface attribute */
+                    final Node attributeNode =
+                            interfaceNode.getAttributes().getNamedItem(
+                                       INTERFACE_ATTRIBUTE_MAP.get(param));
+                    if (attributeNode == null) {
+                        interfaceNode.setAttribute(
+                                       INTERFACE_ATTRIBUTE_MAP.get(param),
+                                       parametersMap.get(param));
+                    } else {
+                        attributeNode.setNodeValue(
+                                                parametersMap.get(param));
                     }
-                    Element node = (Element) getChildNode(
-                                                interfaceNode,
-                                                INTERFACE_TAG_MAP.get(param));
-                    if (node == null) {
-                        node = (Element) interfaceNode.appendChild(
-                                domainNode.getOwnerDocument().createElement(
-                                                INTERFACE_TAG_MAP.get(param)));
-                    }
-                    if (INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
-                        final Node attributeNode = 
-                                node.getAttributes().getNamedItem(
-                                           INTERFACE_ATTRIBUTE_MAP.get(param));
-                        if (attributeNode == null) {
-                            node.setAttribute(
-                                            INTERFACE_ATTRIBUTE_MAP.get(param),
-                                            parametersMap.get(param));
-                        } else {
-                            attributeNode.setNodeValue(
-                                                    parametersMap.get(param));
-                        }
+                    continue;
+                }
+                Element node = (Element) getChildNode(
+                                            interfaceNode,
+                                            INTERFACE_TAG_MAP.get(param));
+                if (node == null) {
+                    node = (Element) interfaceNode.appendChild(
+                            domainNode.getOwnerDocument().createElement(
+                                            INTERFACE_TAG_MAP.get(param)));
+                }
+                if (INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
+                    final Node attributeNode =
+                            node.getAttributes().getNamedItem(
+                                       INTERFACE_ATTRIBUTE_MAP.get(param));
+                    if (attributeNode == null) {
+                        node.setAttribute(
+                                        INTERFACE_ATTRIBUTE_MAP.get(param),
+                                        parametersMap.get(param));
+                    } else {
+                        attributeNode.setNodeValue(
+                                                parametersMap.get(param));
                     }
                 }
             }
@@ -447,7 +492,7 @@ public class VMSXML extends XML {
         }
         final XPath xpath = XPathFactory.newInstance().newXPath();
         try {
-            final String interfacePath = "//domain/devices/interface";
+            final String interfacePath = "devices/interface";
             final NodeList nodes = (NodeList) xpath.evaluate(
                                                        interfacePath,
                                                        domainNode,
@@ -676,7 +721,10 @@ public class VMSXML extends XML {
                         String sourceDev = null;
                         String targetDev = null;
                         String targetBus = null;
+                        String driverName = null;
+                        String driverType = null;
                         boolean readonly = false;
+                        boolean shareable = false;
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
@@ -686,8 +734,13 @@ public class VMSXML extends XML {
                             } else if ("target".equals(nodeName)) {
                                 targetDev = getAttribute(optionNode, "dev");
                                 targetBus = getAttribute(optionNode, "bus");
+                            } else if ("driver".equals(nodeName)) {
+                                driverName = getAttribute(optionNode, "name");
+                                driverType = getAttribute(optionNode, "type");
                             } else if ("readonly".equals(nodeName)) {
                                 readonly = true;
+                            } else if ("shareable".equals(nodeName)) {
+                                shareable = true;
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown disk option: "
                                                  + nodeName);
@@ -700,7 +753,10 @@ public class VMSXML extends XML {
                                                       sourceFile,
                                                       sourceDev,
                                                       targetBus + "/" + device,
-                                                      readonly);
+                                                      driverName,
+                                                      driverType,
+                                                      readonly,
+                                                      shareable);
                             devMap.put(targetDev, diskData);
                         }
                     } else if ("interface".equals(deviceNode.getNodeName())) {
@@ -927,7 +983,8 @@ public class VMSXML extends XML {
         /** Bridge delay. */
         public static final String BRIDGE_DELAY = "bridge_delay";
         /** Bridge forward delay. */
-        public static final String BRIDGE_FORWARD_DELAY = "bridge_forward_delay";
+        public static final String BRIDGE_FORWARD_DELAY =
+                                                        "bridge_forward_delay";
 
         /** Creates new NetworkData object. */
         public NetworkData(final String name,
@@ -1006,8 +1063,14 @@ public class VMSXML extends XML {
         private final String sourceDev;
         /** Target bus: ide... and type: disk..., delimited with, */
         private final String targetBusType;
+        /** Driver name: qemu... */
+        private final String driverName;
+        /** Driver type: raw... */
+        private final String driverType;
         /** Whether the disk is read only. */
         private final boolean readonly;
+        /** Whether the disk is shareable. */
+        private final boolean shareable;
         /** Name value pairs. */
         private final Map<String, String> valueMap =
                                                 new HashMap<String, String>();
@@ -1025,8 +1088,14 @@ public class VMSXML extends XML {
         public static final String TARGET_BUS = "target_bus";
         /** Target type. */
         public static final String TARGET_TYPE = "target_type";
+        /** Driver name. */
+        public static final String DRIVER_NAME = "driver_name";
+        /** Driver type. */
+        public static final String DRIVER_TYPE = "driver_type";
         /** Readonly. */
         public static final String READONLY = "readonly";
+        /** Shareable. */
+        public static final String SHAREABLE = "shareable";
 
         /**
          * Creates new DiskData object.
@@ -1036,7 +1105,10 @@ public class VMSXML extends XML {
                         final String sourceFile,
                         final String sourceDev,
                         final String targetBusType,
-                        final boolean readonly) {
+                        final String driverName,
+                        final String driverType,
+                        final boolean readonly,
+                        final boolean shareable) {
             this.type = type;
             valueMap.put(TYPE, type);
             this.targetDev = targetDev;
@@ -1047,11 +1119,21 @@ public class VMSXML extends XML {
             valueMap.put(SOURCE_DEVICE, sourceDev);
             this.targetBusType = targetBusType;
             valueMap.put(TARGET_BUS_TYPE, targetBusType);
+            this.driverName = driverName;
+            valueMap.put(DRIVER_NAME, driverName);
+            this.driverType = driverType;
+            valueMap.put(DRIVER_TYPE, driverType);
             this.readonly = readonly;
             if (readonly) {
                 valueMap.put(READONLY, "True");
             } else {
                 valueMap.put(READONLY, "False");
+            }
+            this.shareable = shareable;
+            if (shareable) {
+                valueMap.put(SHAREABLE, "True");
+            } else {
+                valueMap.put(SHAREABLE, "False");
             }
         }
 
@@ -1080,9 +1162,24 @@ public class VMSXML extends XML {
             return targetBusType;
         }
 
+        /** Returns driver name. */
+        public final String getDriverName() {
+            return driverName;
+        }
+
+        /** Returns driver type. */
+        public final String getDriverType() {
+            return driverType;
+        }
+
         /** Returns whether the disk is read only. */
         public final boolean isReadonly() {
             return readonly;
+        }
+
+        /** Returns whether the disk is read only. */
+        public final boolean isShareable() {
+            return shareable;
         }
 
         /** Returns value of this parameter. */

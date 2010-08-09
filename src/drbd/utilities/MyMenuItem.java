@@ -102,7 +102,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        processAccessType(); //TODO: should not be called here
+        update(); //TODO: should not be called here
     }
 
 

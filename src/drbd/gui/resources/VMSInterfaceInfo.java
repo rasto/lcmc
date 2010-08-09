@@ -28,15 +28,11 @@ import drbd.data.VMSXML;
 import drbd.data.VMSXML.InterfaceData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
-import drbd.data.resources.NetInterface;
 import drbd.data.ConfigData;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
-import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
-import drbd.utilities.SSH;
 import drbd.utilities.MyMenuItem;
-import drbd.utilities.MyList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -48,40 +44,30 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileSystemView;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.Arrays;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 /**
  * This class holds info about Virtual Interfaces.
  */
-public class VMSInterfaceInfo extends EditableInfo {
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
-    /** VMS virtual domain info object. */
-    private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
+public class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Source network combo box, so that it can be disabled, depending on
      * type. */
     private GuiComboBox sourceNetworkCB = null;
     /** Source bridge combo box, so that it can be disabled, depending on
      * type. */
     private GuiComboBox sourceBridgeCB = null;
-    /** Source bridge combo box, so that it can be disabled, depending on
-    /** Back to overview icon. */
-    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
-                                                 Tools.getDefault("BackIcon"));
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
@@ -89,15 +75,6 @@ public class VMSInterfaceInfo extends EditableInfo {
                                                 InterfaceData.SOURCE_BRIDGE,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
-    /** Section map. */
-    private static final Map<String, String> SECTION_MAP =
-                                                 new HashMap<String, String>();
-    /** Default units. */
-    private static final Map<String, String> DEFAULT_UNIT =
-                                                new HashMap<String, String>();
-    /** If it has units. */
-    private static final Map<String, Boolean> HAS_UNIT =
-                                                new HashMap<String, Boolean>();
     /** Field type. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
@@ -115,17 +92,29 @@ public class VMSInterfaceInfo extends EditableInfo {
         SHORTNAME_MAP.put(InterfaceData.MODEL_TYPE, "Model Type");
     }
 
+    /** Whether the parameter is editable only in advanced mode. */
+    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
+        new HashSet<String>(Arrays.asList(new String[]{
+                                                InterfaceData.MAC_ADDRESS,
+                                                InterfaceData.TARGET_DEV,
+                                                InterfaceData.MODEL_TYPE}));
+
+    /** Whether the parameter is required. */
+    private static final Set<String> IS_REQUIRED =
+        new HashSet<String>(Arrays.asList(new String[]{
+                                                InterfaceData.TYPE,
+                                                InterfaceData.SOURCE_NETWORK,
+                                                InterfaceData.SOURCE_BRIDGE}));
+
     /** Default name. */
     private static final Map<String, String> DEFAULTS_MAP =
                                                  new HashMap<String, String>();
     /** Possible values. */
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                                new HashMap<String, Object[]>();
-    /** Default location for libvirt images. */
-    private static final String LIBVIRT_IMAGE_LOCATION =
-                                             "/var/lib/libvirt/images/";
     static {
-        POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE, 
+        DEFAULTS_MAP.put(InterfaceData.MAC_ADDRESS, "generate");
+        POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE,
                             new String[]{null,
                                          "default",
                                          "e1000",
@@ -137,102 +126,13 @@ public class VMSInterfaceInfo extends EditableInfo {
     /** Creates the VMSInterfaceInfo object. */
     public VMSInterfaceInfo(final String name, final Browser browser,
                             final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
-        super(name, browser);
-        setResource(new Resource(name));
-        this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
+        super(name, browser, vmsVirtualDomainInfo);
     }
 
-    /** Returns browser object of this info. */
-    protected final ClusterBrowser getBrowser() {
-        return (ClusterBrowser) super.getBrowser();
-    }
-
-    /** Returns info panel. */
-    public final JComponent getInfoPanel() {
-        if (infoPanel != null) {
-            return infoPanel;
-        }
-        final boolean abExisted = applyButton != null;
-        /* main, button and options panels */
-        final JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JTable headerTable = getTable(vmsVirtualDomainInfo.HEADER_TABLE);
-        if (headerTable != null) {
-            mainPanel.add(headerTable.getTableHeader());
-            mainPanel.add(headerTable);
-        }
+    /** Adds disk table with only this disk to the main panel. */
+    protected void addHardwareTable(final JPanel mainPanel) {
         mainPanel.add(getTablePanel("Interfaces",
-                                    vmsVirtualDomainInfo.INTERFACES_TABLE));
-
-        final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
-        buttonPanel.setMinimumSize(new Dimension(0, 50));
-        buttonPanel.setPreferredSize(new Dimension(0, 50));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-
-        final JPanel optionsPanel = new JPanel(
-                                        new FlowLayout(FlowLayout.LEFT, 0, 20));
-        optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-
-        final String[] params = getParametersFromXML();
-        initApplyButton(null);
-        /* add item listeners to the apply button. */
-        if (!abExisted) {
-            applyButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                apply(false);
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            );
-        }
-        final JPanel extraButtonPanel =
-                           new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        extraButtonPanel.setBackground(Browser.STATUS_BACKGROUND);
-        buttonPanel.add(extraButtonPanel);
-        addApplyButton(buttonPanel);
-        final MyButton overviewButton = new MyButton("VM Host Overview",
-                                                     BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(200, 50));
-        overviewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                vmsVirtualDomainInfo.selectMyself();
-            }
-        });
-        extraButtonPanel.add(overviewButton);
-        addParams(optionsPanel,
-                  params,
-                  ClusterBrowser.SERVICE_LABEL_WIDTH,
-                  ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
-                  null);
-        /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        JMenu serviceCombo;
-        serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
-
-        mainPanel.add(optionsPanel);
-        final JPanel newPanel = new JPanel();
-        newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
-        newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(
-                                  ClusterBrowser.SERVICE_LABEL_WIDTH
-                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
-        newPanel.add(new JScrollPane(mainPanel));
-        applyButton.setEnabled(checkResourceFields(null, params));
-        infoPanel = newPanel;
-        return infoPanel;
+                                    VMSVirtualDomainInfo.INTERFACES_TABLE));
     }
 
     /** Returns service icon in the menu. */
@@ -293,16 +193,12 @@ public class VMSInterfaceInfo extends EditableInfo {
 
     /** Returns section to which the specified parameter belongs. */
     protected final String getSection(final String param) {
-        final String sm = SECTION_MAP.get(param);
-        if (sm == null) {
-            return "Interface Options";
-        }
-        return sm;
+        return "Interface Options";
     }
 
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
-        return false;
+        return IS_REQUIRED.contains(param);
     }
 
     /** Returns true if the specified parameter is integer. */
@@ -333,7 +229,7 @@ public class VMSInterfaceInfo extends EditableInfo {
     /** Returns the regexp of the parameter. */
     protected final String getParamRegexp(final String param) {
         if (VMSXML.InterfaceData.MAC_ADDRESS.equals(param)) {
-            return "^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$";
+            return "^((([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2})|generate)?$";
         }
         return null;
     }
@@ -378,92 +274,49 @@ public class VMSInterfaceInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                vmsxml.modifyInterfaceXML(vmsVirtualDomainInfo.getDomainName(),
-                                          getName(),
-                                          parameters);
-                getBrowser().periodicalVMSUpdate(h);
+                vmsxml.modifyInterfaceXML(
+                                    getVMSVirtualDomainInfo().getDomainName(),
+                                    getName(),
+                                    parameters);
             }
+            getResource().setNew(false);
+            setName(getParamSaved(InterfaceData.MAC_ADDRESS));
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            getBrowser().periodicalVMSUpdate(h);
         }
         checkResourceFields(null, params);
-    }
-
-    /** Returns whether this parameter has a unit prefix. */
-    protected final boolean hasUnitPrefix(final String param) {
-        return HAS_UNIT.containsKey(param) && HAS_UNIT.get(param);
-    }
-
-    ///** Returns units. */
-    //protected final Unit[] getUnits() {
-    //    return new Unit[]{
-    //               //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
-    //               new Unit("K", "K", "KiByte", "KiBytes"),
-    //               new Unit("M", "M", "MiByte", "MiBytes"),
-    //               new Unit("G",  "G",  "GiByte",      "GiBytes"),
-    //               new Unit("T",  "T",  "TiByte",      "TiBytes")
-    //   };
-    //}
-
-    /** Returns the default unit for the parameter. */
-    protected final String getDefaultUnit(final String param) {
-        return DEFAULT_UNIT.get(param);
-    }
-
-    /** Returns columns for the table. */
-    protected final String[] getColumnNames(final String tableName) {
-        return vmsVirtualDomainInfo.getColumnNames(tableName);
+        getBrowser().reload(getNode());
     }
 
     /** Returns data for the table. */
     protected final Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo.getMainTableData();
+            return getVMSVirtualDomainInfo().getMainTableData();
         } else if (VMSVirtualDomainInfo.INTERFACES_TABLE.equals(tableName)) {
-            return new Object[][]{vmsVirtualDomainInfo.getInterfaceDataRow(
-                                        getName(),
-                                        null,
-                                        vmsVirtualDomainInfo.getInterfaces(),
-                                        true)};
+            if (getResource().isNew()) {
+                return new Object[][]{};
+            }
+            return new Object[][]{getVMSVirtualDomainInfo().getInterfaceDataRow(
+                                    getName(),
+                                    null,
+                                    getVMSVirtualDomainInfo().getInterfaces(),
+                                    true)};
         }
         return new Object[][]{};
-    }
-
-    /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName, final String key) {
-        vmsVirtualDomainInfo.selectMyself();
-    }
-
-    /** Retrurns color for some rows. */
-    protected final Color getTableRowColor(final String tableName,
-                                           final String key) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo.getTableRowColor(tableName, key);
-        }
-        return Browser.PANEL_BACKGROUND;
-    }
-
-    /** Alignment for the specified column. */
-    protected final int getTableColumnAlignment(final String tableName,
-                                                final int column) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo.getTableColumnAlignment(tableName,
-                                                                column);
-        }
-        return SwingConstants.LEFT;
-    }
-
-    /** Returns info object for this row. */
-    protected final Info getTableInfo(final String tableName,
-                                      final String key) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo;
-        }
-        return null;
     }
 
     /** Returns whether this parameter is advanced. */
     protected final boolean isAdvanced(final String param) {
         return false;
     }
+
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+         return !IS_ENABLED_ONLY_IN_ADVANCED.contains(param)
+                || Tools.getConfigData().getExpertMode();
+    }
+
     /** Returns access type of this parameter. */
     protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
@@ -473,16 +326,12 @@ public class VMSInterfaceInfo extends EditableInfo {
     protected final boolean checkParam(final String param,
                                        final String newValue) {
         if (InterfaceData.TYPE.equals(param)) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if (sourceNetworkCB != null) {
-                        sourceNetworkCB.setVisible("network".equals(newValue));
-                    } 
-                    if (sourceBridgeCB != null) {
-                        sourceBridgeCB.setVisible("bridge".equals(newValue));
-                    }
-                }
-            });
+            if (sourceNetworkCB != null) {
+                sourceNetworkCB.setVisible("network".equals(newValue));
+            }
+            if (sourceBridgeCB != null) {
+                sourceBridgeCB.setVisible("bridge".equals(newValue));
+            }
         }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
@@ -511,7 +360,7 @@ public class VMSInterfaceInfo extends EditableInfo {
     /** Updates parameters. */
     public final void updateParameters() {
         final Map<String, InterfaceData> interfaces =
-                                        vmsVirtualDomainInfo.getInterfaces();
+                                    getVMSVirtualDomainInfo().getInterfaces();
         if (interfaces != null) {
             final InterfaceData interfaceData = interfaces.get(getName());
             if (interfaceData != null) {
@@ -543,89 +392,6 @@ public class VMSInterfaceInfo extends EditableInfo {
         updateTable(VMSVirtualDomainInfo.INTERFACES_TABLE);
     }
 
-    /** Get first host that has this vm and is connected. */
-    private Host getFirstConnectedHost() {
-        for (final Host h : getBrowser().getClusterHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null && h.isConnected()) {
-                return h;
-            }
-        }
-        return null;
-    }
-
-    /** Removes this interface from the libvirt with confirmation dialog. */
-    public void removeMyself(final boolean testOnly) {
-        if (getResource().isNew()) {
-            removeMyselfNoConfirm(testOnly);
-            getResource().setNew(false);
-            return;
-        }
-        String desc = Tools.getString(
-                                "VMSInterfaceInfo.confirmRemove.Description");
-
-        desc  = desc.replaceAll("@INTERFACE@", toString());
-        if (Tools.confirmDialog(
-               Tools.getString("VMSInterfaceInfo.confirmRemove.Title"),
-               desc,
-               Tools.getString("VMSInterfaceInfo.confirmRemove.Yes"),
-               Tools.getString("VMSInterfaceInfo.confirmRemove.No"))) {
-            removeMyselfNoConfirm(testOnly);
-            getResource().setNew(false);
-        }
-    }
-
-    /** Removes this interface without confirmation dialog. */
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
-            return;
-        }
-        for (final Host h : getBrowser().getClusterHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
-                vmsxml.removeInterfaceXML(vmsVirtualDomainInfo.getDomainName(),
-                                          getName());
-            }
-        }
-        for (final Host h : getBrowser().getClusterHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
-    }
-
-    /** Returns list of menu items. */
-    public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
-        /* remove service */
-        final MyMenuItem removeMenuItem = new MyMenuItem(
-                    Tools.getString("VMSInterfaceInfo.Menu.Remove"),
-                    ClusterBrowser.REMOVE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    ConfigData.AccessType.ADMIN,
-                    ConfigData.AccessType.OP) {
-            private static final long serialVersionUID = 1L;
-
-            public boolean enablePredicate() {
-                if (getResource().isNew()) {
-                    return true;
-                }
-                return true;
-            }
-
-            public void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
-                removeMyself(false);
-            }
-        };
-        addMouseOverListener(removeMenuItem, null);
-        items.add((UpdatableItem) removeMenuItem);
-        return items;
-    }
-
     /** Returns string representation. */
     public String toString() {
         final StringBuffer s = new StringBuffer(30);
@@ -636,7 +402,7 @@ public class VMSInterfaceInfo extends EditableInfo {
             source = getParamSaved(InterfaceData.SOURCE_BRIDGE);
         }
         if (source == null) {
-            s.append("new...");
+            s.append("new interface...");
         } else {
             s.append(source);
         }
@@ -652,5 +418,23 @@ public class VMSInterfaceInfo extends EditableInfo {
             s.append(')');
         }
         return s.toString();
+    }
+
+    /** Removes this interface without confirmation dialog. */
+    protected void removeMyselfNoConfirm(final boolean testOnly) {
+        if (testOnly) {
+            return;
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null) {
+                vmsxml.removeInterfaceXML(
+                                    getVMSVirtualDomainInfo().getDomainName(),
+                                    getName());
+            }
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            getBrowser().periodicalVMSUpdate(h);
+        }
     }
 }

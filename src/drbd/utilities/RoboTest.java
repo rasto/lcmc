@@ -520,7 +520,6 @@ public final class RoboTest {
         sleep(1000);
         typeDummy(robot);
         sleep(1000);
-        
         setTimeouts(robot);
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
@@ -595,7 +594,6 @@ public final class RoboTest {
                                          KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_MINUS,
                                          KeyEvent.VK_I});
-        
         sleep(3000);
         checkTest(host, "test1", 4.2); /* 4.2 */
 

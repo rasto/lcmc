@@ -204,6 +204,11 @@ public class RscDefaultsInfo extends EditableInfo {
         return getBrowser().getCRMXML().getRscDefaultsAccessType(param);
     }
 
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+        return true;
+    }
+
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();

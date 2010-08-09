@@ -59,6 +59,7 @@ import drbd.gui.resources.CommonBlockDevInfo;
 import drbd.gui.resources.CRMInfo;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.resources.VMSInfo;
+import drbd.gui.resources.VMSHardwareInfo;
 import drbd.gui.resources.AvailableServicesInfo;
 import drbd.gui.resources.ResourceAgentClassInfo;
 import drbd.gui.resources.ClusterHostsInfo;
@@ -2425,8 +2426,17 @@ public class ClusterBrowser extends Browser {
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
                 vmsvdi.updateAdvancedPanels();
+                final Enumeration ce = node.children();
+                while (ce.hasMoreElements()) {
+                    final DefaultMutableTreeNode cnode =
+                                     (DefaultMutableTreeNode) ce.nextElement();
+                    final VMSHardwareInfo vmshi =
+                                  (VMSHardwareInfo) cnode.getUserObject();
+                    vmshi.checkResourceFields(null,
+                                              vmshi.getParametersFromXML());
+                    vmshi.updateAdvancedPanels();
+                }
             }
-
         }
 
         for (final HbConnectionInfo hbci

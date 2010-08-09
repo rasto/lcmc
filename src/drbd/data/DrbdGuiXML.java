@@ -38,7 +38,6 @@ import java.util.Set;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.awt.Color;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;

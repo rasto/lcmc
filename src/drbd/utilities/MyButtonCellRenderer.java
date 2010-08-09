@@ -75,10 +75,13 @@ public class MyButtonCellRenderer extends MyButton
 
         final int al = getColumnAlignment(column);
         setHorizontalAlignment(al);
-        final String key = ((MyButton) table.getValueAt(row, 0)).getText();
-        final Color bg = getRowColor(key);
-        setBackgroundColor(bg);
-        setToolTipText(button.getText());
+        final Object v = table.getValueAt(row, 0);
+        if (v != null) {
+            final String key = ((MyButton) v).getText();
+            final Color bg = getRowColor(key);
+            setBackgroundColor(bg);
+            setToolTipText(button.getText());
+        }
         return this;
     }
 

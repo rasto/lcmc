@@ -142,7 +142,7 @@ public class NetInterface extends Resource {
     //}
 
     /**
-     * Returns first ip in the network. 
+     * Returns first ip in the network.
      * e.g. 192.168.1.1 and mask 255.255.255.0 gives * 192.168.1.0.
      */
     public final String getNetworkIp() {

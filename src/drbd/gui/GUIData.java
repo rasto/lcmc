@@ -35,7 +35,6 @@ import javax.swing.JButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;

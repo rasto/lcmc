@@ -74,6 +74,8 @@ public abstract class EditableInfo extends Info {
     protected abstract boolean isRequired(String param);
     /** Returns whether this parameter is advanced. */
     protected abstract boolean isAdvanced(String param);
+    /** Returns whether this parameter should be enabled. */
+    protected abstract boolean isEnabled(String param);
     /** Returns access type of this parameter. */
     protected abstract ConfigData.AccessType getAccessType(String param);
     /** Returns whether this parameter is of label type. */
@@ -107,7 +109,7 @@ public abstract class EditableInfo extends Info {
     /** Returns the possible choices for pull down menus if applicable. */
     protected abstract Object[] getParamPossibleChoices(String param);
     /** Returns array of all parameters. */
-    protected abstract String[] getParametersFromXML(); // TODO: no XML
+    public abstract String[] getParametersFromXML(); // TODO: no XML
     /** Map from widget to its label. */
     private final Map<GuiComboBox, JLabel> labelMap =
                                         new HashMap<GuiComboBox, JLabel>();
@@ -630,7 +632,7 @@ public abstract class EditableInfo extends Info {
             return false;
         }
         return true;
-    } 
+    }
 
     /**
      * Checks parameter, but use cached value. This is useful if some other
@@ -773,7 +775,9 @@ public abstract class EditableInfo extends Info {
                 if (param == null || otherParam.equals(param)) {
                     final GuiComboBox wizardCb =
                                     paramComboBoxGet(otherParam, "wizard");
+                    final boolean enable = isEnabled(otherParam);
                     if (wizardCb != null) {
+                        wizardCb.setEnabled(enable);
                         final Object wo = wizardCb.getValue();
                         if (Tools.isStringClass(wo)) {
                             newValue = wizardCb.getStringValue();
@@ -785,6 +789,7 @@ public abstract class EditableInfo extends Info {
                             newValue = ((Info) wo).getStringValue();
                         }
                     }
+                    cb.setEnabled(enable);
                     final boolean check = checkParam(otherParam, newValue)
                                           && checkRegexp(otherParam, newValue);
                     if (check) {
@@ -833,7 +838,10 @@ public abstract class EditableInfo extends Info {
                     }
                     setCheckParamCache(otherParam, check);
                 } else {
-                    correctValue = correctValue && checkParamCache(otherParam);
+                    if (cb.isVisible()) {
+                        correctValue =
+                                   correctValue && checkParamCache(otherParam);
+                    }
                 }
             }
         }

@@ -911,9 +911,15 @@ public class HbConnectionInfo extends EditableInfo {
     protected final boolean isAdvanced(final String param) {
         return false;
     }
+
     /** Returns access type of this parameter. */
     protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
+    }
+
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+        return true;
     }
 
     /** Hide/Show advanced panels. */

@@ -30,7 +30,6 @@ import javax.swing.JSplitPane;
 import java.awt.event.HierarchyEvent;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.HierarchyListener;
 
 import EDU.oswego.cs.dl.util.concurrent.Mutex;

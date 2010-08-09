@@ -70,9 +70,12 @@ public class MyCellRenderer extends JLabel
             ret = this;
         }
         ((JLabel) ret).setHorizontalAlignment(al);
-        final String key = ((MyButton) table.getValueAt(row, 0)).getText();
-        final Color bg = getRowColor(key);
-        ret.setBackground(bg);
+        final Object v = table.getValueAt(row, 0);
+        if (v != null) {
+            final String key = ((MyButton) v).getText();
+            final Color bg = getRowColor(key);
+            ret.setBackground(bg);
+        }
         ret.setBorder(EMPTY_BORDER);
         ret.setToolTipText(value.toString());
         return ret;

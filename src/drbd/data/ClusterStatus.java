@@ -586,7 +586,7 @@ public class ClusterStatus {
                 final String cib =
                        Tools.join("\n", data.toArray(new String[data.size()]));
                 final boolean expertMode =
-                                        Tools.getConfigData().getExpertMode(); 
+                                        Tools.getConfigData().getExpertMode();
                 if (!cib.equals(oldCib) || oldExpertMode != expertMode) {
                     Tools.debug(this, "cib update: " + host.getName(), 1);
                     oldCib = cib;

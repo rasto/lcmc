@@ -3448,7 +3448,6 @@ public class CRMXML extends XML {
                        final Map<String, Map<String, String>> parametersMap,
                        final Set<String> orphanedList,
                        final Map<String, Set<String>> failedClonesMap) {
-        
         final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
         final NodeList lrmResources = lrmResourcesNode.getChildNodes();
         for (int j = 0; j < lrmResources.getLength(); j++) {

@@ -190,6 +190,11 @@ public class ServicesInfo extends EditableInfo {
         return getBrowser().getCRMXML().getGlobalAccessType(param);
     }
 
+    /** Whether the parameter should be enabled. */
+    protected final boolean isEnabled(final String param) {
+        return true;
+    }
+
     /**
      * Returns whether the global parameter is required.
      */
