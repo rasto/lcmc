@@ -167,8 +167,7 @@ public class Configuration extends DialogHost {
              * hostnames since it can be different than canonical name.
              */
             try {
-                hostname =
-                    addresses[0].getByName(ip).getHostName();
+                hostname = InetAddress.getByName(ip).getHostName();
             } catch (UnknownHostException e) {
                 Tools.appError("Host.Configuration.Unknown.Host", "", e);
                 return false;

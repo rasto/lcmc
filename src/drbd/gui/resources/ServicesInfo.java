@@ -110,7 +110,11 @@ public class ServicesInfo extends EditableInfo {
      * Returns names of all global parameters.
      */
     public final String[] getParametersFromXML() {
-        return getBrowser().getCRMXML().getGlobalParameters();
+        final CRMXML crmxml = getBrowser().getCRMXML();
+        if (crmxml == null) {
+            return null;
+        }
+        return crmxml.getGlobalParameters();
     }
 
     /**
@@ -1040,7 +1044,7 @@ public class ServicesInfo extends EditableInfo {
             if (master) {
                 cloneName = ConfigData.PM_MASTER_SLAVE_SET_NAME;
             } else {
-                cloneName = ClusterBrowser.PM_CLONE_SET_NAME;
+                cloneName = ConfigData.PM_CLONE_SET_NAME;
             }
             newServiceInfo = new CloneInfo(newRA,
                                            cloneName,

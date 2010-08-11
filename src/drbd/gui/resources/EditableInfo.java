@@ -99,6 +99,7 @@ public abstract class EditableInfo extends Info {
     protected abstract String getParamType(final String param);
     /** Returns the regexp of the parameter. */
     protected String getParamRegexp(String param) {
+        // TODO: this should be only for Pacemaker
         if (isInteger(param)) {
             return "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
                    + "|" + CRMXML.DISABLED_STRING
@@ -355,7 +356,7 @@ public abstract class EditableInfo extends Info {
                 if (rpcb.getType() == GuiComboBox.Type.LABELFIELD) {
                     height = Tools.getDefaultInt("Browser.LabelFieldHeight");
                 }
-                rpcb.setValue(paramCb.getValue());
+                rpcb.setValue(paramCb.getStringValue());
             }
             final GuiComboBox realParamCb = rpcb;
             paramCb.addListeners(new ItemListener() {
@@ -481,7 +482,7 @@ public abstract class EditableInfo extends Info {
                               Tools.getString("EditableInfo.MoreOptions"));
         final Font font = l.getFont();
         final String name = font.getFontName();
-        final int style = font.ITALIC;
+        final int style = Font.ITALIC;
         final int size = font.getSize();
         l.setFont(new Font(name, style, size - 3));
 
@@ -504,7 +505,7 @@ public abstract class EditableInfo extends Info {
                 paramCb.setEditable();
                 boolean c;
                 if (realParamCb != null) {
-                    realParamCb.setValue(paramCb.getValue());
+                    realParamCb.setValue(paramCb.getStringValue());
                     c = checkResourceFieldsCorrect(param,
                                                    params);
                 } else {
@@ -772,7 +773,8 @@ public abstract class EditableInfo extends Info {
                     newValue = ((Info) o).getStringValue();
                 }
 
-                if (param == null || otherParam.equals(param)) {
+                if (param == null || otherParam.equals(param)
+                    || !paramCorrectValueMap.containsKey(param)) {
                     final GuiComboBox wizardCb =
                                     paramComboBoxGet(otherParam, "wizard");
                     final boolean enable = isEnabled(otherParam);
@@ -838,10 +840,7 @@ public abstract class EditableInfo extends Info {
                     }
                     setCheckParamCache(otherParam, check);
                 } else {
-                    if (cb.isVisible()) {
-                        correctValue =
-                                   correctValue && checkParamCache(otherParam);
-                    }
+                    correctValue = correctValue && checkParamCache(otherParam);
                 }
             }
         }

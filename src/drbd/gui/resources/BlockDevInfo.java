@@ -509,6 +509,11 @@ public class BlockDevInfo extends EditableInfo {
         return null;
     }
 
+    /** Returns the regexp of the parameter. */
+    protected String getParamRegexp(String param) {
+        return null;
+    }
+
     protected final Object[] getParamPossibleChoices(final String param) {
         if (DRBD_NI_PARAM.equals(param)) {
             /* net interfaces */

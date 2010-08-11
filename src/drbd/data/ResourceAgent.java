@@ -519,7 +519,7 @@ public class ResourceAgent {
      * Returns whether this service/object is group.
      */
     public final boolean isGroup() {
-        return Tools.getConfigData().PM_GROUP_NAME.equals(name)
+        return ConfigData.PM_GROUP_NAME.equals(name)
                && "group".equals(resourceClass);
     }
 
@@ -527,7 +527,7 @@ public class ResourceAgent {
      * Returns whether this service/object is clone set.
      */
     public final boolean isClone() {
-        return Tools.getConfigData().PM_CLONE_SET_NAME.equals(name)
+        return ConfigData.PM_CLONE_SET_NAME.equals(name)
                && "clone".equals(resourceClass);
     }
 

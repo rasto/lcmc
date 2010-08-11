@@ -205,7 +205,7 @@ public class GuiComboBox extends JPanel {
                     && items[1] != null
                     && items[1].toString().equalsIgnoreCase(
                                         Tools.getString("Boolean.False"))) {
-                    this.type = type.CHECKBOX;
+                    this.type = Type.CHECKBOX;
                 } else {
                     this.type = Type.COMBOBOX;
                 }

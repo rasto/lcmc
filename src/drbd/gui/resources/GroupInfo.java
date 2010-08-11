@@ -59,7 +59,7 @@ public class GroupInfo extends ServiceInfo {
      * Creates new GroupInfo object.
      */
     public GroupInfo(final ResourceAgent ra, final Browser browser) {
-        super(ClusterBrowser.PM_GROUP_NAME, ra, browser);
+        super(ConfigData.PM_GROUP_NAME, ra, browser);
     }
 
     /**

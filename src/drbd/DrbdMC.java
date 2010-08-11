@@ -67,13 +67,13 @@ public final class DrbdMC extends JPanel {
      * Create the GUI and show it.
      */
     private static void createAndShowGUI() {
-        final java.util.List buttonGradient = Arrays.asList(
+        final java.util.List<Object> buttonGradient = Arrays.asList(
           new Object[] {new Float(.3f),
                         new Float(0f),
                         new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                         new ColorUIResource(0xFFFFFF),
                         new ColorUIResource(ClusterBrowser.STATUS_BACKGROUND)});
-        final java.util.List checkboxGradient = Arrays.asList(
+        final java.util.List<Object> checkboxGradient = Arrays.asList(
           new Object[] {new Float(.3f),
                         new Float(0f),
                         new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),

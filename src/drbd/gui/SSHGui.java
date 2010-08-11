@@ -251,7 +251,7 @@ public class SSHGui {
                 final JLabel l = new JLabel(underText);
                 final Font font = l.getFont();
                 final String name = font.getFontName();
-                final int style = font.ITALIC;
+                final int style = Font.ITALIC;
                 final int size = font.getSize();
                 l.setFont(new Font(name, style, size - 3));
                 l.setForeground(java.awt.Color.GRAY);

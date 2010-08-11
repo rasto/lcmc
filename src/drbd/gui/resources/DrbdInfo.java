@@ -187,7 +187,7 @@ public class DrbdInfo extends EditableInfo {
                                         getBrowser().getDrbdNode().children();
             while (drbdResources.hasMoreElements()) {
                 final DefaultMutableTreeNode n =
-                       (DefaultMutableTreeNode) drbdResources.nextElement();
+                        (DefaultMutableTreeNode) drbdResources.nextElement();
                 final DrbdResourceInfo drbdRes =
                                     (DrbdResourceInfo) n.getUserObject();
                 if (drbdRes.resourceInHost(host)) {
@@ -224,7 +224,11 @@ public class DrbdInfo extends EditableInfo {
      * Returns lsit of all parameters as an array.
      */
     public final String[] getParametersFromXML() {
-        return getBrowser().getDrbdXML().getGlobalParams();
+        final DrbdXML drbdXML = getBrowser().getDrbdXML();
+        if (drbdXML == null) {
+            return null;
+        }
+        return drbdXML.getGlobalParams();
     }
 
     /**
@@ -240,6 +244,11 @@ public class DrbdInfo extends EditableInfo {
      */
     protected final String getParamDefault(final String param) {
         return getBrowser().getDrbdXML().getParamDefault(param);
+    }
+
+    /** Returns the regexp of the parameter. */
+    protected String getParamRegexp(String param) {
+        return null;
     }
 
     /**
@@ -581,11 +590,12 @@ public class DrbdInfo extends EditableInfo {
      * Returns new drbd resource index, the one that is not used .
      */
     private int getNewDrbdResourceIndex() {
-        final Iterator it = getBrowser().getDrbdResHash().keySet().iterator();
+        final Iterator<String> it =
+                         getBrowser().getDrbdResHash().keySet().iterator();
         int index = -1;
 
         while (it.hasNext()) {
-            final String name = (String) it.next();
+            final String name = it.next();
             // TODO: should not assume r0
             final Pattern p = Pattern.compile("^" + "r" + "(\\d+)$");
             final Matcher m = p.matcher(name);

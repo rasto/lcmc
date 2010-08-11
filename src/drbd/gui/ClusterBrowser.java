@@ -241,12 +241,6 @@ public class ClusterBrowser extends Browser {
     public static final String DRBD_RES_PARAM_DEV = "device";
     /** Name of the boolean type in drbd. */
     public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
-    /** Name of the group hearbeat service. */
-    public static final String PM_GROUP_NAME =
-                                        Tools.getConfigData().PM_GROUP_NAME;
-    /** Name of the clone service. */
-    public static final String PM_CLONE_SET_NAME =
-                                Tools.getConfigData().PM_CLONE_SET_NAME;
     /** String array with all hb classes. */
     public static final String[] HB_CLASSES = {HB_OCF_CLASS,
                                                HB_HEARTBEAT_CLASS,
@@ -1781,9 +1775,10 @@ public class ClusterBrowser extends Browser {
         final String id = si.getService().getId();
         String pmId = si.getService().getHeartbeatId();
         if (pmId == null) {
-            if (PM_GROUP_NAME.equals(si.getService().getName())) {
+            if (ConfigData.PM_GROUP_NAME.equals(si.getService().getName())) {
                 pmId = Service.GRP_ID_PREFIX;
-            } else if (PM_CLONE_SET_NAME.equals(si.getService().getName())
+            } else if (ConfigData.PM_CLONE_SET_NAME.equals(
+                                                    si.getService().getName())
                        || ConfigData.PM_MASTER_SLAVE_SET_NAME.equals(
                                                 si.getService().getName())) {
                 if (si.getService().isMaster()) {

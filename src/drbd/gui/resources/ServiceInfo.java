@@ -350,7 +350,7 @@ public class ServiceInfo extends EditableInfo {
         }
         final String id = getComboBoxValue(GUI_ID);
         final String heartbeatId = getService().getHeartbeatId();
-        if (ClusterBrowser.PM_GROUP_NAME.equals(getName())) {
+        if (ConfigData.PM_GROUP_NAME.equals(getName())) {
             if (heartbeatId == null) {
                 changed = true;
             } else if (heartbeatId.equals(Service.GRP_ID_PREFIX + id)
@@ -362,7 +362,7 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 changed = true;
             }
-        } else if (ClusterBrowser.PM_CLONE_SET_NAME.equals(getName())
+        } else if (ConfigData.PM_CLONE_SET_NAME.equals(getName())
                    || ConfigData.PM_MASTER_SLAVE_SET_NAME.equals(getName())) {
             String prefix;
             if (getService().isMaster()) {
@@ -1887,12 +1887,20 @@ public class ServiceInfo extends EditableInfo {
         optionsPanel.add(sectionPanel);
     }
 
-    /**
-     * Returns parameters.
-     */
+    /** Returns parameters. */
     public String[] getParametersFromXML() {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getParameters(resourceAgent, getService().isMaster());
+    }
+
+    /** Returns the regexp of the parameter. */
+    protected String getParamRegexp(String param) {
+        if (isInteger(param)) {
+            return "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
+                   + "|" + CRMXML.DISABLED_STRING
+                   + "))|@NOTHING_SELECTED@$";
+        }
+        return null;
     }
 
     /**
@@ -2106,7 +2114,7 @@ public class ServiceInfo extends EditableInfo {
         if (clone) {
             final CRMXML crmXML = getBrowser().getCRMXML();
             final CloneInfo oldCI = cloneInfo;
-            String title = ClusterBrowser.PM_CLONE_SET_NAME;
+            String title = ConfigData.PM_CLONE_SET_NAME;
             if (masterSlave) {
                 title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
             }
@@ -3499,7 +3507,7 @@ public class ServiceInfo extends EditableInfo {
             if (master) {
                 cloneName = ConfigData.PM_MASTER_SLAVE_SET_NAME;
             } else {
-                cloneName = ClusterBrowser.PM_CLONE_SET_NAME;
+                cloneName = ConfigData.PM_CLONE_SET_NAME;
             }
             newServiceInfo = new CloneInfo(newRA,
                                            cloneName,
@@ -4374,8 +4382,8 @@ public class ServiceInfo extends EditableInfo {
                         }
                     });
                     final StringInfo gi = new StringInfo(
-                                            ClusterBrowser.PM_GROUP_NAME,
-                                            ClusterBrowser.PM_GROUP_NAME,
+                                            ConfigData.PM_GROUP_NAME,
+                                            ConfigData.PM_GROUP_NAME,
                                             getBrowser());
                     final CRMXML crmXML = getBrowser().getCRMXML();
                     addServicePanel(crmXML.getHbGroup(),

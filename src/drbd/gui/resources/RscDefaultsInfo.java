@@ -100,6 +100,9 @@ public class RscDefaultsInfo extends EditableInfo {
      */
     public final String[] getParametersFromXML() {
         final CRMXML crmXML = getBrowser().getCRMXML();
+        if (crmXML == null) {
+            return null;
+        }
         final Collection<String> params =
                                    crmXML.getRscDefaultsParameters().keySet();
         return params.toArray(new String[params.size()]);

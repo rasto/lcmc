@@ -22,6 +22,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.WizardDialog;
@@ -102,7 +103,7 @@ public class HeartbeatInst extends DialogHost {
         Tools.getConfigData().setLastHbPmInstalledMethod(
             getHost().getDistString("HbPmInst.install.text." + installMethod));
         Tools.getConfigData().setLastInstalledClusterStack(
-                                        Tools.getConfigData().HEARTBEAT_NAME);
+                                                ConfigData.HEARTBEAT_NAME);
 
         getHost().execCommand(installCommand,
                          getProgressBar(),

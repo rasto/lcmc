@@ -855,11 +855,10 @@ public class CheckInstallation extends DialogHost {
         final String lastInstalled =
                           Tools.getConfigData().getLastInstalledClusterStack();
         if (lastInstalled != null) {
-            if (Tools.getConfigData().HEARTBEAT_NAME.equals(lastInstalled)) {
+            if (ConfigData.HEARTBEAT_NAME.equals(lastInstalled)) {
                 pmJLabel.setForeground(Color.LIGHT_GRAY);
                 pmLabel.setForeground(Color.LIGHT_GRAY);
-            } else if (
-                  Tools.getConfigData().COROSYNC_NAME.equals(lastInstalled)) {
+            } else if (ConfigData.COROSYNC_NAME.equals(lastInstalled)) {
                 hbPmJLabel.setForeground(Color.LIGHT_GRAY);
                 hbPmLabel.setForeground(Color.LIGHT_GRAY);
             }

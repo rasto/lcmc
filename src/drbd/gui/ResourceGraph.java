@@ -619,7 +619,7 @@ public abstract class ResourceGraph {
      * Scales the graph, so that all vertices can be seen. The graph can
      * get smaller but not bigger.
      */
-    public final void scale() { // TODO: synchronize differently
+    public void scale() { // TODO: synchronize differently
         //TODO: disabling it till it works properly
         //Point2D max = getFilledGraphSize();
         //max = visualizationViewer.inverseLayoutTransform(max);

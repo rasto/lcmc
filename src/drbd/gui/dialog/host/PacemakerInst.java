@@ -22,6 +22,7 @@
 package drbd.gui.dialog.host;
 
 import drbd.data.Host;
+import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.SSH;
 import drbd.utilities.ExecCallback;
@@ -119,7 +120,7 @@ public class PacemakerInst extends DialogHost {
         Tools.getConfigData().setLastHbPmInstalledMethod(
            getHost().getDistString("PmInst.install.text." + installMethod));
         Tools.getConfigData().setLastInstalledClusterStack(
-                                        Tools.getConfigData().COROSYNC_NAME);
+                                                ConfigData.COROSYNC_NAME);
 
         getHost().execCommand(installCommand,
                          getProgressBar(),

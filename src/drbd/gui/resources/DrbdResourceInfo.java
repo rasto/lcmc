@@ -355,11 +355,14 @@ public class DrbdResourceInfo extends EditableInfo
         return getBrowser().getDrbdGraph().getDrbdInfo();
     }
 
-    /**
-     * Returns all parameters.
-     */
+    /** Returns all parameters. */
     public final String[] getParametersFromXML() {
         return getBrowser().getDrbdXML().getParameters();
+    }
+
+    /** Returns the regexp of the parameter. */
+    protected String getParamRegexp(String param) {
+        return null;
     }
 
     /**

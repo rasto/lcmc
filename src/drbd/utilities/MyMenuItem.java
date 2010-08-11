@@ -189,7 +189,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private void setNormalFont() {
         final Font font = getFont();
         final String name = font.getFontName();
-        final int style   = font.PLAIN;
+        final int style   = Font.PLAIN;
         final int size    = font.getSize();
         setFont(new Font(name, style, size));
     }
@@ -200,7 +200,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     public final void setSpecialFont() {
         final Font font = getFont();
         final String name = font.getFontName();
-        final int style   = font.ITALIC;
+        final int style   = Font.ITALIC;
         final int size    = font.getSize();
         setFont(new Font(name, style, size));
         //setBackground(Color.WHITE);

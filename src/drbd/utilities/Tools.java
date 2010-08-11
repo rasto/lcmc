@@ -1248,10 +1248,10 @@ public final class Tools {
      *          enumeration
      * @return string array
      */
-    public static String[] enumToStringArray(final Enumeration e) {
+    public static String[] enumToStringArray(final Enumeration<String> e) {
         final List<String> list = new ArrayList<String>();
         while (e.hasMoreElements()) {
-            list.add((String) e.nextElement());
+            list.add(e.nextElement());
         }
         return list.toArray(new String[list.size()]);
     }
@@ -1559,12 +1559,12 @@ public final class Tools {
                         if (callbackHash != null) {
                             if (lastIndex >= 0) {
                                 final MyMenuItem lastItem =
-                                         (MyMenuItem) dlm.elementAt(lastIndex);
+                                        (MyMenuItem) dlm.elementAt(lastIndex);
                                 callbackHash.get(lastItem).mouseOut();
                             }
                             if (index >= 0) {
                                 final MyMenuItem item =
-                                             (MyMenuItem) dlm.elementAt(index);
+                                            (MyMenuItem) dlm.elementAt(index);
                                 callbackHash.get(item).mouseOver();
                             }
                         }

@@ -22,41 +22,22 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
-import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.VMSXML.InterfaceData;
 import drbd.data.Host;
-import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
-import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
-import drbd.utilities.MyButton;
-import drbd.utilities.MyMenuItem;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Dimension;
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 /**
  * This class holds info about Virtual Interfaces.
@@ -68,6 +49,8 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Source bridge combo box, so that it can be disabled, depending on
      * type. */
     private GuiComboBox sourceBridgeCB = null;
+    /** Previous value of the type (network or bridge). */
+    private String prevType = null;
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
@@ -102,9 +85,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Whether the parameter is required. */
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{
-                                                InterfaceData.TYPE,
-                                                InterfaceData.SOURCE_NETWORK,
-                                                InterfaceData.SOURCE_BRIDGE}));
+                                                InterfaceData.TYPE }));
 
     /** Default name. */
     private static final Map<String, String> DEFAULTS_MAP =
@@ -198,6 +179,13 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
+        final String type = getComboBoxValue(InterfaceData.TYPE);
+        if ((InterfaceData.SOURCE_NETWORK.equals(param)
+             && "network".equals(type))
+            || (InterfaceData.SOURCE_BRIDGE.equals(param)
+                && "bridge".equals(type))) {
+            return true;
+        }
         return IS_REQUIRED.contains(param);
     }
 
@@ -326,11 +314,18 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     protected final boolean checkParam(final String param,
                                        final String newValue) {
         if (InterfaceData.TYPE.equals(param)) {
-            if (sourceNetworkCB != null) {
-                sourceNetworkCB.setVisible("network".equals(newValue));
-            }
-            if (sourceBridgeCB != null) {
-                sourceBridgeCB.setVisible("bridge".equals(newValue));
+            if (!newValue.equals(prevType)) {
+                if (sourceNetworkCB != null) {
+                    sourceNetworkCB.setVisible("network".equals(newValue));
+                }
+                if (sourceBridgeCB != null) {
+                    sourceBridgeCB.setVisible("bridge".equals(newValue));
+                }
+                prevType = newValue;
+                checkResourceFields(InterfaceData.SOURCE_NETWORK,
+                                    getParametersFromXML());
+                checkResourceFields(InterfaceData.SOURCE_BRIDGE,
+                                    getParametersFromXML());
             }
         }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {

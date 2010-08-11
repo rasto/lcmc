@@ -157,9 +157,9 @@ public class CRMXML extends XML {
                                               new HashMap<String, String[]>();
     /** Predefined group as heartbeat service. */
     private final ResourceAgent hbGroup =
-                      new ResourceAgent(Tools.getConfigData().PM_GROUP_NAME,
-                                        "",
-                                        "group");
+                                  new ResourceAgent(ConfigData.PM_GROUP_NAME,
+                                                    "",
+                                                    "group");
     /** Predefined clone as pacemaker service. */
     private final ResourceAgent pcmkClone;
     /** Predefined drbddisk as heartbeat service. */
@@ -483,7 +483,7 @@ public class CRMXML extends XML {
         final String hbBooleanTrue = booleanValues[0];
         final String hbBooleanFalse = booleanValues[1];
         /* clones */
-        pcmkClone = new ResourceAgent(Tools.getConfigData().PM_CLONE_SET_NAME,
+        pcmkClone = new ResourceAgent(ConfigData.PM_CLONE_SET_NAME,
                                       "",
                                       "clone");
         addMetaAttribute(pcmkClone, MASTER_MAX_META_ATTR,      null, true);

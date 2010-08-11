@@ -145,12 +145,15 @@ public class CreateFS extends DrbdConfig {
                 bdiPri.forcePrimary(testOnly);
                 final String fs = filesystemCB.getStringValue();
                 bdiPri.makeFilesystem(fs, testOnly);
-                getDrbdResourceInfo().setCreatedFs(fs);
-                bdiPri.setSecondary(testOnly);
-                hostCB.setValue(NO_HOST_STRING);
-                filesystemCB.setValue(NO_FILESYSTEM_STRING);
-                answerPaneSetText(
+                if (bdiPri.getDrbdResourceInfo() != null) {
+                    /* could be canceled */
+                    getDrbdResourceInfo().setCreatedFs(fs);
+                    bdiPri.setSecondary(testOnly);
+                    hostCB.setValue(NO_HOST_STRING);
+                    filesystemCB.setValue(NO_FILESYSTEM_STRING);
+                    answerPaneSetText(
                      Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS.Done"));
+                }
                 progressBarDone();
             }
         };

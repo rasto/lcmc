@@ -54,12 +54,6 @@ public class CommStack extends DialogCluster {
     private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
     private GuiComboBox chooseStackCombo;
-    /** Name of the Corosync in the radio group. */
-    private static final String COROSYNC_NAME =
-                                        Tools.getConfigData().COROSYNC_NAME;
-    /** Name of the Heartbeat in the radio group. */
-    private static final String HEARTBEAT_NAME =
-                                        Tools.getConfigData().HEARTBEAT_NAME;
 
     /**
      * Prepares a new <code>CommStack</code> object.
@@ -73,11 +67,13 @@ public class CommStack extends DialogCluster {
      * Returns the next dialog.
      */
     public final WizardDialog nextDialog() {
-        if (HEARTBEAT_NAME.equals(chooseStackCombo.getValue())) {
-            Tools.getConfigData().setLastInstalledClusterStack(HEARTBEAT_NAME);
+        if (ConfigData.HEARTBEAT_NAME.equals(chooseStackCombo.getValue())) {
+            Tools.getConfigData().setLastInstalledClusterStack(
+                                                    ConfigData.HEARTBEAT_NAME);
             return new HbConfig(this, getCluster());
         } else {
-            Tools.getConfigData().setLastInstalledClusterStack(COROSYNC_NAME);
+            Tools.getConfigData().setLastInstalledClusterStack(
+                                                    ConfigData.COROSYNC_NAME);
             return new CoroConfig(this, getCluster());
         }
     }
@@ -152,7 +148,7 @@ public class CommStack extends DialogCluster {
             }
         }
         if (!aisIsPossible && hbIsPossible) {
-            chooseStackCombo.setValue(HEARTBEAT_NAME);
+            chooseStackCombo.setValue(ConfigData.HEARTBEAT_NAME);
         }
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
@@ -160,10 +156,12 @@ public class CommStack extends DialogCluster {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (ais) {
-                        chooseStackCombo.setEnabled(COROSYNC_NAME, true);
+                        chooseStackCombo.setEnabled(ConfigData.COROSYNC_NAME,
+                                                    true);
                     }
                     if (hb) {
-                        chooseStackCombo.setEnabled(HEARTBEAT_NAME, true);
+                        chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME,
+                                                    true);
                     }
                 }
             });
@@ -219,34 +217,35 @@ public class CommStack extends DialogCluster {
         /* slight preference to corosync */
         String defaultValue = null;
         if (hbImpossible) {
-            defaultValue = COROSYNC_NAME;
+            defaultValue = ConfigData.COROSYNC_NAME;
         } else if (aisImpossible) {
-            defaultValue = HEARTBEAT_NAME;
+            defaultValue = ConfigData.HEARTBEAT_NAME;
         } else if (aisIsRc < hbIsRc) {
-            defaultValue = HEARTBEAT_NAME;
+            defaultValue = ConfigData.HEARTBEAT_NAME;
         } else if (aisIsRc > hbIsRc) {
-            defaultValue = COROSYNC_NAME;
+            defaultValue = ConfigData.COROSYNC_NAME;
         } else if (aisIsRunning < hbIsRunning) {
-            defaultValue = HEARTBEAT_NAME;
+            defaultValue = ConfigData.HEARTBEAT_NAME;
         } else if (aisIsRunning > hbIsRunning) {
-            defaultValue = COROSYNC_NAME;
+            defaultValue = ConfigData.COROSYNC_NAME;
         } else {
             defaultValue = Tools.getConfigData().getLastInstalledClusterStack();
         }
         if (defaultValue == null) {
-            defaultValue = COROSYNC_NAME;
+            defaultValue = ConfigData.COROSYNC_NAME;
         }
         chooseStackCombo = new GuiComboBox(defaultValue,
-                                           new String[]{HEARTBEAT_NAME,
-                                                        COROSYNC_NAME},
+                                           new String[]{
+                                                    ConfigData.HEARTBEAT_NAME,
+                                                    ConfigData.COROSYNC_NAME},
                                            null, /* units */
                                            GuiComboBox.Type.RADIOGROUP,
                                            null, /* regexp */
                                            500,
                                            null, /* abbrv */
                                            ConfigData.AccessType.ADMIN);
-        chooseStackCombo.setEnabled(COROSYNC_NAME, false);
-        chooseStackCombo.setEnabled(HEARTBEAT_NAME, false);
+        chooseStackCombo.setEnabled(ConfigData.COROSYNC_NAME, false);
+        chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);
         inputPane.add(getProgressBarPane(null));
         inputPane.add(chooseStackCombo);

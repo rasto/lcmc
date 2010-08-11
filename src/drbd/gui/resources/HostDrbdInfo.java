@@ -345,10 +345,10 @@ public class HostDrbdInfo extends Info {
                 }
 
                 public void action() {
-                    final JColorChooser tcc = new JColorChooser();
-                    Color newColor = tcc.showDialog(
+                    Color newColor = JColorChooser.showDialog(
                                             Tools.getGUIData().getMainFrame(),
-                                            "asdf",
+                                            "Choose " + host.getName()
+                                            + " color",
                                             host.getPmColors()[0]);
                     if (newColor != null) {
                         host.setSavedColor(newColor);

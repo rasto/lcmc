@@ -27,26 +27,15 @@ import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.VMSXML.DiskData;
 import drbd.data.Host;
-import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
 import drbd.data.LinuxFile;
-import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
-import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
-import drbd.utilities.MyMenuItem;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 import java.util.Set;
@@ -60,10 +49,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Dimension;
-import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -267,8 +252,9 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
-        if (DiskData.SOURCE_FILE.equals(param)
-            || DiskData.SOURCE_DEVICE.equals(param)) {
+        final String type = getComboBoxValue(DiskData.TYPE);
+        if ((DiskData.SOURCE_FILE.equals(param) && "file".equals(type))
+            || (DiskData.SOURCE_DEVICE.equals(param) && "block".equals(type))) {
             if ("ide/cdrom".equals(prevTargetBusType)
                 || "fdc/floppy".equals(prevTargetBusType)) {
                 return false;
@@ -402,24 +388,29 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     protected final boolean checkParam(final String param,
                                        final String newValue) {
         if (DiskData.TYPE.equals(param)) {
-            if (sourceFileCB != null) {
-                sourceFileCB.setVisible("file".equals(newValue));
-            }
-            if (sourceDeviceCB != null) {
-                sourceDeviceCB.setVisible("block".equals(newValue));
-            }
-            if (driverTypeCB != null
-                && !newValue.equals(prevType)) {
-                if (prevType != null
-                    || getParamSaved(DiskData.DRIVER_TYPE) == null) {
-                    if ("file".equals(newValue)) {
-                        driverTypeCB.setValue("raw");
-                    } else {
-                        driverTypeCB.setValue("");
-                    }
+            if (!newValue.equals(prevType)) {
+                if (sourceFileCB != null) {
+                    sourceFileCB.setVisible("file".equals(newValue));
                 }
+                if (sourceDeviceCB != null) {
+                    sourceDeviceCB.setVisible("block".equals(newValue));
+                }
+                //if (driverTypeCB != null) {
+                //    if (prevType != null
+                //        || getParamSaved(DiskData.DRIVER_TYPE) == null) {
+                //        if ("file".equals(newValue)) {
+                //            driverTypeCB.setValue("raw");
+                //        } else {
+                //            driverTypeCB.setValue("");
+                //        }
+                //    }
+                //}
+                prevType = newValue;
+                checkResourceFields(DiskData.SOURCE_FILE,
+                                    getParametersFromXML());
+                checkResourceFields(DiskData.SOURCE_DEVICE,
+                                    getParametersFromXML());
             }
-            prevType = newValue;
         } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
             if (targetDeviceCB != null && !newValue.equals(prevTargetBusType)) {
                 final Set<String> devices = new LinkedHashSet<String>();

@@ -262,6 +262,13 @@ public class DrbdGraph extends ResourceGraph {
         }
     }
 
+    public final void scale() {
+        for (final HostDrbdInfo hostDrbdInfo : hostBDVerticesMap.keySet()) {
+            addHost(hostDrbdInfo);
+        }
+        super.scale();
+    }
+
     /**
      * Removes drbd resource from the graph.
      */
@@ -313,7 +320,7 @@ public class DrbdGraph extends ResourceGraph {
      */
     protected final String getLabelForEdgeStringer(final ArchetypeEdge e) {
         final DrbdResourceInfo dri = edgeToDrbdResourceMap.get(e);
-        if (dri != null) {
+        if (dri != null && dri.getName() != null) {
             final MyEdge edge = (MyEdge) e;
             final Vertex source = edge.getSource();
             final Vertex dest = edge.getDest();

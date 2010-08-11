@@ -23,17 +23,14 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
-import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
-import drbd.data.LinuxFile;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
-import drbd.utilities.SSH;
 import drbd.utilities.MyMenuItem;
 
 import javax.swing.JComponent;
@@ -46,24 +43,16 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileSystemView;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 /**
  * This class holds info about Virtual Hardware.
@@ -105,7 +94,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JTable headerTable = getTable(vmsVirtualDomainInfo.HEADER_TABLE);
+        final JTable headerTable = getTable(VMSVirtualDomainInfo.HEADER_TABLE);
         if (headerTable != null) {
             mainPanel.add(headerTable.getTableHeader());
             mainPanel.add(headerTable);
