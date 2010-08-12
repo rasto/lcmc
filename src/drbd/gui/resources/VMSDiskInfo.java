@@ -454,7 +454,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         }
         return true;
     }
-    
+
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
          return !IS_ENABLED_ONLY_IN_ADVANCED.contains(param)
@@ -738,5 +738,10 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         }
         s.append(')');
         return s.toString();
+    }
+
+    /** Returns whether this item is removeable. */
+    protected final boolean isRemoveable() {
+        return true;
     }
 }

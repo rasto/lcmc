@@ -1868,6 +1868,9 @@ public class TextResource extends
         {"VMSVirtualDomainInfo.AddNewInterface",
          "New Interface"},
 
+        {"VMSVirtualDomainInfo.AddNewInputDev",
+         "New Input Device"},
+
         {"VMSVirtualDomainInfo.AddNewHardware",
          "Add Virtual Hardware"},
 

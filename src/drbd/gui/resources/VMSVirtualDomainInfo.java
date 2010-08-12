@@ -28,6 +28,7 @@ import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.VMSXML.DiskData;
 import drbd.data.VMSXML.InterfaceData;
+import drbd.data.VMSXML.InputDevData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
@@ -109,10 +110,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Map from key to vms interface info object. */
     private final Map<String, VMSInterfaceInfo> interfaceToInfo =
                                        new HashMap<String, VMSInterfaceInfo>();
-    /** Map from target string in the table to vms interface info object.
-     */
+    /** Map from target string in the table to vms interface info object. */
     private volatile Map<String, VMSInterfaceInfo> interfaceKeyToInfo =
                                        new HashMap<String, VMSInterfaceInfo>();
+    /** Input device to info hash lock. */
+    private final Mutex mInputDevToInfoLock = new Mutex();
+    /** Map from key to vms input device info object. */
+    private final Map<String, VMSInputDevInfo> inputDevToInfo =
+                                       new HashMap<String, VMSInputDevInfo>();
+    /** Map from target string in the table to vms interface info object.
+     */
+    private volatile Map<String, VMSInputDevInfo> inputDevKeyToInfo =
+                                       new HashMap<String, VMSInputDevInfo>();
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
@@ -170,6 +179,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     protected static final String DISK_TABLE = "disks";
     /** Interface table. */
     protected static final String INTERFACES_TABLE = "interfaces";
+    /** Input devices table. */
+    protected static final String INPUTDEVS_TABLE = "inputdevs";
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
@@ -298,9 +309,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             node.removeFromParent();
         }
 
-        final Enumeration eee = getNode().children();
-        int i = 0;
         for (final String disk : diskNames) {
+            final Enumeration eee = getNode().children();
+            int i = 0;
             while (eee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
                                 (DefaultMutableTreeNode) eee.nextElement();
@@ -329,7 +340,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                         new DefaultMutableTreeNode(vmsdi);
             getBrowser().setNode(resource);
             getNode().insert(resource, i);
-            i++;
             nodeChanged = true;
         }
         return nodeChanged;
@@ -384,16 +394,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             node.removeFromParent();
         }
 
-        final Enumeration eee = getNode().children();
-        int i = 0;
         for (final String interf : interfaceNames) {
             VMSInterfaceInfo vmsii;
             if (emptySlot == null) {
+                final Enumeration eee = getNode().children();
+                int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (!(node.getUserObject() instanceof VMSInterfaceInfo)) {
-                        i++;
+                        if (node.getUserObject() instanceof VMSDiskInfo) {
+                            i++;
+                        }
                         continue;
                     }
                     final VMSInterfaceInfo v =
@@ -409,7 +421,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                             new DefaultMutableTreeNode(vmsii);
                 getBrowser().setNode(resource);
                 getNode().insert(resource, i);
-                i++;
                 nodeChanged = true;
             } else {
                 vmsii = emptySlot;
@@ -428,9 +439,94 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
-    /**
-     * Sets service parameters with values from resourceNode hash.
-     */
+    /** Updates input devices nodes. Returns whether the node changed. */
+    private boolean updateInputDevNodes() {
+        final Map<String, InputDevData> inputDevs = getInputDevs();
+        final List<String> inputDevNames  = new ArrayList<String>();
+        if (inputDevs != null) {
+            for (final String d : inputDevs.keySet()) {
+                inputDevNames.add(d);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSInputDevInfo)) {
+                continue;
+            }
+            final VMSInputDevInfo vmsid =
+                              (VMSInputDevInfo) node.getUserObject();
+            if (vmsid.getResource().isNew()) {
+                /* keep */
+            } else if (inputDevNames.contains(vmsid.getName())) {
+                /* keeping */
+                inputDevNames.remove(vmsid.getName());
+                vmsid.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mInputDevToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                inputDevToInfo.remove(vmsid.getName());
+                mInputDevToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        for (final String inputDev : inputDevNames) {
+            VMSInputDevInfo vmsid;
+            final InputDevData data = inputDevs.get(inputDev);
+            final Enumeration eee = getNode().children();
+            int i = 0;
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSInputDevInfo)) {
+                    if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSInterfaceInfo) {
+                        i++;
+                    }
+                    continue;
+                }
+                final VMSInputDevInfo v =
+                                     (VMSInputDevInfo) node.getUserObject();
+                if (inputDev.compareTo(v.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm input device */
+            vmsid = new VMSInputDevInfo(inputDev, getBrowser(), this);
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmsid);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            nodeChanged = true;
+            try {
+                mInputDevToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            inputDevToInfo.put(inputDev, vmsid);
+            mInputDevToInfoLock.release();
+            vmsid.updateParameters();
+        }
+        return nodeChanged;
+    }
+
+    /** Sets service parameters with values from resourceNode hash. */
     public final void updateParameters() {
         final List<String> runningOnHosts = new ArrayList<String>();
         final List<String> suspendedOnHosts = new ArrayList<String>();
@@ -581,10 +677,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         updateTable(HEADER_TABLE);
         updateTable(DISK_TABLE);
         updateTable(INTERFACES_TABLE);
+        updateTable(INPUTDEVS_TABLE);
         /* disks */
         final boolean interfaceNodeChanged = updateInterfaceNodes();
         final boolean diskNodeChanged = updateDiskNodes();
-        if (diskNodeChanged || interfaceNodeChanged) {
+        final boolean inputDevNodeChanged = updateInputDevNodes();
+        if (diskNodeChanged
+            || interfaceNodeChanged
+            || inputDevNodeChanged) {
             getBrowser().reload(getNode());
         }
         //final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
@@ -695,6 +795,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         mainPanel.add(getTablePanel("Disks", DISK_TABLE));
         mainPanel.add(Box.createVerticalStrut(20));
         mainPanel.add(getTablePanel("Interfaces", INTERFACES_TABLE));
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(getTablePanel("Input Devices", INPUTDEVS_TABLE));
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
@@ -951,6 +1053,31 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         vmsii.selectMyself();
     }
 
+    /** Adds new virtual input device. */
+    private void addInputDevPanel(final Point2D pos) {
+        final VMSInputDevInfo vmsidi =
+                            new VMSInputDevInfo(null, getBrowser(), this);
+        vmsidi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmsidi);
+        getBrowser().setNode(resource);
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) eee.nextElement();
+            if (!(node.getUserObject() instanceof VMSInputDevInfo)) {
+                i++;
+                continue;
+            }
+            break;
+        }
+
+        getNode().insert(resource, i);
+        getBrowser().reload(getNode());
+        vmsidi.selectMyself();
+    }
+
     /** Add new hardware. */
     private final MyMenu getAddNewHardwareMenu(final String name) {
         return new MyMenu(name,
@@ -1001,6 +1128,24 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 };
                 newInterfaceMenuItem.setPos(pos);
                 add(newInterfaceMenuItem);
+
+                final MyMenuItem newInputDevMenuItem = new MyMenuItem(
+                   Tools.getString("VMSVirtualDomainInfo.AddNewInputDev"),
+                   NetInfo.NET_I_ICON_LARGE,
+                   ConfigData.AccessType.ADMIN,
+                   ConfigData.AccessType.OP) {
+                    private static final long serialVersionUID = 1L;
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        addInputDevPanel(getPos());
+                    }
+                };
+                newInputDevMenuItem.setPos(pos);
+                add(newInputDevMenuItem);
             }
         };
     }
@@ -1668,6 +1813,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return new String[]{"Virtual Device", "Source"};
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return new String[]{"Virtual Interface", "Source"};
+        } else if (INPUTDEVS_TABLE.equals(tableName)) {
+            return new String[]{"Input Device", "Bus"};
         }
         return new String[]{};
     }
@@ -1680,6 +1827,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return getDiskTableData();
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return getInterfaceTableData();
+        } else if (INPUTDEVS_TABLE.equals(tableName)) {
+            return getInputDevTableData();
         }
         return new Object[][]{};
     }
@@ -1830,6 +1979,28 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return new Object[]{iLabel, source.toString()};
     }
 
+    /** Get one row of the table. */
+    final protected Object[] getInputDevDataRow(
+                                final String index,
+                                final Map<String, VMSInputDevInfo> iToInfo,
+                                final Map<String, InputDevData> inputDevs,
+                                boolean opaque) {
+        final InputDevData inputDevData = inputDevs.get(index);
+        if (inputDevData == null) {
+            return new Object[]{index + ": unknown", ""};
+        }
+        final String type = inputDevData.getType();
+        final String bus = inputDevData.getBus();
+        if (iToInfo != null) {
+            final VMSInputDevInfo vidi = inputDevToInfo.get(index);
+            iToInfo.put(index, vidi);
+        }
+        final MyButton iLabel = new MyButton(type,
+                                             NetInfo.NET_I_ICON_LARGE);
+        iLabel.setOpaque(opaque);
+        return new Object[]{iLabel, bus};
+    }
+
     /** Returns all interfaces. */
     protected final Map<String, InterfaceData> getInterfaces() {
         Map<String, InterfaceData> interfaces = null;
@@ -1841,6 +2012,44 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         return interfaces;
+    }
+
+    /** Returns data for the input devices table. */
+    private Object[][] getInputDevTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, InputDevData> inputDevs = getInputDevs();
+        final Map<String, VMSInputDevInfo> iToInfo =
+                                      new HashMap<String, VMSInputDevInfo>();
+        if (inputDevs != null) {
+            for (final String index : inputDevs.keySet()) {
+                final Object[] row = getInputDevDataRow(index,
+                                                        iToInfo,
+                                                        inputDevs,
+                                                        false);
+                rows.add(row);
+            }
+        }
+        try {
+            mInputDevToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        inputDevKeyToInfo = iToInfo;
+        mInputDevToInfoLock.release();
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /** Returns all input devices. */
+    protected final Map<String, InputDevData> getInputDevs() {
+        Map<String, InputDevData> inputDevs = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                inputDevs = vxml.getInputDevs(getDomainName());
+                break;
+            }
+        }
+        return inputDevs;
     }
 
     /** Returns data for the interface table. */
@@ -1894,6 +2103,17 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             if (vii != null) {
                 vii.selectMyself();
             }
+        } else if (INPUTDEVS_TABLE.equals(tableName)) {
+            try {
+                mInputDevToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSInputDevInfo vidi = inputDevKeyToInfo.get(key);
+            mInputDevToInfoLock.release();
+            if (vidi != null) {
+                vidi.selectMyself();
+            }
         }
     }
 
@@ -1932,6 +2152,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return info;
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return interfaceToInfo.get(key);
+        } else if (INPUTDEVS_TABLE.equals(tableName)) {
+            return inputDevToInfo.get(key);
         }
         return null;
     }

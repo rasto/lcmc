@@ -97,6 +97,9 @@ public class VMSXML extends XML {
     /** Map from domain name and mac address to the interface data. */
     private final Map<String, Map<String, InterfaceData>> interfacesMap =
                        new LinkedHashMap<String, Map<String, InterfaceData>>();
+    /** Map from domain name and index to the input device data. */
+    private final Map<String, Map<String, InputDevData>> inputDevsMap =
+                       new LinkedHashMap<String, Map<String, InputDevData>>();
     /** Map from domain name and network name to the network data. */
     private final Map<String, NetworkData> networkMap =
                                     new LinkedHashMap<String, NetworkData>();
@@ -139,6 +142,12 @@ public class VMSXML extends XML {
     /** Map from paramater to its xml attribute. */
     public static final Map<String, String> DISK_ATTRIBUTE_MAP =
                                              new HashMap<String, String>();
+    /** Map from paramater to its xml tag. */
+    public static final Map<String, String> INPUTDEV_TAG_MAP =
+                                             new HashMap<String, String>();
+    /** Map from paramater to its xml attribute. */
+    public static final Map<String, String> INPUTDEV_ATTRIBUTE_MAP =
+                                             new HashMap<String, String>();
 
     static {
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
@@ -174,6 +183,10 @@ public class VMSXML extends XML {
         DISK_TAG_MAP.put(DiskData.READONLY, "readonly");
 
         DISK_TAG_MAP.put(DiskData.SHAREABLE, "shareable");
+
+        INPUTDEV_ATTRIBUTE_MAP.put(InputDevData.TYPE, "type");
+
+        INPUTDEV_ATTRIBUTE_MAP.put(InputDevData.BUS, "bus");
     }
 
     /** XML document lock. */
@@ -265,6 +278,54 @@ public class VMSXML extends XML {
         }
     }
 
+    /** Modify xml of some device element. */
+    private void modifyXML(final Node domainNode,
+                           final Element devNode,
+                           final Map<String, String> tagMap,
+                           final Map<String, String> attributeMap,
+                           final Map<String, String> parametersMap) {
+        for (final String param : parametersMap.keySet()) {
+            final String value = parametersMap.get(param);
+            if (!tagMap.containsKey(param)
+                && attributeMap.containsKey(param)) {
+                /* attribute */
+                final Node attributeNode =
+                 devNode.getAttributes().getNamedItem(attributeMap.get(param));
+                if (attributeNode == null) {
+                    devNode.setAttribute(attributeMap.get(param), value);
+                } else {
+                    attributeNode.setNodeValue(value);
+                }
+                continue;
+            }
+            Element node = (Element) getChildNode(devNode, tagMap.get(param));
+            if ((attributeMap.containsKey(param) || "True".equals(value))
+                && node == null) {
+                node = (Element) devNode.appendChild(
+                      domainNode.getOwnerDocument().createElement(
+                                                          tagMap.get(param)));
+            } else if (!attributeMap.containsKey(param)
+                       && "False".equals(value)
+                       && node != null) {
+                devNode.removeChild(node);
+            }
+            if (attributeMap.containsKey(param)) {
+                final Node attributeNode = node.getAttributes().getNamedItem(
+                                                      attributeMap.get(param));
+                if (attributeNode == null) {
+                    node.setAttribute(attributeMap.get(param), value);
+
+                } else {
+                    if ("".equals(value)) {
+                        node.removeAttribute(attributeMap.get(param));
+                    } else {
+                        attributeNode.setNodeValue(value);
+                    }
+                }
+            }
+        }
+    }
+
     /** Modify disk XML. */
     public final void modifyDiskXML(final String domainName,
                                     final String targetDev,
@@ -301,53 +362,11 @@ public class VMSXML extends XML {
                 diskNode = (Element) devicesNode.appendChild(
                           domainNode.getOwnerDocument().createElement("disk"));
             }
-            for (final String param : parametersMap.keySet()) {
-                final String value = parametersMap.get(param);
-                if (!DISK_TAG_MAP.containsKey(param)
-                    && DISK_ATTRIBUTE_MAP.containsKey(param)) {
-                    /* disk attribute */
-                    final Node attributeNode =
-                                diskNode.getAttributes().getNamedItem(
-                                           DISK_ATTRIBUTE_MAP.get(param));
-                    if (attributeNode == null) {
-                        diskNode.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
-                                              value);
-                    } else {
-                        attributeNode.setNodeValue(value);
-                    }
-                    continue;
-                }
-                Element node = (Element) getChildNode(
-                                                diskNode,
-                                                DISK_TAG_MAP.get(param));
-                if ((DISK_ATTRIBUTE_MAP.containsKey(param)
-                     || "True".equals(value))
-                    && node == null) {
-                    node = (Element) diskNode.appendChild(
-                          domainNode.getOwnerDocument().createElement(
-                                                  DISK_TAG_MAP.get(param)));
-                } else if (!DISK_ATTRIBUTE_MAP.containsKey(param)
-                           && "False".equals(value)
-                           && node != null) {
-                    diskNode.removeChild(node);
-                }
-                if (DISK_ATTRIBUTE_MAP.containsKey(param)) {
-                    final Node attributeNode =
-                                node.getAttributes().getNamedItem(
-                                            DISK_ATTRIBUTE_MAP.get(param));
-                    if (attributeNode == null) {
-                        node.setAttribute(DISK_ATTRIBUTE_MAP.get(param),
-                                          value);
-
-                    } else {
-                        if ("".equals(value)) {
-                            node.removeAttribute(DISK_ATTRIBUTE_MAP.get(param));
-                        } else {
-                            attributeNode.setNodeValue(value);
-                        }
-                    }
-                }
-            }
+            modifyXML(domainNode,
+                      diskNode,
+                      DISK_TAG_MAP,
+                      DISK_ATTRIBUTE_MAP,
+                      parametersMap);
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
             return;
@@ -380,6 +399,7 @@ public class VMSXML extends XML {
                 final Node mn = getChildNode(nodes.item(i), "target");
                 if (targetDev.equals(getAttribute(mn, "dev"))) {
                     diskNode = (Element) nodes.item(i);
+                    break;
                 }
             }
             if (diskNode != null) {
@@ -424,6 +444,7 @@ public class VMSXML extends XML {
                     final Node mn = getChildNode(nodes.item(i), "mac");
                     if (macAddress.equals(getAttribute(mn, "address"))) {
                         interfaceNode = (Element) nodes.item(i);
+                        break;
                     }
                 }
             }
@@ -431,45 +452,11 @@ public class VMSXML extends XML {
                 interfaceNode = (Element) devicesNode.appendChild(
                     domainNode.getOwnerDocument().createElement("interface"));
             }
-            for (final String param : parametersMap.keySet()) {
-                if (!INTERFACE_TAG_MAP.containsKey(param)
-                    && INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
-                    /* interface attribute */
-                    final Node attributeNode =
-                            interfaceNode.getAttributes().getNamedItem(
-                                       INTERFACE_ATTRIBUTE_MAP.get(param));
-                    if (attributeNode == null) {
-                        interfaceNode.setAttribute(
-                                       INTERFACE_ATTRIBUTE_MAP.get(param),
-                                       parametersMap.get(param));
-                    } else {
-                        attributeNode.setNodeValue(
-                                                parametersMap.get(param));
-                    }
-                    continue;
-                }
-                Element node = (Element) getChildNode(
-                                            interfaceNode,
-                                            INTERFACE_TAG_MAP.get(param));
-                if (node == null) {
-                    node = (Element) interfaceNode.appendChild(
-                            domainNode.getOwnerDocument().createElement(
-                                            INTERFACE_TAG_MAP.get(param)));
-                }
-                if (INTERFACE_ATTRIBUTE_MAP.containsKey(param)) {
-                    final Node attributeNode =
-                            node.getAttributes().getNamedItem(
-                                       INTERFACE_ATTRIBUTE_MAP.get(param));
-                    if (attributeNode == null) {
-                        node.setAttribute(
-                                        INTERFACE_ATTRIBUTE_MAP.get(param),
-                                        parametersMap.get(param));
-                    } else {
-                        attributeNode.setNodeValue(
-                                                parametersMap.get(param));
-                    }
-                }
-            }
+            modifyXML(domainNode,
+                      interfaceNode,
+                      INTERFACE_TAG_MAP,
+                      INTERFACE_ATTRIBUTE_MAP,
+                      parametersMap);
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
             return;
@@ -502,10 +489,107 @@ public class VMSXML extends XML {
                 final Node mn = getChildNode(nodes.item(i), "mac");
                 if (macAddress.equals(getAttribute(mn, "address"))) {
                     interfaceNode = (Element) nodes.item(i);
+                    break;
                 }
             }
             if (interfaceNode != null) {
                 interfaceNode.getParentNode().removeChild(interfaceNode);
+            }
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return;
+        }
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
+    }
+
+    /** Modify input device XML. */
+    public final void modifyInputDevXML(
+                                     final String domainName,
+                                     final String type,
+                                     final String bus,
+                                     final Map<String, String> parametersMap) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        final Node devicesNode = getDevicesNode(xpath, domainNode);
+        if (devicesNode == null) {
+            return;
+        }
+        try {
+            final String inputDevPath = "devices/input";
+            final NodeList nodes = (NodeList) xpath.evaluate(
+                                                       inputDevPath,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+            Element inputDevNode = null;
+            if (type != null && bus != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = nodes.item(i);
+                    if (type.equals(getAttribute(mn, "type"))
+                        && bus.equals(getAttribute(mn, "bus"))) {
+                        inputDevNode = (Element) nodes.item(i);
+                        break;
+                    }
+                }
+            }
+            if (inputDevNode == null) {
+                inputDevNode = (Element) devicesNode.appendChild(
+                    domainNode.getOwnerDocument().createElement("input"));
+            }
+            modifyXML(domainNode,
+                      inputDevNode,
+                      INPUTDEV_TAG_MAP,
+                      INPUTDEV_ATTRIBUTE_MAP,
+                      parametersMap);
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return;
+        }
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
+    }
+
+    /** Remove input device XML. */
+    public final void removeInputDevXML(final String domainName,
+                                        final String type,
+                                        final String bus) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            final String inputDevPath = "devices/input";
+            final NodeList nodes = (NodeList) xpath.evaluate(
+                                                       inputDevPath,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+            Element inputDevNode = null;
+            if (type != null && bus != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    final Node mn = nodes.item(i);
+                    if (type.equals(getAttribute(mn, "type"))
+                        && bus.equals(getAttribute(mn, "bus"))) {
+                        inputDevNode = (Element) nodes.item(i);
+                        break;
+                    }
+                }
+            }
+            if (inputDevNode != null) {
+                inputDevNode.getParentNode().removeChild(inputDevNode);
             }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
@@ -686,14 +770,21 @@ public class VMSXML extends XML {
                                     new LinkedHashMap<String, DiskData>();
                 final Map<String, InterfaceData> macMap =
                                     new LinkedHashMap<String, InterfaceData>();
+                final Map<String, InputDevData> inputMap =
+                                    new LinkedHashMap<String, InputDevData>();
                 final NodeList devices = option.getChildNodes();
                 for (int j = 0; j < devices.getLength(); j++) {
                     final Node deviceNode = devices.item(j);
                     if ("input".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
+                        final String bus = getAttribute(deviceNode, "bus");
                         if ("tablet".equals(type)) {
                             tabletOk = true;
                         }
+                        final InputDevData inputDevData =
+                                                 new InputDevData(type, bus);
+                        inputMap.put(type + ":" + bus,
+                                     inputDevData);
                     } else if ("graphics".equals(deviceNode.getNodeName())) {
                         /** remotePort will be overwritten with virsh output */
                         final String type = getAttribute(deviceNode, "type");
@@ -801,6 +892,7 @@ public class VMSXML extends XML {
                 }
                 disksMap.put(name, devMap);
                 interfacesMap.put(name, macMap);
+                inputDevsMap.put(name, inputMap);
             }
         }
         if (!tabletOk) {
@@ -948,6 +1040,11 @@ public class VMSXML extends XML {
     /** Returns array of networks. */
     public final List<String> getNetworks() {
         return new ArrayList<String>(networkMap.keySet());
+    }
+
+    /** Returns array of input devices. */
+    public final Map<String, InputDevData> getInputDevs(final String name) {
+        return inputDevsMap.get(name);
     }
 
     /** Class that holds data about networks. */
@@ -1267,6 +1364,44 @@ public class VMSXML extends XML {
         /** Returns model type. */
         public final String getModelType() {
             return modelType;
+        }
+
+        /** Returns value of this parameter. */
+        public final String getValue(final String param) {
+            return valueMap.get(param);
+        }
+    }
+
+    /** Class that holds data about virtual input devices. */
+    public class InputDevData {
+        /** Type: tablet, mouse... */
+        private final String type;
+        /** Bus: usb... */
+        private final String bus;
+        /** Name value pairs. */
+        private final Map<String, String> valueMap =
+                                                new HashMap<String, String>();
+        /** Type. */
+        public static final String TYPE = "type";
+        /** Bus. */
+        public static final String BUS = "bus";
+        /** Creates new InputDevData object. */
+        public InputDevData(final String type,
+                            final String bus) {
+            this.type = type;
+            valueMap.put(TYPE, type);
+            this.bus = bus;
+            valueMap.put(BUS, bus);
+        }
+
+        /** Returns type. */
+        public final String getType() {
+            return type;
+        }
+
+        /** Returns bus. */
+        public final String getBus() {
+            return bus;
         }
 
         /** Returns value of this parameter. */

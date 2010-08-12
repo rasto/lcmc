@@ -246,6 +246,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         return null;
     }
 
+    /** Returns whether this item is removeable. */
+    protected abstract boolean isRemoveable();
+
     /** Returns list of menu items. */
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -263,7 +266,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                 if (getResource().isNew()) {
                     return true;
                 }
-                return true;
+                return isRemoveable();
             }
 
             public void action() {
@@ -287,7 +290,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             getResource().setNew(false);
             return;
         }
-        String desc = Tools.getString("VMSHardwareInfo.confirmRemove.Description");
+        String desc = Tools.getString(
+                                "VMSHardwareInfo.confirmRemove.Description");
 
         desc  = desc.replaceAll("@HW@", toString());
         if (Tools.confirmDialog(
