@@ -273,11 +273,9 @@ public class DrbdGuiXML extends XML {
                                 host.setSavedColor(color);
                             }
                             Boolean sudo = false;
-                            if (sudo != null) {
-                                if ("true".equals(useSudo)) {
-                                    sudo = true;
-                                    host.setUseSudo(true);
-                                }
+                            if (sudo != null && "true".equals(useSudo)) {
+                                sudo = true;
+                                host.setUseSudo(true);
                             }
                             Tools.getConfigData().setLastEnteredUseSudo(sudo);
                             Tools.getConfigData().addHostToHosts(host);

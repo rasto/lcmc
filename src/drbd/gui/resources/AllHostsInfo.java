@@ -26,6 +26,7 @@ import drbd.gui.Browser;
 import drbd.data.Cluster;
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenuItem;
@@ -285,15 +286,14 @@ public class AllHostsInfo extends Info {
         if (Tools.getConfigData().getAutoHosts().isEmpty()
             && !Tools.getConfigData().getAutoClusters().isEmpty()) {
             for (final Cluster cl : allLoadButtons.keySet()) {
-                if (cl.getClusterTab() == null) {
-                    if (Tools.getConfigData().getAutoClusters().contains(
+                if (cl.getClusterTab() == null
+                    && Tools.getConfigData().getAutoClusters().contains(
                                                                cl.getName())) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                allLoadButtons.get(cl).pressButton();
-                            }
-                        });
-                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            allLoadButtons.get(cl).pressButton();
+                        }
+                    });
                 }
             }
         }
@@ -553,8 +553,8 @@ public class AllHostsInfo extends Info {
             new MyMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"),
                            HOST_ICON,
                            null,
-                           ConfigData.AccessType.RO,
-                           ConfigData.AccessType.RO) {
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

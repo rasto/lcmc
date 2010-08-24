@@ -90,17 +90,15 @@ public class VMSInfo extends CategoryInfo {
             ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
             for (final Host host : getBrowser().getClusterHosts()) {
                 final VMSXML vxml = getBrowser().getVMSXML(host);
-                if (vxml != null) {
-                    if (vxml.isRunning(domainName)) {
-                        final Color bgColor = host.getPmColors()[0];
-                        dtc.put(domainName, bgColor);
-                        if (vxml.isSuspended(domainName)) {
-                            hostIcon = VMSVirtualDomainInfo.PAUSE_ICON;
-                        } else {
-                            hostIcon = HostBrowser.HOST_ON_ICON_LARGE;
-                        }
-                        break;
+                if (vxml != null && vxml.isRunning(domainName)) {
+                    final Color bgColor = host.getPmColors()[0];
+                    dtc.put(domainName, bgColor);
+                    if (vxml.isSuspended(domainName)) {
+                        hostIcon = VMSVirtualDomainInfo.PAUSE_ICON;
+                    } else {
+                        hostIcon = HostBrowser.HOST_ON_ICON_LARGE;
                     }
+                    break;
                 }
             }
             final VMSVirtualDomainInfo vmsvdi =

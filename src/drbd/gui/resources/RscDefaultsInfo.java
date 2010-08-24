@@ -212,6 +212,11 @@ public class RscDefaultsInfo extends EditableInfo {
         return true;
     }
 
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+        return false;
+    }
+
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();

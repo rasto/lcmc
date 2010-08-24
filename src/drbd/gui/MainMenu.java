@@ -24,6 +24,7 @@ package drbd.gui;
 
 import drbd.utilities.Tools;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.AddHostDialog;
 import drbd.AddClusterDialog;
 
@@ -112,7 +113,9 @@ public class MainMenu extends JPanel implements ActionListener {
                                                loadActionListener(),
                                                null);
         Tools.getGUIData().addToEnabledInAccessType(loadItem,
-                                                    ConfigData.AccessType.GOD);
+                                                    new AccessMode(
+                                                     ConfigData.AccessType.GOD,
+                                                     false));
 
         final JMenuItem item = addMenuItem(
                                 Tools.getString("MainMenu.RemoveEverything"),
@@ -122,7 +125,9 @@ public class MainMenu extends JPanel implements ActionListener {
                                 removeEverythingActionListener(),
                                 null);
         Tools.getGUIData().addToVisibleInAccessType(item,
-                                                    ConfigData.AccessType.GOD);
+                                                    new AccessMode(
+                                                     ConfigData.AccessType.GOD,
+                                                     false));
 
         addMenuItem(Tools.getString("MainMenu.Save"),
                     submenu,
@@ -152,7 +157,9 @@ public class MainMenu extends JPanel implements ActionListener {
         /* settings */
         submenu = addMenu(Tools.getString("MainMenu.Settings"), 0);
         Tools.getGUIData().addToVisibleInAccessType(submenu,
-                                                    ConfigData.AccessType.GOD);
+                                                    new AccessMode(
+                                                     ConfigData.AccessType.GOD,
+                                                     false));
         menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
         final UIManager.LookAndFeelInfo[] lookAndFeels =
                                         UIManager.getInstalledLookAndFeels();

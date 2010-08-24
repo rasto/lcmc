@@ -22,6 +22,7 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
@@ -168,7 +169,8 @@ public class LinbitLogin extends DialogHost {
                                         "^[,\\w.-]+$",
                                         CHECKBOX_WIDTH,
                                         null, /* abbrv */
-                                        ConfigData.AccessType.RO);
+                                        new AccessMode(ConfigData.AccessType.RO,
+                                                       false)); /* only adv. */
 
         addCheckField(downloadUserField);
         userLabel.setLabelFor(downloadUserField);
@@ -180,14 +182,15 @@ public class LinbitLogin extends DialogHost {
 
         inputPane.add(passwordLabel);
         downloadPasswordField = new GuiComboBox(
-                                Tools.getConfigData().getDownloadPassword(),
-                                null, /* items */
-                                null, /* units */
-                                GuiComboBox.Type.PASSWDFIELD,
-                                null, /* type */
-                                CHECKBOX_WIDTH,
-                                null, /* abbrv */
-                                ConfigData.AccessType.RO);
+                                  Tools.getConfigData().getDownloadPassword(),
+                                  null, /* items */
+                                  null, /* units */
+                                  GuiComboBox.Type.PASSWDFIELD,
+                                  null, /* type */
+                                  CHECKBOX_WIDTH,
+                                  null, /* abbrv */
+                                  new AccessMode(ConfigData.AccessType.RO,
+                                                 false)); /* only adv. mode */
 
         addCheckField(downloadPasswordField);
         passwordLabel.setLabelFor(downloadPasswordField);

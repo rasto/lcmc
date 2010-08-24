@@ -40,6 +40,7 @@ import drbd.data.Subtext;
 import drbd.data.Cluster;
 import drbd.data.DRBDtestData;
 import drbd.data.resources.BlockDevice;
+import drbd.data.AccessMode;
 
 import java.awt.Dimension;
 import java.awt.Component;
@@ -54,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -391,7 +391,8 @@ public class BlockDevInfo extends EditableInfo {
                        regexp,
                        width,
                        null, /* abbrv */
-                       getAccessType(param));
+                       new AccessMode(getAccessType(param),
+                                      isEnabledOnlyInAdvancedMode(param)));
             gcb.setValue(defaultPort);
             paramComboBoxAdd(param, prefix, gcb);
             gcb.setEnabled(true);
@@ -482,6 +483,11 @@ public class BlockDevInfo extends EditableInfo {
         return true;
     }
 
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+         return false;
+    }
+
     /** Returns whether this type is integer. */
     protected final boolean isInteger(final String param) {
         if (DRBD_NI_PORT_PARAM.equals(param)) {
@@ -510,7 +516,7 @@ public class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns the regexp of the parameter. */
-    protected String getParamRegexp(String param) {
+    protected String getParamRegexp(final String param) {
         return null;
     }
 
@@ -981,8 +987,9 @@ public class BlockDevInfo extends EditableInfo {
         return new MyMenuItem(oBdi.toString(),
                               null,
                               null,
-                              ConfigData.AccessType.ADMIN,
-                              ConfigData.AccessType.OP) {
+                              new AccessMode(ConfigData.AccessType.ADMIN,
+                                             false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             public void action() {
                 final DrbdInfo drbdInfo =
@@ -1012,8 +1019,8 @@ public class BlockDevInfo extends EditableInfo {
         final boolean testOnly = false;
         final MyMenu repMenuItem = new MyMenu(
                         Tools.getString("HostBrowser.Drbd.AddDrbdResource"),
-                        ConfigData.AccessType.ADMIN,
-                        ConfigData.AccessType.OP) {
+                        new AccessMode(ConfigData.AccessType.ADMIN, false),
+                        new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public final boolean enablePredicate() {
@@ -1032,8 +1039,12 @@ public class BlockDevInfo extends EditableInfo {
                         continue;
                     }
                     MyMenu hostMenu = new MyMenu(oHost.getName(),
-                                                 ConfigData.AccessType.ADMIN,
-                                                 ConfigData.AccessType.OP) {
+                                                 new AccessMode(
+                                                    ConfigData.AccessType.ADMIN,
+                                                    false),
+                                                 new AccessMode(
+                                                    ConfigData.AccessType.OP,
+                                                    false)) {
                         private static final long serialVersionUID = 1L;
 
                         public final boolean enablePredicate() {
@@ -1085,9 +1096,8 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.Attach"),
                            HARDDISK_ICON_LARGE,
                            Tools.getString("HostBrowser.Drbd.Attach.ToolTip"),
-
-                           ConfigData.AccessType.OP,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1099,7 +1109,7 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1139,9 +1149,8 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.Connect"),
                            null,
                            null,
-
-                           ConfigData.AccessType.OP,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1152,7 +1161,7 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1199,8 +1208,8 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.SetPrimary"),
                            null,
                            null,
-                           ConfigData.AccessType.OP,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1215,7 +1224,7 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1238,15 +1247,15 @@ public class BlockDevInfo extends EditableInfo {
                            null,
                            Tools.getString(
                                 "HostBrowser.Drbd.SetSecondary.ToolTip"),
-                           ConfigData.AccessType.OP,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1265,15 +1274,15 @@ public class BlockDevInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ForcePrimary"),
                            null,
                            null,
-                           ConfigData.AccessType.OP,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1292,15 +1301,15 @@ public class BlockDevInfo extends EditableInfo {
                    Tools.getString("HostBrowser.Drbd.Invalidate"),
                    null,
                    Tools.getString("HostBrowser.Drbd.Invalidate.ToolTip"),
-                   ConfigData.AccessType.ADMIN,
-                   ConfigData.AccessType.OP) {
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1324,8 +1333,8 @@ public class BlockDevInfo extends EditableInfo {
                        Tools.getString("HostBrowser.Drbd.PauseSync"),
                        null,
                        Tools.getString("HostBrowser.Drbd.PauseSync.ToolTip"),
-                       ConfigData.AccessType.OP,
-                       ConfigData.AccessType.OP) {
+                       new AccessMode(ConfigData.AccessType.OP, false),
+                       new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -1337,7 +1346,7 @@ public class BlockDevInfo extends EditableInfo {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1360,15 +1369,15 @@ public class BlockDevInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Resize"),
                            null,
                            Tools.getString("HostBrowser.Drbd.Resize.ToolTip"),
-                           ConfigData.AccessType.ADMIN,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1387,15 +1396,15 @@ public class BlockDevInfo extends EditableInfo {
                            null,
                            Tools.getString(
                                      "HostBrowser.Drbd.DiscardData.ToolTip"),
-                           ConfigData.AccessType.ADMIN,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
-                    if (!Tools.getConfigData().getExpertMode()
+                    if (!Tools.getConfigData().isAdvancedMode()
                         && getDrbdResourceInfo().isUsedByCRM()) {
                         return false;
                     }
@@ -1415,8 +1424,8 @@ public class BlockDevInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewDrbdLog"),
                            LOGFILE_ICON,
                            null,
-                           ConfigData.AccessType.RO,
-                           ConfigData.AccessType.RO) {
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

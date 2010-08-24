@@ -29,6 +29,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.data.CRMXML;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.gui.SpringUtilities;
 
 import javax.swing.JLabel;
@@ -78,6 +79,8 @@ public abstract class EditableInfo extends Info {
     protected abstract boolean isEnabled(String param);
     /** Returns access type of this parameter. */
     protected abstract ConfigData.AccessType getAccessType(String param);
+    /** Returns whether this parameter is enabled in advanced mode. */
+    protected abstract boolean isEnabledOnlyInAdvancedMode(String param);
     /** Returns whether this parameter is of label type. */
     protected abstract boolean isLabel(String param);
     /** Returns whether this parameter is of the integer type. */
@@ -98,7 +101,7 @@ public abstract class EditableInfo extends Info {
     /** Returns the name of the type. */
     protected abstract String getParamType(final String param);
     /** Returns the regexp of the parameter. */
-    protected String getParamRegexp(String param) {
+    protected String getParamRegexp(final String param) {
         // TODO: this should be only for Pacemaker
         if (isInteger(param)) {
             return "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
@@ -317,7 +320,8 @@ public abstract class EditableInfo extends Info {
                     final JPanel p = panel;
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            p.setVisible(Tools.getConfigData().getExpertMode());
+                            p.setVisible(
+                                     Tools.getConfigData().isAdvancedMode());
                         }
                     });
                 }
@@ -462,7 +466,7 @@ public abstract class EditableInfo extends Info {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         sectionPanel.setVisible(
-                                        Tools.getConfigData().getExpertMode());
+                                      Tools.getConfigData().isAdvancedMode());
                     }
                 });
             }
@@ -471,7 +475,7 @@ public abstract class EditableInfo extends Info {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 moreOptionsPanel.setVisible(
-                                  a && !Tools.getConfigData().getExpertMode());
+                                a && !Tools.getConfigData().isAdvancedMode());
             }
         });
     }
@@ -576,7 +580,7 @@ public abstract class EditableInfo extends Info {
         } else {
             initValue = value;
         }
-        String regexp = getParamRegexp(param);
+        final String regexp = getParamRegexp(param);
         Map<String, String> abbreviations = new HashMap<String, String>();
         if (isInteger(param)) {
             abbreviations = new HashMap<String, String>();
@@ -600,14 +604,16 @@ public abstract class EditableInfo extends Info {
             type = GuiComboBox.Type.LABELFIELD;
         }
         final GuiComboBox paramCb = new GuiComboBox(
-                                                initValue,
-                                                getPossibleChoices(param),
-                                                units,
-                                                type,
-                                                regexp,
-                                                width,
-                                                abbreviations,
-                                                getAccessType(param));
+                                      initValue,
+                                      getPossibleChoices(param),
+                                      units,
+                                      type,
+                                      regexp,
+                                      width,
+                                      abbreviations,
+                                      new AccessMode(
+                                        getAccessType(param),
+                                        isEnabledOnlyInAdvancedMode(param)));
         paramComboBoxAdd(param, prefix, paramCb);
         paramCb.setEditable(true);
         return paramCb;
@@ -622,7 +628,8 @@ public abstract class EditableInfo extends Info {
     protected abstract boolean checkParam(String param, String newValue);
 
     /** Checks whether this value matches the regexp of this field. */
-    protected final boolean checkRegexp(String param, String newValue) {
+    protected final boolean checkRegexp(final String param,
+                                        final String newValue) {
         final String regexp = getParamRegexp(param);
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
@@ -913,12 +920,12 @@ public abstract class EditableInfo extends Info {
 
     /** Hide/Show advanced panels. */
     public void updateAdvancedPanels() {
-        final boolean expertMode = Tools.getConfigData().getExpertMode();
+        final boolean advancedMode = Tools.getConfigData().isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    apl.setVisible(expertMode);
+                    apl.setVisible(advancedMode);
                 }
             });
             advanced = true;
@@ -926,7 +933,7 @@ public abstract class EditableInfo extends Info {
         for (final JPanel p : advancedOnlySectionList) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    p.setVisible(expertMode);
+                    p.setVisible(advancedMode);
                 }
             });
             advanced = true;
@@ -934,7 +941,7 @@ public abstract class EditableInfo extends Info {
         final boolean a = advanced;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                moreOptionsPanel.setVisible(a && !expertMode);
+                moreOptionsPanel.setVisible(a && !advancedMode);
             }
         });
     }

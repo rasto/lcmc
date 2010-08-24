@@ -72,7 +72,6 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                                new HashMap<String, Object[]>();
     static {
-        //DEFAULTS_MAP.put(InputDevData.BUS, "usb");
         POSSIBLE_VALUES.put(InputDevData.TYPE,
                             new String[]{"tablet", "mouse"});
         POSSIBLE_VALUES.put(InputDevData.BUS,
@@ -85,7 +84,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Adds disk table with only this disk to the main panel. */
-    protected void addHardwareTable(final JPanel mainPanel) {
+    protected final void addHardwareTable(final JPanel mainPanel) {
         mainPanel.add(getTablePanel("Input Devices",
                                     VMSVirtualDomainInfo.INPUTDEVS_TABLE));
     }
@@ -97,12 +96,16 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Returns long description of the specified parameter. */
     protected final String getParamLongDesc(final String param) {
-        return SHORTNAME_MAP.get(param);
+        return getParamShortDesc(param);
     }
 
     /** Returns short description of the specified parameter. */
     protected final String getParamShortDesc(final String param) {
-        return SHORTNAME_MAP.get(param);
+        final String name = SHORTNAME_MAP.get(param);
+        if (name == null) {
+            return param;
+        }
+        return name;
     }
 
     /** Returns preferred value for specified parameter. */
@@ -182,7 +185,6 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
         });
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
-        String type = null;
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
             if (!Tools.areEqual(getParamSaved(param), value)) {
@@ -193,10 +195,12 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
+                parameters.put(InputDevData.SAVED_TYPE,
+                               getParamSaved(InputDevData.TYPE));
+                parameters.put(InputDevData.SAVED_BUS,
+                               getParamSaved(InputDevData.BUS));
                 vmsxml.modifyInputDevXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
-                                    parameters.get(InputDevData.TYPE),
-                                    parameters.get(InputDevData.BUS),
                                     parameters);
             }
             getResource().setNew(false);
@@ -235,8 +239,12 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
-         return !IS_ENABLED_ONLY_IN_ADVANCED.contains(param)
-                || Tools.getConfigData().getExpertMode();
+        return true;
+    }
+
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
     }
 
     /** Returns access type of this parameter. */
@@ -252,16 +260,6 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
         }
         return true;
     }
-
-    ///** Returns combo box for parameter. */
-    //protected final GuiComboBox getParamComboBox(final String param,
-    //                                       final String prefix,
-    //                                       final int width) {
-    //    final GuiComboBox paramCB = super.getParamComboBox(param,
-    //                                                       prefix,
-    //                                                       width);
-    //    return paramCB;
-    //}
 
     /** Updates parameters. */
     public final void updateParameters() {
@@ -299,7 +297,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns string representation. */
-    public String toString() {
+    public final String toString() {
         final StringBuffer s = new StringBuffer(30);
         final String type = getParamSaved(InputDevData.TYPE);
         if (type == null) {
@@ -314,23 +312,26 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
             s.append(bus);
             s.append(')');
         }
-        s.append(" /");
-        s.append(getName());
         return s.toString();
     }
 
     /** Removes this input device without confirmation dialog. */
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
+    protected final void removeMyselfNoConfirm(final boolean testOnly) {
         if (testOnly) {
             return;
         }
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
+                final Map<String, String> parameters =
+                                                new HashMap<String, String>();
+                parameters.put(InputDevData.SAVED_TYPE,
+                               getParamSaved(InputDevData.TYPE));
+                parameters.put(InputDevData.SAVED_BUS,
+                               getParamSaved(InputDevData.BUS));
                 vmsxml.removeInputDevXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
-                                    getParamSaved(InputDevData.TYPE),
-                                    getParamSaved(InputDevData.BUS));
+                                    parameters);
             }
         }
         for (final Host h : getBrowser().getClusterHosts()) {

@@ -24,6 +24,7 @@ package drbd.gui.dialog.cluster;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.SSH.ExecCommandThread;
@@ -243,7 +244,9 @@ public class CommStack extends DialogCluster {
                                            null, /* regexp */
                                            500,
                                            null, /* abbrv */
-                                           ConfigData.AccessType.ADMIN);
+                                           new AccessMode(
+                                                  ConfigData.AccessType.ADMIN,
+                                                  false)); /* only adv. mode */
         chooseStackCombo.setEnabled(ConfigData.COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);

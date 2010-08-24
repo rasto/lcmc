@@ -882,7 +882,7 @@ public final class RoboTest {
         unmigrateResource(robot, gx, gy, 25);
         sleep(5000);
         checkTest(host, "test1", 28);
-        stopResource(robot, ipX,ipY, 0);
+        stopResource(robot, ipX, ipY, 0);
         sleep(5000);
         stopGroup(robot, gx, gy, 15);
         sleep(5000);

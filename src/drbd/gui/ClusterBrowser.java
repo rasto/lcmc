@@ -1786,7 +1786,7 @@ public class ClusterBrowser extends Browser {
                 } else {
                     pmId = Service.CL_ID_PREFIX;
                 }
-            } else if ((si.getResourceAgent().isStonith()))  {
+            } else if (si.getResourceAgent().isStonith())  {
                 pmId = Service.STONITH_ID_PREFIX
                        + si.getService().getName()
                        + "_";

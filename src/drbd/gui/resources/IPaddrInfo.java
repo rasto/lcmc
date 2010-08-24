@@ -24,6 +24,7 @@ package drbd.gui.resources;
 import drbd.gui.Browser;
 import drbd.gui.GuiComboBox;
 import drbd.data.ResourceAgent;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 
 import java.util.Map;
@@ -114,7 +115,9 @@ class IPaddrInfo extends ServiceInfo {
                                       regexp,
                                       width,
                                       null, /* abbrv */
-                                      getAccessType(param));
+                                      new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)));
 
             paramCb.setAlwaysEditable(true);
             paramComboBoxAdd(param, prefix, paramCb);

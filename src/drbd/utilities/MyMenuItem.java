@@ -22,6 +22,7 @@
 package drbd.utilities;
 
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -72,9 +73,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Tooltip background color. */
     private Color toolTipBackground = null;
     /** Access Type for this component to become enabled. */
-    private final ConfigData.AccessType enableAccessType;
+    private final AccessMode enableAccessMode;
     /** Access Type for this component to become visible. */
-    private final ConfigData.AccessType visibleAccessType;
+    private final AccessMode visibleAccessMode;
 
     /**
      * Prepares a new <code>MyMenuItem</code> object with icon but without
@@ -87,13 +88,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      */
     public MyMenuItem(final String text,
                       final ImageIcon icon,
-                      final ConfigData.AccessType enableAccessType,
-                      final ConfigData.AccessType visibleAccessType) {
+                      final AccessMode enableAccessMode,
+                      final AccessMode visibleAccessMode) {
         super(text);
         this.text1 = text;
         this.icon1 = icon;
-        this.enableAccessType = enableAccessType;
-        this.visibleAccessType = visibleAccessType;
+        this.enableAccessMode = enableAccessMode;
+        this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
         setNormalFont();
         addActionListener(this);
@@ -119,23 +120,23 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     public MyMenuItem(final String text,
                       final ImageIcon icon,
                       final String shortDesc,
-                      final ConfigData.AccessType enableAccessType,
-                      final ConfigData.AccessType visibleAccessType) {
+                      final AccessMode enableAccessMode,
+                      final AccessMode visibleAccessMode) {
         super(text);
         toolTip = createToolTip();
         setNormalFont();
         this.text1 = text;
         this.icon1 = icon;
         this.shortDesc1 = shortDesc;
-        this.enableAccessType = enableAccessType;
-        this.visibleAccessType = visibleAccessType;
+        this.enableAccessMode = enableAccessMode;
+        this.visibleAccessMode = visibleAccessMode;
         addActionListener(this);
         try {
             robot = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        processAccessType(); //TODO: should not be called here
+        processAccessMode(); //TODO: should not be called here
     }
 
     /**
@@ -161,9 +162,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                       final String text2,
                       final ImageIcon icon2,
                       final String shortDesc2,
-                      final ConfigData.AccessType enableAccessType,
-                      final ConfigData.AccessType visibleAccessType) {
-        this(text1a, icon1a, shortDesc1a, enableAccessType, visibleAccessType);
+                      final AccessMode enableAccessMode,
+                      final AccessMode visibleAccessMode) {
+        this(text1a, icon1a, shortDesc1a, enableAccessMode, visibleAccessMode);
         this.text2 = text2;
         this.icon2 = icon2;
         this.shortDesc2 = shortDesc2;
@@ -256,23 +257,30 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                 toolTip.setTipText(shortDesc2);
             }
         }
-        processAccessType();
+        processAccessMode();
     }
 
     /** Sets this item enabled and visible according to its access type. */
-    private void processAccessType() {
+    private void processAccessMode() {
         final boolean accessible =
-                   Tools.getConfigData().isAccessible(enableAccessType);
+                   Tools.getConfigData().isAccessible(enableAccessMode);
         setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
-                   && Tools.getConfigData().isAccessible(visibleAccessType));
+                   && Tools.getConfigData().isAccessible(visibleAccessMode));
+        String advanced = "";
+        if (enableAccessMode.isAdvancedMode()) {
+            advanced = "Advanced ";
+        }
         if (isVisible()
             && !accessible
-            && enableAccessType != ConfigData.AccessType.NEVER) {
+            && enableAccessMode.getAccessType()
+               != ConfigData.AccessType.NEVER) {
             setToolTipText("<html><b>"
                            + getText()
                            + " (disabled)</b><br>available in \""
-                           + ConfigData.OP_MODES_MAP.get(enableAccessType)
+                           + advanced
+                           + ConfigData.OP_MODES_MAP.get(
+                                            enableAccessMode.getAccessType())
                            + "\" mode</html>");
         }
     }

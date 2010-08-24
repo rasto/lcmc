@@ -102,7 +102,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Returns panal with user visible info. */
-    protected JPanel getLabels(final HbConstraintInterface c) {
+    protected final JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
         final int rows = 1;

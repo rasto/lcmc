@@ -23,6 +23,7 @@ package drbd.gui.dialog.cluster;
 
 import drbd.data.Cluster;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
@@ -164,7 +165,8 @@ public class Name extends DialogCluster {
                                     regexp,
                                     NAME_FIELD_WIDTH,
                                     null, /* abbrv */
-                                    ConfigData.AccessType.RO);
+                                    new AccessMode(ConfigData.AccessType.RO,
+                                                   false)); /* only adv. mode */
         addCheckField(nameField);
         nameLabel.setLabelFor(nameField);
         pane.add(nameField);

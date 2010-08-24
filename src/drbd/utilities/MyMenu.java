@@ -22,6 +22,7 @@
 package drbd.utilities;
 
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import javax.swing.JMenu;
 import java.awt.geom.Point2D;
 
@@ -34,21 +35,21 @@ public class MyMenu extends JMenu implements UpdatableItem {
     /** Position of the menu that can be stored and retrieved. */
     private Point2D pos = null;
     /** Access Type for this component to become enabled. */
-    private final ConfigData.AccessType enableAccessType;
+    private final AccessMode enableAccessMode;
     /** Access Type for this component to become visible. */
-    private final ConfigData.AccessType visibleAccessType;
+    private final AccessMode visibleAccessMode;
 
     /**
      * Prepares a new <code>MyMenu</code> object.
      */
     public MyMenu(final String text,
-                  final ConfigData.AccessType enableAccessType,
-                  final ConfigData.AccessType visibleAccessType) {
+                  final AccessMode enableAccessMode,
+                  final AccessMode visibleAccessMode) {
         super(text);
-        this.enableAccessType = enableAccessType;
-        this.visibleAccessType = visibleAccessType;
+        this.enableAccessMode = enableAccessMode;
+        this.visibleAccessMode = visibleAccessMode;
         setOpaque(false);
-        processAccessType(); //TODO: should not be called here
+        processAccessMode(); //TODO: should not be called here
     }
 
     /**
@@ -91,23 +92,30 @@ public class MyMenu extends JMenu implements UpdatableItem {
      * items are to be updated.
      */
     public void update() {
-        processAccessType();
+        processAccessMode();
     }
 
     /** Sets this item enabled and visible according to its access type. */
-    private void processAccessType() {
+    private void processAccessMode() {
         final boolean accessible =
-                   Tools.getConfigData().isAccessible(enableAccessType);
+                   Tools.getConfigData().isAccessible(enableAccessMode);
         setEnabled(enablePredicate() && accessible);
         setVisible(visiblePredicate()
-                   && Tools.getConfigData().isAccessible(visibleAccessType));
+                   && Tools.getConfigData().isAccessible(visibleAccessMode));
+        String advanced = "";
+        if (enableAccessMode.isAdvancedMode()) {
+            advanced = "Advanced ";
+        }
         if (isVisible()
             && !accessible
-            && enableAccessType != ConfigData.AccessType.NEVER) {
+            && enableAccessMode.getAccessType()
+               != ConfigData.AccessType.NEVER) {
             setToolTipText("<html><b>"
                            + getText()
                            + " (disabled)</b><br>available in \""
-                           + ConfigData.OP_MODES_MAP.get(enableAccessType)
+                           + advanced
+                           + ConfigData.OP_MODES_MAP.get(
+                                            enableAccessMode.getAccessType())
                            + "\" mode</html>");
         }
     }

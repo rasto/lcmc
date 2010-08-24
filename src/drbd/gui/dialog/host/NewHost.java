@@ -23,6 +23,7 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.TerminalPanel;
@@ -268,7 +269,8 @@ public class NewHost extends DialogHost {
                                     regexp,
                                     FIELD_WIDTH,
                                     null, /* abbrv */
-                                    ConfigData.AccessType.RO);
+                                    new AccessMode(ConfigData.AccessType.RO,
+                                                   false)); /* only adv. mode */
 
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField);
@@ -296,7 +298,8 @@ public class NewHost extends DialogHost {
                                        "^\\d+$",
                                        50,
                                        null, /* abbrv */
-                                       ConfigData.AccessType.RO);
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      false)); /* only adv. */
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField);
         inputPane.add(sshPortField);
@@ -331,7 +334,8 @@ public class NewHost extends DialogHost {
                                     regexp,
                                     FIELD_WIDTH,
                                     null, /* abbrv */
-                                    ConfigData.AccessType.RO);
+                                    new AccessMode(ConfigData.AccessType.RO,
+                                                   false)); /* only adv. mode */
         usernameField.setEditable(true);
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField);
@@ -359,7 +363,8 @@ public class NewHost extends DialogHost {
                                    null, /* regexp */
                                    50,
                                    null, /* abbrv */
-                                   ConfigData.AccessType.RO);
+                                   new AccessMode(ConfigData.AccessType.RO,
+                                                  false)); /* only adv. mode */
         //addCheckField(useSudoField);
         useSudoLabel.setLabelFor(useSudoField);
         inputPane.add(useSudoField);

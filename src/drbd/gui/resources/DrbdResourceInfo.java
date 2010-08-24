@@ -34,6 +34,7 @@ import drbd.data.Host;
 import drbd.data.DrbdXML;
 import drbd.data.DRBDtestData;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
@@ -361,7 +362,7 @@ public class DrbdResourceInfo extends EditableInfo
     }
 
     /** Returns the regexp of the parameter. */
-    protected String getParamRegexp(String param) {
+    protected String getParamRegexp(final String param) {
         return null;
     }
 
@@ -446,6 +447,11 @@ public class DrbdResourceInfo extends EditableInfo
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
         return true;
+    }
+
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+        return false;
     }
 
     /** Returns whether this drbd parameter is of integer type. */
@@ -533,7 +539,9 @@ public class DrbdResourceInfo extends EditableInfo
                                       null, /* regexp */
                                       width,
                                       null, /* abbrv */
-                                      getAccessType(param));
+                                      new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)));
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
         } else if (ClusterBrowser.DRBD_RES_PARAM_DEV.equals(param)) {
@@ -563,7 +571,9 @@ public class DrbdResourceInfo extends EditableInfo
                                           null, /* regexp */
                                           width,
                                           null, /* abbrv */
-                                          getAccessType(param));
+                                          new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)));
                 paramCb.setEditable(true);
             } else {
                 final String defaultItem = getDevice();
@@ -579,7 +589,9 @@ public class DrbdResourceInfo extends EditableInfo
                                        regexp,
                                        width,
                                        null, /* abbrv */
-                                       getAccessType(param));
+                                       new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)));
             }
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
@@ -626,7 +638,9 @@ public class DrbdResourceInfo extends EditableInfo
                                       null, /* regexp */
                                       width,
                                       null, /* abbrv */
-                                      getAccessType(param));
+                                      new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)));
 
             paramComboBoxAdd(param, prefix, paramCb);
         } else if (hasUnitPrefix(param)) {
@@ -683,7 +697,9 @@ public class DrbdResourceInfo extends EditableInfo
                                       regexp,
                                       width,
                                       null, /* abbrv */
-                                      getAccessType(param));
+                                      new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)));
 
             paramComboBoxAdd(param, prefix, paramCb);
         } else {
@@ -1119,8 +1135,8 @@ public class DrbdResourceInfo extends EditableInfo
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect"),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
-            ConfigData.AccessType.OP,
-            ConfigData.AccessType.OP) {
+            new AccessMode(ConfigData.AccessType.OP, true),
+            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1129,8 +1145,10 @@ public class DrbdResourceInfo extends EditableInfo
             }
 
             public boolean enablePredicate() {
-                if (!Tools.getConfigData().getExpertMode()
-                    && isUsedByCRM()) {
+                //if (!Tools.getConfigData().isAdvancedMode() // TODO: use access
+                //                                            // type for this
+                //                                            // everywhere
+                if (isUsedByCRM()) {
                     return false;
                 }
                 return !isSyncing();
@@ -1189,8 +1207,8 @@ public class DrbdResourceInfo extends EditableInfo
            Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
            null,
            Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
-           ConfigData.AccessType.OP,
-           ConfigData.AccessType.OP) {
+           new AccessMode(ConfigData.AccessType.OP, false),
+           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {
@@ -1227,8 +1245,8 @@ public class DrbdResourceInfo extends EditableInfo
                 null,
                 Tools.getString(
                             "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
-                ConfigData.AccessType.OP,
-                ConfigData.AccessType.OP) {
+                new AccessMode(ConfigData.AccessType.OP, false),
+                new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1247,8 +1265,8 @@ public class DrbdResourceInfo extends EditableInfo
                 Tools.getString("ClusterBrowser.Drbd.Verify"),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
-                ConfigData.AccessType.OP,
-                ConfigData.AccessType.OP) {
+                new AccessMode(ConfigData.AccessType.OP, false),
+                new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1269,8 +1287,8 @@ public class DrbdResourceInfo extends EditableInfo
                         ClusterBrowser.REMOVE_ICON,
                         Tools.getString(
                                 "ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
-                        ConfigData.AccessType.ADMIN,
-                        ConfigData.AccessType.OP) {
+                        new AccessMode(ConfigData.AccessType.ADMIN, false),
+                        new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             public void action() {
                 /* this drbdResourceInfo remove myself and this calls
@@ -1287,11 +1305,11 @@ public class DrbdResourceInfo extends EditableInfo
 
         /* view log */
         final MyMenuItem viewLogMenu = new MyMenuItem(
-                               Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
-                               LOGFILE_ICON,
-                               null,
-                               ConfigData.AccessType.RO,
-                               ConfigData.AccessType.RO) {
+                           Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
+                           LOGFILE_ICON,
+                           null,
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
 
             private static final long serialVersionUID = 1L;
 

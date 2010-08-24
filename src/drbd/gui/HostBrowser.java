@@ -28,6 +28,7 @@ import drbd.data.resources.BlockDevice;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.FSInfo;
 import drbd.gui.resources.HostDrbdInfo;
@@ -366,9 +367,9 @@ public class HostBrowser extends Browser {
     }
 
     /**
-     * Adds expert submenu to the host menus in drbd and pacemaker view.
+     * Adds advanced submenu to the host menus in drbd and pacemaker view.
      */
-    public final void addExpertMenu(final MyMenu submenu) {
+    public final void addAdvancedMenu(final MyMenu submenu) {
         if (submenu.getItemCount() > 0) {
             return;
         }
@@ -377,8 +378,8 @@ public class HostBrowser extends Browser {
                     Tools.getString("HostBrowser.MakeKernelPanic")
                     + host.getName(),
                     null,
-                    ConfigData.AccessType.GOD,
-                    ConfigData.AccessType.ADMIN) {
+                    new AccessMode(ConfigData.AccessType.GOD, false),
+                    new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -407,8 +408,8 @@ public class HostBrowser extends Browser {
                     Tools.getString("HostBrowser.MakeKernelReboot")
                     + host.getName(),
                     null,
-                    ConfigData.AccessType.GOD,
-                    ConfigData.AccessType.ADMIN) {
+                    new AccessMode(ConfigData.AccessType.GOD, false),
+                    new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {

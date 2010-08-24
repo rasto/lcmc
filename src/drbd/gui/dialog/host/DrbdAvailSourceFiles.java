@@ -23,6 +23,7 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.utilities.ComboInfo;
@@ -199,7 +200,9 @@ public class DrbdAvailSourceFiles extends DialogHost {
                                            null, /* regexp */
                                            0,    /* width */
                                            null, /* abbrv */
-                                           ConfigData.AccessType.RO);
+                                           new AccessMode(
+                                                    ConfigData.AccessType.RO,
+                                                    false)); /* only adv mode*/
 
         //drbdTarballCombo.setEnabled(false);
         pane.add(drbdTarballCombo);

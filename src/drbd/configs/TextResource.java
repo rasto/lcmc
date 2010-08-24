@@ -1074,7 +1074,7 @@ public class TextResource extends
         {"Browser.ParamType",
          "Type: "},
 
-        {"Browser.ExpertMode",
+        {"Browser.AdvancedMode",
          "Advanced"},
 
         {"Browser.ApplyResource",
@@ -1083,7 +1083,7 @@ public class TextResource extends
         {"ClusterBrowser.Host.Disconnected",
          "Disconnected"},
 
-        {"ClusterBrowser.ExpertSubmenu",
+        {"ClusterBrowser.AdvancedSubmenu",
          "More Options"},
 
         {"ClusterBrowser.Host.Offline",
@@ -1617,7 +1617,7 @@ public class TextResource extends
         {"HostBrowser.Hb.NoInfoAvailable",
          "no info available"},
 
-        {"HostBrowser.ExpertSubmenu",
+        {"HostBrowser.AdvancedSubmenu",
          "More Options"},
 
         {"HostBrowser.MakeKernelPanic",
@@ -1871,6 +1871,21 @@ public class TextResource extends
         {"VMSVirtualDomainInfo.AddNewInputDev",
          "New Input Device"},
 
+        {"VMSVirtualDomainInfo.AddNewGraphics",
+         "New Graphics Device"},
+
+        {"VMSVirtualDomainInfo.AddNewSound",
+         "New Sound Device"},
+
+        {"VMSVirtualDomainInfo.AddNewSerial",
+         "New Serial Device"},
+
+        {"VMSVirtualDomainInfo.AddNewParallel",
+         "New Parallel Device"},
+
+        {"VMSVirtualDomainInfo.AddNewVideo",
+         "New Video Device"},
+
         {"VMSVirtualDomainInfo.AddNewHardware",
          "Add Virtual Hardware"},
 
@@ -1913,9 +1928,24 @@ public class TextResource extends
 
         {"VMSDiskInfo.Approve",
          "Select"},
+
         {"VMSDiskInfo.Approve.ToolTip",
          "Select this image."},
 
+        {"VMSVideoInfo.ModelType",
+         "Type"},
+
+        {"VMSVideoInfo.ModelVRAM",
+         "Video Memory (Kb)"},
+
+        {"VMSVideoInfo.ModelHeads",
+         "Number of Screens"},
+
+        {"VMSVideoInfo.ModelVRAM.ToolTip",
+         "Video Memory in kilobytes (VRAM)"},
+
+        {"VMSVideoInfo.ModelHeads.ToolTip",
+         "Number of Screens (Heads)"},
 
         {"VMSHardwareInfo.Menu.Remove",
          "Remove"},

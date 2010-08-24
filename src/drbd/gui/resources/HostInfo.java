@@ -33,6 +33,7 @@ import drbd.utilities.UpdatableItem;
 import drbd.data.Subtext;
 import drbd.data.ClusterStatus;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.ExecCallback;
@@ -257,8 +258,8 @@ public class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
                            null,
-                           ConfigData.AccessType.RO,
-                           ConfigData.AccessType.RO) {
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -282,8 +283,8 @@ public class HostInfo extends Info {
                            Tools.getString("HostBrowser.CRM.StandByOff"),
                            HOST_STANDBY_OFF_ICON,
                            null,
-                           ConfigData.AccessType.OP,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean predicate() {
@@ -322,8 +323,8 @@ public class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            null,
                            null,
-                           ConfigData.AccessType.RO,
-                           ConfigData.AccessType.RO) {
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -348,8 +349,8 @@ public class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            null,
-                           ConfigData.AccessType.RO,
-                           ConfigData.AccessType.RO) {
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -363,11 +364,11 @@ public class HostInfo extends Info {
                 }
             };
         items.add(viewLogsItem);
-        /* expert options */
-        final MyMenu hostExpertSubmenu = new MyMenu(
-                        Tools.getString("HostBrowser.ExpertSubmenu"),
-                        ConfigData.AccessType.OP,
-                        ConfigData.AccessType.OP) {
+        /* advacend options */
+        final MyMenu hostAdvancedSubmenu = new MyMenu(
+                        Tools.getString("HostBrowser.AdvancedSubmenu"),
+                        new AccessMode(ConfigData.AccessType.OP, false),
+                        new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             public boolean enablePredicate() {
                 return host.isConnected();
@@ -375,18 +376,18 @@ public class HostInfo extends Info {
 
             public void update() {
                 super.update();
-                getBrowser().addExpertMenu(this);
+                getBrowser().addAdvancedMenu(this);
             }
         };
-        items.add(hostExpertSubmenu);
+        items.add(hostAdvancedSubmenu);
 
         /* remove host from gui */
         final MyMenuItem removeHostItem =
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
                            null,
-                           ConfigData.AccessType.RO,
-                           ConfigData.AccessType.RO) {
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

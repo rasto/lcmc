@@ -29,6 +29,7 @@ import drbd.data.VMSXML.DiskData;
 import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.data.LinuxFile;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
@@ -188,7 +189,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     }
 
     /** Adds disk table with only this disk to the main panel. */
-    protected void addHardwareTable(final JPanel mainPanel) {
+    protected final void addHardwareTable(final JPanel mainPanel) {
        mainPanel.add(getTablePanel("Disk", VMSVirtualDomainInfo.DISK_TABLE));
     }
 
@@ -199,12 +200,16 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Returns long description of the specified parameter. */
     protected final String getParamLongDesc(final String param) {
-        return SHORTNAME_MAP.get(param);
+        return getParamShortDesc(param);
     }
 
     /** Returns short description of the specified parameter. */
     protected final String getParamShortDesc(final String param) {
-        return SHORTNAME_MAP.get(param);
+        final String name = SHORTNAME_MAP.get(param);
+        if (name == null) {
+            return param;
+        }
+        return name;
     }
 
     /** Returns preferred value for specified parameter. */
@@ -341,9 +346,9 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
+                    parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
                     vmsxml.modifyDiskXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
-                                    getName(),
                                     parameters);
                 }
             }
@@ -422,13 +427,11 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 }
                 final String saved = getParamSaved(DiskData.TARGET_DEVICE);
                 String selected = null;
-                if (!devices.add(saved)) {
-                    /* it was there */
-                }
+                devices.add(saved);
                 if (prevTargetBusType == null && saved != null) {
                     selected = saved;
                 } else if (devices.size() > 1) {
-                    selected = devices.toArray(new String[0])[1];
+                    selected = devices.toArray(new String[devices.size()])[1];
                 }
                 targetDeviceCB.reloadComboBox(
                                 selected,
@@ -457,8 +460,12 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
-         return !IS_ENABLED_ONLY_IN_ADVANCED.contains(param)
-                || Tools.getConfigData().getExpertMode();
+        return true;
+    }
+
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
     }
 
     /** Updates parameters. */
@@ -632,11 +639,10 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                        Tools.getGUIData().getMainFrame(),
                                        Tools.getString("VMSDiskInfo.Approve"));
         linuxFileCache.clear();
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            if (fc.getSelectedFile() != null) {
-                final String name = fc.getSelectedFile().getAbsolutePath();
-                paramCB.setValue(name);
-            }
+        if (ret == JFileChooser.APPROVE_OPTION
+            && fc.getSelectedFile() != null) {
+            final String name = fc.getSelectedFile().getAbsolutePath();
+            paramCB.setValue(name);
         }
     }
 
@@ -648,15 +654,17 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
             final String regexp = "[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
-            final GuiComboBox paramCB = new GuiComboBox(sourceFile,
-                                      null,
-                                      null, /* units */
-                                      GuiComboBox.Type.TEXTFIELDWITHBUTTON,
-                                      regexp,
-                                      width,
-                                      null, /* abbrv */
-                                      getAccessType(param),
-                                      fileChooserBtn);
+            final GuiComboBox paramCB = new GuiComboBox(
+                                  sourceFile,
+                                  null,
+                                  null, /* units */
+                                  GuiComboBox.Type.TEXTFIELDWITHBUTTON,
+                                  regexp,
+                                  width,
+                                  null, /* abbrv */
+                                  new AccessMode(getAccessType(param),
+                                                 false), /* only adv. mode */
+                                  fileChooserBtn);
             sourceFileCB = paramCB;
             if (Tools.isWindows()) {
                 /* does not work on windows and I tries, ultimatly because
@@ -709,9 +717,11 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                vmsxml.removeDiskXML(
-                                getVMSVirtualDomainInfo().getDomainName(),
-                                getName());
+                final Map<String, String> parameters =
+                                                new HashMap<String, String>();
+                parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
+                vmsxml.removeDiskXML(getVMSVirtualDomainInfo().getDomainName(),
+                                     parameters);
             }
         }
         for (final Host h : getBrowser().getClusterHosts()) {
@@ -720,7 +730,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     }
 
     /** Returns string representation. */
-    public String toString() {
+    public final String toString() {
         final StringBuffer s = new StringBuffer(30);
         final String name = getName();
         if (name == null) {

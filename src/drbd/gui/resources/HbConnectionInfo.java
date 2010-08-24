@@ -28,6 +28,7 @@ import drbd.data.Host;
 import drbd.data.PtestData;
 import drbd.data.ClusterStatus;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.Tools;
@@ -513,8 +514,8 @@ public class HbConnectionInfo extends EditableInfo {
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge"),
                      ClusterBrowser.REMOVE_ICON,
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
-                     ConfigData.AccessType.ADMIN,
-                     ConfigData.AccessType.OP) {
+                     new AccessMode(ConfigData.AccessType.ADMIN, false),
+                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -554,8 +555,8 @@ public class HbConnectionInfo extends EditableInfo {
                 Tools.getString("ClusterBrowser.Hb.AddOrder"),
                 null,
                 Tools.getString("ClusterBrowser.Hb.AddOrder.ToolTip"),
-                ConfigData.AccessType.ADMIN,
-                ConfigData.AccessType.OP) {
+                new AccessMode(ConfigData.AccessType.ADMIN, false),
+                new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {
@@ -628,8 +629,8 @@ public class HbConnectionInfo extends EditableInfo {
                     null,
                     Tools.getString(
                             "ClusterBrowser.Hb.AddColocation.ToolTip"),
-                    ConfigData.AccessType.ADMIN,
-                    ConfigData.AccessType.OP) {
+                    new AccessMode(ConfigData.AccessType.ADMIN, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean predicate() {
@@ -920,6 +921,11 @@ public class HbConnectionInfo extends EditableInfo {
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
         return true;
+    }
+
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+         return false;
     }
 
     /** Hide/Show advanced panels. */

@@ -27,6 +27,7 @@ import drbd.data.VMSXML;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
@@ -258,8 +259,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                     Tools.getString("VMSHardwareInfo.Menu.Remove"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    ConfigData.AccessType.ADMIN,
-                    ConfigData.AccessType.OP) {
+                    new AccessMode(ConfigData.AccessType.ADMIN, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {

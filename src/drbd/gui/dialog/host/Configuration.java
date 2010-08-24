@@ -24,6 +24,7 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
@@ -373,7 +374,8 @@ public class Configuration extends DialogHost {
                                     regexp,
                                     COMBO_BOX_WIDTH,
                                     null, /* abbrv */
-                                    ConfigData.AccessType.RO);
+                                    new AccessMode(ConfigData.AccessType.RO,
+                                                   false)); /* only adv. mode */
         inputPane.add(nameField);
         nameField.setBackground(getHost().getName(),
                                 getHost().getName(),
@@ -400,7 +402,9 @@ public class Configuration extends DialogHost {
                                                null, /* regexp*/
                                                COMBO_BOX_WIDTH,
                                                null, /* abbrv */
-                                               ConfigData.AccessType.RO);
+                                               new AccessMode(
+                                                    ConfigData.AccessType.RO,
+                                                    false)); /* only adv mode */
 
             inputPane.add(hostnameField[i]);
         }
@@ -420,7 +424,9 @@ public class Configuration extends DialogHost {
                                          null, /* regexp */
                                          COMBO_BOX_WIDTH,
                                          null, /* abbrv */
-                                         ConfigData.AccessType.RO);
+                                         new AccessMode(
+                                                     ConfigData.AccessType.RO,
+                                                     false)); /* only adv. */
 
             inputPane.add(ipCombo[i]);
             ipCombo[i].setEnabled(false);

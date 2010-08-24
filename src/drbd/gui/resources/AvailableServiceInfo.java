@@ -26,6 +26,7 @@ import drbd.gui.ClusterBrowser;
 import drbd.data.CRMXML;
 import drbd.data.ResourceAgent;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.MyMenuItem;
@@ -163,8 +164,8 @@ public class AvailableServiceInfo extends HbCategoryInfo {
                             "Add Service To Cluster",
                             null,
                             null,
-                            ConfigData.AccessType.ADMIN,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.ADMIN, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 

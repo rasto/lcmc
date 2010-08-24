@@ -34,6 +34,7 @@ import drbd.data.ConfigData;
 import drbd.data.Cluster;
 import drbd.data.AisCastAddress;
 import drbd.data.resources.NetInterface;
+import drbd.data.AccessMode;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 import drbd.gui.ProgressBar;
@@ -836,7 +837,8 @@ public class CoroConfig extends DialogCluster {
                                  null, /* regexp */
                                  TYPE_COMBOBOX_WIDTH,
                                  null, /* abbrv */
-                                 ConfigData.AccessType.RO);
+                                 new AccessMode(ConfigData.AccessType.RO,
+                                                false)); /* only adv. mode */
         typeCB.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
@@ -847,7 +849,8 @@ public class CoroConfig extends DialogCluster {
                                   null, /* regexp */
                                   INTF_COMBOBOX_WIDTH,
                                   null, /* abbrv */
-                                  ConfigData.AccessType.RO);
+                                  new AccessMode(ConfigData.AccessType.RO,
+                                                 false)); /* only adv. mode */
 
         /* this matches something like this: 225.0.0.43 694 1 0
          * if you think that the regexp is too complicated for that, consider,
@@ -862,7 +865,8 @@ public class CoroConfig extends DialogCluster {
               regexp,
               ADDR_COMBOBOX_WIDTH,
               null, /* abbrv */
-              ConfigData.AccessType.RO);
+              new AccessMode(ConfigData.AccessType.RO,
+                             false)); /* only adv. mode */
 
         final ItemListener typeL = new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
@@ -919,7 +923,8 @@ public class CoroConfig extends DialogCluster {
                 portRegexp,
                 PORT_COMBOBOX_WIDTH,
                 null, /* abbrv */
-                ConfigData.AccessType.RO);
+                new AccessMode(ConfigData.AccessType.RO,
+                               false)); /* only adv. mode */
         portCB.addListeners(portL, null);
 
         final DocumentListener addrL = new DocumentListener() {

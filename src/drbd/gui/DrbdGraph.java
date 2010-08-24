@@ -262,6 +262,7 @@ public class DrbdGraph extends ResourceGraph {
         }
     }
 
+    /** Scale and add hosts if they appeared. */
     public final void scale() {
         for (final HostDrbdInfo hostDrbdInfo : hostBDVerticesMap.keySet()) {
             addHost(hostDrbdInfo);

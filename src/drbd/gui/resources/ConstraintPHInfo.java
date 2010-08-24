@@ -29,6 +29,7 @@ import drbd.data.CRMXML;
 import drbd.data.ClusterStatus;
 import drbd.data.ConfigData;
 import drbd.data.Subtext;
+import drbd.data.AccessMode;
 import drbd.utilities.CRM;
 import drbd.utilities.Tools;
 import drbd.utilities.UpdatableItem;
@@ -305,6 +306,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Applies changes to the placeholder. */
     public final void apply(final Host dcHost, final boolean testOnly) {
+        /* apply is in resource set info object. */
     }
 
     /** Returns whether this parameter is advanced. */
@@ -327,7 +329,7 @@ public class ConstraintPHInfo extends ServiceInfo {
      * TODO: this id is used for stored position info, should be named
      * differently.
      */
-    public String getId() {
+    public final String getId() {
         String ordId = "";
         String colId = "";
         final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
@@ -368,8 +370,8 @@ public class ConstraintPHInfo extends ServiceInfo {
                     "Remove",
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    ConfigData.AccessType.ADMIN,
-                    ConfigData.AccessType.OP) {
+                    new AccessMode(ConfigData.AccessType.ADMIN, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -515,7 +517,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Adds constraint to or from placeholder. */
-    protected List<CRMXML.RscSet> addConstraintWithPlaceholder(
+    protected final List<CRMXML.RscSet> addConstraintWithPlaceholder(
                                       final List<ServiceInfo> servicesAll,
                                       final List<ServiceInfo> servicesFrom,
                                       final boolean colocationOnly,
@@ -965,11 +967,9 @@ public class ConstraintPHInfo extends ServiceInfo {
             }
             final List<String> ids = rscSet.getRscIds();
             for (int i = 0; i < ids.size(); i++) {
-                if (ids.get(i).equals(si.getHeartbeatId(true))) {
-                    if (i < ids.size() - 1) {
-                        return getBrowser().getServiceInfoFromCRMId(
-                                                               ids.get(i + 1));
-                    }
+                if (i < ids.size() - 1
+                    && ids.get(i).equals(si.getHeartbeatId(true))) {
+                    return getBrowser().getServiceInfoFromCRMId(ids.get(i + 1));
                 }
             }
         }
@@ -998,11 +998,8 @@ public class ConstraintPHInfo extends ServiceInfo {
             }
             final List<String> ids = rscSet.getRscIds();
             for (int i = ids.size() - 1; i >= 0; i--) {
-                if (ids.get(i).equals(si.getHeartbeatId(true))) {
-                    if (i > 0) {
-                        return getBrowser().getServiceInfoFromCRMId(
-                                                               ids.get(i - 1));
-                    }
+                if (i > 0 && ids.get(i).equals(si.getHeartbeatId(true))) {
+                    return getBrowser().getServiceInfoFromCRMId(ids.get(i - 1));
                 }
             }
         }
@@ -1010,16 +1007,16 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns the main text that appears in the graph. */
-    public String getMainTextForGraph() {
+    public final String getMainTextForGraph() {
         return getService().getId();
     }
 
     /** Returns text that appears above the icon in the graph. */
-    public String getIconTextForGraph(final boolean testOnly) {
+    public final String getIconTextForGraph(final boolean testOnly) {
         return "   PH";
     }
     /** Returns text with lines as array that appears in the cluster graph. */
-    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
         return null;
     }
 }

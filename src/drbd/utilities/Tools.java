@@ -154,11 +154,6 @@ public final class Tools {
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(
                                                           DIALOG_PANEL_WIDTH,
                                                           DIALOG_PANEL_HEIGHT);
-    ///** Array of expert pannels. */
-    //private static final List<JPanel> expertPanels = new ArrayList<JPanel>();
-    ///** Expert panel mutex. */
-    //private static final Mutex mExpertPanels = new Mutex();
-
     /** Previous index in the scrolling menu. */
     private static volatile int prevScrollingMenuIndex = -1;
     /** Text/html mime type. */

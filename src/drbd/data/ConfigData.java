@@ -93,8 +93,8 @@ public class ConfigData implements Serializable {
     private String savedDownloadPassword = "";
     /** If set to true user and password will be saved. */
     private boolean loginSave = true;
-    /** Whether it is an expert mode. */
-    private boolean expertMode = false;
+    /** Whether it is an advanced mode. */
+    private boolean advancedMode = false;
     /** Default save file. */
     private String saveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
     /** Known hosts object. */
@@ -302,15 +302,15 @@ public class ConfigData implements Serializable {
     }
 
     /**
-     * Sets global expert mode.
+     * Sets global advanced mode.
      */
-    public final void setExpertMode(final boolean expertMode) {
-        this.expertMode = expertMode;
+    public final void setAdvancedMode(final boolean advancedMode) {
+        this.advancedMode = advancedMode;
     }
 
-    /** Gets expert mode. */
-    public final boolean getExpertMode() {
-        return expertMode;
+    /** Gets advanced mode. */
+    public final boolean isAdvancedMode() {
+        return advancedMode;
     }
 
     /**
@@ -674,10 +674,12 @@ public class ConfigData implements Serializable {
 
     /**
      * Returns true if the access type is greater than the one that is
-     * required.
+     * required and advanced mode is required and we are not in advanced mode.
      */
-    public final boolean isAccessible(final AccessType required) {
-        return getAccessType().compareTo(required) >= 0;
+    public final boolean isAccessible(final AccessMode required) {
+        return getAccessType().compareTo(required.getAccessType()) > 0
+               || (getAccessType().compareTo(required.getAccessType()) == 0 
+                   && (advancedMode || !required.isAdvancedMode()));
     }
 
     /**

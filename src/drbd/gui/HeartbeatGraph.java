@@ -32,6 +32,7 @@ import drbd.gui.resources.ConstraintPHInfo;
 import drbd.data.Subtext;
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -693,11 +694,12 @@ public class HeartbeatGraph extends ResourceGraph {
         final boolean tOnly = isTestOnly();
         for (final ServiceInfo asi
                             : getClusterBrowser().getExistingServiceList(si)) {
-            final MyMenuItem mmi = new MyMenuItem(asi.toString(),
-                                                  null,
-                                                  null,
-                                                  ConfigData.AccessType.ADMIN,
-                                                  ConfigData.AccessType.OP) {
+            final MyMenuItem mmi = new MyMenuItem(
+                          asi.toString(),
+                          null,
+                          null,
+                          new AccessMode(ConfigData.AccessType.ADMIN, false),
+                          new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
                 public void action() {
                     si.addServicePanel(asi,

@@ -25,6 +25,7 @@ package drbd.gui.dialog.drbdConfig;
 import drbd.utilities.Tools;
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.gui.SpringUtilities;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.DrbdResourceInfo;
@@ -266,7 +267,8 @@ public class CreateFS extends DrbdConfig {
                                  null, /* regexp */
                                  COMBOBOX_WIDTH,
                                  null, /* abbrv */
-                                 ConfigData.AccessType.RO);
+                                 new AccessMode(ConfigData.AccessType.RO,
+                                                false)); /* only adv. mode */
         hostCB.addListeners(
             new  ItemListener() {
                 public void itemStateChanged(final ItemEvent e) {
@@ -302,7 +304,8 @@ public class CreateFS extends DrbdConfig {
                                        null, /* regexp */
                                        COMBOBOX_WIDTH,
                                        null, /* abbrv */
-                                       ConfigData.AccessType.RO);
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      false)); /* only adv. */
         inputPane.add(filesystemLabel);
         inputPane.add(filesystemCB);
         filesystemCB.addListeners(

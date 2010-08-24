@@ -472,4 +472,8 @@ public class HbOrderInfo extends EditableInfo
         return Integer.parseInt(score);
     }
 
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+         return false;
+    }
 }

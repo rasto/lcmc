@@ -24,7 +24,7 @@ package drbd.gui.resources;
 import drbd.gui.Browser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
-import drbd.data.VMSXML.InterfaceData;
+import drbd.data.VMSXML.ParallelData;
 import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.utilities.Tools;
@@ -36,28 +36,20 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Arrays;
 
 /**
- * This class holds info about Virtual Interfaces.
+ * This class holds info about virtual parallel device.
  */
-public class VMSInterfaceInfo extends VMSHardwareInfo {
-    /** Source network combo box, so that it can be disabled, depending on
-     * type. */
-    private GuiComboBox sourceNetworkCB = null;
-    /** Source bridge combo box, so that it can be disabled, depending on
-     * type. */
-    private GuiComboBox sourceBridgeCB = null;
-    /** Previous value of the type (network or bridge). */
-    private String prevType = null;
+public class VMSParallelInfo extends VMSHardwareInfo {
     /** Parameters. */
-    private static final String[] PARAMETERS = {InterfaceData.TYPE,
-                                                InterfaceData.MAC_ADDRESS,
-                                                InterfaceData.SOURCE_NETWORK,
-                                                InterfaceData.SOURCE_BRIDGE,
-                                                InterfaceData.TARGET_DEV,
-                                                InterfaceData.MODEL_TYPE};
+    private static final String[] PARAMETERS = {ParallelData.TYPE,
+                                                ParallelData.SOURCE_PATH,
+                                                ParallelData.SOURCE_MODE,
+                                                ParallelData.SOURCE_HOST,
+                                                ParallelData.PROTOCOL_TYPE,
+                                                ParallelData.TARGET_PORT};
+
     /** Field type. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
@@ -65,27 +57,16 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
-        FIELD_TYPES.put(InterfaceData.TYPE,
-                        GuiComboBox.Type.RADIOGROUP);
-        SHORTNAME_MAP.put(InterfaceData.TYPE, "Type");
-        SHORTNAME_MAP.put(InterfaceData.MAC_ADDRESS, "Mac Address");
-        SHORTNAME_MAP.put(InterfaceData.SOURCE_NETWORK, "Source Network");
-        SHORTNAME_MAP.put(InterfaceData.SOURCE_BRIDGE, "Source Bridge");
-        SHORTNAME_MAP.put(InterfaceData.TARGET_DEV, "Target Device");
-        SHORTNAME_MAP.put(InterfaceData.MODEL_TYPE, "Model Type");
+        SHORTNAME_MAP.put(ParallelData.TYPE, "Type");
     }
 
-    /** Whether the parameter is editable only in advanced mode. */
+    /** Whether the parameter is enabled only in advanced mode. */
     private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                InterfaceData.MAC_ADDRESS,
-                                                InterfaceData.TARGET_DEV,
-                                                InterfaceData.MODEL_TYPE}));
+                                                        new HashSet<String>();
 
     /** Whether the parameter is required. */
     private static final Set<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                InterfaceData.TYPE }));
+        new HashSet<String>(Arrays.asList(new String[]{ParallelData.TYPE}));
 
     /** Default name. */
     private static final Map<String, String> DEFAULTS_MAP =
@@ -94,28 +75,28 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                                new HashMap<String, Object[]>();
     static {
-        DEFAULTS_MAP.put(InterfaceData.MAC_ADDRESS, "generate");
-        POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE,
-                            new String[]{null,
-                                         "default",
-                                         "e1000",
-                                         "ne2k_pci",
-                                         "pcnet",
-                                         "rtl8139",
-                                         "virtio"});
-        POSSIBLE_VALUES.put(InterfaceData.TYPE,
-                            new String[]{"network", "bridge"});
+        POSSIBLE_VALUES.put(ParallelData.TYPE,
+                            new String[]{"dev",
+                                         "file",
+                                         "null",
+                                         "pipe",
+                                         "pty",
+                                         "stdio",
+                                         "tcp",
+                                         "udp",
+                                         "unix",
+                                         "vc"});
     }
-    /** Creates the VMSInterfaceInfo object. */
-    public VMSInterfaceInfo(final String name, final Browser browser,
-                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Creates the VMSParallelInfo object. */
+    public VMSParallelInfo(final String name, final Browser browser,
+                           final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Adds disk table with only this disk to the main panel. */
     protected final void addHardwareTable(final JPanel mainPanel) {
-        mainPanel.add(getTablePanel("Interfaces",
-                                    VMSVirtualDomainInfo.INTERFACES_TABLE));
+        mainPanel.add(getTablePanel("Displays",
+                                    VMSVirtualDomainInfo.PARALLEL_TABLE));
     }
 
     /** Returns service icon in the menu. */
@@ -154,42 +135,16 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
-        if (InterfaceData.SOURCE_NETWORK.equals(param)) {
-            for (final Host h : getBrowser().getClusterHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
-                    final List<String> networks = vmsxml.getNetworks();
-                    networks.add(0, null);
-                    return networks.toArray(new String[networks.size()]);
-                }
-            }
-        } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
-            for (final Host h : getBrowser().getClusterHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
-                    final List<String> bridges = h.getBridges();
-                    bridges.add(0, null);
-                    return bridges.toArray(new String[bridges.size()]);
-                }
-            }
-        }
         return POSSIBLE_VALUES.get(param);
     }
 
     /** Returns section to which the specified parameter belongs. */
     protected final String getSection(final String param) {
-        return "Interface Options";
+        return "Display Options";
     }
 
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
-        final String type = getComboBoxValue(InterfaceData.TYPE);
-        if ((InterfaceData.SOURCE_NETWORK.equals(param)
-             && "network".equals(type))
-            || (InterfaceData.SOURCE_BRIDGE.equals(param)
-                && "bridge".equals(type))) {
-            return true;
-        }
         return IS_REQUIRED.contains(param);
     }
 
@@ -220,9 +175,6 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns the regexp of the parameter. */
     protected final String getParamRegexp(final String param) {
-        if (VMSXML.InterfaceData.MAC_ADDRESS.equals(param)) {
-            return "^((([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2})|generate)?$";
-        }
         return null;
     }
 
@@ -243,21 +195,8 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         });
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
-        String type = null;
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
-            if (InterfaceData.TYPE.equals(param)) {
-                type = value;
-            }
-            if ("network".equals(type)
-                && InterfaceData.SOURCE_BRIDGE.equals(param)) {
-                getResource().setValue(param, null);
-                continue;
-            } else if ("bridge".equals(type)
-                && InterfaceData.SOURCE_NETWORK.equals(param)) {
-                getResource().setValue(param, null);
-                continue;
-            }
             if (!Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
@@ -266,13 +205,14 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
-                vmsxml.modifyInterfaceXML(
+                parameters.put(ParallelData.SAVED_TYPE,
+                               getParamSaved(ParallelData.TYPE));
+                vmsxml.modifyParallelXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters);
             }
             getResource().setNew(false);
-            setName(getParamSaved(InterfaceData.MAC_ADDRESS));
+            setName(getParamSaved(ParallelData.TYPE));
         }
         for (final Host h : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(h);
@@ -285,15 +225,15 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     protected final Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.INTERFACES_TABLE.equals(tableName)) {
+        } else if (VMSVirtualDomainInfo.PARALLEL_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
-            return new Object[][]{getVMSVirtualDomainInfo().getInterfaceDataRow(
-                                    getName(),
-                                    null,
-                                    getVMSVirtualDomainInfo().getInterfaces(),
-                                    true)};
+            return new Object[][]{getVMSVirtualDomainInfo().getParallelDataRow(
+                                getName(),
+                                null,
+                                getVMSVirtualDomainInfo().getParallels(),
+                                true)};
         }
         return new Object[][]{};
     }
@@ -321,52 +261,19 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     protected final boolean checkParam(final String param,
                                        final String newValue) {
-        if (InterfaceData.TYPE.equals(param)) {
-            if (!newValue.equals(prevType)) {
-                if (sourceNetworkCB != null) {
-                    sourceNetworkCB.setVisible("network".equals(newValue));
-                }
-                if (sourceBridgeCB != null) {
-                    sourceBridgeCB.setVisible("bridge".equals(newValue));
-                }
-                prevType = newValue;
-                checkResourceFields(InterfaceData.SOURCE_NETWORK,
-                                    getParametersFromXML());
-                checkResourceFields(InterfaceData.SOURCE_BRIDGE,
-                                    getParametersFromXML());
-            }
-        }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
         return true;
     }
-    /** Returns combo box for parameter. */
-    protected final GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        final GuiComboBox paramCB = super.getParamComboBox(param,
-                                                           prefix,
-                                                           width);
-        if (InterfaceData.TYPE.equals(param)) {
-            paramCB.setAlwaysEditable(false);
-        } else if (InterfaceData.SOURCE_NETWORK.equals(param)) {
-            sourceNetworkCB = paramCB;
-            paramCB.setAlwaysEditable(false);
-        } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
-            sourceBridgeCB = paramCB;
-            paramCB.setAlwaysEditable(false);
-        }
-        return paramCB;
-    }
 
     /** Updates parameters. */
     public final void updateParameters() {
-        final Map<String, InterfaceData> interfaces =
-                                    getVMSVirtualDomainInfo().getInterfaces();
-        if (interfaces != null) {
-            final InterfaceData interfaceData = interfaces.get(getName());
-            if (interfaceData != null) {
+        final Map<String, ParallelData> parallels =
+                              getVMSVirtualDomainInfo().getParallels();
+        if (parallels != null) {
+            final ParallelData parallelData = parallels.get(getName());
+            if (parallelData != null) {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
@@ -375,7 +282,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
                             final String savedValue =
-                                               interfaceData.getValue(param);
+                                                  parallelData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
                             }
@@ -392,38 +299,25 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             }
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.INTERFACES_TABLE);
+        updateTable(VMSVirtualDomainInfo.PARALLEL_TABLE);
     }
 
     /** Returns string representation. */
     public final String toString() {
         final StringBuffer s = new StringBuffer(30);
-        String source;
-        if ("network".equals(getParamSaved(InterfaceData.TYPE))) {
-            source = getParamSaved(InterfaceData.SOURCE_NETWORK);
+        final String type = getParamSaved(ParallelData.TYPE);
+        if (type == null) {
+            s.append("new parallel device...");
         } else {
-            source = getParamSaved(InterfaceData.SOURCE_BRIDGE);
-        }
-        if (source == null) {
-            s.append("new interface...");
-        } else {
-            s.append(source);
+            s.append(type);
         }
 
-        final String saved = getParamSaved(InterfaceData.MAC_ADDRESS);
-        if (saved != null) {
-            s.append(" (");
-            if (saved.length() > 8) {
-                s.append(saved.substring(8));
-            } else {
-                s.append(saved);
-            }
-            s.append(')');
-        }
+        s.append(" /");
+        s.append(getName());
         return s.toString();
     }
 
-    /** Removes this interface without confirmation dialog. */
+    /** Removes this parallel device without confirmation dialog. */
     protected final void removeMyselfNoConfirm(final boolean testOnly) {
         if (testOnly) {
             return;
@@ -433,8 +327,9 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             if (vmsxml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
-                parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
-                vmsxml.removeInterfaceXML(
+                parameters.put(ParallelData.SAVED_TYPE,
+                               getParamSaved(ParallelData.TYPE));
+                vmsxml.removeParallelXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters);
             }
@@ -447,5 +342,17 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns whether this item is removeable. */
     protected final boolean isRemoveable() {
         return true;
+    }
+
+    /** Returns combo box for parameter. */
+    protected final GuiComboBox getParamComboBox(final String param,
+                                                 final String prefix,
+                                                 final int width) {
+        final GuiComboBox paramCB =
+                             super.getParamComboBox(param, prefix, width);
+        if (ParallelData.TYPE.equals(param)) {
+            paramCB.setAlwaysEditable(false);
+        }
+        return paramCB;
     }
 }

@@ -23,6 +23,7 @@ package drbd.gui.resources;
 
 import drbd.data.ResourceAgent;
 import drbd.data.Host;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.SSH;
 import drbd.gui.GuiComboBox;
@@ -263,7 +264,9 @@ class FilesystemInfo extends ServiceInfo {
                                       null, /* regexp */
                                       width,
                                       null, /* abbrv */
-                                      getAccessType(param));
+                                      new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)));
             blockDeviceParamCb = paramCb;
             addParamComboListeners(paramCb);
             paramComboBoxAdd(param, prefix, paramCb);
@@ -282,7 +285,9 @@ class FilesystemInfo extends ServiceInfo {
                               null, /* regexp */
                               width,
                               null, /* abbrv */
-                              getAccessType(param));
+                              new AccessMode(
+                                       getAccessType(param),
+                                       isEnabledOnlyInAdvancedMode(param)));
             fstypeParamCb = paramCb;
 
             paramComboBoxAdd(param, prefix, paramCb);
@@ -314,7 +319,9 @@ class FilesystemInfo extends ServiceInfo {
                                       regexp,
                                       width,
                                       null, /* abbrv */
-                                      getAccessType(param));
+                                      new AccessMode(
+                                         getAccessType(param),
+                                         isEnabledOnlyInAdvancedMode(param)));
             paramComboBoxAdd(param, prefix, paramCb);
             paramCb.setAlwaysEditable(true);
         } else {

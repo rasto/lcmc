@@ -247,7 +247,7 @@ public class DrbdInfo extends EditableInfo {
     }
 
     /** Returns the regexp of the parameter. */
-    protected String getParamRegexp(String param) {
+    protected String getParamRegexp(final String param) {
         return null;
     }
 
@@ -771,5 +771,10 @@ public class DrbdInfo extends EditableInfo {
         } else {
             getBrowser().resetFilesystems();
         }
+    }
+
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+         return false;
     }
 }

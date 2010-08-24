@@ -29,9 +29,15 @@ import drbd.data.VMSXML;
 import drbd.data.VMSXML.DiskData;
 import drbd.data.VMSXML.InterfaceData;
 import drbd.data.VMSXML.InputDevData;
+import drbd.data.VMSXML.GraphicsData;
+import drbd.data.VMSXML.SoundData;
+import drbd.data.VMSXML.SerialData;
+import drbd.data.VMSXML.ParallelData;
+import drbd.data.VMSXML.VideoData;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenu;
@@ -118,10 +124,54 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Map from key to vms input device info object. */
     private final Map<String, VMSInputDevInfo> inputDevToInfo =
                                        new HashMap<String, VMSInputDevInfo>();
-    /** Map from target string in the table to vms interface info object.
-     */
+    /** Map from target string in the table to vms interface info object. */
     private volatile Map<String, VMSInputDevInfo> inputDevKeyToInfo =
                                        new HashMap<String, VMSInputDevInfo>();
+
+    /** Graphics device to info hash lock. */
+    private final Mutex mGraphicsToInfoLock = new Mutex();
+    /** Map from key to vms graphics device info object. */
+    private final Map<String, VMSGraphicsInfo> graphicsToInfo =
+                                       new HashMap<String, VMSGraphicsInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, VMSGraphicsInfo> graphicsKeyToInfo =
+                                       new HashMap<String, VMSGraphicsInfo>();
+
+    /** Sound device to info hash lock. */
+    private final Mutex mSoundToInfoLock = new Mutex();
+    /** Map from key to vms sound device info object. */
+    private final Map<String, VMSSoundInfo> soundToInfo =
+                                       new HashMap<String, VMSSoundInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, VMSSoundInfo> soundKeyToInfo =
+                                       new HashMap<String, VMSSoundInfo>();
+
+    /** Serial device to info hash lock. */
+    private final Mutex mSerialToInfoLock = new Mutex();
+    /** Map from key to vms serial device info object. */
+    private final Map<String, VMSSerialInfo> serialToInfo =
+                                       new HashMap<String, VMSSerialInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, VMSSerialInfo> serialKeyToInfo =
+                                       new HashMap<String, VMSSerialInfo>();
+
+    /** Parallel device to info hash lock. */
+    private final Mutex mParallelToInfoLock = new Mutex();
+    /** Map from key to vms parallel device info object. */
+    private final Map<String, VMSParallelInfo> parallelToInfo =
+                                       new HashMap<String, VMSParallelInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, VMSParallelInfo> parallelKeyToInfo =
+                                       new HashMap<String, VMSParallelInfo>();
+
+    /** Video device to info hash lock. */
+    private final Mutex mVideoToInfoLock = new Mutex();
+    /** Map from key to vms video device info object. */
+    private final Map<String, VMSVideoInfo> videoToInfo =
+                                       new HashMap<String, VMSVideoInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, VMSVideoInfo> videoKeyToInfo =
+                                       new HashMap<String, VMSVideoInfo>();
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
@@ -181,6 +231,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     protected static final String INTERFACES_TABLE = "interfaces";
     /** Input devices table. */
     protected static final String INPUTDEVS_TABLE = "inputdevs";
+    /** Graphics devices table. */
+    protected static final String GRAPHICS_TABLE = "graphics";
+    /** Sound devices table. */
+    protected static final String SOUND_TABLE = "sound";
+    /** Serial devices table. */
+    protected static final String SERIAL_TABLE = "serial";
+    /** Parallel devices table. */
+    protected static final String PARALLEL_TABLE = "parallel";
+    /** Video devices table. */
+    protected static final String VIDEO_TABLE = "video";
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
@@ -526,6 +586,452 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
+    /** Updates graphics devices nodes. Returns whether the node changed. */
+    private boolean updateGraphicsNodes() {
+        final Map<String, GraphicsData> graphicDisplays =
+                                                        getGraphicDisplays();
+        final List<String> graphicsNames  = new ArrayList<String>();
+        if (graphicDisplays != null) {
+            for (final String d : graphicDisplays.keySet()) {
+                graphicsNames.add(d);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSGraphicsInfo)) {
+                continue;
+            }
+            final VMSGraphicsInfo vmsgi =
+                              (VMSGraphicsInfo) node.getUserObject();
+            if (vmsgi.getResource().isNew()) {
+                /* keep */
+            } else if (graphicsNames.contains(vmsgi.getName())) {
+                /* keeping */
+                graphicsNames.remove(vmsgi.getName());
+                vmsgi.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mGraphicsToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                graphicsToInfo.remove(vmsgi.getName());
+                mGraphicsToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        for (final String graphicDisplay : graphicsNames) {
+            VMSGraphicsInfo vmsgi;
+            final GraphicsData data = graphicDisplays.get(graphicDisplay);
+            final Enumeration eee = getNode().children();
+            int i = 0;
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSGraphicsInfo)) {
+                    if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSInterfaceInfo
+                        || node.getUserObject() instanceof VMSInputDevInfo) {
+                        i++;
+                    }
+                    continue;
+                }
+                final VMSGraphicsInfo v =
+                                     (VMSGraphicsInfo) node.getUserObject();
+                if (graphicDisplay.compareTo(v.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm graphics device */
+            vmsgi = new VMSGraphicsInfo(graphicDisplay, getBrowser(), this);
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmsgi);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            nodeChanged = true;
+            try {
+                mGraphicsToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            graphicsToInfo.put(graphicDisplay, vmsgi);
+            mGraphicsToInfoLock.release();
+            vmsgi.updateParameters();
+        }
+        return nodeChanged;
+    }
+
+    /** Updates sound devices nodes. Returns whether the node changed. */
+    private boolean updateSoundNodes() {
+        final Map<String, SoundData> sounds = getSounds();
+        final List<String> soundNames  = new ArrayList<String>();
+        if (sounds != null) {
+            for (final String d : sounds.keySet()) {
+                soundNames.add(d);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSSoundInfo)) {
+                continue;
+            }
+            final VMSSoundInfo vmssi =
+                              (VMSSoundInfo) node.getUserObject();
+            if (vmssi.getResource().isNew()) {
+                /* keep */
+            } else if (soundNames.contains(vmssi.getName())) {
+                /* keeping */
+                soundNames.remove(vmssi.getName());
+                vmssi.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mSoundToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                soundToInfo.remove(vmssi.getName());
+                mSoundToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        for (final String sound : soundNames) {
+            VMSSoundInfo vmssi;
+            final SoundData data = sounds.get(sound);
+            final Enumeration eee = getNode().children();
+            int i = 0;
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSSoundInfo)) {
+                    if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSInterfaceInfo
+                        || node.getUserObject() instanceof VMSInputDevInfo
+                        || node.getUserObject() instanceof VMSGraphicsInfo) {
+                        i++;
+                    }
+                    continue;
+                }
+                final VMSSoundInfo v = (VMSSoundInfo) node.getUserObject();
+                if (sound.compareTo(v.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm sound device */
+            vmssi = new VMSSoundInfo(sound, getBrowser(), this);
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmssi);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            nodeChanged = true;
+            try {
+                mSoundToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            soundToInfo.put(sound, vmssi);
+            mSoundToInfoLock.release();
+            vmssi.updateParameters();
+        }
+        return nodeChanged;
+    }
+
+    /** Updates serial devices nodes. Returns whether the node changed. */
+    private boolean updateSerialNodes() {
+        final Map<String, SerialData> serials = getSerials();
+        final List<String> serialNames  = new ArrayList<String>();
+        if (serials != null) {
+            for (final String d : serials.keySet()) {
+                serialNames.add(d);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSSerialInfo)) {
+                continue;
+            }
+            final VMSSerialInfo vmssi = (VMSSerialInfo) node.getUserObject();
+            if (vmssi.getResource().isNew()) {
+                /* keep */
+            } else if (serialNames.contains(vmssi.getName())) {
+                /* keeping */
+                serialNames.remove(vmssi.getName());
+                vmssi.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mSerialToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                serialToInfo.remove(vmssi.getName());
+                mSerialToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        for (final String serial : serialNames) {
+            VMSSerialInfo vmssi;
+            final SerialData data = serials.get(serial);
+            final Enumeration eee = getNode().children();
+            int i = 0;
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSSerialInfo)) {
+                    if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSInterfaceInfo
+                        || node.getUserObject() instanceof VMSInputDevInfo
+                        || node.getUserObject() instanceof VMSGraphicsInfo
+                        || node.getUserObject() instanceof VMSSoundInfo) {
+                        i++;
+                    }
+                    continue;
+                }
+                final VMSSerialInfo v = (VMSSerialInfo) node.getUserObject();
+                if (serial.compareTo(v.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm serial device */
+            vmssi = new VMSSerialInfo(serial, getBrowser(), this);
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmssi);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            nodeChanged = true;
+            try {
+                mSerialToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            serialToInfo.put(serial, vmssi);
+            mSerialToInfoLock.release();
+            vmssi.updateParameters();
+        }
+        return nodeChanged;
+    }
+
+    /** Updates parallel devices nodes. Returns whether the node changed. */
+    private boolean updateParallelNodes() {
+        final Map<String, ParallelData> parallels = getParallels();
+        final List<String> parallelNames  = new ArrayList<String>();
+        if (parallels != null) {
+            for (final String d : parallels.keySet()) {
+                parallelNames.add(d);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSParallelInfo)) {
+                continue;
+            }
+            final VMSParallelInfo vmspi =
+                                      (VMSParallelInfo) node.getUserObject();
+            if (vmspi.getResource().isNew()) {
+                /* keep */
+            } else if (parallelNames.contains(vmspi.getName())) {
+                /* keeping */
+                parallelNames.remove(vmspi.getName());
+                vmspi.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mParallelToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                parallelToInfo.remove(vmspi.getName());
+                mParallelToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        for (final String parallel : parallelNames) {
+            VMSParallelInfo vmspi;
+            final ParallelData data = parallels.get(parallel);
+            final Enumeration eee = getNode().children();
+            int i = 0;
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSParallelInfo)) {
+                    if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSInterfaceInfo
+                        || node.getUserObject() instanceof VMSInputDevInfo
+                        || node.getUserObject() instanceof VMSGraphicsInfo
+                        || node.getUserObject() instanceof VMSSoundInfo
+                        || node.getUserObject() instanceof VMSSerialInfo) {
+                        i++;
+                    }
+                    continue;
+                }
+                final VMSParallelInfo v =
+                                       (VMSParallelInfo) node.getUserObject();
+                if (parallel.compareTo(v.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm parallel device */
+            vmspi = new VMSParallelInfo(parallel, getBrowser(), this);
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmspi);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            nodeChanged = true;
+            try {
+                mParallelToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            parallelToInfo.put(parallel, vmspi);
+            mParallelToInfoLock.release();
+            vmspi.updateParameters();
+        }
+        return nodeChanged;
+    }
+
+    /** Updates video devices nodes. Returns whether the node changed. */
+    private boolean updateVideoNodes() {
+        final Map<String, VideoData> videos = getVideos();
+        final List<String> videoNames  = new ArrayList<String>();
+        if (videos != null) {
+            for (final String d : videos.keySet()) {
+                videoNames.add(d);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = getNode().children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSVideoInfo)) {
+                continue;
+            }
+            final VMSVideoInfo vmspi = (VMSVideoInfo) node.getUserObject();
+            if (vmspi.getResource().isNew()) {
+                /* keep */
+            } else if (videoNames.contains(vmspi.getName())) {
+                /* keeping */
+                videoNames.remove(vmspi.getName());
+                vmspi.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                try {
+                    mVideoToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                videoToInfo.remove(vmspi.getName());
+                mVideoToInfoLock.release();
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        for (final String video : videoNames) {
+            VMSVideoInfo vmspi;
+            final VideoData data = videos.get(video);
+            final Enumeration eee = getNode().children();
+            int i = 0;
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSVideoInfo)) {
+                    if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSInterfaceInfo
+                        || node.getUserObject() instanceof VMSInputDevInfo
+                        || node.getUserObject() instanceof VMSGraphicsInfo
+                        || node.getUserObject() instanceof VMSSoundInfo
+                        || node.getUserObject() instanceof VMSSerialInfo
+                        || node.getUserObject() instanceof VMSParallelInfo) {
+                        i++;
+                    }
+                    continue;
+                }
+                final VMSVideoInfo v = (VMSVideoInfo) node.getUserObject();
+                if (video.compareTo(v.getName()) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm video device */
+            vmspi = new VMSVideoInfo(video, getBrowser(), this);
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmspi);
+            getBrowser().setNode(resource);
+            getNode().insert(resource, i);
+            nodeChanged = true;
+            try {
+                mVideoToInfoLock.acquire();
+            } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            videoToInfo.put(video, vmspi);
+            mVideoToInfoLock.release();
+            vmspi.updateParameters();
+        }
+        return nodeChanged;
+    }
+
     /** Sets service parameters with values from resourceNode hash. */
     public final void updateParameters() {
         final List<String> runningOnHosts = new ArrayList<String>();
@@ -678,13 +1184,28 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         updateTable(DISK_TABLE);
         updateTable(INTERFACES_TABLE);
         updateTable(INPUTDEVS_TABLE);
+        updateTable(GRAPHICS_TABLE);
+        updateTable(SOUND_TABLE);
+        updateTable(SERIAL_TABLE);
+        updateTable(PARALLEL_TABLE);
+        updateTable(VIDEO_TABLE);
         /* disks */
         final boolean interfaceNodeChanged = updateInterfaceNodes();
         final boolean diskNodeChanged = updateDiskNodes();
         final boolean inputDevNodeChanged = updateInputDevNodes();
+        final boolean graphicsNodeChanged = updateGraphicsNodes();
+        final boolean soundNodeChanged = updateSoundNodes();
+        final boolean serialNodeChanged = updateSerialNodes();
+        final boolean parallelNodeChanged = updateParallelNodes();
+        final boolean vidoNodeChanged = updateVideoNodes();
         if (diskNodeChanged
             || interfaceNodeChanged
-            || inputDevNodeChanged) {
+            || inputDevNodeChanged
+            || graphicsNodeChanged
+            || soundNodeChanged
+            || serialNodeChanged
+            || parallelNodeChanged
+            || vidoNodeChanged) {
             getBrowser().reload(getNode());
         }
         //final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
@@ -797,6 +1318,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         mainPanel.add(getTablePanel("Interfaces", INTERFACES_TABLE));
         mainPanel.add(Box.createVerticalStrut(20));
         mainPanel.add(getTablePanel("Input Devices", INPUTDEVS_TABLE));
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(getTablePanel("Input Devices", GRAPHICS_TABLE));
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(getTablePanel("Input Devices", SOUND_TABLE));
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(getTablePanel("Input Devices", SERIAL_TABLE));
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(getTablePanel("Input Devices", PARALLEL_TABLE));
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(getTablePanel("Input Devices", VIDEO_TABLE));
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
@@ -1006,7 +1537,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual disk. */
-    private void addDiskPanel(final Point2D pos) {
+    private void addDiskPanel() {
         final VMSDiskInfo vmsdi = new VMSDiskInfo(null, getBrowser(), this);
         vmsdi.getResource().setNew(true);
         final DefaultMutableTreeNode resource =
@@ -1029,7 +1560,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual interface. */
-    private void addInterfacePanel(final Point2D pos) {
+    private void addInterfacePanel() {
         final VMSInterfaceInfo vmsii =
                             new VMSInterfaceInfo(null, getBrowser(), this);
         vmsii.getResource().setNew(true);
@@ -1054,7 +1585,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual input device. */
-    private void addInputDevPanel(final Point2D pos) {
+    private void addInputDevPanel() {
         final VMSInputDevInfo vmsidi =
                             new VMSInputDevInfo(null, getBrowser(), this);
         vmsidi.getResource().setNew(true);
@@ -1078,11 +1609,136 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         vmsidi.selectMyself();
     }
 
+    /** Adds new graphics device. */
+    private void addGraphicsPanel() {
+        final VMSGraphicsInfo vmsgi =
+                            new VMSGraphicsInfo(null, getBrowser(), this);
+        vmsgi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmsgi);
+        getBrowser().setNode(resource);
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) eee.nextElement();
+            if (!(node.getUserObject() instanceof VMSGraphicsInfo)) {
+                i++;
+                continue;
+            }
+            break;
+        }
+
+        getNode().insert(resource, i);
+        getBrowser().reload(getNode());
+        vmsgi.selectMyself();
+    }
+
+    /** Adds new sound device. */
+    private void addSoundsPanel() {
+        final VMSSoundInfo vmssi =
+                            new VMSSoundInfo(null, getBrowser(), this);
+        vmssi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmssi);
+        getBrowser().setNode(resource);
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) eee.nextElement();
+            if (!(node.getUserObject() instanceof VMSSoundInfo)) {
+                i++;
+                continue;
+            }
+            break;
+        }
+
+        getNode().insert(resource, i);
+        getBrowser().reload(getNode());
+        vmssi.selectMyself();
+    }
+
+    /** Adds new serial device. */
+    private void addSerialsPanel() {
+        final VMSSerialInfo vmssi =
+                            new VMSSerialInfo(null, getBrowser(), this);
+        vmssi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmssi);
+        getBrowser().setNode(resource);
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) eee.nextElement();
+            if (!(node.getUserObject() instanceof VMSSerialInfo)) {
+                i++;
+                continue;
+            }
+            break;
+        }
+
+        getNode().insert(resource, i);
+        getBrowser().reload(getNode());
+        vmssi.selectMyself();
+    }
+
+    /** Adds new parallel device. */
+    private void addParallelsPanel() {
+        final VMSParallelInfo vmspi =
+                            new VMSParallelInfo(null, getBrowser(), this);
+        vmspi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmspi);
+        getBrowser().setNode(resource);
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) eee.nextElement();
+            if (!(node.getUserObject() instanceof VMSParallelInfo)) {
+                i++;
+                continue;
+            }
+            break;
+        }
+
+        getNode().insert(resource, i);
+        getBrowser().reload(getNode());
+        vmspi.selectMyself();
+    }
+
+    /** Adds new video device. */
+    private void addVideosPanel() {
+        final VMSVideoInfo vmsvi =
+                            new VMSVideoInfo(null, getBrowser(), this);
+        vmsvi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmsvi);
+        getBrowser().setNode(resource);
+        final Enumeration eee = getNode().children();
+        int i = 0;
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                            (DefaultMutableTreeNode) eee.nextElement();
+            if (!(node.getUserObject() instanceof VMSVideoInfo)) {
+                i++;
+                continue;
+            }
+            break;
+        }
+
+        getNode().insert(resource, i);
+        getBrowser().reload(getNode());
+        vmsvi.selectMyself();
+    }
+
     /** Add new hardware. */
-    private final MyMenu getAddNewHardwareMenu(final String name) {
+    private MyMenu getAddNewHardwareMenu(final String name) {
         return new MyMenu(name,
-                          ConfigData.AccessType.ADMIN,
-                          ConfigData.AccessType.OP) {
+                          new AccessMode(ConfigData.AccessType.ADMIN, false),
+                          new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -1093,11 +1749,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 super.update();
                 removeAll();
                 final Point2D pos = getPos();
+                /* disk */
                 final MyMenuItem newDiskMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewDisk"),
                    BlockDevInfo.HARDDISK_ICON_LARGE,
-                   ConfigData.AccessType.ADMIN,
-                   ConfigData.AccessType.OP) {
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -1105,17 +1762,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 getPopup().setVisible(false);
                             }
                         });
-                        addDiskPanel(getPos());
+                        addDiskPanel();
                     }
                 };
                 newDiskMenuItem.setPos(pos);
                 add(newDiskMenuItem);
 
+                /* interface */
                 final MyMenuItem newInterfaceMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewInterface"),
                    NetInfo.NET_I_ICON_LARGE,
-                   ConfigData.AccessType.ADMIN,
-                   ConfigData.AccessType.OP) {
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -1123,17 +1781,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 getPopup().setVisible(false);
                             }
                         });
-                        addInterfacePanel(getPos());
+                        addInterfacePanel();
                     }
                 };
                 newInterfaceMenuItem.setPos(pos);
                 add(newInterfaceMenuItem);
 
+                /* input dev */
                 final MyMenuItem newInputDevMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewInputDev"),
                    NetInfo.NET_I_ICON_LARGE,
-                   ConfigData.AccessType.ADMIN,
-                   ConfigData.AccessType.OP) {
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -1141,11 +1800,106 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 getPopup().setVisible(false);
                             }
                         });
-                        addInputDevPanel(getPos());
+                        addInputDevPanel();
                     }
                 };
                 newInputDevMenuItem.setPos(pos);
                 add(newInputDevMenuItem);
+
+                /* graphics */
+                final MyMenuItem newGraphicsMenuItem = new MyMenuItem(
+                   Tools.getString("VMSVirtualDomainInfo.AddNewGraphics"),
+                   NetInfo.NET_I_ICON_LARGE,
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        addGraphicsPanel();
+                    }
+                };
+                newGraphicsMenuItem.setPos(pos);
+                add(newGraphicsMenuItem);
+
+                /* sounds */
+                final MyMenuItem newSoundsMenuItem = new MyMenuItem(
+                   Tools.getString("VMSVirtualDomainInfo.AddNewSound"),
+                   NetInfo.NET_I_ICON_LARGE,
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        addSoundsPanel();
+                    }
+                };
+                newSoundsMenuItem.setPos(pos);
+                add(newSoundsMenuItem);
+
+                /* serials */
+                final MyMenuItem newSerialsMenuItem = new MyMenuItem(
+                   Tools.getString("VMSVirtualDomainInfo.AddNewSerial"),
+                   NetInfo.NET_I_ICON_LARGE,
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        addSerialsPanel();
+                    }
+                };
+                newSerialsMenuItem.setPos(pos);
+                add(newSerialsMenuItem);
+
+                /* parallels */
+                final MyMenuItem newParallelsMenuItem = new MyMenuItem(
+                   Tools.getString("VMSVirtualDomainInfo.AddNewParallel"),
+                   NetInfo.NET_I_ICON_LARGE,
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        addParallelsPanel();
+                    }
+                };
+                newParallelsMenuItem.setPos(pos);
+                add(newParallelsMenuItem);
+
+                /* videos */
+                final MyMenuItem newVideosMenuItem = new MyMenuItem(
+                   Tools.getString("VMSVirtualDomainInfo.AddNewVideo"),
+                   NetInfo.NET_I_ICON_LARGE,
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+                    public void action() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getPopup().setVisible(false);
+                            }
+                        });
+                        addVideosPanel();
+                    }
+                };
+                newVideosMenuItem.setPos(pos);
+                add(newVideosMenuItem);
             }
         };
     }
@@ -1158,8 +1912,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             + host.getName(),
                             HostBrowser.HOST_ON_ICON_LARGE,
                             null,
-                            ConfigData.AccessType.OP,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1199,8 +1953,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             + host.getName(),
                             SHUTDOWN_ICON,
                             null,
-                            ConfigData.AccessType.OP,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1240,8 +1994,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             + host.getName(),
                             REBOOT_ICON,
                             null,
-                            ConfigData.AccessType.OP,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1281,8 +2035,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             + host.getName(),
                             RESUME_ICON,
                             null,
-                            ConfigData.AccessType.OP,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1318,15 +2072,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /**
      * Adds vm domain destroy menu item.
      */
-    public final void addDestroyMenu(final MyMenu expertSubmenu,
+    public final void addDestroyMenu(final MyMenu advancedSubmenu,
                                      final Host host) {
         final MyMenuItem destroyMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.DestroyOn")
                             + host.getName(),
                             DESTROY_ICON,
                             null,
-                            ConfigData.AccessType.OP,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1353,21 +2107,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         };
-        expertSubmenu.add(destroyMenuItem);
+        advancedSubmenu.add(destroyMenuItem);
     }
 
     /**
      * Adds vm domain suspend menu item.
      */
-    public final void addSuspendMenu(final MyMenu expertSubmenu,
+    public final void addSuspendMenu(final MyMenu advancedSubmenu,
                                      final Host host) {
         final MyMenuItem suspendMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.SuspendOn")
                             + host.getName(),
                             PAUSE_ICON,
                             null,
-                            ConfigData.AccessType.OP,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1396,21 +2150,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         };
-        expertSubmenu.add(suspendMenuItem);
+        advancedSubmenu.add(suspendMenuItem);
     }
 
     /**
      * Adds vm domain resume menu item.
      */
-    public final void addResumeExpertMenu(final MyMenu expertSubmenu,
-                                          final Host host) {
+    public final void addResumeAdvancedMenu(final MyMenu advancedSubmenu,
+                                            final Host host) {
         final MyMenuItem resumeMenuItem = new MyMenuItem(
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
                             RESUME_ICON,
                             null,
-                            ConfigData.AccessType.OP,
-                            ConfigData.AccessType.OP) {
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1439,7 +2193,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         };
-        expertSubmenu.add(resumeMenuItem);
+        advancedSubmenu.add(resumeMenuItem);
     }
 
     /**
@@ -1474,30 +2228,30 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         items.add(getAddNewHardwareMenu(
                       Tools.getString("VMSVirtualDomainInfo.AddNewHardware")));
 
-        /* expert options */
-        final MyMenu expertSubmenu = new MyMenu(
-                        Tools.getString("ClusterBrowser.ExpertSubmenu"),
-                        ConfigData.AccessType.OP,
-                        ConfigData.AccessType.OP) {
+        /* advanced options */
+        final MyMenu advancedSubmenu = new MyMenu(
+                        Tools.getString("ClusterBrowser.AdvancedSubmenu"),
+                        new AccessMode(ConfigData.AccessType.OP, false),
+                        new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             public boolean enablePredicate() {
                 return true;
             }
         };
-        items.add(expertSubmenu);
+        items.add(advancedSubmenu);
         /* destroy */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addDestroyMenu(expertSubmenu, h);
+            addDestroyMenu(advancedSubmenu, h);
         }
 
         /* suspend */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addSuspendMenu(expertSubmenu, h);
+            addSuspendMenu(advancedSubmenu, h);
         }
 
         /* resume */
         for (final Host h : getBrowser().getClusterHosts()) {
-            addResumeExpertMenu(expertSubmenu, h);
+            addResumeAdvancedMenu(advancedSubmenu, h);
         }
         return items;
     }
@@ -1528,11 +2282,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (Tools.getConfigData().isTightvnc()) {
             /* tight vnc test menu */
             final MyMenuItem tightvncViewerMenu = new MyMenuItem(
-                                getVNCMenuString("TIGHT", host),
-                                VNC_ICON,
-                                null,
-                                ConfigData.AccessType.RO,
-                                ConfigData.AccessType.RO) {
+                            getVNCMenuString("TIGHT", host),
+                            VNC_ICON,
+                            null,
+                            new AccessMode(ConfigData.AccessType.RO, false),
+                            new AccessMode(ConfigData.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -1569,11 +2323,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (Tools.getConfigData().isUltravnc()) {
             /* ultra vnc test menu */
             final MyMenuItem ultravncViewerMenu = new MyMenuItem(
-                                getVNCMenuString("ULTRA", host),
-                                VNC_ICON,
-                                null,
-                                ConfigData.AccessType.RO,
-                                ConfigData.AccessType.RO) {
+                            getVNCMenuString("ULTRA", host),
+                            VNC_ICON,
+                            null,
+                            new AccessMode(ConfigData.AccessType.RO, false),
+                            new AccessMode(ConfigData.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -1610,11 +2364,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (Tools.getConfigData().isRealvnc()) {
             /* real vnc test menu */
             final MyMenuItem realvncViewerMenu = new MyMenuItem(
-                                    getVNCMenuString("REAL", host),
-                                    VNC_ICON,
-                                    null,
-                                    ConfigData.AccessType.RO,
-                                    ConfigData.AccessType.RO) {
+                            getVNCMenuString("REAL", host),
+                            VNC_ICON,
+                            null,
+                            new AccessMode(ConfigData.AccessType.RO, false),
+                            new AccessMode(ConfigData.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -1815,6 +2569,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return new String[]{"Virtual Interface", "Source"};
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
             return new String[]{"Input Device", "Bus"};
+        } else if (GRAPHICS_TABLE.equals(tableName)) {
+            return new String[]{"Graphic Display"};
+        } else if (SOUND_TABLE.equals(tableName)) {
+            return new String[]{"Sound Device"};
+        } else if (SERIAL_TABLE.equals(tableName)) {
+            return new String[]{"Serial Device"};
+        } else if (PARALLEL_TABLE.equals(tableName)) {
+            return new String[]{"Parallel Device"};
+        } else if (VIDEO_TABLE.equals(tableName)) {
+            return new String[]{"Video Device"};
         }
         return new String[]{};
     }
@@ -1829,6 +2593,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return getInterfaceTableData();
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
             return getInputDevTableData();
+        } else if (GRAPHICS_TABLE.equals(tableName)) {
+            return getGraphicsTableData();
+        } else if (SOUND_TABLE.equals(tableName)) {
+            return getSoundTableData();
+        } else if (SERIAL_TABLE.equals(tableName)) {
+            return getSerialTableData();
+        } else if (PARALLEL_TABLE.equals(tableName)) {
+            return getParallelTableData();
+        } else if (VIDEO_TABLE.equals(tableName)) {
+            return getVideoTableData();
         }
         return new Object[][]{};
     }
@@ -1940,11 +2714,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Get one row of the table. */
-    final protected Object[] getInterfaceDataRow(
+    protected final Object[] getInterfaceDataRow(
                                 final String mac,
                                 final Map<String, VMSInterfaceInfo> iToInfo,
                                 final Map<String, InterfaceData> interfaces,
-                                boolean opaque) {
+                                final boolean opaque) {
         final InterfaceData interfaceData = interfaces.get(mac);
         if (interfaceData == null) {
             return new Object[]{mac, "unknown"};
@@ -1980,11 +2754,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Get one row of the table. */
-    final protected Object[] getInputDevDataRow(
+    protected final Object[] getInputDevDataRow(
                                 final String index,
                                 final Map<String, VMSInputDevInfo> iToInfo,
                                 final Map<String, InputDevData> inputDevs,
-                                boolean opaque) {
+                                final boolean opaque) {
         final InputDevData inputDevData = inputDevs.get(index);
         if (inputDevData == null) {
             return new Object[]{index + ": unknown", ""};
@@ -2000,6 +2774,112 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel, bus};
     }
+
+    /** Get one row of the table. */
+    protected final Object[] getGraphicsDataRow(
+                                final String index,
+                                final Map<String, VMSGraphicsInfo> iToInfo,
+                                final Map<String, GraphicsData> graphicDisplays,
+                                final boolean opaque) {
+        final GraphicsData graphicsData = graphicDisplays.get(index);
+        if (graphicsData == null) {
+            return new Object[]{index + ": unknown", ""};
+        }
+        final String type = graphicsData.getType();
+        if (iToInfo != null) {
+            final VMSGraphicsInfo vidi = graphicsToInfo.get(index);
+            iToInfo.put(index, vidi);
+        }
+        final MyButton iLabel = new MyButton(type,
+                                             NetInfo.NET_I_ICON_LARGE);
+        iLabel.setOpaque(opaque);
+        return new Object[]{iLabel};
+    }
+
+    /** Get one row of the table. */
+    protected final Object[] getSoundDataRow(
+                                final String index,
+                                final Map<String, VMSSoundInfo> iToInfo,
+                                final Map<String, SoundData> sounds,
+                                final boolean opaque) {
+        final SoundData soundData = sounds.get(index);
+        if (soundData == null) {
+            return new Object[]{index + ": unknown", ""};
+        }
+        final String model = soundData.getModel();
+        if (iToInfo != null) {
+            final VMSSoundInfo vidi = soundToInfo.get(index);
+            iToInfo.put(index, vidi);
+        }
+        final MyButton iLabel = new MyButton(model,
+                                             NetInfo.NET_I_ICON_LARGE);
+        iLabel.setOpaque(opaque);
+        return new Object[]{iLabel};
+    }
+
+    /** Get one row of the table. */
+    protected final Object[] getSerialDataRow(
+                                final String index,
+                                final Map<String, VMSSerialInfo> iToInfo,
+                                final Map<String, SerialData> serials,
+                                final boolean opaque) {
+        final SerialData serialData = serials.get(index);
+        if (serialData == null) {
+            return new Object[]{index + ": unknown", ""};
+        }
+        final String type = serialData.getType();
+        if (iToInfo != null) {
+            final VMSSerialInfo vidi = serialToInfo.get(index);
+            iToInfo.put(index, vidi);
+        }
+        final MyButton iLabel = new MyButton(type,
+                                             NetInfo.NET_I_ICON_LARGE);
+        iLabel.setOpaque(opaque);
+        return new Object[]{iLabel};
+    }
+
+    /** Get one row of the table. */
+    protected final Object[] getParallelDataRow(
+                                final String index,
+                                final Map<String, VMSParallelInfo> iToInfo,
+                                final Map<String, ParallelData> parallels,
+                                final boolean opaque) {
+        final ParallelData parallelData = parallels.get(index);
+        if (parallelData == null) {
+            return new Object[]{index + ": unknown", ""};
+        }
+        final String type = parallelData.getType();
+        if (iToInfo != null) {
+            final VMSParallelInfo vidi = parallelToInfo.get(index);
+            iToInfo.put(index, vidi);
+        }
+        final MyButton iLabel = new MyButton(type,
+                                             NetInfo.NET_I_ICON_LARGE);
+        iLabel.setOpaque(opaque);
+        return new Object[]{iLabel};
+    }
+
+    /** Get one row of the table. */
+    protected final Object[] getVideoDataRow(
+                                final String index,
+                                final Map<String, VMSVideoInfo> iToInfo,
+                                final Map<String, VideoData> videos,
+                                final boolean opaque) {
+        final VideoData videoData = videos.get(index);
+        if (videoData == null) {
+            return new Object[]{index + ": unknown", ""};
+        }
+        final String modelType = videoData.getModelType();
+        if (iToInfo != null) {
+            final VMSVideoInfo vidi = videoToInfo.get(index);
+            iToInfo.put(index, vidi);
+        }
+        final MyButton iLabel = new MyButton(modelType,
+                                             NetInfo.NET_I_ICON_LARGE);
+        iLabel.setOpaque(opaque);
+        return new Object[]{iLabel};
+    }
+
 
     /** Returns all interfaces. */
     protected final Map<String, InterfaceData> getInterfaces() {
@@ -2039,6 +2919,131 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
+    /** Returns data for the graphics devices table. */
+    private Object[][] getGraphicsTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, GraphicsData> graphicDisplays = getGraphicDisplays();
+        final Map<String, VMSGraphicsInfo> iToInfo =
+                                      new HashMap<String, VMSGraphicsInfo>();
+        if (graphicDisplays != null) {
+            for (final String index : graphicDisplays.keySet()) {
+                final Object[] row = getGraphicsDataRow(index,
+                                                     iToInfo,
+                                                     graphicDisplays,
+                                                     false);
+                rows.add(row);
+            }
+        }
+        try {
+            mGraphicsToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        graphicsKeyToInfo = iToInfo;
+        mGraphicsToInfoLock.release();
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /** Returns data for the sound devices table. */
+    private Object[][] getSoundTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, SoundData> sounds = getSounds();
+        final Map<String, VMSSoundInfo> iToInfo =
+                                      new HashMap<String, VMSSoundInfo>();
+        if (sounds != null) {
+            for (final String index : sounds.keySet()) {
+                final Object[] row = getSoundDataRow(index,
+                                                     iToInfo,
+                                                     sounds,
+                                                     false);
+                rows.add(row);
+            }
+        }
+        try {
+            mSoundToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        soundKeyToInfo = iToInfo;
+        mSoundToInfoLock.release();
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /** Returns data for the serial devices table. */
+    private Object[][] getSerialTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, SerialData> serials = getSerials();
+        final Map<String, VMSSerialInfo> iToInfo =
+                                      new HashMap<String, VMSSerialInfo>();
+        if (serials != null) {
+            for (final String index : serials.keySet()) {
+                final Object[] row = getSerialDataRow(index,
+                                                      iToInfo,
+                                                      serials,
+                                                      false);
+                rows.add(row);
+            }
+        }
+        try {
+            mSerialToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        serialKeyToInfo = iToInfo;
+        mSerialToInfoLock.release();
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /** Returns data for the parallel devices table. */
+    private Object[][] getParallelTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, ParallelData> parallels = getParallels();
+        final Map<String, VMSParallelInfo> iToInfo =
+                                      new HashMap<String, VMSParallelInfo>();
+        if (parallels != null) {
+            for (final String index : parallels.keySet()) {
+                final Object[] row = getParallelDataRow(index,
+                                                        iToInfo,
+                                                        parallels,
+                                                        false);
+                rows.add(row);
+            }
+        }
+        try {
+            mParallelToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        parallelKeyToInfo = iToInfo;
+        mParallelToInfoLock.release();
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /** Returns data for the video devices table. */
+    private Object[][] getVideoTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, VideoData> videos = getVideos();
+        final Map<String, VMSVideoInfo> iToInfo =
+                                      new HashMap<String, VMSVideoInfo>();
+        if (videos != null) {
+            for (final String index : videos.keySet()) {
+                final Object[] row = getVideoDataRow(index,
+                                                     iToInfo,
+                                                     videos,
+                                                     false);
+                rows.add(row);
+            }
+        }
+        try {
+            mVideoToInfoLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        videoKeyToInfo = iToInfo;
+        mVideoToInfoLock.release();
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
     /** Returns all input devices. */
     protected final Map<String, InputDevData> getInputDevs() {
         Map<String, InputDevData> inputDevs = null;
@@ -2050,6 +3055,71 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         return inputDevs;
+    }
+
+    /** Returns all graphics devices. */
+    protected final Map<String, GraphicsData> getGraphicDisplays() {
+        Map<String, GraphicsData> graphicDisplays = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                graphicDisplays = vxml.getGraphicDisplays(getDomainName());
+                break;
+            }
+        }
+        return graphicDisplays;
+    }
+
+    /** Returns all sound devices. */
+    protected final Map<String, SoundData> getSounds() {
+        Map<String, SoundData> sounds = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                sounds = vxml.getSounds(getDomainName());
+                break;
+            }
+        }
+        return sounds;
+    }
+
+    /** Returns all serial devices. */
+    protected final Map<String, SerialData> getSerials() {
+        Map<String, SerialData> serials = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                serials = vxml.getSerials(getDomainName());
+                break;
+            }
+        }
+        return serials;
+    }
+
+    /** Returns all parallel devices. */
+    protected final Map<String, ParallelData> getParallels() {
+        Map<String, ParallelData> parallels = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                parallels = vxml.getParallels(getDomainName());
+                break;
+            }
+        }
+        return parallels;
+    }
+
+    /** Returns all video devices. */
+    protected final Map<String, VideoData> getVideos() {
+        Map<String, VideoData> videos = null;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                videos = vxml.getVideos(getDomainName());
+                break;
+            }
+        }
+        return videos;
     }
 
     /** Returns data for the interface table. */
@@ -2114,6 +3184,61 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             if (vidi != null) {
                 vidi.selectMyself();
             }
+        } else if (GRAPHICS_TABLE.equals(tableName)) {
+            try {
+                mGraphicsToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSGraphicsInfo vgi = graphicsKeyToInfo.get(key);
+            mGraphicsToInfoLock.release();
+            if (vgi != null) {
+                vgi.selectMyself();
+            }
+        } else if (SOUND_TABLE.equals(tableName)) {
+            try {
+                mSoundToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSSoundInfo vsi = soundKeyToInfo.get(key);
+            mSoundToInfoLock.release();
+            if (vsi != null) {
+                vsi.selectMyself();
+            }
+        } else if (SERIAL_TABLE.equals(tableName)) {
+            try {
+                mSerialToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSSerialInfo vsi = serialKeyToInfo.get(key);
+            mSerialToInfoLock.release();
+            if (vsi != null) {
+                vsi.selectMyself();
+            }
+        } else if (PARALLEL_TABLE.equals(tableName)) {
+            try {
+                mParallelToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSParallelInfo vpi = parallelKeyToInfo.get(key);
+            mParallelToInfoLock.release();
+            if (vpi != null) {
+                vpi.selectMyself();
+            }
+        } else if (VIDEO_TABLE.equals(tableName)) {
+            try {
+                mVideoToInfoLock.acquire();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final VMSVideoInfo vvi = videoKeyToInfo.get(key);
+            mVideoToInfoLock.release();
+            if (vvi != null) {
+                vvi.selectMyself();
+            }
         }
     }
 
@@ -2154,6 +3279,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return interfaceToInfo.get(key);
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
             return inputDevToInfo.get(key);
+        } else if (GRAPHICS_TABLE.equals(tableName)) {
+            return graphicsToInfo.get(key);
+        } else if (SOUND_TABLE.equals(tableName)) {
+            return soundToInfo.get(key);
+        } else if (SERIAL_TABLE.equals(tableName)) {
+            return serialToInfo.get(key);
+        } else if (PARALLEL_TABLE.equals(tableName)) {
+            return parallelToInfo.get(key);
+        } else if (VIDEO_TABLE.equals(tableName)) {
+            return videoToInfo.get(key);
         }
         return null;
     }
@@ -2179,6 +3314,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     protected final boolean isEnabled(final String param) {
         return true;
     }
+
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+         return false;
+    }
+
 
     /** Returns access type of this parameter. */
     protected final ConfigData.AccessType getAccessType(final String param) {

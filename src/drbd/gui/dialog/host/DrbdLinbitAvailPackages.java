@@ -23,6 +23,7 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
@@ -406,7 +407,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                         null, /* regexp */
                                         0,    /* width */
                                         null, /* abbrv */
-                                        ConfigData.AccessType.RO);
+                                        new AccessMode(ConfigData.AccessType.RO,
+                                                       false)); /* only adv. */
 
         drbdDistCombo.setEnabled(false);
         pane.add(drbdDistCombo);
@@ -417,7 +419,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                              null, /* regexp */
                                              0,    /* width */
                                              null, /* abbrv */
-                                             ConfigData.AccessType.RO);
+                                             new AccessMode(
+                                                    ConfigData.AccessType.RO,
+                                                    false)); /* only adv mode */
 
         drbdKernelDirCombo.setEnabled(false);
         pane.add(drbdKernelDirCombo);
@@ -428,7 +432,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                         null, /* regexp */
                                         0,    /* width */
                                         null, /* abbrv */
-                                        ConfigData.AccessType.RO);
+                                        new AccessMode(ConfigData.AccessType.RO,
+                                                       false)); /* only adv. */
 
         drbdArchCombo.setEnabled(false);
         pane.add(drbdArchCombo);

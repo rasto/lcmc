@@ -32,6 +32,7 @@ import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.MyButton;
 import drbd.utilities.DRBD;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
@@ -258,7 +259,9 @@ public class CreateMD extends DrbdConfig {
                                          null, /* regexp */
                                          COMBOBOX_WIDTH,
                                          null, /* abbrv */
-                                         ConfigData.AccessType.RO);
+                                         new AccessMode(
+                                                  ConfigData.AccessType.RO,
+                                                  false)); /* only adv. mode */
         } else {
             final String[] choices = {useExistingMetadata,
                                       createNewMetadata,
@@ -278,7 +281,9 @@ public class CreateMD extends DrbdConfig {
                                          null, /* regexp */
                                          COMBOBOX_WIDTH,
                                          null, /* abbrv */
-                                         ConfigData.AccessType.RO);
+                                         new AccessMode(
+                                                  ConfigData.AccessType.RO,
+                                                  false)); /* only adv. mode */
         }
 
         inputPane.add(metadataLabel);

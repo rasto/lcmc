@@ -34,6 +34,7 @@ import drbd.data.resources.Resource;
 import drbd.data.PtestData;
 import drbd.data.CRMXML;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Unit;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.CRM;
@@ -199,6 +200,11 @@ public class ServicesInfo extends EditableInfo {
         return true;
     }
 
+    /** Whether the parameter should be enabled only in advanced mode. */
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+        return false;
+    }
+
     /**
      * Returns whether the global parameter is required.
      */
@@ -314,7 +320,6 @@ public class ServicesInfo extends EditableInfo {
      */
     private void setFilesystemWithDrbd(final ServiceInfo siP,
                                        final ServiceInfo si) {
-        DrbdResourceInfo dri;
         if (siP.getResourceAgent().isLinbitDrbd()) {
             /* linbit::drbd -> Filesystem */
             ((FilesystemInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
@@ -657,13 +662,11 @@ public class ServicesInfo extends EditableInfo {
                         }
                     }
                 }
-                if (cphi == null) {
+                if (cphi == null && !preNewCphis.isEmpty()) {
                     /* placeholder */
-                    if (!preNewCphis.isEmpty()) {
-                        cphi = preNewCphis.remove(0);
-                        rdataToCphi.put(rdata, cphi);
-                        cphi.setRscSetConnectionData(rdata);
-                    }
+                    cphi = preNewCphis.remove(0);
+                    rdataToCphi.put(rdata, cphi);
+                    cphi.setRscSetConnectionData(rdata);
                 }
                 if (cphi == null) {
                     cphi = new ConstraintPHInfo(getBrowser(), rdata);
@@ -1128,8 +1131,10 @@ public class ServicesInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.AddGroup"),
                            null,
                            null,
-                           ConfigData.AccessType.ADMIN,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          false),
+                           new AccessMode(ConfigData.AccessType.OP,
+                                          false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -1156,8 +1161,10 @@ public class ServicesInfo extends EditableInfo {
         /* add service */
         final MyMenu addServiceMenuItem = new MyMenu(
                         Tools.getString("ClusterBrowser.Hb.AddService"),
-                        ConfigData.AccessType.OP,
-                        ConfigData.AccessType.OP) {
+                        new AccessMode(ConfigData.AccessType.OP,
+                                       false),
+                        new AccessMode(ConfigData.AccessType.OP,
+                                       false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {
@@ -1181,8 +1188,10 @@ public class ServicesInfo extends EditableInfo {
                      Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
                      null,
                      null,
-                     ConfigData.AccessType.ADMIN,
-                     ConfigData.AccessType.OP) {
+                     new AccessMode(ConfigData.AccessType.ADMIN,
+                                    false),
+                     new AccessMode(ConfigData.AccessType.OP,
+                                    false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -1223,8 +1232,10 @@ public class ServicesInfo extends EditableInfo {
                      Tools.getString("ClusterBrowser.DrbddiskMenuName"),
                      null,
                      null,
-                     ConfigData.AccessType.ADMIN,
-                     ConfigData.AccessType.OP) {
+                     new AccessMode(ConfigData.AccessType.ADMIN,
+                                    false),
+                     new AccessMode(ConfigData.AccessType.OP,
+                                    false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -1257,11 +1268,14 @@ public class ServicesInfo extends EditableInfo {
                                          "ocf");
                 if (ipService != null) { /* just skip it, if it is not*/
                     final MyMenuItem ipMenuItem =
-                           new MyMenuItem(ipService.getMenuName(),
-                                          null,
-                                          null,
-                                          ConfigData.AccessType.ADMIN,
-                                          ConfigData.AccessType.OP) {
+                         new MyMenuItem(ipService.getMenuName(),
+                                        null,
+                                        null,
+                                        new AccessMode(
+                                                  ConfigData.AccessType.ADMIN,
+                                                  false),
+                                        new AccessMode(ConfigData.AccessType.OP,
+                                                       false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -1284,16 +1298,23 @@ public class ServicesInfo extends EditableInfo {
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
-                                       ConfigData.AccessType.ADMIN,
-                                       ConfigData.AccessType.OP);
+                                       new AccessMode(
+                                                   ConfigData.AccessType.ADMIN,
+                                                   false),
+                                       new AccessMode(ConfigData.AccessType.OP,
+                                                      false));
                     DefaultListModel dlm = new DefaultListModel();
                     for (final ResourceAgent ra : getAddServiceList(cl)) {
                         final MyMenuItem mmi =
                                 new MyMenuItem(ra.getMenuName(),
                                                null,
                                                null,
-                                               ConfigData.AccessType.ADMIN,
-                                               ConfigData.AccessType.OP) {
+                                               new AccessMode(
+                                                    ConfigData.AccessType.ADMIN,
+                                                    false),
+                                               new AccessMode(
+                                                    ConfigData.AccessType.OP,
+                                                    false)) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -1344,8 +1365,10 @@ public class ServicesInfo extends EditableInfo {
                            null,
                            Tools.getString(
                              "ServicesInfo.AddConstraintPlaceholder.ToolTip"),
-                           ConfigData.AccessType.ADMIN,
-                           ConfigData.AccessType.OP) {
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          false),
+                           new AccessMode(ConfigData.AccessType.OP,
+                                          false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {
@@ -1381,12 +1404,14 @@ public class ServicesInfo extends EditableInfo {
         final MyMenuItem removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),
                 ClusterBrowser.REMOVE_ICON,
-                ConfigData.AccessType.ADMIN,
-                ConfigData.AccessType.ADMIN) {
+                new AccessMode(ConfigData.AccessType.ADMIN,
+                               false),
+                new AccessMode(ConfigData.AccessType.ADMIN,
+                               false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean visiblePredicate() {
-                return Tools.getConfigData().getExpertMode();
+                return Tools.getConfigData().isAdvancedMode();
             }
 
             public boolean enablePredicate() {
@@ -1432,8 +1457,10 @@ public class ServicesInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ViewLogs"),
                            LOGFILE_ICON,
                            null,
-                           ConfigData.AccessType.RO,
-                           ConfigData.AccessType.RO) {
+                           new AccessMode(ConfigData.AccessType.RO,
+                                          false),
+                           new AccessMode(ConfigData.AccessType.RO,
+                                          false)) {
                 private static final long serialVersionUID = 1L;
 
                 public boolean enablePredicate() {

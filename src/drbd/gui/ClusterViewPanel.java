@@ -69,8 +69,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private final JTree tree;
     /** Combo box with operating modes. */
     private final JComboBox operatingModesCB;
-    /** Expert mode button. */
-    private final JCheckBox expertModeCB;
+    /** Advanced mode button. */
+    private final JCheckBox advancedModeCB;
 
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.
@@ -112,8 +112,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         clusterButtonsPanel.add(clusterWizardButton);
         buttonPanel.add(clusterButtonsPanel);
 
-        /* expert mode button */
-        expertModeCB = createExpertModeButton();
+        /* advanced mode button */
+        advancedModeCB = createAdvancedModeButton();
         /* Operating mode */
         final JPanel opModePanel = new JPanel();
         opModePanel.setBackground(STATUS_BACKGROUND);
@@ -148,7 +148,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
             }
         });
         opModePanel.add(opModeCB);
-        opModePanel.add(expertModeCB);
+        opModePanel.add(advancedModeCB);
         buttonPanel.add(opModePanel);
         operatingModesCB = opModeCB;
 
@@ -172,22 +172,23 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         Tools.getGUIData().registerAllHostsUpdate(this);
     }
 
-    /** Returns expert mode check box. That hides expert options. */
-    public final JCheckBox createExpertModeButton() {
+    /** Returns advanced mode check box. That hides advanced options. */
+    public final JCheckBox createAdvancedModeButton() {
         final JCheckBox emCB = new JCheckBox(Tools.getString(
-                                                        "Browser.ExpertMode"));
+                                                      "Browser.AdvancedMode"));
         emCB.setBackground(Tools.getDefaultColor(
                                             "ViewPanel.Status.Background"));
-        emCB.setSelected(Tools.getConfigData().getExpertMode());
+        emCB.setSelected(Tools.getConfigData().isAdvancedMode());
         emCB.addItemListener(new ItemListener() {
             public void itemStateChanged(final ItemEvent e) {
                 final boolean selected =
                                     e.getStateChange() == ItemEvent.SELECTED;
-                if (selected != Tools.getConfigData().getExpertMode()) {
+                if (selected != Tools.getConfigData().isAdvancedMode()) {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            Tools.getConfigData().setExpertMode(selected);
-                            Tools.getGUIData().setExpertModeGlobally(cluster,
+                            Tools.getConfigData().setAdvancedMode(selected);
+                            Tools.getGUIData().setAdvancedModeGlobally(
+                                                                     cluster,
                                                                      selected);
                             cluster.getBrowser().checkAccessOfEverything();
                         }
@@ -240,11 +241,11 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         });
     }
 
-    /** Sets expert mode. */
-    public final void setExpertMode(final boolean expertMode) {
+    /** Sets advanced mode. */
+    public final void setAdvancedMode(final boolean advancedMode) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                expertModeCB.setSelected(expertMode);
+                advancedModeCB.setSelected(advancedMode);
             }
         });
     }

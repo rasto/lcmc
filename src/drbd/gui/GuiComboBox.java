@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.PatternDocument;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.gui.resources.Info;
 import drbd.utilities.MyButton;
 
@@ -149,8 +150,9 @@ public class GuiComboBox extends JPanel {
     /** Whether the extra text field button should be enabled. */
     private boolean tfButtonEnabled = true;
     /** Access Type for this component to become enabled. */
-    private ConfigData.AccessType enableAccessType =
-                                                     ConfigData.AccessType.RO;
+    private AccessMode enableAccessMode = new AccessMode(
+                                                    ConfigData.AccessType.RO,
+                                                    false);
     /** Tooltip if element is enabled. */
     private String toolTipText = null;
     /** getValue setValue lock. */
@@ -164,7 +166,7 @@ public class GuiComboBox extends JPanel {
                        final String regexp,
                        final int width,
                        final Map<String, String> abbreviations,
-                       final ConfigData.AccessType enableAccessType) {
+                       final AccessMode enableAccessMode) {
         this(selectedValue,
              items,
              units,
@@ -172,7 +174,7 @@ public class GuiComboBox extends JPanel {
              regexp,
              width,
              abbreviations,
-             enableAccessType,
+             enableAccessMode,
              null); /* without button */
     }
 
@@ -184,11 +186,11 @@ public class GuiComboBox extends JPanel {
                        String regexp,
                        final int width,
                        final Map<String, String> abbreviations,
-                       final ConfigData.AccessType enableAccessType,
+                       final AccessMode enableAccessMode,
                        final MyButton textFieldBtn) {
         super();
         this.units = units;
-        this.enableAccessType = enableAccessType;
+        this.enableAccessMode = enableAccessMode;
         this.textFieldBtn = textFieldBtn;
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
@@ -319,7 +321,7 @@ public class GuiComboBox extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 1)), BorderLayout.PAGE_START);
         add(component, BorderLayout.CENTER);
         add(Box.createRigidArea(new Dimension(0, 1)), BorderLayout.PAGE_END);
-        processAccessType();
+        processAccessMode();
     }
 
     /**
@@ -542,7 +544,7 @@ public class GuiComboBox extends JPanel {
     public final void setEnabled(final String s, final boolean enabled) {
         enablePredicate = enabled;
         final boolean accessible =
-                           Tools.getConfigData().isAccessible(enableAccessType);
+                       Tools.getConfigData().isAccessible(enableAccessMode);
         if (componentsHash.containsKey(s)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -581,11 +583,13 @@ public class GuiComboBox extends JPanel {
      */
     public final void setToolTipText(String text) {
         toolTipText = text;
-        if (enableAccessType != ConfigData.AccessType.NEVER) {
+        if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
             final boolean accessible =
-                         Tools.getConfigData().isAccessible(enableAccessType);
+                     Tools.getConfigData().isAccessible(enableAccessMode);
             if (!accessible) {
-                text = text + getDisabledTooltip();
+                final String tp = getDisabledTooltip();
+                text = text + tp;
+                // TODO: label tool tip
             }
         }
         if (type == Type.TEXTFIELDWITHUNIT) {
@@ -603,8 +607,13 @@ public class GuiComboBox extends JPanel {
      * Returns tooltip for disabled element.
      */
     private String getDisabledTooltip() {
+        String advanced = "";
+        if (enableAccessMode.isAdvancedMode()) {
+            advanced = "Advanced ";
+        }
         return "<br>available in \""
-               + ConfigData.OP_MODES_MAP.get(enableAccessType)
+               + advanced
+               + ConfigData.OP_MODES_MAP.get(enableAccessMode.getAccessType())
                + "\" mode";
     }
 
@@ -749,7 +758,7 @@ public class GuiComboBox extends JPanel {
                         unitComboBox.repaint();
                     }
                     final boolean accessible =
-                         Tools.getConfigData().isAccessible(enableAccessType);
+                      Tools.getConfigData().isAccessible(enableAccessMode);
                     if ("".equals(text)) {
                         if (!u.isEmpty()) {
                             u.setEmpty(true);
@@ -864,8 +873,9 @@ public class GuiComboBox extends JPanel {
      */
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
-        setComponentsEnabled(enabled
-                     && Tools.getConfigData().isAccessible(enableAccessType));
+        setComponentsEnabled(
+                   enabled
+                   && Tools.getConfigData().isAccessible(enableAccessMode));
     }
 
     /** Sets extra button enabled. */
@@ -1289,7 +1299,7 @@ public class GuiComboBox extends JPanel {
             default:
                 /* error */
         }
-        processAccessType();
+        processAccessMode();
     }
 
     /**
@@ -1543,9 +1553,9 @@ public class GuiComboBox extends JPanel {
     }
 
     /** Sets this item enabled and visible according to its access type. */
-    public final void processAccessType() {
+    public final void processAccessMode() {
         final boolean accessible =
-                         Tools.getConfigData().isAccessible(enableAccessType);
+                       Tools.getConfigData().isAccessible(enableAccessMode);
         setComponentsEnabled(enablePredicate && accessible);
         if (toolTipText != null) {
             setToolTipText(toolTipText);

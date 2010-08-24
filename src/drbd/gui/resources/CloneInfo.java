@@ -29,6 +29,7 @@ import drbd.data.Host;
 import drbd.data.ClusterStatus;
 import drbd.data.CRMXML;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.CRM;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
@@ -550,9 +551,12 @@ public class CloneInfo extends ServiceInfo {
         if (cs == null) {
             return items;
         }
-        final MyMenu csMenu = new MyMenu(cs.toString(),
-                                         ConfigData.AccessType.RO,
-                                         ConfigData.AccessType.RO) {
+        final MyMenu csMenu = new MyMenu(
+                                     cs.toString(),
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    false),
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    false)) {
             private static final long serialVersionUID = 1L;
 
             public boolean enablePredicate() {

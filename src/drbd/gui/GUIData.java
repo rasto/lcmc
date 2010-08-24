@@ -24,6 +24,7 @@ package drbd.gui;
 
 import drbd.data.Cluster;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.AllHostsUpdatable;
 
@@ -75,12 +76,12 @@ public class GUIData  {
     private final List<JComponent> addHostButtonList =
                                                    new ArrayList<JComponent>();
     /** Components that can be made visible in the god mode. */
-    private final Map<JComponent, ConfigData.AccessType> visibleInAccessType =
-                              new HashMap<JComponent, ConfigData.AccessType>();
+    private final Map<JComponent, AccessMode> visibleInAccessType =
+                                      new HashMap<JComponent, AccessMode>();
     /** Global elements like menus, that are enabled, disabled according to
      * their access type. */
-    private final Map<JComponent, ConfigData.AccessType> enabledInAccessType =
-                            new HashMap<JComponent, ConfigData.AccessType>();
+    private final Map<JComponent, AccessMode> enabledInAccessType =
+                                        new HashMap<JComponent, AccessMode>();
     /**
      * List of components that have allHostsUpdate method that must be called
      * when a host is added.
@@ -391,23 +392,23 @@ public class GUIData  {
 
 
     /**
-     * Add to the list of components that are visible only in god mode.
+     * Add to the list of components that are visible only in specific access
+     * mode.
      */
-    public final void addToVisibleInAccessType(
-                                    final JComponent c,
-                                    final ConfigData.AccessType accessType) {
-        c.setVisible(Tools.getConfigData().isAccessible(accessType));
-        visibleInAccessType.put(c, accessType);
+    public final void addToVisibleInAccessType(final JComponent c,
+                                               final AccessMode accessMode) {
+        c.setVisible(Tools.getConfigData().isAccessible(accessMode));
+        visibleInAccessType.put(c, accessMode);
     }
 
     /**
-     * Add to the list of components that are visible only in god mode.
+     * Add to the list of components that are visible only in specific access
+     * mode.
      */
-    public final void addToEnabledInAccessType(
-                                    final JComponent c,
-                                    final ConfigData.AccessType accessType) {
-        c.setEnabled(Tools.getConfigData().isAccessible(accessType));
-        enabledInAccessType.put(c, accessType);
+    public final void addToEnabledInAccessType(final JComponent c,
+                                               final AccessMode accessMode) {
+        c.setEnabled(Tools.getConfigData().isAccessible(accessMode));
+        enabledInAccessType.put(c, accessMode);
     }
 
     /**
@@ -442,9 +443,9 @@ public class GUIData  {
         }
     }
 
-    /** Sets expert mode in every cluster view. */
-    public final void setExpertModeGlobally(final Cluster fromCluster,
-                                            final boolean expertMode) {
+    /** Sets advanced mode in every cluster view. */
+    public final void setAdvancedModeGlobally(final Cluster fromCluster,
+                                              final boolean advancedMode) {
         for (final Cluster cluster
                         : Tools.getConfigData().getClusters().getClusterSet()) {
             if (cluster == fromCluster) {
@@ -452,7 +453,7 @@ public class GUIData  {
             }
             final ClusterBrowser cb = cluster.getBrowser();
             if (cb != null) {
-                cb.getClusterViewPanel().setExpertMode(expertMode);
+                cb.getClusterViewPanel().setAdvancedMode(advancedMode);
             }
         }
     }

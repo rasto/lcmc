@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.gui.SpringUtilities;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.GuiComboBox;
@@ -162,7 +163,8 @@ public class SplitBrain extends DrbdConfig {
                                  null, /* regexp */
                                  COMBOBOX_WIDTH,
                                  null, /* abbrv */
-                                 ConfigData.AccessType.RO);
+                                 new AccessMode(ConfigData.AccessType.RO,
+                                                false)); /* only adv. mode */
         inputPane.add(hostLabel);
         inputPane.add(hostCB);
         resolveButton.addActionListener(new ActionListener() {

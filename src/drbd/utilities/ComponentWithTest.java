@@ -28,12 +28,8 @@ import java.awt.Color;
  * Components that have on mouse over test.
  */
 public interface ComponentWithTest {
-    /**
-     * Sets background of the tool tip.
-     */
+    /** Sets background of the tool tip. */
     void setToolTipBackground(final Color background);
-    /**
-     * Sets tooltip text.
-     */
+    /** Sets tooltip text. */
     void setToolTipText(final String toolTipText);
 }

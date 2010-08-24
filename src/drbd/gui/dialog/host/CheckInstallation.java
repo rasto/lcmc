@@ -23,6 +23,7 @@ package drbd.gui.dialog.host;
 
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.utilities.ExecCallback;
@@ -641,7 +642,8 @@ public class CheckInstallation extends DialogHost {
                    null, /* regexp */
                    0,    /* width */
                    null, /* abbrv */
-                   ConfigData.AccessType.RO);
+                   new AccessMode(ConfigData.AccessType.RO,
+                                  false)); /* only adv. mode */
         if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -719,7 +721,8 @@ public class CheckInstallation extends DialogHost {
                    null, /* regexp */
                    0,    /* width */
                    null, /* abbrv */
-                   ConfigData.AccessType.RO);
+                   new AccessMode(ConfigData.AccessType.RO,
+                                  false)); /* only adv. mode */
         if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -805,7 +808,8 @@ public class CheckInstallation extends DialogHost {
                        null, /* regexp */
                        0,    /* width */
                        null, /* abbrv */
-                       ConfigData.AccessType.RO);
+                       new AccessMode(ConfigData.AccessType.RO,
+                                      false)); /* only adv. mode */
             drbdInstMethodCB.addListeners(
                 new ItemListener() {
                     public void itemStateChanged(final ItemEvent e) {
@@ -839,7 +843,9 @@ public class CheckInstallation extends DialogHost {
                                                null, /* regexp */
                                                0,    /* width */
                                                null, /* abbrv */
-                                               ConfigData.AccessType.RO);
+                                               new AccessMode(
+                                                      ConfigData.AccessType.RO,
+                                                      false)); /* only adv. */
             drbdInstMethodCB.setEnabled(false);
         }
         if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
