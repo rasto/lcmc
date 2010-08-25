@@ -198,7 +198,15 @@ public class ServiceInfo extends EditableInfo {
     public static final String GUI_ID = "__drbdmcid";
     /** PCMK ID parameter. */
     public static final String PCMK_ID = "__pckmkid";
+    /** String that appears as a tooltip in menu items if item is being
+     * removed. */
+    public static final String IS_BEING_REMOVED_STRING = "it is being removed";
 
+    /** String that appears as a tooltip in menu items if item is orphan. */
+    public static final String IS_ORPHANED_STRING =
+                                                 "cannot do that to an ophan";
+    /** String that appears as a tooltip in menu items if item is new. */
+    public static final String IS_NEW_STRING = "it is not applied yet";
 
     /**
      * Prepares a new <code>ServiceInfo</code> object and creates
@@ -1419,7 +1427,7 @@ public class ServiceInfo extends EditableInfo {
                     /* do nothing */
                 }
             });
-            cb.setLabel(label);
+            cb.setLabel(label, "");
             addField(panel,
                      label,
                      cb,
@@ -1753,7 +1761,7 @@ public class ServiceInfo extends EditableInfo {
         sameAsOperationsCB.setToolTipText(defaultOpIdRef);
         final JLabel label = new JLabel(Tools.getString(
                                            "ClusterBrowser.OperationsSameAs"));
-        sameAsOperationsCB.setLabel(label);
+        sameAsOperationsCB.setLabel(label, "");
         final JPanel saPanel = new JPanel(new SpringLayout());
         saPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
         addField(saPanel,
@@ -1830,7 +1838,7 @@ public class ServiceInfo extends EditableInfo {
                 final JLabel cbLabel = new JLabel(Tools.ucfirst(op)
                                                   + " / "
                                                   + Tools.ucfirst(param));
-                cb.setLabel(cbLabel);
+                cb.setLabel(cbLabel, "");
                 JPanel panel;
                 if (ClusterBrowser.HB_OP_NOT_ADVANCED.containsKey(op, param)) {
                     panel = normalOpPanel;
@@ -4049,12 +4057,22 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed()
-                       && !getService().isRemoved()
-                       && (enableForNew || !getService().isNew())
-                       && !getService().isOrphaned();
-                       //TODO: enableForNew should be always enabled
+            public String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                } else if (getService().isRemoved()) {
+                    return IS_BEING_REMOVED_STRING;
+                } else if (getService().isOrphaned()) {
+                    return IS_ORPHANED_STRING;
+                } else if (!enableForNew && getService().isNew()) {
+                    return IS_NEW_STRING;
+                }
+                return null;
+                //return !getBrowser().clStatusFailed()
+                //       && !getService().isRemoved()
+                //       && (enableForNew || !getService().isNew())
+                //       && !getService().isOrphaned();
+                //       //TODO: enableForNew should be always enabled
             }
 
             public void update() {
@@ -4141,11 +4159,21 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed()
-                       && !getService().isRemoved()
-                       && !getService().isNew()
-                       && !getService().isOrphaned();
+            public String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                } else if (getService().isRemoved()) {
+                    return IS_BEING_REMOVED_STRING;
+                } else if (getService().isOrphaned()) {
+                    return IS_ORPHANED_STRING;
+                } else if (getService().isNew()) {
+                    return IS_NEW_STRING;
+                }
+                return null;
+                //return !getBrowser().clStatusFailed()
+                //       && !getService().isRemoved()
+                //       && !getService().isNew()
+                //       && !getService().isOrphaned();
             }
 
             public void update() {
@@ -4395,11 +4423,21 @@ public class ServiceInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return !getBrowser().clStatusFailed()
-                           && !getService().isRemoved()
-                           && !getService().isNew()
-                           && !getService().isOrphaned();
+                public String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else if (getService().isRemoved()) {
+                        return IS_BEING_REMOVED_STRING;
+                    } else if (getService().isOrphaned()) {
+                        return IS_ORPHANED_STRING;
+                    } else if (getService().isNew()) {
+                        return IS_NEW_STRING;
+                    }
+                    return null;
+                    //return !getBrowser().clStatusFailed()
+                    //       && !getService().isRemoved()
+                    //       && !getService().isNew()
+                    //       && !getService().isOrphaned();
                 }
 
                 public void action() {
@@ -4463,10 +4501,17 @@ public class ServiceInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return !getBrowser().clStatusFailed()
-                           && getService().isAvailable()
-                           && !isStarted(testOnly);
+                public final String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else if (isStarted(testOnly)) {
+                        return "it is already started";
+                    } else {
+                        return getService().isAvailableWithText();
+                    }
+                    //return !getBrowser().clStatusFailed()
+                    //       && getService().isAvailable()
+                    //       && !isStarted(testOnly);
                 }
 
                 public void action() {
@@ -4496,10 +4541,17 @@ public class ServiceInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return !getBrowser().clStatusFailed()
-                           && getService().isAvailable()
-                           && !isStopped(testOnly);
+                public String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else if (isStopped(testOnly)) {
+                        return "it is already stopped";
+                    } else {
+                        return getService().isAvailableWithText();
+                    }
+                    //return !getBrowser().clStatusFailed()
+                    //       && getService().isAvailable()
+                    //       && !isStopped(testOnly);
                 }
 
                 public void action() {
@@ -4539,10 +4591,17 @@ public class ServiceInfo extends EditableInfo {
                            && isOneFailed(testOnly);
                 }
 
-                public boolean enablePredicate() {
-                    return !getBrowser().clStatusFailed()
-                           && getService().isAvailable()
-                           && isOneFailedCount(testOnly);
+                public String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else if (!isOneFailedCount(testOnly)) {
+                        return "no fail count";
+                    } else {
+                        return getService().isAvailableWithText();
+                    }
+                    //return !getBrowser().clStatusFailed()
+                    //       && getService().isAvailable()
+                    //       && isOneFailedCount(testOnly);
                 }
 
                 public void action() {
@@ -4576,9 +4635,14 @@ public class ServiceInfo extends EditableInfo {
                 public boolean predicate() {
                     return !isManaged(testOnly);
                 }
-                public boolean enablePredicate() {
-                    return !getBrowser().clStatusFailed()
-                           && getService().isAvailable();
+                public String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else {
+                        return getService().isAvailableWithText();
+                    }
+                    //return !getBrowser().clStatusFailed()
+                    //       && getService().isAvailable();
                 }
 
                 public void action() {
@@ -4615,17 +4679,24 @@ public class ServiceInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public String enablePredicate() {
                     if (getService().isNew()) {
-                        return true;
+                        return null;
                     }
-                    if (getBrowser().clStatusFailed()
-                        || getService().isRemoved()
-                        || isRunning(testOnly)) {
-                        return false;
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    } else if (getService().isRemoved()) {
+                        return IS_BEING_REMOVED_STRING;
+                    } else if (isRunning(testOnly)) {
+                        return "cannot remove running resource";
                     }
+                    //if (getBrowser().clStatusFailed()
+                    //    || getService().isRemoved()
+                    //    || isRunning(testOnly)) {
+                    //    return false;
+                    //}
                     if (groupInfo == null) {
-                        return true;
+                        return null;
                     }
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     final List<String> gr = cs.getGroupResources(
@@ -4633,7 +4704,11 @@ public class ServiceInfo extends EditableInfo {
                                           testOnly);
 
 
-                    return gr != null && gr.size() > 1;
+                    if (gr != null && gr.size() > 1) {
+                        return null;
+                    } else {
+                        return "you can remove the group";
+                    }
                 }
 
                 public void action() {
@@ -4673,8 +4748,12 @@ public class ServiceInfo extends EditableInfo {
 
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return !getService().isNew();
+            public String enablePredicate() {
+                if (getService().isNew()) {
+                    return IS_NEW_STRING;
+                } else {
+                    return null;
+                }
             }
 
             public void action() {
@@ -4696,8 +4775,8 @@ public class ServiceInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            public boolean enablePredicate() {
-                return true;
+            public String enablePredicate() {
+                return null; //TODO: enable only if it has items
             }
         };
         items.add(advancedSubmenu);
@@ -4734,23 +4813,39 @@ public class ServiceInfo extends EditableInfo {
 
                     public boolean visiblePredicate() {
                         return !host.isClStatus()
-                               || enablePredicate();
+                               || enablePredicate() == null;
                     }
 
-                    public boolean enablePredicate() {
+                    public String enablePredicate() {
                         final List<String> runningOnNodes =
                                                getRunningOnNodes(testOnly);
                         if (runningOnNodes == null
                             || runningOnNodes.isEmpty()) {
-                            return false;
+                            return "it is not running anywhere";
                         }
                         final String runningOnNode =
                                 runningOnNodes.get(0).toLowerCase(Locale.US);
-                        return !getBrowser().clStatusFailed()
-                               && getService().isAvailable()
-                               && !hostName.toLowerCase(Locale.US).equals(
-                                                                 runningOnNode)
-                               && host.isClStatus();
+                        if (getBrowser().clStatusFailed()
+                            || !host.isClStatus()) {
+                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                        } else {
+                            final String tp =
+                                            getService().isAvailableWithText();
+                            if (tp != null) {
+                                return tp;
+                            }
+                        }
+                        if (hostName.toLowerCase(Locale.US).equals(
+                                                             runningOnNode)) {
+                            return "already running on this node";
+                        } else {
+                            return null;
+                        }
+                        //return !getBrowser().clStatusFailed()
+                        //       && getService().isAvailable()
+                        //       && !hostName.toLowerCase(Locale.US).equals(
+                        //                                      runningOnNode)
+                        //       && host.isClStatus();
                     }
 
                     public void action() {
@@ -4785,15 +4880,19 @@ public class ServiceInfo extends EditableInfo {
                 private static final long serialVersionUID = 1L;
 
                 public boolean visiblePredicate() {
-                    return enablePredicate();
+                    return enablePredicate() == null;
                 }
 
-                public boolean enablePredicate() {
+                public String enablePredicate() {
                     // TODO: if it was migrated
-                    return !getBrowser().clStatusFailed()
+                    if (!getBrowser().clStatusFailed()
                            && getService().isAvailable()
                            && (getMigratedTo(testOnly) != null
-                               || getMigratedFrom(testOnly) != null);
+                               || getMigratedFrom(testOnly) != null)) {
+                        return null;
+                    } else {
+                        return ""; /* it's not visible anyway */
+                    }
                 }
 
                 public void action() {
@@ -4845,23 +4944,27 @@ public class ServiceInfo extends EditableInfo {
 
                     public boolean visiblePredicate() {
                         return !host.isClStatus()
-                               || enablePredicate();
+                               || enablePredicate() == null;
                     }
 
-                    public boolean enablePredicate() {
+                    public String enablePredicate() {
                         final List<String> runningOnNodes =
                                                getRunningOnNodes(testOnly);
                         if (runningOnNodes == null
                             || runningOnNodes.size() != 1) {
-                            return false;
+                            return "must run on exactly 1 node";
                         }
                         final String runningOnNode =
                                 runningOnNodes.get(0).toLowerCase(Locale.US);
-                        return !getBrowser().clStatusFailed()
+                        if (!getBrowser().clStatusFailed()
                                && getService().isAvailable()
                                && hostName.toLowerCase(Locale.US).equals(
                                                                  runningOnNode)
-                               && host.isClStatus();
+                               && host.isClStatus()) {
+                            return null;
+                        } else {
+                            return ""; /* is not visible anyway */
+                        }
                     }
 
                     public void action() {
@@ -4909,23 +5012,27 @@ public class ServiceInfo extends EditableInfo {
 
                     public boolean visiblePredicate() {
                         return !host.isClStatus()
-                               || enablePredicate();
+                               || enablePredicate() == null;
                     }
 
-                    public boolean enablePredicate() {
+                    public String enablePredicate() {
                         final List<String> runningOnNodes =
                                                getRunningOnNodes(testOnly);
                         if (runningOnNodes == null
                             || runningOnNodes.isEmpty()) {
-                            return false;
+                            return "it is not running anywhere";
                         }
                         final String runningOnNode =
                                 runningOnNodes.get(0).toLowerCase(Locale.US);
-                        return !getBrowser().clStatusFailed()
+                        if (!getBrowser().clStatusFailed()
                                && getService().isAvailable()
                                && !hostName.toLowerCase(Locale.US).equals(
                                                                  runningOnNode)
-                               && host.isClStatus();
+                               && host.isClStatus()) {
+                            return null;
+                        } else {
+                            return "";
+                        }
                     }
 
                     public void action() {

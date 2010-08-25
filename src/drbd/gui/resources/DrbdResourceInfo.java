@@ -84,6 +84,13 @@ public class DrbdResourceInfo extends EditableInfo
     private String createdFs = null;
     /** Name of the drbd after parameter. */
     private static final String DRBD_RES_PARAM_AFTER = "after";
+    /** String that is displayed as a tool tip if a menu item is used by CRM. */
+    public static final String IS_USED_BY_CRM_STRING =
+                                               "it is used by cluster manager";
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String IS_SYNCING_STRING = "it is being full-synced";
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String IS_VERIFYING_STRING = "it is being verified";
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -1144,17 +1151,17 @@ public class DrbdResourceInfo extends EditableInfo
                 return !isConnected(testOnly);
             }
 
-            public boolean enablePredicate() {
-                //if (!Tools.getConfigData().isAdvancedMode() // TODO: use access
-                //                                            // type for this
-                //                                            // everywhere
+            public final String enablePredicate() {
                 if (isUsedByCRM()) {
-                    return false;
+                    return IS_USED_BY_CRM_STRING;
                 }
-                return !isSyncing();
+                if (isSyncing()) {
+                    return IS_SYNCING_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
@@ -1211,14 +1218,17 @@ public class DrbdResourceInfo extends EditableInfo
            new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean predicate() {
+            public final boolean predicate() {
                 return isPausedSync();
             }
 
-            public boolean enablePredicate() {
-                return isSyncing();
+            public final String enablePredicate() {
+                if (!isSyncing()) {
+                    return "it is not syncing";
+                }
+                return null;
             }
-            public void action() {
+            public final void action() {
                 BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
@@ -1250,11 +1260,15 @@ public class DrbdResourceInfo extends EditableInfo
 
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return isSplitBrain();
+            public final String enablePredicate() {
+                if (isSplitBrain()) {
+                    return null;
+                } else {
+                    return "";
+                }
             }
 
-            public void action() {
+            public final void action() {
                 resolveSplitBrain();
             }
         };
@@ -1270,13 +1284,20 @@ public class DrbdResourceInfo extends EditableInfo
 
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return isConnected(testOnly)
-                       && !isSyncing()
-                       && !isVerifying();
+            public final String enablePredicate() {
+                if (!isConnected(testOnly)) {
+                    return "not connected";
+                }
+                if (isSyncing()) {
+                    return IS_SYNCING_STRING;
+                }
+                if (isVerifying()) {
+                    return IS_VERIFYING_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 verify(testOnly);
             }
         };
@@ -1290,15 +1311,18 @@ public class DrbdResourceInfo extends EditableInfo
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            public void action() {
+            public final void action() {
                 /* this drbdResourceInfo remove myself and this calls
                    removeDrbdResource in this class, that removes the edge
                    in the graph. */
                 removeMyself(testOnly);
             }
 
-            public boolean enablePredicate() {
-                return !isUsedByCRM();
+            public final String enablePredicate() {
+                if (isUsedByCRM()) {
+                    return IS_USED_BY_CRM_STRING;
+                }
+                return null;
             }
         };
         items.add(removeResMenu);
@@ -1313,11 +1337,11 @@ public class DrbdResourceInfo extends EditableInfo
 
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return true;
+            public final String enablePredicate() {
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);

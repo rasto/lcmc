@@ -3888,7 +3888,7 @@ public class CRMXML extends XML {
                     || oRscSet2 == null
                     || rscSet2.isSubsetOf(oRscSet2)
                     || oRscSet2.isSubsetOf(rscSet2))) {
-                 /* at least one subset without rscset beeing null. */
+                 /* at least one subset without rscset being null. */
                 if ((rscSet1 != null && rscSet1.isSubsetOf(oRscSet1))
                     || (oRscSet1 != null && oRscSet1.isSubsetOf(rscSet1))
                     || (rscSet2 != null && rscSet2.isSubsetOf(oRscSet2))

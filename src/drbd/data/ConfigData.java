@@ -678,7 +678,7 @@ public class ConfigData implements Serializable {
      */
     public final boolean isAccessible(final AccessMode required) {
         return getAccessType().compareTo(required.getAccessType()) > 0
-               || (getAccessType().compareTo(required.getAccessType()) == 0 
+               || (getAccessType().compareTo(required.getAccessType()) == 0
                    && (advancedMode || !required.isAdvancedMode()));
     }
 

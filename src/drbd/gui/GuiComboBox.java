@@ -155,6 +155,8 @@ public class GuiComboBox extends JPanel {
                                                     false);
     /** Tooltip if element is enabled. */
     private String toolTipText = null;
+    /** Tooltip for label if it is enabled. */
+    private String labelToolTipText = null;
     /** getValue setValue lock. */
     private final Mutex mValueLock = new Mutex();
 
@@ -578,18 +580,14 @@ public class GuiComboBox extends JPanel {
         return cb;
     }
 
-    /**
-     * Sets the tooltip text.
-     */
+    /** Sets the tooltip text. */
     public final void setToolTipText(String text) {
         toolTipText = text;
         if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
             final boolean accessible =
                      Tools.getConfigData().isAccessible(enableAccessMode);
             if (!accessible) {
-                final String tp = getDisabledTooltip();
-                text = text + tp;
-                // TODO: label tool tip
+                text = text + getDisabledTooltip();
             }
         }
         if (type == Type.TEXTFIELDWITHUNIT) {
@@ -603,6 +601,19 @@ public class GuiComboBox extends JPanel {
         }
     }
 
+    /** Sets label tooltip text. */
+    public final void setLabelToolTipText(String text) {
+        labelToolTipText = text;
+        if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
+            final boolean accessible =
+                     Tools.getConfigData().isAccessible(enableAccessMode);
+            if (!accessible) {
+                text = text + getDisabledTooltip();
+            }
+        }
+        label.setToolTipText("<html>" + text + "</html>");
+    }
+
     /**
      * Returns tooltip for disabled element.
      */
@@ -611,7 +622,7 @@ public class GuiComboBox extends JPanel {
         if (enableAccessMode.isAdvancedMode()) {
             advanced = "Advanced ";
         }
-        return "<br>available in \""
+        return "<br>editable in \""
                + advanced
                + ConfigData.OP_MODES_MAP.get(enableAccessMode.getAccessType())
                + "\" mode";
@@ -1531,16 +1542,14 @@ public class GuiComboBox extends JPanel {
         });
     }
 
-    /**
-     * Sets label for this component.
-     */
-    public final void setLabel(final JLabel label) {
+    /** Sets label for this component. */
+    public final void setLabel(final JLabel label,
+                               final String labelToolTipText) {
         this.label = label;
+        this.labelToolTipText = labelToolTipText;
     }
 
-    /**
-     * Returns label for this component.
-     */
+    /** Returns label for this component. */
     public final JLabel getLabel() {
         return label;
     }
@@ -1561,6 +1570,9 @@ public class GuiComboBox extends JPanel {
             setToolTipText(toolTipText);
         }
         if (label != null) {
+            if (labelToolTipText != null) {
+                setLabelToolTipText(labelToolTipText);
+            }
             label.setEnabled(accessible);
         }
     }

@@ -138,14 +138,17 @@ class VirtualDomainInfo extends ServiceInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public String enablePredicate() {
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml == null || vmsVirtualDomainInfo == null) {
-                        return false;
+                        return "VM is not available";
                     }
                     final int remotePort = vxml.getRemotePort(
                                                vmsVirtualDomainInfo.getName());
-                    return remotePort > 0;
+                    if (remotePort <=0) {
+                        return "remote port is not greater than 0";
+                    }
+                    return null;
                 }
 
                 public void action() {
@@ -180,14 +183,17 @@ class VirtualDomainInfo extends ServiceInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public String enablePredicate() {
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml == null || vmsVirtualDomainInfo == null) {
-                        return false;
+                        return "VM is not available";
                     }
                     final int remotePort = vxml.getRemotePort(
                                                vmsVirtualDomainInfo.getName());
-                    return remotePort > 0;
+                    if (remotePort <=0) {
+                        return "remote port is not greater than 0";
+                    }
+                    return null;
                 }
 
                 public void action() {
@@ -222,14 +228,17 @@ class VirtualDomainInfo extends ServiceInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public String enablePredicate() {
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml == null || vmsVirtualDomainInfo == null) {
-                        return false;
+                        return "VM is not available";
                     }
                     final int remotePort = vxml.getRemotePort(
                                                vmsVirtualDomainInfo.getName());
-                    return remotePort > 0;
+                    if (remotePort <=0) {
+                        return "remote port is not greater than 0";
+                    }
+                    return null;
                 }
 
                 public void action() {

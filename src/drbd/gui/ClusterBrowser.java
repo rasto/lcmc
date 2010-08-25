@@ -328,6 +328,9 @@ public class ClusterBrowser extends Browser {
     /** Small cluster icon. */
     public static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
                           Tools.getDefault("ClusterBrowser.ClusterIconSmall"));
+    /** String that appears as a tooltip in menu items if status was disabled.*/
+    public static final String UNKNOWN_CLUSTER_STATUS_STRING =
+                                                     "unknown cluster status";
     /**
      * Prepares a new <code>CusterBrowser</code> object.
      */

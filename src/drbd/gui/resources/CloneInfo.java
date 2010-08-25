@@ -559,8 +559,8 @@ public class CloneInfo extends ServiceInfo {
                                                     false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return true;
+            public String enablePredicate() {
+                return null;
             }
 
             public void update() {

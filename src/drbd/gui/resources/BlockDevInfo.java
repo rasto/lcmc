@@ -112,6 +112,9 @@ public class BlockDevInfo extends EditableInfo {
                                           new Subtext("mounted", Color.BLUE);
     /** String length after the cut. */
     private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String NO_DRBD_RESOURCE_STRING =
+                                                "it is not a drbd resource";
 
     /**
      * Prepares a new <code>BlockDevInfo</code> object.
@@ -1023,10 +1026,18 @@ public class BlockDevInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public final boolean enablePredicate() {
-                return drbdResourceInfo == null
-                       && getHost().isConnected()
-                       && getHost().isDrbdLoaded();
+            public final String enablePredicate() {
+                if (drbdResourceInfo != null) {
+                    return "it is already a drbd resouce";
+                } else if (!getHost().isConnected()) {
+                    return Host.NOT_CONNECTED_STRING;
+                } else if (getHost().isDrbdLoaded()) {
+                    return "drbd is not loaded";
+                }
+                return null;
+                //return drbdResourceInfo == null
+                //       && getHost().isConnected()
+                //       && getHost().isDrbdLoaded();
             }
 
             public void update() {
@@ -1047,9 +1058,16 @@ public class BlockDevInfo extends EditableInfo {
                                                     false)) {
                         private static final long serialVersionUID = 1L;
 
-                        public final boolean enablePredicate() {
-                            return oHost.isConnected()
-                                   && oHost.isDrbdLoaded();
+                        public final String enablePredicate() {
+                            if (!oHost.isConnected()) {
+                                return Host.NOT_CONNECTED_STRING;
+                            } else if (oHost.isDrbdLoaded()) {
+                                return "drbd is not loaded";
+                            } else {
+                                return null;
+                            }
+                            //return oHost.isConnected()
+                            //       && oHost.isDrbdLoaded();
                         }
 
                         public final void update() {
@@ -1096,7 +1114,7 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.Attach"),
                            HARDDISK_ICON_LARGE,
                            Tools.getString("HostBrowser.Drbd.Attach.ToolTip"),
-                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1105,15 +1123,21 @@ public class BlockDevInfo extends EditableInfo {
                            || getBlockDevice().isAttached();
                 }
 
-                public boolean enablePredicate() {
+                public boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return !getBlockDevice().isSyncing();
+                    if (getBlockDevice().isSyncing()) {
+                        return DrbdResourceInfo.IS_SYNCING_STRING;
+                    }
+                    return null;
                 }
 
                 public void action() {
@@ -1149,28 +1173,35 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.Connect"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean predicate() {
+                public final boolean predicate() {
                     return isConnectedOrWF(testOnly);
                 }
 
-                public boolean enablePredicate() {
+                public final boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return !getBlockDevice().isSyncing()
+                    if (!getBlockDevice().isSyncing()
                         || ((getBlockDevice().isPrimary()
                             && getBlockDevice().isSyncSource())
                             || (getOtherBlockDevInfo().getBlockDevice().
                                                                 isPrimary()
-                                && getBlockDevice().isSyncTarget()));
+                                && getBlockDevice().isSyncTarget()))) {
+                        return null;
+                    } else {
+                        return DrbdResourceInfo.IS_SYNCING_STRING;
+                    }
                 }
 
                 public void action() {
@@ -1208,7 +1239,7 @@ public class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.SetPrimary"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1220,15 +1251,21 @@ public class BlockDevInfo extends EditableInfo {
                          && getOtherBlockDevInfo().getBlockDevice().isPrimary();
                 }
 
-                public boolean enablePredicate() {
+                public boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return getBlockDevice().isSecondary();
+                    if (!getBlockDevice().isSecondary()) {
+                        return "cannot do that to the primary";
+                    }
+                    return null;
                 }
 
                 public void action() {
@@ -1247,19 +1284,25 @@ public class BlockDevInfo extends EditableInfo {
                            null,
                            Tools.getString(
                                 "HostBrowser.Drbd.SetSecondary.ToolTip"),
-                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return getBlockDevice().isPrimary();
+                    if (!getBlockDevice().isPrimary()) {
+                        return "cannot do that to the secondary";
+                    }
+                    return null;
                 }
 
                 public void action() {
@@ -1274,19 +1317,22 @@ public class BlockDevInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ForcePrimary"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public final boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return true;
+                    return null;
                 }
 
                 public void action() {
@@ -1301,20 +1347,30 @@ public class BlockDevInfo extends EditableInfo {
                    Tools.getString("HostBrowser.Drbd.Invalidate"),
                    null,
                    Tools.getString("HostBrowser.Drbd.Invalidate.ToolTip"),
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.ADMIN, true),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public final boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return !getBlockDevice().isSyncing()
-                           && !getDrbdResourceInfo().isVerifying();
+                    if (getBlockDevice().isSyncing()) {
+                        return DrbdResourceInfo.IS_SYNCING_STRING;
+                    }
+                    if (getDrbdResourceInfo().isVerifying()) {
+                        return DrbdResourceInfo.IS_VERIFYING_STRING;
+                    }
+                    return null;
+                    //return !getBlockDevice().isSyncing()
+                    //       && !getDrbdResourceInfo().isVerifying();
                 }
 
                 public void action() {
@@ -1333,7 +1389,7 @@ public class BlockDevInfo extends EditableInfo {
                        Tools.getString("HostBrowser.Drbd.PauseSync"),
                        null,
                        Tools.getString("HostBrowser.Drbd.PauseSync.ToolTip"),
-                       new AccessMode(ConfigData.AccessType.OP, false),
+                       new AccessMode(ConfigData.AccessType.OP, true),
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1342,15 +1398,21 @@ public class BlockDevInfo extends EditableInfo {
                            && getBlockDevice().isPausedSync();
                 }
 
-                public boolean enablePredicate() {
+                public final boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return getBlockDevice().isSyncing();
+                    if (!getBlockDevice().isSyncing()) {
+                        return "it is not being synced";
+                    }
+                    return null;
                 }
 
                 public void action() {
@@ -1369,19 +1431,25 @@ public class BlockDevInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Resize"),
                            null,
                            Tools.getString("HostBrowser.Drbd.Resize.ToolTip"),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.ADMIN, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public final boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return !getBlockDevice().isSyncing();
+                    if (getBlockDevice().isSyncing()) {
+                        return DrbdResourceInfo.IS_SYNCING_STRING;
+                    }
+                    return null;
                 }
 
                 public void action() {
@@ -1396,21 +1464,34 @@ public class BlockDevInfo extends EditableInfo {
                            null,
                            Tools.getString(
                                      "HostBrowser.Drbd.DiscardData.ToolTip"),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.ADMIN, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
+                public final boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
-                        return false;
+                        return NO_DRBD_RESOURCE_STRING;
                     }
-                    if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdResourceInfo().isUsedByCRM()) {
-                        return false;
+                    if (getDrbdResourceInfo().isUsedByCRM()) {
+                        return DrbdResourceInfo.IS_USED_BY_CRM_STRING;
                     }
-                    return !getBlockDevice().isSyncing()
-                           && !isConnected(testOnly)
-                           && !getBlockDevice().isPrimary();
+                    if (getBlockDevice().isSyncing()) {
+                        return DrbdResourceInfo.IS_SYNCING_STRING;
+                    }
+                    //if (isConnected(testOnly)) { // ? TODO: check this
+                    //    return "is connected";
+                    //}
+                    if (getBlockDevice().isPrimary()) {
+                        return "cannot do that to the primary";
+                    }
+                    return null;
+                    //return !getBlockDevice().isSyncing()
+                    //       && !isConnected(testOnly)
+                    //       && !getBlockDevice().isPrimary();
                 }
 
                 public void action() {
@@ -1428,11 +1509,12 @@ public class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    if (!getBlockDevice().isDrbd()) {
-                        return false;
-                    }
-                    return true;
+                public final boolean visiblePredicate() {
+                    return getBlockDevice().isDrbd();
+                }
+
+                public final String enablePredicate() {
+                    return null;
                 }
 
                 public void action() {
@@ -1450,17 +1532,15 @@ public class BlockDevInfo extends EditableInfo {
     /**
      * Returns how much of the block device is used.
      */
-     public final int getUsed() {
-         if (drbdResourceInfo != null) {
-             return drbdResourceInfo.getUsed();
-         }
-         return getBlockDevice().getUsed();
-     }
+    public final int getUsed() {
+        if (drbdResourceInfo != null) {
+            return drbdResourceInfo.getUsed();
+        }
+        return getBlockDevice().getUsed();
+    }
 
-     /**
-      * Returns text that appears above the icon.
-      */
-    public String getIconTextForGraph(final boolean testOnly) {
+     /** Returns text that appears above the icon. */
+    public final String getIconTextForGraph(final boolean testOnly) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
         }

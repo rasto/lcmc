@@ -335,10 +335,10 @@ public abstract class EditableInfo extends Info {
             /* label */
             final JLabel label = new JLabel(getParamShortDesc(param));
             labelMap.put(paramCb, label);
-            paramCb.setLabel(label);
+            final String longDesc = getParamLongDesc(param);
+            paramCb.setLabel(label, longDesc);
 
             /* tool tip */
-            final String longDesc = getParamLongDesc(param);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     paramCb.setToolTipText(getToolTipText(param));
@@ -435,7 +435,7 @@ public abstract class EditableInfo extends Info {
                         final JPanel saPanel = new JPanel(new SpringLayout());
                         saPanel.setBackground(Browser.STATUS_BACKGROUND);
                         final JLabel label = new JLabel("Same As");
-                        sameAsCombo.setLabel(label);
+                        sameAsCombo.setLabel(label, "");
                         addField(saPanel,
                                  label,
                                  sameAsCombo,

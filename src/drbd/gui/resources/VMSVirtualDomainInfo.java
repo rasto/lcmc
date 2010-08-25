@@ -244,6 +244,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String NO_VM_STATUS_STRING =
+                                                "VM status is not available";
 
     static {
         SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
@@ -1741,11 +1744,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return true;
+            public final String enablePredicate() {
+                return null;
             }
 
-            public void update() {
+            public final void update() {
                 super.update();
                 removeAll();
                 final Point2D pos = getPos();
@@ -1924,11 +1927,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                        && !vmsxml.isRunning(getDomainName());
             }
 
-            public boolean enablePredicate() {
-                return true;
+            public final String enablePredicate() {
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -1965,11 +1968,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                        && vmsxml.isRunning(getDomainName());
             }
 
-            public boolean enablePredicate() {
-                return true;
+            public final String enablePredicate() {
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -2006,11 +2009,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                        && vmsxml.isRunning(getDomainName());
             }
 
-            public boolean enablePredicate() {
-                return true;
+            public final String enablePredicate() {
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -2047,13 +2050,20 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                        && vmsxml.isSuspended(getDomainName());
             }
 
-            public boolean enablePredicate() {
+            public final String enablePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                return vmsxml != null
-                       && vmsxml.isSuspended(getDomainName());
+                if (vmsxml == null) {
+                    return NO_VM_STATUS_STRING;
+                }
+                if (!vmsxml.isSuspended(getDomainName())) {
+                    return "it is not suspended";
+                }
+                return null;
+                //return vmsxml != null
+                //       && vmsxml.isSuspended(getDomainName());
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -2091,11 +2101,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                        && vmsxml.isRunning(getDomainName());
             }
 
-            public boolean enablePredicate() {
-                return true;
+            public final String enablePredicate() {
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -2132,13 +2142,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                        && vmsxml.isRunning(getDomainName());
             }
 
-            public boolean enablePredicate() {
+            public final String enablePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                return vmsxml != null
-                       && !vmsxml.isSuspended(getDomainName());
+                if (vmsxml == null) {
+                    return NO_VM_STATUS_STRING;
+                }
+                if (vmsxml.isSuspended(getDomainName())) {
+                    return "it is already suspended";
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -2175,13 +2190,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                        && vmsxml.isRunning(getDomainName());
             }
 
-            public boolean enablePredicate() {
+            public final String enablePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                return vmsxml != null
-                       && vmsxml.isSuspended(getDomainName());
+                if (vmsxml == null) {
+                    return NO_VM_STATUS_STRING;
+                }
+                if (!vmsxml.isSuspended(getDomainName())) {
+                    return "it is not suspended";
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -2234,8 +2254,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            public boolean enablePredicate() {
-                return true;
+            public final String enablePredicate() {
+                return null;
             }
         };
         items.add(advancedSubmenu);
@@ -2290,17 +2310,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return visiblePredicate();
+                public final String enablePredicate() {
+                    if (visiblePredicate()) {
+                        return null;
+                    } else {
+                        return "disabled";
+                    }
                 }
 
-                public boolean visiblePredicate() {
+                public final boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
                            && vmsxml.isRunning(getDomainName());
                 }
 
-                public void action() {
+                public final void action() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             getPopup().setVisible(false);
@@ -2331,17 +2355,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return visiblePredicate();
+                public final String enablePredicate() {
+                    if (visiblePredicate()) {
+                        return null;
+                    } else {
+                        return "disabled";
+                    }
                 }
 
-                public boolean visiblePredicate() {
+                public final boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
                            && vmsxml.isRunning(getDomainName());
                 }
 
-                public void action() {
+                public final void action() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             getPopup().setVisible(false);
@@ -2372,11 +2400,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return visiblePredicate();
+                public final String enablePredicate() {
+                    if (visiblePredicate()) {
+                        return null;
+                    } else {
+                        return "disabled";
+                    }
                 }
 
-                public boolean visiblePredicate() {
+                public final boolean visiblePredicate() {
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     return vmsxml != null
                            && vmsxml.isRunning(getDomainName());

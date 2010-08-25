@@ -557,8 +557,8 @@ public class AllHostsInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return true;
+                public String enablePredicate() {
+                    return null;
                 }
 
                 public void action() {

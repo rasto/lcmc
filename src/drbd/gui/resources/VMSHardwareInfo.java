@@ -247,8 +247,10 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         return null;
     }
 
-    /** Returns whether this item is removeable. */
-    protected abstract boolean isRemoveable();
+    /**
+     * Returns whether this item is removeable (null), or string why it isn't.
+     */
+    protected abstract String isRemoveable();
 
     /** Returns list of menu items. */
     public final List<UpdatableItem> createPopup() {
@@ -263,9 +265,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
+            public String enablePredicate() {
                 if (getResource().isNew()) {
-                    return true;
+                    return null;
                 }
                 return isRemoveable();
             }

@@ -1137,11 +1137,14 @@ public class ServicesInfo extends EditableInfo {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return !getBrowser().clStatusFailed();
+                public final String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             getPopup().setVisible(false);
@@ -1167,11 +1170,14 @@ public class ServicesInfo extends EditableInfo {
                                        false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed();
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                return null;
             }
 
-            public void update() {
+            public final void update() {
                 super.update();
                 removeAll();
                 Point2D pos = getPos();
@@ -1371,11 +1377,14 @@ public class ServicesInfo extends EditableInfo {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return !getBrowser().clStatusFailed();
+                public final String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             getPopup().setVisible(false);
@@ -1404,22 +1413,21 @@ public class ServicesInfo extends EditableInfo {
         final MyMenuItem removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),
                 ClusterBrowser.REMOVE_ICON,
-                new AccessMode(ConfigData.AccessType.ADMIN,
-                               false),
-                new AccessMode(ConfigData.AccessType.ADMIN,
-                               false)) {
+                new AccessMode(ConfigData.AccessType.ADMIN, true),
+                new AccessMode(ConfigData.AccessType.ADMIN, true)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean visiblePredicate() {
-                return Tools.getConfigData().isAdvancedMode();
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                if (getBrowser().getExistingServiceList(null).isEmpty()) {
+                    return "there are no other services";
+                }
+                return null;
             }
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed()
-                       && !getBrowser().getExistingServiceList(null).isEmpty();
-            }
-
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
@@ -1463,11 +1471,11 @@ public class ServicesInfo extends EditableInfo {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return true;
+                public final String enablePredicate() {
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     ClusterLogs l = new ClusterLogs(getBrowser().getCluster());
                     l.showDialog();
                 }

@@ -224,9 +224,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /**
      * Returns whether the item should be enabled or not.
+     * null if it should be enabled or some string that can be used as
+     * tooltip if it should be disabled.
      */
-    public boolean enablePredicate() {
-        return true;
+    public String enablePredicate() {
+        return null;
     }
 
     /**
@@ -264,24 +266,31 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private void processAccessMode() {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessMode);
-        setEnabled(enablePredicate() && accessible);
+        final String disableTooltip = enablePredicate();
+        setEnabled(disableTooltip == null && accessible);
         setVisible(visiblePredicate()
                    && Tools.getConfigData().isAccessible(visibleAccessMode));
         String advanced = "";
         if (enableAccessMode.isAdvancedMode()) {
             advanced = "Advanced ";
         }
-        if (isVisible()
-            && !accessible
-            && enableAccessMode.getAccessType()
-               != ConfigData.AccessType.NEVER) {
-            setToolTipText("<html><b>"
-                           + getText()
-                           + " (disabled)</b><br>available in \""
-                           + advanced
-                           + ConfigData.OP_MODES_MAP.get(
-                                            enableAccessMode.getAccessType())
-                           + "\" mode</html>");
+        if (isVisible()) {
+            if (!accessible && enableAccessMode.getAccessType()
+                               != ConfigData.AccessType.NEVER) {
+                setToolTipText("<html><b>"
+                               + getText()
+                               + " (disabled)</b><br>available in \""
+                               + advanced
+                               + ConfigData.OP_MODES_MAP.get(
+                                                enableAccessMode.getAccessType())
+                               + "\" mode</html>");
+            } else if (disableTooltip != null) {
+                setToolTipText("<html><b>"
+                               + getText()
+                               + " (disabled)</b><br>"
+                               + disableTooltip
+                               + "</html>");
+            }
         }
     }
 

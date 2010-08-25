@@ -374,12 +374,13 @@ public class ConstraintPHInfo extends ServiceInfo {
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                if (getBrowser().clStatusFailed()
-                    || getService().isRemoved()) {
-                    return false;
+            public String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                } else if (getService().isRemoved()) {
+                    return IS_BEING_REMOVED_STRING;
                 }
-                return true;
+                return null;
             }
 
             public void action() {

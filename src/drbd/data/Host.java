@@ -210,6 +210,9 @@ public class Host implements Serializable {
     private String oldHwInfo = null;
     /** Index of this host in its cluster. */
     private int index = 0;
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String NOT_CONNECTED_STRING =
+                                                   "not connected to the host";
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.

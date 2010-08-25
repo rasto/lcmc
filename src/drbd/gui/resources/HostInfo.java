@@ -84,6 +84,9 @@ public class HostInfo extends Info {
     /** Standby subtext. */
     private static final Subtext STANDBY_SUBTEXT =
                                          new Subtext("STANDBY", Color.RED);
+    /** String that is displayed as a tool tip for disabled menu item. */
+    private static final String NO_PCMK_STATUS_STRING =
+                                             "cluster status is not available";
     /**
      * Prepares a new <code>HostInfo</code> object.
      */
@@ -262,11 +265,11 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return true;
+                public final String enablePredicate() {
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     final EditHostDialog dialog = new EditHostDialog(host);
                     dialog.showDialogs();
                 }
@@ -287,15 +290,18 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean predicate() {
+                public final boolean predicate() {
                     return !isStandby(testOnly);
                 }
 
-                public boolean enablePredicate() {
-                    return getHost().isClStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isClStatus()) {
+                        return NO_PCMK_STATUS_STRING;
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     if (isStandby(testOnly)) {
                         CRM.standByOff(host, testOnly);
                     } else {
@@ -327,11 +333,11 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return true;
+                public final String enablePredicate() {
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     Color newColor = JColorChooser.showDialog(
                                         Tools.getGUIData().getMainFrame(),
                                         "Choose " + host.getName()
@@ -353,11 +359,14 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isConnected();
+                public final String enablePredicate() {
+                    if (!getHost().isConnected()) {
+                        return Host.NOT_CONNECTED_STRING;
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     drbd.gui.dialog.HostLogs l =
                                            new drbd.gui.dialog.HostLogs(host);
                     l.showDialog();
@@ -370,11 +379,15 @@ public class HostInfo extends Info {
                         new AccessMode(ConfigData.AccessType.OP, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            public boolean enablePredicate() {
-                return host.isConnected();
+
+            public final String enablePredicate() {
+                if (!host.isConnected()) {
+                    return Host.NOT_CONNECTED_STRING;
+                }
+                return null;
             }
 
-            public void update() {
+            public final void update() {
                 super.update();
                 getBrowser().addAdvancedMenu(this);
             }
@@ -390,11 +403,14 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().getCluster() == null;
+                public final String enablePredicate() {
+                    if (getHost().getCluster() != null) {
+                        return "it is a member of a cluster";
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     getHost().disconnect();
                     Tools.getConfigData().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();

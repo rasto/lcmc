@@ -390,8 +390,12 @@ public class GroupInfo extends ServiceInfo {
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed();
+            public String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                } else {
+                    return null;
+                }
             }
 
             public void update() {
@@ -469,8 +473,8 @@ public class GroupInfo extends ServiceInfo {
                             new AccessMode(ConfigData.AccessType.RO, false)) {
                     private static final long serialVersionUID = 1L;
 
-                    public boolean enablePredicate() {
-                        return true;
+                    public String enablePredicate() {
+                        return null;
                     }
 
                     public void update() {

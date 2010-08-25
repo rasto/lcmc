@@ -248,6 +248,27 @@ public class Service extends Resource {
     }
 
     /**
+     * Returns whether the service is available with text why it isn't, null if
+     * it is.
+     */
+    public final String isAvailableWithText() {
+        if (isNew()) {
+            return "it is not applied yet";
+        } else if (modified) {
+            return "it is being modified";
+        } else if (removed) {
+            return "it is being removed";
+        } else if (modifying) {
+            return "it is being modified";
+        } else if (removing) {
+            return "it is being removed";
+        } else if (orphaned) {
+            return "cannot do that to an orphan";
+        }
+        return null;
+    }
+
+    /**
      * Sets heartbeat resource class heartbeat (old style), ocf, lsb (from
      * init.d).
      */

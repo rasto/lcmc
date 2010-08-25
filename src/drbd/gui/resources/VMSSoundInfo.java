@@ -320,8 +320,10 @@ public class VMSSoundInfo extends VMSHardwareInfo {
         }
     }
 
-    /** Returns whether this item is removeable. */
-    protected final boolean isRemoveable() {
-        return true;
+    /**
+     * Returns whether this item is removeable (null), or string why it isn't.
+     */
+    protected final String isRemoveable() {
+        return null;
     }
 }

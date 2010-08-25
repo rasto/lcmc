@@ -339,15 +339,17 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
         }
     }
 
-    /** Returns whether this item is removeable. */
-    protected final boolean isRemoveable() {
+    /**
+     * Returns whether this item is removeable (null), or string why it isn't.
+     */
+    protected final String isRemoveable() {
         final String type = getParamSaved(InputDevData.TYPE);
         if (type != null && "mouse".equals(type)) {
             final String bus = getParamSaved(InputDevData.BUS);
             if (bus != null && "ps2".equals(bus)) {
-                return false;
+                return "You can never remove this one";
             }
         }
-        return true;
+        return null;
     }
 }

@@ -518,11 +518,14 @@ public class HbConnectionInfo extends EditableInfo {
                      new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed();
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 getBrowser().getHeartbeatGraph().removeConnection(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
@@ -559,15 +562,18 @@ public class HbConnectionInfo extends EditableInfo {
                 new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean predicate() {
+            public final boolean predicate() {
                 return getBrowser().getHeartbeatGraph().isOrder(thisClass);
             }
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed();
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 if (this.getText().equals(Tools.getString(
                                        "ClusterBrowser.Hb.RemoveOrder"))) {
                     getBrowser().getHeartbeatGraph().removeOrder(
@@ -633,15 +639,18 @@ public class HbConnectionInfo extends EditableInfo {
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean predicate() {
+            public final boolean predicate() {
                 return getBrowser().getHeartbeatGraph().isColocation(thisClass);
             }
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed();
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 if (this.getText().equals(Tools.getString(
                                   "ClusterBrowser.Hb.RemoveColocation"))) {
                     getBrowser().getHeartbeatGraph().removeColocation(

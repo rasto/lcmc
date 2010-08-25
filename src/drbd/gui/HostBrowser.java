@@ -382,11 +382,14 @@ public class HostBrowser extends Browser {
                     new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return host.isConnected();
+            public final String enablePredicate() {
+                if (!host.isConnected()) {
+                    return Host.NOT_CONNECTED_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelPanic";
@@ -412,11 +415,14 @@ public class HostBrowser extends Browser {
                     new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return host.isConnected();
+            public final String enablePredicate() {
+                if (!host.isConnected()) {
+                    return Host.NOT_CONNECTED_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelReboot";

@@ -67,6 +67,9 @@ import javax.swing.JColorChooser;
 public class HostDrbdInfo extends Info {
     /** Host data. */
     private final Host host;
+    /** String that is displayed as a tool tip for disabled menu item. */
+    private static final String NO_DRBD_STATUS_STRING =
+                                                "drbd status is not available";
     /**
      * Prepares a new <code>HostDrbdInfo</code> object.
      */
@@ -257,11 +260,11 @@ public class HostDrbdInfo extends Info {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return true;
+                public final String enablePredicate() {
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     final EditHostDialog dialog = new EditHostDialog(host);
                     dialog.showDialogs();
                 }
@@ -278,12 +281,18 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isConnected()
-                           && !getHost().isDrbdStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isConnected()) {
+                        return Host.NOT_CONNECTED_STRING;
+                    } else if (getHost().isDrbdStatus()) {
+                        return "already loaded";
+                    }
+                    return null;
+                    //return getHost().isConnected()
+                    //       && !getHost().isDrbdStatus();
                 }
 
-                public void action() {
+                public final void action() {
                     DRBD.load(getHost(), testOnly);
                 }
             };
@@ -298,11 +307,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isDrbdStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isDrbdStatus()) {
+                        return NO_DRBD_STATUS_STRING;
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     for (final BlockDevInfo bdi
                                          : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -325,11 +337,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isConnected();
+                public final String enablePredicate() {
+                    if (!getHost().isConnected()) {
+                        return Host.NOT_CONNECTED_STRING;
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     upgradeDrbd();
                 }
             };
@@ -344,11 +359,11 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return true;
+                public final String enablePredicate() {
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     Color newColor = JColorChooser.showDialog(
                                             Tools.getGUIData().getMainFrame(),
                                             "Choose " + host.getName()
@@ -370,11 +385,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isConnected();
+                public final String enablePredicate() {
+                    if (!getHost().isConnected()) {
+                        return Host.NOT_CONNECTED_STRING;
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     drbd.gui.dialog.drbd.DrbdsLog l =
                                       new drbd.gui.dialog.drbd.DrbdsLog(host);
                     l.showDialog();
@@ -391,11 +409,15 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isDrbdStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isDrbdStatus()) {
+                        return NO_DRBD_STATUS_STRING;
+                    } else {
+                        return null;
+                    }
                 }
 
-                public void action() {
+                public final void action() {
                     for (final BlockDevInfo bdi
                                          : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -416,11 +438,15 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isDrbdStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isDrbdStatus()) {
+                        return NO_DRBD_STATUS_STRING;
+                    } else {
+                        return null;
+                    }
                 }
 
-                public void action() {
+                public final void action() {
                     for (final BlockDevInfo bdi
                                           : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -441,11 +467,15 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isDrbdStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isDrbdStatus()) {
+                        return NO_DRBD_STATUS_STRING;
+                    } else {
+                        return null;
+                    }
                 }
 
-                public void action() {
+                public final void action() {
                     for (final BlockDevInfo bdi
                                            : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -470,8 +500,12 @@ public class HostDrbdInfo extends Info {
                                                    false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isDrbdStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isDrbdStatus()) {
+                        return NO_DRBD_STATUS_STRING;
+                    } else {
+                        return null;
+                    }
                 }
 
                 public void action() {
@@ -495,11 +529,15 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().isDrbdStatus();
+                public final String enablePredicate() {
+                    if (!getHost().isDrbdStatus()) {
+                        return NO_DRBD_STATUS_STRING;
+                    } else {
+                        return null;
+                    }
                 }
 
-                public void action() {
+                public final void action() {
                     for (final BlockDevInfo bdi
                                         : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -520,11 +558,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public boolean enablePredicate() {
-                    return getHost().getCluster() == null;
+                public final String enablePredicate() {
+                    if (getHost().getCluster() != null) {
+                        return "it is a member of a cluster";
+                    }
+                    return null;
                 }
 
-                public void action() {
+                public final void action() {
                     getHost().disconnect();
                     Tools.getConfigData().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
@@ -539,11 +580,14 @@ public class HostDrbdInfo extends Info {
                                 new AccessMode(ConfigData.AccessType.OP,
                                                false)) {
             private static final long serialVersionUID = 1L;
-            public boolean enablePredicate() {
-                return host.isConnected();
+            public final String enablePredicate() {
+                if (!host.isConnected()) {
+                    return Host.NOT_CONNECTED_STRING;
+                }
+                return null;
             }
 
-            public void update() {
+            public final void update() {
                 super.update();
                 getBrowser().addAdvancedMenu(this);
             }

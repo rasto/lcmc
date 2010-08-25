@@ -169,11 +169,14 @@ public class AvailableServiceInfo extends HbCategoryInfo {
 
             private static final long serialVersionUID = 1L;
 
-            public boolean enablePredicate() {
-                return !getBrowser().clStatusFailed();
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                return null;
             }
 
-            public void action() {
+            public final void action() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getPopup().setVisible(false);
