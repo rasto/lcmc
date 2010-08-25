@@ -431,6 +431,7 @@ public class ServicesInfo extends EditableInfo {
                             clStatus.getParamValuePairs(grpOrCloneId));
         }
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        boolean newService = false;
         for (String hbId : clStatus.getGroupResources(grpOrCloneId,
                                                            testOnly)) {
             if (allGroupsAndClones.contains(hbId)) {
@@ -465,6 +466,7 @@ public class ServicesInfo extends EditableInfo {
             final Map<String, String> resourceNode =
                                        clStatus.getParamValuePairs(hbId);
             if (newSi == null) {
+                newService = true;
                 // TODO: get rid of the service name? (everywhere)
                 String serviceName;
                 if (newRA == null) {
@@ -535,6 +537,9 @@ public class ServicesInfo extends EditableInfo {
             if (!testOnly) {
                 newSi.setUpdated(false);
             }
+        }
+        if (newService) {
+            getBrowser().reload(getBrowser().getServicesNode());
         }
         hg.repaint();
     }
@@ -1427,7 +1432,7 @@ public class ServicesInfo extends EditableInfo {
                 }
                 for (ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
-                    if (!si.isStopped(false)) {
+                    if (!si.isStopped(false) && !si.getService().isOrphaned()) {
                         return null;
                     }
                 }
