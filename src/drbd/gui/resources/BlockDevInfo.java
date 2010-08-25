@@ -1031,7 +1031,7 @@ public class BlockDevInfo extends EditableInfo {
                     return "it is already a drbd resouce";
                 } else if (!getHost().isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
-                } else if (getHost().isDrbdLoaded()) {
+                } else if (!getHost().isDrbdLoaded()) {
                     return "drbd is not loaded";
                 }
                 return null;
@@ -1061,7 +1061,7 @@ public class BlockDevInfo extends EditableInfo {
                         public final String enablePredicate() {
                             if (!oHost.isConnected()) {
                                 return Host.NOT_CONNECTED_STRING;
-                            } else if (oHost.isDrbdLoaded()) {
+                            } else if (!oHost.isDrbdLoaded()) {
                                 return "drbd is not loaded";
                             } else {
                                 return null;

@@ -1409,6 +1409,52 @@ public class ServicesInfo extends EditableInfo {
                 }
             };
         items.add((UpdatableItem) addConstraintPlaceholder);
+
+        /* stop all services. */
+        final MyMenuItem stopMenuItem = new MyMenuItem(
+                Tools.getString("ClusterBrowser.Hb.StopAllServices"),
+                ServiceInfo.STOP_ICON,
+                new AccessMode(ConfigData.AccessType.ADMIN, true),
+                new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+            private static final long serialVersionUID = 1L;
+
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                if (getBrowser().getExistingServiceList(null).isEmpty()) {
+                    return "there are no services";
+                }
+                for (ServiceInfo si
+                        : getBrowser().getExistingServiceList(null)) {
+                    if (!si.isStopped(false)) {
+                        return null;
+                    }
+                }
+                return "all services are stopped";
+            }
+
+            public final void action() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getPopup().setVisible(false);
+                    }
+                });
+                final Host dcHost = getBrowser().getDCHost();
+                for (ServiceInfo si
+                        : getBrowser().getExistingServiceList(null)) {
+                    if (si.getGroupInfo() == null) {
+                        if (!si.isStopped(false)
+                            && !si.getService().isOrphaned()) {
+                            si.stopResource(dcHost, false);
+                        }
+                    }
+                }
+                getBrowser().getHeartbeatGraph().repaint();
+            }
+        };
+        items.add((UpdatableItem) stopMenuItem);
+
         /* remove all services. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),
@@ -1422,7 +1468,7 @@ public class ServicesInfo extends EditableInfo {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 if (getBrowser().getExistingServiceList(null).isEmpty()) {
-                    return "there are no other services";
+                    return "there are no services";
                 }
                 return null;
             }

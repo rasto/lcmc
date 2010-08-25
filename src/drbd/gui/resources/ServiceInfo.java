@@ -171,7 +171,7 @@ public class ServiceInfo extends EditableInfo {
     /** Start service icon. */
     private static final ImageIcon START_ICON = SERVICE_RUNNING_ICON;
     /** Stop service icon. */
-    private static final ImageIcon STOP_ICON  = SERVICE_NOT_RUNNING_ICON;
+    public static final ImageIcon STOP_ICON  = SERVICE_NOT_RUNNING_ICON;
     /** Migrate icon. */
     private static final ImageIcon MIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.MigrateIcon"));

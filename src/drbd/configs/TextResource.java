@@ -1267,6 +1267,9 @@ public class TextResource extends
         {"ClusterBrowser.Hb.RemoveAllServices",
          "Remove All Services"},
 
+        {"ClusterBrowser.Hb.StopAllServices",
+         "Stop All Services"},
+
         {"ClusterBrowser.Hb.RemoveService",
          "Remove Service"},
 

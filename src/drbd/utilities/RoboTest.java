@@ -887,6 +887,7 @@ public final class RoboTest {
         stopGroup(robot, gx, gy, 15);
         sleep(5000);
         stopGroup(robot, statefulX, statefulY, 0);
+        stopEverything(robot); /* to be sure */
         sleep(5000);
         checkTest(host, "test1", 29);
         if (maybe()) {
@@ -903,6 +904,21 @@ public final class RoboTest {
     }
 
 
+    /** Stop everything. */
+    private static void stopEverything(final Robot robot) {
+        moveTo(robot, 335, 129); /* advanced */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 271, 568);
+        rightClick(robot); /* popup */
+        sleep(3000);
+        moveTo(robot, 332, 644);
+        sleep(3000);
+        leftClick(robot);
+        moveTo(robot, 335, 129); /* not advanced */
+        leftClick(robot);
+    }
+
     /** Remove everything. */
     private static void removeEverything(final Robot robot) {
         moveTo(robot, 335, 129); /* advanced */
@@ -911,7 +927,7 @@ public final class RoboTest {
         moveTo(robot, 271, 568);
         rightClick(robot); /* popup */
         sleep(3000);
-        moveTo(robot, 332, 644);
+        moveTo(robot, 332, 674);
         sleep(3000);
         leftClick(robot);
         confirmRemove(robot);
@@ -1124,6 +1140,7 @@ public final class RoboTest {
         stopResource(robot, dummy3X, dummy3Y, 0);
         sleep(10000);
         stopResource(robot, dummy4X, dummy4Y, 0);
+        stopEverything(robot);
         sleep(10000);
         checkTest(host, "test2", 12.5);
         if (maybe()) {

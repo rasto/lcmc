@@ -587,7 +587,7 @@ public class GuiComboBox extends JPanel {
             final boolean accessible =
                      Tools.getConfigData().isAccessible(enableAccessMode);
             if (!accessible) {
-                text = text + getDisabledTooltip();
+                text = text + "<br>" + getDisabledTooltip();
             }
         }
         if (type == Type.TEXTFIELDWITHUNIT) {
@@ -608,10 +608,15 @@ public class GuiComboBox extends JPanel {
             final boolean accessible =
                      Tools.getConfigData().isAccessible(enableAccessMode);
             if (!accessible) {
-                text = text + getDisabledTooltip();
+                if ("<html>".equals(text.substring(0, 6))) {
+                    text = "<html>" + getDisabledTooltip() + "<br>" + "<br>"
+                           + text.substring(6);
+                } else {
+                    text = Tools.html(text + "<br>" + getDisabledTooltip());
+                }
             }
         }
-        label.setToolTipText("<html>" + text + "</html>");
+        label.setToolTipText(text);
     }
 
     /**
@@ -622,7 +627,7 @@ public class GuiComboBox extends JPanel {
         if (enableAccessMode.isAdvancedMode()) {
             advanced = "Advanced ";
         }
-        return "<br>editable in \""
+        return "editable in \""
                + advanced
                + ConfigData.OP_MODES_MAP.get(enableAccessMode.getAccessType())
                + "\" mode";
