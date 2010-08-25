@@ -1590,7 +1590,7 @@ public class CRMXML extends XML {
                                                             "longdesc");
                 if (longdescParamNode != null) {
                     final String longDesc = getText(longdescParamNode);
-                    ra.setParamLongDesc(param, longDesc);
+                    ra.setParamLongDesc(param, Tools.trimText(longDesc));
                 }
 
                 /* <shortdesc lang="en"> */
@@ -1726,7 +1726,7 @@ public class CRMXML extends XML {
         /* <longdesc lang="en"> */
         final Node longdescNode = getChildNode(raNode, "longdesc");
         if (longdescNode != null) {
-            ra.setLongDesc(getText(longdescNode));
+            ra.setLongDesc(Tools.trimText(getText(longdescNode)));
         }
 
         /* <shortdesc lang="en"> */
@@ -1804,7 +1804,8 @@ public class CRMXML extends XML {
                                                                 "longdesc");
                     if (longdescParamNode != null) {
                         final String longDesc = getText(longdescParamNode);
-                        paramGlobalLongDescMap.put(param, longDesc);
+                        paramGlobalLongDescMap.put(param,
+                                                   Tools.trimText(longDesc));
                     }
 
                     /* <content> */

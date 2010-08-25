@@ -2265,4 +2265,27 @@ public final class Tools {
         }
         return true;
     }
+
+    /** Trims text to have displayable width. */
+    public static String trimText(final String text) {
+        final int width = 80;
+        if (text == null || text.length() <= width) {
+            return text;
+        }
+        final StringBuffer out = new StringBuffer(text.length() + 10);
+        /* find next space */
+        String t = text;
+        while (true) {
+            final int pos = t.indexOf(" ", width);
+            if (pos > 0) {
+                out.append(t.substring(0, pos));
+                out.append('\n');
+                t = t.substring(pos + 1);
+            } else {
+                break;
+            }
+        }
+        out.append(t);
+        return out.toString();
+    }
 }
