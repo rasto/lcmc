@@ -1506,6 +1506,45 @@ sub gui_test {
 }
 
 sub gui_vm_test {
+	my $testname = shift;
+	my $index = shift;
+	my ($path) = `ls /etc/libvirt/qemu/*.xml`;
+	my ($name) = $path =~ /([^\/]+)\.xml$/;
+	my $xml = `virsh dumpxml $name`;
+	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
+	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
+	$xml =~ s/^(\s*<source file=')[^']+/$1IMAGE/gm;
+	$xml =~ s/\b$name\b/DOMAIN/g;
+
+	my $testfile = "/tmp/drbd-mc-test/$testname/domain.xml$index";
+	my $test = "";
+	my $notestfile;
+	if (!open TEST, $testfile) {
+		print "$!";
+		# .new can be used for new tests.
+		open TEST, ">$testfile.new" or print "$!";
+		print TEST $test;
+		close TEST;
+		$notestfile++;
+	} else {
+		{
+			local $/;
+			$test = <TEST>;
+		}
+		close TEST;
+	}
+	if ($xml eq $test) {
+		print "ok ";
+	} else {
+		open TEST, ">$testfile.error" or print "$!";
+		print TEST $xml;
+		close TEST;
+		my $diff = `diff -u $testfile $testfile.error`;
+		print "error\n";
+		print "-------------\n";
+		print $diff;
+		exit 1;
+	}
 }
 
 sub gui_drbd_test {

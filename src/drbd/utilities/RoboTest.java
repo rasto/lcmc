@@ -2090,7 +2090,8 @@ public final class RoboTest {
         slowFactor = 0.2f;
         host.getSSH().installTestFiles(1);
         aborted = false;
-        checkVMTest(host, "vm-test1", 1);
         moveTo(robot, 10, 10);
+        checkVMTest(host, "vm-test1", 1);
+        Tools.sleep(25000);
     }
 }
