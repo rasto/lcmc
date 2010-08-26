@@ -543,8 +543,10 @@ public abstract class EditableInfo extends Info {
         if (Tools.isStringClass(o)) {
             value = cb.getStringValue();
         } else if (o instanceof Object[]) {
-            value = ((Object[]) o)[0].toString()
-                       + ((Unit) ((Object[]) o)[1]).getShortName();
+            value = ((Object[]) o)[0].toString();
+            if (((Object[]) o)[1] instanceof Unit) {
+                value += ((Unit) ((Object[]) o)[1]).getShortName();
+            }
         } else {
             value = ((Info) o).getStringValue();
         }
@@ -774,7 +776,9 @@ public abstract class EditableInfo extends Info {
                     final Object o1 = ((Object[]) o)[1];
                     newValue = o0.toString();
                     if (o1 != null) {
-                        newValue += ((Unit) o1).getShortName();
+                        if (o1 instanceof Unit) {
+                            newValue += ((Unit) o1).getShortName();
+                        }
                     }
                 } else {
                     newValue = ((Info) o).getStringValue();

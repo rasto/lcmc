@@ -550,7 +550,8 @@ public class GuiComboBox extends JPanel {
         if (componentsHash.containsKey(s)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    componentsHash.get(s).setEnabled(enabled && accessible);
+                    componentsHash.get(s).setEnabled(enablePredicate
+                                                     && accessible);
                 }
             });
         }
@@ -700,7 +701,9 @@ public class GuiComboBox extends JPanel {
                 final Object o1 = ((Object[]) o)[1];
                 String v = o0.toString();
                 if (v != null && !"".equals(v) && o1 != null) {
-                    v += ((Unit) o1).getShortName();
+                    if (o1 instanceof Unit) {
+                        v += ((Unit) o1).getShortName();
+                    }
                 }
                 return v;
             } else {
@@ -891,7 +894,7 @@ public class GuiComboBox extends JPanel {
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
         setComponentsEnabled(
-                   enabled
+                   enablePredicate
                    && Tools.getConfigData().isAccessible(enableAccessMode));
     }
 

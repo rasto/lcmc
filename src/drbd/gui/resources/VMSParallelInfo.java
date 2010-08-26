@@ -28,8 +28,10 @@ import drbd.data.VMSXML.ParallelData;
 import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.util.Set;
@@ -37,6 +39,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * This class holds info about virtual parallel device.
@@ -87,6 +91,8 @@ public class VMSParallelInfo extends VMSHardwareInfo {
                                          "unix",
                                          "vc"});
     }
+    /** Table panel. */
+    private JComponent tablePanel = null;
     /** Creates the VMSParallelInfo object. */
     public VMSParallelInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
@@ -95,8 +101,17 @@ public class VMSParallelInfo extends VMSHardwareInfo {
 
     /** Adds disk table with only this disk to the main panel. */
     protected final void addHardwareTable(final JPanel mainPanel) {
-        mainPanel.add(getTablePanel("Displays",
-                                    VMSVirtualDomainInfo.PARALLEL_TABLE));
+        tablePanel = getTablePanel("Displays",
+                                   VMSVirtualDomainInfo.PARALLEL_TABLE,
+                                   getNewBtn(getVMSVirtualDomainInfo()));
+        if (getResource().isNew()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tablePanel.setVisible(false);
+                }
+            });
+        }
+        mainPanel.add(tablePanel);
     }
 
     /** Returns service icon in the menu. */
@@ -217,6 +232,11 @@ public class VMSParallelInfo extends VMSHardwareInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                tablePanel.setVisible(true);
+            }
+        });
         checkResourceFields(null, params);
         getBrowser().reload(getNode());
     }
@@ -356,5 +376,21 @@ public class VMSParallelInfo extends VMSHardwareInfo {
             paramCB.setAlwaysEditable(false);
         }
         return paramCB;
+    }
+
+    /** Returns "add new" button. */
+    public static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Parallel Device");
+        newBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        vdi.addParallelsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
     }
 }

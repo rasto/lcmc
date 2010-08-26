@@ -28,8 +28,10 @@ import drbd.data.VMSXML.VideoData;
 import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.util.Set;
@@ -37,6 +39,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * This class holds info about virtual video device.
@@ -92,6 +96,8 @@ public class VMSVideoInfo extends VMSHardwareInfo {
         POSSIBLE_VALUES.put(VideoData.MODEL_TYPE,
                             new String[]{"cirrus", "vga", "vmvga", "xen"});
     }
+    /** Table panel. */
+    private JComponent tablePanel = null;
     /** Creates the VMSVideoInfo object. */
     public VMSVideoInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
@@ -100,8 +106,17 @@ public class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Adds disk table with only this disk to the main panel. */
     protected final void addHardwareTable(final JPanel mainPanel) {
-        mainPanel.add(getTablePanel("Displays",
-                                    VMSVirtualDomainInfo.VIDEO_TABLE));
+        tablePanel = getTablePanel("Displays",
+                                   VMSVirtualDomainInfo.VIDEO_TABLE,
+                                   getNewBtn(getVMSVirtualDomainInfo()));
+        if (getResource().isNew()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tablePanel.setVisible(false);
+                }
+            });
+        }
+        mainPanel.add(tablePanel);
     }
 
     /** Returns service icon in the menu. */
@@ -227,6 +242,11 @@ public class VMSVideoInfo extends VMSHardwareInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                tablePanel.setVisible(true);
+            }
+        });
         checkResourceFields(null, params);
         getBrowser().reload(getNode());
     }
@@ -350,5 +370,22 @@ public class VMSVideoInfo extends VMSHardwareInfo {
      */
     protected final String isRemoveable() {
         return null;
+    }
+
+
+    /** Returns "add new" button. */
+    public static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Video Device");
+        newBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        vdi.addVideosPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
     }
 }

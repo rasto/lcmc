@@ -35,6 +35,7 @@ import drbd.utilities.MyButton;
 import drbd.utilities.SSH;
 
 import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JFileChooser;
@@ -181,6 +182,8 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     /** Cache for files. */
     private final Map<String, LinuxFile> linuxFileCache =
                                             new HashMap<String, LinuxFile>();
+    /** Table panel. */
+    private JComponent tablePanel = null;
 
     /** Creates the VMSDiskInfo object. */
     public VMSDiskInfo(final String name, final Browser browser,
@@ -190,7 +193,17 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Adds disk table with only this disk to the main panel. */
     protected final void addHardwareTable(final JPanel mainPanel) {
-       mainPanel.add(getTablePanel("Disk", VMSVirtualDomainInfo.DISK_TABLE));
+        tablePanel = getTablePanel("Disk",
+                                   VMSVirtualDomainInfo.DISK_TABLE,
+                                   getNewBtn(getVMSVirtualDomainInfo()));
+        if (getResource().isNew()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tablePanel.setVisible(false);
+                }
+            });
+        }
+        mainPanel.add(tablePanel);
     }
 
     /** Returns service icon in the menu. */
@@ -358,6 +371,11 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                tablePanel.setVisible(true);
+            }
+        });
         checkResourceFields(null, params);
         getBrowser().reload(getNode());
     }
@@ -755,5 +773,21 @@ public class VMSDiskInfo extends VMSHardwareInfo {
      */
     protected final String isRemoveable() {
         return null;
+    }
+
+    /** Returns "add new" button. */
+    public static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Disk");
+        newBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        vdi.addDiskPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
     }
 }

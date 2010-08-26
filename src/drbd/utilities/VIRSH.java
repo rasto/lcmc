@@ -84,7 +84,16 @@ public final class VIRSH {
      */
     public static void setParameters(final Host[] hosts,
                                      final String domainName,
-                                     final Map<String, String> parameters) {
+                                     final Map<String, String> parameters,
+                                     final boolean isNew) {
+//<domain type='kvm'>
+//  <memory>524288</memory>
+//  <name>fff</name>
+//  <os>
+//    <type arch='i686' machine='pc-0.12'>hvm</type>
+//  </os>
+//</domain>
+ 
         final StringBuffer commands = new StringBuffer(100);
         for (final String param : parameters.keySet()) {
             String command = VIRSH_COMMANDS.get(param);

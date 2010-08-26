@@ -176,6 +176,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
+                                               VMSXML.VM_PARAM_NAME,
                                                VMSXML.VM_PARAM_VCPU,
                                                VMSXML.VM_PARAM_CURRENTMEMORY,
                                                VMSXML.VM_PARAM_MEMORY,
@@ -247,14 +248,36 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NO_VM_STATUS_STRING =
                                                 "VM status is not available";
+    /** New vm domain button. */
+    private JComponent newVMButton = null;
+    /** New disk button. */
+    private MyButton newDiskBtn = null;
+    /** New interface button. */
+    private MyButton newInterfaceBtn = null;
+    /** New input button. */
+    private MyButton newInputBtn = null;
+    /** New graphics button. */
+    private MyButton newGraphicsBtn = null;
+    /** New sound button. */
+    private MyButton newSoundBtn = null;
+    /** New serial button. */
+    private MyButton newSerialBtn = null;
+    /** New parallel button. */
+    private MyButton newParallelBtn = null;
+    /** New video button. */
+    private MyButton newVideoBtn = null;
 
     static {
+        SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
 
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_NAME,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Name"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_VCPU,
                    Tools.getString("VMSVirtualDomainInfo.Short.Vcpu"));
@@ -316,7 +339,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns a name of the service with virtual domain name.
      */
     public final String toString() {
-        return getName();
+        if (getResource().isNew()) {
+            return "new...";
+        } else {
+            return getName();
+        }
     }
 
     /**
@@ -1246,6 +1273,23 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         final JTable table = getTable(HEADER_TABLE);
         if (table != null) {
+            newVMButton = getBrowser().getVMSInfo().getNewButton();
+            if (getResource().isNew()) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        newVMButton.setVisible(false);
+                        newDiskBtn.setVisible(false);
+                        newInterfaceBtn.setVisible(false);
+                        newInputBtn.setVisible(false);
+                        newGraphicsBtn.setVisible(false);
+                        newSoundBtn.setVisible(false);
+                        newSerialBtn.setVisible(false);
+                        newParallelBtn.setVisible(false);
+                        newVideoBtn.setVisible(false);
+                    }
+                });
+            } 
+            mainPanel.add(newVMButton);
             mainPanel.add(table.getTableHeader());
             mainPanel.add(table);
         }
@@ -1314,23 +1358,49 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         serviceCombo = getActionsMenu();
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
-
         mainPanel.add(optionsPanel);
-        mainPanel.add(getTablePanel("Disks", DISK_TABLE));
+
+        newDiskBtn = VMSDiskInfo.getNewBtn(this);
+        newInterfaceBtn = VMSInterfaceInfo.getNewBtn(this);
+        newInputBtn = VMSInputDevInfo.getNewBtn(this);
+        newGraphicsBtn = VMSGraphicsInfo.getNewBtn(this);
+        newSoundBtn = VMSSoundInfo.getNewBtn(this);
+        newSerialBtn = VMSSerialInfo.getNewBtn(this);
+        newParallelBtn = VMSParallelInfo.getNewBtn(this);
+        newVideoBtn = VMSVideoInfo.getNewBtn(this);
+        /* new video button */
+        mainPanel.add(getTablePanel("Disks",
+                                    DISK_TABLE,
+                                    newDiskBtn));
+
         mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(getTablePanel("Interfaces", INTERFACES_TABLE));
+        mainPanel.add(getTablePanel("Interfaces",
+                                    INTERFACES_TABLE,
+                                    newInterfaceBtn));
         mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(getTablePanel("Input Devices", INPUTDEVS_TABLE));
+        mainPanel.add(getTablePanel("Input Devices",
+                                    INPUTDEVS_TABLE,
+                                    newInputBtn));
         mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(getTablePanel("Input Devices", GRAPHICS_TABLE));
+        mainPanel.add(getTablePanel("Graphics Devices",
+                                    GRAPHICS_TABLE,
+                                    newGraphicsBtn));
         mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(getTablePanel("Input Devices", SOUND_TABLE));
+        mainPanel.add(getTablePanel("Sound Devices",
+                                    SOUND_TABLE,
+                                    newSoundBtn));
         mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(getTablePanel("Input Devices", SERIAL_TABLE));
+        mainPanel.add(getTablePanel("Serial Devices",
+                                    SERIAL_TABLE,
+                                    newSerialBtn));
         mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(getTablePanel("Input Devices", PARALLEL_TABLE));
+        mainPanel.add(getTablePanel("Parallel Devices",
+                                    PARALLEL_TABLE,
+                                    newParallelBtn));
         mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(getTablePanel("Input Devices", VIDEO_TABLE));
+        mainPanel.add(getTablePanel("Video Devices",
+                                    VIDEO_TABLE,
+                                    newVideoBtn));
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
@@ -1540,7 +1610,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual disk. */
-    private void addDiskPanel() {
+    public final void addDiskPanel() {
         final VMSDiskInfo vmsdi = new VMSDiskInfo(null, getBrowser(), this);
         vmsdi.getResource().setNew(true);
         final DefaultMutableTreeNode resource =
@@ -1563,7 +1633,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual interface. */
-    private void addInterfacePanel() {
+    public final void addInterfacePanel() {
         final VMSInterfaceInfo vmsii =
                             new VMSInterfaceInfo(null, getBrowser(), this);
         vmsii.getResource().setNew(true);
@@ -1588,7 +1658,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual input device. */
-    private void addInputDevPanel() {
+    public final void addInputDevPanel() {
         final VMSInputDevInfo vmsidi =
                             new VMSInputDevInfo(null, getBrowser(), this);
         vmsidi.getResource().setNew(true);
@@ -1613,7 +1683,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new graphics device. */
-    private void addGraphicsPanel() {
+    public final void addGraphicsPanel() {
         final VMSGraphicsInfo vmsgi =
                             new VMSGraphicsInfo(null, getBrowser(), this);
         vmsgi.getResource().setNew(true);
@@ -1638,7 +1708,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new sound device. */
-    private void addSoundsPanel() {
+    public final void addSoundsPanel() {
         final VMSSoundInfo vmssi =
                             new VMSSoundInfo(null, getBrowser(), this);
         vmssi.getResource().setNew(true);
@@ -1663,7 +1733,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new serial device. */
-    private void addSerialsPanel() {
+    public final void addSerialsPanel() {
         final VMSSerialInfo vmssi =
                             new VMSSerialInfo(null, getBrowser(), this);
         vmssi.getResource().setNew(true);
@@ -1688,7 +1758,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new parallel device. */
-    private void addParallelsPanel() {
+    public final void addParallelsPanel() {
         final VMSParallelInfo vmspi =
                             new VMSParallelInfo(null, getBrowser(), this);
         vmspi.getResource().setNew(true);
@@ -1713,7 +1783,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new video device. */
-    private void addVideosPanel() {
+    public final void addVideosPanel() {
         final VMSVideoInfo vmsvi =
                             new VMSVideoInfo(null, getBrowser(), this);
         vmsvi.getResource().setNew(true);
@@ -2547,6 +2617,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         });
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
+        setName(getComboBoxValue(VMSXML.VM_PARAM_NAME));
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
             if (!Tools.areEqual(getParamSaved(param), value)) {
@@ -2556,7 +2627,24 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         VIRSH.setParameters(getBrowser().getClusterHosts(),
                             getDomainName(),
-                            parameters);
+                            parameters,
+                            getResource().isNew());
+        if (getResource().isNew()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    newVMButton.setVisible(true);
+                    newDiskBtn.setVisible(true);
+                    newInterfaceBtn.setVisible(true);
+                    newInputBtn.setVisible(true);
+                    newGraphicsBtn.setVisible(true);
+                    newSoundBtn.setVisible(true);
+                    newSerialBtn.setVisible(true);
+                    newParallelBtn.setVisible(true);
+                    newVideoBtn.setVisible(true);
+                }
+            });
+        } 
+        getResource().setNew(false);
         checkResourceFields(null, params);
     }
 
@@ -2600,7 +2688,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return new String[]{"Virtual Interface", "Source"};
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
-            return new String[]{"Input Device", "Bus"};
+            return new String[]{"Input Device"};
         } else if (GRAPHICS_TABLE.equals(tableName)) {
             return new String[]{"Graphic Display"};
         } else if (SOUND_TABLE.equals(tableName)) {
@@ -2660,12 +2748,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         rowColor = newColor;
-        final MyButton domainNameLabel = new MyButton(domainName, hostIcon);
-        domainNameLabel.setOpaque(true);
-        rows.add(new Object[]{domainNameLabel,
-                              getDefinedOnString(),
-                              getRunningOnString(),
-                              getResource().getValue("memory")});
+        System.out.println("domain name: " + domainName);
+        if (domainName != null) {
+            final MyButton domainNameLabel = new MyButton(domainName, hostIcon);
+            domainNameLabel.setOpaque(true);
+            rows.add(new Object[]{domainNameLabel,
+                                  getDefinedOnString(),
+                                  getRunningOnString(),
+                                  getResource().getValue("memory")});
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -2795,16 +2886,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (inputDevData == null) {
             return new Object[]{index + ": unknown", ""};
         }
-        final String type = inputDevData.getType();
-        final String bus = inputDevData.getBus();
         if (iToInfo != null) {
             final VMSInputDevInfo vidi = inputDevToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(type,
-                                             NetInfo.NET_I_ICON_LARGE);
+        final MyButton iLabel = new MyButton(index, NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        return new Object[]{iLabel, bus};
+        return new Object[]{iLabel};
     }
 
     /** Get one row of the table. */
@@ -2822,7 +2910,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSGraphicsInfo vidi = graphicsToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(type,
+        final MyButton iLabel = new MyButton(index,
                                              NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel};
@@ -2864,8 +2952,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSSerialInfo vidi = serialToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(type,
-                                             NetInfo.NET_I_ICON_LARGE);
+        final MyButton iLabel = new MyButton(index, NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel};
     }
@@ -2885,8 +2972,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSParallelInfo vidi = parallelToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(type,
-                                             NetInfo.NET_I_ICON_LARGE);
+        final MyButton iLabel = new MyButton(index, NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel};
     }
@@ -3344,6 +3430,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
+        if (!getResource().isNew() && VMSXML.VM_PARAM_NAME.equals(param)) {
+            return false;
+        }
         return true;
     }
 

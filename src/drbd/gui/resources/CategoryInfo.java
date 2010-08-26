@@ -22,6 +22,7 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
+import drbd.utilities.MyButton;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -75,6 +76,11 @@ public class CategoryInfo extends Info {
             if (backButton != null) {
                 infoPanel.add(backButton);
             }
+
+            final JComponent newButton = getNewButton();
+            if (newButton != null) {
+                infoPanel.add(newButton);
+            }
             final JScrollPane sp = new JScrollPane(table);
             sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);
             sp.setBackground(Browser.PANEL_BACKGROUND);
@@ -85,9 +91,12 @@ public class CategoryInfo extends Info {
         return infoPanel;
     }
 
-    /**
-     * Selects the node in the menu and reloads everything underneath.
-     */
+    /** Returns new button. */
+    protected JComponent getNewButton() {
+        return null;
+    }
+
+    /** Selects the node in the menu and reloads everything underneath. */
     public void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());

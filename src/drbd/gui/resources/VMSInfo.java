@@ -31,6 +31,9 @@ import drbd.utilities.MyButton;
 
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,7 +41,12 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
+import java.util.Enumeration;
+import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * This class shows a list of virtual machines.
@@ -199,5 +207,40 @@ public class VMSInfo extends CategoryInfo {
         } else {
             return c;
         }
+    }
+
+    /** Returns new button. */
+    protected JComponent getNewButton() {
+        final MyButton newButton = new MyButton("Add New Domain");
+        newButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        addDomainPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        final JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        bp.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        bp.add(newButton);
+        final Dimension d = bp.getPreferredSize();
+        bp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) d.getHeight()));
+        return (JComponent) bp;
+    }
+
+    /** Adds new virtual domain. */
+    public final void addDomainPanel() {
+        final VMSVirtualDomainInfo vmsdi =
+                                new VMSVirtualDomainInfo(null, getBrowser());
+        vmsdi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmsdi);
+        getBrowser().setNode(resource);
+        final Enumeration eee = getNode().children();
+        getNode().add(resource);
+        getBrowser().reload(getNode());
+        vmsdi.selectMyself();
     }
 }

@@ -794,6 +794,7 @@ public class VMSXML extends XML {
                 if (!domainNames.contains(name)) {
                     domainNames.add(name);
                 }
+                parameterValues.put(name, VM_PARAM_NAME, name);
                 if (!name.equals(nameInFilename)) {
                     Tools.appWarning("unexpected name: " + name
                                      + " != " + nameInFilename);
@@ -847,7 +848,7 @@ public class VMSXML extends XML {
                         }
                         final InputDevData inputDevData =
                                                  new InputDevData(type, bus);
-                        inputMap.put(type + ":" + bus,
+                        inputMap.put(type + " : " + bus,
                                      inputDevData);
                     } else if ("graphics".equals(deviceNode.getNodeName())) {
                         /** remotePort will be overwritten with virsh output */
@@ -882,7 +883,7 @@ public class VMSXML extends XML {
                                                           listen,
                                                           passwd,
                                                           keymap);
-                            graphicsMap.put(port, graphicsData);
+                            graphicsMap.put(type + " : " + port, graphicsData);
                         }
                     } else if ("disk".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
@@ -1016,7 +1017,8 @@ public class VMSXML extends XML {
                                                                   sourceHost,
                                                                   protocolType,
                                                                   targetPort);
-                            serialMap.put(sourcePath, serialData);
+                            serialMap.put(type + " : " + sourcePath,
+                                          serialData);
                         }
                     } else if ("parallel".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
@@ -1050,7 +1052,8 @@ public class VMSXML extends XML {
                                                                   sourceHost,
                                                                   protocolType,
                                                                   targetPort);
-                            parallelMap.put(sourcePath, parallelData);
+                            parallelMap.put(type + " : " + sourcePath,
+                                            parallelData);
                         }
                     } else if ("video".equals(deviceNode.getNodeName())) {
                         final NodeList opts = deviceNode.getChildNodes();

@@ -68,6 +68,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseListener;
 import java.awt.Point;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.MouseMotionListener;
 import java.util.Comparator;
 import java.util.List;
@@ -344,16 +345,12 @@ public class Info implements Comparable {
         return Tools.MIME_TYPE_TEXT_PLAIN;
     }
 
-    /**
-     * Returns back button.
-     */
+    /** Returns back button. */
     protected JComponent getBackButton() {
         return null;
     }
 
-    /**
-     * Returns info panel for this resource.
-     */
+    /** Returns info panel for this resource. */
     public JComponent getInfoPanel() {
         //setTerminalPanel();
         final String info = getInfo();
@@ -844,7 +841,8 @@ public class Info implements Comparable {
 
     /** Retruns panel with table and border. */
     protected JComponent getTablePanel(final String title,
-                                     final String tableName) {
+                                       final String tableName,
+                                       final MyButton newButton) {
         final JPanel p = new JPanel();
         p.setBackground(Browser.PANEL_BACKGROUND);
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
@@ -852,6 +850,16 @@ public class Info implements Comparable {
         p.setBorder(titleBorder);
         final JTable table = getTable(tableName);
         if (table != null) {
+            if (newButton != null) {
+                final JPanel bp = new JPanel(
+                                    new FlowLayout(FlowLayout.LEFT, 0, 0));
+                bp.setBackground(Browser.STATUS_BACKGROUND);
+                bp.add(newButton);
+                final Dimension d = bp.getPreferredSize();
+                bp.setMaximumSize(new Dimension(Short.MAX_VALUE,
+                                                (int) d.getHeight()));
+                p.add(bp);
+            }
             p.add(table.getTableHeader());
             p.add(table);
         }

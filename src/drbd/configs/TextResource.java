@@ -1829,6 +1829,9 @@ public class TextResource extends
         {"VMSVirtualDomainInfo.Section.VirtualSystem",
          "Virtual System"},
 
+        {"VMSVirtualDomainInfo.Short.Name",
+         "Domain name"},
+
         {"VMSVirtualDomainInfo.Short.Vcpu",
          "Number of CPUs"},
 
