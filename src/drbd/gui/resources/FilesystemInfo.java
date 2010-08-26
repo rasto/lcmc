@@ -359,6 +359,23 @@ class FilesystemInfo extends ServiceInfo {
 
         return s.toString();
     }
+    /** Removes the service without confirmation dialog. */
+    protected void removeMyselfNoConfirm(final Host dcHost,
+                                         final boolean testOnly) {
+        final DrbdResourceInfo oldDri =
+                    getBrowser().getDrbdDevHash().get(
+                                            getParamSaved(FS_RES_PARAM_DEV));
+        super.removeMyselfNoConfirm(dcHost, testOnly);
+        if (oldDri != null && !testOnly) {
+            oldDri.setUsedByCRM(null);
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    oldDri.updateMenus(null);
+                }
+            });
+            t.start();
+        }
+    }
 
     /**
      * Adds DrbddiskInfo before the filesysteminfo is added, returns true
@@ -387,6 +404,13 @@ class FilesystemInfo extends ServiceInfo {
             } else {
                 oldDri.removeLinbitDrbd(this, dcHost, testOnly);
             }
+            oldDri.setUsedByCRM(null);
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    oldDri.updateMenus(null);
+                }
+            });
+            t.start();
             //oldDri.setUsedByCRM(false);
             //final Thread t = new Thread(new Runnable() {
             //    public void run() {

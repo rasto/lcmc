@@ -608,7 +608,8 @@ public class GuiComboBox extends JPanel {
             final boolean accessible =
                      Tools.getConfigData().isAccessible(enableAccessMode);
             if (!accessible) {
-                if ("<html>".equals(text.substring(0, 6))) {
+                if (text.length() > 6
+                    && "<html>".equals(text.substring(0, 6))) {
                     text = "<html>" + getDisabledTooltip() + "<br>" + "<br>"
                            + text.substring(6);
                 } else {

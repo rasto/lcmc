@@ -284,94 +284,130 @@ public final class RoboTest {
                 if (robot == null) {
                     return;
                 }
-                if (index == 1) {
-                    /* pacemaker */
-                    int i = 1;
-                    while (!aborted) {
-                        final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index + " no " + i);
-                        startTest1(robot, host);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        Tools.info("test" + index + " no " + i + ", secs: "
-                                   + secs);
-                        i++;
-                    }
-                } else if (index == 2) {
-                    /* resource sets */
-                    int i = 1;
-                    while (!aborted) {
-                        final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index + " no " + i);
-                        startTest2(robot, host);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        Tools.info("test" + index + " no " + i + ", secs: "
-                                   + secs);
-                        i++;
-                    }
-                } else if (index == 3) {
-                    /* pacemaker drbd */
-                    final int i = 1;
-                    final long startTime = System.currentTimeMillis();
-                    Tools.info("test" + index + " no " + i);
-                    startTest3(robot);
-                    final int secs = (int) (System.currentTimeMillis()
-                                             - startTime) / 1000;
-                    Tools.info("test" + index + " no " + i + ", secs: "
-                               + secs);
-                } else if (index == 4) {
-                    /* placeholders 6 dummies */
-                    final int i = 1;
-                    final long startTime = System.currentTimeMillis();
-                    Tools.info("test" + index + " no " + i);
-                    startTest4(robot, host);
-                    final int secs = (int) (System.currentTimeMillis()
-                                             - startTime) / 1000;
-                    Tools.info("test" + index + " no " + i + ", secs: "
-                               + secs);
-                } else if (index == 5) {
-                    int i = 1;
-                    while (true) {
+                final String selected =
+                            host.getCluster().getBrowser().getTree()
+                                .getLastSelectedPathComponent().toString();
+                if ("Services".equals(selected)
+                    || "Cluster".equals(selected)) {
+                    if (index == 1) {
                         /* pacemaker */
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTest1(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
+                    } else if (index == 2) {
+                        /* resource sets */
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTest2(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
+                    } else if (index == 3) {
+                        /* pacemaker drbd */
+                        final int i = 1;
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index + " no " + i);
-                        startTest5(robot, host);
+                        startTest3(robot);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + " no " + i + ", secs: "
                                    + secs);
-                        i++;
+                    } else if (index == 4) {
+                        /* placeholders 6 dummies */
+                        final int i = 1;
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index + " no " + i);
+                        startTest4(robot, host);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + " no " + i + ", secs: "
+                                   + secs);
+                    } else if (index == 5) {
+                        int i = 1;
+                        while (true) {
+                            /* pacemaker */
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTest5(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
+                    } else if (index == 6) {
+                        int i = 1;
+                        while (true) {
+                            /* pacemaker */
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTest6(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
+                    } else if (index == 9) {
+                        /* all pacemaker tests */
+                        int i = 1;
+                        while (true) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTest1(robot, host);
+                            startTest2(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
                     }
-                } else if (index == 6) {
-                    int i = 1;
-                    while (true) {
-                        /* pacemaker */
-                        final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index + " no " + i);
-                        startTest6(robot, host);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        Tools.info("test" + index + " no " + i + ", secs: "
-                                   + secs);
-                        i++;
+                } else if ("Storage (DRBD)".equals(selected)) {
+                    if (index == 1) {
+                        /* DRBD */
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startDRBDTest1(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
                     }
-                } else if (index == 9) {
-                    /* all pacemaker tests */
-                    int i = 1;
-                    while (true) {
-                        final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index + " no " + i);
-                        startTest1(robot, host);
-                        startTest2(robot, host);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        Tools.info("test" + index + " no " + i + ", secs: "
-                                   + secs);
-                        i++;
+                } else if ("VMs".equals(selected)) {
+                    if (index == 1) {
+                        /* VMs */
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startVMTest1(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
                     }
                 }
-                Tools.info("test " + index + " done");
+                Tools.info(selected + " test " + index + " done");
             }
         });
         thread.start();
@@ -382,7 +418,25 @@ public final class RoboTest {
                                   final String test,
                                   final double no) {
         if (!aborted) {
-            host.checkTest(test, no);
+            host.checkPCMKTest(test, no);
+        }
+    }
+
+    /** Check DRBD test. */
+    private static void checkDRBDTest(final Host host,
+                                      final String test,
+                                      final double no) {
+        if (!aborted) {
+            host.checkDRBDTest(test, no);
+        }
+    }
+
+    /** Check VM test. */
+    private static void checkVMTest(final Host host,
+                                      final String test,
+                                      final double no) {
+        if (!aborted) {
+            host.checkVMTest(test, no);
         }
     }
 
@@ -1974,5 +2028,69 @@ public final class RoboTest {
             }
         });
         thread.start();
+    }
+
+    /** DRBD Test 1. */
+    private static void startDRBDTest1(final Robot robot, final Host host) {
+        slowFactor = 0.2f;
+        host.getSSH().installTestFiles(1);
+        aborted = false;
+        moveTo(robot, 334, 315); /* add drbd resource */
+        rightClick(robot);
+        moveTo(robot, 342, 321);
+        moveTo(robot, 667, 322);
+        leftClick(robot);
+        sleep(20000);
+
+
+        moveTo(robot, 720, 580); 
+        leftClick(robot); /* next */
+        sleep(20000);
+
+        moveTo(robot, 751, 412); /* interface */
+        leftClick(robot);
+        moveTo(robot, 716, 451);
+        leftClick(robot);
+        sleep(1000);
+
+        moveTo(robot, 720, 580); 
+        leftClick(robot); /* next */
+        sleep(20000);
+
+        moveTo(robot, 751, 412); /* interface again */
+        leftClick(robot);
+        moveTo(robot, 716, 451);
+        leftClick(robot);
+        sleep(1000);
+
+        moveTo(robot, 720, 580); 
+        leftClick(robot); /* next */
+        sleep(10000);
+
+        moveTo(robot, 720, 580); /* meta-data */
+        leftClick(robot); /* next */
+        sleep(10000);
+
+        moveTo(robot, 820, 580); /* fs */
+        leftClick(robot); /* finish */
+        sleep(10000);
+
+        checkDRBDTest(host, "drbd-test1", 1);
+
+        moveTo(robot, 480, 250); /* rsc popup */
+        rightClick(robot); /* finish */
+        moveTo(robot, 555, 340); /* remove */
+        leftClick(robot);
+        confirmRemove(robot);
+        checkDRBDTest(host, "drbd-test1", 2);
+    }
+
+    /** VM Test 1. */
+    private static void startVMTest1(final Robot robot, final Host host) {
+        slowFactor = 0.2f;
+        host.getSSH().installTestFiles(1);
+        aborted = false;
+        checkVMTest(host, "vm-test1", 1);
+        moveTo(robot, 10, 10);
     }
 }

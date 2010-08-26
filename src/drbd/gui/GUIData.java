@@ -198,7 +198,7 @@ public class GUIData  {
                                                           .getHeight();
                 if ((buttonNo == 0 && height == 0)
                     || (buttonNo == 1 && height > 0)) {
-                    Tools.debug(this, "expand terminal split pane");
+                    Tools.debug(this, "expand terminal split pane", 1);
                     final BasicSplitPaneUI ui =
                                    (BasicSplitPaneUI) terminalSplitPane.getUI();
                     final BasicSplitPaneDivider divider = ui.getDivider();

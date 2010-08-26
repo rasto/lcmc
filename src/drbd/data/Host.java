@@ -2328,12 +2328,16 @@ public class Host implements Serializable {
         return index;
     }
 
-    /** This is part of testsuite, it checks cib. */
-    public final boolean checkTest(final String test, final double index) {
+    /** This is part of testsuite. */
+    public final boolean checkTest(final String checkCommand,
+                                   final String test,
+                                   final double index) {
         Tools.sleep(1500);
         final StringBuffer command = new StringBuffer(50);
         command.append(replaceVars("@GUI-HELPER@"));
-        command.append(" gui-test ");
+        command.append(' ');
+        command.append(checkCommand);
+        command.append(' ');
         command.append(test);
         command.append(' ');
         final String indexString =
@@ -2363,6 +2367,21 @@ public class Host implements Serializable {
         }
         Tools.info(test + " " + index + " " + out.getOutput());
         return out.getExitCode() == 0;
+    }
+
+    /** This is part of testsuite, it checks Pacemaker. */
+    public final boolean checkPCMKTest(final String test, final double index) {
+        return checkTest("gui-test", test, index);
+    }
+
+    /** This is part of testsuite, it checks DRBD. */
+    public final boolean checkDRBDTest(final String test, final double index) {
+        return checkTest("gui-drbd-test", test, index);
+    }
+
+    /** This is part of testsuite, it checks VMs. */
+    public final boolean checkVMTest(final String test, final double index) {
+        return checkTest("gui-vm-test", test, index);
     }
 
     /** Returns color of this host. Null if it is default color. */

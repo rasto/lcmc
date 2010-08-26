@@ -3688,9 +3688,7 @@ public class ServiceInfo extends EditableInfo {
         CRM.startResource(dcHost, getHeartbeatId(testOnly), testOnly);
     }
 
-    /**
-     * Stops resource in crm.
-     */
+    /** Stops resource in crm. */
     public void stopResource(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);

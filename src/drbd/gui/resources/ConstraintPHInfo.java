@@ -1020,4 +1020,9 @@ public class ConstraintPHInfo extends ServiceInfo {
     public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
         return null;
     }
+
+    /** Stops resource in crm. */
+    public void stopResource(final Host dcHost, final boolean testOnly) {
+        /* cannot stop placeholder */
+    }
 }
