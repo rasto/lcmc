@@ -490,9 +490,7 @@ public class GUIData  {
         allHostsUpdateList.remove(component);
     }
 
-    /**
-     * Calls allHostsUpdate method on all registered components.
-     */
+    /** Calls allHostsUpdate method on all registered components. */
     public final void allHostsUpdate() {
         for (final AllHostsUpdatable component : allHostsUpdateList) {
             component.allHostsUpdate();
@@ -500,9 +498,7 @@ public class GUIData  {
         checkAddClusterButtons();
     }
 
-    /**
-     * Enabled the component if it is accessible.
-     */
+    /** Enabled the component if it is accessible. */
     public final void setAccessible(final JComponent c,
                                     final ConfigData.AccessType required) {
         c.setEnabled(Tools.getConfigData().getAccessType().compareTo(

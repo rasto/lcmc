@@ -50,6 +50,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
@@ -361,6 +364,122 @@ public class VMSXML extends XML {
             Tools.appError("could not evaluate: ", e);
             return null;
         }
+    }
+
+    /** Creates XML for new domain. */
+    public final void createDomainXML(final String domainName,
+                                   final Map<String, String> parametersMap) {
+        //<domain type='kvm'>
+        //  <memory>524288</memory>
+        //  <name>fff</name>
+        //  <os>
+        //    <type arch='i686' machine='pc-0.12'>hvm</type>
+        //  </os>
+        //</domain>
+ 
+        final String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
+        /* build xml */
+        final String encoding = "UTF-8";
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = null;
+
+        try {
+             db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException pce) {
+             assert false;
+        }
+        final Document doc = db.newDocument();
+        final Element root = (Element) doc.appendChild(
+                                                  doc.createElement("domain"));
+        /* name */
+        root.setAttribute("type", "kvm");
+        final Node nameNode = (Element) root.appendChild(
+                                                    doc.createElement("name"));
+        nameNode.appendChild(doc.createTextNode(domainName));
+        /* memory */
+        final Node memoryNode = (Element) root.appendChild(
+                                                  doc.createElement("memory"));
+        final int mem = Tools.convertToKilobytes(
+                                           parametersMap.get(VM_PARAM_MEMORY));
+        memoryNode.appendChild(doc.createTextNode(Integer.toString(mem)));
+        /* current memory */
+        final Node curMemoryNode = (Element) root.appendChild(
+                                           doc.createElement("currentMemory"));
+        final int curMem = Tools.convertToKilobytes(
+                                    parametersMap.get(VM_PARAM_CURRENTMEMORY));
+        curMemoryNode.appendChild(doc.createTextNode(Integer.toString(curMem)));
+        /* vcpu */
+        final String vcpu = parametersMap.get(VM_PARAM_VCPU);
+        if (vcpu != null) {
+            final Node vcpuNode = (Element) root.appendChild(
+                                                   doc.createElement("vcpu"));
+            vcpuNode.appendChild(doc.createTextNode(vcpu));
+        }
+
+        /* os */
+        final Element osNode = (Element) root.appendChild(
+                                                  doc.createElement("os"));
+        final Element typeNode = (Element) osNode.appendChild(
+                                                  doc.createElement("type"));
+        typeNode.setAttribute("arch", "i686"); //TODO
+        typeNode.setAttribute("machine", "pc-0.12");
+        typeNode.appendChild(doc.createTextNode("hvm"));
+
+        /* xml done */
+        saveDomainXML(configName, root);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
+    }
+
+    /** Modify xml of the domain. */
+    public final void modifyDomainXML(final String domainName,
+                                      final Map<String, String> parametersMap) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        final Map<String, String> paths = new HashMap<String, String>();
+        paths.put(VM_PARAM_MEMORY, "memory");
+        paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
+        paths.put(VM_PARAM_VCPU, "vcpu");
+        paths.put(VM_PARAM_BOOT, "os/boot");
+        try {
+            for (final String param : parametersMap.keySet()) {
+                final String path = paths.get(param);
+                if (path == null) {
+                    continue;
+                }
+                final NodeList nodes = (NodeList) xpath.evaluate(
+                                                       path,
+                                                       domainNode,
+                                                       XPathConstants.NODESET);
+                if (nodes.getLength() > 0) {
+                    final Element node = (Element) nodes.item(0);
+                    String value = parametersMap.get(param);
+                    if (VM_PARAM_MEMORY.equals(param)
+                        || VM_PARAM_CURRENTMEMORY.equals(param)) {
+                        value = Integer.toString(
+                                            Tools.convertToKilobytes(value));
+                    }
+                    if (VM_PARAM_BOOT.equals(param)) {
+                        node.setAttribute("dev", value);
+                    } else {
+                        getChildNode(node, "#text").setNodeValue(value);
+                    }
+                }
+            }
+        } catch (final javax.xml.xpath.XPathExpressionException e) {
+            Tools.appError("could not evaluate: ", e);
+            return;
+        }
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
     }
 
     /** Modify xml of some device element. */

@@ -86,7 +86,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                                 DiskData.DRIVER_TYPE,
                                                 DiskData.READONLY,
                                                 DiskData.SHAREABLE};
-    /** Whether the parameter is editable only in advanced mode. */
+    /** Whether the parameter is enabled only in advanced mode. */
     private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{
                                                 DiskData.TARGET_DEVICE,
@@ -243,7 +243,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
         if (DiskData.SOURCE_DEVICE.equals(param)) {
-            for (final Host h : getBrowser().getClusterHosts()) {
+            for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 final Set<String> bds = new TreeSet<String>();
                 bds.add("");
@@ -356,7 +356,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             }
         }
         if (!testOnly) {
-            for (final Host h : getBrowser().getClusterHosts()) {
+            for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
                     parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
@@ -368,7 +368,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             getResource().setNew(false);
             setName(getParamSaved(DiskData.TARGET_DEVICE));
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
         SwingUtilities.invokeLater(new Runnable() {
@@ -497,7 +497,8 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
                     final GuiComboBox cb = paramComboBoxGet(param, null);
-                    for (final Host h : getBrowser().getClusterHosts()) {
+                    for (final Host h
+                            : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
                             final String savedValue =
@@ -653,9 +654,8 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         fc.setApproveButtonToolTipText(
                                Tools.getString("VMSDiskInfo.Approve.ToolTip"));
         fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
-        final int ret = fc.showDialog(
-                                       Tools.getGUIData().getMainFrame(),
-                                       Tools.getString("VMSDiskInfo.Approve"));
+        final int ret = fc.showDialog(Tools.getGUIData().getMainFrame(),
+                                      Tools.getString("VMSDiskInfo.Approve"));
         linuxFileCache.clear();
         if (ret == JFileChooser.APPROVE_OPTION
             && fc.getSelectedFile() != null) {
@@ -732,7 +732,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Removes this disk without confirmation dialog. */
     protected final void removeMyselfNoConfirm(final boolean testOnly) {
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 final Map<String, String> parameters =
@@ -742,7 +742,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                      parameters);
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
     }

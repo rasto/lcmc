@@ -439,6 +439,11 @@ public final class Tools {
 
                              public void doneError(final String ans,
                                                    final int exitCode) {
+                                 Tools.appWarning("error: "
+                                                  + command
+                                                  + " "
+                                                  + ans + " rc: "
+                                                  + exitCode);
                                  if (outputVisible) {
                                     Tools.sshError(host,
                                                    command,

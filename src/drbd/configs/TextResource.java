@@ -1826,6 +1826,9 @@ public class TextResource extends
         {"VMSXML.GetConfig",
          "Parsing libvirt config..."},
 
+        {"VMSInfo.AddNewDomain",
+         "Add New Domain"},
+
         {"VMSVirtualDomainInfo.Section.VirtualSystem",
          "Virtual System"},
 
@@ -1894,6 +1897,25 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.AddNewHardware",
          "Add Virtual Hardware"},
+
+        {"VMSVirtualDomainInfo.RemoveDomain",
+         "Remove Domain"},
+
+        {"VMSVirtualDomainInfo.CancelDomain",
+         "Cancel Domain"},
+
+        {"VMSVirtualDomainInfo.confirmRemove.Title",
+         "Remove Virtual Domain"},
+
+        {"VMSVirtualDomainInfo.confirmRemove.Description",
+         "Virtual domain \"@DOMAIN@\" will be removed. "
+         + "Are you sure?"},
+
+        {"VMSVirtualDomainInfo.confirmRemove.Yes",
+         "Remove"},
+
+        {"VMSVirtualDomainInfo.confirmRemove.No",
+         "Cancel"},
 
         {"ConstraintPHInfo.confirmRemove.Title",
          "Remove Constraint Placeholder"},

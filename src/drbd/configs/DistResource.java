@@ -354,5 +354,8 @@ public class DistResource extends
 
         {"VIRSH.Define",
          "virsh define @CONFIG@"},
+
+        {"VIRSH.Undefine",
+         "virsh undefine @DOMAIN@"},
     };
 }

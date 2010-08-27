@@ -26,14 +26,20 @@ import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
 import drbd.data.VMSXML;
 import drbd.data.Host;
+import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
+import drbd.utilities.MyMenu;
+import drbd.utilities.MyMenuItem;
+import drbd.utilities.UpdatableItem;
 
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -58,30 +64,22 @@ public class VMSInfo extends CategoryInfo {
     /** Colors for some rows. */
     private volatile Map<String, Color> domainToColor =
                                                   new HashMap<String, Color>();
-    /**
-     * Creates the new VMSInfo object with name of the category.
-     */
+    /** Creates the new VMSInfo object with name of the category. */
     public VMSInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /**
-     * Returns browser object of this info.
-     */
+    /** Returns browser object of this info. */
     protected final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /**
-     * Returns columns for the table.
-     */
+    /** Returns columns for the table. */
     protected final String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Defined on", "Status", "Memory"};
     }
 
-    /**
-     * Returns data for the table.
-     */
+    /** Returns data for the table. */
     protected final Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final Set<String> domainNames = new TreeSet<String>();
@@ -126,17 +124,13 @@ public class VMSInfo extends CategoryInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /**
-     * Returns info object for the key.
-     */
+    /** Returns info object for the key. */
     protected final Info getTableInfo(final String tableName,
                                       final String key) {
         return domainToInfo.get(key);
     }
 
-    /**
-     * Execute when row in the table was clicked.
-     */
+    /** Execute when row in the table was clicked. */
     protected final void rowClicked(final String tableName, final String key) {
         final VMSVirtualDomainInfo vmsvdi = domainToInfo.get(key);
         if (vmsvdi != null) {
@@ -144,9 +138,7 @@ public class VMSInfo extends CategoryInfo {
         }
     }
 
-    /**
-     * Alignment for the specified column.
-     */
+    /** Alignment for the specified column. */
     protected final int getTableColumnAlignment(final String tableName,
                                                 final int column) {
         if (column == 3) {
@@ -155,17 +147,13 @@ public class VMSInfo extends CategoryInfo {
         return SwingConstants.LEFT;
     }
 
-    /**
-     * Selects the node in the menu.
-     */
+    /** Selects the node in the menu. */
     public final void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
     }
 
-    /**
-     * Returns comparator for column.
-     */
+    /** Returns comparator for column. */
     protected final Comparator<Object> getColComparator(final int col) {
         if (col == 0) {
             /* memory */
@@ -196,9 +184,7 @@ public class VMSInfo extends CategoryInfo {
         return null;
     }
 
-    /**
-     * Retrurns color for some rows.
-     */
+    /** Retrurns color for some rows. */
     protected final Color getTableRowColor(final String tableName,
                                            final String key) {
         final Color c = domainToColor.get(key);
@@ -211,7 +197,8 @@ public class VMSInfo extends CategoryInfo {
 
     /** Returns new button. */
     protected JComponent getNewButton() {
-        final MyButton newButton = new MyButton("Add New Domain");
+        final MyButton newButton = new MyButton(
+                                     Tools.getString("VMSInfo.AddNewDomain"));
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
@@ -242,5 +229,28 @@ public class VMSInfo extends CategoryInfo {
         getNode().add(resource);
         getBrowser().reload(getNode());
         vmsdi.selectMyself();
+    }
+
+    /** Returns list of menu items for VM. */
+    public final List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        /* New domain */
+        final MyMenuItem newDomainMenuItem = new MyMenuItem(
+                       Tools.getString("VMSInfo.AddNewDomain"),
+                       HostBrowser.HOST_OFF_ICON_LARGE,
+                       new AccessMode(ConfigData.AccessType.ADMIN, false),
+                       new AccessMode(ConfigData.AccessType.OP, false)) {
+                        private static final long serialVersionUID = 1L;
+                        public void action() {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    getPopup().setVisible(false);
+                                }
+                            });
+                            addDomainPanel();
+                        }
+        };
+        items.add(newDomainMenuItem);
+        return items;
     }
 }

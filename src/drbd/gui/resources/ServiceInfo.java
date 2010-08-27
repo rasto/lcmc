@@ -146,7 +146,7 @@ public class ServiceInfo extends EditableInfo {
     /** Name of the heartbeat provider. */
     public static final String HB_HEARTBEAT_PROVIDER = "heartbeat";
     /** Check the cached fields. */
-    private static final String CACHED_FIELD = "cached";
+    protected static final String CACHED_FIELD = "cached";
     /** Master / Slave type string. */
     public static final String MASTER_SLAVE_TYPE_STRING = "Master/Slave";
     /** Unmanage service icon. */

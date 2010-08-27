@@ -824,6 +824,18 @@ public class ClusterBrowser extends Browser {
         }
      }
 
+     /** Adds new vmsxml object to the hash. */
+            
+    public final void vmsXMLPut(final Host host, final VMSXML newVMSXML) {
+        try {
+            mVMSLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        vmsXML.put(host, newVMSXML);
+        mVMSLock.release();
+    }
+
     /**
      * Cancels the server status.
      */
@@ -1360,9 +1372,7 @@ public class ClusterBrowser extends Browser {
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        if (!domainNames.isEmpty()) {
-            addVMSNode();
-        }
+        addVMSNode();
         if (vmsNode != null) {
             final Enumeration ee = vmsNode.children();
             while (ee.hasMoreElements()) {
@@ -1392,9 +1402,9 @@ public class ClusterBrowser extends Browser {
             return;
         }
 
-        final Enumeration e = vmsNode.children();
-        int i = 0;
         for (final String domainName : domainNames) {
+            final Enumeration e = vmsNode.children();
+            int i = 0;
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
                                      (DefaultMutableTreeNode) e.nextElement();
@@ -1412,7 +1422,6 @@ public class ClusterBrowser extends Browser {
             setNode(resource);
             vmsvdi.updateParameters();
             vmsNode.insert(resource, i);
-            i++;
             nodeChanged = true;
         }
         if (nodeChanged) {

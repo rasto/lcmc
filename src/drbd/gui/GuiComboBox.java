@@ -1582,7 +1582,7 @@ public class GuiComboBox extends JPanel {
             if (labelToolTipText != null) {
                 setLabelToolTipText(labelToolTipText);
             }
-            label.setEnabled(accessible);
+            label.setEnabled(enablePredicate && accessible);
         }
     }
 

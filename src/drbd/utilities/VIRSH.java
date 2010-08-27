@@ -37,11 +37,6 @@ public final class VIRSH {
     private static final Map<String, String> VIRSH_COMMANDS =
                                                  new HashMap<String, String>();
     static {
-        VIRSH_COMMANDS.put("vcpu",
-                           "/usr/bin/virsh setvcpus @DOMAIN@ @VALUE@");
-        VIRSH_COMMANDS.put("memory",
-                           "/usr/bin/virsh setmaxmem @DOMAIN@ @VALUE@"
-                           + " && /usr/bin/virsh setmem @DOMAIN@ @VALUE@");
         VIRSH_COMMANDS.put("autostart",
                            "/usr/bin/virsh autostart @VALUE@ @DOMAIN@");
     }
@@ -79,21 +74,10 @@ public final class VIRSH {
         return exitCode;
     }
 
-    /**
-     * Sets paramters with virsh command.
-     */
+    /** Sets paramters with virsh command. */
     public static void setParameters(final Host[] hosts,
                                      final String domainName,
-                                     final Map<String, String> parameters,
-                                     final boolean isNew) {
-//<domain type='kvm'>
-//  <memory>524288</memory>
-//  <name>fff</name>
-//  <os>
-//    <type arch='i686' machine='pc-0.12'>hvm</type>
-//  </os>
-//</domain>
- 
+                                     final Map<String, String> parameters) {
         final StringBuffer commands = new StringBuffer(100);
         for (final String param : parameters.keySet()) {
             String command = VIRSH_COMMANDS.get(param);
@@ -111,16 +95,6 @@ public final class VIRSH {
                     } else {
                         value = "--disable";
                     }
-                } else if ("memory".equals(param)) {
-                    final int num = Tools.convertToKilobytes(value);
-                    if (num < 0) {
-                        Tools.appError("cannot parse: "
-                                       + param
-                                       + " = "
-                                       + value);
-                        continue;
-                    }
-                    value = Integer.toString(num);
                 }
                 command = command.replaceAll("@VALUE@", value);
             }
@@ -129,7 +103,9 @@ public final class VIRSH {
             }
             commands.append(command);
         }
-        execCommand(hosts, commands.toString(), true);
+        if (commands.length() > 0) {
+            execCommand(hosts, commands.toString(), true);
+        }
     }
 
     /**
@@ -185,9 +161,7 @@ public final class VIRSH {
         return execCommand(new Host[]{host}, command, true);
     }
 
-    /**
-     * Resumes virtual domain.
-     */
+    /** Resumes virtual domain. */
     public static boolean resume(final Host host, final String domain) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
@@ -196,12 +170,23 @@ public final class VIRSH {
         return execCommand(new Host[]{host}, command, true);
     }
 
-    /** Defines virtual domain. It rereads the config from XML, but does not
-     * start the domain like "create" would. */
+    /**
+     * Defines virtual domain. It rereads the config from XML, but does not
+     * start the domain like "create" would.
+     */
     public static boolean define(final Host host, final String config) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@", config);
         final String command = host.getDistCommand("VIRSH.Define",
+                                                   replaceHash);
+        return execCommand(new Host[]{host}, command, true);
+    }
+
+    /** Undefines virtual domain. It removes the config. */
+    public static boolean undefine(final Host host, final String domain) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domain);
+        final String command = host.getDistCommand("VIRSH.Undefine",
                                                    replaceHash);
         return execCommand(new Host[]{host}, command, true);
     }

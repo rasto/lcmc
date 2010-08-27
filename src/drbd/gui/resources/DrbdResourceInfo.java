@@ -949,7 +949,7 @@ public class DrbdResourceInfo extends EditableInfo
             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
                                                                      testOnly);
         } catch (Exceptions.DrbdConfigException dce) {
-            Tools.appError("config failed");
+            Tools.appError("config failed", dce);
         }
         getBrowser().getDrbdGraph().getDrbdInfo().setSelectedNode(null);
         getBrowser().getDrbdGraph().getDrbdInfo().selectMyself();

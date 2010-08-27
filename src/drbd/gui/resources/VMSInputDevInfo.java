@@ -207,7 +207,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
                 getResource().setValue(param, value);
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(InputDevData.SAVED_TYPE,
@@ -223,7 +223,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
                     + ":"
                     + getParamSaved(InputDevData.BUS));
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
         SwingUtilities.invokeLater(new Runnable() {
@@ -292,7 +292,8 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
                     final GuiComboBox cb = paramComboBoxGet(param, null);
-                    for (final Host h : getBrowser().getClusterHosts()) {
+                    for (final Host h
+                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
                             final String savedValue =
@@ -340,7 +341,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
         if (testOnly) {
             return;
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 final Map<String, String> parameters =
@@ -354,7 +355,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
                                     parameters);
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
     }

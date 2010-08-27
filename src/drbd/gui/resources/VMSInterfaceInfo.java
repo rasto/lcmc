@@ -170,7 +170,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
         if (InterfaceData.SOURCE_NETWORK.equals(param)) {
-            for (final Host h : getBrowser().getClusterHosts()) {
+            for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
                     final List<String> networks = vmsxml.getNetworks();
@@ -179,7 +179,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                 }
             }
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
-            for (final Host h : getBrowser().getClusterHosts()) {
+            for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
                     final List<String> bridges = h.getBridges();
@@ -278,7 +278,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                 getResource().setValue(param, value);
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
@@ -289,7 +289,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             getResource().setNew(false);
             setName(getParamSaved(InterfaceData.MAC_ADDRESS));
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
         SwingUtilities.invokeLater(new Runnable() {
@@ -391,7 +391,8 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
                     final GuiComboBox cb = paramComboBoxGet(param, null);
-                    for (final Host h : getBrowser().getClusterHosts()) {
+                    for (final Host h
+                            : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
                             final String savedValue =
@@ -448,7 +449,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         if (testOnly) {
             return;
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 final Map<String, String> parameters =
@@ -459,7 +460,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                                     parameters);
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
     }

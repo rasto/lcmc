@@ -2065,11 +2065,11 @@ public final class RoboTest {
 
         moveTo(robot, 720, 580); 
         leftClick(robot); /* next */
-        sleep(10000);
+        sleep(20000);
 
         moveTo(robot, 720, 580); /* meta-data */
         leftClick(robot); /* next */
-        sleep(10000);
+        sleep(20000);
 
         moveTo(robot, 820, 580); /* fs */
         leftClick(robot); /* finish */
