@@ -109,7 +109,10 @@ public class SSH {
             try {
                 final ConnectionThread ct = connectionThread;
                 mConnectionThreadLock.release();
-                ct.join();
+                ct.join(20000);
+                if (ct.isAlive()) {
+                    return false;
+                }
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
