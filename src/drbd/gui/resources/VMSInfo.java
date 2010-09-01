@@ -64,6 +64,12 @@ public class VMSInfo extends CategoryInfo {
     /** Colors for some rows. */
     private volatile Map<String, Color> domainToColor =
                                                   new HashMap<String, Color>();
+    /** Default widths for columns. */
+    private static final Map<Integer, Integer> DEFAULT_WIDTHS =
+                                                new HashMap<Integer, Integer>();
+    static {
+        DEFAULT_WIDTHS.put(4, 65); /* remove button column */
+    }
     /** Creates the new VMSInfo object with name of the category. */
     public VMSInfo(final String name, final Browser browser) {
         super(name, browser);
@@ -76,7 +82,7 @@ public class VMSInfo extends CategoryInfo {
 
     /** Returns columns for the table. */
     protected final String[] getColumnNames(final String tableName) {
-        return new String[]{"Name", "Defined on", "Status", "Memory"};
+        return new String[]{"Name", "Defined on", "Status", "Memory", ""};
     }
 
     /** Returns data for the table. */
@@ -113,10 +119,16 @@ public class VMSInfo extends CategoryInfo {
                 dti.put(domainName, vmsvdi);
                 final MyButton domainNameLabel = new MyButton(domainName,
                                                               hostIcon);
+                final MyButton removeDomain = new MyButton(
+                                                   null,
+                                                   ClusterBrowser.REMOVE_ICON,
+                                                   "Remove " + domainName
+                                                   + " domain");
                 rows.add(new Object[]{domainNameLabel,
                                       vmsvdi.getDefinedOnString(),
                                       vmsvdi.getRunningOnString(),
-                                      vmsvdi.getResource().getValue("memory")});
+                                      vmsvdi.getResource().getValue("memory"),
+                                      removeDomain});
             }
         }
         domainToInfo = dti;
@@ -131,10 +143,22 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName, final String key) {
+    protected final void rowClicked(final String tableName,
+                                    final String key,
+                                    final int column) {
         final VMSVirtualDomainInfo vmsvdi = domainToInfo.get(key);
         if (vmsvdi != null) {
-            vmsvdi.selectMyself();
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    if (column < 4) {
+                        vmsvdi.selectMyself();
+                    } else {
+                        /* remove button */
+                        vmsvdi.removeMyself(false);
+                    }
+                }
+            });
+            t.start();
         }
     }
 
@@ -154,7 +178,8 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns comparator for column. */
-    protected final Comparator<Object> getColComparator(final int col) {
+    protected final Comparator<Object> getColComparator(final String tableName,
+                                                        final int col) {
         if (col == 0) {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
@@ -252,5 +277,16 @@ public class VMSInfo extends CategoryInfo {
         };
         items.add(newDomainMenuItem);
         return items;
+    }
+
+    /** Returns whether the column is a button, 0 column is always a button. */
+    protected final Map<Integer, Integer> getDefaultWidths(     
+                                                      final String tableName) {
+        return DEFAULT_WIDTHS;
+    }
+
+    /** Returns default widths for columns. Null for computed width. */
+    protected final boolean isButton(final String tableName, final int column) {
+        return column == 4;
     }
 }

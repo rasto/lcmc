@@ -74,7 +74,9 @@ public class ClusterHostsInfo extends CategoryInfo {
     /**
      * Execute when row in the table was clicked.
      */
-    protected final void rowClicked(final String tableName, final String key) {
+    protected final void rowClicked(final String tableName,
+                                    final String key,
+                                    final int column) {
         // TODO: does not work
         final Host host = getBrowser().getCluster().getHostByName(key);
         final HostInfo hi = host.getBrowser().getHostInfo();

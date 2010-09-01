@@ -88,7 +88,9 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
     }
 
     /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName, final String key) {
+    protected final void rowClicked(final String tableName,
+                                    final String key,
+                                    final int column) {
         final ResourceAgent ra = raMap.get(key);
         if (ra != null) {
             final AvailableServiceInfo asi =

@@ -794,9 +794,7 @@ public final class Tools {
         }
     }
 
-    /**
-     * Removes the specified clusters from the gui.
-     */
+    /** Removes the specified clusters from the gui. */
     public static void removeClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
             getConfigData().removeClusterFromClusters(cluster);
@@ -2101,11 +2099,10 @@ public final class Tools {
         return -1;
     }
 
-    /**
-     * Resize table.
-     */
-    public static void resizeTable(final JTable table) {
-        final int margin = 5;
+    /** Resize table. */
+    public static void resizeTable(final JTable table,
+                                   final Map<Integer, Integer> defaultWidths) {
+        final int margin = 3;
 
         for (int i = 0; i < table.getColumnCount(); i++) {
             final int vColIndex = i;
@@ -2125,16 +2122,25 @@ public final class Tools {
                                                         false,
                                                         0,
                                                         0);
-            width = comp.getPreferredSize().width;
-            for (int r = 0; r < table.getRowCount(); r++) {
-                renderer = table.getCellRenderer(r, vColIndex);
-                comp = renderer.getTableCellRendererComponent(
+            Integer dw = null;
+            if (defaultWidths != null) {
+                dw = defaultWidths.get(i);
+            }
+            if (dw == null) {
+                width = comp.getPreferredSize().width;
+                for (int r = 0; r < table.getRowCount(); r++) {
+                    renderer = table.getCellRenderer(r, vColIndex);
+                    comp = renderer.getTableCellRendererComponent(
                                               table,
                                               table.getValueAt(r, vColIndex),
                                               false,
                                               false,
-                        r, vColIndex);
-                width = Math.max(width, comp.getPreferredSize().width);
+                            r, vColIndex);
+                    width = Math.max(width, comp.getPreferredSize().width);
+                }
+            } else {
+                width = dw;
+                col.setMaxWidth(width);
             }
             width += 2 * margin;
             col.setPreferredWidth(width);

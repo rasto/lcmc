@@ -1033,10 +1033,10 @@ public class TextResource extends
          "Connect marked clusters in the GUI."},
 
         {"EmptyBrowser.UnloadMarkedClusters",
-         "Disconnnect Marked Clusters"},
+         "Disconnect Marked Clusters"},
 
         {"EmptyBrowser.UnloadMarkedClusters.ToolTip",
-         "Disconnnect marked clusters in the GUI."},
+         "Disconnect marked clusters in the GUI."},
 
         {"EmptyBrowser.RemoveMarkedClusters",
          "Remove Marked Clusters"},

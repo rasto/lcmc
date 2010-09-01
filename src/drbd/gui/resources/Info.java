@@ -902,16 +902,14 @@ public class Info implements Comparable {
             final JTable table = new JTable(tableModel) {
                 /** Serial version uid. */
                 private static final long serialVersionUID = 1L;
-                /**
-                 * Overriding so that jlabels show up.
-                 */
+                /** Overriding so that jlabels show up. */
                 public Class getColumnClass(final int c) {
                     return getValueAt(0, c).getClass();
                 }
 
                 public TableCellRenderer getCellRenderer(final int row,
                                                          final int column) {
-                    if (column == 0) {
+                    if (column == 0 || isButton(tableName, column)) {
                         return bcr;
                     }
                     return super.getCellRenderer(row, column);
@@ -922,7 +920,7 @@ public class Info implements Comparable {
             final TableRowSorter sorter =
                         new TableRowSorter<DefaultTableModel>(tableModel);
             for (int i = 0; i < colNames.length; i++) {
-                final Comparator<Object> c = getColComparator(i);
+                final Comparator<Object> c = getColComparator(tableName, i);
                 if (c != null) {
                     sorter.setComparator(i, c);
                 }
@@ -958,15 +956,27 @@ public class Info implements Comparable {
                    final Point p = me.getPoint();
                    final int newRow = table.rowAtPoint(p);
                    if (row >= 0 && newRow != row) {
-                       final MyButton b = (MyButton) table.getValueAt(row, 0);
-                       b.getModel().setRollover(false);
-                       table.setValueAt((Object) b, row, 0);
+                       try {
+                           for (int c = 0; c < table.getColumnCount(); c++) {
+                               final Object v = table.getValueAt(row, c);
+                               if (v instanceof MyButton) {
+                                   ((MyButton) v).getModel().setRollover(false);
+                                   table.setValueAt(v, row, c);
+                               }
+                           }
+                       } catch (final java.lang.IndexOutOfBoundsException e) {
+                           /* could be removed in the meantime, igonring. */
+                       }
                    }
                    if (newRow >= 0 && newRow != row) {
                        row = newRow;
-                       final MyButton b = (MyButton) table.getValueAt(row, 0);
-                       b.getModel().setRollover(true);
-                       table.setValueAt((Object) b, row, 0);
+                       for (int c = 0; c < table.getColumnCount(); c++) {
+                           final Object v = table.getValueAt(row, c);
+                           if (v instanceof MyButton) {
+                               ((MyButton) v).getModel().setRollover(true);
+                               table.setValueAt(v, row, c);
+                           }
+                       }
                    }
                 }
                 public void mouseDragged(final MouseEvent me) {
@@ -986,8 +996,9 @@ public class Info implements Comparable {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
                     final int row = table.rowAtPoint(p);
-                    final MyButton b = (MyButton) table.getValueAt(row, 0);
-                    rowClicked(tableName, b.getText());
+                    final int column = table.columnAtPoint(p);
+                    final MyButton keyB = (MyButton) table.getValueAt(row, 0);
+                    rowClicked(tableName, keyB.getText(), column);
                 }
 
                 public final void mousePressed(final MouseEvent e) {
@@ -1002,18 +1013,27 @@ public class Info implements Comparable {
                         }
                         return;
                     }
-                    b.getModel().setPressed(true);
-                    b.getModel().setArmed(true);
-                    table.setValueAt((Object) b, row,  0);
+                    for (int c = 0; c < table.getColumnCount(); c++) {
+                        final Object v = table.getValueAt(row, c);
+                        if (v instanceof MyButton) {
+                            ((MyButton) v).getModel().setPressed(true);
+                            ((MyButton) v).getModel().setArmed(true);
+                            table.setValueAt(v, row, c);
+                        }
+                    }
                     paintIt = true;
                 }
 
                 public final void mouseReleased(final MouseEvent e) {
                     if (paintIt) {
-                        final MyButton b = (MyButton) table.getValueAt(row, 0);
-                        b.getModel().setPressed(false);
-                        b.getModel().setArmed(false);
-                        table.setValueAt((Object) b, row, 0);
+                        for (int c = 0; c < table.getColumnCount(); c++) {
+                            final Object v = table.getValueAt(row, c);
+                            if (v instanceof MyButton) {
+                                ((MyButton) v).getModel().setPressed(false);
+                                ((MyButton) v).getModel().setArmed(false);
+                                table.setValueAt(v, row, c);
+                            }
+                        }
                     }
                     paintIt = false;
                 }
@@ -1022,26 +1042,34 @@ public class Info implements Comparable {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
                     final int row = table.rowAtPoint(p);
-                    final MyButton b = (MyButton) table.getValueAt(row, 0);
-                    b.getModel().setRollover(true);
-                    table.setValueAt((Object) b, row, 0);
+                    for (int c = 0; c < table.getColumnCount(); c++) {
+                        final Object v = table.getValueAt(row, c);
+                        if (v instanceof MyButton) {
+                            ((MyButton) v).getModel().setRollover(true);
+                            table.setValueAt(v, row, c);
+                        }
+                    }
                     paintItMouseOver = true;
                 }
 
                 public final void mouseExited(final MouseEvent e) {
                     if (paintItMouseOver) {
                         for (int i = 0; i < table.getRowCount(); i++) {
-                            final MyButton b =
-                                            (MyButton) table.getValueAt(i, 0);
-                            b.getModel().setRollover(false);
-                            table.setValueAt((Object) b, i, 0);
+                            for (int c = 0; c < table.getColumnCount(); c++) {
+                                final Object v = table.getValueAt(i, c);
+                                if (v instanceof MyButton) {
+                                    ((MyButton) v).getModel().setRollover(
+                                                                        false);
+                                    table.setValueAt(v, i, c);
+                                }
+                            }
                         }
                     }
                     paintItMouseOver = false;
                 }
             });
 
-            Tools.resizeTable(table);
+            Tools.resizeTable(table, getDefaultWidths(tableName));
             return table;
         }
         return null;
@@ -1098,7 +1126,8 @@ public class Info implements Comparable {
                         tableModel.setDataVector(data, colNames);
                         sorter.setSortKeys(sortKeys);
                         tableModel.fireTableDataChanged();
-                        Tools.resizeTable(tables.get(tableName));
+                        Tools.resizeTable(tables.get(tableName),
+                                          getDefaultWidths(tableName));
                     }
                 });
             }
@@ -1108,7 +1137,9 @@ public class Info implements Comparable {
     /**
      * Execute when row in the table was clicked.
      */
-    protected void rowClicked(final String tableName, final String key) {
+    protected void rowClicked(final String tableName,
+                              final String key,
+                              final int column) {
         /* do nothing */
     }
 
@@ -1116,20 +1147,27 @@ public class Info implements Comparable {
      * Returns row height for the table.
      */
     protected final int getRowHeight() {
-        return 38;
+        return 40;
     }
 
-    /**
-     * Retrurns color for some rows.
-     */
+    /** Retrurns color for some rows. */
     protected Color getTableRowColor(final String tableName, final String key) {
         return null;
     }
 
-    /**
-     * Returns comparator for column.
-     */
-    protected Comparator<Object> getColComparator(final int col) {
+    /** Returns comparator for column. */
+    protected Comparator<Object> getColComparator(final String tableName,
+                                                  final int col) {
         return null;
+    }
+
+    /** Returns default widths for columns. Null for computed width. */
+    protected Map<Integer, Integer> getDefaultWidths(final String tableName) {
+        return null;
+    }
+
+    /** Returns default widths for columns. Null for computed width. */
+    protected boolean isButton(final String tableName, final int column) {
+        return false;
     }
 }

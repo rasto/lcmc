@@ -41,12 +41,10 @@ public class MyButtonCellRenderer extends MyButton
      */
     public MyButtonCellRenderer() {
         super();
-        final Dimension s = getPreferredSize();
+        //final Dimension s = getPreferredSize();
     }
 
-    /**
-     * Sets background color and padding in jlabels for every cell.
-     */
+    /** Sets background color and padding in jlabels for every cell. */
     public final Component getTableCellRendererComponent(
                                                       final JTable table,
                                                       final Object value,
@@ -82,12 +80,11 @@ public class MyButtonCellRenderer extends MyButton
             setBackgroundColor(bg);
             setToolTipText(button.getText());
         }
+        ((MyButton) this).setToolTipText("asdf");
         return this;
     }
 
-    /**
-     * Alignment for the specified column.
-     */
+    /** Alignment for the specified column. */
     protected int getColumnAlignment(final int column) {
         return SwingConstants.LEFT;
     }

@@ -62,7 +62,9 @@ public class AvailableServicesInfo extends HbCategoryInfo {
     /**
      * Execute when row in the table was clicked.
      */
-    protected final void rowClicked(final String tableName, final String key) {
+    protected final void rowClicked(final String tableName,
+                                    final String key,
+                                    final int column) {
         final ResourceAgentClassInfo raci =
                      getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
         if (raci != null) {

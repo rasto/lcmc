@@ -199,7 +199,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName, final String key) {
+    protected final void rowClicked(final String tableName,
+                                    final String key,
+                                    final int column) {
         vmsVirtualDomainInfo.selectMyself();
     }
 

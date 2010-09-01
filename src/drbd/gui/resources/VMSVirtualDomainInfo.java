@@ -257,6 +257,38 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NO_VM_STATUS_STRING =
                                                 "VM status is not available";
+    /** Default widths for columns. */
+    private static final Map<Integer, Integer> HEADER_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> DISK_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> INTERFACES_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> INPUTDEVS_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> GRAPHICS_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> SOUND_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> SERIAL_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> PARALLEL_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> VIDEO_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    private static final int REMOVE_BUTTON_WIDTH = 65;
+    static {
+        /* remove button column */
+        HEADER_DEFAULT_WIDTHS.put(4, REMOVE_BUTTON_WIDTH);
+        DISK_DEFAULT_WIDTHS.put(2, REMOVE_BUTTON_WIDTH);
+        INTERFACES_DEFAULT_WIDTHS.put(2, REMOVE_BUTTON_WIDTH);
+        INPUTDEVS_DEFAULT_WIDTHS.put(1, REMOVE_BUTTON_WIDTH);
+        GRAPHICS_DEFAULT_WIDTHS.put(1, REMOVE_BUTTON_WIDTH);
+        SOUND_DEFAULT_WIDTHS.put(1, REMOVE_BUTTON_WIDTH);
+        SERIAL_DEFAULT_WIDTHS.put(1, REMOVE_BUTTON_WIDTH);
+        PARALLEL_DEFAULT_WIDTHS.put(1, REMOVE_BUTTON_WIDTH);
+        VIDEO_DEFAULT_WIDTHS.put(1, REMOVE_BUTTON_WIDTH);
+    }
     /** New vm domain button. */
     private JComponent newVMButton = null;
     /** New disk button. */
@@ -2859,23 +2891,23 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns columns for the table. */
     protected final String[] getColumnNames(final String tableName) {
         if (HEADER_TABLE.equals(tableName)) {
-            return new String[]{"Name", "Defined on", "Status", "Memory"};
+            return new String[]{"Name", "Defined on", "Status", "Memory", ""};
         } else if (DISK_TABLE.equals(tableName)) {
-            return new String[]{"Virtual Device", "Source"};
+            return new String[]{"Virtual Device", "Source", ""};
         } else if (INTERFACES_TABLE.equals(tableName)) {
-            return new String[]{"Virtual Interface", "Source"};
+            return new String[]{"Virtual Interface", "Source", ""};
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
-            return new String[]{"Input Device"};
+            return new String[]{"Input Device", ""};
         } else if (GRAPHICS_TABLE.equals(tableName)) {
-            return new String[]{"Graphic Display"};
+            return new String[]{"Graphic Display", ""};
         } else if (SOUND_TABLE.equals(tableName)) {
-            return new String[]{"Sound Device"};
+            return new String[]{"Sound Device", ""};
         } else if (SERIAL_TABLE.equals(tableName)) {
-            return new String[]{"Serial Device"};
+            return new String[]{"Serial Device", ""};
         } else if (PARALLEL_TABLE.equals(tableName)) {
-            return new String[]{"Parallel Device"};
+            return new String[]{"Parallel Device", ""};
         } else if (VIDEO_TABLE.equals(tableName)) {
-            return new String[]{"Video Device"};
+            return new String[]{"Video Device", ""};
         }
         return new String[]{};
     }
@@ -2928,10 +2960,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (domainName != null) {
             final MyButton domainNameLabel = new MyButton(domainName, hostIcon);
             domainNameLabel.setOpaque(true);
+            final MyButton removeDomain = new MyButton(
+                                               null,
+                                               ClusterBrowser.REMOVE_ICON,
+                                               "Remove " + domainName
+                                               + " domain");
             rows.add(new Object[]{domainNameLabel,
                                   getDefinedOnString(),
                                   getRunningOnString(),
-                                  getResource().getValue("memory")});
+                                  getResource().getValue("memory"),
+                                  removeDomain});
         }
         return rows.toArray(new Object[rows.size()][]);
     }
@@ -2954,9 +2992,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                             final Map<String, VMSDiskInfo> dkti,
                                             final Map<String, DiskData> disks,
                                             final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + targetDev);
         final DiskData diskData = disks.get(targetDev);
         if (diskData == null) {
-            return new Object[]{targetDev, "unknown"};
+            return new Object[]{targetDev, "unknown", removeBtn};
         }
         final StringBuffer target = new StringBuffer(10);
         target.append(diskData.getTargetBusType());
@@ -2986,7 +3028,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             source.append(" : ");
             source.append(s);
         }
-        return new Object[]{targetDevLabel, source.toString()};
+        return new Object[]{targetDevLabel, source.toString(), removeBtn};
     }
 
     /** Returns all hosts on which this domain is defined. */
@@ -3031,9 +3073,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSInterfaceInfo> iToInfo,
                                 final Map<String, InterfaceData> interfaces,
                                 final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + mac);
         final InterfaceData interfaceData = interfaces.get(mac);
         if (interfaceData == null) {
-            return new Object[]{mac, "unknown"};
+            return new Object[]{mac, "unknown", removeBtn};
         }
         final StringBuffer interf = new StringBuffer(20);
         interf.append(mac);
@@ -3062,7 +3108,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             source.append(" : ");
             source.append(s);
         }
-        return new Object[]{iLabel, source.toString()};
+        return new Object[]{iLabel, source.toString(), removeBtn};
     }
 
     /** Get one row of the table. */
@@ -3071,9 +3117,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSInputDevInfo> iToInfo,
                                 final Map<String, InputDevData> inputDevs,
                                 final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + index);
         final InputDevData inputDevData = inputDevs.get(index);
         if (inputDevData == null) {
-            return new Object[]{index + ": unknown", ""};
+            return new Object[]{index + ": unknown", "", removeBtn};
         }
         if (iToInfo != null) {
             final VMSInputDevInfo vidi = inputDevToInfo.get(index);
@@ -3081,7 +3131,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         final MyButton iLabel = new MyButton(index, NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        return new Object[]{iLabel};
+        return new Object[]{iLabel, removeBtn};
     }
 
     /** Get one row of the table. */
@@ -3090,9 +3140,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSGraphicsInfo> iToInfo,
                                 final Map<String, GraphicsData> graphicDisplays,
                                 final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + index);
         final GraphicsData graphicsData = graphicDisplays.get(index);
         if (graphicsData == null) {
-            return new Object[]{index + ": unknown", ""};
+            return new Object[]{index + ": unknown", "", removeBtn};
         }
         final String type = graphicsData.getType();
         if (iToInfo != null) {
@@ -3102,7 +3156,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyButton iLabel = new MyButton(index,
                                              NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        return new Object[]{iLabel};
+        return new Object[]{iLabel, removeBtn};
     }
 
     /** Get one row of the table. */
@@ -3111,9 +3165,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSSoundInfo> iToInfo,
                                 final Map<String, SoundData> sounds,
                                 final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + index);
         final SoundData soundData = sounds.get(index);
         if (soundData == null) {
-            return new Object[]{index + ": unknown", ""};
+            return new Object[]{index + ": unknown", "", removeBtn};
         }
         final String model = soundData.getModel();
         if (iToInfo != null) {
@@ -3123,7 +3181,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyButton iLabel = new MyButton(model,
                                              NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        return new Object[]{iLabel};
+        return new Object[]{iLabel, removeBtn};
     }
 
     /** Get one row of the table. */
@@ -3132,9 +3190,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSSerialInfo> iToInfo,
                                 final Map<String, SerialData> serials,
                                 final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + index);
         final SerialData serialData = serials.get(index);
         if (serialData == null) {
-            return new Object[]{index + ": unknown", ""};
+            return new Object[]{index + ": unknown", "", removeBtn};
         }
         final String type = serialData.getType();
         if (iToInfo != null) {
@@ -3143,7 +3205,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         final MyButton iLabel = new MyButton(index, NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        return new Object[]{iLabel};
+        return new Object[]{iLabel, removeBtn};
     }
 
     /** Get one row of the table. */
@@ -3152,9 +3214,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSParallelInfo> iToInfo,
                                 final Map<String, ParallelData> parallels,
                                 final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + index);
         final ParallelData parallelData = parallels.get(index);
         if (parallelData == null) {
-            return new Object[]{index + ": unknown", ""};
+            return new Object[]{index + ": unknown", "", removeBtn};
         }
         final String type = parallelData.getType();
         if (iToInfo != null) {
@@ -3163,7 +3229,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         final MyButton iLabel = new MyButton(index, NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        return new Object[]{iLabel};
+        return new Object[]{iLabel, removeBtn};
     }
 
     /** Get one row of the table. */
@@ -3172,9 +3238,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSVideoInfo> iToInfo,
                                 final Map<String, VideoData> videos,
                                 final boolean opaque) {
+        final MyButton removeBtn = new MyButton(
+                                           null,
+                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove " + index);
         final VideoData videoData = videos.get(index);
         if (videoData == null) {
-            return new Object[]{index + ": unknown", ""};
+            return new Object[]{index + ": unknown", "", removeBtn};
         }
         final String modelType = videoData.getModelType();
         if (iToInfo != null) {
@@ -3184,7 +3254,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyButton iLabel = new MyButton(modelType,
                                              NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        return new Object[]{iLabel};
+        return new Object[]{iLabel, removeBtn};
     }
 
 
@@ -3455,7 +3525,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName, final String key) {
+    protected final void rowClicked(final String tableName,
+                                    final String key,
+                                    final int column) {
         if (HEADER_TABLE.equals(tableName)) {
             getBrowser().getVMSInfo().selectMyself();
         } else if (DISK_TABLE.equals(tableName)) {
@@ -3748,5 +3820,55 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+    }
+
+    /** Returns whether the column is a button, 0 column is always a button. */
+    protected final Map<Integer, Integer> getDefaultWidths(
+                                                    final String tableName) {
+        if (HEADER_TABLE.equals(tableName)) {
+            return HEADER_DEFAULT_WIDTHS;
+        } else if (DISK_TABLE.equals(tableName)) {
+            return DISK_DEFAULT_WIDTHS;
+        } else if (INTERFACES_TABLE.equals(tableName)) {
+            return INTERFACES_DEFAULT_WIDTHS;
+        } else if (INPUTDEVS_TABLE.equals(tableName)) {
+            return INPUTDEVS_DEFAULT_WIDTHS;
+        } else if (GRAPHICS_TABLE.equals(tableName)) {
+            return GRAPHICS_DEFAULT_WIDTHS;
+        } else if (SOUND_TABLE.equals(tableName)) {
+            return SOUND_DEFAULT_WIDTHS;
+        } else if (SERIAL_TABLE.equals(tableName)) {
+            return SERIAL_DEFAULT_WIDTHS;
+        } else if (PARALLEL_TABLE.equals(tableName)) {
+            return PARALLEL_DEFAULT_WIDTHS;
+        } else if (VIDEO_TABLE.equals(tableName)) {
+            return VIDEO_DEFAULT_WIDTHS;
+        }
+        return null;
+    }
+
+    /** Returns default widths for columns. Null for computed width. */
+    protected final boolean isButton(final String tableName,
+                                     final int column) {
+        if (HEADER_TABLE.equals(tableName)) {
+            return HEADER_DEFAULT_WIDTHS.containsKey(column);
+        } else if (DISK_TABLE.equals(tableName)) {
+            return DISK_DEFAULT_WIDTHS.containsKey(column);
+        } else if (INTERFACES_TABLE.equals(tableName)) {
+            return INTERFACES_DEFAULT_WIDTHS.containsKey(column);
+        } else if (INPUTDEVS_TABLE.equals(tableName)) {
+            return INPUTDEVS_DEFAULT_WIDTHS.containsKey(column);
+        } else if (GRAPHICS_TABLE.equals(tableName)) {
+            return GRAPHICS_DEFAULT_WIDTHS.containsKey(column);
+        } else if (SOUND_TABLE.equals(tableName)) {
+            return SOUND_DEFAULT_WIDTHS.containsKey(column);
+        } else if (SERIAL_TABLE.equals(tableName)) {
+            return SERIAL_DEFAULT_WIDTHS.containsKey(column);
+        } else if (PARALLEL_TABLE.equals(tableName)) {
+            return PARALLEL_DEFAULT_WIDTHS.containsKey(column);
+        } else if (VIDEO_TABLE.equals(tableName)) {
+            return VIDEO_DEFAULT_WIDTHS.containsKey(column);
+        }
+        return false;
     }
 }
