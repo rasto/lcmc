@@ -86,6 +86,24 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                                 DiskData.DRIVER_TYPE,
                                                 DiskData.READONLY,
                                                 DiskData.SHAREABLE};
+    /** Block parameters. */
+    private static final String[] BLOCK_PARAMETERS = {DiskData.TYPE,
+                                                      DiskData.TARGET_DEVICE,
+                                                      DiskData.SOURCE_DEVICE,
+                                                      DiskData.TARGET_BUS_TYPE,
+                                                      DiskData.DRIVER_NAME,
+                                                      DiskData.DRIVER_TYPE,
+                                                      DiskData.READONLY,
+                                                      DiskData.SHAREABLE};
+    /** File parameters. */
+    private static final String[] FILE_PARAMETERS = {DiskData.TYPE,
+                                                     DiskData.TARGET_DEVICE,
+                                                     DiskData.SOURCE_FILE,
+                                                     DiskData.TARGET_BUS_TYPE,
+                                                     DiskData.DRIVER_NAME,
+                                                     DiskData.DRIVER_TYPE,
+                                                     DiskData.READONLY,
+                                                     DiskData.SHAREABLE};
     /** Whether the parameter is enabled only in advanced mode. */
     private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{
@@ -323,10 +341,16 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 applyButton.setEnabled(false);
             }
         });
-        final String[] params = getParametersFromXML();
+        String[] params;
+        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
+            params = BLOCK_PARAMETERS;
+        } else {
+            params = FILE_PARAMETERS;
+        }
+
         final Map<String, String> parameters = new HashMap<String, String>();
         String type = null;
-        for (final String param : getParametersFromXML()) {
+        for (final String param : params) {
             final String value = getComboBoxValue(param);
             if (DiskData.TYPE.equals(param)) {
                 type = value;
@@ -341,15 +365,15 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 getResource().setValue(param, value);
                 continue;
             }
-            if ("file".equals(type)
-                && DiskData.SOURCE_DEVICE.equals(param)) {
-                getResource().setValue(param, null);
-                continue;
-            } else if ("block".equals(type)
-                && DiskData.SOURCE_FILE.equals(param)) {
-                getResource().setValue(param, null);
-                continue;
-            }
+            //if ("file".equals(type)
+            //    && DiskData.SOURCE_DEVICE.equals(param)) {
+            //    getResource().setValue(param, null);
+            //    continue;
+            //} else if ("block".equals(type)
+            //    && DiskData.SOURCE_FILE.equals(param)) {
+            //    getResource().setValue(param, null);
+            //    continue;
+            //}
             if (!Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
@@ -412,12 +436,16 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                        final String newValue) {
         if (DiskData.TYPE.equals(param)) {
             if (!newValue.equals(prevType)) {
-                if (sourceFileCB != null) {
-                    sourceFileCB.setVisible("file".equals(newValue));
-                }
-                if (sourceDeviceCB != null) {
-                    sourceDeviceCB.setVisible("block".equals(newValue));
-                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (sourceFileCB != null) {
+                            sourceFileCB.setVisible("file".equals(newValue));
+                        }
+                        if (sourceDeviceCB != null) {
+                            sourceDeviceCB.setVisible("block".equals(newValue));
+                        }
+                    }
+                });
                 //if (driverTypeCB != null) {
                 //    if (prevType != null
                 //        || getParamSaved(DiskData.DRIVER_TYPE) == null) {
@@ -454,8 +482,9 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 targetDeviceCB.reloadComboBox(
                                 selected,
                                 devices.toArray(new String[devices.size()]));
-                if (prevTargetBusType != null
-                    || getParamSaved(DiskData.DRIVER_NAME) == null) {
+                if (getResource().isNew() 
+                    && (prevTargetBusType != null
+                        || getParamSaved(DiskData.DRIVER_NAME) == null)) {
                     driverNameCB.setValue("qemu");
                     if ("ide/cdrom".equals(newValue)) {
                         readonlyCB.setValue("True");
@@ -789,5 +818,18 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             }
         });
         return newBtn;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. Don't check the invisible for the type parameters.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
+            return super.checkResourceFieldsChanged(param, BLOCK_PARAMETERS);
+        } else {
+            return super.checkResourceFieldsChanged(param, FILE_PARAMETERS);
+        }
     }
 }

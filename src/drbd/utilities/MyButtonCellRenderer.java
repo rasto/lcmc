@@ -78,9 +78,10 @@ public class MyButtonCellRenderer extends MyButton
             final String key = ((MyButton) v).getText();
             final Color bg = getRowColor(key);
             setBackgroundColor(bg);
-            setToolTipText(button.getText());
+            //setToolTipText(button.getText());
         }
-        ((MyButton) this).setToolTipText("asdf");
+        //(((MyButton) this).createToolTip()).setTipText("asdf");
+        //(((MyButton) button).createToolTip()).setTipText("asdff");
         return this;
     }
 

@@ -253,7 +253,7 @@ public class Cluster {
             commonNetworks.add(network);
         }
 
-        return commonNetworks.toArray(new Network [commonNetworks.size()]);
+        return commonNetworks.toArray(new Network[commonNetworks.size()]);
     }
 
     /**

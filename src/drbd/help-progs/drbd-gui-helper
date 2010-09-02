@@ -1363,7 +1363,14 @@ sub get_vm_info {
 		next if !$info;
 		my $vncdisplay = `/usr/bin/virsh vncdisplay $name 2>/dev/null`
 				 || "";
-		my $config = `/usr/bin/virsh dumpxml $name 2>/dev/null` || "";
+		my $config = "";
+		if (open CONFIG, $_) {
+			local $/;
+			$config = <CONFIG>;
+			close CONFIG;
+		}
+		#TODO
+		#my $config = `/usr/bin/virsh dumpxml $name 2>/dev/null` || "";
 		$out.= "<vm name=\"$name\" config=\"$_\"";
 		if ($autostart{$name}) {
 			$out.= ' autostart="True"';

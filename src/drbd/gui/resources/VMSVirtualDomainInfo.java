@@ -196,6 +196,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Map of default values. */
     private static final Map<String, String> DEFAULTS_MAP =
                                                  new HashMap<String, String>();
+    /** Preferred values. */
+    private static final Map<String, String> PREFERRED_MAP =
+                                                 new HashMap<String, String>();
     /** Types of some of the field. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
@@ -343,6 +346,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         FIELD_TYPES.put(VMSXML.VM_PARAM_MEMORY,
                         GuiComboBox.Type.TEXTFIELDWITHUNIT);
         FIELD_TYPES.put(VMSXML.VM_PARAM_AUTOSTART, GuiComboBox.Type.CHECKBOX);
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, "512M");
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, "512M");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT,   "hd");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU,      "1");
@@ -1077,7 +1082,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     continue;
                 }
                 final VMSVideoInfo v = (VMSVideoInfo) node.getUserObject();
-                if (video.compareTo(v.getName()) < 0) {
+                if (v.getName() != null && video.compareTo(v.getName()) < 0) {
                     break;
                 }
                 i++;
@@ -2677,7 +2682,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
      * Returns preferred value for specified parameter.
      */
     protected final String getParamPreferred(final String param) {
-        return null;
+        return PREFERRED_MAP.get(param);
     }
 
     /**
@@ -2855,6 +2860,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             parameters);
         getResource().setNew(false);
         checkResourceFields(null, params);
+        getBrowser().reload(getNode());
     }
 
     /** Returns whether this parameter has a unit prefix. */
@@ -3529,7 +3535,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                     final String key,
                                     final int column) {
         if (HEADER_TABLE.equals(tableName)) {
-            getBrowser().getVMSInfo().selectMyself();
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    if (HEADER_DEFAULT_WIDTHS.containsKey(column)) {
+                        removeMyself(false);
+                    } else {
+                        getBrowser().getVMSInfo().selectMyself();
+                    }
+                }
+            });
+            thread.start();
         } else if (DISK_TABLE.equals(tableName)) {
             try {
                 mDiskToInfoLock.acquire();
@@ -3539,7 +3554,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSDiskInfo vdi = diskKeyToInfo.get(key);
             mDiskToInfoLock.release();
             if (vdi != null) {
-                vdi.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (DISK_DEFAULT_WIDTHS.containsKey(column)) {
+                            vdi.removeMyself(false);
+                        } else {
+                            vdi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         } else if (INTERFACES_TABLE.equals(tableName)) {
             try {
@@ -3550,7 +3574,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSInterfaceInfo vii = interfaceKeyToInfo.get(key);
             mInterfaceToInfoLock.release();
             if (vii != null) {
-                vii.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (INTERFACES_DEFAULT_WIDTHS.containsKey(column)) {
+                            vii.removeMyself(false);
+                        } else {
+                            vii.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
             try {
@@ -3561,7 +3594,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSInputDevInfo vidi = inputDevKeyToInfo.get(key);
             mInputDevToInfoLock.release();
             if (vidi != null) {
-                vidi.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (INPUTDEVS_DEFAULT_WIDTHS.containsKey(column)) {
+                            vidi.removeMyself(false);
+                        } else {
+                            vidi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         } else if (GRAPHICS_TABLE.equals(tableName)) {
             try {
@@ -3572,7 +3614,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSGraphicsInfo vgi = graphicsKeyToInfo.get(key);
             mGraphicsToInfoLock.release();
             if (vgi != null) {
-                vgi.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (GRAPHICS_DEFAULT_WIDTHS.containsKey(column)) {
+                            vgi.removeMyself(false);
+                        } else {
+                            vgi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         } else if (SOUND_TABLE.equals(tableName)) {
             try {
@@ -3583,7 +3634,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSSoundInfo vsi = soundKeyToInfo.get(key);
             mSoundToInfoLock.release();
             if (vsi != null) {
-                vsi.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (SOUND_DEFAULT_WIDTHS.containsKey(column)) {
+                            vsi.removeMyself(false);
+                        } else {
+                            vsi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         } else if (SERIAL_TABLE.equals(tableName)) {
             try {
@@ -3594,7 +3654,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSSerialInfo vsi = serialKeyToInfo.get(key);
             mSerialToInfoLock.release();
             if (vsi != null) {
-                vsi.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (SERIAL_DEFAULT_WIDTHS.containsKey(column)) {
+                            vsi.removeMyself(false);
+                        } else {
+                            vsi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         } else if (PARALLEL_TABLE.equals(tableName)) {
             try {
@@ -3605,7 +3674,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSParallelInfo vpi = parallelKeyToInfo.get(key);
             mParallelToInfoLock.release();
             if (vpi != null) {
-                vpi.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (PARALLEL_DEFAULT_WIDTHS.containsKey(column)) {
+                            vpi.removeMyself(false);
+                        } else {
+                            vpi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         } else if (VIDEO_TABLE.equals(tableName)) {
             try {
@@ -3616,7 +3694,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final VMSVideoInfo vvi = videoKeyToInfo.get(key);
             mVideoToInfoLock.release();
             if (vvi != null) {
-                vvi.selectMyself();
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        if (VIDEO_DEFAULT_WIDTHS.containsKey(column)) {
+                            vvi.removeMyself(false);
+                        } else {
+                            vvi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
             }
         }
     }
@@ -3848,7 +3935,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns default widths for columns. Null for computed width. */
-    protected final boolean isButton(final String tableName,
+    protected final boolean isRemoveButton(final String tableName,
                                      final int column) {
         if (HEADER_TABLE.equals(tableName)) {
             return HEADER_DEFAULT_WIDTHS.containsKey(column);
@@ -3870,5 +3957,51 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return VIDEO_DEFAULT_WIDTHS.containsKey(column);
         }
         return false;
+    }
+
+    /** Returns tool tip text in the table. */
+    protected String getTableToolTip(final String tableName,
+                                     final String key,
+                                     final Object object,
+                                     final int raw,
+                                     final int column) {
+        if (HEADER_TABLE.equals(tableName)) {
+            if (HEADER_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove domain " + key + ".";
+            }
+        } else if (DISK_TABLE.equals(tableName)) {
+            if (DISK_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (INTERFACES_TABLE.equals(tableName)) {
+            if (INTERFACES_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (INPUTDEVS_TABLE.equals(tableName)) {
+            if (INPUTDEVS_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (GRAPHICS_TABLE.equals(tableName)) {
+            if (GRAPHICS_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (SOUND_TABLE.equals(tableName)) {
+            if (SOUND_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (SERIAL_TABLE.equals(tableName)) {
+            if (SERIAL_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (PARALLEL_TABLE.equals(tableName)) {
+            if (PARALLEL_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (VIDEO_TABLE.equals(tableName)) {
+            if (VIDEO_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        }
+        return super.getTableToolTip(tableName, key, object, raw, column);
     }
 }

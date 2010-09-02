@@ -665,8 +665,7 @@ public class DrbdInfo extends EditableInfo {
             for (String section : sections) {
                 final String[] params = dxml.getSectionParams(section);
                 for (String param : params) {
-                    String value =
-                        dxml.getConfigValue(name, section, param);
+                    String value = dxml.getConfigValue(name, section, param);
                     if ("".equals(value)) {
                         value = dxml.getParamDefault(param);
                     }

@@ -981,6 +981,9 @@ public class VMSXML extends XML {
                                                            "passwd");
                         final String keymap = getAttribute(deviceNode,
                                                            "keymap");
+                        final String display = getAttribute(deviceNode,
+                                                           "display");
+                        final String xauth = getAttribute(deviceNode, "xauth");
                         Tools.debug(this, "type: " + type, 2);
                         Tools.debug(this, "port: " + port, 2);
                         Tools.debug(this, "autoport: " + autoport, 2);
@@ -994,16 +997,21 @@ public class VMSXML extends XML {
                                 autoports.put(name, false);
                             }
                         }
+                        final GraphicsData graphicsData =
+                                     new GraphicsData(type,
+                                                      port,
+                                                      autoport,
+                                                      listen,
+                                                      passwd,
+                                                      keymap,
+                                                      display,
+                                                      xauth);
                         if (port != null) {
-                            final GraphicsData graphicsData =
-                                         new GraphicsData(type,
-                                                          port,
-                                                          autoport,
-                                                          listen,
-                                                          passwd,
-                                                          keymap);
                             graphicsMap.put(type + " : " + port, graphicsData);
-                        }
+                        } else if (display != null) {
+                            graphicsMap.put(type + " (" + display + ")",
+                                            graphicsData);
+                        } 
                     } else if ("disk".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
                         final String device = getAttribute(deviceNode,
@@ -1934,6 +1942,10 @@ public class VMSXML extends XML {
         public static final String PASSWD = "passwd";
         /** Keymap. */
         public static final String KEYMAP = "keymap";
+        /** Display / SDL. */
+        public static final String DISPLAY = "display";
+        /** Xauth file / SDL. */
+        public static final String XAUTH = "xauth";
 
         /** Creates new GraphicsData object. */
         public GraphicsData(final String type,
@@ -1941,7 +1953,9 @@ public class VMSXML extends XML {
                             final String autoport,
                             final String listen,
                             final String passwd,
-                            final String keymap) {
+                            final String keymap,
+                            final String display,
+                            final String xauth) {
             super();
             this.type = type;
             setValue(TYPE, type);
@@ -1950,6 +1964,8 @@ public class VMSXML extends XML {
             setValue(LISTEN, listen);
             setValue(PASSWD, passwd);
             setValue(KEYMAP, keymap);
+            setValue(DISPLAY, display);
+            setValue(XAUTH, xauth);
         }
 
         /** Returns type. */

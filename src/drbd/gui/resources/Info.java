@@ -909,10 +909,24 @@ public class Info implements Comparable {
 
                 public TableCellRenderer getCellRenderer(final int row,
                                                          final int column) {
-                    if (column == 0 || isButton(tableName, column)) {
+                    if (column == 0 || isRemoveButton(tableName, column)) {
                         return bcr;
                     }
                     return super.getCellRenderer(row, column);
+                }
+
+                public String getToolTipText(MouseEvent me) {
+                    int row = rowAtPoint(me.getPoint());
+                    int column = columnAtPoint(me.getPoint());
+                    try {
+                        final String key =
+                                   ((MyButton) getValueAt(row, 0)).getText();
+                        final Object o = getValueAt(row, column);
+                        return getTableToolTip(tableName, key, o, row, column);
+                    } catch (final java.lang.IndexOutOfBoundsException e) {
+                        /* could be removed in the meantime, igonring. */
+                    }
+                    return null;
                 }
 
             };
@@ -1167,7 +1181,19 @@ public class Info implements Comparable {
     }
 
     /** Returns default widths for columns. Null for computed width. */
-    protected boolean isButton(final String tableName, final int column) {
+    protected boolean isRemoveButton(final String tableName, final int column) {
         return false;
+    }
+
+    /** Returns tool tip text in the table. */
+    protected String getTableToolTip(final String tableName,
+                                     final String key,
+                                     final Object object,
+                                     final int raw,
+                                     final int column) {
+        if (object instanceof MyButton) {
+            return ((MyButton) object).getText();
+        }
+        return object.toString();
     }
 }

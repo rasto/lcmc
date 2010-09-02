@@ -577,8 +577,8 @@ public abstract class EditableInfo extends Info {
             initValue = getParamPreferred(param);
             if (initValue == null) {
                 initValue = getParamDefault(param);
+                getResource().setValue(param, initValue);
             }
-            getResource().setValue(param, initValue);
         } else {
             initValue = value;
         }

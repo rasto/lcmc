@@ -150,11 +150,11 @@ public class VMSInfo extends CategoryInfo {
         if (vmsvdi != null) {
             final Thread t = new Thread(new Runnable() {
                 public void run() {
-                    if (column < 4) {
-                        vmsvdi.selectMyself();
-                    } else {
+                    if (DEFAULT_WIDTHS.containsKey(column)) {
                         /* remove button */
                         vmsvdi.removeMyself(false);
+                    } else {
+                        vmsvdi.selectMyself();
                     }
                 }
             });
@@ -250,7 +250,6 @@ public class VMSInfo extends CategoryInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsdi);
         getBrowser().setNode(resource);
-        final Enumeration eee = getNode().children();
         getNode().add(resource);
         getBrowser().reload(getNode());
         vmsdi.selectMyself();
@@ -285,8 +284,21 @@ public class VMSInfo extends CategoryInfo {
         return DEFAULT_WIDTHS;
     }
 
-    /** Returns default widths for columns. Null for computed width. */
-    protected final boolean isButton(final String tableName, final int column) {
-        return column == 4;
+    /** Returns if this column contains remove button. */
+    protected final boolean isRemoveButton(final String tableName,
+                                           final int column) {
+        return DEFAULT_WIDTHS.containsKey(column);
+    }
+
+    /** Returns tool tip text in the table. */
+    protected String getTableToolTip(final String tableName,
+                                     final String key,
+                                     final Object object,
+                                     final int raw,
+                                     final int column) {
+        if (DEFAULT_WIDTHS.containsKey(column)) {
+            return "Remove domain " + key + ".";
+        }
+        return super.getTableToolTip(tableName, key, object, raw, column);
     }
 }

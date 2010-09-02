@@ -27,6 +27,7 @@ import drbd.data.VMSXML;
 import drbd.data.VMSXML.GraphicsData;
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.resources.Network;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 
@@ -39,6 +40,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -46,13 +49,40 @@ import java.awt.event.ActionEvent;
  * This class holds info about virtual graphics displays.
  */
 public class VMSGraphicsInfo extends VMSHardwareInfo {
+    /** Combo box that can be made invisible. */
+    private GuiComboBox portCB = null;
+    /** Combo box that can be made invisible. */
+    private GuiComboBox autoportCB = null;
+    /** Combo box that can be made invisible. */
+    private GuiComboBox listenCB = null;
+    /** Combo box that can be made invisible. */
+    private GuiComboBox passwdCB = null;
+    /** Combo box that can be made invisible. */
+    private GuiComboBox keymapCB = null;
+    /** Combo box that can be made invisible. */
+    private GuiComboBox displayCB = null;
+    /** Combo box that can be made invisible. */
+    private GuiComboBox xauthCB = null;
     /** Parameters. */
     private static final String[] PARAMETERS = {GraphicsData.TYPE,
-                                                GraphicsData.PORT,
                                                 GraphicsData.AUTOPORT,
+                                                GraphicsData.PORT,
                                                 GraphicsData.LISTEN,
                                                 GraphicsData.PASSWD,
-                                                GraphicsData.KEYMAP};
+                                                GraphicsData.KEYMAP,
+                                                GraphicsData.DISPLAY,
+                                                GraphicsData.XAUTH};
+
+    /** VNC parameters. */
+    private static final String[] VNC_PARAMETERS = {GraphicsData.TYPE,
+                                                    GraphicsData.AUTOPORT,
+                                                    GraphicsData.PORT,
+                                                    GraphicsData.LISTEN,
+                                                    GraphicsData.PASSWD,
+                                                    GraphicsData.KEYMAP};
+    /** SDL parameters. */
+    private static final String[] SDL_PARAMETERS = {GraphicsData.DISPLAY,
+                                                    GraphicsData.XAUTH};
 
     /** Field type. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
@@ -60,14 +90,25 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
+    /** Preferred values. */
+    private static final Map<String, String> PREFERRED_VALUES =
+                                                 new HashMap<String, String>();
     static {
         FIELD_TYPES.put(GraphicsData.TYPE, GuiComboBox.Type.RADIOGROUP);
+        FIELD_TYPES.put(GraphicsData.AUTOPORT, GuiComboBox.Type.CHECKBOX);
+        FIELD_TYPES.put(GraphicsData.PASSWD, GuiComboBox.Type.PASSWDFIELD);
         SHORTNAME_MAP.put(GraphicsData.TYPE, "Type");
         SHORTNAME_MAP.put(GraphicsData.PORT, "Port");
         SHORTNAME_MAP.put(GraphicsData.AUTOPORT, "Autoport");
         SHORTNAME_MAP.put(GraphicsData.LISTEN, "Listen");
         SHORTNAME_MAP.put(GraphicsData.PASSWD, "Password");
         SHORTNAME_MAP.put(GraphicsData.KEYMAP, "Keymap");
+        SHORTNAME_MAP.put(GraphicsData.DISPLAY, "Display");
+        SHORTNAME_MAP.put(GraphicsData.XAUTH, "Xauth File");
+        PREFERRED_VALUES.put(GraphicsData.PORT, "5900");
+        PREFERRED_VALUES.put(GraphicsData.DISPLAY, ":0.0");
+        PREFERRED_VALUES.put(GraphicsData.XAUTH,
+                             System.getProperty("user.home") + "/.Xauthority");
     }
 
     /** Whether the parameter is editable only in advanced mode. */
@@ -87,6 +128,8 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     static {
         POSSIBLE_VALUES.put(GraphicsData.TYPE,
                             new String[]{"vnc", "sdl"});
+        POSSIBLE_VALUES.put(GraphicsData.AUTOPORT,
+                            new String[]{"yes", "no"});
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -132,7 +175,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     protected final String getParamPreferred(final String param) {
-        return null;
+        return PREFERRED_VALUES.get(param);
     }
 
     /** Returns default value for specified parameter. */
@@ -147,6 +190,26 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
+        if (GraphicsData.LISTEN.equals(param)) {
+            Map<String, String> networksIntersection = null;
+            
+            final List<Host> definedOnHosts =
+                                getVMSVirtualDomainInfo().getDefinedOnHosts();
+            for (final Host host : definedOnHosts) {
+                networksIntersection =
+                            host.getNetworksIntersection(networksIntersection);
+            }
+            final List<StringInfo> commonNetworks = new ArrayList<StringInfo>();
+            commonNetworks.add(new StringInfo("All Interfaces/0.0.0.0",
+                                              "0.0.0.0",
+                                              null));
+            commonNetworks.add(new StringInfo("localhost/127.0.0.1", "127.0.0.1", null));
+            for (final String netIp : networksIntersection.keySet()) {
+                final StringInfo network = new StringInfo(netIp, netIp, null);
+                commonNetworks.add(network);
+            }
+            return commonNetworks.toArray(new StringInfo[commonNetworks.size()]);
+        }
         return POSSIBLE_VALUES.get(param);
     }
 
@@ -205,8 +268,13 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
                 applyButton.setEnabled(false);
             }
         });
-        final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
+        String[] params;
+        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
+            params = VNC_PARAMETERS;
+        } else {
+            params = SDL_PARAMETERS;
+        }
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
             if (!Tools.areEqual(getParamSaved(param), value)) {
@@ -278,6 +346,30 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     protected final boolean checkParam(final String param,
                                        final String newValue) {
+        if (GraphicsData.TYPE.equals(param)) {
+            final boolean vnc = "vnc".equals(newValue);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    autoportCB.setVisible(vnc);
+                    portCB.setVisible(vnc
+                                      && !"yes".equals(getComboBoxValue(
+                                                     GraphicsData.AUTOPORT)));
+                    listenCB.setVisible(vnc);
+                    passwdCB.setVisible(vnc);
+                    keymapCB.setVisible(vnc);
+                    displayCB.setVisible(!vnc);
+                    xauthCB.setVisible(!vnc);
+                }
+            });
+        } else if (GraphicsData.AUTOPORT.equals(param)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    portCB.setVisible(!"yes".equals(newValue) &&
+                                      "vnc".equals(getComboBoxValue(
+                                                          GraphicsData.TYPE)));
+                }
+            });
+        }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
@@ -327,11 +419,9 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
         if (type == null) {
             s.append("new graphics device...");
         } else {
-            s.append(type);
+            s.append(getName());
         }
 
-        s.append(" /");
-        s.append(getName());
         return s.toString();
     }
 
@@ -378,5 +468,42 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
             }
         });
         return newBtn;
+    }
+
+    /** Returns combo box for parameter. */
+    protected final GuiComboBox getParamComboBox(final String param,
+                                                 final String prefix,
+                                                 final int width) {
+        final GuiComboBox paramCB =
+                                 super.getParamComboBox(param, prefix, width);
+        if (GraphicsData.PORT.equals(param)) {
+            portCB = paramCB;
+        } else if (GraphicsData.AUTOPORT.equals(param)) {
+            autoportCB = paramCB;
+        } else if (GraphicsData.LISTEN.equals(param)) {
+            listenCB = paramCB;
+        } else if (GraphicsData.PASSWD.equals(param)) {
+            passwdCB = paramCB;
+        } else if (GraphicsData.KEYMAP.equals(param)) {
+            keymapCB = paramCB;
+        } else if (GraphicsData.DISPLAY.equals(param)) {
+            displayCB = paramCB;
+        } else if (GraphicsData.XAUTH.equals(param)) {
+            xauthCB = paramCB;
+        }
+        return paramCB;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. Don't check the invisible for the type parameters.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
+            return super.checkResourceFieldsChanged(param, VNC_PARAMETERS);
+        } else {
+            return super.checkResourceFieldsChanged(param, SDL_PARAMETERS);
+        }
     }
 }

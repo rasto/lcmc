@@ -202,7 +202,16 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     protected final void rowClicked(final String tableName,
                                     final String key,
                                     final int column) {
-        vmsVirtualDomainInfo.selectMyself();
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                if (isRemoveButton(tableName, column)) {
+                    vmsVirtualDomainInfo.rowClicked(tableName, key, column);
+                } else {
+                    vmsVirtualDomainInfo.selectMyself();
+                }
+            }
+        });
+        thread.start();
     }
 
     /** Retrurns color for some rows. */
@@ -317,4 +326,29 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /** Adds disk table with only this disk to the main panel. */
     protected abstract void addHardwareTable(final JPanel mainPanel);
+
+    /** Returns whether the column is a button, 0 column is always a button. */
+    protected final Map<Integer, Integer> getDefaultWidths(
+                                                    final String tableName) {
+        return vmsVirtualDomainInfo.getDefaultWidths(tableName);
+    }
+
+    /** Returns default widths for columns. Null for computed width. */
+    protected final boolean isRemoveButton(final String tableName,
+                                           final int column) {
+        return vmsVirtualDomainInfo.isRemoveButton(tableName, column);
+    }
+
+    /** Returns tool tip text in the table. */
+    protected String getTableToolTip(final String tableName,
+                                     final String key,
+                                     final Object object,
+                                     final int raw,
+                                     final int column) {
+        return vmsVirtualDomainInfo.getTableToolTip(tableName,
+                                                    key,
+                                                    object,
+                                                    raw,
+                                                    column);
+    }
 }

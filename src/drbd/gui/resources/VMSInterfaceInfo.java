@@ -62,6 +62,19 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                                                 InterfaceData.SOURCE_BRIDGE,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
+    /** Network parameters. */
+    private static final String[] NETWORK_PARAMETERS = {
+                                                InterfaceData.TYPE,
+                                                InterfaceData.MAC_ADDRESS,
+                                                InterfaceData.SOURCE_NETWORK,
+                                                InterfaceData.TARGET_DEV,
+                                                InterfaceData.MODEL_TYPE};
+    private static final String[] BRIDGE_PARAMETERS = {
+                                                InterfaceData.TYPE,
+                                                InterfaceData.MAC_ADDRESS,
+                                                InterfaceData.SOURCE_BRIDGE,
+                                                InterfaceData.TARGET_DEV,
+                                                InterfaceData.MODEL_TYPE};
     /** Field type. */
     private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
                                        new HashMap<String, GuiComboBox.Type>();
@@ -256,23 +269,29 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                 applyButton.setEnabled(false);
             }
         });
-        final String[] params = getParametersFromXML();
+        String[] params;
+        if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
+            params = NETWORK_PARAMETERS;
+        } else {
+            params = BRIDGE_PARAMETERS;
+        }
+
         final Map<String, String> parameters = new HashMap<String, String>();
         String type = null;
-        for (final String param : getParametersFromXML()) {
+        for (final String param : params) {
             final String value = getComboBoxValue(param);
             if (InterfaceData.TYPE.equals(param)) {
                 type = value;
             }
-            if ("network".equals(type)
-                && InterfaceData.SOURCE_BRIDGE.equals(param)) {
-                getResource().setValue(param, null);
-                continue;
-            } else if ("bridge".equals(type)
-                && InterfaceData.SOURCE_NETWORK.equals(param)) {
-                getResource().setValue(param, null);
-                continue;
-            }
+            //if ("network".equals(type)
+            //    && InterfaceData.SOURCE_BRIDGE.equals(param)) {
+            //    getResource().setValue(param, null);
+            //    continue;
+            //} else if ("bridge".equals(type)
+            //    && InterfaceData.SOURCE_NETWORK.equals(param)) {
+            //    getResource().setValue(param, null);
+            //    continue;
+            //}
             if (!Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
@@ -486,5 +505,18 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             }
         });
         return newBtn;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. Don't check the invisible for the type parameters.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
+            return super.checkResourceFieldsChanged(param, NETWORK_PARAMETERS);
+        } else {
+            return super.checkResourceFieldsChanged(param, BRIDGE_PARAMETERS);
+        }
     }
 }
