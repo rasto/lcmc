@@ -572,9 +572,11 @@ public abstract class EditableInfo extends Info {
         getResource().setPossibleChoices(param, getParamPossibleChoices(param));
         /* set default value */
         final String value = getParamSaved(param);
-        String initValue;
+        String initValue = null;
         if (value == null || "".equals(value)) {
-            initValue = getParamPreferred(param);
+            if (getResource().isNew()) {
+                initValue = getParamPreferred(param);
+            }
             if (initValue == null) {
                 initValue = getParamDefault(param);
                 getResource().setValue(param, initValue);

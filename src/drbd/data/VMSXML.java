@@ -142,6 +142,20 @@ public class VMSXML extends XML {
     public static final String VM_PARAM_BOOT = "boot";
     /** VM field: autostart. */
     public static final String VM_PARAM_AUTOSTART = "autostart";
+    /** VM field: arch. */
+    public static final String VM_PARAM_ARCH = "arch";
+    /** VM field: acpi. */
+    public static final String VM_PARAM_ACPI = "acpi";
+    /** VM field: apic. */
+    public static final String VM_PARAM_APIC = "apic";
+    /** VM field: pae. */
+    public static final String VM_PARAM_PAE = "pae";
+    /** VM field: on reboot. */
+    public static final String VM_PARAM_ON_REBOOT = "on_reboot";
+    /** VM field: on crash. */
+    public static final String VM_PARAM_ON_CRASH = "on_crash";
+    /** VM field: emulator. */
+    public static final String VM_PARAM_EMULATOR = "emulator";
     /** Network field: name. */
     public static final String NET_PARAM_NAME = "name";
     /** Network field: uuid. */
@@ -201,7 +215,6 @@ public class VMSXML extends XML {
     /** Map from paramater to its xml attribute. */
     public static final Map<String, String> VIDEO_ATTRIBUTE_MAP =
                                              new HashMap<String, String>();
-
 
     static {
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
@@ -421,9 +434,53 @@ public class VMSXML extends XML {
                                                   doc.createElement("os"));
         final Element typeNode = (Element) osNode.appendChild(
                                                   doc.createElement("type"));
-        typeNode.setAttribute("arch", "i686"); //TODO
+        typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_ARCH));
         typeNode.setAttribute("machine", "pc-0.12");
         typeNode.appendChild(doc.createTextNode("hvm"));
+
+        /* features */
+        final boolean acpi = "True".equals(parametersMap.get(VM_PARAM_ACPI));
+        final boolean apic = "True".equals(parametersMap.get(VM_PARAM_APIC));
+        final boolean pae = "True".equals(parametersMap.get(VM_PARAM_PAE));
+        if (acpi || apic || pae) {
+            final Element featuresNode = (Element) root.appendChild(
+                                                doc.createElement("features"));
+            if (acpi) {
+                featuresNode.appendChild(doc.createElement("acpi"));
+            }
+            if (apic) {
+                featuresNode.appendChild(doc.createElement("apic"));
+            }
+            if (pae) {
+                featuresNode.appendChild(doc.createElement("pae"));
+            }
+        }
+
+        /* on_ */
+        final String onReboot = parametersMap.get(VM_PARAM_ON_REBOOT);
+        if (onReboot != null) {
+            final Element onRebootNode = (Element) root.appendChild(
+                                              doc.createElement("on_reboot"));
+            onRebootNode.appendChild(doc.createTextNode(onReboot));
+
+        }
+        final String onCrash = parametersMap.get(VM_PARAM_ON_CRASH);
+        if (onCrash != null) {
+            final Element onCrashNode = (Element) root.appendChild(
+                                              doc.createElement("on_crash"));
+            onCrashNode.appendChild(doc.createTextNode(onCrash));
+
+        }
+        /* devices / emulator */
+        final String emulator = parametersMap.get(VM_PARAM_EMULATOR);
+        if (emulator != null) {
+            final Element devicesNode = (Element) root.appendChild(
+                                              doc.createElement("devices"));
+            final Element emulatorNode = (Element) devicesNode.appendChild(
+                                              doc.createElement("emulator"));
+            emulatorNode.appendChild(doc.createTextNode(emulator));
+        }
+
 
         /* xml done */
         saveDomainXML(configName, root);
@@ -448,6 +505,13 @@ public class VMSXML extends XML {
         paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
         paths.put(VM_PARAM_VCPU, "vcpu");
         paths.put(VM_PARAM_BOOT, "os/boot");
+        paths.put(VM_PARAM_ARCH, "os/type");
+        //paths.put(VM_PARAM_ACPI, "features/acpi");
+        //paths.put(VM_PARAM_APIC, "features/apic");
+        //paths.put(VM_PARAM_PAE, "features/ape");
+        paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
+        paths.put(VM_PARAM_ON_CRASH, "on_crash");
+        paths.put(VM_PARAM_EMULATOR, "devices/emulator");
         try {
             for (final String param : parametersMap.keySet()) {
                 final String path = paths.get(param);
@@ -468,6 +532,8 @@ public class VMSXML extends XML {
                     }
                     if (VM_PARAM_BOOT.equals(param)) {
                         node.setAttribute("dev", value);
+                    } else if (VM_PARAM_ARCH.equals(param)) {
+                        node.setAttribute("arch", value);
                     } else {
                         getChildNode(node, "#text").setNodeValue(value);
                     }
@@ -937,8 +1003,28 @@ public class VMSXML extends XML {
                         parameterValues.put(name,
                                             VM_PARAM_BOOT,
                                             getAttribute(osOption, "dev"));
+                    } else if ("type".equals(osOption.getNodeName())) {
+                        parameterValues.put(name,
+                                            VM_PARAM_ARCH,
+                                            getAttribute(osOption, "arch"));
                     }
                 }
+            } else if ("features".equals(option.getNodeName())) {
+                final NodeList ftrOptions = option.getChildNodes();
+                for (int j = 0; j < ftrOptions.getLength(); j++) {
+                    final Node ftrOption = ftrOptions.item(j);
+                    if (VM_PARAM_ACPI.equals(ftrOption.getNodeName())) {
+                        parameterValues.put(name, VM_PARAM_ACPI, "True");
+                    } else if (VM_PARAM_APIC.equals(ftrOption.getNodeName())) {
+                        parameterValues.put(name, VM_PARAM_APIC, "True");
+                    } else if (VM_PARAM_PAE.equals(ftrOption.getNodeName())) {
+                        parameterValues.put(name, VM_PARAM_PAE, "True");
+                    }
+                }
+            } else if (VM_PARAM_ON_REBOOT.equals(option.getNodeName())) {
+                parameterValues.put(name, VM_PARAM_ON_REBOOT, getText(option));
+            } else if (VM_PARAM_ON_CRASH.equals(option.getNodeName())) {
+                parameterValues.put(name, VM_PARAM_ON_CRASH, getText(option));
             } else if ("devices".equals(option.getNodeName())) {
                 final Map<String, DiskData> devMap =
                                     new LinkedHashMap<String, DiskData>();
@@ -959,7 +1045,11 @@ public class VMSXML extends XML {
                 final NodeList devices = option.getChildNodes();
                 for (int j = 0; j < devices.getLength(); j++) {
                     final Node deviceNode = devices.item(j);
-                    if ("input".equals(deviceNode.getNodeName())) {
+                    if ("emulator".equals(deviceNode.getNodeName())) {
+                        parameterValues.put(name,
+                                            VM_PARAM_EMULATOR,
+                                            getText(deviceNode));
+                    } if ("input".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
                         final String bus = getAttribute(deviceNode, "bus");
                         if ("tablet".equals(type)) {

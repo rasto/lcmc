@@ -1832,6 +1832,12 @@ public class TextResource extends
         {"VMSVirtualDomainInfo.Section.VirtualSystem",
          "Virtual System"},
 
+        {"VMSVirtualDomainInfo.Section.Options",
+         "Advanced Options"},
+
+        {"VMSVirtualDomainInfo.Section.Features",
+         "Features"},
+
         {"VMSVirtualDomainInfo.Short.Name",
          "Domain name"},
 
@@ -1849,6 +1855,27 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.Short.Autostart",
          "Autostart"},
+
+        {"VMSVirtualDomainInfo.Short.Arch",
+         "Architecture"},
+
+        {"VMSVirtualDomainInfo.Short.Acpi",
+         "ACPI"},
+
+        {"VMSVirtualDomainInfo.Short.Apic",
+         "APIC"},
+
+        {"VMSVirtualDomainInfo.Short.Pae",
+         "PAE"},
+
+        {"VMSVirtualDomainInfo.Short.OnReboot",
+         "On Reboot"},
+
+        {"VMSVirtualDomainInfo.Short.OnCrash",
+         "On Crash"},
+
+        {"VMSVirtualDomainInfo.Short.Emulator",
+         "Emulator"},
 
         {"VMSVirtualDomainInfo.StartVNCViewerOn",
          "Console (@VIEWER@ VNC) on "},

@@ -1267,9 +1267,9 @@ public class GuiComboBox extends JPanel {
         if (!Tools.areEqual(value, savedValue)
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
+                Tools.debug(this, "changed label: " + labelText + " != "
+                                   + savedLabel, 1);
                 /*
-                   System.out.println("changed label: " + labelText + " != "
-                                      + savedLabel);
                    Tools.printStackTrace("changed: " + value + " != "
                                          + savedValue);
                 */
