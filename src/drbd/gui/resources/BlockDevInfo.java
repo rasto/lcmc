@@ -762,7 +762,7 @@ public class BlockDevInfo extends EditableInfo {
             final String[] params = getParametersFromXML();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    applyButton.setEnabled(false);
+                    getApplyButton().setEnabled(false);
                 }
             });
             if (getBlockDevice().getMetaDisk() != null) {
@@ -809,8 +809,8 @@ public class BlockDevInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
-                drbdGraph.stopTestAnimation(applyButton);
-                applyButton.setToolTipText(null);
+                drbdGraph.stopTestAnimation(getApplyButton());
+                getApplyButton().setToolTipText(null);
             }
 
             public final void mouseOver() {
@@ -818,9 +818,9 @@ public class BlockDevInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = true;
-                applyButton.setToolTipText(Tools.getString(
+                getApplyButton().setToolTipText(Tools.getString(
                                          "ClusterBrowser.StartingDRBDtest"));
-                applyButton.setToolTipBackground(Tools.getDefaultColor(
+                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
                                   "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -829,7 +829,7 @@ public class BlockDevInfo extends EditableInfo {
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
                 final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
-                drbdGraph.startTestAnimation(applyButton, startTestLatch);
+                drbdGraph.startTestAnimation(getApplyButton(), startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 thisClass.setDRBDtestData(null);
                 apply(true);
@@ -846,7 +846,7 @@ public class BlockDevInfo extends EditableInfo {
                     Tools.appError("config failed");
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
-                applyButton.setToolTipText(dtd.getToolTip());
+                getApplyButton().setToolTipText(dtd.getToolTip());
                 thisClass.setDRBDtestData(dtd);
                 getBrowser().drbdtestLockRelease();
                 startTestLatch.countDown();
@@ -887,7 +887,7 @@ public class BlockDevInfo extends EditableInfo {
 
 
             /* apply button */
-            applyButton.addActionListener(new ActionListener() {
+            getApplyButton().addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
@@ -909,7 +909,7 @@ public class BlockDevInfo extends EditableInfo {
             });
             addApplyButton(buttonPanel);
 
-            applyButton.setEnabled(checkResourceFields(null, params));
+            getApplyButton().setEnabled(checkResourceFields(null, params));
         }
 
         /* info */

@@ -71,8 +71,8 @@ public class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    applyButton.setEnabled(false);
-                    applyButton.setToolTipText(null);
+                    getApplyButton().setEnabled(false);
+                    getApplyButton().setToolTipText(null);
                     final GuiComboBox idField = paramComboBoxGet(GUI_ID, null);
                     idField.setEnabled(false);
                 }

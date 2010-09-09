@@ -48,6 +48,8 @@ if ($option eq "all") {
 	get_filesystems_info();
 	print "crypto-info\n";
 	get_crypto_info();
+	print "qemu-keymaps-info\n";
+	get_qemu_keymaps_info();
 	print "mount-points-info\n";
 	get_mount_points_info();
 	print "gui-info\n";
@@ -65,6 +67,8 @@ if ($option eq "all") {
 	get_filesystems_info();
 	print "crypto-info\n";
 	get_crypto_info();
+	print "qemu-keymaps-info\n";
+	get_qemu_keymaps_info();
 	print "mount-points-info\n";
 	get_mount_points_info();
 	#print "gui-info\n";
@@ -83,6 +87,8 @@ if ($option eq "all") {
 	get_filesystems_info();
 } elsif ($option eq "get-crypto-info") {
 	get_crypto_info();
+} elsif ($option eq "get-qemu-keymaps-info") {
+	get_qemu_keymaps_info();
 } elsif ($option eq "get-gui-info") {
 	get_gui_info();
 } elsif ($option eq "get-mount-point-info") {
@@ -525,6 +531,17 @@ sub get_crypto_info {
 	}
 	for (@modules) {
 		print "$_\n";
+	}
+}
+
+# get_crypto_info
+#
+# prints available qemu keymaps.
+sub get_qemu_keymaps_info {
+	my @modules;
+	my %module_exists;
+	for (`ls /usr/share/qemu/keymaps/ 2>&1`) {
+		print;
 	}
 }
 
@@ -1363,14 +1380,14 @@ sub get_vm_info {
 		next if !$info;
 		my $vncdisplay = `/usr/bin/virsh vncdisplay $name 2>/dev/null`
 				 || "";
-		my $config = "";
-		if (open CONFIG, $_) {
-			local $/;
-			$config = <CONFIG>;
-			close CONFIG;
-		}
-		#TODO
-		#my $config = `/usr/bin/virsh dumpxml $name 2>/dev/null` || "";
+		my $config_in_etc;
+		#if (open CONFIG, $_) {
+		#	local $/;
+		#	$config_in_etc = <CONFIG>;
+		#	close CONFIG;
+		#}
+		my $config;
+		$config = `/usr/bin/virsh dumpxml $name 2>/dev/null` || "";
 		$out.= "<vm name=\"$name\" config=\"$_\"";
 		if ($autostart{$name}) {
 			$out.= ' autostart="True"';
@@ -1382,9 +1399,16 @@ sub get_vm_info {
 		$out.= $info;
 		$out.= "</info>\n";
 		$out.= "<vncdisplay>$vncdisplay</vncdisplay>\n";
-		$out.= "<config>\n";
-		$out.= $config;
-		$out.= "</config>\n";
+		if ($config) {
+			$out.= "<config>\n";
+			$out.= $config;
+			$out.= "</config>\n";
+		}
+		if ($config_in_etc) {
+			$out.= "<config-in-etc>\n";
+			$out.= "<![CDATA[$config_in_etc]]>";
+			$out.= "</config-in-etc>\n";
+		}
 		$out.= "</vm>\n";
 	}
 	my $md5 = md5_hex($out);

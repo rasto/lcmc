@@ -28,7 +28,6 @@ import drbd.data.VMSXML;
 import drbd.data.VMSXML.DiskData;
 import drbd.data.Host;
 import drbd.data.ConfigData;
-import drbd.data.LinuxFile;
 import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
@@ -38,8 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileSystemView;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
@@ -53,7 +50,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Disks.
@@ -78,19 +75,19 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     private String prevType = null;
     /** Parameters. */
     private static final String[] PARAMETERS = {DiskData.TYPE,
+                                                DiskData.TARGET_BUS_TYPE,
                                                 DiskData.TARGET_DEVICE,
                                                 DiskData.SOURCE_FILE,
                                                 DiskData.SOURCE_DEVICE,
-                                                DiskData.TARGET_BUS_TYPE,
                                                 DiskData.DRIVER_NAME,
                                                 DiskData.DRIVER_TYPE,
                                                 DiskData.READONLY,
                                                 DiskData.SHAREABLE};
     /** Block parameters. */
     private static final String[] BLOCK_PARAMETERS = {DiskData.TYPE,
+                                                      DiskData.TARGET_BUS_TYPE,
                                                       DiskData.TARGET_DEVICE,
                                                       DiskData.SOURCE_DEVICE,
-                                                      DiskData.TARGET_BUS_TYPE,
                                                       DiskData.DRIVER_NAME,
                                                       DiskData.DRIVER_TYPE,
                                                       DiskData.READONLY,
@@ -139,7 +136,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         SHORTNAME_MAP.put(DiskData.TARGET_DEVICE, "Target Device");
         SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "Source File");
         SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Source Device");
-        SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Target Type");
+        SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Disk Type");
         SHORTNAME_MAP.put(DiskData.DRIVER_NAME, "Driver Name");
         SHORTNAME_MAP.put(DiskData.DRIVER_TYPE, "Driver Type");
         SHORTNAME_MAP.put(DiskData.READONLY, "Readonly");
@@ -172,18 +169,21 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         POSSIBLE_VALUES.put(
                     DiskData.TARGET_BUS_TYPE,
                     new StringInfo[]{
-                       new StringInfo("IDE disk",    "ide/disk",    null),
-                       new StringInfo("IDE cdrom",   "ide/cdrom",    null),
-                       new StringInfo("Floppy disk", "fdc/floppy", null),
-                       new StringInfo("SCSI disk",   "scsi/disk",   null),
-                       new StringInfo("USB disk",    "usb/disk",    null),
+                       new StringInfo("IDE Disk",    "ide/disk",    null),
+                       new StringInfo("IDE CDROM",   "ide/cdrom",    null),
+                       new StringInfo("Floppy Disk", "fdc/floppy", null),
+                       new StringInfo("SCSI Disk",   "scsi/disk",   null),
+                       new StringInfo("USB Disk",    "usb/disk",    null),
                        new StringInfo("Virtio Disk", "virtio/disk", null)});
+        POSSIBLE_VALUES.put(DiskData.DRIVER_NAME, new String[]{null, "qemu"});
+        POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
             TARGET_BUS_TYPES.put(tbt.getStringValue(), tbt.toString());
         }
         DEFAULTS_MAP.put(DiskData.READONLY, "False");
         DEFAULTS_MAP.put(DiskData.SHAREABLE, "False");
+        PREFERRED_MAP.put(DiskData.DRIVER_NAME, "qemu");
         TARGET_DEVICES_MAP.put("ide/disk",
                                new String[]{"hda", "hdb", "hdd"});
         TARGET_DEVICES_MAP.put("ide/cdrom",
@@ -197,9 +197,6 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         TARGET_DEVICES_MAP.put("virtio/disk",
                                new String[]{"vda", "vdb", "vdc", "vdd", "vde"});
     }
-    /** Cache for files. */
-    private final Map<String, LinuxFile> linuxFileCache =
-                                            new HashMap<String, LinuxFile>();
     /** Table panel. */
     private JComponent tablePanel = null;
 
@@ -263,8 +260,8 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         if (DiskData.SOURCE_DEVICE.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                final Set<String> bds = new TreeSet<String>();
-                bds.add("");
+                final List<String> bds = new ArrayList<String>();
+                bds.add(null);
                 if (vmsxml != null) {
                     for (final BlockDevInfo bdi
                             : h.getBrowser().getBlockDevInfos()) {
@@ -331,29 +328,22 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         return FIELD_TYPES.get(param);
     }
 
-    /** Applies the changes. */
-    public final void apply(final boolean testOnly) {
-        if (testOnly) {
-            return;
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                applyButton.setEnabled(false);
-            }
-        });
+    /** Returns device parameters. */
+    protected final Map<String, String> getHWParametersAndSave() {
         String[] params;
         if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
             params = BLOCK_PARAMETERS;
         } else {
             params = FILE_PARAMETERS;
         }
-
         final Map<String, String> parameters = new HashMap<String, String>();
         String type = null;
         for (final String param : params) {
             final String value = getComboBoxValue(param);
             if (DiskData.TYPE.equals(param)) {
                 type = value;
+                parameters.put(param, value);
+                getResource().setValue(param, value);
             } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
                 final String[] values = value.split("/");
                 if (values.length == 2) {
@@ -363,35 +353,45 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                     Tools.appWarning("cannot parse: " + param + " = " + value);
                 }
                 getResource().setValue(param, value);
-                continue;
-            }
-            //if ("file".equals(type)
-            //    && DiskData.SOURCE_DEVICE.equals(param)) {
-            //    getResource().setValue(param, null);
-            //    continue;
-            //} else if ("block".equals(type)
-            //    && DiskData.SOURCE_FILE.equals(param)) {
-            //    getResource().setValue(param, null);
-            //    continue;
-            //}
-            if (!Tools.areEqual(getParamSaved(param), value)) {
+            } else if (!Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
             }
         }
-        if (!testOnly) {
-            for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
-                    parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
-                    vmsxml.modifyDiskXML(
-                                    getVMSVirtualDomainInfo().getDomainName(),
-                                    parameters);
-                }
-            }
-            getResource().setNew(false);
-            setName(getParamSaved(DiskData.TARGET_DEVICE));
+        parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
+        setName(getParamSaved(DiskData.TARGET_DEVICE));
+        return parameters;
+    }
+
+    /** Applies the changes. */
+    public final void apply(final boolean testOnly) {
+        if (testOnly) {
+            return;
         }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getApplyButton().setEnabled(false);
+            }
+        });
+        final Map<String, String> parameters = getHWParametersAndSave();
+        String[] params;
+        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
+            params = BLOCK_PARAMETERS;
+        } else {
+            params = FILE_PARAMETERS;
+        }
+        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null) {
+                final String domainName = 
+                                getVMSVirtualDomainInfo().getDomainName();
+                final Node domainNode = vmsxml.getDomainNode(domainName);
+                modifyXML(vmsxml, domainNode, domainName, parameters);
+                vmsxml.saveAndDefine(domainNode, domainName);
+            }
+        }
+        getResource().setNew(false);
+        getBrowser().reload(getNode());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
@@ -401,7 +401,16 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             }
         });
         checkResourceFields(null, params);
-        getBrowser().reload(getNode());
+    }
+
+    /** Modify device xml. */
+    protected final void modifyXML(final VMSXML vmsxml,
+                                   final Node node,
+                                   final String domainName,
+                                   final Map<String, String> params) {
+        if (vmsxml != null) {
+            vmsxml.modifyDiskXML(node, domainName, params);
+        }
     }
 
     /** Returns data for the table. */
@@ -446,16 +455,6 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                         }
                     }
                 });
-                //if (driverTypeCB != null) {
-                //    if (prevType != null
-                //        || getParamSaved(DiskData.DRIVER_TYPE) == null) {
-                //        if ("file".equals(newValue)) {
-                //            driverTypeCB.setValue("raw");
-                //        } else {
-                //            driverTypeCB.setValue("");
-                //        }
-                //    }
-                //}
                 prevType = newValue;
                 checkResourceFields(DiskData.SOURCE_FILE,
                                     getParametersFromXML());
@@ -482,12 +481,13 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 targetDeviceCB.reloadComboBox(
                                 selected,
                                 devices.toArray(new String[devices.size()]));
-                if (getResource().isNew() 
-                    && (prevTargetBusType != null
-                        || getParamSaved(DiskData.DRIVER_NAME) == null)) {
-                    driverNameCB.setValue("qemu");
+                if (prevTargetBusType != null
+                    || getParamSaved(DiskData.DRIVER_NAME) == null) {
                     if ("ide/cdrom".equals(newValue)) {
                         readonlyCB.setValue("True");
+                        driverTypeCB.setValue(null);
+                    } else if ("virtio/disk".equals(newValue)) {
+                        driverTypeCB.setValue("raw");
                     } else {
                         readonlyCB.setValue("False");
                     }
@@ -549,148 +549,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.DISK_TABLE);
-    }
-
-    /** Returns cached file object. */
-    public final LinuxFile getLinuxDir(final String dir, final Host host) {
-        LinuxFile ret = linuxFileCache.get(dir);
-        if (ret == null) {
-            ret = new LinuxFile(this, host, dir, "d", 0, 0);
-            linuxFileCache.put(dir, ret);
-        }
-        return ret;
-    }
-
-    /** Returns file system view that allows remote browsing. */
-    private FileSystemView getFileSystemView(final Host host) {
-        final VMSDiskInfo thisClass = this;
-        return new FileSystemView() {
-            public final File[] getRoots() {
-                return new LinuxFile[]{getLinuxDir("/", host)};
-            }
-
-            public final boolean isRoot(final File f) {
-                final String path = Tools.getUnixPath(f.toString());
-                if ("/".equals(path)) {
-                    return true;
-                }
-                return false;
-            }
-
-            public final File createNewFolder(final File containingDir) {
-                return null;
-            }
-
-            public final File getHomeDirectory() {
-                return getLinuxDir(LIBVIRT_IMAGE_LOCATION, host);
-            }
-
-            public final Boolean isTraversable(final File f) {
-                final LinuxFile lf = linuxFileCache.get(f.toString());
-                if (lf != null) {
-                    return lf.isDirectory();
-                }
-                return true;
-            }
-
-            public final File getParentDirectory(final File dir) {
-                return getLinuxDir(dir.getParent(), host);
-            }
-
-            public final File[] getFiles(final File dir,
-                                         final boolean useFileHiding) {
-                final StringBuffer dirSB = new StringBuffer(dir.toString());
-                if ("/".equals(dir.toString())) {
-                    dirSB.append('*');
-                } else {
-                    dirSB.append("/*");
-                }
-                final SSH.SSHOutput out =
-                        Tools.execCommandProgressIndicator(
-                                      host,
-                                      "stat -c \"%A %a %Y %s %n\" "
-                                      + dirSB.toString()
-                                      + " 2>/dev/null",
-                                      null,
-                                      false,
-                                      "executing...",
-                                      SSH.DEFAULT_COMMAND_TIMEOUT);
-                final List<LinuxFile> files = new ArrayList<LinuxFile>();
-                if (out.getExitCode() == 0) {
-                    for (final String line : out.getOutput().split("\r\n")) {
-                        if ("".equals(line.trim())) {
-                            continue;
-                        }
-                        final Matcher m = STAT_PATTERN.matcher(line);
-                        if (m.matches()) {
-                            final String type = m.group(1);
-                            final long lastModified =
-                                           Long.parseLong(m.group(3)) * 1000;
-                            final long size = Long.parseLong(m.group(4));
-                            final String filename = m.group(5);
-                            LinuxFile lf = linuxFileCache.get(filename);
-                            if (lf == null) {
-                                lf = new LinuxFile(thisClass,
-                                                   host,
-                                                   filename,
-                                                   type,
-                                                   lastModified,
-                                                   size);
-                                linuxFileCache.put(filename, lf);
-                            } else {
-                                lf.update(type, lastModified, size);
-                            }
-                            files.add(lf);
-                        } else {
-                            Tools.appWarning("could not match: " + line);
-                        }
-                    }
-                }
-                return files.toArray(new LinuxFile[files.size()]);
-            }
-        };
-    }
-
-    /** Starts file chooser. */
-    private void startFileChooser(final GuiComboBox paramCB) {
-        final Host host = getFirstConnectedHost();
-        if (host == null) {
-            Tools.appError("Connection to host lost.");
-            return;
-        }
-        final VMSDiskInfo thisClass = this;
-        final JFileChooser fc = new JFileChooser(
-                                    getLinuxDir(LIBVIRT_IMAGE_LOCATION, host),
-                                    getFileSystemView(host)) {
-            /** Serial version UID. */
-            private static final long serialVersionUID = 1L;
-                public final void setCurrentDirectory(final File dir) {
-                    super.setCurrentDirectory(new LinuxFile(
-                                                    thisClass,
-                                                    host,
-                                                    dir.toString(),
-                                                    "d",
-                                                    0,
-                                                    0));
-                }
-
-            };
-        fc.setBackground(ClusterBrowser.STATUS_BACKGROUND);
-        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
-        fc.setDialogTitle(Tools.getString("VMSDiskInfo.FileChooserTitle")
-                          + host.getName());
-//        fc.setApproveButtonText(Tools.getString("VMSDiskInfo.Approve"));
-        fc.setApproveButtonToolTipText(
-                               Tools.getString("VMSDiskInfo.Approve.ToolTip"));
-        fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
-        final int ret = fc.showDialog(Tools.getGUIData().getMainFrame(),
-                                      Tools.getString("VMSDiskInfo.Approve"));
-        linuxFileCache.clear();
-        if (ret == JFileChooser.APPROVE_OPTION
-            && fc.getSelectedFile() != null) {
-            final String name = fc.getSelectedFile().getAbsolutePath();
-            paramCB.setValue(name);
-        }
+        checkResourceFields(null, getParametersFromXML());
     }
 
     /** Returns combo box for parameter. */
@@ -725,7 +584,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread t = new Thread(new Runnable() {
                         public void run() {
-                            startFileChooser(paramCB);
+                            startFileChooser(paramCB, LIBVIRT_IMAGE_LOCATION);
                         }
                     });
                     t.start();

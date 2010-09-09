@@ -331,8 +331,8 @@ public class HbColocationInfo extends EditableInfo
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    applyButton.setEnabled(false);
-                    applyButton.setToolTipText(null);
+                    getApplyButton().setEnabled(false);
+                    getApplyButton().setToolTipText(null);
                 }
             });
         }

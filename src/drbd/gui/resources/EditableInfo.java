@@ -120,7 +120,7 @@ public abstract class EditableInfo extends Info {
     /** Old apply button, is used for wizards. */
     private MyButton oldApplyButton = null;
     /** Apply button. */ // TODO: private
-    protected MyButton applyButton;
+    private MyButton applyButton;
     /** Is counted down, first time the info panel is initialized. */
     private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
     /** List of advanced panels. */
@@ -955,5 +955,10 @@ public abstract class EditableInfo extends Info {
     /** Returns apply button. */
     public final MyButton getApplyButton() {
         return applyButton;
+    }
+
+    /** Sets apply button. */
+    public final void setApplyButton(final MyButton applyButton) {
+        this.applyButton = applyButton;
     }
 }

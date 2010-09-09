@@ -255,16 +255,26 @@ public class VMSXML extends XML {
         GRAPHICS_ATTRIBUTE_MAP.put(GraphicsData.LISTEN, "listen");
         GRAPHICS_ATTRIBUTE_MAP.put(GraphicsData.PASSWD, "passwd");
         GRAPHICS_ATTRIBUTE_MAP.put(GraphicsData.KEYMAP, "keymap");
+        GRAPHICS_ATTRIBUTE_MAP.put(GraphicsData.DISPLAY, "display");
+        GRAPHICS_ATTRIBUTE_MAP.put(GraphicsData.XAUTH, "xauth");
 
         SOUND_ATTRIBUTE_MAP.put(SoundData.MODEL, "model");
 
         SERIAL_ATTRIBUTE_MAP.put(SerialData.TYPE, "type");
         SERIAL_TAG_MAP.put(SerialData.SOURCE_PATH, "source");
         SERIAL_ATTRIBUTE_MAP.put(SerialData.SOURCE_PATH, "path");
-        SERIAL_TAG_MAP.put(SerialData.SOURCE_MODE, "source");
-        SERIAL_ATTRIBUTE_MAP.put(SerialData.SOURCE_MODE, "mode");
-        SERIAL_TAG_MAP.put(SerialData.SOURCE_HOST, "source");
-        SERIAL_ATTRIBUTE_MAP.put(SerialData.SOURCE_HOST, "host");
+        SERIAL_TAG_MAP.put(SerialData.BIND_SOURCE_MODE, "source");
+        SERIAL_ATTRIBUTE_MAP.put(SerialData.BIND_SOURCE_MODE, "mode");
+        SERIAL_TAG_MAP.put(SerialData.BIND_SOURCE_HOST, "source");
+        SERIAL_ATTRIBUTE_MAP.put(SerialData.BIND_SOURCE_HOST, "host");
+        SERIAL_TAG_MAP.put(SerialData.BIND_SOURCE_SERVICE, "source");
+        SERIAL_ATTRIBUTE_MAP.put(SerialData.BIND_SOURCE_SERVICE, "service");
+        SERIAL_TAG_MAP.put(SerialData.CONNECT_SOURCE_MODE, "source");
+        SERIAL_ATTRIBUTE_MAP.put(SerialData.CONNECT_SOURCE_MODE, "mode");
+        SERIAL_TAG_MAP.put(SerialData.CONNECT_SOURCE_HOST, "source");
+        SERIAL_ATTRIBUTE_MAP.put(SerialData.CONNECT_SOURCE_HOST, "host");
+        SERIAL_TAG_MAP.put(SerialData.CONNECT_SOURCE_SERVICE, "source");
+        SERIAL_ATTRIBUTE_MAP.put(SerialData.CONNECT_SOURCE_SERVICE, "service");
         SERIAL_TAG_MAP.put(SerialData.PROTOCOL_TYPE, "protocol");
         SERIAL_ATTRIBUTE_MAP.put(SerialData.PROTOCOL_TYPE, "type");
         SERIAL_TAG_MAP.put(SerialData.TARGET_PORT, "target");
@@ -273,10 +283,21 @@ public class VMSXML extends XML {
         PARALLEL_ATTRIBUTE_MAP.put(ParallelData.TYPE, "type");
         PARALLEL_TAG_MAP.put(ParallelData.SOURCE_PATH, "source");
         PARALLEL_ATTRIBUTE_MAP.put(ParallelData.SOURCE_PATH, "path");
-        PARALLEL_TAG_MAP.put(ParallelData.SOURCE_MODE, "source");
-        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.SOURCE_MODE, "mode");
-        PARALLEL_TAG_MAP.put(ParallelData.SOURCE_HOST, "source");
-        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.SOURCE_HOST, "host");
+        PARALLEL_TAG_MAP.put(ParallelData.BIND_SOURCE_MODE, "source");
+        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.BIND_SOURCE_MODE, "mode");
+        PARALLEL_TAG_MAP.put(ParallelData.BIND_SOURCE_HOST, "source");
+        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.BIND_SOURCE_HOST, "host");
+        PARALLEL_TAG_MAP.put(ParallelData.BIND_SOURCE_SERVICE, "source");
+        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.BIND_SOURCE_SERVICE, "service");
+
+        PARALLEL_TAG_MAP.put(ParallelData.CONNECT_SOURCE_MODE, "source");
+        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.CONNECT_SOURCE_MODE, "mode");
+        PARALLEL_TAG_MAP.put(ParallelData.CONNECT_SOURCE_HOST, "source");
+        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.CONNECT_SOURCE_HOST, "host");
+        PARALLEL_TAG_MAP.put(ParallelData.CONNECT_SOURCE_SERVICE, "source");
+        PARALLEL_ATTRIBUTE_MAP.put(ParallelData.CONNECT_SOURCE_SERVICE,
+                                   "service");
+
         PARALLEL_TAG_MAP.put(ParallelData.PROTOCOL_TYPE, "protocol");
         PARALLEL_ATTRIBUTE_MAP.put(ParallelData.PROTOCOL_TYPE, "type");
         PARALLEL_TAG_MAP.put(ParallelData.TARGET_PORT, "target");
@@ -304,7 +325,7 @@ public class VMSXML extends XML {
     }
 
     /** Returns xml node of the specified domain. */
-    private Node getDomainNode(final String domainName) {
+    public Node getDomainNode(final String domainName) {
         try {
             mXMLDocumentLock.acquire();
         } catch (InterruptedException ie) {
@@ -380,8 +401,8 @@ public class VMSXML extends XML {
     }
 
     /** Creates XML for new domain. */
-    public final void createDomainXML(final String domainName,
-                                   final Map<String, String> parametersMap) {
+    public final Node createDomainXML(final String domainName,
+                                      final Map<String, String> parametersMap) {
         //<domain type='kvm'>
         //  <memory>524288</memory>
         //  <name>fff</name>
@@ -391,6 +412,7 @@ public class VMSXML extends XML {
         //</domain>
  
         final String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
+        namesConfigsMap.put(domainName, configName);
         /* build xml */
         final String encoding = "UTF-8";
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -480,12 +502,7 @@ public class VMSXML extends XML {
                                               doc.createElement("emulator"));
             emulatorNode.appendChild(doc.createTextNode(emulator));
         }
-
-
-        /* xml done */
-        saveDomainXML(configName, root);
-        VIRSH.define(host, configName);
-        host.setVMInfoMD5(null);
+        return root;
     }
 
     /** Modify xml of the domain. */
@@ -543,13 +560,12 @@ public class VMSXML extends XML {
             Tools.appError("could not evaluate: ", e);
             return;
         }
-        saveDomainXML(configName, domainNode);
-        VIRSH.define(host, configName);
-        host.setVMInfoMD5(null);
+        saveAndDefine(domainNode, domainName);
     }
 
     /** Modify xml of some device element. */
-    private void modifyXML(final String domainName,
+    private void modifyXML(final Node domainNode,
+                           final String domainName,
                            final Map<String, String> tagMap,
                            final Map<String, String> attributeMap,
                            final Map<String, String> parametersMap,
@@ -560,7 +576,7 @@ public class VMSXML extends XML {
         if (configName == null) {
             return;
         }
-        final Node domainNode = getDomainNode(domainName);
+        //final Node domainNode = getDomainNode(domainName);
         if (domainNode == null) {
             return;
         }
@@ -626,9 +642,6 @@ public class VMSXML extends XML {
             Tools.appError("could not evaluate: ", e);
             return;
         }
-        saveDomainXML(configName, domainNode);
-        VIRSH.define(host, configName);
-        host.setVMInfoMD5(null);
     }
 
     /** Remove XML from some device. */
@@ -658,15 +671,15 @@ public class VMSXML extends XML {
             Tools.appError("could not evaluate: ", e);
             return;
         }
-        saveDomainXML(configName, domainNode);
-        VIRSH.define(host, configName);
-        host.setVMInfoMD5(null);
+        saveAndDefine(domainNode, domainName);
     }
 
     /** Modify disk XML. */
-    public final void modifyDiskXML(final String domainName,
+    public final void modifyDiskXML(final Node domainNode,
+                                    final String domainName,
                                     final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   DISK_TAG_MAP,
                   DISK_ATTRIBUTE_MAP,
                   parametersMap,
@@ -675,11 +688,22 @@ public class VMSXML extends XML {
                   getDiskDataComparator());
     }
 
+    /** Save and define. */
+    public final void saveAndDefine(final Node domainNode,
+                                    final String domainName) {
+        final String configName = namesConfigsMap.get(domainName);
+        saveDomainXML(configName, domainNode);
+        VIRSH.define(host, configName);
+        host.setVMInfoMD5(null);
+    }
+
     /** Modify interface XML. */
     public final void modifyInterfaceXML(
+                                     final Node domainNode,
                                      final String domainName,
                                      final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   INTERFACE_TAG_MAP,
                   INTERFACE_ATTRIBUTE_MAP,
                   parametersMap,
@@ -690,9 +714,11 @@ public class VMSXML extends XML {
 
     /** Modify input device XML. */
     public final void modifyInputDevXML(
+                                     final Node domainNode,
                                      final String domainName,
                                      final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   INPUTDEV_TAG_MAP,
                   INPUTDEV_ATTRIBUTE_MAP,
                   parametersMap,
@@ -703,9 +729,11 @@ public class VMSXML extends XML {
 
     /** Modify graphics device XML. */
     public final void modifyGraphicsXML(
+                                     final Node domainNode,
                                      final String domainName,
                                      final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   GRAPHICS_TAG_MAP,
                   GRAPHICS_ATTRIBUTE_MAP,
                   parametersMap,
@@ -715,9 +743,11 @@ public class VMSXML extends XML {
     }
 
     /** Modify sound device XML. */
-    public final void modifySoundXML(final String domainName,
+    public final void modifySoundXML(final Node domainNode,
+                                     final String domainName,
                                      final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   SOUND_TAG_MAP,
                   SOUND_ATTRIBUTE_MAP,
                   parametersMap,
@@ -727,9 +757,11 @@ public class VMSXML extends XML {
     }
 
     /** Modify serial device XML. */
-    public final void modifySerialXML(final String domainName,
+    public final void modifySerialXML(final Node domainNode,
+                                      final String domainName,
                                       final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   SERIAL_TAG_MAP,
                   SERIAL_ATTRIBUTE_MAP,
                   parametersMap,
@@ -740,9 +772,11 @@ public class VMSXML extends XML {
 
     /** Modify parallel device XML. */
     public final void modifyParallelXML(
+                                     final Node domainNode,
                                      final String domainName,
                                      final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   PARALLEL_TAG_MAP,
                   PARALLEL_ATTRIBUTE_MAP,
                   parametersMap,
@@ -752,9 +786,11 @@ public class VMSXML extends XML {
     }
 
     /** Modify video device XML. */
-    public final void modifyVideoXML(final String domainName,
+    public final void modifyVideoXML(final Node domainNode,
+                                     final String domainName,
                                      final Map<String, String> parametersMap) {
-        modifyXML(domainName,
+        modifyXML(domainNode,
+                  domainName,
                   VIDEO_TAG_MAP,
                   VIDEO_ATTRIBUTE_MAP,
                   parametersMap,
@@ -1090,18 +1126,15 @@ public class VMSXML extends XML {
                         final GraphicsData graphicsData =
                                      new GraphicsData(type,
                                                       port,
-                                                      autoport,
                                                       listen,
                                                       passwd,
                                                       keymap,
                                                       display,
                                                       xauth);
-                        if (port != null) {
-                            graphicsMap.put(type + " : " + port, graphicsData);
-                        } else if (display != null) {
-                            graphicsMap.put(type + " (" + display + ")",
-                                            graphicsData);
-                        } 
+                        graphicsMap.put(graphicsDisplayName(type,
+                                                            port,
+                                                            display),
+                                        graphicsData);
                     } else if ("disk".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
                         final String device = getAttribute(deviceNode,
@@ -1206,8 +1239,12 @@ public class VMSXML extends XML {
                         final String type = getAttribute(deviceNode, "type");
                         final NodeList opts = deviceNode.getChildNodes();
                         String sourcePath = null;
-                        String sourceMode = null;
-                        String sourceHost = null;
+                        String bindSourceMode = null;
+                        String bindSourceHost = null;
+                        String bindSourceService = null;
+                        String connectSourceMode = null;
+                        String connectSourceHost = null;
+                        String connectSourceService = null;
                         String protocolType = null;
                         String targetPort = null;
                         for (int k = 0; k < opts.getLength(); k++) {
@@ -1215,8 +1252,25 @@ public class VMSXML extends XML {
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
                                 sourcePath = getAttribute(optionNode, "path");
-                                sourceMode = getAttribute(optionNode, "mode");
-                                sourceHost = getAttribute(optionNode, "host");
+                                final String sourceMode =
+                                               getAttribute(optionNode, "mode");
+                                if ("bind".equals(sourceMode)) {
+                                    bindSourceMode = sourceMode;
+                                    bindSourceHost = getAttribute(optionNode,
+                                                                  "host");
+                                    bindSourceService = getAttribute(optionNode,
+                                                                     "service");
+                                } else if ("connect".equals(sourceMode)) {
+                                    connectSourceMode = sourceMode;
+                                    connectSourceHost = getAttribute(optionNode,
+                                                                    "host");
+                                    connectSourceService =
+                                                       getAttribute(optionNode,
+                                                                    "service");
+                                } else {
+                                    Tools.appWarning("uknown source mode: "
+                                                     + sourceMode);
+                                }
                             } else if ("protocol".equals(nodeName)) {
                                 protocolType = getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
@@ -1226,23 +1280,34 @@ public class VMSXML extends XML {
                                                  + nodeName);
                             }
                         }
-                        if (sourcePath != null) {
+                        if (type != null) {
                             final SerialData serialData =
-                                                   new SerialData(type,
-                                                                  sourcePath,
-                                                                  sourceMode,
-                                                                  sourceHost,
-                                                                  protocolType,
-                                                                  targetPort);
-                            serialMap.put(type + " : " + sourcePath,
+                                           new SerialData(type,
+                                                          sourcePath,
+                                                          bindSourceMode,
+                                                          bindSourceHost,
+                                                          bindSourceService,
+                                                          connectSourceMode,
+                                                          connectSourceHost,
+                                                          connectSourceService,
+                                                          protocolType,
+                                                          targetPort);
+                            serialMap.put("serial "
+                                          + targetPort
+                                          + " / "
+                                          + type,
                                           serialData);
                         }
                     } else if ("parallel".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
                         final NodeList opts = deviceNode.getChildNodes();
                         String sourcePath = null;
-                        String sourceMode = null;
-                        String sourceHost = null;
+                        String bindSourceMode = null;
+                        String bindSourceHost = null;
+                        String bindSourceService = null;
+                        String connectSourceMode = null;
+                        String connectSourceHost = null;
+                        String connectSourceService = null;
                         String protocolType = null;
                         String targetPort = null;
                         for (int k = 0; k < opts.getLength(); k++) {
@@ -1250,8 +1315,24 @@ public class VMSXML extends XML {
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
                                 sourcePath = getAttribute(optionNode, "path");
-                                sourceMode = getAttribute(optionNode, "mode");
-                                sourceHost = getAttribute(optionNode, "host");
+                                final String sourceMode =
+                                            getAttribute(optionNode, "mode");
+                                if ("bind".equals(sourceMode)) {
+                                    bindSourceMode = sourceMode;
+                                    bindSourceHost =
+                                           getAttribute(optionNode, "host");
+                                    bindSourceService =
+                                           getAttribute(optionNode, "service");
+                                } else if ("connect".equals(sourceMode)) {
+                                    connectSourceMode = sourceMode;
+                                    connectSourceHost =
+                                           getAttribute(optionNode, "host");
+                                    connectSourceService =
+                                           getAttribute(optionNode, "service");
+                                } else {
+                                    Tools.appWarning("uknown source mode: "
+                                                     + sourceMode);
+                                }
                             } else if ("protocol".equals(nodeName)) {
                                 protocolType = getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
@@ -1261,15 +1342,22 @@ public class VMSXML extends XML {
                                                  + nodeName);
                             }
                         }
-                        if (sourcePath != null) {
+                        if (type != null) {
                             final ParallelData parallelData =
-                                                 new ParallelData(type,
-                                                                  sourcePath,
-                                                                  sourceMode,
-                                                                  sourceHost,
-                                                                  protocolType,
-                                                                  targetPort);
-                            parallelMap.put(type + " : " + sourcePath,
+                                         new ParallelData(type,
+                                                          sourcePath,
+                                                          bindSourceMode,
+                                                          bindSourceHost,
+                                                          bindSourceService,
+                                                          connectSourceMode,
+                                                          connectSourceHost,
+                                                          connectSourceService,
+                                                          protocolType,
+                                                          targetPort);
+                            parallelMap.put("parallel "
+                                            + targetPort
+                                            + " / "
+                                            + type,
                                             parallelData);
                         }
                     } else if ("video".equals(deviceNode.getNodeName())) {
@@ -1346,6 +1434,9 @@ public class VMSXML extends XML {
                 remotePorts.put(name, Integer.parseInt(m.group(1)) + 5900);
             }
         }
+        //parseConfig(getXMLDocument(
+        //                    getCDATA(getChildNode(vmNode, "config-in-etc"))),
+        //            name);
         parseConfig(getChildNode(vmNode, "config"), name);
     }
 
@@ -2022,10 +2113,10 @@ public class VMSXML extends XML {
         public static final String TYPE = "type";
         /** Saved type. */
         public static final String SAVED_TYPE = "saved_type";
+        /** Autoport. */
+        public static final String AUTOPORT = "autoport";
         /** Port: -1 for auto. */
         public static final String PORT = "port";
-        /** Autoport: yes, no. */
-        public static final String AUTOPORT = "autoport";
         /** Listen: ip, on which interface to listen. */
         public static final String LISTEN = "listen";
         /** Passwdord. */
@@ -2040,7 +2131,6 @@ public class VMSXML extends XML {
         /** Creates new GraphicsData object. */
         public GraphicsData(final String type,
                             final String port,
-                            final String autoport,
                             final String listen,
                             final String passwd,
                             final String keymap,
@@ -2050,7 +2140,6 @@ public class VMSXML extends XML {
             this.type = type;
             setValue(TYPE, type);
             setValue(PORT, port);
-            setValue(AUTOPORT, autoport);
             setValue(LISTEN, listen);
             setValue(PASSWD, passwd);
             setValue(KEYMAP, keymap);
@@ -2087,7 +2176,7 @@ public class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual parallel or serial devices. */
-    private abstract class ParallelSerialData extends HardwareData {
+    public abstract class ParallelSerialData extends HardwareData {
         /** Type. */
         private final String type;
         /** Type: dev, file, null, pipe, pty, stdio, tcp, udp, unix, vc. */
@@ -2096,10 +2185,22 @@ public class VMSXML extends XML {
         public static final String SAVED_TYPE = "saved_type";
         /** Source path. */
         public static final String SOURCE_PATH = "source_path";
-        /** Source mode: bind, connect. */
+        /** Source mode: bind, connect. This is for tcp, because it is
+            either-or */
         public static final String SOURCE_MODE = "source_mode";
-        /** Source host. */
-        public static final String SOURCE_HOST = "source_host";
+        /** Source mode: bind, connect. */
+        public static final String BIND_SOURCE_MODE = "bind_source_mode";
+        /** Bind source host. */
+        public static final String BIND_SOURCE_HOST = "bind_source_host";
+        /** Bind source service. */
+        public static final String BIND_SOURCE_SERVICE = "bind_source_service";
+        /** Source mode: bind, connect. */
+        public static final String CONNECT_SOURCE_MODE = "bind_source_mode";
+        /** Connect source host. */
+        public static final String CONNECT_SOURCE_HOST = "connect_source_host";
+        /** Connect source service. */
+        public static final String CONNECT_SOURCE_SERVICE =
+                                                    "connect_source_service";
         /** Protocol type. */
         public static final String PROTOCOL_TYPE = "protocol_type";
         /** Target port. */
@@ -2107,16 +2208,24 @@ public class VMSXML extends XML {
         /** Creates new ParallelSerialData object. */
         public ParallelSerialData(final String type,
                                   final String sourcePath,
-                                  final String sourceMode,
-                                  final String sourceHost,
+                                  final String bindSourceMode,
+                                  final String bindSourceHost,
+                                  final String bindSourceService,
+                                  final String connectSourceMode,
+                                  final String connectSourceHost,
+                                  final String connectSourceService,
                                   final String protocolType,
                                   final String targetPort) {
             super();
             this.type = type;
             setValue(TYPE, type);
             setValue(SOURCE_PATH, sourcePath);
-            setValue(SOURCE_MODE, sourceMode);
-            setValue(SOURCE_HOST, sourceHost);
+            setValue(BIND_SOURCE_MODE, bindSourceMode);
+            setValue(BIND_SOURCE_HOST, bindSourceHost);
+            setValue(BIND_SOURCE_SERVICE, bindSourceService);
+            setValue(CONNECT_SOURCE_MODE, connectSourceMode);
+            setValue(CONNECT_SOURCE_HOST, connectSourceHost);
+            setValue(CONNECT_SOURCE_SERVICE, connectSourceService);
             setValue(PROTOCOL_TYPE, protocolType);
             setValue(TARGET_PORT, targetPort);
         }
@@ -2132,15 +2241,23 @@ public class VMSXML extends XML {
         /** Creates new SerialData object. */
         public SerialData(final String type,
                           final String sourcePath,
-                          final String sourceMode,
-                          final String sourceHost,
+                          final String bindSourceMode,
+                          final String bindSourceHost,
+                          final String bindSourceService,
+                          final String connectSourceMode,
+                          final String connectSourceHost,
+                          final String connectSourceService,
                           final String protocolType,
                           final String targetPort) {
 
         super(type,
               sourcePath,
-              sourceMode,
-              sourceHost,
+              bindSourceMode,
+              bindSourceHost,
+              bindSourceService,
+              connectSourceMode,
+              connectSourceHost,
+              connectSourceService,
               protocolType,
               targetPort);
         }
@@ -2151,15 +2268,23 @@ public class VMSXML extends XML {
         /** Creates new ParallelData object. */
         public ParallelData(final String type,
                             final String sourcePath,
-                            final String sourceMode,
-                            final String sourceHost,
+                            final String bindSourceMode,
+                            final String bindSourceHost,
+                            final String bindSourceService,
+                            final String connectSourceMode,
+                            final String connectSourceHost,
+                            final String connectSourceService,
                             final String protocolType,
                             final String targetPort) {
 
         super(type,
               sourcePath,
-              sourceMode,
-              sourceHost,
+              bindSourceMode,
+              bindSourceHost,
+              bindSourceService,
+              connectSourceMode,
+              connectSourceHost,
+              connectSourceService,
               protocolType,
               targetPort);
         }
@@ -2199,5 +2324,25 @@ public class VMSXML extends XML {
     private interface VirtualHardwareComparator {
         Element getElement(final NodeList nodes,
                            final Map<String, String> parameters);
+    }
+
+    /** Returns string representation of the port; it can be autoport. */
+    public static String portString(final String port) {
+        if ("-1".equals(port)) {
+            return "auto";
+        }
+        return port;
+    }
+
+    /** Returns string representation graphic display SDL/VNC. */
+    public static String graphicsDisplayName(final String type,
+                                             final String port,
+                                             final String display) {
+        if ("vnc".equals(type)) {
+            return type + " : " + portString(port);
+        } else if ("sdl".equals(type)) {
+            return type + " (" + display + ")";
+        }
+        return "unknown";
     }
 }

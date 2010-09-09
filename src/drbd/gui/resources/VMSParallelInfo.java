@@ -37,208 +37,21 @@ import javax.swing.SwingUtilities;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual parallel device.
  */
-public class VMSParallelInfo extends VMSHardwareInfo {
-    /** Parameters. */
-    private static final String[] PARAMETERS = {ParallelData.TYPE,
-                                                ParallelData.SOURCE_PATH,
-                                                ParallelData.SOURCE_MODE,
-                                                ParallelData.SOURCE_HOST,
-                                                ParallelData.PROTOCOL_TYPE,
-                                                ParallelData.TARGET_PORT};
-
-    /** Field type. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
-    /** Short name. */
-    private static final Map<String, String> SHORTNAME_MAP =
-                                                 new HashMap<String, String>();
-    static {
-        SHORTNAME_MAP.put(ParallelData.TYPE, "Type");
-    }
-
-    /** Whether the parameter is enabled only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
-                                                        new HashSet<String>();
-
-    /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{ParallelData.TYPE}));
-
-    /** Default name. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
-    /** Possible values. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Object[]>();
-    static {
-        POSSIBLE_VALUES.put(ParallelData.TYPE,
-                            new String[]{"dev",
-                                         "file",
-                                         "null",
-                                         "pipe",
-                                         "pty",
-                                         "stdio",
-                                         "tcp",
-                                         "udp",
-                                         "unix",
-                                         "vc"});
-    }
-    /** Table panel. */
-    private JComponent tablePanel = null;
+public class VMSParallelInfo extends VMSParallelSerialInfo {
     /** Creates the VMSParallelInfo object. */
     public VMSParallelInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
-    }
-
-    /** Adds disk table with only this disk to the main panel. */
-    protected final void addHardwareTable(final JPanel mainPanel) {
-        tablePanel = getTablePanel("Displays",
-                                   VMSVirtualDomainInfo.PARALLEL_TABLE,
-                                   getNewBtn(getVMSVirtualDomainInfo()));
-        if (getResource().isNew()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    tablePanel.setVisible(false);
-                }
-            });
-        }
-        mainPanel.add(tablePanel);
-    }
-
-    /** Returns service icon in the menu. */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return NetInfo.NET_I_ICON;
-    }
-
-    /** Returns long description of the specified parameter. */
-    protected final String getParamLongDesc(final String param) {
-        return getParamShortDesc(param);
-    }
-
-    /** Returns short description of the specified parameter. */
-    protected final String getParamShortDesc(final String param) {
-        final String name = SHORTNAME_MAP.get(param);
-        if (name == null) {
-            return param;
-        }
-        return name;
-    }
-
-    /** Returns preferred value for specified parameter. */
-    protected final String getParamPreferred(final String param) {
-        return null;
-    }
-
-    /** Returns default value for specified parameter. */
-    protected final String getParamDefault(final String param) {
-        return DEFAULTS_MAP.get(param);
-    }
-
-    /** Returns parameters. */
-    public final String[] getParametersFromXML() {
-        return PARAMETERS;
-    }
-
-    /** Returns possible choices for drop down lists. */
-    protected final Object[] getParamPossibleChoices(final String param) {
-        return POSSIBLE_VALUES.get(param);
-    }
-
-    /** Returns section to which the specified parameter belongs. */
-    protected final String getSection(final String param) {
-        return "Display Options";
-    }
-
-    /** Returns true if the specified parameter is required. */
-    protected final boolean isRequired(final String param) {
-        return IS_REQUIRED.contains(param);
-    }
-
-    /** Returns true if the specified parameter is integer. */
-    protected final boolean isInteger(final String param) {
-        return false;
-    }
-
-    /** Returns true if the specified parameter is label. */
-    protected final boolean isLabel(final String param) {
-        return false;
-    }
-
-    /** Returns true if the specified parameter is of time type. */
-    protected final boolean isTimeType(final String param) {
-        return false;
-    }
-
-    /** Returns whether parameter is checkbox. */
-    protected final boolean isCheckBox(final String param) {
-        return false;
-    }
-
-    /** Returns the type of the parameter. */
-    protected final String getParamType(final String param) {
-        return "undef"; // TODO:
-    }
-
-    /** Returns the regexp of the parameter. */
-    protected final String getParamRegexp(final String param) {
-        return null;
-    }
-
-    /** Returns type of the field. */
-    protected final GuiComboBox.Type getFieldType(final String param) {
-        return FIELD_TYPES.get(param);
-    }
-
-    /** Applies the changes. */
-    public final void apply(final boolean testOnly) {
-        if (testOnly) {
-            return;
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                applyButton.setEnabled(false);
-            }
-        });
-        final String[] params = getParametersFromXML();
-        final Map<String, String> parameters = new HashMap<String, String>();
-        for (final String param : getParametersFromXML()) {
-            final String value = getComboBoxValue(param);
-            if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
-                getResource().setValue(param, value);
-            }
-        }
-        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
-                parameters.put(ParallelData.SAVED_TYPE,
-                               getParamSaved(ParallelData.TYPE));
-                vmsxml.modifyParallelXML(
-                                    getVMSVirtualDomainInfo().getDomainName(),
-                                    parameters);
-            }
-            getResource().setNew(false);
-            setName(getParamSaved(ParallelData.TYPE));
-        }
-        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                tablePanel.setVisible(true);
-            }
-        });
-        checkResourceFields(null, params);
-        getBrowser().reload(getNode());
     }
 
     /** Returns data for the table. */
@@ -256,35 +69,6 @@ public class VMSParallelInfo extends VMSHardwareInfo {
                                 true)};
         }
         return new Object[][]{};
-    }
-
-    /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
-        return false;
-    }
-
-    /** Whether the parameter should be enabled. */
-    protected final boolean isEnabled(final String param) {
-        return true;
-    }
-
-    /** Whether the parameter should be enabled only in advanced mode. */
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
-    }
-
-    /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
-    }
-
-    /** Returns true if the value of the parameter is ok. */
-    protected final boolean checkParam(final String param,
-                                       final String newValue) {
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
-            return false;
-        }
-        return true;
     }
 
     /** Updates parameters. */
@@ -330,11 +114,8 @@ public class VMSParallelInfo extends VMSHardwareInfo {
         if (type == null) {
             s.append("new parallel device...");
         } else {
-            s.append(type);
+            s.append(getName());
         }
-
-        s.append(" /");
-        s.append(getName());
         return s.toString();
     }
 
@@ -360,23 +141,9 @@ public class VMSParallelInfo extends VMSHardwareInfo {
         }
     }
 
-    /**
-     * Returns whether this item is removeable (null), or string why it isn't.
-     */
-    protected final String isRemoveable() {
-        return null;
-    }
-
-    /** Returns combo box for parameter. */
-    protected final GuiComboBox getParamComboBox(final String param,
-                                                 final String prefix,
-                                                 final int width) {
-        final GuiComboBox paramCB =
-                             super.getParamComboBox(param, prefix, width);
-        if (ParallelData.TYPE.equals(param)) {
-            paramCB.setAlwaysEditable(false);
-        }
-        return paramCB;
+    /** Returns "add new" button. */
+    protected final MyButton getNewBtn0(final VMSVirtualDomainInfo vdi) {
+        return getNewBtn(vdi);
     }
 
     /** Returns "add new" button. */
@@ -393,5 +160,35 @@ public class VMSParallelInfo extends VMSHardwareInfo {
             }
         });
         return newBtn;
+    }
+
+    /** Modify device xml. */
+    protected final void modifyXML(final VMSXML vmsxml,
+                                   final Node node,
+                                   final String domainName,
+                                   final Map<String, String> params) {
+        if (vmsxml != null) {
+            vmsxml.modifyParallelXML(node, domainName, params);
+        }
+    }
+
+    /** Return table name that appears on the screen. */
+    protected final String getTableScreenName() {
+        return "Parallel Device";
+    }
+
+    /** Return table name. */
+    protected final String getTableName() {
+        return VMSVirtualDomainInfo.PARALLEL_TABLE;
+    }
+
+    /** Returns device parameters. */
+    protected final Map<String, String> getHWParametersAndSave() {
+        final Map<String, String> parameters = super.getHWParametersAndSave();
+        setName("parallel "
+                + getParamSaved(ParallelData.TARGET_PORT)
+                + " / "
+                + getParamSaved(ParallelData.TYPE));
+        return parameters;
     }
 }

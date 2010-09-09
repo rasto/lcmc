@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual input devices.
@@ -195,18 +196,10 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                applyButton.setEnabled(false);
+                getApplyButton().setEnabled(false);
             }
         });
-        final String[] params = getParametersFromXML();
-        final Map<String, String> parameters = new HashMap<String, String>();
-        for (final String param : getParametersFromXML()) {
-            final String value = getComboBoxValue(param);
-            if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
-                getResource().setValue(param, value);
-            }
-        }
+        final Map<String, String> parameters = getHWParametersAndSave();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -214,15 +207,15 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
                                getParamSaved(InputDevData.TYPE));
                 parameters.put(InputDevData.SAVED_BUS,
                                getParamSaved(InputDevData.BUS));
-                vmsxml.modifyInputDevXML(
-                                    getVMSVirtualDomainInfo().getDomainName(),
-                                    parameters);
+                final String domainName = 
+                                getVMSVirtualDomainInfo().getDomainName();
+                final Node domainNode = vmsxml.getDomainNode(domainName);
+                modifyXML(vmsxml, domainNode, domainName, parameters);
+                vmsxml.saveAndDefine(domainNode, domainName);
             }
-            getResource().setNew(false);
-            setName(getParamSaved(InputDevData.TYPE)
-                    + ":"
-                    + getParamSaved(InputDevData.BUS));
         }
+        getResource().setNew(false);
+        getBrowser().reload(getNode());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
@@ -231,8 +224,16 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        checkResourceFields(null, params);
-        getBrowser().reload(getNode());
+        checkResourceFields(null, getParametersFromXML());
+    }
+
+    /** Returns device parameters. */
+    protected Map<String, String> getHWParametersAndSave() {
+        final Map<String, String> params = super.getHWParametersAndSave();
+        setName(getParamSaved(InputDevData.TYPE)
+                + ":"
+                + getParamSaved(InputDevData.BUS));
+        return params;
     }
 
     /** Returns data for the table. */
@@ -388,5 +389,15 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
             }
         });
         return newBtn;
+    }
+
+    /** Modify device xml. */
+    protected final void modifyXML(final VMSXML vmsxml,
+                                   final Node node,
+                                   final String domainName,
+                                   final Map<String, String> params) {
+        if (vmsxml != null) {
+            vmsxml.modifyInputDevXML(node, domainName, params);
+        }
     }
 }

@@ -124,6 +124,8 @@ public class Host implements Serializable {
     private final Set<String> fileSystems = new TreeSet<String>();
     /** Available crypto modules. */
     private final Set<String> cryptoModules = new TreeSet<String>();
+    /** Available qemu keymaps. */
+    private final Set<String> qemuKeymaps = new TreeSet<String>();
     /** Mount points that exist in /mnt dir. */
     private final Set<String> mountPoints = new TreeSet<String>();
     /** List of block devices of this host. */
@@ -573,19 +575,24 @@ public class Host implements Serializable {
         fileSystems.add(fileSystem);
     }
 
-    /**
-     * Returns available crypto modules as a list of strings.
-     */
+    /** Returns available crypto modules as a list of strings. */
     public final Set<String> getCryptoModules() {
         return cryptoModules;
     }
 
-
-    /**
-     * Adds crypto module to the list of crypto modules.
-     */
+    /** Adds crypto module to the list of crypto modules. */
     public final void addCryptoModule(final String cryptoModule) {
         cryptoModules.add(cryptoModule);
+    }
+
+    /** Returns available qemu keymaps as a list of strings. */
+    public final Set<String> getQemuKeymaps() {
+        return qemuKeymaps;
+    }
+
+    /** Adds qemu keymap to the list of qemu keymaps. */
+    public final void addQemuKeymap(final String qemuKeymap) {
+        qemuKeymaps.add(qemuKeymap);
     }
 
     /**
@@ -1841,6 +1848,7 @@ public class Host implements Serializable {
                 || "disk-info".equals(line)
                 || "filesystems-info".equals(line)
                 || "crypto-info".equals(line)
+                || "qemu-keymaps-info".equals(line)
                 || "mount-points-info".equals(line)
                 || "gui-info".equals(line)
                 || "installation-info".equals(line)
@@ -1872,6 +1880,8 @@ public class Host implements Serializable {
                 addFileSystem(line);
             } else if ("crypto-info".equals(type)) {
                 addCryptoModule(line);
+            } else if ("qemu-keymaps-info".equals(type)) {
+                addQemuKeymap(line);
             } else if ("mount-points-info".equals(type)) {
                 addMountPoint(line);
             } else if ("gui-info".equals(type)) {

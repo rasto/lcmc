@@ -450,9 +450,7 @@ public class Info implements Comparable {
         }
     }
 
-    /**
-     * Selects and highlights this node.
-     */
+    /** Selects and highlights this node. */
     public void selectMyself() {
         // this fires an event in ViewPanel.
         getBrowser().reload(node);
@@ -924,7 +922,7 @@ public class Info implements Comparable {
                         final Object o = getValueAt(row, column);
                         return getTableToolTip(tableName, key, o, row, column);
                     } catch (final java.lang.IndexOutOfBoundsException e) {
-                        /* could be removed in the meantime, igonring. */
+                        /* could be removed in the meantime, ignoring. */
                     }
                     return null;
                 }
@@ -979,7 +977,7 @@ public class Info implements Comparable {
                                }
                            }
                        } catch (final java.lang.IndexOutOfBoundsException e) {
-                           /* could be removed in the meantime, igonring. */
+                           /* could be removed in the meantime, ignoring. */
                        }
                    }
                    if (newRow >= 0 && newRow != row) {
@@ -1056,14 +1054,18 @@ public class Info implements Comparable {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
                     final int row = table.rowAtPoint(p);
-                    for (int c = 0; c < table.getColumnCount(); c++) {
-                        final Object v = table.getValueAt(row, c);
-                        if (v instanceof MyButton) {
-                            ((MyButton) v).getModel().setRollover(true);
-                            table.setValueAt(v, row, c);
+                    try {
+                        for (int c = 0; c < table.getColumnCount(); c++) {
+                            final Object v = table.getValueAt(row, c);
+                            if (v instanceof MyButton) {
+                                ((MyButton) v).getModel().setRollover(true);
+                                table.setValueAt(v, row, c);
+                            }
                         }
+                        paintItMouseOver = true;
+                    } catch (final java.lang.IndexOutOfBoundsException ie) {
+                        /* could be removed in the meantime, ignoring. */
                     }
-                    paintItMouseOver = true;
                 }
 
                 public final void mouseExited(final MouseEvent e) {
@@ -1196,4 +1198,19 @@ public class Info implements Comparable {
         }
         return object.toString();
     }
+
+    ///** Removes node. If it is selected, it will be deselected. */
+    //protected void removeNode(final DefaultMutableTreeNode node) {
+    //    SwingUtilities.invokeLater(new Runnable() {
+    //        public void run() {
+    //            if (node
+    //                == getBrowser().getTree().getLastSelectedPathComponent()) {
+    //                getBrowser().getTree().setSelectionPath(
+    //                 getBrowser().getTree().getSelectionPath().getParentPath().getParentPath());
+    //                //getBrowser().getTree().setSelectionRow(2);
+    //            }
+    //            node.removeFromParent();
+    //        }
+    //    });
+    //}
 }

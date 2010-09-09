@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Interfaces.
@@ -104,7 +105,10 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         new HashSet<String>(Arrays.asList(new String[]{
                                                 InterfaceData.TYPE }));
 
-    /** Default name. */
+    /** Preferred values. */
+    private static final Map<String, String> PREFERRED_MAP =
+                                                 new HashMap<String, String>();
+    /** Default values. */
     private static final Map<String, String> DEFAULTS_MAP =
                                                  new HashMap<String, String>();
     /** Possible values. */
@@ -112,6 +116,8 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                                                new HashMap<String, Object[]>();
     static {
         DEFAULTS_MAP.put(InterfaceData.MAC_ADDRESS, "generate");
+        PREFERRED_MAP.put(InterfaceData.MODEL_TYPE, "virtio");
+        PREFERRED_MAP.put(InterfaceData.SOURCE_NETWORK, "default");
         POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE,
                             new String[]{null,
                                          "default",
@@ -167,7 +173,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     protected final String getParamPreferred(final String param) {
-        return null;
+        return PREFERRED_MAP.get(param);
     }
 
     /** Returns default value for specified parameter. */
@@ -259,16 +265,8 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         return FIELD_TYPES.get(param);
     }
 
-    /** Applies the changes. */
-    public final void apply(final boolean testOnly) {
-        if (testOnly) {
-            return;
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                applyButton.setEnabled(false);
-            }
-        });
+    /** Returns device parameters. */
+    protected final Map<String, String> getHWParametersAndSave() {
         String[] params;
         if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
             params = NETWORK_PARAMETERS;
@@ -283,31 +281,56 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             if (InterfaceData.TYPE.equals(param)) {
                 type = value;
             }
-            //if ("network".equals(type)
-            //    && InterfaceData.SOURCE_BRIDGE.equals(param)) {
-            //    getResource().setValue(param, null);
-            //    continue;
-            //} else if ("bridge".equals(type)
-            //    && InterfaceData.SOURCE_NETWORK.equals(param)) {
-            //    getResource().setValue(param, null);
-            //    continue;
-            //}
             if (!Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
             }
         }
+        setName(getParamSaved(InterfaceData.MAC_ADDRESS));
+        return parameters;
+    }
+
+    /** Modify device xml. */
+    protected final void modifyXML(final VMSXML vmsxml,
+                                   final Node node,
+                                   final String domainName,
+                                   final Map<String, String> params) {
+        if (vmsxml != null) {
+            vmsxml.modifyInterfaceXML(node, domainName, params);
+        }
+    }
+
+    /** Applies the changes. */
+    public final void apply(final boolean testOnly) {
+        if (testOnly) {
+            return;
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getApplyButton().setEnabled(false);
+            }
+        });
+
+        final Map<String, String> parameters = getHWParametersAndSave();
+        String[] params;
+        if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
+            params = NETWORK_PARAMETERS;
+        } else {
+            params = BRIDGE_PARAMETERS;
+        }
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
-                vmsxml.modifyInterfaceXML(
-                                    getVMSVirtualDomainInfo().getDomainName(),
-                                    parameters);
+                final String domainName = 
+                                    getVMSVirtualDomainInfo().getDomainName();
+                final Node domainNode = vmsxml.getDomainNode(domainName);
+                modifyXML(vmsxml, domainNode, domainName, parameters);
+                vmsxml.saveAndDefine(domainNode, domainName);
             }
             getResource().setNew(false);
-            setName(getParamSaved(InterfaceData.MAC_ADDRESS));
         }
+        getBrowser().reload(getNode());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
@@ -317,7 +340,6 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             }
         });
         checkResourceFields(null, params);
-        getBrowser().reload(getNode());
     }
 
     /** Returns data for the table. */

@@ -256,8 +256,8 @@ public class HbConnectionInfo extends EditableInfo {
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    applyButton.setEnabled(false);
-                    applyButton.setToolTipText(null);
+                    getApplyButton().setEnabled(false);
+                    getApplyButton().setToolTipText(null);
                 }
             });
         }
@@ -372,8 +372,8 @@ public class HbConnectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getHeartbeatGraph().stopTestAnimation(applyButton);
-                applyButton.setToolTipText(null);
+                getBrowser().getHeartbeatGraph().stopTestAnimation(getApplyButton());
+                getApplyButton().setToolTipText(null);
             }
 
             public final void mouseOver() {
@@ -381,9 +381,9 @@ public class HbConnectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = true;
-                applyButton.setToolTipText(
+                getApplyButton().setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                applyButton.setToolTipBackground(Tools.getDefaultColor(
+                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
                                     "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -392,7 +392,7 @@ public class HbConnectionInfo extends EditableInfo {
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
                 getBrowser().getHeartbeatGraph().startTestAnimation(
-                                                            applyButton,
+                                                            getApplyButton(),
                                                             startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
@@ -400,7 +400,7 @@ public class HbConnectionInfo extends EditableInfo {
                 clStatus.setPtestData(null);
                 apply(dcHost, true);
                 final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                applyButton.setToolTipText(ptestData.getToolTip());
+                getApplyButton().setToolTipText(ptestData.getToolTip());
                 clStatus.setPtestData(ptestData);
                 getBrowser().ptestLockRelease();
                 startTestLatch.countDown();
@@ -408,10 +408,10 @@ public class HbConnectionInfo extends EditableInfo {
         };
         initApplyButton(buttonCallback);
         for (final String col : colocationIds.keySet()) {
-            colocationIds.get(col).applyButton = applyButton;
+            colocationIds.get(col).setApplyButton(getApplyButton());
         }
         for (final String ord : orderIds.keySet()) {
-            orderIds.get(ord).applyButton = applyButton;
+            orderIds.get(ord).setApplyButton(getApplyButton());
         }
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -459,7 +459,7 @@ public class HbConnectionInfo extends EditableInfo {
                         null);
         }
         mConstraintsLock.release();
-        applyButton.addActionListener(
+        getApplyButton().addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
@@ -476,7 +476,7 @@ public class HbConnectionInfo extends EditableInfo {
 
         /* apply button */
         addApplyButton(buttonPanel);
-        applyButton.setEnabled(checkResourceFields(null, null));
+        getApplyButton().setEnabled(checkResourceFields(null, null));
         mainPanel.add(optionsPanel);
 
         final JPanel newPanel = new JPanel();
@@ -777,7 +777,7 @@ public class HbConnectionInfo extends EditableInfo {
                                                serviceInfoParent,
                                                serviceInfoChild,
                                                getBrowser());
-        oi.applyButton = applyButton;
+        oi.setApplyButton(getApplyButton());
         orderIds.put(ordId, oi);
         oi.getService().setHeartbeatId(ordId);
         oi.setParameters();
@@ -814,7 +814,7 @@ public class HbConnectionInfo extends EditableInfo {
                                                          serviceInfoRsc,
                                                          serviceInfoWithRsc,
                                                          getBrowser());
-        ci.applyButton = applyButton;
+        ci.setApplyButton(getApplyButton());
         colocationIds.put(colId, ci);
         ci.getService().setHeartbeatId(colId);
         ci.setParameters();

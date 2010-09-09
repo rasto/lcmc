@@ -465,17 +465,21 @@ public class GuiComboBox extends JPanel {
                                                   items);
 
         final JComboBox cb = (JComboBox) component;
-        cb.setSelectedIndex(-1);
-        cb.removeAllItems();
-        for (final Object item : comboList) {
-            if (!itemCache.contains(item.toString())) {
-                cb.addItem(item);
-                itemCache.add(item.toString());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                cb.setSelectedIndex(-1);
+                cb.removeAllItems();
+                for (final Object item : comboList) {
+                    if (!itemCache.contains(item.toString())) {
+                        cb.addItem(item);
+                        itemCache.add(item.toString());
+                    }
+                }
+                if (selectedValueInfo != null) {
+                    cb.setSelectedItem(selectedValueInfo);
+                }
             }
-        }
-        if (selectedValueInfo != null) {
-            cb.setSelectedItem(selectedValueInfo);
-        }
+        });
     }
 
     /** Adds items to the combo box. */

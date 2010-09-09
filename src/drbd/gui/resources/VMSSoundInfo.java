@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual sound device.
@@ -88,7 +89,7 @@ public class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Adds disk table with only this disk to the main panel. */
     protected final void addHardwareTable(final JPanel mainPanel) {
-        tablePanel = getTablePanel("Displays",
+        tablePanel = getTablePanel("Sound Devices",
                                    VMSVirtualDomainInfo.SOUND_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
@@ -142,7 +143,7 @@ public class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Returns section to which the specified parameter belongs. */
     protected final String getSection(final String param) {
-        return "Display Options";
+        return "Sound Device Options";
     }
 
     /** Returns true if the specified parameter is required. */
@@ -192,29 +193,24 @@ public class VMSSoundInfo extends VMSHardwareInfo {
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                applyButton.setEnabled(false);
+                getApplyButton().setEnabled(false);
             }
         });
-        final String[] params = getParametersFromXML();
-        final Map<String, String> parameters = new HashMap<String, String>();
-        for (final String param : getParametersFromXML()) {
-            final String value = getComboBoxValue(param);
-            if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
-                getResource().setValue(param, value);
-            }
-        }
+        final Map<String, String> parameters = getHWParametersAndSave();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(SoundData.SAVED_MODEL,
                                getParamSaved(SoundData.MODEL));
-                vmsxml.modifySoundXML(getVMSVirtualDomainInfo().getDomainName(),
-                                      parameters);
+                final String domainName = 
+                                getVMSVirtualDomainInfo().getDomainName();
+                final Node domainNode = vmsxml.getDomainNode(domainName);
+                modifyXML(vmsxml, domainNode, domainName, parameters);
+                vmsxml.saveAndDefine(domainNode, domainName);
             }
             getResource().setNew(false);
-            setName(getParamSaved(SoundData.MODEL));
         }
+        getBrowser().reload(getNode());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
@@ -223,8 +219,14 @@ public class VMSSoundInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        checkResourceFields(null, params);
-        getBrowser().reload(getNode());
+        checkResourceFields(null, getParametersFromXML());
+    }
+
+    /** Returns device parameters. */
+    protected Map<String, String> getHWParametersAndSave() {
+        final Map<String, String> params = super.getHWParametersAndSave();
+        setName(getParamSaved(SoundData.MODEL));
+        return params;
     }
 
     /** Returns data for the table. */
@@ -362,5 +364,15 @@ public class VMSSoundInfo extends VMSHardwareInfo {
             }
         });
         return newBtn;
+    }
+
+    /** Modify device xml. */
+    protected final void modifyXML(final VMSXML vmsxml,
+                                   final Node node,
+                                   final String domainName,
+                                   final Map<String, String> params) {
+        if (vmsxml != null) {
+            vmsxml.modifySoundXML(node, domainName, params);
+        }
     }
 }

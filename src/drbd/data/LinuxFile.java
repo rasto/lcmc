@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import drbd.utilities.Tools;
 import drbd.utilities.SSH;
-import drbd.gui.resources.VMSDiskInfo;
+import drbd.gui.resources.VMSHardwareInfo;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite
@@ -51,17 +51,17 @@ public class LinuxFile extends File {
     /** Is true if this file exists, false it doesn't, null - it is not known.*/
     private Boolean existCache = null;
     /** VMs disk info object. */
-    private final VMSDiskInfo vmsDiskInfo;
+    private final VMSHardwareInfo vmsHardwareInfo;
 
     /** Creates new LinuxFile object. */
-    public LinuxFile(final VMSDiskInfo vmsDiskInfo,
+    public LinuxFile(final VMSHardwareInfo vmsHardwareInfo,
                      final Host host,
                      final String name,
                      final String type,
                      final long lastModified,
                      final long fileLength) {
         super(Tools.getUnixPath(name));
-        this.vmsDiskInfo = vmsDiskInfo;
+        this.vmsHardwareInfo = vmsHardwareInfo;
         this.host = host;
         if ("d".equals(type)) {
             directory = true;
@@ -133,13 +133,13 @@ public class LinuxFile extends File {
     /** Returns file with absolute path. */
     public final File getAbsoluteFile() {
         final String absPath = getAbsolutePath();
-        return vmsDiskInfo.getLinuxDir(absPath, host);
+        return vmsHardwareInfo.getLinuxDir(absPath, host);
     }
 
     /** Returns cannonical file name. */
     public final File getCanonicalFile() throws IOException {
         final String canonPath = getCanonicalPath();
-        return vmsDiskInfo.getLinuxDir(canonPath, host);
+        return vmsHardwareInfo.getLinuxDir(canonPath, host);
     }
 
     /** Returns parent dir. */
@@ -148,6 +148,6 @@ public class LinuxFile extends File {
         if (p == null) {
             return null;
         }
-        return vmsDiskInfo.getLinuxDir(p, host);
+        return vmsHardwareInfo.getLinuxDir(p, host);
     }
 }

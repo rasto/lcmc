@@ -734,7 +734,7 @@ public class DrbdResourceInfo extends EditableInfo
             final String[] params = getParametersFromXML();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    applyButton.setEnabled(false);
+                    getApplyButton().setEnabled(false);
                 }
             });
             getBrowser().getDrbdResHash().remove(getName());
@@ -778,8 +778,8 @@ public class DrbdResourceInfo extends EditableInfo
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getDrbdGraph().stopTestAnimation(applyButton);
-                applyButton.setToolTipText(null);
+                getBrowser().getDrbdGraph().stopTestAnimation(getApplyButton());
+                getApplyButton().setToolTipText(null);
             }
 
             public final void mouseOver() {
@@ -787,9 +787,9 @@ public class DrbdResourceInfo extends EditableInfo
                     return;
                 }
                 mouseStillOver = true;
-                applyButton.setToolTipText(
+                getApplyButton().setToolTipText(
                        Tools.getString("ClusterBrowser.StartingDRBDtest"));
-                applyButton.setToolTipBackground(Tools.getDefaultColor(
+                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
                                 "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -797,7 +797,7 @@ public class DrbdResourceInfo extends EditableInfo
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getDrbdGraph().startTestAnimation(applyButton,
+                getBrowser().getDrbdGraph().startTestAnimation(getApplyButton(),
                                                                startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
@@ -815,7 +815,7 @@ public class DrbdResourceInfo extends EditableInfo
                     Tools.appError("config failed");
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
-                applyButton.setToolTipText(dtd.getToolTip());
+                getApplyButton().setToolTipText(dtd.getToolTip());
                 getBrowser().setDRBDtestData(dtd);
                 getBrowser().drbdtestLockRelease();
                 startTestLatch.countDown();
@@ -859,7 +859,7 @@ public class DrbdResourceInfo extends EditableInfo
                   Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"),
                   null);
 
-        applyButton.addActionListener(new ActionListener() {
+        getApplyButton().addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
                     public void run() {
@@ -882,7 +882,7 @@ public class DrbdResourceInfo extends EditableInfo
         });
 
         addApplyButton(buttonPanel);
-        applyButton.setEnabled(checkResourceFields(null, params));
+        getApplyButton().setEnabled(checkResourceFields(null, params));
 
         mainPanel.add(optionsPanel);
 

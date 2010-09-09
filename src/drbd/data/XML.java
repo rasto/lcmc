@@ -58,9 +58,7 @@ public class XML {
         return null;
     }
 
-    /**
-     * Returns attribute value for node and name of the attribute.
-     */
+    /** Returns attribute value for node and name of the attribute. */
     public final String getAttribute(final Node node, final String name) {
         if (node.getAttributes().getNamedItem(name) == null) {
             return null;
@@ -69,9 +67,13 @@ public class XML {
         }
     }
 
-    /**
-     * Returns text in the node.
-     */
+    /** Returns CDATA section. */
+    public final String getCDATA(final Node node) {
+        final Node n = getChildNode(node, "#cdata-section");
+        return n.getNodeValue();
+    }
+
+    /** Returns text in the node. */
     public final String getText(final Node node) {
         final Node ch = getChildNode(node, "#text");
         if (ch == null) {
@@ -106,7 +108,7 @@ public class XML {
             if (sxe.getException() != null) {
                 x = sxe.getException();
             }
-            Tools.appError("could not parse: ", xml, x);
+            Tools.appWarning("could not parse: " + xml);
             return null;
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built

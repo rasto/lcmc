@@ -23,16 +23,19 @@ package drbd.gui.resources;
 
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
+import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.Host;
 import drbd.data.resources.Resource;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
+import drbd.data.LinuxFile;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.SSH;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -44,16 +47,22 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Hardware.
@@ -72,6 +81,14 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** If it has units. */
     private static final Map<String, Boolean> HAS_UNIT =
                                                 new HashMap<String, Boolean>();
+    /** Cache for files. */
+    private final Map<String, LinuxFile> linuxFileCache =
+                                            new HashMap<String, LinuxFile>();
+    /** Pattern that parses stat output. */
+    private static final Pattern STAT_PATTERN = Pattern.compile(
+                                                       "(.).{9}\\s+(\\d+)\\s+"
+                                                       + "(\\d+)\\s+"
+                                                       + "(\\d+) (.*)$");
     /** Creates the VMSHardwareInfo object. */
     public VMSHardwareInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
@@ -90,7 +107,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (infoPanel != null) {
             return infoPanel;
         }
-        final boolean abExisted = applyButton != null;
+        final boolean abExisted = getApplyButton() != null;
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -116,7 +133,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         initApplyButton(null);
         /* add item listeners to the apply button. */
         if (!abExisted) {
-            applyButton.addActionListener(
+            getApplyButton().addActionListener(
                 new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(new Runnable() {
@@ -167,7 +184,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                   ClusterBrowser.SERVICE_LABEL_WIDTH
                                   + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        applyButton.setEnabled(checkResourceFields(null, params));
+        getApplyButton().setVisible(
+                            !getVMSVirtualDomainInfo().getResource().isNew());
+        getApplyButton().setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;
         return infoPanel;
     }
@@ -272,9 +291,16 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                     Tools.getString("VMSHardwareInfo.Menu.Remove"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    Tools.getString("VMSHardwareInfo.Menu.Cancel"),
+                    ClusterBrowser.REMOVE_ICON,
+                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
                     new AccessMode(ConfigData.AccessType.ADMIN, false),
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
+
+            public boolean predicate() {
+                return !getResource().isNew();
+            }
 
             public String enablePredicate() {
                 if (getResource().isNew()) {
@@ -327,11 +353,32 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Adds disk table with only this disk to the main panel. */
     protected abstract void addHardwareTable(final JPanel mainPanel);
 
+    /** Modify device xml. */
+    protected abstract void modifyXML(final VMSXML vmsxml,
+                                      final Node node,
+                                      final String domainName,
+                                      final Map<String, String> params);
+
     /** Returns whether the column is a button, 0 column is always a button. */
     protected final Map<Integer, Integer> getDefaultWidths(
                                                     final String tableName) {
         return vmsVirtualDomainInfo.getDefaultWidths(tableName);
     }
+
+    /** Returns device parameters. */
+    protected Map<String, String> getHWParametersAndSave() {
+        final String[] params = getParametersFromXML();
+        final Map<String, String> parameters = new HashMap<String, String>();
+        for (final String param : getParametersFromXML()) {
+            final String value = getComboBoxValue(param);
+            if (!Tools.areEqual(getParamSaved(param), value)) {
+                parameters.put(param, value);
+                getResource().setValue(param, value);
+            }
+        }
+        return parameters;
+    }
+
 
     /** Returns default widths for columns. Null for computed width. */
     protected final boolean isRemoveButton(final String tableName,
@@ -351,4 +398,150 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                                     raw,
                                                     column);
     }
+
+    /** Returns cached file object. */
+    public final LinuxFile getLinuxDir(final String dir, final Host host) {
+        LinuxFile ret = linuxFileCache.get(dir);
+        if (ret == null) {
+            ret = new LinuxFile(this, host, dir, "d", 0, 0);
+            linuxFileCache.put(dir, ret);
+        }
+        return ret;
+    }
+
+    /** Returns file system view that allows remote browsing. */
+    private FileSystemView getFileSystemView(final Host host,
+                                             final String directory) {
+        final VMSHardwareInfo thisClass = this;
+        return new FileSystemView() {
+            public final File[] getRoots() {
+                return new LinuxFile[]{getLinuxDir("/", host)};
+            }
+
+            public final boolean isRoot(final File f) {
+                final String path = Tools.getUnixPath(f.toString());
+                if ("/".equals(path)) {
+                    return true;
+                }
+                return false;
+            }
+
+            public final File createNewFolder(final File containingDir) {
+                return null;
+            }
+
+            public final File getHomeDirectory() {
+                return getLinuxDir(directory, host);
+            }
+
+            public final Boolean isTraversable(final File f) {
+                final LinuxFile lf = linuxFileCache.get(f.toString());
+                if (lf != null) {
+                    return lf.isDirectory();
+                }
+                return true;
+            }
+
+            public final File getParentDirectory(final File dir) {
+                return getLinuxDir(dir.getParent(), host);
+            }
+
+            public final File[] getFiles(final File dir,
+                                         final boolean useFileHiding) {
+                final StringBuffer dirSB = new StringBuffer(dir.toString());
+                if ("/".equals(dir.toString())) {
+                    dirSB.append('*');
+                } else {
+                    dirSB.append("/*");
+                }
+                final SSH.SSHOutput out =
+                        Tools.execCommandProgressIndicator(
+                                      host,
+                                      "stat -c \"%A %a %Y %s %n\" "
+                                      + dirSB.toString()
+                                      + " 2>/dev/null",
+                                      null,
+                                      false,
+                                      "executing...",
+                                      SSH.DEFAULT_COMMAND_TIMEOUT);
+                final List<LinuxFile> files = new ArrayList<LinuxFile>();
+                if (out.getExitCode() == 0) {
+                    for (final String line : out.getOutput().split("\r\n")) {
+                        if ("".equals(line.trim())) {
+                            continue;
+                        }
+                        final Matcher m = STAT_PATTERN.matcher(line);
+                        if (m.matches()) {
+                            final String type = m.group(1);
+                            final long lastModified =
+                                           Long.parseLong(m.group(3)) * 1000;
+                            final long size = Long.parseLong(m.group(4));
+                            final String filename = m.group(5);
+                            LinuxFile lf = linuxFileCache.get(filename);
+                            if (lf == null) {
+                                lf = new LinuxFile(thisClass,
+                                                   host,
+                                                   filename,
+                                                   type,
+                                                   lastModified,
+                                                   size);
+                                linuxFileCache.put(filename, lf);
+                            } else {
+                                lf.update(type, lastModified, size);
+                            }
+                            files.add(lf);
+                        } else {
+                            Tools.appWarning("could not match: " + line);
+                        }
+                    }
+                }
+                return files.toArray(new LinuxFile[files.size()]);
+            }
+        };
+    }
+
+    /** Starts file chooser. */
+    protected void startFileChooser(final GuiComboBox paramCB,
+                                    final String directory) {
+        final Host host = getFirstConnectedHost();
+        if (host == null) {
+            Tools.appError("Connection to host lost.");
+            return;
+        }
+        final VMSHardwareInfo thisClass = this;
+        final JFileChooser fc = new JFileChooser(
+                                    getLinuxDir(directory, host),
+                                    getFileSystemView(host, directory)) {
+            /** Serial version UID. */
+            private static final long serialVersionUID = 1L;
+                public final void setCurrentDirectory(final File dir) {
+                    super.setCurrentDirectory(new LinuxFile(
+                                                    thisClass,
+                                                    host,
+                                                    dir.toString(),
+                                                    "d",
+                                                    0,
+                                                    0));
+                }
+
+            };
+        fc.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
+        fc.setDialogTitle(Tools.getString("VMSDiskInfo.FileChooserTitle")
+                          + host.getName());
+//        fc.setApproveButtonText(Tools.getString("VMSDiskInfo.Approve"));
+        fc.setApproveButtonToolTipText(
+                               Tools.getString("VMSDiskInfo.Approve.ToolTip"));
+        fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
+        final int ret = fc.showDialog(Tools.getGUIData().getMainFrame(),
+                                      Tools.getString("VMSDiskInfo.Approve"));
+        linuxFileCache.clear();
+        if (ret == JFileChooser.APPROVE_OPTION
+            && fc.getSelectedFile() != null) {
+            final String name = fc.getSelectedFile().getAbsolutePath();
+            paramCB.setValue(name);
+        }
+    }
+
+
 }

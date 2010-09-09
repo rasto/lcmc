@@ -69,7 +69,6 @@ import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
 import drbd.utilities.ButtonCallback;
 
-
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;

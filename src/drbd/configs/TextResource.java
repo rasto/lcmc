@@ -1902,13 +1902,13 @@ public class TextResource extends
          "New Disk"},
 
         {"VMSVirtualDomainInfo.AddNewInterface",
-         "New Interface"},
+         "New Network Interface"},
 
         {"VMSVirtualDomainInfo.AddNewInputDev",
-         "New Input Device"},
+         "New Input Device (Mouse/Tablet)"},
 
         {"VMSVirtualDomainInfo.AddNewGraphics",
-         "New Graphics Device"},
+         "New Graphics Device (VNC, SDL)"},
 
         {"VMSVirtualDomainInfo.AddNewSound",
          "New Sound Device"},
@@ -1929,7 +1929,7 @@ public class TextResource extends
          "Remove Domain"},
 
         {"VMSVirtualDomainInfo.CancelDomain",
-         "Cancel Domain"},
+         "Cancel New Domain"},
 
         {"VMSVirtualDomainInfo.confirmRemove.Title",
          "Remove Virtual Domain"},
@@ -2004,6 +2004,9 @@ public class TextResource extends
 
         {"VMSHardwareInfo.Menu.Remove",
          "Remove"},
+
+        {"VMSHardwareInfo.Menu.Cancel",
+         "Cancel"},
 
         {"VMSHardwareInfo.confirmRemove.Title",
          "Remove Virtual Hardware"},

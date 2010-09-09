@@ -242,8 +242,8 @@ public class ServicesInfo extends EditableInfo {
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    applyButton.setEnabled(false);
-                    applyButton.setToolTipText(null);
+                    getApplyButton().setEnabled(false);
+                    getApplyButton().setToolTipText(null);
                 }
             });
         }
@@ -917,8 +917,8 @@ public class ServicesInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                hg.stopTestAnimation(applyButton);
-                applyButton.setToolTipText(null);
+                hg.stopTestAnimation(getApplyButton());
+                getApplyButton().setToolTipText(null);
             }
 
             public final void mouseOver() {
@@ -926,9 +926,9 @@ public class ServicesInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = true;
-                applyButton.setToolTipText(
+                getApplyButton().setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                applyButton.setToolTipBackground(Tools.getDefaultColor(
+                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
                                     "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -936,21 +936,21 @@ public class ServicesInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                hg.startTestAnimation(applyButton, startTestLatch);
+                hg.startTestAnimation(getApplyButton(), startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 clStatus.setPtestData(null);
                 apply(dcHost, true);
                 final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                applyButton.setToolTipText(ptestData.getToolTip());
+                getApplyButton().setToolTipText(ptestData.getToolTip());
                 clStatus.setPtestData(ptestData);
                 getBrowser().ptestLockRelease();
                 startTestLatch.countDown();
             }
         };
         initApplyButton(buttonCallback);
-        getBrowser().getRscDefaultsInfo().applyButton = applyButton;
+        getBrowser().getRscDefaultsInfo().setApplyButton(getApplyButton());
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -983,7 +983,7 @@ public class ServicesInfo extends EditableInfo {
                       optionsPanel,
                       Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
                       Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"));
-        applyButton.addActionListener(
+        getApplyButton().addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(
@@ -1002,7 +1002,7 @@ public class ServicesInfo extends EditableInfo {
 
         /* apply button */
         addApplyButton(buttonPanel);
-        applyButton.setEnabled(checkResourceFields(null, params));
+        getApplyButton().setEnabled(checkResourceFields(null, params));
 
         mainPanel.add(optionsPanel);
 

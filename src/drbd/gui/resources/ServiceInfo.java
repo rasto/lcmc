@@ -1418,7 +1418,7 @@ public class ServiceInfo extends EditableInfo {
                                 label.setText(onText);
                             }
                             final String[] params = getParametersFromXML();
-                            applyButton.setEnabled(
+                            getApplyButton().setEnabled(
                                 checkResourceFields(CACHED_FIELD, params));
                         }
                     });
@@ -1883,7 +1883,7 @@ public class ServiceInfo extends EditableInfo {
                                 SwingUtilities.invokeLater(
                                 new Runnable() {
                                     public void run() {
-                                        applyButton.setEnabled(enable);
+                                        getApplyButton().setEnabled(enable);
                                         if (info != null) {
                                             sameAsOperationsCB.setToolTipText(
                                                               info.toString());
@@ -2198,7 +2198,7 @@ public class ServiceInfo extends EditableInfo {
                                     new Runnable() {
                                         public void run() {
                                             cb.setEditable();
-                                            applyButton.setEnabled(enable);
+                                            getApplyButton().setEnabled(enable);
                                         }
                                     });
                                 }
@@ -2217,7 +2217,7 @@ public class ServiceInfo extends EditableInfo {
                                 SwingUtilities.invokeLater(
                                 new Runnable() {
                                     public void run() {
-                                        applyButton.setEnabled(enable);
+                                        getApplyButton().setEnabled(enable);
                                     }
                                 });
                             }
@@ -2264,7 +2264,7 @@ public class ServiceInfo extends EditableInfo {
                                                             params);
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        applyButton.setEnabled(enable);
+                                        getApplyButton().setEnabled(enable);
                                     }
                                 });
                             }
@@ -2282,7 +2282,7 @@ public class ServiceInfo extends EditableInfo {
                                  checkResourceFields(CACHED_FIELD, params);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
-                                    applyButton.setEnabled(enable);
+                                    getApplyButton().setEnabled(enable);
                                 }
                             });
                         }
@@ -2344,7 +2344,7 @@ public class ServiceInfo extends EditableInfo {
                                   checkResourceFields(CACHED_FIELD, params);
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        applyButton.setEnabled(enable);
+                                        getApplyButton().setEnabled(enable);
                                         if (info != null) {
                                             sameAsMetaAttrsCB.setToolTipText(
                                                               info.toString());
@@ -2382,7 +2382,7 @@ public class ServiceInfo extends EditableInfo {
             return infoPanel;
         }
         /* init save button */
-        final boolean abExisted = applyButton != null;
+        final boolean abExisted = getApplyButton() != null;
         final ServiceInfo thisClass = this;
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
@@ -2408,8 +2408,9 @@ public class ServiceInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getHeartbeatGraph().stopTestAnimation(applyButton);
-                applyButton.setToolTipText(null);
+                getBrowser().getHeartbeatGraph().stopTestAnimation(
+                                                             getApplyButton());
+                getApplyButton().setToolTipText(null);
             }
 
             public final void mouseOver() {
@@ -2417,9 +2418,9 @@ public class ServiceInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = true;
-                applyButton.setToolTipText(
+                getApplyButton().setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                applyButton.setToolTipBackground(Tools.getDefaultColor(
+                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
                                    "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -2428,7 +2429,7 @@ public class ServiceInfo extends EditableInfo {
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
                 getBrowser().getHeartbeatGraph().startTestAnimation(
-                                                               applyButton,
+                                                               getApplyButton(),
                                                                startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
@@ -2436,7 +2437,7 @@ public class ServiceInfo extends EditableInfo {
                 cs.setPtestData(null);
                 apply(dcHost, true);
                 final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                applyButton.setToolTipText(ptestData.getToolTip());
+                getApplyButton().setToolTipText(ptestData.getToolTip());
                 cs.setPtestData(ptestData);
                 getBrowser().ptestLockRelease();
                 startTestLatch.countDown();
@@ -2444,11 +2445,11 @@ public class ServiceInfo extends EditableInfo {
         };
         initApplyButton(buttonCallback);
         if (cloneInfo != null) {
-            cloneInfo.applyButton = applyButton;
+            cloneInfo.setApplyButton(getApplyButton());
         }
         /* add item listeners to the apply button. */
         if (!abExisted) {
-            applyButton.addActionListener(
+            getApplyButton().addActionListener(
                 new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(new Runnable() {
@@ -2592,7 +2593,7 @@ public class ServiceInfo extends EditableInfo {
         }
         /* apply button */
         addApplyButton(buttonPanel);
-        applyButton.setEnabled(checkResourceFields(null, params));
+        getApplyButton().setEnabled(checkResourceFields(null, params));
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -2810,8 +2811,8 @@ public class ServiceInfo extends EditableInfo {
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    applyButton.setEnabled(false);
-                    applyButton.setToolTipText(null);
+                    getApplyButton().setEnabled(false);
+                    getApplyButton().setToolTipText(null);
                     paramComboBoxGet(GUI_ID, null).setEnabled(false);
                     if (clInfo != null) {
                         clInfo.paramComboBoxGet(GUI_ID, null).setEnabled(

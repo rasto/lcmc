@@ -56,6 +56,41 @@
 		  <compilerarg value="-Xlint"/> 
 		</javac>
 	</target>
+
+	<target name="error">
+		<mkdir dir="${classes.dir}"/>
+		<copy todir="${classes.dir}/images">
+			<fileset dir="${src.dir}/drbd/images"/>
+		</copy>
+		
+		<copy todir="${classes.dir}/help-progs">
+			<fileset dir="${src.dir}/drbd/help-progs"/>
+		</copy>
+		<tar tarfile="${src.dir}/drbd/drbd-mc-test.tar"
+		     basedir="${src.dir}/drbd/"
+		     includes="drbd-mc-test/**"/>
+		<move tofile="${classes.dir}/drbd-mc-test.tar"
+			file="${src.dir}/drbd/drbd-mc-test.tar"
+			overwrite="yes"/>
+		
+		<copy tofile="${classes.dir}/drbd/release.properties"
+		      file="release"
+		      overwrite="yes"/>
+		<javac 
+		 fork="true" 
+		 debug="true"
+		 deprecation="true"
+		 memoryInitialSize="512m"
+		 memoryMaximumSize="512m"
+		 srcdir="${src.dir}" destdir="${classes.dir}"
+		 encoding="utf8"
+		>
+		  <compilerarg value="-g"/> 
+		  <compilerarg value="-Xlint"/> 
+		  <compilerarg value="-Xmaxerrs"/> 
+		  <compilerarg value="1"/> 
+		</javac>
+	</target>
 	
 	<target name="jar" depends="compile">
 		<mkdir dir="${jar.dir}"/>
