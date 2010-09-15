@@ -202,7 +202,7 @@ public class VMSSoundInfo extends VMSHardwareInfo {
             if (vmsxml != null) {
                 parameters.put(SoundData.SAVED_MODEL,
                                getParamSaved(SoundData.MODEL));
-                final String domainName = 
+                final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);

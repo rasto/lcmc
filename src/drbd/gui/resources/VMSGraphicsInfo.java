@@ -27,7 +27,6 @@ import drbd.data.VMSXML;
 import drbd.data.VMSXML.GraphicsData;
 import drbd.data.Host;
 import drbd.data.ConfigData;
-import drbd.data.resources.Network;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 
@@ -42,7 +41,6 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.TreeSet;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import org.w3c.dom.Node;
@@ -195,7 +193,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     protected final Object[] getParamPossibleChoices(final String param) {
         if (GraphicsData.LISTEN.equals(param)) {
             Map<String, String> networksIntersection = null;
-            
+
             final List<Host> definedOnHosts =
                                 getVMSVirtualDomainInfo().getDefinedOnHosts();
             for (final Host host : definedOnHosts) {
@@ -207,7 +205,8 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
             commonNetworks.add(new StringInfo("All Interfaces/0.0.0.0",
                                               "0.0.0.0",
                                               null));
-            commonNetworks.add(new StringInfo("localhost/127.0.0.1", "127.0.0.1", null));
+            commonNetworks.add(new StringInfo("localhost/127.0.0.1",
+                                              "127.0.0.1", null));
             if (networksIntersection != null) {
                 for (final String netIp : networksIntersection.keySet()) {
                     final StringInfo network = new StringInfo(netIp,
@@ -216,7 +215,8 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
                     commonNetworks.add(network);
                 }
             }
-            return commonNetworks.toArray(new StringInfo[commonNetworks.size()]);
+            return commonNetworks.toArray(
+                                        new StringInfo[commonNetworks.size()]);
         } else if (GraphicsData.KEYMAP.equals(param)) {
             List<String> keymaps = null;
             final List<Host> definedOnHosts =
@@ -352,7 +352,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
             if (vmsxml != null) {
                 parameters.put(GraphicsData.SAVED_TYPE,
                                getParamSaved(GraphicsData.TYPE));
-                final String domainName = 
+                final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);

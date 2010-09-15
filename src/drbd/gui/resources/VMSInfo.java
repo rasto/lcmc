@@ -30,7 +30,6 @@ import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 
@@ -47,7 +46,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -279,7 +277,7 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */
-    protected final Map<Integer, Integer> getDefaultWidths(     
+    protected final Map<Integer, Integer> getDefaultWidths(
                                                       final String tableName) {
         return DEFAULT_WIDTHS;
     }

@@ -2287,7 +2287,7 @@ public final class Tools {
         /* find next space */
         String t = text;
         while (true) {
-            final int pos = t.indexOf(" ", width);
+            final int pos = t.indexOf(' ', width);
             if (pos > 0) {
                 out.append(t.substring(0, pos));
                 out.append('\n');

@@ -207,7 +207,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
                                getParamSaved(InputDevData.TYPE));
                 parameters.put(InputDevData.SAVED_BUS,
                                getParamSaved(InputDevData.BUS));
-                final String domainName = 
+                final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);

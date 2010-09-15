@@ -224,7 +224,7 @@ public class VMSVideoInfo extends VMSHardwareInfo {
             if (vmsxml != null) {
                 parameters.put(VideoData.SAVED_MODEL_TYPE,
                                getParamSaved(VideoData.MODEL_TYPE));
-                final String domainName = 
+                final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);

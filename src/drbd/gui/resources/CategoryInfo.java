@@ -22,7 +22,6 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
-import drbd.utilities.MyButton;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;

@@ -27,7 +27,6 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
 import javax.swing.SwingConstants;
 import java.awt.Color;
-import java.awt.Dimension;
 
 /**
  * Cells with jlabels, widths and colors.
@@ -41,7 +40,6 @@ public class MyButtonCellRenderer extends MyButton
      */
     public MyButtonCellRenderer() {
         super();
-        //final Dimension s = getPreferredSize();
     }
 
     /** Sets background color and padding in jlabels for every cell. */

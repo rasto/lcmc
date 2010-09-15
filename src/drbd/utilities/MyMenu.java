@@ -117,7 +117,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
                                + " (disabled)</b><br>available in \""
                                + advanced
                                + ConfigData.OP_MODES_MAP.get(
-                                                enableAccessMode.getAccessType())
+                                              enableAccessMode.getAccessType())
                                + "\" mode</html>");
             } else if (disableTooltip != null) {
                 setToolTipText("<html><b>"

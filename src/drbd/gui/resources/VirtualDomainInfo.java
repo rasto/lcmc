@@ -145,7 +145,7 @@ class VirtualDomainInfo extends ServiceInfo {
                     }
                     final int remotePort = vxml.getRemotePort(
                                                vmsVirtualDomainInfo.getName());
-                    if (remotePort <=0) {
+                    if (remotePort <= 0) {
                         return "remote port is not greater than 0";
                     }
                     return null;
@@ -190,7 +190,7 @@ class VirtualDomainInfo extends ServiceInfo {
                     }
                     final int remotePort = vxml.getRemotePort(
                                                vmsVirtualDomainInfo.getName());
-                    if (remotePort <=0) {
+                    if (remotePort <= 0) {
                         return "remote port is not greater than 0";
                     }
                     return null;
@@ -235,7 +235,7 @@ class VirtualDomainInfo extends ServiceInfo {
                     }
                     final int remotePort = vxml.getRemotePort(
                                                vmsVirtualDomainInfo.getName());
-                    if (remotePort <=0) {
+                    if (remotePort <= 0) {
                         return "remote port is not greater than 0";
                     }
                     return null;

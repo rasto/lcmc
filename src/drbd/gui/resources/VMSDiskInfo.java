@@ -22,7 +22,6 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
-import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.VMSXML.DiskData;
@@ -31,7 +30,6 @@ import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.utilities.SSH;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -40,14 +38,12 @@ import javax.swing.SwingUtilities;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
-import java.util.TreeSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import org.w3c.dom.Node;
@@ -383,7 +379,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                final String domainName = 
+                final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);

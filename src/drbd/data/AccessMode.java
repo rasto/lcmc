@@ -23,7 +23,7 @@
 package drbd.data;
 
 /**
- * This class holds access type and mode (advanced or not advanced)
+ * This class holds access type and mode (advanced or not advanced).
  *
  * @author Rasto Levrinc
  *

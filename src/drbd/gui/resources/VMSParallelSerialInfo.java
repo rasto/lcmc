@@ -22,7 +22,6 @@
 package drbd.gui.resources;
 
 import drbd.gui.Browser;
-import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 import drbd.data.VMSXML.ParallelSerialData;
@@ -311,13 +310,13 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             }
         });
         final Map<String, String> parameters = getHWParametersAndSave();
-        
+
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(ParallelSerialData.SAVED_TYPE,
                                getParamSaved(ParallelSerialData.TYPE));
-                final String domainName = 
+                final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);

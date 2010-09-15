@@ -322,7 +322,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
-                final String domainName = 
+                final String domainName =
                                     getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);

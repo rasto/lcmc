@@ -1198,19 +1198,4 @@ public class Info implements Comparable {
         }
         return object.toString();
     }
-
-    ///** Removes node. If it is selected, it will be deselected. */
-    //protected void removeNode(final DefaultMutableTreeNode node) {
-    //    SwingUtilities.invokeLater(new Runnable() {
-    //        public void run() {
-    //            if (node
-    //                == getBrowser().getTree().getLastSelectedPathComponent()) {
-    //                getBrowser().getTree().setSelectionPath(
-    //                 getBrowser().getTree().getSelectionPath().getParentPath().getParentPath());
-    //                //getBrowser().getTree().setSelectionRow(2);
-    //            }
-    //            node.removeFromParent();
-    //        }
-    //    });
-    //}
 }

@@ -372,7 +372,8 @@ public class HbConnectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getHeartbeatGraph().stopTestAnimation(getApplyButton());
+                getBrowser().getHeartbeatGraph().stopTestAnimation(
+                                                             getApplyButton());
                 getApplyButton().setToolTipText(null);
             }
 

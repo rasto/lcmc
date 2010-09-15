@@ -2395,7 +2395,7 @@ public class Host implements Serializable {
     }
 
     /** Returns color of this host. Null if it is default color. */
-    final public String getColor() {
+    public final String getColor() {
         if (savedColor == null || defaultColor == savedColor) {
             return null;
         }
@@ -2403,7 +2403,7 @@ public class Host implements Serializable {
     }
 
     /** Sets color of this host. Don't if it is default color. */
-    final public void setSavedColor(final String colorString) {
+    public final void setSavedColor(final String colorString) {
         try {
             savedColor = new Color(Integer.parseInt(colorString));
         } catch (java.lang.NumberFormatException e) {

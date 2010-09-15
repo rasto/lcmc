@@ -1008,7 +1008,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                         }
                         continue;
                     }
-                    final VMSSerialInfo v = (VMSSerialInfo) node.getUserObject();
+                    final VMSSerialInfo v =
+                                          (VMSSerialInfo) node.getUserObject();
                     if (serial.compareTo(v.getName()) < 0) {
                         break;
                     }
@@ -1113,7 +1114,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                         continue;
                     }
                     final VMSParallelInfo v =
-                                           (VMSParallelInfo) node.getUserObject();
+                                        (VMSParallelInfo) node.getUserObject();
                     System.out.println("parallel: " + parallel
                                        + " v: " + v);
                     if (parallel.compareTo(v.getName()) < 0) {
@@ -1461,20 +1462,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final JTable table = getTable(HEADER_TABLE);
         if (table != null) {
             newVMButton = getBrowser().getVMSInfo().getNewButton();
-            //if (getResource().isNew()) {
-            //    SwingUtilities.invokeLater(new Runnable() {
-            //        public void run() {
-            //            final Enumeration eee = getNode().children();
-            //            while (eee.hasMoreElements()) {
-            //                final DefaultMutableTreeNode node =
-            //                            (DefaultMutableTreeNode) eee.nextElement();
-            //                final VMSHardwareInfo vmshi =
-            //                                (VMSHardwareInfo) node.getUserObject();
-            //                vmshi.getApplyButton().setVisible(false);
-            //            }
-            //        }
-            //    });
-            //} 
             mainPanel.add(newVMButton);
             mainPanel.add(table.getTableHeader());
             mainPanel.add(table);
@@ -1531,7 +1518,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             String defaultValue = null;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
             if (host.isConnected()
-                && (getResource().isNew() 
+                && (getResource().isNew()
                     || (vmsxml != null
                         && vmsxml.getDomainNames().contains(
                                                         getDomainName())))) {
@@ -2879,11 +2866,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns true if the specified parameter is integer. */
     protected final boolean isInteger(final String param) {
-        if (VMSXML.VM_PARAM_VCPU.equals(param)) {
-            return true;
-        } else {
-            return false;
-        }
+        return VMSXML.VM_PARAM_VCPU.equals(param);
     }
 
     /** Returns true if the specified parameter is a label. */

@@ -2043,7 +2043,7 @@ public final class RoboTest {
         sleep(20000);
 
 
-        moveTo(robot, 720, 580); 
+        moveTo(robot, 720, 580);
         leftClick(robot); /* next */
         sleep(20000);
 
@@ -2053,7 +2053,7 @@ public final class RoboTest {
         leftClick(robot);
         sleep(1000);
 
-        moveTo(robot, 720, 580); 
+        moveTo(robot, 720, 580);
         leftClick(robot); /* next */
         sleep(20000);
 
@@ -2063,7 +2063,7 @@ public final class RoboTest {
         leftClick(robot);
         sleep(1000);
 
-        moveTo(robot, 720, 580); 
+        moveTo(robot, 720, 580);
         leftClick(robot); /* next */
         sleep(20000);
 

@@ -410,7 +410,7 @@ public class VMSXML extends XML {
         //    <type arch='i686' machine='pc-0.12'>hvm</type>
         //  </os>
         //</domain>
- 
+
         final String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
         namesConfigsMap.put(domainName, configName);
         /* build xml */
@@ -645,10 +645,10 @@ public class VMSXML extends XML {
     }
 
     /** Remove XML from some device. */
-    private final void removeXML(final String domainName,
-                                 final Map<String, String> parametersMap,
-                                 final String path,
-                                 final VirtualHardwareComparator vhc) {
+    private void removeXML(final String domainName,
+                           final Map<String, String> parametersMap,
+                           final String path,
+                           final VirtualHardwareComparator vhc) {
         final String configName = namesConfigsMap.get(domainName);
         if (configName == null) {
             return;
@@ -1085,7 +1085,7 @@ public class VMSXML extends XML {
                         parameterValues.put(name,
                                             VM_PARAM_EMULATOR,
                                             getText(deviceNode));
-                    } if ("input".equals(deviceNode.getNodeName())) {
+                    } else if ("input".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
                         final String bus = getAttribute(deviceNode, "bus");
                         if ("tablet".equals(type)) {
@@ -2157,7 +2157,7 @@ public class VMSXML extends XML {
     public class SoundData extends HardwareData {
         /* Model. */
         private final String model;
-        /** Model: ac97, es1370, pcspk, sb16 */
+        /** Model: ac97, es1370, pcspk, sb16. */
         public static final String MODEL = "model";
         /** Saved model. */
         public static final String SAVED_MODEL = "saved_model";

@@ -821,10 +821,9 @@ public class ClusterBrowser extends Browser {
             mVMSLock.release();
             updateVMS();
         }
-     }
+    }
 
-     /** Adds new vmsxml object to the hash. */
-            
+    /** Adds new vmsxml object to the hash. */
     public final void vmsXMLPut(final Host host, final VMSXML newVMSXML) {
         try {
             mVMSLock.acquire();
