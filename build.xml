@@ -11,6 +11,7 @@
 	
 	<target name="clean">
 		<delete dir="${build.dir}/classes/drbd/"/>
+		<delete dir="${jar.dir}"/>
 	</target>
 	
 	<target name="superclean">

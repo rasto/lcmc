@@ -1865,11 +1865,11 @@ public class ClusterBrowser extends Browser {
             }
         } else {
             if (service.getId() == null) {
-                final Iterator it = idToInfoHash.keySet().iterator();
+                final Iterator<String> it = idToInfoHash.keySet().iterator();
                 int index = 0;
                 while (it.hasNext()) {
                     final String id =
-                      idToInfoHash.get((String) it.next()).getService().getId();
+                      idToInfoHash.get(it.next()).getService().getId();
                     Pattern p;
                     if (csPmId == null) {
                         p = Pattern.compile("^(\\d+)$");

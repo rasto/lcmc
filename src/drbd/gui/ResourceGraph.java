@@ -531,7 +531,7 @@ public abstract class ResourceGraph {
     /**
      * Returns all resources.
      */
-    protected final Set infoToVertexKeySet() {
+    protected final Set<Info> infoToVertexKeySet() {
         return infoToVertexMap.keySet();
     }
 

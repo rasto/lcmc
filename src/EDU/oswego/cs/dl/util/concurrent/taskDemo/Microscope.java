@@ -18,6 +18,7 @@ import EDU.oswego.cs.dl.util.concurrent.*;
  **/
 
 public class Microscope extends JPanel {
+    private static final long serialVersionUID = 1L;
 
   /*
    * If true, the move finder uses a repeatable evaluation
@@ -310,6 +311,7 @@ public class Microscope extends JPanel {
 
 
   class BoardPanel extends Canvas implements MouseListener {
+    private static final long serialVersionUID = 1L;
     
     BoardPanel() { 
       setSize(new Dimension(Board.RANKS * CELL_SIZE + 5, 
