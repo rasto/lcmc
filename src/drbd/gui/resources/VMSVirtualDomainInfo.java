@@ -459,7 +459,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns browser object of this info. */
-    protected final ClusterBrowser getBrowser() {
+    public final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -1862,7 +1862,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                             (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSDiskInfo)) {
+            if (node.getUserObject() instanceof VMSDiskInfo) {
                 i++;
                 continue;
             }
@@ -1886,7 +1886,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                             (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSInterfaceInfo)) {
+            if (node.getUserObject() instanceof VMSDiskInfo
+                || node.getUserObject() instanceof VMSInterfaceInfo) {
                 i++;
                 continue;
             }
@@ -1911,7 +1912,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                             (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSInputDevInfo)) {
+            if (node.getUserObject() instanceof VMSDiskInfo
+                || node.getUserObject() instanceof VMSInterfaceInfo
+                || node.getUserObject() instanceof VMSInputDevInfo) {
                 i++;
                 continue;
             }
@@ -1936,7 +1939,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                             (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSGraphicsInfo)) {
+            if (node.getUserObject() instanceof VMSDiskInfo
+                || node.getUserObject() instanceof VMSInterfaceInfo
+                || node.getUserObject() instanceof VMSInputDevInfo
+                || node.getUserObject() instanceof VMSGraphicsInfo) {
                 i++;
                 continue;
             }
@@ -1961,7 +1967,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                             (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSSoundInfo)) {
+            if (node.getUserObject() instanceof VMSDiskInfo
+                || node.getUserObject() instanceof VMSInterfaceInfo
+                || node.getUserObject() instanceof VMSInputDevInfo
+                || node.getUserObject() instanceof VMSGraphicsInfo
+                || node.getUserObject() instanceof VMSSoundInfo) {
                 i++;
                 continue;
             }
@@ -1986,7 +1996,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                             (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSSerialInfo)) {
+            if (node.getUserObject() instanceof VMSDiskInfo
+                || node.getUserObject() instanceof VMSInterfaceInfo
+                || node.getUserObject() instanceof VMSInputDevInfo
+                || node.getUserObject() instanceof VMSGraphicsInfo
+                || node.getUserObject() instanceof VMSSoundInfo
+                || node.getUserObject() instanceof VMSSerialInfo) {
                 i++;
                 continue;
             }
@@ -2011,7 +2026,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                             (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSParallelInfo)) {
+            if (node.getUserObject() instanceof VMSDiskInfo
+                || node.getUserObject() instanceof VMSInterfaceInfo
+                || node.getUserObject() instanceof VMSInputDevInfo
+                || node.getUserObject() instanceof VMSGraphicsInfo
+                || node.getUserObject() instanceof VMSSoundInfo
+                || node.getUserObject() instanceof VMSSerialInfo
+                || node.getUserObject() instanceof VMSParallelInfo) {
                 i++;
                 continue;
             }
@@ -2031,19 +2052,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsvi);
         getBrowser().setNode(resource);
-        final Enumeration eee = getNode().children();
-        int i = 0;
-        while (eee.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                            (DefaultMutableTreeNode) eee.nextElement();
-            if (!(node.getUserObject() instanceof VMSVideoInfo)) {
-                i++;
-                continue;
-            }
-            break;
-        }
-
-        getNode().insert(resource, i);
+        /* all the way till the end */
+        getNode().add(resource);
         getBrowser().reload(getNode());
         vmsvi.selectMyself();
     }
@@ -2439,9 +2449,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         advancedSubmenu.add(destroyMenuItem);
     }
 
-    /**
-     * Adds vm domain suspend menu item.
-     */
+    /** Adds vm domain suspend menu item. */
     public final void addSuspendMenu(final MyMenu advancedSubmenu,
                                      final Host host) {
         final MyMenuItem suspendMenuItem = new MyMenuItem(
@@ -2772,7 +2780,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     return null;
                 }
 
-                public void action() {
+                public final void action() {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             getPopup().setVisible(false);

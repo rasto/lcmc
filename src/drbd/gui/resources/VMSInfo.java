@@ -21,6 +21,7 @@
  */
 package drbd.gui.resources;
 
+import drbd.AddVMConfigDialog;
 import drbd.gui.Browser;
 import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
@@ -251,6 +252,8 @@ public class VMSInfo extends CategoryInfo {
         getNode().add(resource);
         getBrowser().reload(getNode());
         vmsdi.selectMyself();
+        AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
+        avmcd.showDialogs();
     }
 
     /** Returns list of menu items for VM. */

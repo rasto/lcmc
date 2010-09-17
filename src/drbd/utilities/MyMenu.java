@@ -95,6 +95,11 @@ public class MyMenu extends JMenu implements UpdatableItem {
      */
     public void update() {
         processAccessMode();
+        for (final java.awt.Component m : getMenuComponents()) {
+            if (m instanceof UpdatableItem) {
+                ((UpdatableItem) m).update();
+            }
+        }
     }
 
     /** Sets this item enabled and visible according to its access type. */
