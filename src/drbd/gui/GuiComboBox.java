@@ -138,6 +138,8 @@ public class GuiComboBox extends JPanel {
     /** Name to component hash. */
     private final Map<String, JComponent> componentsHash =
                                              new HashMap<String, JComponent>();
+    /** group components lock. */
+    private final Mutex mComponentsLock = new Mutex();
     /** Nothing selected string, that returns null, if selected. */
     public static final String NOTHING_SELECTED =
                                 Tools.getString("GuiComboBox.NothingSelected");
@@ -519,6 +521,11 @@ public class GuiComboBox extends JPanel {
                                      final Object[] items) {
         final ButtonGroup group = new ButtonGroup();
         final JPanel radioPanel = new JPanel(new GridLayout(1, 1));
+        try {
+            mComponentsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         componentsHash.clear();
         for (int i = 0; i < items.length; i++) {
             final String item = items[i].toString();
@@ -539,6 +546,7 @@ public class GuiComboBox extends JPanel {
                 }
             });
         }
+        mComponentsLock.release();
 
         return radioPanel;
     }
@@ -551,11 +559,17 @@ public class GuiComboBox extends JPanel {
         enablePredicate = enabled;
         final boolean accessible =
                        Tools.getConfigData().isAccessible(enableAccessMode);
-        if (componentsHash.containsKey(s)) {
+        try {
+            mComponentsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final JComponent c = componentsHash.get(s);
+        mComponentsLock.release();
+        if (c != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    componentsHash.get(s).setEnabled(enablePredicate
-                                                     && accessible);
+                    c.setEnabled(enablePredicate && accessible);
                 }
             });
         }
@@ -569,8 +583,15 @@ public class GuiComboBox extends JPanel {
      * by specified string. This works only with RADIOGROUP in a moment.
      */
     public final void setVisible(final String s, final boolean visible) {
-        if (componentsHash.containsKey(s)) {
-            componentsHash.get(s).setVisible(visible);
+        try {
+            mComponentsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final JComponent c = componentsHash.get(s);
+        mComponentsLock.release();
+        if (c != null) {
+            c.setVisible(visible);
         }
     }
 
@@ -872,9 +893,15 @@ public class GuiComboBox extends JPanel {
                     label.setVisible(visible);
                 }
                 component.setVisible(visible);
+                try {
+                    mComponentsLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 for (final JComponent c : componentsHash.values()) {
                     c.setVisible(visible);
                 }
+                mComponentsLock.release();
                 switch(type) {
                     case TEXTFIELDWITHUNIT:
                         textFieldPart.setVisible(visible);
@@ -915,9 +942,15 @@ public class GuiComboBox extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 component.setEnabled(enabled);
+                try {
+                    mComponentsLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 for (final JComponent c : componentsHash.values()) {
                     c.setEnabled(enabled);
                 }
+                mComponentsLock.release();
                 switch(type) {
                     case TEXTFIELDWITHUNIT:
                         textFieldPart.setEnabled(enabled);
@@ -1004,9 +1037,17 @@ public class GuiComboBox extends JPanel {
 
             case RADIOGROUP:
                 if (item != null) {
+                    try {
+                        mComponentsLock.acquire();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                     final JRadioButton rb =
                                     (JRadioButton) componentsHash.get(item);
-                    rb.setSelected(true);
+                    mComponentsLock.release();
+                    if (rb != null) {
+                        rb.setSelected(true);
+                    }
                     radioGroupValue = (String) item;
                 }
                 break;
@@ -1197,9 +1238,15 @@ public class GuiComboBox extends JPanel {
                 break;
             case RADIOGROUP:
                 if (il != null) {
+                    try {
+                        mComponentsLock.acquire();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                     for (final JComponent c : componentsHash.values()) {
                         ((JRadioButton) c).addItemListener(il);
                     }
+                    mComponentsLock.release();
                 }
                 break;
             case CHECKBOX:
@@ -1307,9 +1354,15 @@ public class GuiComboBox extends JPanel {
                 break;
             case RADIOGROUP:
                 component.setBackground(backgroundColor);
+                try {
+                    mComponentsLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 for (final JComponent c : componentsHash.values()) {
                     c.setBackground(backgroundColor);
                 }
+                mComponentsLock.release();
                 break;
             case CHECKBOX:
                 component.setBackground(backgroundColor);
@@ -1535,9 +1588,15 @@ public class GuiComboBox extends JPanel {
                         break;
                     case RADIOGROUP:
                         component.setBackground(bg);
+                        try {
+                            mComponentsLock.acquire();
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
                         for (final JComponent c : componentsHash.values()) {
                             c.setBackground(bg);
                         }
+                        mComponentsLock.release();
                         break;
                     case CHECKBOX:
                         component.setBackground(bg);
