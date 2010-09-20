@@ -874,9 +874,11 @@ public final class RoboTest {
         sleep(4000);
         /* set clone max to 1 */
         moveTo(robot, 978, 381);
+        sleep(3000);
         leftClick(robot); /* Clone Max */
+        sleep(3000);
         press(robot, KeyEvent.VK_BACK_SPACE);
-        sleep(200);
+        sleep(3000);
         press(robot, KeyEvent.VK_1);
         setTimeouts(robot);
         moveTo(robot, 812, 179);
@@ -948,7 +950,9 @@ public final class RoboTest {
             removeEverything(robot);
         } else {
             removeResource(robot, ipX, ipY, -15);
+	    sleep(5000);
             removeGroup(robot, gx, gy, 0);
+	    sleep(5000);
             removeGroup(robot, statefulX, statefulY, -15);
         }
         if (!aborted) {
@@ -960,35 +964,43 @@ public final class RoboTest {
 
     /** Stop everything. */
     private static void stopEverything(final Robot robot) {
+	sleep(10000);
         moveTo(robot, 335, 129); /* advanced */
+	sleep(2000);
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 271, 568);
+        moveTo(robot, 671, 568);
         rightClick(robot); /* popup */
         sleep(3000);
-        moveTo(robot, 332, 644);
+        moveTo(robot, 732, 644);
         sleep(3000);
         leftClick(robot);
         moveTo(robot, 335, 129); /* not advanced */
+	sleep(2000);
         leftClick(robot);
+	sleep(2000);
     }
 
     /** Remove everything. */
     private static void removeEverything(final Robot robot) {
+	sleep(10000);
         moveTo(robot, 335, 129); /* advanced */
+	sleep(2000);
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 271, 568);
+        moveTo(robot, 671, 568);
         rightClick(robot); /* popup */
         sleep(3000);
-        moveTo(robot, 332, 674);
+        moveTo(robot, 732, 674);
         sleep(3000);
         leftClick(robot);
         confirmRemove(robot);
         sleep(3000);
         leftClick(robot);
         moveTo(robot, 335, 129); /* not advanced */
+	sleep(2000);
         leftClick(robot);
+	sleep(2000);
     }
 
     /** Disable stonith if it is enabled. */
@@ -1384,7 +1396,7 @@ public final class RoboTest {
 
     /** TEST 6. */
     private static void startTest6(final Robot robot, final Host host) {
-        slowFactor = 0.1f;
+        slowFactor = 0.2f;
         host.getSSH().installTestFiles(2);
         aborted = false;
         final int dummy1X = 235;
@@ -1424,17 +1436,17 @@ public final class RoboTest {
     private static void setLocation(final Robot robot, final Integer[] events) {
         moveTo(robot, 1041 , 615);
         leftClick(robot);
-        sleep(1000);
+        sleep(2000);
         for (final int ev : events) {
             if (ev == KeyEvent.VK_PLUS) {
                 robot.keyPress(KeyEvent.VK_SHIFT);
-                sleep(200);
+                sleep(400);
             }
             press(robot, ev);
-            sleep(200);
+            sleep(400);
             if (ev == KeyEvent.VK_PLUS) {
                 robot.keyRelease(KeyEvent.VK_SHIFT);
-                sleep(200);
+                sleep(400);
             }
         }
         moveTo(robot, 809, 192); /* ptest */
@@ -1565,7 +1577,7 @@ public final class RoboTest {
                                     final int corr) {
         moveTo(robot, x + 20, y);
         rightClick(robot);
-        sleep(60000);
+        sleep(120000);
         moveTo(robot, x + 40 , y + 250 + corr);
         leftClick(robot);
         confirmRemove(robot);
@@ -1596,7 +1608,9 @@ public final class RoboTest {
                                      final int y,
                                      final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        sleep(1000);
+        sleep(2000);
+        rightClick(robot); /* popup */
+        sleep(2000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 130 + yFactor);
         sleep(6000); /* ptest */
@@ -1665,10 +1679,12 @@ public final class RoboTest {
                                           final int y,
                                           final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        sleep(1000);
+        sleep(12000);
+        rightClick(robot); /* popup */
+        sleep(6000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 260 + yFactor);
-        sleep(6000); /* ptest */
+        sleep(12000); /* ptest */
         leftClick(robot); /* stop */
     }
 
