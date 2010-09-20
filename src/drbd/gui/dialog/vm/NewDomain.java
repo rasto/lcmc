@@ -47,11 +47,14 @@ public class NewDomain extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Configuration options of the new domain. */
-    private static final String[] PARAMS = {VMSXML.VM_PARAM_NAME};
+    private static final String[] PARAMS = {VMSXML.VM_PARAM_NAME,
+                                            VMSXML.VM_PARAM_VCPU,
+                                            VMSXML.VM_PARAM_CURRENTMEMORY,
+                                            VMSXML.VM_PARAM_BOOT,
+                                            VMSXML.VM_PARAM_ARCH,
+                                            VMSXML.VM_PARAM_EMULATOR};
 
-    /**
-     * Prepares a new <code>NewDomain</code> object.
-     */
+    /** Prepares a new <code>NewDomain</code> object. */
     public NewDomain(final WizardDialog previousDialog,
                     final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
@@ -68,18 +71,18 @@ public class NewDomain extends VMConfig {
 
     /**
      * Returns the title of the dialog. It is defined as
-     * Dialog.VMConfig.Resource.Title in TextResources.
+     * Dialog.VMConfig.Domain.Title in TextResources.
      */
     protected final String getDialogTitle() {
-        return Tools.getString("Dialog.VMConfig.Resource.Title");
+        return Tools.getString("Dialog.VMConfig.Domain.Title");
     }
 
     /**
      * Returns the description of the dialog. It is defined as
-     * Dialog.VMConfig.Resource.Description in TextResources.
+     * Dialog.VMConfig.Domain.Description in TextResources.
      */
     protected final String getDescription() {
-        return Tools.getString("Dialog.VMConfig.Resource.Description");
+        return Tools.getString("Dialog.VMConfig.Domain.Description");
     }
 
     /** Inits dialog. */

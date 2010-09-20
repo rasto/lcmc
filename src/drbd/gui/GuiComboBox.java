@@ -135,6 +135,9 @@ public class GuiComboBox extends JPanel {
     private static final int WIDGET_HEIGHT = 28;
     /** Widget enclosing component default height. */
     private static final int WIDGET_COMPONENT_HEIGHT = 30;
+    /** Radio group hash, from string that is displayed to the object. */
+    private final Map<String, Object> radioGroupHash =
+                                                 new HashMap<String, Object>();
     /** Name to component hash. */
     private final Map<String, JComponent> componentsHash =
                                              new HashMap<String, JComponent>();
@@ -528,21 +531,41 @@ public class GuiComboBox extends JPanel {
         }
         componentsHash.clear();
         for (int i = 0; i < items.length; i++) {
-            final String item = items[i].toString();
-            final JRadioButton rb = new JRadioButton(item);
-            componentsHash.put(item, rb);
-            rb.setActionCommand(item);
+            final Object item = items[i];
+            final JRadioButton rb = new JRadioButton(item.toString());
+            radioGroupHash.put(item.toString(), item);
+            rb.setActionCommand(item.toString());
             group.add(rb);
             radioPanel.add(rb);
 
-            if (items[i].equals(selectedValue)) {
+            String v;
+            if (item instanceof Info) {
+                v = ((Info) item).getStringValue();
+            } else {
+                v = item.toString();
+            }
+            componentsHash.put(v, rb);
+            if (v.equals(selectedValue)) {
                 rb.setSelected(true);
                 radioGroupValue = selectedValue;
             }
 
             rb.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    radioGroupValue = e.getActionCommand();
+                    try {
+                        mComponentsLock.acquire();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                    Object item = radioGroupHash.get(e.getActionCommand());
+                    mComponentsLock.release();
+                    String v;
+                    if (item instanceof Info) {
+                        v = ((Info) item).getStringValue();
+                    } else {
+                        v = item.toString();
+                    }
+                    radioGroupValue = v;
                 }
             });
         }
@@ -1048,7 +1071,11 @@ public class GuiComboBox extends JPanel {
                     if (rb != null) {
                         rb.setSelected(true);
                     }
-                    radioGroupValue = (String) item;
+                    if (item instanceof Info) {
+                        radioGroupValue = ((Info) item).getStringValue();
+                    } else {
+                        radioGroupValue = (String) item;
+                    }
                 }
                 break;
 

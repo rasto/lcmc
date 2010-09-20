@@ -123,9 +123,11 @@ public class ServiceInfo extends EditableInfo {
     /** Group info object of the group this service is in or null, if it is
      * not in any group. */
     private GroupInfo groupInfo = null;
+    /** Clone info object lock */
+    private final Mutex mCloneInfo = new Mutex();
     /** Master/Slave info object, if is null, it is not master/slave
      * resource. */
-    private CloneInfo cloneInfo = null;
+    private volatile CloneInfo cloneInfo = null;
     /** ResourceAgent object of the service, with name, ocf informations
      * etc. */
     private final ResourceAgent resourceAgent;
@@ -285,10 +287,11 @@ public class ServiceInfo extends EditableInfo {
         if (getService().isOrphaned()) {
             return false;
         }
-        if (cloneInfo != null
-            && !cloneInfo.checkResourceFieldsCorrect(
+        final CloneInfo ci = getCloneInfo();
+        if (ci != null
+            && !ci.checkResourceFieldsCorrect(
                                          param,
-                                         cloneInfo.getParametersFromXML())) {
+                                         ci.getParametersFromXML())) {
             /* the next super checkResourceFieldsCorrect must be run at
               least once. */
             ret = false;
@@ -296,7 +299,7 @@ public class ServiceInfo extends EditableInfo {
         if (!super.checkResourceFieldsCorrect(param, params)) {
             return false;
         }
-        if (cloneInfo == null) {
+        if (ci == null) {
             boolean on = false;
             for (Host host : getBrowser().getClusterHosts()) {
                 final HostInfo hi = host.getBrowser().getHostInfo();
@@ -351,10 +354,11 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         }
-        if (cloneInfo != null
-                   && cloneInfo.checkResourceFieldsChanged(
+        final CloneInfo ci = getCloneInfo();
+        if (ci != null
+                   && ci.checkResourceFieldsChanged(
                                            param,
-                                           cloneInfo.getParametersFromXML())) {
+                                           ci.getParametersFromXML())) {
             changed = true;
         }
         final String id = getComboBoxValue(GUI_ID);
@@ -705,7 +709,7 @@ public class ServiceInfo extends EditableInfo {
         if (cs.isOrphaned(getHeartbeatId(false))) {
             getService().setOrphaned(true);
             getService().setNew(false);
-            final CloneInfo ci = cloneInfo;
+            final CloneInfo ci = getCloneInfo();
             if (ci != null) {
                 ci.getService().setNew(false);
             }
@@ -1284,28 +1288,28 @@ public class ServiceInfo extends EditableInfo {
     protected void addCloneFields(final JPanel optionsPanel,
                                   final int leftWidth,
                                   final int rightWidth) {
-        cloneInfo.paramComboBoxClear();
+        final CloneInfo ci = getCloneInfo();
+        ci.paramComboBoxClear();
 
-        final String[] params = cloneInfo.getParametersFromXML();
-        final Info savedMAIdRef = cloneInfo.getSavedMetaAttrInfoRef();
-        cloneInfo.getResource().setValue(GUI_ID,
-                                         cloneInfo.getService().getId());
-        cloneInfo.addParams(optionsPanel,
-                            params,
-                            ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH,
-                            cloneInfo.getSameAsFields(savedMAIdRef));
-        if (!cloneInfo.getService().isNew()) {
-            cloneInfo.paramComboBoxGet(GUI_ID, null).setEnabled(false);
+        final String[] params = ci.getParametersFromXML();
+        final Info savedMAIdRef = ci.getSavedMetaAttrInfoRef();
+        ci.getResource().setValue(GUI_ID, ci.getService().getId());
+        ci.addParams(optionsPanel,
+                     params,
+                     ClusterBrowser.SERVICE_LABEL_WIDTH,
+                     ClusterBrowser.SERVICE_FIELD_WIDTH,
+                     ci.getSameAsFields(savedMAIdRef));
+        if (!ci.getService().isNew()) {
+            ci.paramComboBoxGet(GUI_ID, null).setEnabled(false);
         }
         for (final String param : params) {
-            if (cloneInfo.isMetaAttr(param)) {
-                final GuiComboBox cb = cloneInfo.paramComboBoxGet(param, null);
+            if (ci.isMetaAttr(param)) {
+                final GuiComboBox cb = ci.paramComboBoxGet(param, null);
                 cb.setEnabled(savedMAIdRef == null);
             }
         }
 
-        cloneInfo.addHostLocations(optionsPanel,
+        ci.addHostLocations(optionsPanel,
                                    ClusterBrowser.SERVICE_LABEL_WIDTH,
                                    ClusterBrowser.SERVICE_FIELD_WIDTH);
     }
@@ -1996,8 +2000,9 @@ public class ServiceInfo extends EditableInfo {
         if (isCheckBox(param)) {
             return crmXML.getCheckBoxChoices(resourceAgent, param);
         } else {
-            final boolean ms = cloneInfo != null
-                               && cloneInfo.getService().isMaster();
+            final CloneInfo ci = getCloneInfo();
+            final boolean ms = ci != null
+                               && ci.getService().isMaster();
             return crmXML.getParamPossibleChoices(resourceAgent, param, ms);
         }
     }
@@ -2131,51 +2136,53 @@ public class ServiceInfo extends EditableInfo {
             clone = true;
         }
 
+        final ServiceInfo thisClass = this;
         if (clone) {
             final CRMXML crmXML = getBrowser().getCRMXML();
-            final CloneInfo oldCI = cloneInfo;
+            final CloneInfo oldCI = getCloneInfo();
             String title = ConfigData.PM_CLONE_SET_NAME;
             if (masterSlave) {
                 title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
             }
-            cloneInfo = new CloneInfo(crmXML.getHbClone(),
-                                      title,
-                                      masterSlave,
-                                      getBrowser());
-            if (oldCI == null) {
-                getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
-                                                                     cloneInfo,
-                                                                     this);
-            } else {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getBrowser().getServicesNode().remove(oldCI.getNode());
-                    }
-                });
-                getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
-                                                                     cloneInfo,
-                                                                     oldCI);
-            }
-            cloneInfo.setCloneServicePanel(this);
-            infoPanel = null;
-            selectMyself();
-        } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
+            final CloneInfo ci = new CloneInfo(crmXML.getHbClone(),
+                                               title,
+                                               masterSlave,
+                                               getBrowser());
+            setCloneInfo(ci);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    cloneInfo.getNode().remove(getNode());
-                    getBrowser().getServicesNode().remove(cloneInfo.getNode());
+                    if (oldCI == null) {
+                        getBrowser().getHeartbeatGraph()
+                                    .exchangeObjectInTheVertex(ci, thisClass);
+                    } else {
+                        getBrowser().getServicesNode().remove(oldCI.getNode());
+                        getBrowser().getHeartbeatGraph()
+                                    .exchangeObjectInTheVertex(ci, oldCI);
+                        getBrowser().removeFromServiceInfoHash(oldCI);
+                    }
+                    ci.setCloneServicePanel(thisClass);
+                    infoPanel = null;
+                    selectMyself();
                 }
             });
-            getBrowser().getServicesNode().add(getNode());
-            getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
-                                                                    this,
-                                                                    cloneInfo);
-            getBrowser().getHeartbeatIdToServiceInfo().remove(
-                                    cloneInfo.getService().getHeartbeatId());
-            getBrowser().removeFromServiceInfoHash(cloneInfo);
-            cloneInfo = null;
-            infoPanel = null;
-            selectMyself();
+        } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
+            final CloneInfo ci = getCloneInfo();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ci.getNode().remove(getNode());
+                    getBrowser().getServicesNode().remove(ci.getNode());
+                    getBrowser().getServicesNode().add(getNode());
+                    getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
+                                                                     thisClass,
+                                                                     ci);
+                    getBrowser().getHeartbeatIdToServiceInfo().remove(
+                                            ci.getService().getHeartbeatId());
+                    getBrowser().removeFromServiceInfoHash(ci);
+                    infoPanel = null;
+                    setCloneInfo(null);
+                    selectMyself();
+                }
+            });
         }
     }
 
@@ -2373,10 +2380,11 @@ public class ServiceInfo extends EditableInfo {
      * Returns info panel with comboboxes for service parameters.
      */
     public JComponent getInfoPanel() {
-        if (cloneInfo == null) {
+        final CloneInfo ci = getCloneInfo();
+        if (ci == null) {
             getBrowser().getHeartbeatGraph().pickInfo(this);
         } else {
-            getBrowser().getHeartbeatGraph().pickInfo(cloneInfo);
+            getBrowser().getHeartbeatGraph().pickInfo(ci);
         }
         if (infoPanel != null) {
             return infoPanel;
@@ -2444,8 +2452,8 @@ public class ServiceInfo extends EditableInfo {
             }
         };
         initApplyButton(buttonCallback);
-        if (cloneInfo != null) {
-            cloneInfo.setApplyButton(getApplyButton());
+        if (ci != null) {
+            ci.setApplyButton(getApplyButton());
         }
         /* add item listeners to the apply button. */
         if (!abExisted) {
@@ -2483,16 +2491,16 @@ public class ServiceInfo extends EditableInfo {
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         JMenu serviceCombo;
-        if (cloneInfo == null) {
+        if (ci == null) {
             serviceCombo = getActionsMenu();
         } else {
-            serviceCombo = cloneInfo.getActionsMenu();
+            serviceCombo = ci.getActionsMenu();
         }
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
         String defaultValue = PRIMITIVE_TYPE_STRING;
-        if (cloneInfo != null) {
-            if (cloneInfo.getService().isMaster()) {
+        if (ci != null) {
+            if (ci.getService().isMaster()) {
                 defaultValue = MASTER_SLAVE_TYPE_STRING;
             } else {
                 defaultValue = CLONE_TYPE_STRING;
@@ -2537,7 +2545,7 @@ public class ServiceInfo extends EditableInfo {
             typeRadioGroup.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
             optionsPanel.add(tp);
         }
-        if (cloneInfo != null) {
+        if (ci != null) {
             /* add clone fields */
             addCloneFields(optionsPanel,
                            ClusterBrowser.SERVICE_LABEL_WIDTH,
@@ -2555,7 +2563,7 @@ public class ServiceInfo extends EditableInfo {
                   ClusterBrowser.SERVICE_LABEL_WIDTH,
                   ClusterBrowser.SERVICE_FIELD_WIDTH,
                   getSameAsFields(savedMAIdRef));
-        if (cloneInfo == null) {
+        if (ci == null) {
             /* score combo boxes */
             addHostLocations(optionsPanel,
                              ClusterBrowser.SERVICE_LABEL_WIDTH,
@@ -2586,10 +2594,10 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         /* add item listeners to the host scores combos */
-        if (cloneInfo == null) {
+        if (ci == null) {
             addHostLocationsListeners();
         } else {
-            cloneInfo.addHostLocationsListeners();
+            ci.addHostLocationsListeners();
         }
         /* apply button */
         addApplyButton(buttonPanel);
@@ -2702,6 +2710,7 @@ public class ServiceInfo extends EditableInfo {
                               new LinkedHashMap<String, Map<String, String>>();
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
+        final CloneInfo ci = getCloneInfo();
         for (final String op : ClusterBrowser.HB_OPERATIONS) {
             final Map<String, String> opHash =
                                            new LinkedHashMap<String, String>();
@@ -2716,7 +2725,7 @@ public class ServiceInfo extends EditableInfo {
             for (final String param : ClusterBrowser.HB_OPERATION_PARAM_LIST) {
                 if (getBrowser().getCRMOperationParams().get(op).contains(
                                                                        param)) {
-                    if (cloneInfo == null
+                    if (ci == null
                         && (ClusterBrowser.HB_OP_DEMOTE.equals(op)
                             || ClusterBrowser.HB_OP_PROMOTE.equals(op))) {
                         continue;
@@ -2795,9 +2804,11 @@ public class ServiceInfo extends EditableInfo {
         String[] cloneParams = null;
         boolean master = false;
         final GroupInfo gInfo = groupInfo;
-        CloneInfo ci = cloneInfo;
+        CloneInfo ci;
         String[] groupParams = null;
-        if (gInfo != null) {
+        if (gInfo == null) {
+            ci = getCloneInfo();
+        } else {
             ci = gInfo.getCloneInfo();
             groupParams = gInfo.getParametersFromXML();
         }
@@ -3312,8 +3323,9 @@ public class ServiceInfo extends EditableInfo {
             final Map<String, String> attrs =
                                           new LinkedHashMap<String, String>();
             attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
-            if (child.getCloneInfo() != null
-                && child.getCloneInfo().getService().isMaster()) {
+            final CloneInfo chCI = child.getCloneInfo();
+            if (chCI != null
+                && chCI.getService().isMaster()) {
                 attrs.put("first-action", "promote");
                 attrs.put("then-action", "start");
             }
@@ -3485,8 +3497,9 @@ public class ServiceInfo extends EditableInfo {
             final Map<String, String> attrs =
                                         new LinkedHashMap<String, String>();
             attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
-            if (parent.getCloneInfo() != null
-                && parent.getCloneInfo().getService().isMaster()) {
+            final CloneInfo pCI = parent.getCloneInfo();
+            if (pCI != null
+                && pCI.getService().isMaster()) {
                 attrs.put("with-rsc-role", "Master");
             }
             CRM.addColocation(dcHost,
@@ -3807,10 +3820,10 @@ public class ServiceInfo extends EditableInfo {
             setUpdated(true);
             getService().setRemoved(true);
         }
-        final CloneInfo ci = cloneInfo;
+        final CloneInfo ci = getCloneInfo();
         if (ci != null) {
             ci.removeMyselfNoConfirm(dcHost, testOnly);
-            cloneInfo = null;
+            setCloneInfo(null);
         }
 
         if (getService().isNew() && groupInfo == null) {
@@ -3952,7 +3965,13 @@ public class ServiceInfo extends EditableInfo {
      * Sets this service as part of a clone set.
      */
     public void setCloneInfo(final CloneInfo cloneInfo) {
+        try {
+            mCloneInfo.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         this.cloneInfo = cloneInfo;
+        mCloneInfo.release();
     }
 
     /**
@@ -3968,7 +3987,14 @@ public class ServiceInfo extends EditableInfo {
      * or null, if it is not in such set.
      */
     public CloneInfo getCloneInfo() {
-        return cloneInfo;
+        try {
+            mCloneInfo.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final CloneInfo ci = cloneInfo;
+        mCloneInfo.release();
+        return ci;
     }
 
     /** Adds existing service menu item for every member of a group. */
@@ -4487,8 +4513,8 @@ public class ServiceInfo extends EditableInfo {
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
-
-        if (cloneInfo == null) {
+        final CloneInfo ci = getCloneInfo();
+        if (ci == null) {
             addDependencyMenuItems(items, false, testOnly);
         }
         /* start resource */
@@ -4668,7 +4694,7 @@ public class ServiceInfo extends EditableInfo {
         addMouseOverListener(manageMenuItem, manageItemCallback);
         items.add((UpdatableItem) manageMenuItem);
         addMigrateMenuItems(items);
-        if (cloneInfo == null) {
+        if (ci == null) {
             /* remove service */
             final MyMenuItem removeMenuItem = new MyMenuItem(
                         Tools.getString("ClusterBrowser.Hb.RemoveService"),

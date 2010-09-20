@@ -161,7 +161,12 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     private static final Map<String, String> TARGET_BUS_TYPES =
                                                  new HashMap<String, String>();
     static {
-        POSSIBLE_VALUES.put(DiskData.TYPE, new String[]{"file", "block"});
+        POSSIBLE_VALUES.put(DiskData.TYPE,
+                            new StringInfo[]{
+                                 new StringInfo("Image file", "file", null),
+                                 new StringInfo("Disk/block device",
+                                                "block",
+                                                null)});
         POSSIBLE_VALUES.put(
                     DiskData.TARGET_BUS_TYPE,
                     new StringInfo[]{

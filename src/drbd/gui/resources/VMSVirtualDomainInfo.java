@@ -1045,7 +1045,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final List<String> parallelNames  = new ArrayList<String>();
         if (parallels != null) {
             for (final String d : parallels.keySet()) {
-                System.out.println("add parallel name: " + d);
                 parallelNames.add(d);
             }
         }
@@ -1115,8 +1114,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     final VMSParallelInfo v =
                                         (VMSParallelInfo) node.getUserObject();
-                    System.out.println("parallel: " + parallel
-                                       + " v: " + v);
                     if (parallel.compareTo(v.getName()) < 0) {
                         break;
                     }

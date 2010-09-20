@@ -1026,6 +1026,12 @@ public class TextResource extends
         {"ConfirmDialog.No",
          "No"},
 
+        {"Dialog.VMConfig.Domain.Title",
+         "Create a new virtual machine"},
+
+        {"Dialog.VMConfig.Domain.Description",
+         "In this step you can create a new virtual machine..."},
+
         {"EmptyBrowser.LoadMarkedClusters",
          "Connect Marked Clusters"},
 
@@ -1827,7 +1833,7 @@ public class TextResource extends
          "Parsing libvirt config..."},
 
         {"VMSInfo.AddNewDomain",
-         "Add New Domain"},
+         "Add New Virtual Machine"},
 
         {"VMSVirtualDomainInfo.Section.VirtualSystem",
          "Virtual System"},

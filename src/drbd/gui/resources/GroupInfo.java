@@ -560,9 +560,10 @@ public class GroupInfo extends ServiceInfo {
             super.removeMyselfNoConfirm(dcHost, testOnly);
             String cloneId = null;
             boolean master = false;
-            if (getCloneInfo() != null) {
-                cloneId = getCloneInfo().getHeartbeatId(testOnly);
-                master = getCloneInfo().getService().isMaster();
+            final CloneInfo ci = getCloneInfo();
+            if (ci != null) {
+                cloneId = ci.getHeartbeatId(testOnly);
+                master = ci.getService().isMaster();
             }
             CRM.removeResource(dcHost,
                                null,
