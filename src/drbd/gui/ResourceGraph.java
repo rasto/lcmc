@@ -1108,6 +1108,9 @@ public abstract class ResourceGraph {
             final PickedState ps = visualizationViewer.getPickedState();
             for (final Object vertex : ps.getPickedVertices()) {
                 // TODO: if vertex is removed a race condition can be here
+                if (vertex == null) {
+                    continue;
+                }
                 final Point2D p = layout.getLocation((Vertex) vertex);
                 vertexReleased((Vertex) vertex, p);
             }
