@@ -101,8 +101,8 @@ public class NewDomain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        getVMSVirtualDomainInfo().getResource().setValue(VMSXML.VM_PARAM_NAME,
-                                                         "test");
+        getVMSVirtualDomainInfo().getResource().setValue(VMSXML.VM_PARAM_BOOT,
+                                                         "cdrom");
         getVMSVirtualDomainInfo().addWizardParams(
                   optionsPanel,
                   PARAMS,

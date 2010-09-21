@@ -84,6 +84,7 @@ public class DrbdAvailFiles extends DialogHost {
         if (versions != null && versions.length != 0) {
             final String version = versions[versions.length - 1];
             drbdVersionCombo.reloadComboBox(version, versions);
+            Tools.waitForSwing();
         }
         final String selectedItem = drbdVersionCombo.getStringValue();
         if (selectedItem == null) {
@@ -120,25 +121,21 @@ public class DrbdAvailFiles extends DialogHost {
                                 }
                                 final String defaultValueCopy = defaultValue;
                                 drbdBuildCombo.clear();
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        drbdBuildCombo.reloadComboBox(
-                                                              defaultValueCopy,
+                                drbdBuildCombo.reloadComboBox(defaultValueCopy,
                                                               items);
-                                        final String selectedItem =
+                                Tools.waitForSwing();
+                                final String selectedItem =
                                                drbdBuildCombo.getStringValue();
-                                        drbdBuildCombo.setEnabled(true);
-                                        if (selectedItem == null) {
-                                            allDone();
-                                        } else {
-                                            getHost().setDrbdBuildToInstall(
+                                drbdBuildCombo.setEnabled(true);
+                                if (selectedItem == null) {
+                                    allDone();
+                                } else {
+                                    getHost().setDrbdBuildToInstall(
                                                                  selectedItem);
-                                            if (!listenersAdded) {
-                                                availFiles();
-                                            }
-                                        }
+                                    if (!listenersAdded) {
+                                        availFiles();
                                     }
-                                });
+                                }
                             }
 
                             public void doneError(final String ans,

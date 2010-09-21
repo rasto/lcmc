@@ -1458,11 +1458,16 @@ sub gui_test {
 			s/^\s+//;
 			s/\s+$//;
 			my $i = 1;
-			for my $host (@status_hosts) {
+			for my $host (@hosts) {
 				s/$host\b/host$i/gi;
 				$i++;
 			}
 		}
+	}
+	if ($status =~ /Online: \[\s+(.*?)\s+\]/) {
+		my @status_hosts = split /\s+/, $1;
+		my $online_hosts = join " ", sort @status_hosts;
+		$status =~ s/(Online: \[\s+).*?(\s+\])/$1$online_hosts$2/;
 	}
 	$cib =~ s/(start-delay="\d+") (timeout="\d+")/$2 $1/g;
 	$cib =~ s/(node)\s+\$id=".*?"/$1/g;

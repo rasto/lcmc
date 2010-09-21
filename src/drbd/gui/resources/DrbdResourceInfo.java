@@ -1044,6 +1044,7 @@ public class DrbdResourceInfo extends EditableInfo
                                      null,
                                      null,
                                      testOnly);
+        Tools.waitForSwing();
         ldi.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(ldi);
         fi.setLinbitDrbdInfo(ldi);
@@ -1059,9 +1060,7 @@ public class DrbdResourceInfo extends EditableInfo
     }
 
 
-    /**
-     * Remove drbddisk heartbeat service.
-     */
+    /** Remove drbddisk heartbeat service. */
     public final void removeDrbdDisk(final FilesystemInfo fi,
                                      final Host dcHost,
                                      final boolean testOnly) {

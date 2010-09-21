@@ -1865,16 +1865,18 @@ public class Host implements Serializable {
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
                 final String name = blockDevice.getName();
-                if (blockDevices.containsKey(name)) {
-                    /* get the existing block device object,
-                       forget the new one. */
-                    blockDevice = blockDevices.get(name);
-                    blockDevice.update(line);
-                }
-                newBlockDevices.put(name, blockDevice);
-                final Matcher m = bdP.matcher(name);
-                if (m.matches()) {
-                    newBlockDevices.remove(m.group(1));
+                if (name != null) {
+                    if (blockDevices.containsKey(name)) {
+                        /* get the existing block device object,
+                           forget the new one. */
+                        blockDevice = blockDevices.get(name);
+                        blockDevice.update(line);
+                    }
+                    newBlockDevices.put(name, blockDevice);
+                    final Matcher m = bdP.matcher(name);
+                    if (m.matches()) {
+                        newBlockDevices.remove(m.group(1));
+                    }
                 }
             } else if ("filesystems-info".equals(type)) {
                 addFileSystem(line);

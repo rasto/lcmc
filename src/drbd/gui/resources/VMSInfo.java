@@ -251,9 +251,19 @@ public class VMSInfo extends CategoryInfo {
         getBrowser().setNode(resource);
         getNode().add(resource);
         getBrowser().reload(getNode());
-        vmsdi.selectMyself();
-        AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
-        avmcd.showDialogs();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                vmsdi.getInfoPanel();
+                vmsdi.selectMyself();
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
+                        avmcd.showDialogs();
+                    }
+                });
+                t.start();
+            }
+        });
     }
 
     /** Returns list of menu items for VM. */

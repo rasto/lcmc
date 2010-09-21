@@ -102,7 +102,7 @@ public class BlockDevice extends Resource {
     public final void update(final String line) {
         final String[] cols = line.split(" ");
         if (cols.length < 2) {
-            Tools.appError("cannot parse line: " + line);
+            Tools.appWarning("cannot parse line: " + line);
         } else {
             final String device = cols[0];
             this.readlink = cols[1];

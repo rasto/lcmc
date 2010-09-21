@@ -734,8 +734,7 @@ public class DrbdInfo extends EditableInfo {
                 public void run() {
                     //reload(getNode());
                     getBrowser().reload(drbdResourceNode);
-                    AddDrbdConfigDialog adrd
-                        = new AddDrbdConfigDialog(driF);
+                    AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(driF);
                     adrd.showDialogs();
                     /* remove wizard parameters from hashes. */
                     for (final String p : bd1.getParametersFromXML()) {

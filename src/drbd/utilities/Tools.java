@@ -99,7 +99,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
-
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * This class provides tools, that are not classified.
@@ -2298,5 +2298,20 @@ public final class Tools {
         }
         out.append(t);
         return out.toString();
+    }
+
+    /** Wait for next swing threads to finish. It's used for synchronization */
+    public static void waitForSwing() {
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    /* just wait */
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException x) {
+            Tools.printStackTrace();
+        }
     }
 }
