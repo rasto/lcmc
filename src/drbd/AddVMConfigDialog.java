@@ -24,8 +24,7 @@ package drbd;
 import drbd.utilities.Tools;
 
 import drbd.gui.dialog.vm.VMConfig;
-import drbd.gui.dialog.vm.NewDomain;
-import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.dialog.vm.Domain;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 
 /**
@@ -49,7 +48,7 @@ public class AddVMConfigDialog {
 
     /** Shows step by step dialogs that add and configure new vm domain. */
     public final void showDialogs() {
-        VMConfig dialog = new NewDomain(null, vmsVirtualDomainInfo);
+        VMConfig dialog = new Domain(null, vmsVirtualDomainInfo);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final VMConfig newdialog = (VMConfig) dialog.showDialog();

@@ -34,7 +34,6 @@ import drbd.utilities.UpdatableItem;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import java.awt.Dimension;

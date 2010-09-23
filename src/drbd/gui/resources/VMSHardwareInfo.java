@@ -44,7 +44,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.JFileChooser;

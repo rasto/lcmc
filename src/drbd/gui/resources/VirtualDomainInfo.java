@@ -37,7 +37,6 @@ import java.util.TreeSet;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import javax.swing.SwingUtilities;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
