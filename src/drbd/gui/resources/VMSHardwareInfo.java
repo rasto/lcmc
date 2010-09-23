@@ -188,6 +188,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                             !getVMSVirtualDomainInfo().getResource().isNew());
         getApplyButton().setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;
+        infoPanelDone();
         return infoPanel;
     }
 

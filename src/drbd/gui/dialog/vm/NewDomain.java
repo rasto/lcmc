@@ -54,6 +54,9 @@ public class NewDomain extends VMConfig {
                                             VMSXML.VM_PARAM_ARCH,
                                             VMSXML.VM_PARAM_EMULATOR};
 
+    /** Installation disk dialog object. */
+    private NewInstallationDisk installationDisk = null;
+
     /** Prepares a new <code>NewDomain</code> object. */
     public NewDomain(final WizardDialog previousDialog,
                     final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
@@ -62,11 +65,11 @@ public class NewDomain extends VMConfig {
 
     /** Applies the changes and returns next dialog (BlockDev). */
     public final WizardDialog nextDialog() {
-        getVMSVirtualDomainInfo().apply(false);
-        //return new BlockDev(this,
-        //                    getVMSVirtualDomainInfo(),
-        //                    getVMSVirtualDomainInfo().getFirstBlockDevInfo());
-        return null;
+        if (installationDisk == null) {
+            installationDisk =
+                    new NewInstallationDisk(this, getVMSVirtualDomainInfo());
+        }
+        return installationDisk;
     }
 
     /**

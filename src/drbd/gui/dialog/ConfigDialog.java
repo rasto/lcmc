@@ -74,7 +74,7 @@ public abstract class ConfigDialog {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** The whole option pane. */
-    private JOptionPane optionPane;
+    private volatile JOptionPane optionPane;
     /** dialog panel. */
     private JDialog dialogPanel;
     /** Which button was pressed. */
@@ -458,14 +458,26 @@ public abstract class ConfigDialog {
             }
         }
         /* create option pane */
-        optionPane = new JOptionPane(
-                                body(),
-                                getMessageType(),
-                                JOptionPane.DEFAULT_OPTION,
-                                icon(),
-                                allOptions.toArray(
-                                            new JComponent[allOptions.size()]),
-                                defaultButtonClass);
+        final JPanel b = body();
+        final MyButton dbc = defaultButtonClass;
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    optionPane = new JOptionPane(
+                                            b,
+                                            getMessageType(),
+                                            JOptionPane.DEFAULT_OPTION,
+                                            icon(),
+                                            allOptions.toArray(
+                                             new JComponent[allOptions.size()]),
+                                            dbc);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final java.lang.reflect.InvocationTargetException x) {
+            Tools.printStackTrace();
+        }
         /* making non modal dialog */
         dialogGate = new CountDownLatch(1);
         optionPane.addPropertyChangeListener(new PropertyChangeListener() {

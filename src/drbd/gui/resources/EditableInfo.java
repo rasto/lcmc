@@ -360,7 +360,7 @@ public abstract class EditableInfo extends Info {
                 if (rpcb.getType() == GuiComboBox.Type.LABELFIELD) {
                     height = Tools.getDefaultInt("Browser.LabelFieldHeight");
                 }
-                rpcb.setValue(paramCb.getStringValue());
+                rpcb.setValueAndWait(paramCb.getStringValue());
             }
             final GuiComboBox realParamCb = rpcb;
             paramCb.addListeners(new ItemListener() {

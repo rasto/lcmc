@@ -1848,7 +1848,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual disk. */
-    public final void addDiskPanel() {
+    public final VMSDiskInfo addDiskPanel() {
         final VMSDiskInfo vmsdi = new VMSDiskInfo(null, getBrowser(), this);
         vmsdi.getResource().setNew(true);
         final DefaultMutableTreeNode resource =
@@ -1868,6 +1868,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         getNode().insert(resource, i);
         getBrowser().reload(getNode());
         vmsdi.selectMyself();
+        return vmsdi;
     }
 
     /** Adds new virtual interface. */

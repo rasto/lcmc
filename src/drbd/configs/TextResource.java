@@ -1032,6 +1032,12 @@ public class TextResource extends
         {"Dialog.VMConfig.Domain.Description",
          "In this step you can create a new virtual machine..."},
 
+        {"Dialog.VMConfig.InstallationDisk.Title",
+         "Installation Disk"},
+
+        {"Dialog.VMConfig.InstallationDisk.Description",
+         "Choose installation disk or image..."},
+
         {"EmptyBrowser.LoadMarkedClusters",
          "Connect Marked Clusters"},
 
