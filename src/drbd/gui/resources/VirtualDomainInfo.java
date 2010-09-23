@@ -152,11 +152,7 @@ class VirtualDomainInfo extends ServiceInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml != null && vvdi != null) {
@@ -197,11 +193,7 @@ class VirtualDomainInfo extends ServiceInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml != null && vvdi != null) {
@@ -242,11 +234,7 @@ class VirtualDomainInfo extends ServiceInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml != null && vvdi != null) {

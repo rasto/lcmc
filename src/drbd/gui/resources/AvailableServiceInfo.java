@@ -177,11 +177,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final ServicesInfo si = getBrowser().getServicesInfo();
                 final boolean testOnly = false;
                 si.addServicePanel(resourceAgent,

@@ -384,11 +384,7 @@ public class ConstraintPHInfo extends ServiceInfo {
             }
 
             public void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 removeMyself(false);
                 getBrowser().getHeartbeatGraph().repaint();
             }

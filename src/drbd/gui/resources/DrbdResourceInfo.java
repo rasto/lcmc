@@ -1342,11 +1342,7 @@ public class DrbdResourceInfo extends EditableInfo
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final String device = getDevice();
                 DrbdLogs l = new DrbdLogs(getCluster(), device);
                 l.showDialog();

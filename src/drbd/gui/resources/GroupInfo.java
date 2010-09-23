@@ -50,6 +50,7 @@ import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JScrollPane;
 import java.awt.geom.Point2D;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
@@ -85,8 +86,10 @@ public class GroupInfo extends ServiceInfo {
         final String oldHeartbeatId = getHeartbeatId(testOnly);
         if (!testOnly) {
             if (oldHeartbeatId != null) {
+                getBrowser().mHeartbeatIdToServiceLock();
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
                                                                oldHeartbeatId);
+                getBrowser().mHeartbeatIdToServiceUnlock();
             }
             if (getService().isNew()) {
                 final String id = getComboBoxValue(GUI_ID);
@@ -377,9 +380,7 @@ public class GroupInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns items for the group popup.
-     */
+    /** Returns items for the group popup. */
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = super.createPopup();
         final boolean testOnly = false;
@@ -389,6 +390,7 @@ public class GroupInfo extends ServiceInfo {
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
+            private final Mutex mUpdateLock = new Mutex();
 
             public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
@@ -399,9 +401,32 @@ public class GroupInfo extends ServiceInfo {
             }
 
             public void update() {
-                super.update();
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            if (mUpdateLock.attempt(0)) {
+                                updateThread();
+                                mUpdateLock.release();
+                            }
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
+                t.start();
+            }
 
-                removeAll();
+            private void updateThread() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        setEnabled(false);
+                    }
+                });
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeAll();
+                    }
+                });
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
@@ -422,15 +447,11 @@ public class GroupInfo extends ServiceInfo {
                                                   false)) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        final CloneInfo ci = getCloneInfo();
-                                        if (ci != null) {
-                                            ci.getPopup().setVisible(false);
-                                        }
-                                        getPopup().setVisible(false);
-                                    }
-                                });
+                                final CloneInfo ci = getCloneInfo();
+                                if (ci != null) {
+                                    ci.hidePopup();
+                                }
+                                hidePopup();
                                 if (ra.isLinbitDrbd()
                                     && !getBrowser()
                                                 .linbitDrbdConfirmDialog()) {
@@ -452,8 +473,14 @@ public class GroupInfo extends ServiceInfo {
                     } else {
                         classItem.add(jsp);
                     }
-                    add(classItem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            add(classItem);
+                        }
+                    });
                 }
+                Tools.waitForSwing();
+                super.update();
             }
         };
         items.add(0, (UpdatableItem) addGroupServiceMenuItem);
@@ -472,18 +499,54 @@ public class GroupInfo extends ServiceInfo {
                             new AccessMode(ConfigData.AccessType.RO, false),
                             new AccessMode(ConfigData.AccessType.RO, false)) {
                     private static final long serialVersionUID = 1L;
+                    private final Mutex mUpdateLock = new Mutex();
 
                     public String enablePredicate() {
                         return null;
                     }
 
                     public void update() {
-                        super.update();
-                        removeAll();
+                        final Thread t = new Thread(new Runnable() {
+                            public void run() {
+                                try {
+                                    if (mUpdateLock.attempt(0)) {
+                                        updateThread();
+                                        mUpdateLock.release();
+                                    }
+                                } catch (InterruptedException ie) {
+                                    Thread.currentThread().interrupt();
+                                }
+                            }
+                        });
+                        t.start();
+                    }
+
+                    public void updateThread() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                setEnabled(false);
+                            }
+                        });
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                removeAll();
+                            }
+                        });
+                        final List<UpdatableItem> serviceMenus =
+                                        new ArrayList<UpdatableItem>();
                         for (final UpdatableItem u : gsi.createPopup()) {
-                            add((JMenuItem) u);
+                            serviceMenus.add(u);
                             u.update();
                         }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                for (final UpdatableItem u
+                                                     : serviceMenus) {
+                                    add((JMenuItem) u);
+                                }
+                            }
+                        });
+                        super.update();
                     }
                 };
                 items.add((UpdatableItem) groupServicesMenu);

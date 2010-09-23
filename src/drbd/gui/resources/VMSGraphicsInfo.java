@@ -231,7 +231,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
                     final List<String> newKeymaps = new ArrayList<String>();
                     newKeymaps.add(null);
                     for (final String km : keymaps) {
-                        if (hostKeymaps.contains(km)) {
+                        if (km != null && hostKeymaps.contains(km)) {
                             newKeymaps.add(km);
                         }
                     }

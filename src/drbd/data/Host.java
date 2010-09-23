@@ -1022,11 +1022,10 @@ public class Host implements Serializable {
                     new ConvertCmdCallback() {
                         public final String convert(String command) {
                             for (final String tag : replaceHash.keySet()) {
-                                if (command.indexOf(tag) > -1) {
+                                if (tag != null && command.indexOf(tag) > -1) {
                                     command =
-                                        command.replaceAll(
-                                                        tag,
-                                                        replaceHash.get(tag));
+                                      command.replaceAll(tag,
+                                                         replaceHash.get(tag));
                                 }
                             }
                             return command;

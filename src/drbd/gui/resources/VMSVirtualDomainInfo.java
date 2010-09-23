@@ -2078,11 +2078,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addDiskPanel();
                     }
                 };
@@ -2097,11 +2093,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addInterfacePanel();
                     }
                 };
@@ -2116,11 +2108,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addInputDevPanel();
                     }
                 };
@@ -2135,11 +2123,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addGraphicsPanel();
                     }
                 };
@@ -2154,11 +2138,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addSoundsPanel();
                     }
                 };
@@ -2173,11 +2153,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addSerialsPanel();
                     }
                 };
@@ -2192,11 +2168,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addParallelsPanel();
                     }
                 };
@@ -2211,11 +2183,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addVideosPanel();
                     }
                 };
@@ -2250,11 +2218,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
                     start(host);
@@ -2291,11 +2255,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
                     shutdown(host);
@@ -2332,11 +2292,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
                     reboot(host);
@@ -2385,11 +2341,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
                     resume(host);
@@ -2432,11 +2384,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
                     destroy(host);
@@ -2478,11 +2426,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
                     suspend(host);
@@ -2526,11 +2470,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
                     resume(host);
@@ -2627,11 +2567,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             }
 
                             public void action() {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        getPopup().setVisible(false);
-                                    }
-                                });
+                                hidePopup();
                                 removeMyself(false);
                             }
         };
@@ -2688,11 +2624,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
 
                 public final void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
@@ -2733,11 +2665,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
 
                 public final void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
@@ -2778,11 +2706,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 }
 
                 public final void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(

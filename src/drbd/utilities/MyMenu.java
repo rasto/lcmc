@@ -24,6 +24,7 @@ package drbd.utilities;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import javax.swing.JMenu;
+import javax.swing.SwingUtilities;
 import java.awt.geom.Point2D;
 
 /**
@@ -49,7 +50,12 @@ public class MyMenu extends JMenu implements UpdatableItem {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         setOpaque(false);
-        processAccessMode(); //TODO: should not be called here
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                processAccessMode(); //TODO: should not be called here
+            }
+        });
+        t.start();
     }
 
     /**
@@ -94,12 +100,17 @@ public class MyMenu extends JMenu implements UpdatableItem {
      * items are to be updated.
      */
     public void update() {
-        processAccessMode();
-        for (final java.awt.Component m : getMenuComponents()) {
-            if (m instanceof UpdatableItem) {
-                ((UpdatableItem) m).update();
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                processAccessMode();
+                //for (final java.awt.Component m : getMenuComponents()) {
+                //    if (m instanceof UpdatableItem) {
+                //        ((UpdatableItem) m).update();
+                //    }
+                //}
             }
-        }
+        });
+        t.start();
     }
 
     /** Sets this item enabled and visible according to its access type. */
@@ -107,30 +118,39 @@ public class MyMenu extends JMenu implements UpdatableItem {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
-        setEnabled(disableTooltip == null && accessible);
-        setVisible(visiblePredicate()
-                   && Tools.getConfigData().isAccessible(visibleAccessMode));
-        String advanced = "";
-        if (enableAccessMode.isAdvancedMode()) {
-            advanced = "Advanced ";
-        }
-        if (isVisible()) {
-            if (!accessible && enableAccessMode.getAccessType()
-                               != ConfigData.AccessType.NEVER) {
-                setToolTipText("<html><b>"
-                               + getText()
-                               + " (disabled)</b><br>available in \""
-                               + advanced
-                               + ConfigData.OP_MODES_MAP.get(
-                                              enableAccessMode.getAccessType())
-                               + "\" mode</html>");
-            } else if (disableTooltip != null) {
-                setToolTipText("<html><b>"
-                               + getText()
-                               + " (disabled)</b><br>"
-                               + disableTooltip
-                               + "</html>");
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setEnabled(disableTooltip == null && accessible);
+                setVisible(visiblePredicate()
+                           && Tools.getConfigData().isAccessible(
+                                                           visibleAccessMode));
             }
+        });
+        if (isVisible()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (!accessible && enableAccessMode.getAccessType()
+                                       != ConfigData.AccessType.NEVER) {
+                        String advanced = "";
+                        if (enableAccessMode.isAdvancedMode()) {
+                            advanced = "Advanced ";
+                        }
+                        setToolTipText("<html><b>"
+                                       + getText()
+                                       + " (disabled)</b><br>available in \""
+                                       + advanced
+                                       + ConfigData.OP_MODES_MAP.get(
+                                              enableAccessMode.getAccessType())
+                                       + "\" mode</html>");
+                    } else if (disableTooltip != null) {
+                        setToolTipText("<html><b>"
+                                       + getText()
+                                       + " (disabled)</b><br>"
+                                       + disableTooltip
+                                       + "</html>");
+                    }
+                }
+            });
         }
     }
 }

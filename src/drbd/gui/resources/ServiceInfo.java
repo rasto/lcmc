@@ -1453,8 +1453,10 @@ public class ServiceInfo extends EditableInfo {
      */
     private boolean isMetaAttrReferenced() {
         final ClusterStatus cs = getBrowser().getClusterStatus();
+        getBrowser().mHeartbeatIdToServiceLock();
         final Map<String, ServiceInfo> services =
                                     getBrowser().getHeartbeatIdToServiceInfo();
+        getBrowser().mHeartbeatIdToServiceUnlock();
         for (final ServiceInfo si : services.values()) {
             final String refCRMId = cs.getMetaAttrsRef(
                                            si.getService().getHeartbeatId());
@@ -1528,8 +1530,11 @@ public class ServiceInfo extends EditableInfo {
      */
     private boolean isOperationReferenced() {
         final ClusterStatus cs = getBrowser().getClusterStatus();
+        //TODO: need to lock services
+        getBrowser().mHeartbeatIdToServiceLock();
         final Map<String, ServiceInfo> services =
                                     getBrowser().getHeartbeatIdToServiceInfo();
+        getBrowser().mHeartbeatIdToServiceUnlock();
         for (final ServiceInfo si : services.values()) {
             final String refCRMId = cs.getOperationsRef(
                                         si.getService().getHeartbeatId());
@@ -2175,8 +2180,10 @@ public class ServiceInfo extends EditableInfo {
                     getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
                                                                      thisClass,
                                                                      ci);
+                    getBrowser().mHeartbeatIdToServiceLock();
                     getBrowser().getHeartbeatIdToServiceInfo().remove(
                                             ci.getService().getHeartbeatId());
+                    getBrowser().mHeartbeatIdToServiceUnlock();
                     getBrowser().removeFromServiceInfoHash(ci);
                     infoPanel = null;
                     setCloneInfo(null);
@@ -2837,8 +2844,10 @@ public class ServiceInfo extends EditableInfo {
             getBrowser().removeFromServiceInfoHash(this);
             final String oldHeartbeatId = getHeartbeatId(testOnly);
             if (oldHeartbeatId != null) {
+                getBrowser().mHeartbeatIdToServiceLock();
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
                                                                oldHeartbeatId);
+                getBrowser().mHeartbeatIdToServiceUnlock();
             }
             if (getService().isNew()) {
                 final String id = getComboBoxValue(GUI_ID);
@@ -3948,8 +3957,10 @@ public class ServiceInfo extends EditableInfo {
      * Removes the service from some global hashes and lists.
      */
     public void removeInfo() {
+        getBrowser().mHeartbeatIdToServiceLock();
         getBrowser().getHeartbeatIdToServiceInfo().remove(
                                                 getService().getHeartbeatId());
+        getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
         super.removeMyself(false);
     }
@@ -4032,11 +4043,7 @@ public class ServiceInfo extends EditableInfo {
             public void action() {
                 final Thread thread = new Thread(new Runnable() {
                     public void run() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         addServicePanel(asi,
                                         null,
                                         colocationOnly,
@@ -4081,6 +4088,7 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
+            private final Mutex mUpdateLock = new Mutex();
 
             public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
@@ -4092,6 +4100,10 @@ public class ServiceInfo extends EditableInfo {
                 } else if (!enableForNew && getService().isNew()) {
                     return IS_NEW_STRING;
                 }
+                if (getBrowser().getExistingServiceList(thisClass).size()
+                    == 0) {
+                    return "&lt;&lt;empty;&gt;&gt;";
+                }
                 return null;
                 //return !getBrowser().clStatusFailed()
                 //       && !getService().isRemoved()
@@ -4101,8 +4113,32 @@ public class ServiceInfo extends EditableInfo {
             }
 
             public void update() {
-                super.update();
-                removeAll();
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            if (mUpdateLock.attempt(0)) {
+                                updateThread();
+                                mUpdateLock.release();
+                            }
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
+                t.start();
+            }
+
+            private void updateThread() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        setEnabled(false);
+                    }
+                });
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeAll();
+                    }
+                });
 
                 final DefaultListModel dlm = new DefaultListModel();
                 final Map<MyMenuItem, ButtonCallback> callbackHash =
@@ -4138,13 +4174,21 @@ public class ServiceInfo extends EditableInfo {
                                                                dlm,
                                                                list,
                                                                callbackHash);
-                if (jsp == null) {
-                    setEnabled(false);
-                } else {
-                    add(jsp);
-                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (jsp == null) {
+                            setEnabled(false);
+                        } else {
+                            add(jsp);
+                        }
+                    }
+                });
                 if (!colocationOnly && !orderOnly) {
-                    addSeparator();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            addSeparator();
+                        }
+                    });
                     /* colocation only */
                     final MyMenu colOnlyItem = getExistingServiceMenuItem(
                            Tools.getString("ClusterBrowser.Hb.ColOnlySubmenu"),
@@ -4152,7 +4196,11 @@ public class ServiceInfo extends EditableInfo {
                            false,
                            enableForNew,
                            testOnly);
-                    add(colOnlyItem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            add(colOnlyItem);
+                        }
+                    });
 
                     /* order only */
                     final MyMenu ordOnlyItem = getExistingServiceMenuItem(
@@ -4161,15 +4209,15 @@ public class ServiceInfo extends EditableInfo {
                            true,
                            enableForNew,
                            testOnly);
-                    add(ordOnlyItem);
-                    final Thread thread = new Thread(new Runnable() {
+                    SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            colOnlyItem.update();
-                            ordOnlyItem.update();
+                            add(ordOnlyItem);
                         }
                     });
-                    thread.start();
+                    colOnlyItem.update();
+                    ordOnlyItem.update();
                 }
+                super.update();
             }
         };
     }
@@ -4183,6 +4231,7 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
+            private final Mutex mUpdateLock = new Mutex();
 
             public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
@@ -4202,8 +4251,32 @@ public class ServiceInfo extends EditableInfo {
             }
 
             public void update() {
-                super.update();
-                removeAll();
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            if (mUpdateLock.attempt(0)) {
+                                updateThread();
+                                mUpdateLock.release();
+                            }
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
+                t.start();
+            }
+
+            private void updateThread() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                       setEnabled(false);
+                    }
+                });
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeAll();
+                    }
+                });
                 final Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();
                 final ResourceAgent fsService =
@@ -4222,11 +4295,7 @@ public class ServiceInfo extends EditableInfo {
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
+                            hidePopup();
                             if (!getBrowser().linbitDrbdConfirmDialog()) {
                                 return;
                             }
@@ -4244,12 +4313,16 @@ public class ServiceInfo extends EditableInfo {
                             getBrowser().getHeartbeatGraph().repaint();
                         }
                     };
-                    if (getBrowser().atLeastOneDrbddisk()
-                        || !crmXML.isLinbitDrbdPresent()) {
-                        ldMenuItem.setEnabled(false);
-                    }
-                    ldMenuItem.setPos(pos);
-                    add(ldMenuItem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (getBrowser().atLeastOneDrbddisk()
+                                || !crmXML.isLinbitDrbdPresent()) {
+                                ldMenuItem.setEnabled(false);
+                            }
+                            ldMenuItem.setPos(pos);
+                            add(ldMenuItem);
+                        }
+                    });
                 }
                 if (crmXML.isDrbddiskPresent()) { /* just skip it,
                                                      if it is not */
@@ -4263,11 +4336,7 @@ public class ServiceInfo extends EditableInfo {
                      new AccessMode(ConfigData.AccessType.OP, false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
+                            hidePopup();
                             final FilesystemInfo fsi = (FilesystemInfo)
                                                            addServicePanel(
                                                                 fsService,
@@ -4281,12 +4350,16 @@ public class ServiceInfo extends EditableInfo {
                             getBrowser().getHeartbeatGraph().repaint();
                         }
                     };
-                    if (getBrowser().isOneLinbitDrbd()
-                        || !crmXML.isDrbddiskPresent()) {
-                        ddMenuItem.setEnabled(false);
-                    }
-                    ddMenuItem.setPos(pos);
-                    add(ddMenuItem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (getBrowser().isOneLinbitDrbd()
+                                || !crmXML.isDrbddiskPresent()) {
+                                ddMenuItem.setEnabled(false);
+                            }
+                            ddMenuItem.setPos(pos);
+                            add(ddMenuItem);
+                        }
+                    });
                 }
                 final ResourceAgent ipService = crmXML.getResourceAgent(
                                                      "IPaddr2",
@@ -4303,11 +4376,7 @@ public class ServiceInfo extends EditableInfo {
                                                     false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
+                            hidePopup();
                             addServicePanel(ipService,
                                             getPos(),
                                             colocationOnly,
@@ -4319,7 +4388,11 @@ public class ServiceInfo extends EditableInfo {
                         }
                     };
                     ipMenuItem.setPos(pos);
-                    add(ipMenuItem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            add(ipMenuItem);
+                        }
+                    });
                 }
                 if (fsService != null) { /* just skip it, if it is not*/
                     final MyMenuItem fsMenuItem =
@@ -4332,11 +4405,7 @@ public class ServiceInfo extends EditableInfo {
                                                     false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
+                            hidePopup();
                             addServicePanel(fsService,
                                             getPos(),
                                             colocationOnly,
@@ -4348,7 +4417,11 @@ public class ServiceInfo extends EditableInfo {
                         }
                     };
                     fsMenuItem.setPos(pos);
-                    add(fsMenuItem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            add(fsMenuItem);
+                        }
+                    });
                 }
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem = new MyMenu(
@@ -4368,11 +4441,7 @@ public class ServiceInfo extends EditableInfo {
                                                     false)) {
                             private static final long serialVersionUID = 1L;
                             public void action() {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        getPopup().setVisible(false);
-                                    }
-                                });
+                                hidePopup();
                                 if (ra.isLinbitDrbd()
                                     &&
                                      !getBrowser().linbitDrbdConfirmDialog()) {
@@ -4399,37 +4468,49 @@ public class ServiceInfo extends EditableInfo {
                                               dlm,
                                               new MyList(dlm, getBackground()),
                                               null);
-                    if (jsp == null) {
-                        classItem.setEnabled(false);
-                    } else {
-                        classItem.add(jsp);
-                    }
-                    add(classItem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (jsp == null) {
+                                classItem.setEnabled(false);
+                            } else {
+                                classItem.add(jsp);
+                            }
+                            add(classItem);
+                        }
+                    });
                 }
                 if (!colocationOnly && !orderOnly) {
-                    addSeparator();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            addSeparator();
+                        }
+                    });
                     /* colocation only */
                     final MyMenu colOnlyitem = getAddServiceMenuItem(
                             testOnly,
                             Tools.getString("ClusterBrowser.Hb.ColOnlySubmenu"),
                             true,
                             false);
-                    add(colOnlyitem);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            add(colOnlyitem);
+                        }
+                    });
                     /* order only */
                     final MyMenu ordOnlyItem = getAddServiceMenuItem(
                             testOnly,
                             Tools.getString("ClusterBrowser.Hb.OrdOnlySubmenu"),
                             false,
                             true);
-                    add(ordOnlyItem);
-                    final Thread thread = new Thread(new Runnable() {
+                    SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            colOnlyitem.update();
-                            ordOnlyItem.update();
+                            add(ordOnlyItem);
                         }
                     });
-                    thread.start();
+                    colOnlyitem.update();
+                    ordOnlyItem.update();
                 }
+                super.update();
             }
         };
     }
@@ -4466,11 +4547,7 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     final StringInfo gi = new StringInfo(
                                             ConfigData.PM_GROUP_NAME,
                                             ConfigData.PM_GROUP_NAME,
@@ -4540,11 +4617,7 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     startResource(getBrowser().getDCHost(), testOnly);
                 }
             };
@@ -4580,11 +4653,7 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     stopResource(getBrowser().getDCHost(), testOnly);
                 }
             };
@@ -4630,11 +4699,7 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     cleanupResource(getBrowser().getDCHost(), testOnly);
                 }
             };
@@ -4671,11 +4736,7 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     if (this.getText().equals(Tools.getString(
                                     "ClusterBrowser.Hb.ManageResource"))) {
                         setManaged(true, getBrowser().getDCHost(), testOnly);
@@ -4737,11 +4798,7 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     if (getService().isOrphaned()) {
                         cleanupResource(getBrowser().getDCHost(), testOnly);
                     } else {
@@ -4782,11 +4839,7 @@ public class ServiceInfo extends EditableInfo {
             }
 
             public void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 ServiceLogs l = new ServiceLogs(getBrowser().getCluster(),
                                                 getNameForLog(),
                                                 getService().getHeartbeatId());
@@ -4874,11 +4927,7 @@ public class ServiceInfo extends EditableInfo {
                     }
 
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         migrateResource(hostName,
                                         getBrowser().getDCHost(),
                                         testOnly);
@@ -4921,11 +4970,7 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public void action() {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getPopup().setVisible(false);
-                        }
-                    });
+                    hidePopup();
                     unmigrateResource(getBrowser().getDCHost(), testOnly);
                 }
             };
@@ -4993,11 +5038,7 @@ public class ServiceInfo extends EditableInfo {
                     }
 
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         migrateFromResource(getBrowser().getDCHost(),
                                             testOnly);
                     }
@@ -5061,11 +5102,7 @@ public class ServiceInfo extends EditableInfo {
                     }
 
                     public void action() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getPopup().setVisible(false);
-                            }
-                        });
+                        hidePopup();
                         forceMigrateResource(hostName,
                                              getBrowser().getDCHost(),
                                              testOnly);

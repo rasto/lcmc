@@ -47,6 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SwingUtilities;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class holds clone service info object.
@@ -558,13 +559,34 @@ public class CloneInfo extends ServiceInfo {
                                      new AccessMode(ConfigData.AccessType.RO,
                                                     false)) {
             private static final long serialVersionUID = 1L;
+            private final Mutex mUpdateLock = new Mutex();
 
             public String enablePredicate() {
                 return null;
             }
 
             public void update() {
-                super.update();
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            if (mUpdateLock.attempt(0)) {
+                                updateThread();
+                                mUpdateLock.release();
+                            }
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
+                t.start();
+            }
+
+            private void updateThread() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        setEnabled(false);
+                    }
+                });
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         removeAll();
@@ -578,6 +600,7 @@ public class CloneInfo extends ServiceInfo {
                         }
                     });
                 }
+                super.update();
             }
         };
         items.add((UpdatableItem) csMenu);

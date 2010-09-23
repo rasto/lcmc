@@ -75,6 +75,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.lang.reflect.InvocationTargetException;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
@@ -485,33 +486,17 @@ public class Info implements Comparable {
         return null;
     }
 
-    /**
-     * Shows the popup on the specified coordinates.
-     */
+    /** Shows the popup on the specified coordinates. */
     public final void showPopup(final JComponent c,
                                 final int x,
                                 final int y) {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
-                final JPopupMenu empty = new JPopupMenu();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        empty.add(new JMenuItem("wait for popup..."));
-                        empty.show(c, x, y);
-                    }
-                });
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            empty.setVisible(false);
                             pm.show(c, x, y);
-                        }
-                    });
-                } else {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            empty.setVisible(false);
                         }
                     });
                 }
@@ -534,6 +519,23 @@ public class Info implements Comparable {
         return null;
     }
 
+    /** Returns popup object without updating. */
+    public final void hidePopup() {
+        try {
+            mPopupLock.acquire();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final JPopupMenu popup0 = popup;
+        mPopupLock.release();
+        if (popup0 != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    popup0.setVisible(false);
+                }
+            });
+        }
+    }
     /**
      * Returns the popup widget. The createPopup must be defined with menu
      * items.
@@ -546,11 +548,25 @@ public class Info implements Comparable {
         }
         if (popup == null) {
             final List<UpdatableItem> items = createPopup();
-            registerAllMenuItems(items);
             if (items != null) {
-                popup = new JPopupMenu();
+                registerAllMenuItems(items);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            popup = new JPopupMenu();
+                        }
+                    });
+                } catch (final InterruptedException ix) {
+                    Thread.currentThread().interrupt();
+                } catch (final InvocationTargetException x) {
+                    Tools.printStackTrace();
+                }
                 for (final UpdatableItem u : items) {
-                    popup.add((JMenuItem) u);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            popup.add((JMenuItem) u);
+                        }
+                    });
                 }
             }
         }
@@ -562,9 +578,7 @@ public class Info implements Comparable {
         return popup0;
     }
 
-    /**
-     * Returns popup on the spefified position.
-     */
+    /** Returns popup on the spefified position. */
     public final JPopupMenu getPopup(final Point2D pos) {
         try {
             mPopupLock.acquire();
@@ -572,16 +586,34 @@ public class Info implements Comparable {
             Thread.currentThread().interrupt();
         }
         if (popup == null) {
-            popup = new JPopupMenu();
             final List<UpdatableItem> items = createPopup();
-            registerAllMenuItems(items);
-            for (final UpdatableItem u : items) {
-                popup.add((JMenuItem) u);
+            if (items != null) {
+                registerAllMenuItems(items);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            popup = new JPopupMenu();
+                        }
+                    });
+                } catch (final InterruptedException ix) {
+                    Thread.currentThread().interrupt();
+                } catch (final InvocationTargetException x) {
+                    Tools.printStackTrace();
+                }
+                for (final UpdatableItem u : items) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            popup.add((JMenuItem) u);
+                        }
+                    });
+                }
             }
         }
         final JPopupMenu popup0 = popup;
         mPopupLock.release();
-        updateMenus(pos);
+        if (popup0 != null) {
+            updateMenus(pos);
+        }
         return popup0;
     }
 
@@ -700,9 +732,7 @@ public class Info implements Comparable {
         return menu;
     }
 
-    /**
-     * Force popup to be recreated.
-     */
+    /** Force popup to be recreated. */
     protected final void resetPopup() {
         try {
             mPopupLock.acquire();
@@ -713,9 +743,7 @@ public class Info implements Comparable {
         mPopupLock.release();
     }
 
-    /**
-     * Update menus with positions and calles their update methods.
-     */
+    /** Update menus with positions and calles their update methods. */
     public void updateMenus(final Point2D pos) {
         if (menuList != null) {
             try {

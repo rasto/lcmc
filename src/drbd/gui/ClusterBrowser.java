@@ -147,6 +147,8 @@ public class ClusterBrowser extends Browser {
     /** drbd resource device string to drbd resource info hash. */
     private final Map<String, DrbdResourceInfo> drbdDevHash =
                                 new HashMap<String, DrbdResourceInfo>();
+    /** Heartbeat id to service lock. */
+    private final Mutex mHeartbeatIdToService = new Mutex();
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo =
                                           new HashMap<String, ServiceInfo>();
@@ -499,12 +501,19 @@ public class ClusterBrowser extends Browser {
      */
     public final boolean atLeastOneDrbddisk() {
         /* TODO: need to lock it. */
+        try {
+            mHeartbeatIdToService.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         for (final String id : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
             if (si.getResourceAgent().isDrbddisk()) {
+                mHeartbeatIdToService.release();
                 return true;
             }
         }
+        mHeartbeatIdToService.release();
         return false;
     }
 
@@ -512,12 +521,19 @@ public class ClusterBrowser extends Browser {
      * Returns whether there is at least one drbddisk resource.
      */
     public final boolean isOneLinbitDrbd() {
+        try {
+            mHeartbeatIdToService.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         for (final String id : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
             if (si.getResourceAgent().isLinbitDrbd()) {
+                mHeartbeatIdToService.release();
                 return true;
             }
         }
+        mHeartbeatIdToService.release();
         return false;
     }
 
@@ -1650,17 +1666,33 @@ public class ClusterBrowser extends Browser {
         nodeChanged(servicesNode);
     }
 
-    /**
-     * Returns ServiceInfo object from crm id.
-     */
+    /** Returns ServiceInfo object from crm id. */
     public final ServiceInfo getServiceInfoFromCRMId(final String crmId) {
-        // TODO: need to lock heartbeatIdToServiceInfo
-        return heartbeatIdToServiceInfo.get(crmId);
+        try {
+            mHeartbeatIdToService.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        final ServiceInfo si = heartbeatIdToServiceInfo.get(crmId);
+        mHeartbeatIdToService.release();
+        return si;
     }
 
-    /**
-     * Returns heartbeatIdToServiceInfo hash .
-     */
+    /** Locks heartbeatIdToServiceInfo hash. */
+    public final void mHeartbeatIdToServiceLock() {
+        try {
+            mHeartbeatIdToService.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /** Unlocks heartbeatIdToServiceInfo hash. */
+    public final void mHeartbeatIdToServiceUnlock() {
+        mHeartbeatIdToService.release();
+    }
+
+    /** Returns heartbeatIdToServiceInfo hash. You have to lock it. */
     public final Map<String, ServiceInfo> getHeartbeatIdToServiceInfo() {
         return heartbeatIdToServiceInfo;
     }
@@ -1812,11 +1844,23 @@ public class ClusterBrowser extends Browser {
                 newPmId = pmId + id;
                 si.getService().setHeartbeatId(newPmId);
             }
+            try {
+                mHeartbeatIdToService.acquire();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             heartbeatIdToServiceInfo.put(newPmId, si);
+            mHeartbeatIdToService.release();
         } else {
+            try {
+                mHeartbeatIdToService.acquire();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             if (heartbeatIdToServiceInfo.get(pmId) == null) {
                 heartbeatIdToServiceInfo.put(pmId, si);
             }
+            mHeartbeatIdToService.release();
         }
     }
 
@@ -1825,12 +1869,18 @@ public class ClusterBrowser extends Browser {
      * This is usefull if something have changed.
      */
     public final void resetFilesystems() {
+        try {
+            mHeartbeatIdToService.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         for (String hbId : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
             if (si.getName().equals("Filesystem")) {
                 si.setInfoPanel(null);
             }
         }
+        mHeartbeatIdToService.release();
     }
 
     /**
@@ -2456,7 +2506,13 @@ public class ClusterBrowser extends Browser {
         promoted. */
     public final boolean isOneMaster(final List<String> rscs) {
         for (final String id : rscs) {
+            try {
+                mHeartbeatIdToService.acquire();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
+            mHeartbeatIdToService.release();
             if (si.getService().isMaster()) {
                 return true;
             }

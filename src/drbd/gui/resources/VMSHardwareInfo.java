@@ -310,11 +310,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             }
 
             public void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getPopup().setVisible(false);
-                    }
-                });
+                hidePopup();
                 removeMyself(false);
             }
         };

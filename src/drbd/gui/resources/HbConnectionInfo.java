@@ -505,7 +505,7 @@ public class HbConnectionInfo extends EditableInfo {
      * Creates popup menu for heartbeat order and colocation dependencies.
      * These are the edges in the graph.
      */
-    public final List<UpdatableItem> createPopup() {
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         final HbConnectionInfo thisClass = this;

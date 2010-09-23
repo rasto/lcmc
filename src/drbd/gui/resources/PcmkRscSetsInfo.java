@@ -27,6 +27,7 @@ import drbd.gui.SpringUtilities;
 import drbd.data.Host;
 import drbd.data.CRMXML;
 import drbd.utilities.Tools;
+import drbd.utilities.UpdatableItem;
 import drbd.utilities.CRM;
 
 import javax.swing.JComponent;
@@ -307,5 +308,12 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
         mConstraintPHLock.release();
         //TODO: have to chech changed and correct separately
         return super.checkResourceFields(param, params) || oneIsNew;
+    }
+
+    /** Return list of popup items. */
+    public final List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = super.createPopup();
+        // TODO: make submenus for all cphis
+        return items;
     }
 }

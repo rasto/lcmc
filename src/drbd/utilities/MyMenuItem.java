@@ -32,6 +32,7 @@ import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
+import javax.swing.SwingUtilities;
 
 import java.awt.MouseInfo;
 import java.awt.Robot;
@@ -136,7 +137,12 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        processAccessMode(); //TODO: should not be called here
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                processAccessMode(); //TODO: should not be called here
+            }
+        });
+        t.start();
     }
 
     /**
@@ -242,24 +248,39 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * Updates the menu item, checking the predicate and enablePredicate.
      */
     public final void update() {
-        if (predicate()) {
-            setText(text1);
-            if (icon1 != null) {
-                setIcon(icon1);
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                if (predicate()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            setText(text1);
+                            if (icon1 != null) {
+                                setIcon(icon1);
+                            }
+                            if (shortDesc1 != null
+                                && !shortDesc1.equals(text1)) {
+                                toolTip.setTipText(shortDesc1);
+                            }
+                        }
+                    });
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            setText(text2);
+                            if (icon1 != null) { /* icon1 is here on purpose */
+                                setIcon(icon2);
+                            }
+                            if (shortDesc2 != null
+                                && !shortDesc1.equals(text2)) {
+                                toolTip.setTipText(shortDesc2);
+                            }
+                        }
+                    });
+                }
+                processAccessMode();
             }
-            if (shortDesc1 != null && !shortDesc1.equals(text1)) {
-                toolTip.setTipText(shortDesc1);
-            }
-        } else {
-            setText(text2);
-            if (icon1 != null) { /* icon1 is here on purpose */
-                setIcon(icon2);
-            }
-            if (shortDesc2 != null && !shortDesc1.equals(text2)) {
-                toolTip.setTipText(shortDesc2);
-            }
-        }
-        processAccessMode();
+        });
+        t.start();
     }
 
     /** Sets this item enabled and visible according to its access type. */
@@ -267,30 +288,39 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
-        setEnabled(disableTooltip == null && accessible);
-        setVisible(visiblePredicate()
-                   && Tools.getConfigData().isAccessible(visibleAccessMode));
-        String advanced = "";
-        if (enableAccessMode.isAdvancedMode()) {
-            advanced = "Advanced ";
-        }
-        if (isVisible()) {
-            if (!accessible && enableAccessMode.getAccessType()
-                               != ConfigData.AccessType.NEVER) {
-                setToolTipText("<html><b>"
-                               + getText()
-                               + " (disabled)</b><br>available in \""
-                               + advanced
-                               + ConfigData.OP_MODES_MAP.get(
-                                             enableAccessMode.getAccessType())
-                               + "\" mode</html>");
-            } else if (disableTooltip != null) {
-                setToolTipText("<html><b>"
-                               + getText()
-                               + " (disabled)</b><br>"
-                               + disableTooltip
-                               + "</html>");
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setEnabled(disableTooltip == null && accessible);
+                setVisible(visiblePredicate()
+                           && Tools.getConfigData().isAccessible(
+                                                        visibleAccessMode));
             }
+        });
+        if (isVisible()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (!accessible && enableAccessMode.getAccessType()
+                                       != ConfigData.AccessType.NEVER) {
+                        String advanced = "";
+                        if (enableAccessMode.isAdvancedMode()) {
+                            advanced = "Advanced ";
+                        }
+                        setToolTipText("<html><b>"
+                                       + getText()
+                                       + " (disabled)</b><br>available in \""
+                                       + advanced
+                                       + ConfigData.OP_MODES_MAP.get(
+                                              enableAccessMode.getAccessType())
+                                       + "\" mode</html>");
+                    } else if (disableTooltip != null) {
+                        setToolTipText("<html><b>"
+                                       + getText()
+                                       + " (disabled)</b><br>"
+                                       + disableTooltip
+                                       + "</html>");
+                    }
+                }
+            });
         }
     }
 

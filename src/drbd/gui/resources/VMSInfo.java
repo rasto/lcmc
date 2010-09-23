@@ -277,11 +277,7 @@ public class VMSInfo extends CategoryInfo {
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                         private static final long serialVersionUID = 1L;
                         public void action() {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getPopup().setVisible(false);
-                                }
-                            });
+                            hidePopup();
                             addDomainPanel();
                         }
         };
