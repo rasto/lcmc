@@ -1456,15 +1456,16 @@ public class ServiceInfo extends EditableInfo {
         getBrowser().mHeartbeatIdToServiceLock();
         final Map<String, ServiceInfo> services =
                                     getBrowser().getHeartbeatIdToServiceInfo();
-        getBrowser().mHeartbeatIdToServiceUnlock();
         for (final ServiceInfo si : services.values()) {
             final String refCRMId = cs.getMetaAttrsRef(
                                            si.getService().getHeartbeatId());
             if (refCRMId != null
                 && refCRMId.equals(getService().getHeartbeatId())) {
+                getBrowser().mHeartbeatIdToServiceUnlock();
                 return true;
             }
         }
+        getBrowser().mHeartbeatIdToServiceUnlock();
         return false;
     }
 
@@ -1534,15 +1535,16 @@ public class ServiceInfo extends EditableInfo {
         getBrowser().mHeartbeatIdToServiceLock();
         final Map<String, ServiceInfo> services =
                                     getBrowser().getHeartbeatIdToServiceInfo();
-        getBrowser().mHeartbeatIdToServiceUnlock();
         for (final ServiceInfo si : services.values()) {
             final String refCRMId = cs.getOperationsRef(
                                         si.getService().getHeartbeatId());
             if (refCRMId != null
                 && refCRMId.equals(getService().getHeartbeatId())) {
+                getBrowser().mHeartbeatIdToServiceUnlock();
                 return true;
             }
         }
+        getBrowser().mHeartbeatIdToServiceUnlock();
         return false;
     }
 
