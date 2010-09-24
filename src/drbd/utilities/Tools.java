@@ -1474,9 +1474,7 @@ public final class Tools {
         return titledBorder;
     }
 
-    /**
-     * Returns a popup in a scrolling pane.
-     */
+    /** Returns a popup in a scrolling pane. */
     public static JScrollPane getScrollingMenu(
                         final MyMenu menu,
                         final DefaultListModel dlm,
@@ -1520,7 +1518,7 @@ public final class Tools {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 list.setSelectedIndex(index);
-                                setMenuVisible(menu, false);
+                                //setMenuVisible(menu, false);
                                 //menu.setPopupMenuVisible(false);
                                 menu.setSelected(false);
                             }
@@ -1580,12 +1578,12 @@ public final class Tools {
                 if (ch == ' ' || ch == '\n') {
                     final MyMenuItem item =
                                        (MyMenuItem) list.getSelectedValue();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            //menu.setPopupMenuVisible(false);
-                            setMenuVisible(menu, false);
-                        }
-                    });
+                    //SwingUtilities.invokeLater(new Runnable() {
+                    //    public void run() {
+                    //        //menu.setPopupMenuVisible(false);
+                    //        setMenuVisible(menu, false);
+                    //    }
+                    //});
                     if (item != null) {
                         item.action();
                     }

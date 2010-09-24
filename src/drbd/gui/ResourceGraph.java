@@ -955,14 +955,6 @@ public abstract class ResourceGraph {
                     final int posX = (int) popP.getX();
                     final int posY = (int) popP.getY();
 
-                    final JPopupMenu empty = new JPopupMenu();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            empty.add(new JMenuItem("wait for popup..."));
-                            empty.show(vv, posX, posY);
-                        }
-                    });
-
                     if (v == null) {
                         final Edge edge = pickSupport.getEdge(p.getX(),
                                                               p.getY());
@@ -973,7 +965,6 @@ public abstract class ResourceGraph {
                             if (backgroundPopup != null) {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        empty.setVisible(false);
                                         backgroundPopup.show(vv, posX, posY);
                                     }
                                 });
@@ -984,7 +975,6 @@ public abstract class ResourceGraph {
                             if (edgePopup != null) {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        empty.setVisible(false);
                                         edgePopup.show(vv, posX, posY);
                                     }
                                 });
@@ -997,27 +987,29 @@ public abstract class ResourceGraph {
                         if (vertexPopup != null) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
-                                    empty.setVisible(false);
                                     vertexPopup.show(vv, posX, posY);
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                            vertexPopup.pack();
+                                        }
+                                    });
+                                }
+                            });
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    vertexPopup.pack();
                                 }
                             });
                         }
                         oneVertexPressed(v); /* select this vertex */
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            empty.setVisible(false);
-                        }
-                    });
                 }
             });
             thread.start();
         }
     }
 
-    /**
-     * Removes info from the graph.
-     */
+    /** Removes info from the graph. */
     protected void removeInfo(final Info i) {
         //SwingUtilities.invokeLater(new Runnable() {
         //    public void run() {
@@ -1027,9 +1019,7 @@ public abstract class ResourceGraph {
         getVertexLocations().reset();
     }
 
-    /**
-     * Picks and highlights vertex with Info i in the graph.
-     */
+    /** Picks and highlights vertex with Info i in the graph. */
     public void pickInfo(final Info i) {
         final Vertex v = getVertex(i);
         final PickedState ps = visualizationViewer.getPickedState();

@@ -662,9 +662,7 @@ public class HeartbeatGraph extends ResourceGraph {
         }
     }
 
-    /**
-     * Handles right click on the service vertex and creates popup menu.
-     */
+    /** Handles right click on the service vertex and creates popup menu. */
     protected final JPopupMenu handlePopupVertex(final Vertex v,
                                                  final Point2D p) {
         if (vertexToHostMap.containsKey(v)) {

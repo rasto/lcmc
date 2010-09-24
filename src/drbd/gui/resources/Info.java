@@ -561,13 +561,13 @@ public class Info implements Comparable {
                 } catch (final InvocationTargetException x) {
                     Tools.printStackTrace();
                 }
-                for (final UpdatableItem u : items) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (final UpdatableItem u : items) {
                             popup.add((JMenuItem) u);
                         }
-                    });
-                }
+                    }
+                });
             }
         }
         final JPopupMenu popup0 = popup;
@@ -617,16 +617,12 @@ public class Info implements Comparable {
         return popup0;
     }
 
-    /**
-     * Returns the Action menu.
-     */
+    /** Returns the Action menu. */
     public final JMenu getActionsMenu() {
         return getMenu(Tools.getString("Browser.ActionsMenu"));
     }
 
-    /**
-     * Returns the menu with menu item spefified in the createPopup method.
-     */
+    /** Returns the menu with menu item spefified in the createPopup method. */
     public final JMenu getMenu(final String name) {
         if (menu == null) {
             menu = new JMenu(name) {

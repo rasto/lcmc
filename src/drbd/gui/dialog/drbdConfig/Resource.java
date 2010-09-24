@@ -76,6 +76,7 @@ public class Resource extends DrbdConfig {
      * Applies the changes and returns next dialog (BlockDev).
      */
     public final WizardDialog nextDialog() {
+        Tools.waitForSwing();
         getDrbdResourceInfo().apply(false);
         return new BlockDev(this,
                             getDrbdResourceInfo(),

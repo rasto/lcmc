@@ -382,7 +382,6 @@ public class GroupInfo extends ServiceInfo {
 
     /** Returns items for the group popup. */
     public final List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = super.createPopup();
         final boolean testOnly = false;
         /* add group service */
         final MyMenu addGroupServiceMenuItem = new MyMenu(
@@ -483,7 +482,11 @@ public class GroupInfo extends ServiceInfo {
                 super.update();
             }
         };
-        items.add(0, (UpdatableItem) addGroupServiceMenuItem);
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        items.add((UpdatableItem) addGroupServiceMenuItem);
+        for (final UpdatableItem item : super.createPopup()) {
+            items.add(item);
+        }
 
         /* group services */
         final ClusterStatus cs = getBrowser().getClusterStatus();

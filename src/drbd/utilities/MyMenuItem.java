@@ -28,11 +28,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.Font;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
 import javax.swing.SwingUtilities;
+import javax.swing.JPopupMenu;
 
 import java.awt.MouseInfo;
 import java.awt.Robot;
@@ -104,7 +106,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        update(); //TODO: should not be called here
+        //update(); //TODO: should not be called here
     }
 
 
@@ -137,12 +139,12 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        final Thread t = new Thread(new Runnable() {
-            public void run() {
-                processAccessMode(); //TODO: should not be called here
-            }
-        });
-        t.start();
+        //final Thread t = new Thread(new Runnable() {
+        //    public void run() {
+        //        processAccessMode(); //TODO: should not be called here
+        //    }
+        //});
+        //t.start();
     }
 
     /**
@@ -322,6 +324,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                 }
             });
         }
+        //SwingUtilities.invokeLater(new Runnable() {
+        //    public void run() {
+        //        ((JPopupMenu) getParent()).pack();
+        //    }
+        //});
     }
 
     /**

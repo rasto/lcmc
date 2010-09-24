@@ -71,6 +71,7 @@ public class BlockDev extends DrbdConfig {
      * Applies the changes to the blockDevInfo object.
      */
     protected final void finishDialog() {
+        Tools.waitForSwing();
         blockDevInfo.apply(false);
     }
 

@@ -4246,10 +4246,6 @@ public class ServiceInfo extends EditableInfo {
                     return IS_NEW_STRING;
                 }
                 return null;
-                //return !getBrowser().clStatusFailed()
-                //       && !getService().isRemoved()
-                //       && !getService().isNew()
-                //       && !getService().isOrphaned();
             }
 
             public void update() {

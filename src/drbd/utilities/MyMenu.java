@@ -50,17 +50,15 @@ public class MyMenu extends JMenu implements UpdatableItem {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         setOpaque(false);
-        final Thread t = new Thread(new Runnable() {
-            public void run() {
-                processAccessMode(); //TODO: should not be called here
-            }
-        });
-        t.start();
+        //final Thread t = new Thread(new Runnable() {
+        //    public void run() {
+        //        processAccessMode(); //TODO: should not be called here
+        //    }
+        //});
+        //t.start();
     }
 
-    /**
-     * Stores the position.
-     */
+    /** Stores the position. */
     public final void setPos(final Point2D pos) {
         this.pos = pos;
     }
@@ -121,9 +119,9 @@ public class MyMenu extends JMenu implements UpdatableItem {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setEnabled(disableTooltip == null && accessible);
-                setVisible(visiblePredicate()
-                           && Tools.getConfigData().isAccessible(
-                                                           visibleAccessMode));
+                //setVisible(visiblePredicate()
+                //           && Tools.getConfigData().isAccessible(
+                //                                           visibleAccessMode));
             }
         });
         if (isVisible()) {
