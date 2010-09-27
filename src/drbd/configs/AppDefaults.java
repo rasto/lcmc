@@ -113,6 +113,9 @@ public class AppDefaults extends
         {"Dialog.DrbdConfig.BlockDev.LabelWidth", 150},
         {"Dialog.DrbdConfig.BlockDev.FieldWidth", 150},
 
+        {"Dialog.vm.Resource.LabelWidth", 150},
+        {"Dialog.vm.Resource.FieldWidth", 350},
+
         {"MainMenu.DrbdGuiFiles.Extension",     "drbdg"},
         {"MainMenu.DrbdGuiFiles.Default",       System.getProperty("user.home")
                                                 + "/"

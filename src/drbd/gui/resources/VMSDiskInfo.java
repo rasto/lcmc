@@ -53,22 +53,24 @@ import org.w3c.dom.Node;
  */
 public class VMSDiskInfo extends VMSHardwareInfo {
     /** Source file combo box, so that it can be disabled, depending on type. */
-    private GuiComboBox sourceFileCB = null;
+    private Map<String, GuiComboBox> sourceFileCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Source block combo box, so that it can be disabled, depending on type.*/
-    private GuiComboBox sourceDeviceCB = null;
+    private Map<String, GuiComboBox> sourceDeviceCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Target device combo box, that needs to be reloaded if target type has
      * changed. */
-    private GuiComboBox targetDeviceCB = null;
+    private Map<String, GuiComboBox> targetDeviceCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Driver name combo box. */
-    private GuiComboBox driverNameCB = null;
+    private Map<String, GuiComboBox> driverNameCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Driver type combo box. */
-    private GuiComboBox driverTypeCB = null;
+    private Map<String, GuiComboBox> driverTypeCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Readonly combo box. */
-    private GuiComboBox readonlyCB = null;
-    /** Previous value of target bus and type. So that we know if it changed. */
-    private String prevTargetBusType = null;
-    /** Previous value of the type (file or block). */
-    private String prevType = null;
+    private Map<String, GuiComboBox> readonlyCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Parameters. */
     private static final String[] PARAMETERS = {DiskData.TYPE,
                                                 DiskData.TARGET_BUS_TYPE,
@@ -289,8 +291,9 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         final String type = getComboBoxValue(DiskData.TYPE);
         if ((DiskData.SOURCE_FILE.equals(param) && "file".equals(type))
             || (DiskData.SOURCE_DEVICE.equals(param) && "block".equals(type))) {
-            if ("ide/cdrom".equals(prevTargetBusType)
-                || "fdc/floppy".equals(prevTargetBusType)) {
+            if ("ide/cdrom".equals(getComboBoxValue(DiskData.TARGET_BUS_TYPE))
+                || "fdc/floppy".equals(getComboBoxValue(
+                                                 DiskData.TARGET_BUS_TYPE))) {
                 return false;
             } else {
                 return true;
@@ -445,60 +448,61 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     protected final boolean checkParam(final String param,
                                        final String newValue) {
         if (DiskData.TYPE.equals(param)) {
-            if (!newValue.equals(prevType)) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if (sourceFileCB != null) {
-                            sourceFileCB.setVisible("file".equals(newValue));
-                        }
-                        if (sourceDeviceCB != null) {
-                            sourceDeviceCB.setVisible("block".equals(newValue));
-                        }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    for (final String p : sourceFileCB.keySet()) {
+                        sourceFileCB.get(p).setVisible(
+                                                "file".equals(newValue));
                     }
-                });
-                prevType = newValue;
-                checkResourceFields(DiskData.SOURCE_FILE,
-                                    getParametersFromXML());
-                checkResourceFields(DiskData.SOURCE_DEVICE,
-                                    getParametersFromXML());
-            }
+                    for (final String p : sourceDeviceCB.keySet()) {
+                        sourceDeviceCB.get(p).setVisible(
+                                                "block".equals(newValue));
+                    }
+                }
+            });
+            checkOneParam(DiskData.SOURCE_FILE);
+            checkOneParam(DiskData.SOURCE_DEVICE);
         } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
-            if (targetDeviceCB != null && !newValue.equals(prevTargetBusType)) {
-                final Set<String> devices = new LinkedHashSet<String>();
-                devices.add(null);
-                for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
-                    if (!getVMSVirtualDomainInfo().isDevice(dev)) {
-                        devices.add(dev);
-                    }
+            final Set<String> devices = new LinkedHashSet<String>();
+            devices.add(null);
+            for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
+                if (!getVMSVirtualDomainInfo().isDevice(dev)) {
+                    devices.add(dev);
                 }
-                final String saved = getParamSaved(DiskData.TARGET_DEVICE);
-                String selected = null;
-                devices.add(saved);
-                if (prevTargetBusType == null && saved != null) {
-                    selected = saved;
-                } else if (devices.size() > 1) {
-                    selected = devices.toArray(new String[devices.size()])[1];
-                }
-                targetDeviceCB.reloadComboBox(
-                                selected,
-                                devices.toArray(new String[devices.size()]));
-                if (prevTargetBusType != null
-                    || getParamSaved(DiskData.DRIVER_NAME) == null) {
-                    if ("ide/cdrom".equals(newValue)) {
-                        readonlyCB.setValue("True");
-                        driverTypeCB.setValue(null);
-                    } else if ("virtio/disk".equals(newValue)) {
-                        driverTypeCB.setValue("raw");
-                    } else {
-                        readonlyCB.setValue("False");
-                    }
-                }
-                prevTargetBusType = newValue;
-                checkResourceFields(DiskData.SOURCE_FILE,
-                                    getParametersFromXML());
-                checkResourceFields(DiskData.SOURCE_DEVICE,
-                                    getParametersFromXML());
             }
+            final String saved = getParamSaved(DiskData.TARGET_DEVICE);
+            String selected = null;
+            devices.add(saved);
+            if (saved != null) {
+                selected = saved;
+            } else if (devices.size() > 1) {
+                selected = devices.toArray(new String[devices.size()])[1];
+            }
+            for (final String p : targetDeviceCB.keySet()) {
+                targetDeviceCB.get(p).reloadComboBox(
+                            selected,
+                            devices.toArray(new String[devices.size()]));
+            }
+            if (getParamSaved(DiskData.DRIVER_NAME) == null) {
+                if ("ide/cdrom".equals(newValue)) {
+                    for (final String p : readonlyCB.keySet()) {
+                        readonlyCB.get(p).setValue("True");
+                    }
+                    for (final String p : driverTypeCB.keySet()) {
+                        driverTypeCB.get(p).setValue(null);
+                    }
+                } else if ("virtio/disk".equals(newValue)) {
+                    for (final String p : driverTypeCB.keySet()) {
+                        driverTypeCB.get(p).setValue("raw");
+                    }
+                } else {
+                    for (final String p : readonlyCB.keySet()) {
+                        readonlyCB.get(p).setValue("False");
+                    }
+                }
+            }
+            checkOneParam(DiskData.SOURCE_FILE);
+            checkOneParam(DiskData.SOURCE_DEVICE);
         }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
@@ -572,7 +576,11 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                   new AccessMode(getAccessType(param),
                                                  false), /* only adv. mode */
                                   fileChooserBtn);
-            sourceFileCB = paramCB;
+            if (prefix == null) {
+                sourceFileCB.put("", paramCB);
+            } else {
+                sourceFileCB.put(prefix, paramCB);
+            }
             if (Tools.isWindows()) {
                 /* does not work on windows and I tries, ultimatly because
                    FilePane.usesShellFolder(fc) in BasicFileChooserUI returns
@@ -599,21 +607,36 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             if (DiskData.TYPE.equals(param)
                 || DiskData.TARGET_BUS_TYPE.equals(param)) {
                 paramCB.setAlwaysEditable(false);
-            } else if (sourceDeviceCB == null
-                       && DiskData.SOURCE_DEVICE.equals(param)) {
-                sourceDeviceCB = paramCB;
-            } else if (targetDeviceCB == null
-                       && DiskData.TARGET_DEVICE.equals(param)) {
-                targetDeviceCB = paramCB;
-            } else if (driverNameCB == null
-                       && DiskData.DRIVER_NAME.equals(param)) {
-                driverNameCB = paramCB;
-            } else if (driverTypeCB == null
-                       && DiskData.DRIVER_TYPE.equals(param)) {
-                driverTypeCB = paramCB;
-            } else if (readonlyCB == null
-                       && DiskData.READONLY.equals(param)) {
-                readonlyCB = paramCB;
+            } else if (DiskData.SOURCE_DEVICE.equals(param)) {
+                if (prefix == null) {
+                    sourceDeviceCB.put("", paramCB);
+                } else {
+                    sourceDeviceCB.put(prefix, paramCB);
+                }
+            } else if (DiskData.TARGET_DEVICE.equals(param)) {
+                if (prefix == null) {
+                    targetDeviceCB.put("", paramCB);
+                } else {
+                    targetDeviceCB.put(prefix, paramCB);
+                }
+            } else if (DiskData.DRIVER_NAME.equals(param)) {
+                if (prefix == null) {
+                    driverNameCB.put("", paramCB);
+                } else {
+                    driverNameCB.put(prefix, paramCB);
+                }
+            } else if (DiskData.DRIVER_TYPE.equals(param)) {
+                if (prefix == null) {
+                    driverTypeCB.put("", paramCB);
+                } else {
+                    driverTypeCB.put(prefix, paramCB);
+                }
+            } else if (DiskData.READONLY.equals(param)) {
+                if (prefix == null) {
+                    readonlyCB.put("", paramCB);
+                } else {
+                    readonlyCB.put(prefix, paramCB);
+                }
             }
             return paramCB;
         }

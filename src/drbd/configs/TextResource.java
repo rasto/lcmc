@@ -1026,17 +1026,35 @@ public class TextResource extends
         {"ConfirmDialog.No",
          "No"},
 
-        {"Dialog.VMConfig.Domain.Title",
+        {"Dialog.vm.Domain.Title",
          "Create a new virtual machine"},
 
-        {"Dialog.VMConfig.Domain.Description",
+        {"Dialog.vm.Domain.Description",
          "In this step you can create a new virtual machine..."},
 
-        {"Dialog.VMConfig.InstallationDisk.Title",
+        {"Dialog.vm.InstallationDisk.Title",
          "Installation Disk"},
 
-        {"Dialog.VMConfig.InstallationDisk.Description",
+        {"Dialog.vm.InstallationDisk.Description",
          "Choose installation disk or image..."},
+
+        {"Dialog.vm.Storage.Title",
+         "Storage"},
+
+        {"Dialog.vm.Storage.Description",
+         "Enter a storage for this virtual machine."},
+
+        {"Dialog.vm.Network.Title",
+         "Network Interface Configuration"},
+
+        {"Dialog.vm.Network.Description",
+         "Enter a network interface for this virtual machine."},
+
+        {"Dialog.vm.Display.Title",
+         "Remote Display"},
+
+        {"Dialog.vm.Display.Description",
+         "Configure remote display."},
 
         {"EmptyBrowser.LoadMarkedClusters",
          "Connect Marked Clusters"},

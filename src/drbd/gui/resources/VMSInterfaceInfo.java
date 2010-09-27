@@ -50,12 +50,12 @@ import org.w3c.dom.Node;
 public class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Source network combo box, so that it can be disabled, depending on
      * type. */
-    private GuiComboBox sourceNetworkCB = null;
+    private Map<String, GuiComboBox> sourceNetworkCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Source bridge combo box, so that it can be disabled, depending on
      * type. */
-    private GuiComboBox sourceBridgeCB = null;
-    /** Previous value of the type (network or bridge). */
-    private String prevType = null;
+    private Map<String, GuiComboBox> sourceBridgeCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
@@ -383,19 +383,16 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
     protected final boolean checkParam(final String param,
                                        final String newValue) {
         if (InterfaceData.TYPE.equals(param)) {
-            if (!newValue.equals(prevType)) {
-                if (sourceNetworkCB != null) {
-                    sourceNetworkCB.setVisible("network".equals(newValue));
-                }
-                if (sourceBridgeCB != null) {
-                    sourceBridgeCB.setVisible("bridge".equals(newValue));
-                }
-                prevType = newValue;
-                checkResourceFields(InterfaceData.SOURCE_NETWORK,
-                                    getParametersFromXML());
-                checkResourceFields(InterfaceData.SOURCE_BRIDGE,
-                                    getParametersFromXML());
+            for (final String p : sourceNetworkCB.keySet()) {
+                sourceNetworkCB.get(p).setVisible(
+                                               "network".equals(newValue));
             }
+            for (final String p : sourceBridgeCB.keySet()) {
+                sourceBridgeCB.get(p).setVisible(
+                                                "bridge".equals(newValue));
+            }
+            checkOneParam(InterfaceData.SOURCE_NETWORK);
+            checkOneParam(InterfaceData.SOURCE_BRIDGE);
         }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
@@ -412,10 +409,18 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         if (InterfaceData.TYPE.equals(param)) {
             paramCB.setAlwaysEditable(false);
         } else if (InterfaceData.SOURCE_NETWORK.equals(param)) {
-            sourceNetworkCB = paramCB;
+            if (prefix == null) {
+                sourceNetworkCB.put("", paramCB);
+            } else {
+                sourceNetworkCB.put(prefix, paramCB);
+            }
             paramCB.setAlwaysEditable(false);
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
-            sourceBridgeCB = paramCB;
+            if (prefix == null) {
+                sourceBridgeCB.put("", paramCB);
+            } else {
+                sourceBridgeCB.put(prefix, paramCB);
+            }
             paramCB.setAlwaysEditable(false);
         }
         return paramCB;

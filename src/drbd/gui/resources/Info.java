@@ -196,10 +196,8 @@ public class Info implements Comparable {
         }
     }
 
-    /**
-     * Returns the widget for the parameter.
-     */
-    protected final GuiComboBox paramComboBoxGet(final String param,
+    /** Returns the widget for the parameter. */
+    public final GuiComboBox paramComboBoxGet(final String param,
                                                  final String prefix) {
         if (prefix == null) {
             return paramComboBoxHash.get(param);

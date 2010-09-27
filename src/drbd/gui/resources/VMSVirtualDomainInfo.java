@@ -443,13 +443,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_CRASH,
                             new String[]{"restart", "destroy"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_EMULATOR,
-                           new StringInfo[]{
-                                      new StringInfo("kvm",
-                                                     "/usr/bin/kvm",
-                                                     null),
-                                      new StringInfo("qemu",
-                                                     "/usr/bin/qemu",
-                                                     null)});
+                            new StringInfo[]{
+                                       new StringInfo("kvm",
+                                                      "/usr/bin/kvm",
+                                                      null),
+                                       new StringInfo("qemu",
+                                                      "/usr/bin/qemu",
+                                                   null)});
+
     }
     /** Creates the VMSVirtualDomainInfo object. */
     public VMSVirtualDomainInfo(final String name,
@@ -1872,7 +1873,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new virtual interface. */
-    public final void addInterfacePanel() {
+    public final VMSInterfaceInfo addInterfacePanel() {
         final VMSInterfaceInfo vmsii =
                             new VMSInterfaceInfo(null, getBrowser(), this);
         vmsii.getResource().setNew(true);
@@ -1895,6 +1896,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         getNode().insert(resource, i);
         getBrowser().reload(getNode());
         vmsii.selectMyself();
+        return vmsii;
     }
 
     /** Adds new virtual input device. */
@@ -1925,7 +1927,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Adds new graphics device. */
-    public final void addGraphicsPanel() {
+    public final VMSGraphicsInfo addGraphicsPanel() {
         final VMSGraphicsInfo vmsgi =
                             new VMSGraphicsInfo(null, getBrowser(), this);
         vmsgi.getResource().setNew(true);
@@ -1950,6 +1952,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         getNode().insert(resource, i);
         getBrowser().reload(getNode());
         vmsgi.selectMyself();
+        return vmsgi;
     }
 
     /** Adds new sound device. */

@@ -23,10 +23,11 @@
 package drbd.gui.dialog.vm;
 
 import drbd.utilities.Tools;
+import drbd.data.VMSXML;
 import drbd.gui.resources.VMSVirtualDomainInfo;
-import drbd.gui.resources.VMSDiskInfo;
+import drbd.gui.resources.VMSGraphicsInfo;
 import drbd.gui.dialog.WizardDialog;
-import drbd.data.VMSXML.DiskData;
+import drbd.data.VMSXML.GraphicsData;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -42,26 +43,34 @@ import java.awt.Dimension;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class InstallationDisk extends VMConfig {
+public class Display extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Configuration options of the new domain. */
-    private static final String[] PARAMS = {DiskData.TYPE,
-                                            DiskData.TARGET_BUS_TYPE,
-                                            DiskData.SOURCE_FILE,
-                                            DiskData.SOURCE_DEVICE};
-    /** VMS disk info object. */
-    private VMSDiskInfo vmsdi = null;
+    private static final String[] PARAMS = {GraphicsData.TYPE,
+                                            GraphicsData.PORT,
+                                            GraphicsData.LISTEN,
+                                            GraphicsData.PASSWD,
+                                            GraphicsData.KEYMAP,
+                                            GraphicsData.DISPLAY,
+                                            GraphicsData.XAUTH};
+    /** VMS graphics info object. */
+    private VMSGraphicsInfo vmsgi = null;
 
-    /** Prepares a new <code>InstallationDisk</code> object. */
-    public InstallationDisk(final WizardDialog previousDialog,
-                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Prepares a new <code>Display</code> object. */
+    public Display(final WizardDialog previousDialog,
+                   final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        return new Storage(this, getVMSVirtualDomainInfo());
+        return null;
+    }
+
+    /** Finish dialog. */
+    public final void finishDialog() {
+        getVMSVirtualDomainInfo().apply(false);
     }
 
     /**
@@ -69,7 +78,7 @@ public class InstallationDisk extends VMConfig {
      * Dialog.vm.Domain.Title in TextResources.
      */
     protected final String getDialogTitle() {
-        return Tools.getString("Dialog.vm.InstallationDisk.Title");
+        return Tools.getString("Dialog.vm.Display.Title");
     }
 
     /**
@@ -77,13 +86,13 @@ public class InstallationDisk extends VMConfig {
      * Dialog.vm.Domain.Description in TextResources.
      */
     protected final String getDescription() {
-        return Tools.getString("Dialog.vm.InstallationDisk.Description");
+        return Tools.getString("Dialog.vm.Display.Description");
     }
 
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
         enableComponents();
     }
 
@@ -95,25 +104,25 @@ public class InstallationDisk extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        if (vmsdi == null) {
-            vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
-            vmsdi.waitForInfoPanel();
+        if (vmsgi == null) {
+            vmsgi = getVMSVirtualDomainInfo().addGraphicsPanel();
+            vmsgi.waitForInfoPanel();
         } else {
-            vmsdi.selectMyself();
+            vmsgi.selectMyself();
         }
-        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "ide/cdrom");
-        vmsdi.addWizardParams(
+        vmsgi.addWizardParams(
                       optionsPanel,
                       PARAMS,
-                      buttonClass(nextButton()),
+                      buttonClass(finishButton()),
                       Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
+        vmsgi.paramComboBoxGet(GraphicsData.TYPE, "wizard").setValue("vnc");
 
         inputPane.add(optionsPanel);
 
-        buttonClass(nextButton()).setEnabled(
-                                      vmsdi.checkResourceFields(null, PARAMS));
+        buttonClass(finishButton()).setEnabled(
+                                      vmsgi.checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(inputPane);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

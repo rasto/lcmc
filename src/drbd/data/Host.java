@@ -1023,9 +1023,10 @@ public class Host implements Serializable {
                         public final String convert(String command) {
                             for (final String tag : replaceHash.keySet()) {
                                 if (tag != null && command.indexOf(tag) > -1) {
-                                    command =
-                                      command.replaceAll(tag,
-                                                         replaceHash.get(tag));
+                                    final String s = replaceHash.get(tag);
+                                    if (s != null) {
+                                        command = command.replaceAll(tag, s);
+                                    }
                                 }
                             }
                             return command;

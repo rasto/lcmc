@@ -533,7 +533,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Get stored value in the combo box. */
-    protected final String getComboBoxValue(final String param) {
+    public final String getComboBoxValue(final String param) {
         final GuiComboBox cb = paramComboBoxGet(param, null);
         if (cb == null) {
             return null;
@@ -575,7 +575,10 @@ public abstract class EditableInfo extends Info {
         String initValue = null;
         if (value == null || "".equals(value)) {
             if (getResource().isNew()) {
-                initValue = getParamPreferred(param);
+                initValue = getResource().getPreferredValue(param);
+                if (initValue == null) {
+                    initValue = getParamPreferred(param);
+                }
             }
             if (initValue == null) {
                 initValue = getParamDefault(param);
@@ -751,6 +754,11 @@ public abstract class EditableInfo extends Info {
             return checkResourceFieldsChanged(param, params);
         }
         return cor;
+    }
+
+    /** Checks one parameter. */
+    protected final void checkOneParam(final String param) {
+        checkResourceFieldsCorrect(param, new String[]{param});
     }
 
     /**

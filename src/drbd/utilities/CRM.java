@@ -825,12 +825,13 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Stops resource.
-     */
+    /** Stops resource. */
     public static boolean stopResource(final Host host,
                                        final String heartbeatId,
                                        final boolean testOnly) {
+        if (heartbeatId == null) {
+            return false;
+        }
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String cmd = "CRM.stopResource";

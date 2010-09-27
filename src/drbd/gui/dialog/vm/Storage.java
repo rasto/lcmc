@@ -23,6 +23,7 @@
 package drbd.gui.dialog.vm;
 
 import drbd.utilities.Tools;
+import drbd.data.VMSXML;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.resources.VMSDiskInfo;
 import drbd.gui.dialog.WizardDialog;
@@ -41,14 +42,15 @@ import java.awt.Dimension;
  *
  * @author Rasto Levrinc
  * @version $Id$
- *
  */
 public class Storage extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {DiskData.TYPE,
-                                            DiskData.TARGET_BUS_TYPE};
+                                            DiskData.TARGET_BUS_TYPE,
+                                            DiskData.SOURCE_FILE,
+                                            DiskData.SOURCE_DEVICE};
     /** VMS disk info object. */
     private VMSDiskInfo vmsdi = null;
 
@@ -58,27 +60,25 @@ public class Storage extends VMConfig {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Applies the changes and returns next dialog (BlockDev). */
+    /** Next dialog. */
     public final WizardDialog nextDialog() {
-        return null;
-        /* network and that's it */
-//        return new NewInstallationDisk(this, getVMSVirtualDomainInfo());
+        return new Network(this, getVMSVirtualDomainInfo());
     }
 
     /**
      * Returns the title of the dialog. It is defined as
-     * Dialog.VMConfig.Domain.Title in TextResources.
+     * Dialog.vm.Domain.Title in TextResources.
      */
     protected final String getDialogTitle() {
-        return Tools.getString("Dialog.VMConfig.Storage.Title");
+        return Tools.getString("Dialog.vm.Storage.Title");
     }
 
     /**
      * Returns the description of the dialog. It is defined as
-     * Dialog.VMConfig.Domain.Description in TextResources.
+     * Dialog.vm.Domain.Description in TextResources.
      */
     protected final String getDescription() {
-        return Tools.getString("Dialog.VMConfig.Storage.Description");
+        return Tools.getString("Dialog.vm.Storage.Description");
     }
 
     /** Inits dialog. */
@@ -106,14 +106,18 @@ public class Storage extends VMConfig {
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
-                      Tools.getDefaultInt(
-                                    "Dialog.DrbdConfig.Resource.LabelWidth"),
-                      Tools.getDefaultInt(
-                                    "Dialog.DrbdConfig.Resource.FieldWidth"),
+                      Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
+                      Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
-
+        vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
+                                                                "virtio/disk");
+        vmsdi.paramComboBoxGet(DiskData.SOURCE_FILE, "wizard").setValue(
+                                     "/var/lib/libvirt/images/"
+                                     +
+                                     getVMSVirtualDomainInfo().getComboBoxValue(
+                                                         VMSXML.VM_PARAM_NAME)
+                                     + ".img");
         inputPane.add(optionsPanel);
-
         buttonClass(nextButton()).setEnabled(
                                       vmsdi.checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(inputPane);
