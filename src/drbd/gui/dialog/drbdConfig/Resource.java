@@ -119,6 +119,7 @@ public class Resource extends DrbdConfig {
      * Returns input pane where user can configure a drbd resource.
      */
     protected final JComponent getInputPane() {
+        getDrbdResourceInfo().waitForInfoPanel();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
 

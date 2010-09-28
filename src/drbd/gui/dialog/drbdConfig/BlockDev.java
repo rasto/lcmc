@@ -169,6 +169,7 @@ public class BlockDev extends DrbdConfig {
 
         final String[] params = blockDevInfo.getParametersFromXML();
         blockDevInfo.selectMyself();
+        blockDevInfo.waitForInfoPanel();
         blockDevInfo.addWizardParams(
                  optionsPanel,
                  params,

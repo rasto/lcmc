@@ -895,6 +895,7 @@ public class DrbdResourceInfo extends EditableInfo
               + Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
+        infoPanelDone();
         return infoPanel;
     }
 

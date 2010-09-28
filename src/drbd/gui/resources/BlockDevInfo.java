@@ -364,7 +364,7 @@ public class BlockDevInfo extends EditableInfo {
     protected final GuiComboBox getParamComboBox(final String param,
                                                  final String prefix,
                                                  final int width) {
-        GuiComboBox gcb;
+        GuiComboBox paramCb;
         if (DRBD_NI_PORT_PARAM.equals(param)) {
             final List<String> drbdVIPorts = new ArrayList<String>();
             String defaultPort = getBlockDevice().getValue(param);
@@ -386,7 +386,7 @@ public class BlockDevInfo extends EditableInfo {
             if (isInteger(param)) {
                 regexp = "^\\d*$";
             }
-            gcb = new GuiComboBox(
+            final GuiComboBox gcb = new GuiComboBox(
                        defaultPort,
                        drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
                        null, /* units */
@@ -396,18 +396,35 @@ public class BlockDevInfo extends EditableInfo {
                        null, /* abbrv */
                        new AccessMode(getAccessType(param),
                                       isEnabledOnlyInAdvancedMode(param)));
-            gcb.setValue(defaultPort);
+            paramCb = gcb;
+            //gcb.setValue(defaultPort);
             paramComboBoxAdd(param, prefix, gcb);
-            gcb.setEnabled(true);
-            gcb.setAlwaysEditable(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    gcb.setEnabled(true);
+                    gcb.setAlwaysEditable(true);
+                }
+            });
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-            gcb = super.getParamComboBox(param, prefix, width);
-            gcb.setAlwaysEditable(true);
+            final GuiComboBox gcb =
+                                super.getParamComboBox(param, prefix, width);
+            paramCb = gcb;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    gcb.setAlwaysEditable(true);
+                }
+            });
         } else {
-            gcb = super.getParamComboBox(param, prefix, width);
-            gcb.setEditable(false);
+            final GuiComboBox gcb =
+                                 super.getParamComboBox(param, prefix, width);
+            paramCb = gcb;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    gcb.setEditable(false);
+                }
+            });
         }
-        return gcb;
+        return paramCb;
     }
 
     protected final boolean checkParam(final String param, String value) {
@@ -927,6 +944,7 @@ public class BlockDevInfo extends EditableInfo {
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
+        infoPanelDone();
         return infoPanel;
     }
 

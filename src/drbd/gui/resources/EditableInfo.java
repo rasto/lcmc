@@ -509,6 +509,7 @@ public abstract class EditableInfo extends Info {
                 paramCb.setEditable();
                 boolean c;
                 if (realParamCb != null) {
+                    Tools.waitForSwing();
                     realParamCb.setValue(paramCb.getStringValue());
                     c = checkResourceFieldsCorrect(param,
                                                    params);

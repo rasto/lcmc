@@ -239,9 +239,9 @@ public class GuiComboBox extends JPanel {
                 break;
             case COMBOBOX:
                 newComp = getComboBox(selectedValue,
-                                        items,
-                                        regexp,
-                                        abbreviations);
+                                      items,
+                                      regexp,
+                                      abbreviations);
                 break;
             case TEXTFIELDWITHUNIT:
                 newComp = new JPanel();
@@ -418,7 +418,11 @@ public class GuiComboBox extends JPanel {
         }
         cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
         if (selectedValueInfo != null) {
-            cb.setSelectedItem(selectedValueInfo);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    cb.setSelectedItem(selectedValueInfo);
+                }
+            });
         }
         /* workround, so that default button works */
         editor.addKeyListener(new ActivateDefaultButtonListener(cb));
