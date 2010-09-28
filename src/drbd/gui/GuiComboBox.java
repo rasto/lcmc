@@ -1034,11 +1034,11 @@ public class GuiComboBox extends JPanel {
             case COMBOBOX:
                 final JComboBox cb = (JComboBox) component;
                 cb.setSelectedItem(item);
-                if (cb.isEditable()) {
-                    final JTextComponent tc =
-                        (JTextComponent) cb.getEditor().getEditorComponent();
-                    tc.setText((String) item);
-                } else if (Tools.isStringClass(item)) {
+                //if (cb.isEditable()) {
+                //    final JTextComponent tc =
+                //        (JTextComponent) cb.getEditor().getEditorComponent();
+                //    tc.setText((String) item);
+                if (Tools.isStringClass(item)) {
                     Object selectedObject = null;
                     for (int i = 0; i < cb.getItemCount(); i++) {
                         final Object it = cb.getItemAt(i);

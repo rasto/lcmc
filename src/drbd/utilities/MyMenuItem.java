@@ -106,7 +106,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        //update(); //TODO: should not be called here
     }
 
 
@@ -139,12 +138,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
-        //final Thread t = new Thread(new Runnable() {
-        //    public void run() {
-        //        processAccessMode(); //TODO: should not be called here
-        //    }
-        //});
-        //t.start();
     }
 
     /**
@@ -212,7 +205,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
         setFont(new Font(name, style, size));
-        //setBackground(Color.WHITE);
     }
 
     /**
@@ -250,39 +242,34 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * Updates the menu item, checking the predicate and enablePredicate.
      */
     public final void update() {
-        final Thread t = new Thread(new Runnable() {
-            public void run() {
-                if (predicate()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            setText(text1);
-                            if (icon1 != null) {
-                                setIcon(icon1);
-                            }
-                            if (shortDesc1 != null
-                                && !shortDesc1.equals(text1)) {
-                                toolTip.setTipText(shortDesc1);
-                            }
-                        }
-                    });
-                } else {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            setText(text2);
-                            if (icon1 != null) { /* icon1 is here on purpose */
-                                setIcon(icon2);
-                            }
-                            if (shortDesc2 != null
-                                && !shortDesc1.equals(text2)) {
-                                toolTip.setTipText(shortDesc2);
-                            }
-                        }
-                    });
+        if (predicate()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    setText(text1);
+                    if (icon1 != null) {
+                        setIcon(icon1);
+                    }
+                    if (shortDesc1 != null
+                        && !shortDesc1.equals(text1)) {
+                        toolTip.setTipText(shortDesc1);
+                    }
                 }
-                processAccessMode();
-            }
-        });
-        t.start();
+            });
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    setText(text2);
+                    if (icon1 != null) { /* icon1 is here on purpose */
+                        setIcon(icon2);
+                    }
+                    if (shortDesc2 != null
+                        && !shortDesc1.equals(text2)) {
+                        toolTip.setTipText(shortDesc2);
+                    }
+                }
+            });
+        }
+        processAccessMode();
     }
 
     /** Sets this item enabled and visible according to its access type. */
@@ -324,11 +311,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                 }
             });
         }
-        //SwingUtilities.invokeLater(new Runnable() {
-        //    public void run() {
-        //        ((JPopupMenu) getParent()).pack();
-        //    }
-        //});
     }
 
     /**

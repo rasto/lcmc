@@ -1518,8 +1518,9 @@ public final class Tools {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 list.setSelectedIndex(index);
+                                //TODO: some submenus stay visible, during
+                                //ptest, but this breaks group popup menu
                                 //setMenuVisible(menu, false);
-                                //menu.setPopupMenuVisible(false);
                                 menu.setSelected(false);
                             }
                         });
