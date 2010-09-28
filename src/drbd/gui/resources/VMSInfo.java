@@ -292,7 +292,7 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns if this column contains remove button. */
-    protected final boolean isRemoveButton(final String tableName,
+    protected final boolean isControlButton(final String tableName,
                                            final int column) {
         return DEFAULT_WIDTHS.containsKey(column);
     }

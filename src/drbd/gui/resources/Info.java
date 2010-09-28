@@ -929,7 +929,7 @@ public class Info implements Comparable {
 
                 public TableCellRenderer getCellRenderer(final int row,
                                                          final int column) {
-                    if (column == 0 || isRemoveButton(tableName, column)) {
+                    if (column == 0 || isControlButton(tableName, column)) {
                         return bcr;
                     }
                     return super.getCellRenderer(row, column);
@@ -1205,7 +1205,8 @@ public class Info implements Comparable {
     }
 
     /** Returns default widths for columns. Null for computed width. */
-    protected boolean isRemoveButton(final String tableName, final int column) {
+    protected boolean isControlButton(final String tableName,
+                                      final int column) {
         return false;
     }
 

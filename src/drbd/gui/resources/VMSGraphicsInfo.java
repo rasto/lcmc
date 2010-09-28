@@ -157,7 +157,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns service icon in the menu. */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return NetInfo.NET_I_ICON;
+        return VMSVirtualDomainInfo.VNC_ICON_SMALL;
     }
 
     /** Returns long description of the specified parameter. */

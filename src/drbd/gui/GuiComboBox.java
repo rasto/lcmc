@@ -89,8 +89,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
 public class GuiComboBox extends JPanel {
     /** Widget type. */
     public enum Type { LABELFIELD, TEXTFIELD, PASSWDFIELD, COMBOBOX,
-                       RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT,
-                       TEXTFIELDWITHBUTTON };
+                       RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT };
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Component of this widget. */
@@ -111,8 +110,10 @@ public class GuiComboBox extends JPanel {
     private JComboBox unitComboBox = null;
     /** Pattern that matches value and unit. */
     private final Pattern unitPattern = Pattern.compile("^(\\d+)(\\D*)$");
-    /** File chooser button. */
-    private MyButton textFieldBtn;
+    /** File chooser button or some other button. */
+    private MyButton fieldButton;
+    /** Component part of field with button. */
+    private JComponent componentPart = null;
     /** Name for the 'true' value. */
     private String checkBoxTrue = Tools.getString("Boolean.True");
     /** Name for the 'false' value. */
@@ -194,11 +195,11 @@ public class GuiComboBox extends JPanel {
                        final int width,
                        final Map<String, String> abbreviations,
                        final AccessMode enableAccessMode,
-                       final MyButton textFieldBtn) {
+                       final MyButton fieldButton) {
         super();
         this.units = units;
         this.enableAccessMode = enableAccessMode;
-        this.textFieldBtn = textFieldBtn;
+        this.fieldButton = fieldButton;
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
             regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
@@ -224,26 +225,27 @@ public class GuiComboBox extends JPanel {
         } else {
             this.type = type;
         }
-
+        
+        JComponent newComp = null;
         switch(this.type) {
             case LABELFIELD:
-                component = getLabelField(selectedValue);
+                newComp = getLabelField(selectedValue);
                 break;
             case TEXTFIELD:
-                component = getTextField(selectedValue, regexp, abbreviations);
+                newComp = getTextField(selectedValue, regexp, abbreviations);
                 break;
             case PASSWDFIELD:
-                component = getPasswdField(selectedValue, regexp);
+                newComp = getPasswdField(selectedValue, regexp);
                 break;
             case COMBOBOX:
-                component = getComboBox(selectedValue,
+                newComp = getComboBox(selectedValue,
                                         items,
                                         regexp,
                                         abbreviations);
                 break;
             case TEXTFIELDWITHUNIT:
-                component = new JPanel();
-                component.setLayout(new SpringLayout());
+                newComp = new JPanel();
+                newComp.setLayout(new SpringLayout());
 
                 String number = "";
                 String unit = "";
@@ -262,7 +264,7 @@ public class GuiComboBox extends JPanel {
                 textFieldPart = (JTextField) getTextField(number,
                                                           regexp,
                                                           abbreviations);
-                component.add(textFieldPart);
+                newComp.add(textFieldPart);
 
                 /* unit combo box */
                 unitComboBox = (JComboBox) getComboBox(unit,
@@ -270,37 +272,50 @@ public class GuiComboBox extends JPanel {
                                                        regexp,
                                                        abbreviations);
 
-                component.add(unitComboBox);
-                SpringUtilities.makeCompactGrid(component, 1, 2,
-                                                           0, 0,
-                                                           0, 0);
+                newComp.add(unitComboBox);
+                SpringUtilities.makeCompactGrid(newComp, 1, 2,
+                                                         0, 0,
+                                                         0, 0);
                 break;
-            case TEXTFIELDWITHBUTTON:
-                component = new JPanel();
-                component.setLayout(new SpringLayout());
+            //case TEXTFIELDWITHBUTTON:
+            //    newComp = new JPanel();
+            //    newComp.setLayout(new SpringLayout());
 
-                /* text field */
-                textFieldPart = (JTextField) getTextField(selectedValue,
-                                                          regexp,
-                                                          abbreviations);
-                component.add(textFieldPart);
-                /** add button */
-                component.add(textFieldBtn);
-                SpringUtilities.makeCompactGrid(component, 1, 2,
-                                                           0, 0,
-                                                           0, 0);
-                break;
+            //    /* text field */
+            //    textFieldPart = (JTextField) getTextField(selectedValue,
+            //                                              regexp,
+            //                                              abbreviations);
+            //    newComp.add(textFieldPart);
+            //    /** add button */
+            //    SpringUtilities.makeCompactGrid(newComp, 1, 2,
+            //                                               0, 0,
+            //                                               0, 0);
+            //    break;
             case RADIOGROUP:
-                component = getRadioGroup(selectedValue, items);
+                newComp = getRadioGroup(selectedValue, items);
                 break;
             case CHECKBOX:
                 if (items != null && items.length == 2) {
                     checkBoxTrue  = (String) items[0];
                     checkBoxFalse = (String) items[1];
                 }
-                component = getCheckBox(selectedValue);
+                newComp = getCheckBox(selectedValue);
                 break;
             default:
+        }
+        if (fieldButton == null) {
+            component = newComp;
+        } else {
+            componentPart = newComp;
+            component = new JPanel();
+            component.setLayout(new SpringLayout());
+
+            component.add(newComp);
+            component.add(fieldButton);
+            /** add button */
+            SpringUtilities.makeCompactGrid(component, 1, 2,
+                                                       0, 0,
+                                                       0, 0);
         }
         if (this.type == Type.TEXTFIELDWITHUNIT) {
             textFieldPart.setMinimumSize(new Dimension(width / 3,
@@ -318,6 +333,10 @@ public class GuiComboBox extends JPanel {
         }
         component.setPreferredSize(new Dimension(width,
                                                  WIDGET_HEIGHT));
+        if (componentPart != null) {
+            componentPart.setPreferredSize(new Dimension(width,
+                                                         WIDGET_HEIGHT));
+        }
         setPreferredSize(new Dimension(width, WIDGET_COMPONENT_HEIGHT));
         if (width != 0) {
             component.setMaximumSize(new Dimension(width,
@@ -642,11 +661,15 @@ public class GuiComboBox extends JPanel {
         if (type == Type.TEXTFIELDWITHUNIT) {
             textFieldPart.setToolTipText("<html>" + text + "</html>");
             unitComboBox.setToolTipText("<html>" + text + "</html>");
-        } else if (type == Type.TEXTFIELDWITHBUTTON) {
-            textFieldPart.setToolTipText("<html>" + text + "</html>");
-            textFieldBtn.setToolTipText("<html>" + text + "</html>");
+        //} else if (type == Type.TEXTFIELDWITHBUTTON) {
+        //    textFieldPart.setToolTipText("<html>" + text + "</html>");
+        //    fieldButton.setToolTipText("<html>" + text + "</html>");
         } else {
             component.setToolTipText("<html>" + text + "</html>");
+        }
+        if (fieldButton != null) {
+            componentPart.setToolTipText("<html>" + text + "</html>");
+            fieldButton.setToolTipText("<html>" + text + "</html>");
         }
     }
 
@@ -770,18 +793,24 @@ public class GuiComboBox extends JPanel {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         switch(type) {
             case LABELFIELD:
-                value = ((JLabel) component).getText();
+                value = ((JLabel) comp).getText();
                 break;
             case TEXTFIELD:
-                value = ((MTextField) component).getText();
+                value = ((MTextField) comp).getText();
                 break;
             case PASSWDFIELD:
-                value = new String(((JPasswordField) component).getPassword());
+                value = new String(((JPasswordField) comp).getPassword());
                 break;
             case COMBOBOX:
-                final JComboBox cb = (JComboBox) component;
+                final JComboBox cb = (JComboBox) comp;
                 if (cb.isEditable()) {
                     final JTextComponent editor =
                         (JTextComponent) cb.getEditor().getEditorComponent();
@@ -806,7 +835,7 @@ public class GuiComboBox extends JPanel {
                 value = radioGroupValue;
                 break;
             case CHECKBOX:
-                final JCheckBox cbox = (JCheckBox) component;
+                final JCheckBox cbox = (JCheckBox) comp;
                 if (cbox.getSelectedObjects() == null) {
                     value = checkBoxFalse;
                 } else {
@@ -855,9 +884,9 @@ public class GuiComboBox extends JPanel {
                 }
                 value = new Object[]{text, unit};
                 break;
-            case TEXTFIELDWITHBUTTON:
-                value = textFieldPart.getText();
-                break;
+            //case TEXTFIELDWITHBUTTON:
+            //    value = textFieldPart.getText();
+            //    break;
             default:
                 /* error */
         }
@@ -909,13 +938,20 @@ public class GuiComboBox extends JPanel {
      * Sets component visible or invisible.
      */
     private void setComponentsVisible(final boolean visible) {
+        JComponent c;
+        if (fieldButton == null) {
+            c = component;
+        } else {
+            c = componentPart;
+        }
+        final JComponent comp = c;
         super.setVisible(visible);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (label != null) {
                     label.setVisible(visible);
                 }
-                component.setVisible(visible);
+                comp.setVisible(visible);
                 try {
                     mComponentsLock.acquire();
                 } catch (InterruptedException ie) {
@@ -930,12 +966,11 @@ public class GuiComboBox extends JPanel {
                         textFieldPart.setVisible(visible);
                         unitComboBox.setVisible(visible);
                         break;
-                    case TEXTFIELDWITHBUTTON:
-                        textFieldPart.setVisible(visible);
-                        textFieldBtn.setVisible(visible);
-                        break;
 
                 }
+                //if (fieldButton != null) {
+                //    fieldButton.setVisible(visible);
+                //}
                 repaint();
             }
         });
@@ -955,7 +990,7 @@ public class GuiComboBox extends JPanel {
     /** Sets extra button enabled. */
     public final void setTFButtonEnabled(final boolean tfButtonEnabled) {
         this.tfButtonEnabled = tfButtonEnabled;
-        textFieldBtn.setEnabled(tfButtonEnabled);
+        fieldButton.setEnabled(tfButtonEnabled);
     }
 
     /**
@@ -979,10 +1014,10 @@ public class GuiComboBox extends JPanel {
                         textFieldPart.setEnabled(enabled);
                         unitComboBox.setEnabled(enabled && unitEnabled);
                         break;
-                    case TEXTFIELDWITHBUTTON:
-                        textFieldPart.setEnabled(enabled);
-                        textFieldBtn.setEnabled(enabled && tfButtonEnabled);
-                        break;
+                }
+                if (fieldButton != null) {
+                    componentPart.setEnabled(enabled);
+                    fieldButton.setEnabled(enabled && tfButtonEnabled);
                 }
             }
         });
@@ -1021,18 +1056,24 @@ public class GuiComboBox extends JPanel {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         switch(type) {
             case LABELFIELD:
-                ((JLabel) component).setText((String) item);
+                ((JLabel) comp).setText((String) item);
                 break;
             case TEXTFIELD:
-                ((MTextField) component).setText((String) item);
+                ((MTextField) comp).setText((String) item);
                 break;
             case PASSWDFIELD:
-                ((JPasswordField) component).setText((String) item);
+                ((JPasswordField) comp).setText((String) item);
                 break;
             case COMBOBOX:
-                final JComboBox cb = (JComboBox) component;
+                final JComboBox cb = (JComboBox) comp;
                 cb.setSelectedItem(item);
                 //if (cb.isEditable()) {
                 //    final JTextComponent tc =
@@ -1081,7 +1122,7 @@ public class GuiComboBox extends JPanel {
 
             case CHECKBOX:
                 if (item != null) {
-                    ((JCheckBox) component).setSelected(
+                    ((JCheckBox) comp).setSelected(
                                                 item.equals(checkBoxTrue));
                 }
                 break;
@@ -1111,20 +1152,18 @@ public class GuiComboBox extends JPanel {
                     unitComboBox.setSelectedItem(selectedUnitInfo);
                 }
                 break;
-            case TEXTFIELDWITHBUTTON:
-                if (item != null) {
-                    textFieldPart.setText((String) item);
-                }
-                break;
+            //case TEXTFIELDWITHBUTTON:
+            //    if (item != null) {
+            //        textFieldPart.setText((String) item);
+            //    }
+            //    break;
             default:
                 Tools.appError("impossible type");
         }
         mValueLock.release();
     }
 
-    /**
-     * Sets item/value in the component.
-     */
+    /** Sets item/value in the component. */
     public final void setValue(final Object item) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -1133,10 +1172,14 @@ public class GuiComboBox extends JPanel {
         });
     }
 
-    /**
-     * Sets selected index.
-     */
+    /** Sets selected index. */
     public final void setSelectedIndex(final int index) {
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         switch(type) {
             case LABELFIELD:
                 break;
@@ -1145,7 +1188,7 @@ public class GuiComboBox extends JPanel {
             case PASSWDFIELD:
                 break;
             case COMBOBOX:
-                final JComboBox cb = (JComboBox) component;
+                final JComboBox cb = (JComboBox) comp;
                 cb.setSelectedIndex(index);
                 break;
 
@@ -1157,24 +1200,28 @@ public class GuiComboBox extends JPanel {
 
             case TEXTFIELDWITHUNIT:
                 break;
-            case TEXTFIELDWITHBUTTON:
-                break;
+            //case TEXTFIELDWITHBUTTON:
+            //    break;
             default:
                 Tools.appError("impossible type");
         }
     }
 
-    /**
-     * Returns document object of the component.
-     */
+    /** Returns document object of the component. */
     public final Document getDocument() {
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         switch(type) {
             case LABELFIELD:
                 return null;
             case TEXTFIELD:
-                return ((MTextField) component).getDocument();
+                return ((MTextField) comp).getDocument();
             case PASSWDFIELD:
-                return ((JPasswordField) component).getDocument();
+                return ((JPasswordField) comp).getDocument();
             case COMBOBOX:
                 final JTextComponent tc = getTextComponent();
                 return tc.getDocument();
@@ -1184,24 +1231,18 @@ public class GuiComboBox extends JPanel {
                 return null;
             case TEXTFIELDWITHUNIT:
                 return null;
-            case TEXTFIELDWITHBUTTON:
-                return null;
             default:
                 return null;
         }
     }
 
-    /**
-     * Returns the text component of the combo box.
-     */
+    /** Returns the text component of the combo box. */
     private JTextComponent getTextComponent() {
         final ComboBoxEditor editor = ((JComboBox) component).getEditor();
         return (JTextComponent) editor.getEditorComponent();
     }
 
-    /**
-     * Selects part after first '*' in the ip.
-     */
+    /** Selects part after first '*' in the ip. */
     public final void selectSubnet() {
         switch(type) {
             case LABELFIELD:
@@ -1242,6 +1283,12 @@ public class GuiComboBox extends JPanel {
      */
     public final void addListeners(final ItemListener il,
                              final DocumentListener dl) {
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         switch(type) {
             case LABELFIELD:
                 break;
@@ -1257,7 +1304,7 @@ public class GuiComboBox extends JPanel {
                 break;
             case COMBOBOX:
                 if (il != null) {
-                    ((JComboBox) component).addItemListener(il);
+                    ((JComboBox) comp).addItemListener(il);
                 }
                 if (dl != null) {
                     getDocument().addDocumentListener(dl);
@@ -1278,7 +1325,7 @@ public class GuiComboBox extends JPanel {
                 break;
             case CHECKBOX:
                 if (il != null) {
-                    ((JCheckBox) component).addItemListener(il);
+                    ((JCheckBox) comp).addItemListener(il);
                 }
                 break;
             case TEXTFIELDWITHUNIT:
@@ -1289,11 +1336,11 @@ public class GuiComboBox extends JPanel {
                     unitComboBox.addItemListener(il);
                 }
                 break;
-            case TEXTFIELDWITHBUTTON:
-                if (dl != null) {
-                    textFieldPart.getDocument().addDocumentListener(dl);
-                }
-                break;
+            //case TEXTFIELDWITHBUTTON:
+            //    if (dl != null) {
+            //        textFieldPart.getDocument().addDocumentListener(dl);
+            //    }
+            //    break;
             default:
                 /* error */
         }
@@ -1334,6 +1381,12 @@ public class GuiComboBox extends JPanel {
         if (getParent() == null) {
             return;
         }
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         final Object value = getValue();
         String labelText = null;
         if (savedLabel != null) {
@@ -1367,20 +1420,20 @@ public class GuiComboBox extends JPanel {
         setBackground(backgroundColor);
         switch(type) {
             case LABELFIELD:
-                component.setBackground(backgroundColor);
+                comp.setBackground(backgroundColor);
                 break;
             case TEXTFIELD:
                 /* change color possibly set by wrongValue() */
-                component.setBackground(compColor);
+                comp.setBackground(compColor);
                 break;
             case PASSWDFIELD:
-                component.setBackground(compColor);
+                comp.setBackground(compColor);
                 break;
             case COMBOBOX:
                 setBackground(Color.WHITE);
                 break;
             case RADIOGROUP:
-                component.setBackground(backgroundColor);
+                comp.setBackground(backgroundColor);
                 try {
                     mComponentsLock.acquire();
                 } catch (InterruptedException ie) {
@@ -1392,23 +1445,21 @@ public class GuiComboBox extends JPanel {
                 mComponentsLock.release();
                 break;
             case CHECKBOX:
-                component.setBackground(backgroundColor);
+                comp.setBackground(backgroundColor);
                 break;
             case TEXTFIELDWITHUNIT:
                 textFieldPart.setBackground(Color.WHITE);
                 break;
-            case TEXTFIELDWITHBUTTON:
-                textFieldPart.setBackground(Color.WHITE);
-                break;
+            //case TEXTFIELDWITHBUTTON:
+            //    textFieldPart.setBackground(Color.WHITE);
+            //    break;
             default:
                 /* error */
         }
         processAccessMode();
     }
 
-    /**
-     * Workaround for jcombobox so that it works with default button.
-     */
+    /** Workaround for jcombobox so that it works with default button. */
     public class ActivateDefaultButtonListener extends KeyAdapter
                                                implements ActionListener {
         /** Combobox, that should work with default button. */
@@ -1508,15 +1559,20 @@ public class GuiComboBox extends JPanel {
      * Requests focus if applicable.
      */
     public final void requestFocus() {
-
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         switch(type) {
             case LABELFIELD:
                 break;
             case TEXTFIELD:
-                ((MTextField) component).requestFocus();
+                ((MTextField) comp).requestFocus();
                 break;
             case PASSWDFIELD:
-                ((JPasswordField) component).requestFocus();
+                ((JPasswordField) comp).requestFocus();
                 break;
             case COMBOBOX:
                 break;
@@ -1527,9 +1583,9 @@ public class GuiComboBox extends JPanel {
             case TEXTFIELDWITHUNIT:
                 textFieldPart.requestFocus();
                 break;
-            case TEXTFIELDWITHBUTTON:
-                textFieldPart.requestFocus();
-                break;
+            //case TEXTFIELDWITHBUTTON:
+            //    textFieldPart.requestFocus();
+            //    break;
             default:
                 break;
         }
@@ -1539,13 +1595,18 @@ public class GuiComboBox extends JPanel {
      * Selects the whole text in the widget if applicable.
      */
     public final void selectAll() {
-
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
         switch(type) {
             case TEXTFIELD:
-                ((MTextField) component).selectAll();
+                ((MTextField) comp).selectAll();
                 break;
             case PASSWDFIELD:
-                ((JPasswordField) component).selectAll();
+                ((JPasswordField) comp).selectAll();
                 break;
             case COMBOBOX:
                 break;
@@ -1556,9 +1617,9 @@ public class GuiComboBox extends JPanel {
             case TEXTFIELDWITHUNIT:
                 textFieldPart.selectAll();
                 break;
-            case TEXTFIELDWITHBUTTON:
-                textFieldPart.selectAll();
-                break;
+            //case TEXTFIELDWITHBUTTON:
+            //    textFieldPart.selectAll();
+            //    break;
             default:
                 break;
         }
@@ -1598,23 +1659,30 @@ public class GuiComboBox extends JPanel {
      * Sets background color.
      */
     public final void setBackgroundColor(final Color bg) {
+        JComponent c;
+        if (fieldButton == null) {
+            c = component;
+        } else {
+            c = componentPart;
+        }
+        final JComponent comp = c;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setBackground(bg);
                 switch(type) {
                     case LABELFIELD:
-                        component.setBackground(bg);
+                        comp.setBackground(bg);
                         break;
                     case TEXTFIELD:
-                        component.setBackground(bg);
+                        comp.setBackground(bg);
                         break;
                     case PASSWDFIELD:
-                        component.setBackground(bg);
+                        comp.setBackground(bg);
                         break;
                     case COMBOBOX:
                         break;
                     case RADIOGROUP:
-                        component.setBackground(bg);
+                        comp.setBackground(bg);
                         try {
                             mComponentsLock.acquire();
                         } catch (InterruptedException ie) {
@@ -1626,14 +1694,14 @@ public class GuiComboBox extends JPanel {
                         mComponentsLock.release();
                         break;
                     case CHECKBOX:
-                        component.setBackground(bg);
+                        comp.setBackground(bg);
                         break;
                     case TEXTFIELDWITHUNIT:
                         textFieldPart.setBackground(bg);
                         break;
-                    case TEXTFIELDWITHBUTTON:
-                        textFieldPart.setBackground(bg);
-                        break;
+                    //case TEXTFIELDWITHBUTTON:
+                    //    textFieldPart.setBackground(bg);
+                    //    break;
                     default:
                         /* error */
                 }

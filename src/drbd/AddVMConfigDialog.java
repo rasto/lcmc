@@ -55,8 +55,8 @@ public class AddVMConfigDialog {
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 canceled = true;
-                Tools.getGUIData().expandTerminalSplitPane(1);
                 vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
+                vmsVirtualDomainInfo.removeMyself(false);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;

@@ -155,9 +155,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         this.toolTipBackground = toolTipBackground;
     }
 
-    /**
-     * Sets tooltip and wiggles the mouse to refresh it.
-     */
+    /** Sets tooltip and wiggles the mouse to refresh it. */
     public final void setToolTipText(final String toolTipText) {
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             super.setToolTipText(toolTipText);
@@ -183,6 +181,8 @@ public class MyButton extends JButton implements ComponentWithTest {
                             (int) p.getY());
             robot.mouseMove((int) p.getX() + xOffset,
                             (int) p.getY());
+        } else {
+            super.setToolTipText(toolTipText);
         }
     }
 

@@ -120,11 +120,6 @@ public class VMSVideoInfo extends VMSHardwareInfo {
         mainPanel.add(tablePanel);
     }
 
-    /** Returns service icon in the menu. */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return NetInfo.NET_I_ICON;
-    }
-
     /** Returns long description of the specified parameter. */
     protected final String getParamLongDesc(final String param) {
         final String name = LONGNAME_MAP.get(param);

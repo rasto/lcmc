@@ -1056,6 +1056,12 @@ public class TextResource extends
         {"Dialog.vm.Display.Description",
          "Configure remote display."},
 
+        {"Dialog.vm.Finish.Title",
+         "Start Domain."},
+
+        {"Dialog.vm.Finish.Description",
+         "Here you can start the domain and a viewer."},
+
         {"EmptyBrowser.LoadMarkedClusters",
          "Connect Marked Clusters"},
 
@@ -1953,7 +1959,10 @@ public class TextResource extends
          "New Video Device"},
 
         {"VMSVirtualDomainInfo.AddNewHardware",
-         "Add Virtual Hardware"},
+         "Add Hardware"},
+
+        {"VMSVirtualDomainInfo.MoreOptions",
+         "Resume/Suspend"},
 
         {"VMSVirtualDomainInfo.RemoveDomain",
          "Remove Domain"},

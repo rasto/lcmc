@@ -45,6 +45,8 @@ import java.awt.Dimension;
 public class Domain extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {VMSXML.VM_PARAM_NAME,
                                             VMSXML.VM_PARAM_VCPU,
@@ -90,14 +92,17 @@ public class Domain extends VMConfig {
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(new JComponent[]{});
         enableComponents();
     }
 
     /** Returns input pane where user can configure a vm. */
     protected final JComponent getInputPane() {
-        final JPanel inputPane = new JPanel();
-        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
+        if (inputPane != null) {
+            return inputPane;
+        }
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
@@ -113,13 +118,14 @@ public class Domain extends VMConfig {
                   Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                   null);
 
-        inputPane.add(optionsPanel);
+        panel.add(optionsPanel);
 
         buttonClass(nextButton()).setEnabled(
                   getVMSVirtualDomainInfo().checkResourceFields(null, PARAMS));
-        final JScrollPane sp = new JScrollPane(inputPane);
+        final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = sp;
         return sp;
     }
 }

@@ -223,7 +223,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                     final int column) {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
-                if (isRemoveButton(tableName, column)) {
+                if (isControlButton(tableName, column)) {
                     vmsVirtualDomainInfo.rowClicked(tableName, key, column);
                 } else {
                     vmsVirtualDomainInfo.selectMyself();
@@ -377,9 +377,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
 
     /** Returns default widths for columns. Null for computed width. */
-    protected final boolean isRemoveButton(final String tableName,
+    protected final boolean isControlButton(final String tableName,
                                            final int column) {
-        return vmsVirtualDomainInfo.isRemoveButton(tableName, column);
+        return vmsVirtualDomainInfo.isControlButton(tableName, column);
     }
 
     /** Returns tool tip text in the table. */

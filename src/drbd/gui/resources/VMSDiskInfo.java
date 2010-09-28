@@ -118,7 +118,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         FIELD_TYPES.put(DiskData.TYPE,
                         GuiComboBox.Type.RADIOGROUP);
         FIELD_TYPES.put(DiskData.SOURCE_FILE,
-                        GuiComboBox.Type.TEXTFIELDWITHBUTTON);
+                        GuiComboBox.Type.TEXTFIELD);
         FIELD_TYPES.put(DiskData.READONLY,
                         GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(DiskData.SHAREABLE,
@@ -465,9 +465,11 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
             final Set<String> devices = new LinkedHashSet<String>();
             devices.add(null);
-            for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
-                if (!getVMSVirtualDomainInfo().isDevice(dev)) {
-                    devices.add(dev);
+            if (newValue != null) {
+                for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
+                    if (!getVMSVirtualDomainInfo().isDevice(dev)) {
+                        devices.add(dev);
+                    }
                 }
             }
             final String saved = getParamSaved(DiskData.TARGET_DEVICE);
@@ -569,7 +571,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                   sourceFile,
                                   null,
                                   null, /* units */
-                                  GuiComboBox.Type.TEXTFIELDWITHBUTTON,
+                                  GuiComboBox.Type.TEXTFIELD,
                                   regexp,
                                   width,
                                   null, /* abbrv */

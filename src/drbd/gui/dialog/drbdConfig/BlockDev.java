@@ -143,7 +143,7 @@ public class BlockDev extends DrbdConfig {
      */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(new JComponent[]{});
         enableComponents();
 
         final String[] params = blockDevInfo.getParametersFromXML();

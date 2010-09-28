@@ -215,11 +215,6 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         mainPanel.add(tablePanel);
     }
 
-    /** Returns service icon in the menu. */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return NetInfo.NET_I_ICON;
-    }
-
     /** Returns long description of the specified parameter. */
     protected final String getParamLongDesc(final String param) {
         return getParamShortDesc(param);
@@ -422,7 +417,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                   sourceFile,
                                   null,
                                   null, /* units */
-                                  GuiComboBox.Type.TEXTFIELDWITHBUTTON,
+                                  GuiComboBox.Type.TEXTFIELD,
                                   regexp,
                                   width,
                                   null, /* abbrv */

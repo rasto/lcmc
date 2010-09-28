@@ -23,6 +23,7 @@
 package drbd.gui.dialog.vm;
 
 import drbd.utilities.Tools;
+import drbd.utilities.MyButton;
 import drbd.data.VMSXML;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.resources.VMSGraphicsInfo;
@@ -33,9 +34,12 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -43,31 +47,21 @@ import java.awt.Dimension;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class Display extends VMConfig {
+public class Finish extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    /** Configuration options of the new domain. */
-    private static final String[] PARAMS = {GraphicsData.TYPE,
-                                            GraphicsData.PORT,
-                                            GraphicsData.LISTEN,
-                                            GraphicsData.PASSWD,
-                                            GraphicsData.KEYMAP,
-                                            GraphicsData.DISPLAY,
-                                            GraphicsData.XAUTH};
-    /** VMS graphics info object. */
-    private VMSGraphicsInfo vmsgi = null;
 
-    /** Prepares a new <code>Display</code> object. */
-    public Display(final WizardDialog previousDialog,
-                   final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Prepares a new <code>Finish</code> object. */
+    public Finish(final WizardDialog previousDialog,
+                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        return new Finish(this, getVMSVirtualDomainInfo());
+        return null;
     }
 
     /**
@@ -75,7 +69,7 @@ public class Display extends VMConfig {
      * Dialog.vm.Domain.Title in TextResources.
      */
     protected final String getDialogTitle() {
-        return Tools.getString("Dialog.vm.Display.Title");
+        return Tools.getString("Dialog.vm.Finish.Title");
     }
 
     /**
@@ -83,13 +77,13 @@ public class Display extends VMConfig {
      * Dialog.vm.Domain.Description in TextResources.
      */
     protected final String getDescription() {
-        return Tools.getString("Dialog.vm.Display.Description");
+        return Tools.getString("Dialog.vm.Finish.Description");
     }
 
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(new JComponent[]{});
         enableComponents();
     }
 
@@ -100,29 +94,37 @@ public class Display extends VMConfig {
         }
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-
+        final MyButton createConfigBtn = new MyButton("Create Config");
+        createConfigBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                createConfigBtn.setEnabled(false);
+                            }
+                        });
+                        getVMSVirtualDomainInfo().apply(false);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                buttonClass(finishButton()).setEnabled(true);
+                            }
+                        });
+                    }
+                });
+                thread.start();
+            }
+        });
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        if (vmsgi == null) {
-            vmsgi = getVMSVirtualDomainInfo().addGraphicsPanel();
-            vmsgi.waitForInfoPanel();
-        } else {
-            vmsgi.selectMyself();
-        }
-        vmsgi.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
-                      null);
-        vmsgi.paramComboBoxGet(GraphicsData.TYPE, "wizard").setValue("vnc");
+        optionsPanel.add(getVMSVirtualDomainInfo().getDefinedOnHostsPanel(
+                                                            "wizard",
+                                                            createConfigBtn));
 
+        optionsPanel.add(createConfigBtn);
         panel.add(optionsPanel);
 
-        buttonClass(nextButton()).setEnabled(
-                                      vmsgi.checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
