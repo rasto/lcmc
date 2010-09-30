@@ -332,10 +332,13 @@ public abstract class WizardDialog extends ConfigDialog {
         disableComponents();
     }
 
-    /**
-     * if retry button was pressed this method will be executed.
-     */
+    /** if retry button was pressed this method will be executed. */
     protected final void retryWasPressed() {
+        /* no action */
+    }
+
+    /** if back button was pressed this method will be executed. */
+    protected final void backButtonWasPressed() {
         /* no action */
     }
 
@@ -347,6 +350,7 @@ public abstract class WizardDialog extends ConfigDialog {
      */
     protected final ConfigDialog checkAnswer() {
         if (isPressedButton(backButton())) {
+            backButtonWasPressed();
             return getPreviousDialog();
         }
         if (isPressedButton(nextButton())

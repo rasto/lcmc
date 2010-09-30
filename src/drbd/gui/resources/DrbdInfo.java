@@ -183,13 +183,10 @@ public class DrbdInfo extends EditableInfo {
         final Host[] hosts = getBrowser().getCluster().getHostsArray();
         for (Host host : hosts) {
             final StringBuffer resConfig = new StringBuffer("");
-            final Enumeration drbdResources =
-                                        getBrowser().getDrbdNode().children();
-            while (drbdResources.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                        (DefaultMutableTreeNode) drbdResources.nextElement();
-                final DrbdResourceInfo drbdRes =
-                                    (DrbdResourceInfo) n.getUserObject();
+            final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
+            for (final String res : drbdResHash.keySet()) {
+                final DrbdResourceInfo drbdRes = drbdResHash.get(res);
                 if (drbdRes.resourceInHost(host)) {
                     resConfig.append('\n');
                     try {

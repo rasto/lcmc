@@ -432,89 +432,89 @@ public abstract class ConfigDialog {
      * Returns next dialog, or null if it there is no next dialog.
      */
     public final ConfigDialog showDialog() {
-        final String[] buttons = buttons();
-        final ImageIcon[] icons = getIcons();
-        MyButton[] options = new MyButton[buttons.length];
-        MyButton defaultButtonClass = null;
-        final List<JComponent> allOptions = new ArrayList<JComponent>();
-        if (skipButtonEnabled()) {
-            skipButton = new JCheckBox(Tools.getString(
-                                           "Dialog.ConfigDialog.SkipButton"));
-            skipButton.setEnabled(false);
-            skipButton.setBackground(
-                    Tools.getDefaultColor("ConfigDialog.Background.Light"));
-            skipButton.addItemListener(skipButtonListener());
-            allOptions.add(skipButton);
-        }
-        /* populate buttonToObjectMap */
-        for (int i = 0; i < buttons.length; i++) {
-            options[i] = new MyButton(buttons[i], icons[i]);
-            options[i].setBackgroundColor(
-                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
-            allOptions.add(options[i]);
-            buttonToObjectMap.put(buttons[i], options[i]);
-            if (buttons[i].equals(defaultButton())) {
-                defaultButtonClass = options[i];
-            }
-        }
-        /* create option pane */
-        final JPanel b = body();
-        final MyButton dbc = defaultButtonClass;
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    optionPane = new JOptionPane(
-                                            b,
-                                            getMessageType(),
-                                            JOptionPane.DEFAULT_OPTION,
-                                            icon(),
-                                            allOptions.toArray(
-                                             new JComponent[allOptions.size()]),
-                                            dbc);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final java.lang.reflect.InvocationTargetException x) {
-            Tools.printStackTrace();
-        }
         /* making non modal dialog */
         dialogGate = new CountDownLatch(1);
-        optionPane.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(final PropertyChangeEvent evt) {
-                if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
-                    && !"uninitializedValue".equals(evt.getNewValue())) {
-                    optionPaneAnswer = optionPane.getValue();
-                    dialogGate.countDown();
+        if (dialogPanel == null) {
+            final String[] buttons = buttons();
+            final ImageIcon[] icons = getIcons();
+            MyButton[] options = new MyButton[buttons.length];
+            MyButton defaultButtonClass = null;
+            final List<JComponent> allOptions = new ArrayList<JComponent>();
+            if (skipButtonEnabled()) {
+                skipButton = new JCheckBox(Tools.getString(
+                                               "Dialog.ConfigDialog.SkipButton"));
+                skipButton.setEnabled(false);
+                skipButton.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                skipButton.addItemListener(skipButtonListener());
+                allOptions.add(skipButton);
+            }
+            /* populate buttonToObjectMap */
+            for (int i = 0; i < buttons.length; i++) {
+                options[i] = new MyButton(buttons[i], icons[i]);
+                options[i].setBackgroundColor(
+                            Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                allOptions.add(options[i]);
+                buttonToObjectMap.put(buttons[i], options[i]);
+                if (buttons[i].equals(defaultButton())) {
+                    defaultButtonClass = options[i];
                 }
             }
-        });
+            /* create option pane */
+            final JPanel b = body();
+            final MyButton dbc = defaultButtonClass;
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        optionPane = new JOptionPane(
+                                                b,
+                                                getMessageType(),
+                                                JOptionPane.DEFAULT_OPTION,
+                                                icon(),
+                                                allOptions.toArray(
+                                                 new JComponent[allOptions.size()]),
+                                                dbc);
+                    }
+                });
+            } catch (final InterruptedException ix) {
+                Thread.currentThread().interrupt();
+            } catch (final java.lang.reflect.InvocationTargetException x) {
+                Tools.printStackTrace();
+            }
+            optionPane.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
+                        && !"uninitializedValue".equals(evt.getNewValue())) {
+                        optionPaneAnswer = optionPane.getValue();
+                        dialogGate.countDown();
+                    }
+                }
+            });
 
-        optionPane.setPreferredSize(new Dimension(dialogWidth(),
-                                                  dialogHeight()));
-        optionPane.setMaximumSize(new Dimension(dialogWidth(),
-                                                dialogHeight()));
-        optionPane.setMinimumSize(new Dimension(dialogWidth(),
-                                                dialogHeight()));
+            optionPane.setPreferredSize(new Dimension(dialogWidth(),
+                                                      dialogHeight()));
+            optionPane.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
+            optionPane.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
 
-        /* add action listeners */
-        for (final MyButton o : options) {
-            o.addActionListener(new OptionPaneActionListener());
+            /* add action listeners */
+            for (final MyButton o : options) {
+                o.addActionListener(new OptionPaneActionListener());
+            }
+
+            optionPane.setBackground(
+                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+            dialogPanel = optionPane.createDialog(Tools.getGUIData().getMainFrame(),
+                                                  getDialogTitle());
+            dialogPanel.setModal(false);
+            dialogPanel.setResizable(true);
+            dialogPanel.setPreferredSize(new Dimension(dialogWidth(),
+                                                       dialogHeight()));
+            dialogPanel.setMaximumSize(new Dimension(dialogWidth(),
+                                                     dialogHeight()));
+            dialogPanel.setMinimumSize(new Dimension(dialogWidth(),
+                                                     dialogHeight()));
+            /* set location like the previous dialog */
         }
-
-        optionPane.setBackground(
-                    Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-        dialogPanel = optionPane.createDialog(Tools.getGUIData().getMainFrame(),
-                                              getDialogTitle());
-        dialogPanel.setModal(false);
-        dialogPanel.setResizable(true);
-        dialogPanel.setPreferredSize(new Dimension(dialogWidth(),
-                                                   dialogHeight()));
-        dialogPanel.setMaximumSize(new Dimension(dialogWidth(),
-                                                 dialogHeight()));
-        dialogPanel.setMinimumSize(new Dimension(dialogWidth(),
-                                                 dialogHeight()));
-        /* set location like the previous dialog */
         dialogPanel.setVisible(true);
         initDialog();
         try {

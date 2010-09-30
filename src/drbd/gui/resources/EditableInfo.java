@@ -499,18 +499,23 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Checks ands sets paramter fields. */
-    private void checkParameterFields(final GuiComboBox paramCb,
-                                      final GuiComboBox realParamCb,
-                                      final String param,
-                                      final String[] params,
-                                      final MyButton thisApplyButton) {
+    public void checkParameterFields(final GuiComboBox paramCb,
+                                     final GuiComboBox realParamCb,
+                                     final String param,
+                                     final String[] params,
+                                     final MyButton thisApplyButton) {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
-                paramCb.setEditable();
+                //SwingUtilities.invokeLater(new Runnable() {
+                //    public void run() {
+                //        paramCb.setEditable();
+                //    }
+                //});
                 boolean c;
                 if (realParamCb != null) {
                     Tools.waitForSwing();
                     realParamCb.setValue(paramCb.getStringValue());
+                    Tools.waitForSwing();
                     c = checkResourceFieldsCorrect(param,
                                                    params);
                 } else {

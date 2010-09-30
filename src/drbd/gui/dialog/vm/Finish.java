@@ -25,6 +25,7 @@ package drbd.gui.dialog.vm;
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
 import drbd.data.VMSXML;
+import drbd.gui.Browser;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.resources.VMSGraphicsInfo;
 import drbd.gui.dialog.WizardDialog;
@@ -83,18 +84,26 @@ public class Finish extends VMConfig {
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{});
+        enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
         enableComponents();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(finishButton()).setEnabled(false);
+            }
+        });
     }
 
     /** Returns input pane where user can configure a vm. */
     protected final JComponent getInputPane() {
+        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        vdi.selectMyself();
         if (inputPane != null) {
             return inputPane;
         }
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         final MyButton createConfigBtn = new MyButton("Create Config");
+        createConfigBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
         createConfigBtn.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
@@ -104,7 +113,7 @@ public class Finish extends VMConfig {
                                 createConfigBtn.setEnabled(false);
                             }
                         });
-                        getVMSVirtualDomainInfo().apply(false);
+                        vdi.apply(false);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 buttonClass(finishButton()).setEnabled(true);
@@ -118,9 +127,8 @@ public class Finish extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        optionsPanel.add(getVMSVirtualDomainInfo().getDefinedOnHostsPanel(
-                                                            "wizard",
-                                                            createConfigBtn));
+        vdi.waitForInfoPanel();
+        optionsPanel.add(vdi.getDefinedOnHostsPanel("wizard", createConfigBtn));
 
         optionsPanel.add(createConfigBtn);
         panel.add(optionsPanel);

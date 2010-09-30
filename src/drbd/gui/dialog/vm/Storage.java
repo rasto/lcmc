@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -55,6 +56,8 @@ public class Storage extends VMConfig {
                                             DiskData.SOURCE_DEVICE};
     /** VMS disk info object. */
     private VMSDiskInfo vmsdi = null;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>Storage</code> object. */
     public Storage(final WizardDialog previousDialog,
@@ -64,7 +67,10 @@ public class Storage extends VMConfig {
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        return new Network(this, getVMSVirtualDomainInfo());
+        if (nextDialogObject == null) {
+            nextDialogObject = new Network(this, getVMSVirtualDomainInfo());
+        }
+        return nextDialogObject;
     }
 
     /**
@@ -86,12 +92,21 @@ public class Storage extends VMConfig {
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{});
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
+        final boolean enable = vmsdi.checkResourceFieldsCorrect(null, PARAMS);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(enable);
+            }
+        });
     }
 
     /** Returns input pane where user can configure a vm. */
     protected final JComponent getInputPane() {
+        if (vmsdi != null) {
+            vmsdi.selectMyself();
+        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -103,10 +118,8 @@ public class Storage extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         if (vmsdi == null) {
             vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
-            vmsdi.waitForInfoPanel();
-        } else {
-            vmsdi.selectMyself();
         }
+        vmsdi.waitForInfoPanel();
         vmsdi.addWizardParams(
                       optionsPanel,
                       PARAMS,
@@ -114,8 +127,9 @@ public class Storage extends VMConfig {
                       Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
+        vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
         vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
-                                                                "virtio/disk");
+                                                                "IDE Disk");
         vmsdi.paramComboBoxGet(DiskData.SOURCE_FILE, "wizard").setValue(
                                      "/var/lib/libvirt/images/"
                                      +
@@ -123,8 +137,6 @@ public class Storage extends VMConfig {
                                                          VMSXML.VM_PARAM_NAME)
                                      + ".img");
         panel.add(optionsPanel);
-        buttonClass(nextButton()).setEnabled(
-                                      vmsdi.checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

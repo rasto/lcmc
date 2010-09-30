@@ -44,9 +44,7 @@ import org.w3c.dom.Node;
  *
  */
 public class XML {
-    /**
-     * Returns child node of the node identified by the tag.
-     */
+    /** Returns child node of the node identified by the tag. */
     protected final Node getChildNode(final Node node, final String tag) {
         final NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {

@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -58,6 +59,8 @@ public class Display extends VMConfig {
                                             GraphicsData.XAUTH};
     /** VMS graphics info object. */
     private VMSGraphicsInfo vmsgi = null;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>Display</code> object. */
     public Display(final WizardDialog previousDialog,
@@ -67,7 +70,10 @@ public class Display extends VMConfig {
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        return new Finish(this, getVMSVirtualDomainInfo());
+        if (nextDialogObject == null) {
+            nextDialogObject = new Finish(this, getVMSVirtualDomainInfo());
+        }
+        return nextDialogObject;
     }
 
     /**
@@ -91,10 +97,19 @@ public class Display extends VMConfig {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
+        final boolean enable = vmsgi.checkResourceFieldsCorrect(null, PARAMS);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(enable);
+            }
+        });
     }
 
     /** Returns input pane where user can configure a vm. */
     protected final JComponent getInputPane() {
+        if (vmsgi != null) {
+            vmsgi.selectMyself();
+        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -107,8 +122,6 @@ public class Display extends VMConfig {
         if (vmsgi == null) {
             vmsgi = getVMSVirtualDomainInfo().addGraphicsPanel();
             vmsgi.waitForInfoPanel();
-        } else {
-            vmsgi.selectMyself();
         }
         vmsgi.addWizardParams(
                       optionsPanel,
@@ -120,9 +133,6 @@ public class Display extends VMConfig {
         vmsgi.paramComboBoxGet(GraphicsData.TYPE, "wizard").setValue("vnc");
 
         panel.add(optionsPanel);
-
-        buttonClass(nextButton()).setEnabled(
-                                      vmsgi.checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

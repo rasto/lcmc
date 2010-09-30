@@ -2313,4 +2313,13 @@ public final class Tools {
             Tools.printStackTrace();
         }
     }
+
+    /** Return directory part (to the /) of the filename. */
+    public static String getDirectoryPart(final String filename) {
+        final int i = filename.lastIndexOf('/');
+        if (i < 0) {
+            return filename;
+        }
+        return filename.substring(0, i + 1);
+    }
 }

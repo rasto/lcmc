@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -121,6 +122,8 @@ public class VMSXML extends XML {
     /** Map from domain name and network name to the network data. */
     private final Map<String, NetworkData> networkMap =
                                     new LinkedHashMap<String, NetworkData>();
+    /** Directories where are source files. */
+    private final Set<String> sourceFileDirs = new TreeSet<String>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
@@ -459,6 +462,9 @@ public class VMSXML extends XML {
         typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_ARCH));
         typeNode.setAttribute("machine", "pc-0.12");
         typeNode.appendChild(doc.createTextNode("hvm"));
+        final Element bootNode = (Element) osNode.appendChild(
+                                                  doc.createElement("boot"));
+        bootNode.setAttribute("dev", parametersMap.get(VM_PARAM_BOOT));
 
         /* features */
         final boolean acpi = "True".equals(parametersMap.get(VM_PARAM_ACPI));
@@ -1153,6 +1159,8 @@ public class VMSXML extends XML {
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
                                 sourceFile = getAttribute(optionNode, "file");
+                                sourceFileDirs.add(Tools.getDirectoryPart(
+                                                                  sourceFile));
                                 sourceDev = getAttribute(optionNode, "dev");
                             } else if ("target".equals(nodeName)) {
                                 targetDev = getAttribute(optionNode, "dev");
@@ -1475,9 +1483,7 @@ public class VMSXML extends XML {
         return domainNames;
     }
 
-    /**
-     * Returns whether the domain is running.
-     */
+    /** Returns whether the domain is running. */
     public final boolean isRunning(final String name) {
         final Boolean r = runningMap.get(name);
         if (r != null) {
@@ -2344,5 +2350,10 @@ public class VMSXML extends XML {
             return type + " (" + display + ")";
         }
         return "unknown";
+    }
+
+    /** Returns source file directories. */
+    public final Set<String> getsourceFileDirs() {
+        return sourceFileDirs;
     }
 }

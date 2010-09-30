@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -52,9 +53,12 @@ public class Network extends VMConfig {
     private static final String[] PARAMS = {InterfaceData.TYPE,
                                             InterfaceData.MAC_ADDRESS,
                                             InterfaceData.SOURCE_NETWORK,
-                                            InterfaceData.SOURCE_BRIDGE};
+                                            InterfaceData.SOURCE_BRIDGE,
+                                            InterfaceData.MODEL_TYPE};
     /** VMS interface info object. */
     private VMSInterfaceInfo vmsii = null;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>Network</code> object. */
     public Network(final WizardDialog previousDialog,
@@ -64,7 +68,10 @@ public class Network extends VMConfig {
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        return new Display(this, getVMSVirtualDomainInfo());
+        if (nextDialogObject == null) {
+            nextDialogObject = new Display(this, getVMSVirtualDomainInfo());
+        }
+        return nextDialogObject;
     }
 
     /**
@@ -86,12 +93,21 @@ public class Network extends VMConfig {
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{});
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
+        final boolean enable = vmsii.checkResourceFieldsCorrect(null, PARAMS);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(enable);
+            }
+        });
     }
 
     /** Returns input pane where user can configure a vm. */
     protected final JComponent getInputPane() {
+        if (vmsii != null) {
+            vmsii.selectMyself();
+        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -104,8 +120,6 @@ public class Network extends VMConfig {
         if (vmsii == null) {
             vmsii = getVMSVirtualDomainInfo().addInterfacePanel();
             vmsii.waitForInfoPanel();
-        } else {
-            vmsii.selectMyself();
         }
         vmsii.addWizardParams(
                       optionsPanel,
@@ -114,13 +128,14 @@ public class Network extends VMConfig {
                       Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
+        vmsii.paramComboBoxGet(InterfaceData.TYPE,
+                               "wizard").setValue("network");
         vmsii.paramComboBoxGet(InterfaceData.SOURCE_NETWORK,
                                "wizard").setValue("default");
+        vmsii.paramComboBoxGet(InterfaceData.MODEL_TYPE, "wizard").setValue("");
 
         panel.add(optionsPanel);
 
-        buttonClass(nextButton()).setEnabled(
-                                      vmsii.checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

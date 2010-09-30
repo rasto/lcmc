@@ -2106,8 +2106,64 @@ public final class RoboTest {
         slowFactor = 0.2f;
         host.getSSH().installTestFiles(1);
         aborted = false;
-        moveTo(robot, 10, 10);
         checkVMTest(host, "vm-test1", 1);
-        Tools.sleep(25000);
+
+        moveTo(robot, 56, 252); /* popup */
+        rightClick(robot);
+        moveTo(robot, 159, 273); /* new domain */
+        leftClick(robot);
+        moveTo(robot, 450, 395); /* domain name */
+        leftClick(robot);
+        press(robot, KeyEvent.VK_D);
+        sleep(200);
+        press(robot, KeyEvent.VK_M);
+        sleep(200);
+        press(robot, KeyEvent.VK_C);
+        sleep(200);
+        moveTo(robot, 730, 580);
+        leftClick(robot);
+        //press(robot, KeyEvent.VK_ENTER);
+
+        moveTo(robot, 573, 445); /* source file */
+        leftClick(robot);
+        press(robot, KeyEvent.VK_T);
+        sleep(200);
+        press(robot, KeyEvent.VK_E);
+        sleep(200);
+        press(robot, KeyEvent.VK_S);
+        sleep(200);
+        press(robot, KeyEvent.VK_T);
+        sleep(5000);
+        moveTo(robot, 730, 580);
+        leftClick(robot);
+        //press(robot, KeyEvent.VK_ENTER);
+        sleep(9000);
+        moveTo(robot, 730, 580);
+        leftClick(robot);
+        //press(robot, KeyEvent.VK_ENTER); /* storage */
+        sleep(9000);
+        moveTo(robot, 730, 580);
+        leftClick(robot);
+        //press(robot, KeyEvent.VK_ENTER); /* network */
+        sleep(9000);
+        moveTo(robot, 730, 580);
+        leftClick(robot);
+        //press(robot, KeyEvent.VK_ENTER); /* display */
+        sleep(9000);
+        moveTo(robot, 560, 423); /* create config */
+        leftClick(robot);
+
+        checkVMTest(host, "vm-test1", 2);
+
+        moveTo(robot, 814, 581); /* finish */
+        leftClick(robot);
+
+        Tools.sleep(5000);
+        moveTo(robot, 1066, 284); /* remove */
+        leftClick(robot);
+        Tools.sleep(5000);
+        moveTo(robot, 516, 485); /* confirm */
+        leftClick(robot);
+        Tools.sleep(5000);
     }
 }

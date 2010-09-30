@@ -62,6 +62,7 @@ import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SpringLayout;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
@@ -278,6 +279,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private static final String DEFINED_ON_HOST_TRUE = "True";
     /** Not defined on host string value. */
     private static final String DEFINED_ON_HOST_FALSE = "False";
+    /** Wizard prefix string. */
+    private static final String WIZARD_PREFIX = "wizard:";
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
@@ -339,8 +342,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** New video button. */
     private MyButton newVideoBtn = null;
     /** This is a map from host to the check box. */
-    private final Map<Host, GuiComboBox> definedOnHostComboBoxHash =
-                                          new HashMap<Host, GuiComboBox>();
+    private final Map<String, GuiComboBox> definedOnHostComboBoxHash =
+                                          new HashMap<String, GuiComboBox>();
     static {
         SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
@@ -758,6 +761,32 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             inputDevToInfo.put(inputDev, vmsid);
             mInputDevToInfoLock.release();
             vmsid.updateParameters();
+        }
+        /* Sort it. */
+        int i = 0;
+        for (int j = 0; j < getNode().getChildCount(); j++) {
+            final DefaultMutableTreeNode node =
+                         (DefaultMutableTreeNode) getNode().getChildAt(j);
+            final VMSHardwareInfo v = (VMSHardwareInfo) node.getUserObject();
+            final String n = v.getName();
+            if (i > 0) {
+                final DefaultMutableTreeNode prev =
+                     (DefaultMutableTreeNode) getNode().getChildAt(j - 1);
+                final VMSHardwareInfo prevI =
+                                        (VMSHardwareInfo) prev.getUserObject();
+                if (prevI.getClass().getName().equals(v.getClass().getName())) {
+                    final String prevN = prevI.getName();
+                    if (!prevI.getResource().isNew() 
+                        && !v.getResource().isNew()
+                        && prevN.compareTo(n) > 0) {
+                        getNode().remove(j);
+                        getNode().insert(node, j - 1);
+                    }
+                } else {
+                    i = 0;
+                }
+            }
+            i++;
         }
         return nodeChanged;
     }
@@ -1254,49 +1283,46 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns button for defined hosts. */
     private MyButton getHostButton(final Host host, final String prefix) {
-        MyButton hostBtn;
-        if (prefix == null) {
-            hostBtn = hostButtons.get(host.getName());
-        } else {
-            hostBtn = hostButtons.get(prefix + ":" + host.getName());
-        }
-        if (hostBtn == null) {
-            hostBtn = new MyButton("", null, "not defined on "
-                                             + host.getName());
-            final MyButton hBtn = hostBtn;
-            hostBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    final Thread t = new Thread(new Runnable() {
-                        public void run() {
-                            final VMSXML vxml = getBrowser().getVMSXML(host);
-                            if (vxml != null) {
-                                if (hBtn.getIcon() == VNC_ICON) {
-                                    final int remotePort = vxml.getRemotePort(
-                                                              getDomainName());
-                                    Tools.startTightVncViewer(host,
-                                                              remotePort);
-                                } else if (hBtn.getIcon()
-                                           == HostBrowser.HOST_ON_ICON) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        public void run() {
-                                            hBtn.setEnabled(false);
-                                        }
-                                    });
-                                    start(host);
-                                }
+        final MyButton hostBtn = new MyButton("", null, "not defined on "
+                                                       + host.getName());
+        final MyButton hBtn = hostBtn;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                hBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
+            }
+        });
+        hostBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        final VMSXML vxml = getBrowser().getVMSXML(host);
+                        if (vxml != null) {
+                            if (hBtn.getIcon() == VNC_ICON) {
+                                final int remotePort = vxml.getRemotePort(
+                                                          getDomainName());
+                                Tools.startTightVncViewer(host,
+                                                          remotePort);
+                            } else if (hBtn.getIcon()
+                                       == HostBrowser.HOST_ON_ICON) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        hBtn.setEnabled(false);
+                                    }
+                                });
+                                start(host);
                             }
                         }
-                    });
-                    t.start();
-                }
-            });
-            hostBtn.setPreferredSize(new Dimension(60, 20));
-            hostBtn.setMinimumSize(hostBtn.getPreferredSize());
-            if (prefix == null) {
-                hostButtons.put(host.getName(), hostBtn);
-            } else {
-                hostButtons.put(prefix + ":" + host.getName(), hostBtn);
+                    }
+                });
+                t.start();
             }
+        });
+        hostBtn.setPreferredSize(new Dimension(60, 20));
+        hostBtn.setMinimumSize(hostBtn.getPreferredSize());
+        if (prefix == null) {
+            hostButtons.put(host.getName(), hostBtn);
+        } else {
+            hostButtons.put(prefix + ":" + host.getName(), hostBtn);
         }
         return hostBtn;
     }
@@ -1309,24 +1335,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             final String hostName = h.getName();
-            final GuiComboBox hostCB = definedOnHostComboBoxHash.get(h);
-            if (hostCB != null) {
-                if (h.isConnected()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            hostCB.setEnabled(true);
-                        }
-                    });
-                } else {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            hostCB.setEnabled(false);
-                        }
-                    });
-                }
-            }
-            final MyButton hostBtn = getHostButton(h, null);
-            final MyButton wizardHostBtn = getHostButton(h, "wizard");
+            final MyButton hostBtn = hostButtons.get(h.getName());
+            final MyButton wizardHostBtn =
+                                  hostButtons.get(WIZARD_PREFIX + h.getName());
+            final GuiComboBox hostCB =
+                                    definedOnHostComboBoxHash.get(h.getName());
+            final GuiComboBox wizardHostCB =
+                       definedOnHostComboBoxHash.get(WIZARD_PREFIX + hostName);
+
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
                 if (vmsxml.isRunning(getDomainName())) {
@@ -1356,29 +1372,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     starting.remove(hostName);
                     mTransitionLock.release();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            hostBtn.setIcon(VNC_ICON);
-                            hostBtn.setToolTipText("View on " + h.getName());
-                            if (wizardHostBtn != null) {
-                                wizardHostBtn.setIcon(VNC_ICON);
-                                wizardHostBtn.setToolTipText(
-                                                    "View on " + h.getName());
-                            }
-                        }
-                    });
-                } else {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            hostBtn.setIcon(HostBrowser.HOST_ON_ICON);
-                            hostBtn.setToolTipText("Start on " + h.getName());
-                            if (wizardHostBtn != null) {
-                                wizardHostBtn.setIcon(HostBrowser.HOST_ON_ICON);
-                                wizardHostBtn.setToolTipText(
-                                                    "Start on " + h.getName());
-                            }
-                        }
-                    });
                 }
                 definedhosts.add(hostName);
             } else {
@@ -1390,38 +1383,20 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                           + Tools.join(", ", definedhosts.toArray(
                                      new String[definedhosts.size()]))
                           + "</html>";
-        running = runningOnHosts.isEmpty();
+        running = !runningOnHosts.isEmpty();
         try {
             mTransitionLock.acquire();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        /* Set host buttons */
+        setHostButtons(running);
         if (runningOnHosts.isEmpty() && starting.isEmpty()) {
             shuttingdown.clear();
             suspending.clear();
             resuming.clear();
             mTransitionLock.release();
             runningOnString = "Stopped";
-            for (final Host h : getBrowser().getClusterHosts()) {
-                final GuiComboBox hcb = definedOnHostComboBoxHash.get(h);
-                if (hcb != null) {
-                    final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                    if (vmsxml != null
-                        && vmsxml.getDomainNames().contains(getDomainName())) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                hcb.setTFButtonEnabled(true);
-                            }
-                        });
-                    } else {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                hcb.setTFButtonEnabled(false);
-                            }
-                        });
-                    }
-                }
-            }
         } else {
             mTransitionLock.release();
             if (progress.charAt(0) == '-') {
@@ -1482,24 +1457,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             mTransitionLock.release();
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                final GuiComboBox hcb = definedOnHostComboBoxHash.get(h);
-                if (hcb != null) {
-                    if (vmsxml != null
-                        && vmsxml.getDomainNames().contains(getDomainName())
-                        && vmsxml.isRunning(getDomainName())) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                hcb.setTFButtonEnabled(true);
-                            }
-                        });
-                    } else {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                hcb.setTFButtonEnabled(false);
-                            }
-                        });
-                    }
-                }
+                final GuiComboBox hcb =
+                                    definedOnHostComboBoxHash.get(h.getName());
             }
         }
         for (final String param : getParametersFromXML()) {
@@ -1578,9 +1537,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                                final MyButton thisApplyButton) {
         final JPanel hostPanel = new JPanel(new SpringLayout());
         int rows = 0;
+        boolean running = false;
         for (final Host host : getBrowser().getClusterHosts()) {
             String defaultValue = null;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
+            if (vmsxml != null && vmsxml.isRunning(getDomainName())) {
+                running = true;
+            }
+            boolean notDefined = false;
+            if (vmsxml != null && !vmsxml.getDomainNames().contains(
+                                                            getDomainName())) {
+                notDefined = false;
+            }
             if (host.isConnected()
                 && (getResource().isNew()
                     || (vmsxml != null
@@ -1590,6 +1558,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             } else {
                 defaultValue = DEFINED_ON_HOST_FALSE;
             }
+            final MyButton hostBtn = getHostButton(host, prefix);
             final GuiComboBox cb = new GuiComboBox(
                                         defaultValue,
                                         null, /* items */
@@ -1601,8 +1570,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                         new AccessMode(
                                           ConfigData.AccessType.ADMIN,
                                           false),
-                                        getHostButton(host, prefix));
-            definedOnHostComboBoxHash.put(host, cb);
+                                        hostBtn);
+            GuiComboBox rpcb = null;
+            if (prefix == null) {
+                definedOnHostComboBoxHash.put(host.getName(), cb);
+            } else {
+                definedOnHostComboBoxHash.put(prefix + ":" + host.getName(),
+                                              cb);
+                rpcb = definedOnHostComboBoxHash.get(host.getName());
+            }
+            final GuiComboBox realParamCb = rpcb;
             if (!host.isConnected()) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -1615,22 +1592,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     public void itemStateChanged(final ItemEvent e) {
                         if (cb.isCheckBox()
                             || e.getStateChange() == ItemEvent.SELECTED) {
-                            final Thread thread = new Thread(new Runnable() {
-                                public void run() {
-                                    final boolean enable =
-                                      checkResourceFields(
-                                                    ServiceInfo.CACHED_FIELD,
-                                                    getParametersFromXML());
-                                    SwingUtilities.invokeLater(
-                                    new Runnable() {
-                                        public void run() {
-                                            cb.setEditable();
-                                            thisApplyButton.setEnabled(enable);
-                                        }
-                                    });
-                                }
-                            });
-                            thread.start();
+                            checkParameterFields(cb,
+                                                 realParamCb,
+                                                 ServiceInfo.CACHED_FIELD,
+                                                 getParametersFromXML(),
+                                                 thisApplyButton);
                         }
                     }
                 }, null);
@@ -1645,9 +1611,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                      0);
             rows++;
         }
+        setHostButtons(running);
         SpringUtilities.makeCompactGrid(hostPanel, rows, 2, /* rows, cols */
-                                        1, 1,           /* initX, initY */
-                                        1, 1);          /* xPad, yPad */
+                                                   1, 1,    /* initX, initY */
+                                                   1, 1);   /* xPad, yPad */
         final JPanel doPanel = getParamPanel("Defined on");
         doPanel.add(hostPanel);
         return doPanel;
@@ -1780,6 +1747,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         newPanel.add(new JScrollPane(mainPanel));
         getApplyButton().setEnabled(checkResourceFields(null, params));
         infoPanel = newPanel;
+        infoPanelDone();
         return infoPanel;
     }
 
@@ -2695,8 +2663,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                         continue;
                                     }
                                     if (vmsxml.isRunning(getDomainName())) {
-                                        return "it is running on "
-                                                + host.getName();
+                                        return "it is running";
                                     }
                                 }
                                 return null;
@@ -2982,7 +2949,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final List<Host> definedOnHosts = new ArrayList<Host>();
         for (final Host host : getBrowser().getClusterHosts()) {
             final String value =
-                          definedOnHostComboBoxHash.get(host).getStringValue();
+              definedOnHostComboBoxHash.get(host.getName()).getStringValue();
             if (DEFINED_ON_HOST_TRUE.equals(value)) {
                 if (getResource().isNew()) {
                     final VMSXML vmsxml = new VMSXML(host);
@@ -3055,6 +3022,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             getDomainName(),
                             parameters);
         getResource().setNew(false);
+        for (final Host host : definedOnHosts) {
+            getBrowser().periodicalVMSUpdate(host);
+        }
+        updateParameters();
         checkResourceFields(null, params);
         getBrowser().reload(getNode());
     }
@@ -3063,7 +3034,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     protected Map<VMSHardwareInfo, Map<String, String>> getAllHWParameters() {
         final Enumeration e = getNode().children();
         final Map<VMSHardwareInfo, Map<String, String>> allParamaters =
-                         new HashMap<VMSHardwareInfo, Map<String, String>>();
+                         new TreeMap<VMSHardwareInfo, Map<String, String>>();
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                         (DefaultMutableTreeNode) e.nextElement();
@@ -3257,7 +3228,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             if (getResource().isNew()) {
                 final String value =
-                          definedOnHostComboBoxHash.get(h).getStringValue();
+                  definedOnHostComboBoxHash.get(h.getName()).getStringValue();
                 if (DEFINED_ON_HOST_TRUE.equals(value)) {
                     definedOn.add(h);
                 }
@@ -4036,9 +4007,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     public boolean checkResourceFieldsChanged(final String param,
                                               final String[] params) {
         boolean changed = false;
-        for (final Host host : definedOnHostComboBoxHash.keySet()) {
+        for (final Host host : getBrowser().getClusterHosts()) {
+            if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
+                continue;
+            }
             final String value =
-                        definedOnHostComboBoxHash.get(host).getStringValue();
+                definedOnHostComboBoxHash.get(host.getName()).getStringValue();
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
             if ((vmsxml == null
                  || !vmsxml.getDomainNames().contains(getDomainName()))
@@ -4057,8 +4031,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     public boolean checkResourceFieldsCorrect(final String param,
                                               final String[] params) {
         boolean cor = false;
-        for (final Host host : definedOnHostComboBoxHash.keySet()) {
-            final GuiComboBox hostCB = definedOnHostComboBoxHash.get(host);
+        for (final Host host : getBrowser().getClusterHosts()) {
+            if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
+                continue;
+            }
+            final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
+                                                               host.getName());
+            final GuiComboBox wizardHostCB = definedOnHostComboBoxHash.get(
+                                               WIZARD_PREFIX + host.getName());
             final String value = hostCB.getStringValue();
             String savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
@@ -4069,13 +4049,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 savedValue = DEFINED_ON_HOST_FALSE;
             }
             hostCB.setBackground(value, savedValue, false);
+            if (wizardHostCB != null) {
+                wizardHostCB.setBackground(value, savedValue, false);
+            }
             if (DEFINED_ON_HOST_TRUE.equals(value)) {
                 cor = true; /* at least one */
             }
         }
         if (!cor) {
-            for (final Host host : definedOnHostComboBoxHash.keySet()) {
-                definedOnHostComboBoxHash.get(host).wrongValue();
+            for (final String key : definedOnHostComboBoxHash.keySet()) {
+                definedOnHostComboBoxHash.get(key).wrongValue();
             }
         }
         return super.checkResourceFieldsCorrect(null, params) && cor;
@@ -4222,5 +4205,81 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         return super.getTableToolTip(tableName, key, object, raw, column);
+    }
+
+    /** Sets button next to host to the start button. */
+    private void setButtonToStart(final Host host,
+                                  final GuiComboBox hostCB,
+                                  final MyButton hostBtn,
+                                  final boolean stopped) {
+        if (hostCB != null) {
+            final boolean enable = host.isConnected();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    hostCB.setTFButtonEnabled(enable && stopped);
+                    hostBtn.setIcon(HostBrowser.HOST_ON_ICON);
+                    hostBtn.setToolTipText("Start on " + host.getName());
+                }
+            });
+        }
+    }
+
+    /** Sets button next to host to the view button. */
+    private void setButtonToView(final Host host,
+                                 final GuiComboBox hostCB,
+                                 final MyButton hostBtn) {
+        if (hostCB != null) {
+            final boolean enable = host.isConnected();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    hostCB.setTFButtonEnabled(enable);
+                    hostBtn.setIcon(VNC_ICON);
+                    hostBtn.setToolTipText("Graphical console on "
+                                           + host.getName());
+                }
+            });
+        }
+    }
+
+    /** Sets button next to host to the not defined button. */
+    private void setButtonToNotDefined(final Host host,
+                                       final GuiComboBox hostCB,
+                                       final MyButton hostBtn) {
+        if (hostCB != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    hostCB.setTFButtonEnabled(false);
+                    hostBtn.setIcon(null);
+                    hostBtn.setToolTipText("not defined on " + host.getName());
+                }
+            });
+        }
+    }
+
+    /** Sets all host buttons. */
+    private void setHostButtons(final boolean running) {
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            final MyButton hostBtn = hostButtons.get(h.getName());
+            final MyButton wizardHostBtn =
+                                 hostButtons.get(WIZARD_PREFIX + h.getName());
+            final GuiComboBox hostCB =
+                                    definedOnHostComboBoxHash.get(h.getName());
+            final GuiComboBox wizardHostCB =
+                    definedOnHostComboBoxHash.get(WIZARD_PREFIX + h.getName());
+            if (vmsxml != null
+                && vmsxml.getDomainNames().contains(getDomainName())) {
+                if (vmsxml.isRunning(getDomainName())) {
+                    setButtonToView(h, hostCB, hostBtn);
+                    setButtonToView(h, wizardHostCB, wizardHostBtn);
+                } else {
+                    setButtonToStart(h, hostCB, hostBtn, !running);
+                    setButtonToStart(h, wizardHostCB, wizardHostBtn, !running);
+                }
+            } else {
+                setButtonToNotDefined(h, hostCB, hostBtn);
+                setButtonToNotDefined(h, wizardHostCB, wizardHostBtn);
+            }
+        }
     }
 }

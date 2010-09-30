@@ -257,7 +257,10 @@ public class DrbdGuiXML extends XML {
                                                 getAttribute(hostNode,
                                                              HOST_USESUDO_ATTR);
                             final Node ipNode = getChildNode(hostNode, "ip");
-                            final String ip = getText(ipNode);
+                            String ip = null;
+                            if (ipNode != null) {
+                                ip = getText(ipNode);
+                            }
                             final Node usernameNode = getChildNode(hostNode,
                                                                    "user");
                             final String username = getText(usernameNode);

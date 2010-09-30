@@ -1057,7 +1057,7 @@ public class TextResource extends
          "Configure remote display."},
 
         {"Dialog.vm.Finish.Title",
-         "Start Domain."},
+         "Start Domain"},
 
         {"Dialog.vm.Finish.Description",
          "Here you can start the domain and a viewer."},

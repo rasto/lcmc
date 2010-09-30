@@ -131,7 +131,6 @@ class FilesystemInfo extends ServiceInfo {
             final String dir = getComboBoxValue("directory");
             boolean confirm = false; /* confirm only once */
             for (Host host : getBrowser().getClusterHosts()) {
-                final String hostName = host.getName();
                 final String statCmd = "stat -c \"%F\" " + dir + "||true";
                 final SSH.SSHOutput ret =
                                    Tools.execCommandProgressIndicator(

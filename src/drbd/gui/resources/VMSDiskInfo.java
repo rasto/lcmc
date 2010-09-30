@@ -36,6 +36,7 @@ import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.HashSet;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -118,7 +119,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         FIELD_TYPES.put(DiskData.TYPE,
                         GuiComboBox.Type.RADIOGROUP);
         FIELD_TYPES.put(DiskData.SOURCE_FILE,
-                        GuiComboBox.Type.TEXTFIELD);
+                        GuiComboBox.Type.COMBOBOX);
         FIELD_TYPES.put(DiskData.READONLY,
                         GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(DiskData.SHAREABLE,
@@ -149,7 +150,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                                                  new HashMap<String, String>();
     /** Possible values. */
     private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Object[]>();
+                                              new HashMap<String, Object[]>();
     /** Default location for libvirt images. */
     private static final String LIBVIRT_IMAGE_LOCATION =
                                              "/var/lib/libvirt/images/";
@@ -260,7 +261,15 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
-        if (DiskData.SOURCE_DEVICE.equals(param)) {
+        if (DiskData.SOURCE_FILE.equals(param)) {
+            final Set<String> sourceFileDirs = new TreeSet<String>();
+            sourceFileDirs.add(LIBVIRT_IMAGE_LOCATION);
+            for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
+                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                sourceFileDirs.addAll(vmsxml.getsourceFileDirs());
+            }
+            return sourceFileDirs.toArray(new String[sourceFileDirs.size()]);
+        } else if (DiskData.SOURCE_DEVICE.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 final List<String> bds = new ArrayList<String>();
@@ -466,9 +475,13 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             final Set<String> devices = new LinkedHashSet<String>();
             devices.add(null);
             if (newValue != null) {
-                for (final String dev : TARGET_DEVICES_MAP.get(newValue)) {
-                    if (!getVMSVirtualDomainInfo().isDevice(dev)) {
-                        devices.add(dev);
+                final String[] targetDevices =
+                                            TARGET_DEVICES_MAP.get(newValue);
+                if (targetDevices != null) {
+                    for (final String dev : targetDevices) {
+                        if (!getVMSVirtualDomainInfo().isDevice(dev)) {
+                            devices.add(dev);
+                        }
                     }
                 }
             }
@@ -491,7 +504,11 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                         readonlyCB.get(p).setValue("True");
                     }
                     for (final String p : driverTypeCB.keySet()) {
-                        driverTypeCB.get(p).setValue(null);
+                        if (getResource().isNew()) {
+                            driverTypeCB.get(p).setValue("raw");
+                        } else {
+                            driverTypeCB.get(p).setValue(null);
+                        }
                     }
                 } else if ("virtio/disk".equals(newValue)) {
                     for (final String p : driverTypeCB.keySet()) {
@@ -500,6 +517,9 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 } else {
                     for (final String p : readonlyCB.keySet()) {
                         readonlyCB.get(p).setValue("False");
+                        if (getResource().isNew()) {
+                            driverTypeCB.get(p).setValue("raw");
+                        }
                     }
                 }
             }
@@ -569,15 +589,16 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             final MyButton fileChooserBtn = new MyButton("Browse...");
             final GuiComboBox paramCB = new GuiComboBox(
                                   sourceFile,
-                                  null,
+                                  getParamPossibleChoices(param),
                                   null, /* units */
-                                  GuiComboBox.Type.TEXTFIELD,
+                                  getFieldType(param),
                                   regexp,
                                   width,
                                   null, /* abbrv */
                                   new AccessMode(getAccessType(param),
                                                  false), /* only adv. mode */
                                   fileChooserBtn);
+            paramCB.setAlwaysEditable(true);
             if (prefix == null) {
                 sourceFileCB.put("", paramCB);
             } else {
@@ -595,7 +616,14 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread t = new Thread(new Runnable() {
                         public void run() {
-                            startFileChooser(paramCB, LIBVIRT_IMAGE_LOCATION);
+                            String file;
+                            final String oldFile = paramCB.getStringValue();
+                            if (oldFile == null || "".equals(oldFile)) {
+                                file = LIBVIRT_IMAGE_LOCATION;
+                            } else {
+                                file = oldFile;
+                            }
+                            startFileChooser(paramCB, file);
                         }
                     });
                     t.start();
@@ -716,5 +744,13 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         } else {
             return super.checkResourceFieldsChanged(param, FILE_PARAMETERS);
         }
+    }
+
+    /** Returns the regexp of the parameter. */
+    protected String getParamRegexp(final String param) {
+        if (DiskData.SOURCE_FILE.equals(param)) {
+            return ".*[^/]$";
+        }
+        return super.getParamRegexp(param);
     }
 }

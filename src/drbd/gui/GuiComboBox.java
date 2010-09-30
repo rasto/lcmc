@@ -307,6 +307,10 @@ public class GuiComboBox extends JPanel {
             component = newComp;
         } else {
             componentPart = newComp;
+            componentPart.setPreferredSize(new Dimension(width / 3 * 2,
+                                                         WIDGET_HEIGHT));
+            componentPart.setMinimumSize(componentPart.getPreferredSize());
+            componentPart.setMaximumSize(componentPart.getPreferredSize());
             component = new JPanel();
             component.setLayout(new SpringLayout());
 
@@ -318,18 +322,15 @@ public class GuiComboBox extends JPanel {
                                                        0, 0);
         }
         if (this.type == Type.TEXTFIELDWITHUNIT) {
-            textFieldPart.setMinimumSize(new Dimension(width / 3,
-                                                       WIDGET_HEIGHT));
-            textFieldPart.setMaximumSize(new Dimension(width / 3,
-                                                       WIDGET_HEIGHT));
             textFieldPart.setPreferredSize(new Dimension(width / 3,
                                                          WIDGET_HEIGHT));
-            unitComboBox.setMinimumSize(new Dimension(width / 3 * 2,
-                                                      WIDGET_HEIGHT));
-            unitComboBox.setMaximumSize(new Dimension(width / 3 * 2,
-                                                      WIDGET_HEIGHT));
+            textFieldPart.setMinimumSize(textFieldPart.getPreferredSize());
+            textFieldPart.setMaximumSize(textFieldPart.getPreferredSize());
+
             unitComboBox.setPreferredSize(new Dimension(width / 3 * 2,
                                                         WIDGET_HEIGHT));
+            unitComboBox.setMinimumSize(unitComboBox.getPreferredSize());
+            unitComboBox.setMaximumSize(unitComboBox.getPreferredSize());
         }
         component.setPreferredSize(new Dimension(width,
                                                  WIDGET_HEIGHT));
@@ -722,6 +723,13 @@ public class GuiComboBox extends JPanel {
      */
     public final void setEditable(final boolean editable) {
         this.editable = editable;
+        JComponent c;
+        if (fieldButton == null) {
+            c = component;
+        } else {
+            c = componentPart;
+        }
+        final JComponent comp = c;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 switch(type) {
@@ -739,16 +747,16 @@ public class GuiComboBox extends JPanel {
                             o = null;
                         }
                         if (alwaysEditable) {
-                            ((JComboBox) component).setEditable(true);
+                            ((JComboBox) comp).setEditable(true);
                             final JTextComponent editor = getTextComponent();
                             if (o == null) {
                                 editor.selectAll();
                             }
                         } else {
                             if (o == null) {
-                                ((JComboBox) component).setEditable(false);
+                                ((JComboBox) comp).setEditable(false);
                             } else {
-                                ((JComboBox) component).setEditable(editable);
+                                ((JComboBox) comp).setEditable(editable);
                             }
                         }
                         break;
@@ -1242,7 +1250,13 @@ public class GuiComboBox extends JPanel {
 
     /** Returns the text component of the combo box. */
     private JTextComponent getTextComponent() {
-        final ComboBoxEditor editor = ((JComboBox) component).getEditor();
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
+        final ComboBoxEditor editor = ((JComboBox) comp).getEditor();
         return (JTextComponent) editor.getEditorComponent();
     }
 

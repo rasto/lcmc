@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -51,9 +52,12 @@ public class InstallationDisk extends VMConfig {
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
-                                            DiskData.SOURCE_DEVICE};
+                                            DiskData.SOURCE_DEVICE,
+                                            DiskData.DRIVER_TYPE};
     /** VMS disk info object. */
     private VMSDiskInfo vmsdi = null;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>InstallationDisk</code> object. */
     public InstallationDisk(final WizardDialog previousDialog,
@@ -63,7 +67,10 @@ public class InstallationDisk extends VMConfig {
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        return new Storage(this, getVMSVirtualDomainInfo());
+        if (nextDialogObject == null) {
+            nextDialogObject = new Storage(this, getVMSVirtualDomainInfo());
+        }
+        return nextDialogObject;
     }
 
     /**
@@ -85,12 +92,21 @@ public class InstallationDisk extends VMConfig {
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{});
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
+        final boolean enable = vmsdi.checkResourceFieldsCorrect(null, PARAMS);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(enable);
+            }
+        });
     }
 
     /** Returns input pane where user can configure a vm. */
     protected final JComponent getInputPane() {
+        if (vmsdi != null) {
+            vmsdi.selectMyself();
+        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -103,23 +119,19 @@ public class InstallationDisk extends VMConfig {
         if (vmsdi == null) {
             vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
             vmsdi.waitForInfoPanel();
-        } else {
-            vmsdi.selectMyself();
         }
         vmsdi.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
-                      null);
-
+                          optionsPanel,
+                          PARAMS,
+                          buttonClass(nextButton()),
+                          Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
+                          Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
+                          null);
+        vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
         vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
-                                                                  "ide/cdrom");
+                                                                  "IDE CDROM");
         panel.add(optionsPanel);
 
-        buttonClass(nextButton()).setEnabled(
-                                      vmsdi.checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

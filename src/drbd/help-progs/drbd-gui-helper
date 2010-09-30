@@ -1544,13 +1544,10 @@ sub gui_test {
 sub gui_vm_test {
 	my $testname = shift;
 	my $index = shift;
-	my ($path) = `ls /etc/libvirt/qemu/*.xml`;
-	my ($name) = $path =~ /([^\/]+)\.xml$/;
-	my $xml = `virsh dumpxml $name`;
+	my $name = "dmc";
+	my $xml = `virsh dumpxml $name 2>/dev/null`;
 	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
-	$xml =~ s/^(\s*<source file=')[^']+/$1IMAGE/gm;
-	$xml =~ s/\b$name\b/DOMAIN/g;
 
 	my $testfile = "/tmp/drbd-mc-test/$testname/domain.xml$index";
 	my $test = "";

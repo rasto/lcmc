@@ -436,13 +436,18 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread t = new Thread(new Runnable() {
                         public void run() {
-                            final String type = getComboBoxValue(
-                                                      ParallelSerialData.TYPE);
+                            final String oldDir = paramCB.getStringValue();
                             String directory;
-                            if ("dev".equals(type)) {
-                                directory = "/dev";
+                            if (oldDir == null || "".equals(oldDir)) {
+                                final String type = getComboBoxValue(
+                                                      ParallelSerialData.TYPE);
+                                if ("dev".equals(type)) {
+                                    directory = "/dev";
+                                } else {
+                                    directory = "/";
+                                }
                             } else {
-                                directory = "/";
+                                directory = oldDir;
                             }
                             startFileChooser(paramCB, directory);
                         }

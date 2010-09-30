@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -54,9 +55,8 @@ public class Domain extends VMConfig {
                                             VMSXML.VM_PARAM_BOOT,
                                             VMSXML.VM_PARAM_ARCH,
                                             VMSXML.VM_PARAM_EMULATOR};
-
-    /** Installation disk dialog object. */
-    private InstallationDisk installationDisk = null;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>Domain</code> object. */
     public Domain(final WizardDialog previousDialog,
@@ -66,11 +66,11 @@ public class Domain extends VMConfig {
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        if (installationDisk == null) {
-            installationDisk =
+        if (nextDialogObject == null) {
+            nextDialogObject =
                     new InstallationDisk(this, getVMSVirtualDomainInfo());
         }
-        return installationDisk;
+        return nextDialogObject;
     }
 
     /**
@@ -92,12 +92,21 @@ public class Domain extends VMConfig {
     /** Inits dialog. */
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{});
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
+        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        final boolean enable = vdi.checkResourceFieldsCorrect(null, PARAMS);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(enable);
+            }
+        });
     }
 
     /** Returns input pane where user can configure a vm. */
     protected final JComponent getInputPane() {
+        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        vdi.selectMyself();
         if (inputPane != null) {
             return inputPane;
         }
@@ -108,20 +117,18 @@ public class Domain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        getVMSVirtualDomainInfo().getResource().setValue(VMSXML.VM_PARAM_BOOT,
-                                                         "cdrom");
-        getVMSVirtualDomainInfo().addWizardParams(
-                  optionsPanel,
-                  PARAMS,
-                  buttonClass(nextButton()),
-                  Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
-                  Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
-                  null);
+        vdi.waitForInfoPanel();
+        vdi.addWizardParams(
+                          optionsPanel,
+                          PARAMS,
+                          buttonClass(nextButton()),
+                          Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
+                          Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
+                          null);
+        vdi.paramComboBoxGet(VMSXML.VM_PARAM_BOOT, "wizard").setValue("CD-ROM");
 
         panel.add(optionsPanel);
 
-        buttonClass(nextButton()).setEnabled(
-                  getVMSVirtualDomainInfo().checkResourceFields(null, PARAMS));
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
