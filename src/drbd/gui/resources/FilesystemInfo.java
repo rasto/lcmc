@@ -382,9 +382,17 @@ class FilesystemInfo extends ServiceInfo {
      */
     public final void addResourceBefore(final Host dcHost,
                                         final boolean testOnly) {
+        if (getGroupInfo() != null) {
+            // TODO: disabled for now
+            return;
+        }
         final DrbdResourceInfo oldDri =
                     getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
+        if (oldDri != null) {
+            // TODO: disabled because it does not work well at the moment.
+            return;
+        }
         final DrbdResourceInfo newDri =
                     getBrowser().getDrbdDevHash().get(
                                         getComboBoxValue(FS_RES_PARAM_DEV));
