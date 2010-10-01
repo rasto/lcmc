@@ -1090,7 +1090,7 @@ public class DrbdResourceInfo extends EditableInfo
 
     /** Returns whether this drbd resource is used by crm. */
     public final boolean isUsedByCRM() {
-        return isUsedByCRM != null;
+        return isUsedByCRM != null && isUsedByCRM.isManaged(false);
     }
 
     /** Returns common file systems. */
@@ -1153,7 +1153,7 @@ public class DrbdResourceInfo extends EditableInfo
             }
 
             public final String enablePredicate() {
-                if (isUsedByCRM()) {
+                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 if (isSyncing()) {
@@ -1320,7 +1320,7 @@ public class DrbdResourceInfo extends EditableInfo
             }
 
             public final String enablePredicate() {
-                if (isUsedByCRM()) {
+                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
