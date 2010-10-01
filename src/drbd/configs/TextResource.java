@@ -1233,8 +1233,8 @@ public class TextResource extends
         {"ClusterBrowser.Drbd",
          "Storage (DRBD)"},
 
-        {"ClusterBrowser.Heartbeat",
-         "Cluster"},
+        {"ClusterBrowser.ClusterManager",
+         "Cluster Manager"},
 
         {"ClusterBrowser.VMs",
          "VMs"},

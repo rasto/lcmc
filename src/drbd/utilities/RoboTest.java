@@ -288,7 +288,8 @@ public final class RoboTest {
                             host.getCluster().getBrowser().getTree()
                                 .getLastSelectedPathComponent().toString();
                 if ("Services".equals(selected)
-                    || "Cluster".equals(selected)) {
+                    || Tools.getString("ClusterBrowser.ClusterManager").equals(
+                                                                   selected)) {
                     if (index == 1) {
                         /* pacemaker */
                         int i = 1;

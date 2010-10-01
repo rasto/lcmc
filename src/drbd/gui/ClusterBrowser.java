@@ -585,8 +585,8 @@ public class ClusterBrowser extends Browser {
 
         /* CRM */
         final CRMInfo crmInfo = new CRMInfo(
-                                  Tools.getString("ClusterBrowser.Heartbeat"),
-                                  this);
+                              Tools.getString("ClusterBrowser.ClusterManager"),
+                              this);
         final DefaultMutableTreeNode heartbeatNode =
                                         new DefaultMutableTreeNode(crmInfo);
         setNode(heartbeatNode);
