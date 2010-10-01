@@ -748,7 +748,8 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Returns the regexp of the parameter. */
     protected String getParamRegexp(final String param) {
-        if (DiskData.SOURCE_FILE.equals(param)) {
+        if ("file".equals(getComboBoxValue(DiskData.TYPE))
+            && DiskData.SOURCE_FILE.equals(param)) {
             return ".*[^/]$";
         }
         return super.getParamRegexp(param);

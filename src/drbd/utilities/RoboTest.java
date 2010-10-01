@@ -2125,8 +2125,10 @@ public final class RoboTest {
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER);
 
-        moveTo(robot, 573, 445); /* source file */
+        moveTo(robot, 593, 456); /* source file */
+        sleep(2000);
         leftClick(robot);
+        sleep(2000);
         press(robot, KeyEvent.VK_T);
         sleep(200);
         press(robot, KeyEvent.VK_E);

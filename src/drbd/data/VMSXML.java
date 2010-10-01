@@ -1159,8 +1159,11 @@ public class VMSXML extends XML {
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
                                 sourceFile = getAttribute(optionNode, "file");
-                                sourceFileDirs.add(Tools.getDirectoryPart(
-                                                                  sourceFile));
+                                final String dir = Tools.getDirectoryPart(
+                                                                  sourceFile);
+                                if (dir != null) {
+                                    sourceFileDirs.add(dir);
+                                }
                                 sourceDev = getAttribute(optionNode, "dev");
                             } else if ("target".equals(nodeName)) {
                                 targetDev = getAttribute(optionNode, "dev");

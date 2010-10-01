@@ -2316,6 +2316,9 @@ public final class Tools {
 
     /** Return directory part (to the /) of the filename. */
     public static String getDirectoryPart(final String filename) {
+        if (filename == null) {
+            return null;
+        }
         final int i = filename.lastIndexOf('/');
         if (i < 0) {
             return filename;

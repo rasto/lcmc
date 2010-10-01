@@ -360,7 +360,13 @@ public abstract class EditableInfo extends Info {
                 if (rpcb.getType() == GuiComboBox.Type.LABELFIELD) {
                     height = Tools.getDefaultInt("Browser.LabelFieldHeight");
                 }
-                rpcb.setValueAndWait(paramCb.getStringValue());
+                final GuiComboBox rpcb0 = rpcb;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        final Object value = paramCb.getStringValue();
+                        rpcb0.setValueAndWait(value);
+                    }
+                });
             }
             final GuiComboBox realParamCb = rpcb;
             paramCb.addListeners(new ItemListener() {
@@ -513,8 +519,12 @@ public abstract class EditableInfo extends Info {
                 //});
                 boolean c;
                 if (realParamCb != null) {
-                    Tools.waitForSwing();
-                    realParamCb.setValue(paramCb.getStringValue());
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            final Object value = paramCb.getStringValue();
+                            realParamCb.setValueAndWait(value);
+                        }
+                    });
                     Tools.waitForSwing();
                     c = checkResourceFieldsCorrect(param,
                                                    params);
