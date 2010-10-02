@@ -105,6 +105,11 @@ public abstract class ConfigDialog {
         return dialogPanel;
     }
 
+    public final void setDialogPanel(final JDialog dialogPanel) {
+        this.dialogPanel = dialogPanel;
+    }
+
+
     /**
      * Gets location of the dialog panel.
      */

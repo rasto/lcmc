@@ -362,6 +362,7 @@ public abstract class WizardDialog extends ConfigDialog {
                     return nextDialog();
                 } else if (isPressedButton(retryButton())) {
                     retryWasPressed();
+                    setDialogPanel(null);
                     return this;
                 } else {
                     return null;
