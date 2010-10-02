@@ -255,6 +255,10 @@ public class DistResource extends
          "/usr/sbin/crm_attribute -N @HOST@ -n standby -v on -l forever"},
         {"CRM.standByOff",
          "/usr/sbin/crm_attribute -N @HOST@ -n standby -v off -l forever"},
+        {"CRM.2.1.4.standByOn",
+         "/usr/sbin/crm_standby -U @HOST@ -v true"},
+        {"CRM.2.1.4.standByOff",
+         "/usr/sbin/crm_standby -U @HOST@ -v false"},
 
         {"OpenAIS.getAisConfig",     "cat /etc/ais/openais.conf"},
         {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},

@@ -1164,10 +1164,17 @@ public final class CRM {
      * Makes heartbeat stand by.
      */
     public static boolean standByOn(final Host host, final boolean testOnly) {
+        final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
+        String cmd = "CRM.standByOn";
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            cmd = "CRM.2.1.4.standByOn";
+        }
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@HOST@", host.getName());
-        final String command = host.getDistCommand("CRM.standByOn",
-                                                   replaceHash);
+        final String command = host.getDistCommand(cmd, replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
     }
@@ -1177,9 +1184,16 @@ public final class CRM {
      */
     public static boolean standByOff(final Host host, final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
+        final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
+        String cmd = "CRM.standByOff";
+        if (pmV == null
+            && hbV != null
+            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            cmd = "CRM.2.1.4.standByOff";
+        }
         replaceHash.put("@HOST@", host.getName());
-        final String command = host.getDistCommand("CRM.standByOff",
-                                                   replaceHash);
+        final String command = host.getDistCommand(cmd, replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
     }
