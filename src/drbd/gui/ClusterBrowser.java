@@ -1576,10 +1576,11 @@ public class ClusterBrowser extends Browser {
      */
     public final boolean isStandby(final Host host, final boolean testOnly) {
         // TODO: make it more efficient
-        return "on".equals(clusterStatus.getNodeParameter(
+        final String standby = clusterStatus.getNodeParameter(
                                        host.getName().toLowerCase(Locale.US),
                                        "standby",
-                                       testOnly));
+                                       testOnly);
+        return "on".equals(standby) || "true".equals(standby);
     }
 
     /**
