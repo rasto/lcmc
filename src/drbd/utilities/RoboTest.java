@@ -485,6 +485,7 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* ptest */
         leftClick(robot); /* apply */
+        checkTest(host, "test1", 2); /* 2 */
 
         /* group with dummy resources */
         moveTo(robot, gx, gy);
