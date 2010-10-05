@@ -892,8 +892,8 @@ public class BlockDevInfo extends EditableInfo {
         final JMenu serviceCombo = getActionsMenu();
         mb.add(serviceCombo);
 
+        buttonPanel.add(mb, BorderLayout.EAST);
         if (getBlockDevice().isDrbd()) {
-            buttonPanel.add(mb, BorderLayout.EAST);
             final String[] params = getParametersFromXML();
 
             addParams(optionsPanel,
