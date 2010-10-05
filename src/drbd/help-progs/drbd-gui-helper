@@ -1433,8 +1433,33 @@ sub gui_test {
 	my $crm_show;
 	my $crm_status;
 	my $cib;
+	my $status;
 	if ($hb_version eq "2.1.3" || $hb_version eq "2.1.4") {
 		$crm_status = "TERM=dumb /usr/sbin/crm_mon -1|sed 1,5d";
+		my $first_o = 1;
+		my @o_nodes = ();
+		for (`$crm_status`) {
+			if (/^Node:\s+(\S+).*online$/) {
+				push @o_nodes, $1;
+				if ($first_o) {
+					$status .= "!ONLINE!";
+					$first_o = 0;
+				}
+				next;
+			}
+			if ($first_o || /^\s*$/) {
+				$status .= $_;
+			} else {
+				$status .= " $_";
+			}
+		}
+		my $ret = $?;
+		if ($ret != 0) {
+			exit $ret;
+		}
+		$status
+		    =~ s/((\d+) Nodes configured)\./$1, $2 expected votes/;
+		$status =~ s/!ONLINE!/Online: [ @o_nodes ]\n/;
 	} else {
 		my $crm_show = "TERM=dumb /usr/sbin/crm configure show"
 			       ."|grep -v 'expected-quorum-votes=\"2\"'"
@@ -1443,6 +1468,10 @@ sub gui_test {
 			       ."|grep -v 'cluster-infrastructure=\"'"
 			       ."|grep -v 'last-lrm-refresh='";
 		$cib = `$crm_show`;
+		my $ret = $?;
+		if ($ret != 0) {
+			exit $ret;
+		}
 		for ($cib) {
 			s/\\$//mg;
 			s/^\s+//;
@@ -1459,15 +1488,11 @@ sub gui_test {
 		$cib =~
 	  	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
 		$crm_status = "TERM=dumb /usr/sbin/crm status|sed 1,5d";
-	}
-	my $ret = $?;
-	if ($ret != 0) {
-		exit $ret;
-	}
-	my $status = `$crm_status`;
-	$ret = $?;
-	if ($ret != 0) {
-		exit $ret;
+		$status = `$crm_status`;
+		$ret = $?;
+		if ($ret != 0) {
+			exit $ret;
+		}
 	}
 	if ($status =~ /Online: \[\s+(.*?)\s+\]/) {
 		my @status_hosts = split /\s+/, $1;

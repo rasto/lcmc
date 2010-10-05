@@ -1254,6 +1254,39 @@ public class ServicesInfo extends EditableInfo {
                         }
                     });
                 }
+                final ResourceAgent ipService = crmXML.getResourceAgent(
+                                         "IPaddr2",
+                                         ServiceInfo.HB_HEARTBEAT_PROVIDER,
+                                         "ocf");
+                if (ipService != null) { /* just skip it, if it is not*/
+                    final MyMenuItem ipMenuItem =
+                         new MyMenuItem(ipService.getMenuName(),
+                                        null,
+                                        null,
+                                        new AccessMode(
+                                                  ConfigData.AccessType.ADMIN,
+                                                  false),
+                                        new AccessMode(ConfigData.AccessType.OP,
+                                                       false)) {
+                        private static final long serialVersionUID = 1L;
+                        public void action() {
+                            hidePopup();
+                            addServicePanel(ipService,
+                                            getPos(),
+                                            true,
+                                            null,
+                                            null,
+                                            testOnly);
+                            getBrowser().getHeartbeatGraph().repaint();
+                        }
+                    };
+                    ipMenuItem.setPos(pos);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            add(ipMenuItem);
+                        }
+                    });
+                }
                 if (crmXML.isDrbddiskPresent()
                     && (getBrowser().isDrbddiskPreferred()
                         || getBrowser().atLeastOneDrbddisk()
@@ -1291,39 +1324,6 @@ public class ServicesInfo extends EditableInfo {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             add(ddMenuItem);
-                        }
-                    });
-                }
-                final ResourceAgent ipService = crmXML.getResourceAgent(
-                                         "IPaddr2",
-                                         ServiceInfo.HB_HEARTBEAT_PROVIDER,
-                                         "ocf");
-                if (ipService != null) { /* just skip it, if it is not*/
-                    final MyMenuItem ipMenuItem =
-                         new MyMenuItem(ipService.getMenuName(),
-                                        null,
-                                        null,
-                                        new AccessMode(
-                                                  ConfigData.AccessType.ADMIN,
-                                                  false),
-                                        new AccessMode(ConfigData.AccessType.OP,
-                                                       false)) {
-                        private static final long serialVersionUID = 1L;
-                        public void action() {
-                            hidePopup();
-                            addServicePanel(ipService,
-                                            getPos(),
-                                            true,
-                                            null,
-                                            null,
-                                            testOnly);
-                            getBrowser().getHeartbeatGraph().repaint();
-                        }
-                    };
-                    ipMenuItem.setPos(pos);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            add(ipMenuItem);
                         }
                     });
                 }
