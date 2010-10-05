@@ -267,7 +267,7 @@ public class Configuration extends DialogHost {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
         nameField.setEnabled(false);
-        if (getHost().getIp() == null) {
+        if (getHost().getIp() == null || "".equals(getHost().getIp())) {
             final CheckDNSThread[] checkDNSThread =
                             new CheckDNSThread[MAX_HOPS];
             getProgressBar().start(DNS_TIMEOUT);
