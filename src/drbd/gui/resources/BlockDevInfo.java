@@ -103,13 +103,13 @@ public class BlockDevInfo extends EditableInfo {
                                 Tools.getDefault("BlockDevInfo.HarddiskIcon"));
     /** Meta-disk subtext. */
     private static final Subtext METADISK_SUBTEXT =
-                                          new Subtext("meta-disk", Color.BLUE);
+                             new Subtext("meta-disk", Color.BLUE, Color.BLACK);
     /** Swap subtext. */
     private static final Subtext SWAP_SUBTEXT =
-                                          new Subtext("swap", Color.BLUE);
+                                  new Subtext("swap", Color.BLUE, Color.BLACK);
     /** Mounted subtext. */
     private static final Subtext MOUNTED_SUBTEXT =
-                                          new Subtext("mounted", Color.BLUE);
+                               new Subtext("mounted", Color.BLUE, Color.BLACK);
     /** String length after the cut. */
     private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
     /** String that is displayed as a tool tip for disabled menu item. */
@@ -1596,7 +1596,7 @@ public class BlockDevInfo extends EditableInfo {
                                - MAX_RIGHT_CORNER_STRING_LENGTH + 3,
                                s.length());
              }
-             return new Subtext(s, Color.BLUE);
+             return new Subtext(s, Color.BLUE, Color.BLACK);
          }
          return null;
     }

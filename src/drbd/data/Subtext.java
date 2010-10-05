@@ -30,25 +30,30 @@ public class Subtext {
     private final String subtext;
     /** Color. */
     private final Color color;
-    /**
-     * Creates new Subtext object.
-     */
-    public Subtext(final String subtext, final Color color) {
+    /** Text color. */
+    private final Color textColor;
+
+    /** Creates new Subtext object. */
+    public Subtext(final String subtext,
+                   final Color color,
+                   final Color textColor) {
         this.subtext = subtext;
         this.color = color;
+        this.textColor = textColor;
     }
 
-    /**
-     * Returns subtext.
-     */
+    /** Returns subtext. */
     public final String getSubtext() {
         return subtext;
     }
 
-    /**
-     * Returns color.
-     */
+    /** Returns color. */
     public final Color getColor() {
         return color;
+    }
+
+    /** Returns text color. */
+    public final Color getTextColor() {
+        return textColor;
     }
 }

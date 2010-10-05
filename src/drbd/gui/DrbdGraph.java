@@ -429,11 +429,20 @@ public class DrbdGraph extends ResourceGraph {
             if (bdi != null && bdi.getBlockDevice().isDrbd()
                 && bdi.getBlockDevice().getConnectionState() != null
                 && bdi.getBlockDevice().getDiskState() != null) {
+                final String connState = 
+                                  bdi.getBlockDevice().getConnectionState();
+                final String diskState = bdi.getBlockDevice().getDiskState();
+                Color color = null;
+                Color textColor = Color.BLACK;
+                if ("StandAlone".equals(connState)
+                    || !"UpToDate".equals(diskState)) {
+                    color = Color.RED;
+                    textColor = Color.WHITE;
+                }
                 return new Subtext[]{
-                    new Subtext(bdi.getBlockDevice().getConnectionState()
-                                     + " / "
-                                     + bdi.getBlockDevice().getDiskState(),
-                                null)};
+                    new Subtext(connState + " / " + diskState,
+                                color,
+                                textColor)};
             }
         } else {
             return vertexToHostMap.get(v).getSubtextsForDrbdGraph(testOnly);

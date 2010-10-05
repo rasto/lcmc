@@ -181,17 +181,18 @@ public class ServiceInfo extends EditableInfo {
     private static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.UnmigrateIcon"));
     /** Orphaned subtext. */
-    private static final Subtext ORPHANED_SUBTEXT =
-                                         new Subtext("(ORPHANED)", null);
+    private static final Subtext ORPHANED_SUBTEXT = new Subtext("(ORPHANED)",
+                                                                null,
+                                                                Color.BLACK);
     /** Orphaned with fail-count subtext. */
     private static final Subtext ORPHANED_FAILED_SUBTEXT =
-                                         new Subtext("(ORPHANED)", Color.RED);
+                                    new Subtext("(ORPHANED)", null, Color.RED);
     /** Unmanaged subtext. */
     private static final Subtext UNMANAGED_SUBTEXT =
-                                         new Subtext("(unmanaged)", Color.RED);
+                                   new Subtext("(unmanaged)", null, Color.RED);
     /** Migrated subtext. */
     private static final Subtext MIGRATED_SUBTEXT =
-                                         new Subtext("(migrated)", Color.RED);
+                                    new Subtext("(migrated)", null, Color.RED);
     /** Clone type string. */
     protected static final String CLONE_TYPE_STRING = "Clone";
     /** Primitive type string. */
@@ -5201,12 +5202,17 @@ public class ServiceInfo extends EditableInfo {
         Color color = null;
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getService().isOrphaned()) {
-            texts.add(new Subtext("...", null));
+            texts.add(new Subtext("...",
+                                  null,
+                                  Color.BLACK));
         } else if (isFailed(testOnly)) {
-            texts.add(new Subtext("not running:", null));
+            texts.add(new Subtext("not running:",
+                                  null,
+                                  Color.BLACK));
         } else if (isStopped(testOnly)) {
             texts.add(new Subtext("stopped",
-                                  ClusterBrowser.FILL_PAINT_STOPPED));
+                                  ClusterBrowser.FILL_PAINT_STOPPED,
+                                  Color.BLACK));
         } else {
             String runningOnNodeString = null;
             if (getBrowser().allHostsDown()) {
@@ -5221,10 +5227,12 @@ public class ServiceInfo extends EditableInfo {
             }
             if (runningOnNodeString != null) {
                 texts.add(new Subtext("running on: " + runningOnNodeString,
-                                      color));
+                                      color,
+                                      Color.BLACK));
             } else {
                 texts.add(new Subtext("not running",
-                                      ClusterBrowser.FILL_PAINT_STOPPED));
+                                      ClusterBrowser.FILL_PAINT_STOPPED,
+                                      Color.BLACK));
             }
         }
         if (isOneFailedCount(testOnly)) {
@@ -5236,7 +5244,8 @@ public class ServiceInfo extends EditableInfo {
                                           + getFailCountString(
                                                         host.getName(),
                                                         testOnly),
-                              null));
+                                          null,
+                                          Color.BLACK));
                 }
             }
         }

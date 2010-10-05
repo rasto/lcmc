@@ -77,13 +77,13 @@ public class HostInfo extends Info {
                         Tools.getDefault("HeartbeatGraph.HostStandbyOffIcon"));
     /** Offline subtext. */
     private static final Subtext OFFLINE_SUBTEXT =
-                                         new Subtext("offline", Color.BLUE);
+                                     new Subtext("offline", null, Color.BLUE);
     /** Online subtext. */
     private static final Subtext ONLINE_SUBTEXT =
-                                          new Subtext("online", Color.BLUE);
+                                      new Subtext("online", null, Color.BLUE);
     /** Standby subtext. */
     private static final Subtext STANDBY_SUBTEXT =
-                                         new Subtext("STANDBY", Color.RED);
+                                     new Subtext("STANDBY", null, Color.RED);
     /** String that is displayed as a tool tip for disabled menu item. */
     private static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
@@ -449,10 +449,12 @@ public class HostInfo extends Info {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isClStatus()) {
-               texts.add(new Subtext("waiting for cluster status...", null));
+               texts.add(new Subtext("waiting for cluster status...",
+                                     null,
+                                     Color.BLACK));
             }
         } else {
-            texts.add(new Subtext("connecting...", null));
+            texts.add(new Subtext("connecting...", null, Color.BLACK));
         }
         return texts.toArray(new Subtext[texts.size()]);
     }

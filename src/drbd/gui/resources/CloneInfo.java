@@ -242,7 +242,7 @@ public class CloneInfo extends ServiceInfo {
             notRunningOnNodes.put(h.getName().toLowerCase(Locale.US),
                                   h.getName());
         }
-        texts.add(new Subtext(toString(), null));
+        texts.add(new Subtext(toString(), null, Color.BLACK));
         final ServiceInfo cs = getContainedService();
         if (cs != null && cs.getResourceAgent().isGroup()) {
             final ClusterStatus clStatus = getBrowser().getClusterStatus();
@@ -253,7 +253,9 @@ public class CloneInfo extends ServiceInfo {
                 for (final String hbId : resources) {
                     final ServiceInfo si =
                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                    texts.add(new Subtext("   " + si.toString(), null));
+                    texts.add(new Subtext("   " + si.toString(),
+                                          null,
+                                          Color.BLACK));
                 }
             }
         }
@@ -265,11 +267,11 @@ public class CloneInfo extends ServiceInfo {
         if (runningOnNodes != null && !runningOnNodes.isEmpty()) {
             if (containedService != null
                 && containedService.getResourceAgent().isLinbitDrbd()) {
-                texts.add(new Subtext("primary on:", null));
+                texts.add(new Subtext("primary on:", null, Color.BLACK));
             } else if (getService().isMaster()) {
-                texts.add(new Subtext("master on:", null));
+                texts.add(new Subtext("master on:", null, Color.BLACK));
             } else {
-                texts.add(new Subtext("running on:", null));
+                texts.add(new Subtext("running on:", null, Color.BLACK));
             }
             final List<Color> colors =
                     getBrowser().getCluster().getHostColors(runningOnNodes);
@@ -277,7 +279,7 @@ public class CloneInfo extends ServiceInfo {
             for (final String n : runningOnNodes) {
                 texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                       + getFailCountString(n, testOnly),
-                                      colors.get(i)));
+                                      colors.get(i), Color.BLACK));
                 notRunningOnNodes.remove(n.toLowerCase(Locale.US));
                 i++;
             }
@@ -290,14 +292,15 @@ public class CloneInfo extends ServiceInfo {
                 int i = 0;
                 if (containedService != null
                     && containedService.getResourceAgent().isLinbitDrbd()) {
-                    texts.add(new Subtext("secondary on:", null));
+                    texts.add(new Subtext("secondary on:", null, Color.BLACK));
                 } else {
-                    texts.add(new Subtext("slave on:", null));
+                    texts.add(new Subtext("slave on:", null, Color.BLACK));
                 }
                 for (final String n : slaveOnNodes) {
                     texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                           + getFailCountString(n, testOnly),
-                                          colors.get(i)));
+                                          colors.get(i),
+                                          Color.BLACK));
                     notRunningOnNodes.remove(n.toLowerCase(Locale.US));
                     i++;
                 }
@@ -306,9 +309,9 @@ public class CloneInfo extends ServiceInfo {
         if (!notRunningOnNodes.isEmpty()) {
             final Color nColor = ClusterBrowser.FILL_PAINT_STOPPED;
             if (isStopped(testOnly)) {
-                texts.add(new Subtext("stopped", nColor));
+                texts.add(new Subtext("stopped", nColor, Color.BLACK));
             } else {
-                texts.add(new Subtext("not running on:", nColor));
+                texts.add(new Subtext("not running on:", nColor, Color.BLACK));
                 for (final String n : notRunningOnNodes.keySet()) {
                     final String hostName = notRunningOnNodes.get(n);
                     Color color = nColor;
@@ -319,7 +322,8 @@ public class CloneInfo extends ServiceInfo {
                                           + hostName
                                           + getFailCountString(hostName,
                                                                testOnly),
-                                          color));
+                                          color,
+                                          Color.BLACK));
                 }
             }
         }

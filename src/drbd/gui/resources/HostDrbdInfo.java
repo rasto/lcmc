@@ -624,10 +624,12 @@ public class HostDrbdInfo extends Info {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isClStatus()) {
-               texts.add(new Subtext("waiting for cluster status...", null));
+               texts.add(new Subtext("waiting for cluster status...",
+                                     null,
+                                     Color.BLACK));
             }
         } else {
-            texts.add(new Subtext("connecting...", null));
+            texts.add(new Subtext("connecting...", null, Color.BLACK));
         }
         return texts.toArray(new Subtext[texts.size()]);
     }
@@ -639,12 +641,12 @@ public class HostDrbdInfo extends Info {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isDrbdLoaded()) {
-               texts.add(new Subtext("DRBD not loaded", null));
+               texts.add(new Subtext("DRBD not loaded", null, Color.BLACK));
             } else if (!getHost().isDrbdStatus()) {
-               texts.add(new Subtext("waiting...", null));
+               texts.add(new Subtext("waiting...", null, Color.BLACK));
             }
         } else {
-            texts.add(new Subtext("connecting...", null));
+            texts.add(new Subtext("connecting...", null, Color.BLACK));
         }
         return texts.toArray(new Subtext[texts.size()]);
     }

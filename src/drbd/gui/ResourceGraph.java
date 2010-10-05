@@ -1516,7 +1516,7 @@ public abstract class ResourceGraph {
                    x + shapeWidth
                      - rightCornerTextLayout.getBounds().getWidth() - 4,
                    y + 11,
-                   rightCornerText.getColor(),
+                   rightCornerText.getTextColor(),
                    255);
             }
             if (subtextLayouts != null) {
@@ -1542,12 +1542,13 @@ public abstract class ResourceGraph {
                                      (int) (y + height - 3 + 8 * (i - 1)),
                                      shapeWidth - 8, 9);
                     }
+                    final Color textColor = subtext.getTextColor();
                     drawVertexText(
                                g2d,
                                l,
                                x + 4,
                                y + height - 4 + 8 * i,
-                               new Color(0, 0, 0),
+                               textColor,
                                alpha);
                     i++;
                 }

@@ -41,6 +41,7 @@ import drbd.utilities.ButtonCallback;
 
 import java.util.List;
 import java.util.Map;
+import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -777,7 +778,8 @@ public class GroupInfo extends ServiceInfo {
                                               prevSubtext.getSubtext())) {
                         texts.add(new Subtext(sSubtext.getSubtext()
                                               + ":",
-                                              sSubtext.getColor()));
+                                              sSubtext.getColor(),
+                                              Color.BLACK));
                         prevSubtext = sSubtext;
                     }
                     if (si != null) {
@@ -835,7 +837,8 @@ public class GroupInfo extends ServiceInfo {
                                               + unmanaged
                                               + migrated
                                               + constraint,
-                                              sSubtext.getColor()));
+                                              sSubtext.getColor(),
+                                              Color.BLACK));
                         boolean skip = true;
                         for (final Subtext st : subtexts) {
                             if (skip) {
@@ -843,7 +846,8 @@ public class GroupInfo extends ServiceInfo {
                                 continue;
                             }
                             texts.add(new Subtext("   " + st.getSubtext(),
-                                                  st.getColor()));
+                                                  st.getColor(),
+                                                  Color.BLACK));
                         }
                     }
                 }
