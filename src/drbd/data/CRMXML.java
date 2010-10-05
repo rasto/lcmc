@@ -176,6 +176,8 @@ public class CRMXML extends XML {
     private boolean drbddiskPresent = false;
     /** Whether linbit::drbd ra is present. */
     private boolean linbitDrbdPresent = false;
+    /** Choices for combo box in stonith hostlists. */
+    private final List<String> hostlistChoices = new ArrayList<String>();
 
     /** Pacemaker "true" string. */
     public static final String PCMK_TRUE = "true";
@@ -482,6 +484,15 @@ public class CRMXML extends XML {
         final String[] booleanValues = PCMK_BOOLEAN_VALUES;
         final String hbBooleanTrue = booleanValues[0];
         final String hbBooleanFalse = booleanValues[1];
+        /* hostlist choices for stonith */
+        hostlistChoices.add("");
+        final String[] hosts = host.getCluster().getHostNames();
+        if (hosts != null && hosts.length < 8) {
+            hostlistChoices.add(Tools.join(" ", hosts));
+            for (final String h : hosts) {
+                hostlistChoices.add(h);
+            }
+        }
         /* clones */
         pcmkClone = new ResourceAgent(ConfigData.PM_CLONE_SET_NAME,
                                       "",
@@ -1621,6 +1632,12 @@ public class CRMXML extends XML {
                     }
                     ra.setParamDefault(param, defaultValue);
                 }
+                if (ra.isStonith() && "hostlist".equals(param)) {
+                    ra.setParamPossibleChoices(
+                             param,
+                             hostlistChoices.toArray(
+                                          new String[hostlistChoices.size()]));
+                }
             }
         }
         if (ra.isStonith()) {
@@ -1639,6 +1656,7 @@ public class CRMXML extends XML {
                                        new String[]{"", "0", "5", "10"});
             ra.setParamType(STONITH_PRIORITY_INSTANCE_ATTR, PARAM_TYPE_INTEGER);
             ra.setParamDefault(STONITH_PRIORITY_INSTANCE_ATTR, "");
+
         }
         final Map<String, String> metaAttrParams = getMetaAttrParameters();
         for (final String metaAttr : metaAttrParams.keySet()) {
