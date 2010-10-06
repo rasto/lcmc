@@ -23,7 +23,6 @@
 package drbd.gui.dialog.vm;
 
 import drbd.utilities.Tools;
-import drbd.data.VMSXML;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.resources.VMSGraphicsInfo;
 import drbd.gui.dialog.WizardDialog;

@@ -33,7 +33,6 @@ import drbd.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.util.Set;
 import java.util.HashSet;

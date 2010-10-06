@@ -1005,15 +1005,16 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Adds colocation between service with heartbeatId and parentHbId.
-     */
+    /** Adds colocation between service with heartbeatId and parentHbId. */
     public static boolean addColocation(final Host host,
                                         final String colId,
                                         final String heartbeatId,
                                         final String parentHbId,
                                         Map<String, String> attrs,
                                         final boolean testOnly) {
+        if (parentHbId == null) {
+            return false;
+        }
         String colocationId;
         String cibadminOpt;
         if (colId == null) {

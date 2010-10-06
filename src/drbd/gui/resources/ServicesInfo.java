@@ -1434,7 +1434,7 @@ public class ServicesInfo extends EditableInfo {
         items.add((UpdatableItem) addConstraintPlaceholder);
 
         /* stop all services. */
-        final MyMenuItem stopMenuItem = new MyMenuItem(
+        final MyMenuItem stopAllMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.StopAllServices"),
                 ServiceInfo.STOP_ICON,
                 new AccessMode(ConfigData.AccessType.ADMIN, true),
@@ -1460,7 +1460,7 @@ public class ServicesInfo extends EditableInfo {
             public final void action() {
                 hidePopup();
                 final Host dcHost = getBrowser().getDCHost();
-                for (ServiceInfo si
+                for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null) {
                         if (!si.isStopped(false)
@@ -1472,7 +1472,23 @@ public class ServicesInfo extends EditableInfo {
                 getBrowser().getHeartbeatGraph().repaint();
             }
         };
-        items.add((UpdatableItem) stopMenuItem);
+        final ClusterBrowser.ClMenuItemCallback stopAllItemCallback =
+                   getBrowser().new ClMenuItemCallback(stopAllMenuItem, null) {
+            public void action(final Host dcHost) {
+                final Host thisDCHost = getBrowser().getDCHost();
+                for (final ServiceInfo si
+                        : getBrowser().getExistingServiceList(null)) {
+                    if (si.getGroupInfo() == null) {
+                        if (!si.isStopped(true)
+                            && !si.getService().isOrphaned()) {
+                            si.stopResource(thisDCHost, true); /* test only */
+                        }
+                    }
+                }
+            }
+        };
+        addMouseOverListener(stopAllMenuItem, stopAllItemCallback);
+        items.add((UpdatableItem) stopAllMenuItem);
 
         /* remove all services. */
         final MyMenuItem removeMenuItem = new MyMenuItem(

@@ -85,7 +85,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.JMenuItem;
 
 import java.awt.geom.Area;
 

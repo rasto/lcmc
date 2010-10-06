@@ -24,12 +24,9 @@ package drbd.gui.dialog.vm;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.data.VMSXML;
 import drbd.gui.Browser;
 import drbd.gui.resources.VMSVirtualDomainInfo;
-import drbd.gui.resources.VMSGraphicsInfo;
 import drbd.gui.dialog.WizardDialog;
-import drbd.data.VMSXML.GraphicsData;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
