@@ -178,7 +178,7 @@ public class ServiceInfo extends EditableInfo {
     private static final ImageIcon MIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.MigrateIcon"));
     /** Unmigrate icon. */
-    private static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
+    public static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.UnmigrateIcon"));
     /** Orphaned subtext. */
     private static final Subtext ORPHANED_SUBTEXT = new Subtext("(ORPHANED)",

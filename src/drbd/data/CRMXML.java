@@ -3416,7 +3416,7 @@ public class CRMXML extends XML {
      * does not fit the type.
      */
     public final boolean checkColocationParam(final String param,
-                                          final String value) {
+                                              final String value) {
         final String type = getColocationParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {

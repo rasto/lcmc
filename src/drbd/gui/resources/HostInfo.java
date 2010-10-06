@@ -77,34 +77,28 @@ public class HostInfo extends Info {
                         Tools.getDefault("HeartbeatGraph.HostStandbyOffIcon"));
     /** Offline subtext. */
     private static final Subtext OFFLINE_SUBTEXT =
-                                     new Subtext("offline", null, Color.BLUE);
+                                      new Subtext("offline", null, Color.BLUE);
     /** Online subtext. */
     private static final Subtext ONLINE_SUBTEXT =
-                                      new Subtext("online", null, Color.BLUE);
+                                       new Subtext("online", null, Color.BLUE);
     /** Standby subtext. */
     private static final Subtext STANDBY_SUBTEXT =
-                                     new Subtext("STANDBY", null, Color.RED);
+                                       new Subtext("STANDBY", null, Color.RED);
     /** String that is displayed as a tool tip for disabled menu item. */
     private static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
-    /**
-     * Prepares a new <code>HostInfo</code> object.
-     */
+    /** Prepares a new <code>HostInfo</code> object. */
     public HostInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
         this.host = host;
     }
 
-    /**
-     * Returns browser object of this info.
-     */
+    /** Returns browser object of this info. */
     protected final HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /**
-     * Returns a host icon for the menu.
-     */
+    /** Returns a host icon for the menu. */
     public final ImageIcon getMenuIcon(final boolean testOnly) {
         final Cluster cl = host.getCluster();
         if (cl != null) {
@@ -113,30 +107,22 @@ public class HostInfo extends Info {
         return HostBrowser.HOST_ICON;
     }
 
-    /**
-     * Returns id, which is name of the host.
-     */
+    /** Returns id, which is name of the host. */
     public final String getId() {
         return host.getName();
     }
 
-    /**
-     * Returns a host icon for the category in the menu.
-     */
+    /** Returns a host icon for the category in the menu. */
     public final ImageIcon getCategoryIcon(final boolean testOnly) {
         return HostBrowser.HOST_ICON;
     }
 
-    /**
-     * Returns tooltip for the host.
-     */
+    /** Returns tooltip for the host. */
     public final String getToolTipForGraph(final boolean testOnly) {
         return getBrowser().getHostToolTip(host);
     }
 
-    /**
-     * Returns info panel.
-     */
+    /** Returns info panel. */
     public final JComponent getInfoPanel() {
         Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
@@ -215,9 +201,7 @@ public class HostInfo extends Info {
         return mainPanel;
     }
 
-    /**
-     * Gets host.
-     */
+    /** Gets host. */
     public final Host getHost() {
         return host;
     }
@@ -236,23 +220,17 @@ public class HostInfo extends Info {
         return otherHI.toString().equals(host.getName());
     }
 
-    /**
-     * Returns string representation of the host. It's same as name.
-     */
+    /** Returns string representation of the host. It's same as name. */
     public final String toString() {
         return host.getName();
     }
 
-    /**
-     * Returns name of the host.
-     */
+    /** Returns name of the host. */
     public final String getName() {
         return host.getName();
     }
 
-    /**
-     * Creates the popup for the host.
-     */
+    /** Creates the popup for the host. */
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
@@ -276,7 +254,7 @@ public class HostInfo extends Info {
             };
         items.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
-        /* heartbeat standby on/off */
+        /* cluster manager standby on/off */
         final HostInfo thisClass = this;
         final MyMenuItem standbyItem =
             new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
@@ -324,6 +302,65 @@ public class HostInfo extends Info {
             addMouseOverListener(standbyItem, standbyItemCallback);
         }
         items.add(standbyItem);
+
+        /* Migrate all services from this host. */
+        final MyMenuItem allMigrateFromItem =
+            new MyMenuItem(Tools.getString("HostInfo.CRM.AllMigrateFrom"),
+                           HOST_STANDBY_ICON,
+                           null,
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public final boolean predicate() {
+                    return true;
+                }
+
+                public final String enablePredicate() {
+                    if (!getHost().isClStatus()) {
+                        return NO_PCMK_STATUS_STRING;
+                    }
+                    return null;
+                }
+
+                public final void action() {
+                    final Host thisDCHost = cb.getDCHost();
+                    for (final ServiceInfo si
+                            : cb.getExistingServiceList(null)) {
+                        if (!si.isConstraintPH()) {
+                            final List<String> runningOnNodes =
+                                                   si.getRunningOnNodes(false);
+                            if (runningOnNodes != null
+                                && runningOnNodes.contains(
+                                                        getHost().getName())) {
+                                si.migrateFromResource(thisDCHost, false);
+                            }
+                        }
+                    }
+                }
+            };
+        if (cb != null) {
+            final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
+                    cb.new ClMenuItemCallback(allMigrateFromItem, host) {
+                public void action(final Host host) {
+                    for (final ServiceInfo si
+                            : cb.getExistingServiceList(null)) {
+                        if (!si.isConstraintPH()) {
+                            final List<String> runningOnNodes =
+                                                   si.getRunningOnNodes(false);
+                            if (runningOnNodes != null
+                                && runningOnNodes.contains(
+                                                        getHost().getName())) {
+                                si.migrateFromResource(host, true);
+                            }
+                        }
+                    }
+                }
+            };
+            addMouseOverListener(allMigrateFromItem,
+                                 allMigrateFromItemCallback);
+        }
+        items.add(allMigrateFromItem);
         /* change host color */
         final MyMenuItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
@@ -338,11 +375,11 @@ public class HostInfo extends Info {
                 }
 
                 public final void action() {
-                    Color newColor = JColorChooser.showDialog(
-                                        Tools.getGUIData().getMainFrame(),
-                                        "Choose " + host.getName()
-                                        + " color",
-                                        host.getPmColors()[0]);
+                    final Color newColor = JColorChooser.showDialog(
+                                            Tools.getGUIData().getMainFrame(),
+                                            "Choose " + host.getName()
+                                            + " color",
+                                            host.getPmColors()[0]);
                     if (newColor != null) {
                         host.setSavedColor(newColor);
                     }
@@ -417,14 +454,10 @@ public class HostInfo extends Info {
                 }
             };
         items.add(removeHostItem);
-
-
         return items;
     }
 
-    /**
-     * Returns grahical view if there is any.
-     */
+    /** Returns grahical view if there is any. */
     public final JPanel getGraphicalView() {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
@@ -433,17 +466,14 @@ public class HostInfo extends Info {
         return b.getServicesInfo().getGraphicalView();
     }
 
-    /**
-     * Returns how much of this is used.
-     */
+    /** Returns how much of this is used. */
     public final int getUsed() {
         // TODO: maybe the load?
         return -1;
     }
 
     /**
-     * Returns subtexts that appears in the host vertex in the cluster
-     * graph.
+     * Returns subtexts that appears in the host vertex in the cluster graph.
      */
     public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
         final List<Subtext> texts = new ArrayList<Subtext>();
@@ -459,9 +489,7 @@ public class HostInfo extends Info {
         return texts.toArray(new Subtext[texts.size()]);
     }
 
-    /**
-     * Returns text that appears above the icon in the graph.
-     */
+    /** Returns text that appears above the icon in the graph. */
     public final String getIconTextForGraph(final boolean testOnly) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
@@ -469,9 +497,7 @@ public class HostInfo extends Info {
         return null;
     }
 
-    /**
-     * Returns whether this host is in stand by.
-     */
+    /** Returns whether this host is in stand by. */
     public final boolean isStandby(final boolean testOnly) {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
@@ -480,9 +506,7 @@ public class HostInfo extends Info {
         return b.isStandby(host, testOnly);
     }
 
-    /**
-     * Returns cluster status.
-     */
+    /** Returns cluster status. */
     public final ClusterStatus getClusterStatus() {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
@@ -491,9 +515,7 @@ public class HostInfo extends Info {
         return b.getClusterStatus();
     }
 
-    /**
-     * Returns text that appears in the corner of the graph.
-     */
+    /** Returns text that appears in the corner of the graph. */
     public final Subtext getRightCornerTextForGraph(final boolean testOnly) {
         if (getHost().isClStatus()) {
             if (isStandby(testOnly)) {
@@ -507,9 +529,7 @@ public class HostInfo extends Info {
         return null;
     }
 
-    /**
-     * Selects the node in the menu and reloads everything underneath.
-     */
+    /** Selects the node in the menu and reloads everything underneath. */
     public final void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());

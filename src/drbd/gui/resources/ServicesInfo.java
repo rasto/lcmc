@@ -1490,6 +1490,64 @@ public class ServicesInfo extends EditableInfo {
         addMouseOverListener(stopAllMenuItem, stopAllItemCallback);
         items.add((UpdatableItem) stopAllMenuItem);
 
+        /* unmigrate all services. */
+        final MyMenuItem unmigrateAllMenuItem = new MyMenuItem(
+                Tools.getString("ClusterBrowser.Hb.UnmigrateAllServices"),
+                ServiceInfo.UNMIGRATE_ICON,
+                new AccessMode(ConfigData.AccessType.OP, false),
+                new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            public boolean visiblePredicate() {
+                return enablePredicate() == null;
+            }
+
+            public final String enablePredicate() {
+                if (getBrowser().clStatusFailed()) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
+                if (getBrowser().getExistingServiceList(null).isEmpty()) {
+                    return "there are no services";
+                }
+                for (ServiceInfo si
+                                 : getBrowser().getExistingServiceList(null)) {
+                    if (si.getMigratedTo(testOnly) != null
+                        || si.getMigratedFrom(testOnly) != null) {
+                        return null;
+                    }
+                }
+                return "nothing to unmigrate";
+            }
+
+            public final void action() {
+                hidePopup();
+                final Host dcHost = getBrowser().getDCHost();
+                for (final ServiceInfo si
+                                : getBrowser().getExistingServiceList(null)) {
+                    if (si.getMigratedTo(testOnly) != null
+                        || si.getMigratedFrom(testOnly) != null) {
+                        si.unmigrateResource(dcHost, true); /* test only */
+                    }
+                }
+                getBrowser().getHeartbeatGraph().repaint();
+            }
+        };
+        final ClusterBrowser.ClMenuItemCallback unmigrateAllItemCallback =
+               getBrowser().new ClMenuItemCallback(unmigrateAllMenuItem, null) {
+            public void action(final Host dcHost) {
+                final Host thisDCHost = getBrowser().getDCHost();
+                for (final ServiceInfo si
+                                : getBrowser().getExistingServiceList(null)) {
+                    if (si.getMigratedTo(testOnly) != null
+                        || si.getMigratedFrom(testOnly) != null) {
+                        si.unmigrateResource(dcHost, true); /* test only */
+                    }
+                }
+            }
+        };
+        addMouseOverListener(unmigrateAllMenuItem, unmigrateAllItemCallback);
+        items.add((UpdatableItem) unmigrateAllMenuItem);
+
         /* remove all services. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),

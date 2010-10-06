@@ -865,9 +865,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Migrates resource from where it is running.
-     */
+    /** Migrates resource from where it is running. */
     public static boolean migrateFromResource(final Host host,
                                               final String heartbeatId,
                                               final boolean testOnly) {

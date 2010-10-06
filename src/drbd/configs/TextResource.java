@@ -1306,6 +1306,9 @@ public class TextResource extends
         {"ClusterBrowser.Hb.StopAllServices",
          "Stop All Services"},
 
+        {"ClusterBrowser.Hb.UnmigrateAllServices",
+         "Unmigrate All Migrated Services"},
+
         {"ClusterBrowser.Hb.RemoveService",
          "Remove Service"},
 
@@ -1624,6 +1627,9 @@ public class TextResource extends
 
         {"HostBrowser.Drbd.SetAllSecondary",
          "Set All DRBDs Secondary"},
+
+        {"HostInfo.CRM.AllMigrateFrom",
+         "Migrate All Resources Away"},
 
         {"HostBrowser.CRM.StandByOn",
          "Go Into Standby"},
