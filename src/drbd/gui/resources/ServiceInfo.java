@@ -3465,33 +3465,33 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Adds colocation constraint from this service to the parent. The
-     * parent - child order is here important, in case colocation
+     * Adds colocation constraint from this service to the child. The
+     * child - child order is here important, in case colocation
      * constraint is used along with order constraint.
      */
-    public void addColocation(final ServiceInfo parent,
+    public void addColocation(final ServiceInfo child,
                               final Host dcHost,
                               final boolean testOnly) {
         if (!testOnly
-            && !getService().isNew() && !parent.getService().isNew()) {
-            parent.setUpdated(true);
+            && !getService().isNew() && !child.getService().isNew()) {
+            child.setUpdated(true);
             setUpdated(true);
         }
-        if (isConstraintPH() || parent.isConstraintPH()) {
+        if (isConstraintPH() || child.isConstraintPH()) {
             if (isConstraintPH() && ((ConstraintPHInfo) this).isReversedOrd()) {
                 ((ConstraintPHInfo) this).reverseColocation();
-            } else if (parent.isConstraintPH()
-                       && ((ConstraintPHInfo) parent).isReversedOrd()) {
-                ((ConstraintPHInfo) parent).reverseColocation();
+            } else if (child.isConstraintPH()
+                       && ((ConstraintPHInfo) child).isReversedOrd()) {
+                ((ConstraintPHInfo) child).reverseColocation();
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
             final List<ServiceInfo> withFrom = new ArrayList<ServiceInfo>();
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
-                withService = parent;
+                withService = child;
             } else {
-                cphi = (ConstraintPHInfo) parent;
+                cphi = (ConstraintPHInfo) child;
                 withService = this;
                 withFrom.add(this);
             }
@@ -3505,18 +3505,18 @@ public class ServiceInfo extends EditableInfo {
                                               !cphi.getService().isNew(),
                                               testOnly);
         } else {
-            final String parentHbId = parent.getHeartbeatId(testOnly);
+            final String childHbId = child.getHeartbeatId(testOnly);
             final Map<String, String> attrs =
                                         new LinkedHashMap<String, String>();
             attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
-            final CloneInfo pCI = parent.getCloneInfo();
+            final CloneInfo pCI = child.getCloneInfo();
             if (pCI != null
                 && pCI.getService().isMaster()) {
                 attrs.put("with-rsc-role", "Master");
             }
             CRM.addColocation(dcHost,
                               null, /* col id */
-                              parentHbId,
+                              childHbId,
                               getHeartbeatId(testOnly),
                               attrs,
                               testOnly);
