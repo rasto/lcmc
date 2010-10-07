@@ -332,8 +332,14 @@ public class ClusterStatus {
     /**
      * Returns heartbeat ids of all resource locations.
      */
-    public final List<String> getLocationIds(final String rsc) {
-        final List<String> locs = cibQueryMap.getLocationsId().get(rsc);
+    public final List<String> getLocationIds(final String rsc,
+                                             final boolean testOnly) {
+        List<String> locs;
+        if (testOnly && ptestData != null) {
+            locs = shadowCibQueryMap.getLocationsId().get(rsc);
+        } else {
+            locs = cibQueryMap.getLocationsId().get(rsc);
+        }
         if (locs == null) {
             return new ArrayList<String>();
         } else {
@@ -362,16 +368,28 @@ public class ClusterStatus {
     /**
      * Returns score from location id.
      */
-    public final HostLocation getHostLocationFromId(final String locationId) {
-        return cibQueryMap.getLocationMap().get(locationId);
+    public final HostLocation getHostLocationFromId(final String locationId,
+                                                    final boolean testOnly) {
+        if (testOnly && ptestData != null) {
+            return shadowCibQueryMap.getLocationMap().get(locationId);
+        } else {
+            return cibQueryMap.getLocationMap().get(locationId);
+        }
     }
 
     /**
      * Returns location id for specified resource and host.
      */
-    public final String getLocationId(final String rsc, final String node) {
+    public final String getLocationId(final String rsc,
+                                      final String node,
+                                      final boolean testOnly) {
         /* node should not have to be in lower case. */
-        return (String) cibQueryMap.getResHostToLocId().get(rsc, node);
+        if (testOnly && ptestData != null) {
+            return (String) shadowCibQueryMap.getResHostToLocId().get(rsc,
+                                                                      node);
+        } else {
+            return (String) cibQueryMap.getResHostToLocId().get(rsc, node);
+        }
     }
 
     /**

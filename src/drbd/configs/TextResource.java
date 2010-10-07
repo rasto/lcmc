@@ -1122,6 +1122,9 @@ public class TextResource extends
         {"ClusterBrowser.AdvancedSubmenu",
          "More Options"},
 
+        {"ClusterBrowser.MigrateSubmenu",
+         "More Migration Options"},
+
         {"ClusterBrowser.Host.Offline",
          "Offline"},
 
@@ -1307,7 +1310,7 @@ public class TextResource extends
          "Stop All Services"},
 
         {"ClusterBrowser.Hb.UnmigrateAllServices",
-         "Unmigrate All Migrated Services"},
+         "Remove All Migration Constraints"},
 
         {"ClusterBrowser.Hb.RemoveService",
          "Remove Service"},
@@ -1347,7 +1350,7 @@ public class TextResource extends
 
 
         {"ClusterBrowser.Hb.UnmigrateResource",
-         "Unmigrate"},
+         "Remove Migration Constraint"},
 
         {"ClusterBrowser.Hb.ViewServiceLog",
          "View Service Log"},

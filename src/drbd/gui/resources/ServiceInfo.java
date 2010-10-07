@@ -857,7 +857,8 @@ public class ServiceInfo extends EditableInfo {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (Host host : getBrowser().getClusterHosts()) {
             final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
-                                                 host.getName());
+                                                       host.getName(),
+                                                       testOnly);
             if (locationId == null
                 || (!locationId.startsWith("cli-prefer-")
                     && !locationId.startsWith("cli-standby-"))) {
@@ -892,7 +893,8 @@ public class ServiceInfo extends EditableInfo {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (Host host : getBrowser().getClusterHosts()) {
             final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
-                                                       host.getName());
+                                                       host.getName(),
+                                                       testOnly);
             if (locationId == null
                 || (!locationId.startsWith("cli-prefer-")
                     && !locationId.startsWith("cli-standby-"))) {
@@ -2684,7 +2686,8 @@ public class ServiceInfo extends EditableInfo {
             final HostLocation hostLoc = new HostLocation(hs, op);
             if (!hostLoc.equals(hlSaved)) {
                 String locationId = cs.getLocationId(getHeartbeatId(testOnly),
-                                                     onHost);
+                                                     onHost,
+                                                     testOnly);
                 if (((hs == null || "".equals(hs))
                     || !Tools.areEqual(op, opSaved))
                     && locationId != null) {
@@ -3861,9 +3864,11 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 for (final String locId : cs.getLocationIds(
-                                              getHeartbeatId(testOnly))) {
+                                              getHeartbeatId(testOnly),
+                                              testOnly)) {
                     // TODO: remove locationMap, is null anyway
-                    final HostLocation loc = cs.getHostLocationFromId(locId);
+                    final HostLocation loc = cs.getHostLocationFromId(locId,
+                                                                      testOnly);
                     CRM.removeLocation(dcHost,
                                        locId,
                                        getHeartbeatId(testOnly),
@@ -4848,7 +4853,7 @@ public class ServiceInfo extends EditableInfo {
         items.add(viewLogMenu);
         /* advanced options */
         final MyMenu advancedSubmenu = new MyMenu(
-                        Tools.getString("ClusterBrowser.AdvancedSubmenu"),
+                        Tools.getString("ClusterBrowser.MigrateSubmenu"),
                         new AccessMode(ConfigData.AccessType.OP, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
@@ -4864,6 +4869,116 @@ public class ServiceInfo extends EditableInfo {
     /** Adds migrate and unmigrate menu items. */
     protected void addMigrateMenuItems(final List<UpdatableItem> items) {
         /* migrate resource */
+        final boolean testOnly = false;
+        final ServiceInfo thisClass = this;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final String hostName = host.getName();
+            final MyMenuItem migrateFromMenuItem =
+               new MyMenuItem(Tools.getString(
+                                   "ClusterBrowser.Hb.MigrateFromResource")
+                                   + " " + hostName,
+                              MIGRATE_ICON,
+                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                              Tools.getString(
+                                   "ClusterBrowser.Hb.MigrateFromResource")
+                                   + " " + hostName + " (offline)",
+                              MIGRATE_ICON,
+                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean predicate() {
+                        return host.isClStatus();
+                    }
+
+                    public boolean visiblePredicate() {
+                        return !host.isClStatus()
+                               || enablePredicate() == null;
+                    }
+
+                    public String enablePredicate() {
+                        final List<String> runningOnNodes =
+                                               getRunningOnNodes(testOnly);
+                        if (runningOnNodes == null
+                            || runningOnNodes.size() != 1) {
+                            return "must run on exactly 1 node";
+                        }
+                        final String runningOnNode =
+                                runningOnNodes.get(0).toLowerCase(Locale.US);
+                        if (!getBrowser().clStatusFailed()
+                               && getService().isAvailable()
+                               && hostName.toLowerCase(Locale.US).equals(
+                                                                 runningOnNode)
+                               && host.isClStatus()) {
+                            return null;
+                        } else {
+                            return ""; /* is not visible anyway */
+                        }
+                    }
+
+                    public void action() {
+                        hidePopup();
+                        migrateFromResource(getBrowser().getDCHost(),
+                                            testOnly);
+                    }
+                };
+            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
+               getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
+                public void action(final Host dcHost) {
+                    migrateFromResource(dcHost, true); /* testOnly */
+                }
+            };
+            addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
+            items.add(migrateFromMenuItem);
+        }
+
+        /* unmigrate resource */
+        final MyMenuItem unmigrateMenuItem =
+            new MyMenuItem(
+                    Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
+                    UNMIGRATE_ICON,
+                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    new AccessMode(ConfigData.AccessType.OP, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public boolean visiblePredicate() {
+                    return enablePredicate() == null;
+                }
+
+                public String enablePredicate() {
+                    // TODO: if it was migrated
+                    if (!getBrowser().clStatusFailed()
+                           && getService().isAvailable()
+                           && (getMigratedTo(testOnly) != null
+                               || getMigratedFrom(testOnly) != null)) {
+                        return null;
+                    } else {
+                        return ""; /* it's not visible anyway */
+                    }
+                }
+
+                public void action() {
+                    hidePopup();
+                    unmigrateResource(getBrowser().getDCHost(), testOnly);
+                }
+            };
+        final ClusterBrowser.ClMenuItemCallback unmigrateItemCallback =
+               getBrowser().new ClMenuItemCallback(unmigrateMenuItem, null) {
+            public void action(final Host dcHost) {
+                unmigrateResource(dcHost, true); /* testOnly */
+            }
+        };
+        addMouseOverListener(unmigrateMenuItem, unmigrateItemCallback);
+        items.add((UpdatableItem) unmigrateMenuItem);
+    }
+
+    /**
+     * Adds "migrate from" and "force migrate" menuitems to the submenu.
+     */
+    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
         final boolean testOnly = false;
         final ServiceInfo thisClass = this;
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -4939,119 +5054,8 @@ public class ServiceInfo extends EditableInfo {
                 }
             };
             addMouseOverListener(migrateMenuItem, migrateItemCallback);
-            items.add((UpdatableItem) migrateMenuItem);
+            submenu.add(migrateMenuItem);
         }
-
-        /* unmigrate resource */
-        final MyMenuItem unmigrateMenuItem =
-            new MyMenuItem(
-                    Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
-                    UNMIGRATE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                public boolean visiblePredicate() {
-                    return enablePredicate() == null;
-                }
-
-                public String enablePredicate() {
-                    // TODO: if it was migrated
-                    if (!getBrowser().clStatusFailed()
-                           && getService().isAvailable()
-                           && (getMigratedTo(testOnly) != null
-                               || getMigratedFrom(testOnly) != null)) {
-                        return null;
-                    } else {
-                        return ""; /* it's not visible anyway */
-                    }
-                }
-
-                public void action() {
-                    hidePopup();
-                    unmigrateResource(getBrowser().getDCHost(), testOnly);
-                }
-            };
-        final ClusterBrowser.ClMenuItemCallback unmigrateItemCallback =
-               getBrowser().new ClMenuItemCallback(unmigrateMenuItem, null) {
-            public void action(final Host dcHost) {
-                unmigrateResource(dcHost, true); /* testOnly */
-            }
-        };
-        addMouseOverListener(unmigrateMenuItem, unmigrateItemCallback);
-        items.add((UpdatableItem) unmigrateMenuItem);
-    }
-
-    /**
-     * Adds "migrate from" and "force migrate" menuitems to the submenu.
-     */
-    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
-        final boolean testOnly = false;
-        final ServiceInfo thisClass = this;
-        for (final Host host : getBrowser().getClusterHosts()) {
-            final String hostName = host.getName();
-            final MyMenuItem migrateFromMenuItem =
-               new MyMenuItem(Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + " " + hostName,
-                              MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-
-                              Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + " " + hostName + " (offline)",
-                              MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
-                    private static final long serialVersionUID = 1L;
-
-                    public boolean predicate() {
-                        return host.isClStatus();
-                    }
-
-                    public boolean visiblePredicate() {
-                        return !host.isClStatus()
-                               || enablePredicate() == null;
-                    }
-
-                    public String enablePredicate() {
-                        final List<String> runningOnNodes =
-                                               getRunningOnNodes(testOnly);
-                        if (runningOnNodes == null
-                            || runningOnNodes.size() != 1) {
-                            return "must run on exactly 1 node";
-                        }
-                        final String runningOnNode =
-                                runningOnNodes.get(0).toLowerCase(Locale.US);
-                        if (!getBrowser().clStatusFailed()
-                               && getService().isAvailable()
-                               && hostName.toLowerCase(Locale.US).equals(
-                                                                 runningOnNode)
-                               && host.isClStatus()) {
-                            return null;
-                        } else {
-                            return ""; /* is not visible anyway */
-                        }
-                    }
-
-                    public void action() {
-                        hidePopup();
-                        migrateFromResource(getBrowser().getDCHost(),
-                                            testOnly);
-                    }
-                };
-            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
-               getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
-                public void action(final Host dcHost) {
-                    migrateFromResource(dcHost, true); /* testOnly */
-                }
-            };
-            addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
-            submenu.add(migrateFromMenuItem);
-        }
-
         for (final Host host : getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
 

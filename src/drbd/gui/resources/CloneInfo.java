@@ -490,28 +490,28 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Migrates resource in heartbeat from current location.
-     */
-    public final void migrateResource(final String onHost,
-                                      final Host dcHost,
-                                      final boolean testOnly) {
-        final ServiceInfo cs = containedService;
-        if (cs != null) {
-            cs.migrateResource(onHost, dcHost, testOnly);
-        }
-    }
+    ///**
+    // * Migrates resource in heartbeat from current location.
+    // */
+    //public final void migrateResource(final String onHost,
+    //                                  final Host dcHost,
+    //                                  final boolean testOnly) {
+    //    final ServiceInfo cs = containedService;
+    //    if (cs != null) {
+    //        cs.migrateResource(onHost, dcHost, testOnly);
+    //    }
+    //}
 
-    /**
-     * Removes constraints created by resource migrate command.
-     */
-    public final void unmigrateResource(final Host dcHost,
-                                        final boolean testOnly) {
-        final ServiceInfo cs = containedService;
-        if (cs != null) {
-            cs.unmigrateResource(dcHost, testOnly);
-        }
-    }
+    ///**
+    // * Removes constraints created by resource migrate command.
+    // */
+    //public final void unmigrateResource(final Host dcHost,
+    //                                    final boolean testOnly) {
+    //    final ServiceInfo cs = containedService;
+    //    if (cs != null) {
+    //        cs.unmigrateResource(dcHost, testOnly);
+    //    }
+    //}
 
     /**
      * Sets whether the service is managed.
@@ -534,17 +534,10 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /**
-     * Adds migrate and unmigrate menu items.
-     */
-    protected final void addMigrateMenuItems(final List<UpdatableItem> items) {
-        /* no migrate / unmigrate menu items for clones. */
-    }
-
-    /**
      * Adds "migrate from" and "force migrate" menuitems to the submenu.
      */
     protected void addMoreMigrateMenuItems(final MyMenu submenu) {
-        /* no migrate / unmigrate menu items for clones. */
+        /* no migrate / unmigrate menu advanced items for clones. */
     }
 
     /**

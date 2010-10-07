@@ -1478,7 +1478,8 @@ public class ServicesInfo extends EditableInfo {
                 final Host thisDCHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
-                    if (si.getGroupInfo() == null) {
+                    if (si.getGroupInfo() == null
+                        && !si.isConstraintPH()) {
                         if (!si.isStopped(true)
                             && !si.getService().isOrphaned()) {
                             si.stopResource(thisDCHost, true); /* test only */
@@ -1526,7 +1527,7 @@ public class ServicesInfo extends EditableInfo {
                                 : getBrowser().getExistingServiceList(null)) {
                     if (si.getMigratedTo(testOnly) != null
                         || si.getMigratedFrom(testOnly) != null) {
-                        si.unmigrateResource(dcHost, true); /* test only */
+                        si.unmigrateResource(dcHost, false);
                     }
                 }
                 getBrowser().getHeartbeatGraph().repaint();
