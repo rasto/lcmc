@@ -5209,8 +5209,12 @@ public class ServiceInfo extends EditableInfo {
             texts.add(new Subtext("...",
                                   null,
                                   Color.BLACK));
+        } else if (getResource().isNew()) {
+            texts.add(new Subtext("not running (new)",
+                                  ClusterBrowser.FILL_PAINT_STOPPED,
+                                  Color.BLACK));
         } else if (isFailed(testOnly)) {
-            texts.add(new Subtext("not running:",
+            texts.add(new Subtext("not running",
                                   null,
                                   Color.BLACK));
         } else if (isStopped(testOnly)) {

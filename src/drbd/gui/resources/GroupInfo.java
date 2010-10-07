@@ -209,12 +209,12 @@ public class GroupInfo extends ServiceInfo {
     public final void addGroupServicePanel(final ServiceInfo newServiceInfo,
                                            final boolean reloadNode) {
         newServiceInfo.getService().setResourceClass(
-                    newServiceInfo.getResourceAgent().getResourceClass());
+                        newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         getBrowser().addToHeartbeatIdList(newServiceInfo);
         final DefaultMutableTreeNode newServiceNode =
-                                new DefaultMutableTreeNode(newServiceInfo);
+                                   new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
         getNode().add(newServiceNode);
         if (reloadNode) {
@@ -733,12 +733,12 @@ public class GroupInfo extends ServiceInfo {
     public final boolean isFailed(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
-                                                   getHeartbeatId(testOnly),
-                                                   testOnly);
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
         if (resources != null) {
             for (final String hbId : resources) {
                 final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(hbId);
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
                 if (si == null) {
                     continue;
                 }
@@ -754,101 +754,98 @@ public class GroupInfo extends ServiceInfo {
      * Returns subtexts that appears in the service vertex.
      */
     public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                   getHeartbeatId(testOnly),
-                                                   testOnly);
         final List<Subtext> texts = new ArrayList<Subtext>();
         Subtext prevSubtext = null;
         final Host dcHost = getBrowser().getDCHost();
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(hbId);
+
+        final Enumeration e = getNode().children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode n =
+                                  (DefaultMutableTreeNode) e.nextElement();
+            final ServiceInfo si = (ServiceInfo) n.getUserObject();
+            if (si != null) {
+                final Subtext[] subtexts =
+                                     si.getSubtextsForGraph(testOnly);
+                Subtext sSubtext = null;
+                if (subtexts == null || subtexts.length == 0) {
+                    continue;
+                }
+                sSubtext = subtexts[0];
+                if (prevSubtext == null
+                    || !sSubtext.getSubtext().equals(
+                                          prevSubtext.getSubtext())) {
+                    texts.add(new Subtext(sSubtext.getSubtext()
+                                          + ":",
+                                          sSubtext.getColor(),
+                                          Color.BLACK));
+                    prevSubtext = sSubtext;
+                }
                 if (si != null) {
-                    final Subtext[] subtexts =
-                                         si.getSubtextsForGraph(testOnly);
-                    Subtext sSubtext = null;
-                    if (subtexts == null || subtexts.length == 0) {
-                        continue;
+                    String unmanaged = "";
+                    if (!si.isManaged(testOnly)) {
+                        unmanaged = " / unmanaged";
                     }
-                    sSubtext = subtexts[0];
-                    if (prevSubtext == null
-                        || !sSubtext.getSubtext().equals(
-                                              prevSubtext.getSubtext())) {
-                        texts.add(new Subtext(sSubtext.getSubtext()
-                                              + ":",
-                                              sSubtext.getColor(),
-                                              Color.BLACK));
-                        prevSubtext = sSubtext;
+                    String migrated = "";
+                    if (si.getMigratedTo(testOnly) != null
+                        || si.getMigratedFrom(testOnly) != null) {
+                        migrated = " / migrated";
                     }
-                    if (si != null) {
-                        String unmanaged = "";
-                        if (!si.isManaged(testOnly)) {
-                            unmanaged = " / unmanaged";
-                        }
-                        String migrated = "";
-                        if (si.getMigratedTo(testOnly) != null
-                            || si.getMigratedFrom(testOnly) != null) {
-                            migrated = " / migrated";
-                        }
-                        final HbConnectionInfo[] hbcis =
-                          getBrowser().getHeartbeatGraph().getHbConnections(si);
-                        String constraintLeft = "";
-                        String constraint = "";
-                        if (hbcis != null) {
-                            boolean scoreFirst = false;
-                            boolean scoreThen = false;
-                            boolean someConnection = false;
-                            for (final HbConnectionInfo hbci : hbcis) {
-                                if (hbci == null) {
-                                    continue;
-                                }
-                                if (!someConnection
-                                    && hbci.hasColocationOrOrder(si)) {
-                                    someConnection = true;
-                                }
-                                if (!scoreFirst
-                                    && !hbci.isOrdScoreNull(si, null)) {
-                                    scoreFirst = true;
-                                }
-                                if (!scoreThen
-                                    && !hbci.isOrdScoreNull(null, si)) {
-                                    scoreThen = true;
-                                }
-                            }
-                            if (someConnection) {
-                                if (!scoreFirst && !scoreThen) {
-                                    /* just colocation */
-                                    constraint = " --"; /* -- */
-                                } else {
-                                    if (scoreFirst) {
-                                        constraint = " \u2192"; /* -> */
-                                    }
-                                    if (scoreThen) {
-                                        constraintLeft = "\u2192 "; /* -> */
-                                    }
-                                }
-                            }
-                        }
-                        texts.add(new Subtext("   "
-                                              + constraintLeft
-                                              + si.toString()
-                                              + unmanaged
-                                              + migrated
-                                              + constraint,
-                                              sSubtext.getColor(),
-                                              Color.BLACK));
-                        boolean skip = true;
-                        for (final Subtext st : subtexts) {
-                            if (skip) {
-                                skip = false;
+                    final HbConnectionInfo[] hbcis =
+                      getBrowser().getHeartbeatGraph().getHbConnections(si);
+                    String constraintLeft = "";
+                    String constraint = "";
+                    if (hbcis != null) {
+                        boolean scoreFirst = false;
+                        boolean scoreThen = false;
+                        boolean someConnection = false;
+                        for (final HbConnectionInfo hbci : hbcis) {
+                            if (hbci == null) {
                                 continue;
                             }
-                            texts.add(new Subtext("   " + st.getSubtext(),
-                                                  st.getColor(),
-                                                  Color.BLACK));
+                            if (!someConnection
+                                && hbci.hasColocationOrOrder(si)) {
+                                someConnection = true;
+                            }
+                            if (!scoreFirst
+                                && !hbci.isOrdScoreNull(si, null)) {
+                                scoreFirst = true;
+                            }
+                            if (!scoreThen
+                                && !hbci.isOrdScoreNull(null, si)) {
+                                scoreThen = true;
+                            }
                         }
+                        if (someConnection) {
+                            if (!scoreFirst && !scoreThen) {
+                                /* just colocation */
+                                constraint = " --"; /* -- */
+                            } else {
+                                if (scoreFirst) {
+                                    constraint = " \u2192"; /* -> */
+                                }
+                                if (scoreThen) {
+                                    constraintLeft = "\u2192 "; /* -> */
+                                }
+                            }
+                        }
+                    }
+                    texts.add(new Subtext("   "
+                                          + constraintLeft
+                                          + si.toString()
+                                          + unmanaged
+                                          + migrated
+                                          + constraint,
+                                          sSubtext.getColor(),
+                                          Color.BLACK));
+                    boolean skip = true;
+                    for (final Subtext st : subtexts) {
+                        if (skip) {
+                            skip = false;
+                            continue;
+                        }
+                        texts.add(new Subtext("   " + st.getSubtext(),
+                                              st.getColor(),
+                                              Color.BLACK));
                     }
                 }
             }
@@ -939,8 +936,8 @@ public class GroupInfo extends ServiceInfo {
     public final boolean isStopped(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
-                                                    getHeartbeatId(testOnly),
-                                                    testOnly);
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
         if (resources != null) {
             for (final String hbId : resources) {
                 final ServiceInfo si =
@@ -964,8 +961,8 @@ public class GroupInfo extends ServiceInfo {
     public final boolean isRunning(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
-                                                 getHeartbeatId(testOnly),
-                                                 testOnly);
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
         if (resources != null) {
             for (final String hbId : resources) {
                 final ServiceInfo si =
@@ -1003,8 +1000,8 @@ public class GroupInfo extends ServiceInfo {
         super.updateMenus(pos);
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
-                                                 getHeartbeatId(false),
-                                                 false);
+                                                         getHeartbeatId(false),
+                                                         false);
         if (resources != null) {
             for (final String hbId : resources) {
                 final ServiceInfo si =
@@ -1025,8 +1022,8 @@ public class GroupInfo extends ServiceInfo {
                         final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
-                                                 getHeartbeatId(false),
-                                                 false);
+                                                         getHeartbeatId(false),
+                                                         false);
         if (resources != null) {
             for (final String hbId : resources) {
                 final ServiceInfo si =
