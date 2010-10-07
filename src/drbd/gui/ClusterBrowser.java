@@ -1571,12 +1571,14 @@ public class ClusterBrowser extends Browser {
         return null;
     }
 
-    /**
-     * Returns whether the host is in stand by.
-     */
+    /** Returns whether the host is in stand by. */
     public final boolean isStandby(final Host host, final boolean testOnly) {
         // TODO: make it more efficient
-        final String standby = clusterStatus.getNodeParameter(
+        final ClusterStatus cl = clusterStatus;
+        if (cl == null) {
+            return false;
+        }
+        final String standby = cl.getNodeParameter(
                                        host.getName().toLowerCase(Locale.US),
                                        "standby",
                                        testOnly);
