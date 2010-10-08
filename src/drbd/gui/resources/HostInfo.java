@@ -320,6 +320,10 @@ public class HostInfo extends Info {
                     if (!getHost().isClStatus()) {
                         return NO_PCMK_STATUS_STRING;
                     }
+                    if (getBrowser().getClusterBrowser()
+                                    .getExistingServiceList(null).isEmpty()) {
+                        return "there are no services to migrate";
+                    }
                     return null;
                 }
 

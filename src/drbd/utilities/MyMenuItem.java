@@ -77,6 +77,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private final AccessMode enableAccessMode;
     /** Access Type for this component to become visible. */
     private final AccessMode visibleAccessMode;
+    /** Original tool tip text. */
+    private String origToolTipText = "";
 
     /**
      * Prepares a new <code>MyMenuItem</code> object with icon but without
@@ -292,19 +294,21 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                         if (enableAccessMode.isAdvancedMode()) {
                             advanced = "Advanced ";
                         }
-                        setToolTipText("<html><b>"
-                                       + getText()
-                                       + " (disabled)</b><br>available in \""
-                                       + advanced
-                                       + ConfigData.OP_MODES_MAP.get(
+                        setToolTipText0("<html><b>"
+                                        + getText()
+                                        + " (disabled)</b><br>available in \""
+                                        + advanced
+                                        + ConfigData.OP_MODES_MAP.get(
                                               enableAccessMode.getAccessType())
-                                       + "\" mode</html>");
+                                        + "\" mode</html>");
                     } else if (disableTooltip != null) {
-                        setToolTipText("<html><b>"
-                                       + getText()
-                                       + " (disabled)</b><br>"
-                                       + disableTooltip
-                                       + "</html>");
+                        setToolTipText0("<html><b>"
+                                        + getText()
+                                        + " (disabled)</b><br>"
+                                        + disableTooltip
+                                        + "</html>");
+                    } else if (origToolTipText != null) {
+                        setToolTipText0(origToolTipText);
                     }
                 }
             });
@@ -365,10 +369,14 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                          event.getY() + 20);
     }
 
-    /**
-     * Sets tooltip and wiggles the mouse to refresh it.
-     */
+    /** Sets tooltip and wiggles the mouse to refresh it. */
     public final void setToolTipText(final String toolTipText) {
+        origToolTipText = toolTipText;
+        setToolTipText0(toolTipText);
+    }
+
+    /** Sets tooltip and wiggles the mouse to refresh it. */
+    private final void setToolTipText0(final String toolTipText) {
         toolTip.setTipText(toolTipText);
         super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
