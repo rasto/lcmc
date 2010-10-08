@@ -1264,9 +1264,16 @@ public class HeartbeatGraph extends ResourceGraph {
     protected final boolean showEdgeArrow(final Edge e) {
         if (edgeIsOrderList.contains(e)) {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-            return hbci != null
-                   && !hbci.isOrderTwoDirections()
-                   && !hbci.isOrdScoreNull(null, null);
+            return hbci != null && !hbci.isOrderTwoDirections();
+        }
+        return false;
+    }
+
+    /** Returns whether to show a hollow arrow. */
+    protected final boolean showHollowArrow(final Edge e) {
+        if (edgeIsOrderList.contains(e)) {
+            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
+            return hbci != null && hbci.isOrdScoreNull(null, null);
         }
         return false;
     }

@@ -330,9 +330,7 @@ public class ServicesInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Sets clone info object.
-     */
+    /** Sets clone info object. */
     private CloneInfo setCreateCloneInfo(final String cloneId,
                                          final boolean testOnly) {
         CloneInfo newCi = null;
@@ -368,9 +366,8 @@ public class ServicesInfo extends EditableInfo {
         hg.setVertexIsPresent(newCi);
         return newCi;
     }
-    /**
-     * Sets group info object.
-     */
+
+    /** Sets group info object. */
     private GroupInfo setCreateGroupInfo(final String group,
                                          final CloneInfo newCi,
                                          final boolean testOnly) {
@@ -409,16 +406,14 @@ public class ServicesInfo extends EditableInfo {
         return newGi;
     }
 
-    /**
-     * Sets or create all resources.
-     */
+    /** Sets or create all resources. */
     private void setGroupResources(
-                           final Set<String> allGroupsAndClones,
-                           final String grpOrCloneId,
-                           final GroupInfo newGi,
-                           final CloneInfo newCi,
-                           final List<ServiceInfo> groupServiceIsPresent,
-                           final boolean testOnly) {
+                               final Set<String> allGroupsAndClones,
+                               final String grpOrCloneId,
+                               final GroupInfo newGi,
+                               final CloneInfo newCi,
+                               final List<ServiceInfo> groupServiceIsPresent,
+                               final boolean testOnly) {
         final Map<ServiceInfo, Map<String, String>> setParametersHash =
                            new HashMap<ServiceInfo, Map<String, String>>();
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
@@ -433,8 +428,7 @@ public class ServicesInfo extends EditableInfo {
         }
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         boolean newService = false;
-        for (String hbId : clStatus.getGroupResources(grpOrCloneId,
-                                                           testOnly)) {
+        for (String hbId : clStatus.getGroupResources(grpOrCloneId, testOnly)) {
             if (allGroupsAndClones.contains(hbId)) {
                 if (newGi != null) {
                     Tools.appWarning("group in group not implemented");
@@ -834,16 +828,12 @@ public class ServicesInfo extends EditableInfo {
         });
     }
 
-    /**
-     * Clears the info panel cache, forcing it to reload.
-     */
+    /** Clears the info panel cache, forcing it to reload. */
     public final boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
-    /**
-     * Returns type of the info text. text/plain or text/html.
-     */
+    /** Returns type of the info text. text/plain or text/html. */
     protected final String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
@@ -1132,6 +1122,7 @@ public class ServicesInfo extends EditableInfo {
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
+
         /* add group */
         final MyMenuItem addGroupMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.AddGroup"),
@@ -1391,10 +1382,11 @@ public class ServicesInfo extends EditableInfo {
             }
         };
         items.add((UpdatableItem) addServiceMenuItem);
+
         /* add constraint placeholder */
         final MyMenuItem addConstraintPlaceholder =
             new MyMenuItem(Tools.getString(
-                                "ServicesInfo.AddConstraintPlaceholder"),
+                                     "ServicesInfo.AddConstraintPlaceholder"),
                            null,
                            Tools.getString(
                              "ServicesInfo.AddConstraintPlaceholder.ToolTip"),
@@ -1595,7 +1587,6 @@ public class ServicesInfo extends EditableInfo {
         };
         items.add((UpdatableItem) removeMenuItem);
 
-
         /* view logs */
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ViewLogs"),
@@ -1620,9 +1611,7 @@ public class ServicesInfo extends EditableInfo {
         return items;
     }
 
-    /**
-     * Returns units.
-     */
+    /** Returns units. */
     protected final Unit[] getUnits() {
         return new Unit[]{
             new Unit("", "s", "Second", "Seconds"), /* default unit */

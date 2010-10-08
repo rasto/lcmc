@@ -439,6 +439,9 @@ public class HbOrderInfo extends EditableInfo
 
     /** Returns whether this parameter is advanced. */
     protected final boolean isAdvanced(final String param) {
+        if (CRMXML.SCORE_STRING.equals(param)) {
+            return false;
+        }
         return true;
     }
 

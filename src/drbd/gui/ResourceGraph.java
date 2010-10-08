@@ -63,6 +63,7 @@ import edu.uci.ics.jung.visualization.control.EditingPopupGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.ScalingGraphMousePlugin;
 
 import java.awt.Shape;
+import java.awt.Polygon;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
@@ -1289,11 +1290,30 @@ public abstract class ResourceGraph {
          */
         public Shape getArrow(final Edge e) {
             if (showEdgeArrow(e)) {
-                return super.getArrow(e);
+                if (showHollowArrow(e)) {
+                    return getHollowArrow();
+                } else {
+                    return super.getArrow(e);
+                }
             } else {
                 return emptyShape;
             }
         }
+    }
+
+    /** Returns whether to show the hollow arrow. */
+    protected boolean showHollowArrow(final Edge e) {
+        return false;
+    }
+
+    /** Returns hollow arrow shape. */
+    protected final Shape getHollowArrow() {
+         final Polygon arrow = new Polygon();
+         arrow.addPoint(0, 0);
+         arrow.addPoint(-20, -4);
+         arrow.addPoint(-10, 0);
+         arrow.addPoint(-20, 4);
+         return arrow;
     }
 
     /**

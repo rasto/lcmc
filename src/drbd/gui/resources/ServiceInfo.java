@@ -3725,6 +3725,14 @@ public class ServiceInfo extends EditableInfo {
         CRM.stopResource(dcHost, getHeartbeatId(testOnly), testOnly);
     }
 
+    /** Puts a resource up in a group. */
+    public void upResource(final Host dcHost, final boolean testOnly) {
+        if (!testOnly) {
+            setUpdated(true);
+        }
+        System.out.println("up resource not implemented");
+    }
+
     /**
      * Migrates resource in cluster from current location.
      */
@@ -4669,6 +4677,41 @@ public class ServiceInfo extends EditableInfo {
         };
         addMouseOverListener(stopMenuItem, stopItemCallback);
         items.add((UpdatableItem) stopMenuItem);
+
+        /* up group resource */
+        final MyMenuItem upMenuItem =
+            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.UpResource"),
+                           //UP_ICON,
+                           null,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public boolean visiblePredicate() {
+                    return groupInfo != null;
+                }
+
+                public String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    }
+                    return null;
+                }
+
+                public void action() {
+                    hidePopup();
+                    upResource(getBrowser().getDCHost(), testOnly);
+                }
+            };
+        final ClusterBrowser.ClMenuItemCallback upItemCallback =
+                    getBrowser().new ClMenuItemCallback(upMenuItem, null) {
+            public void action(final Host dcHost) {
+                upResource(dcHost, true); /* testOnly */
+            }
+        };
+        addMouseOverListener(upMenuItem, upItemCallback);
+        items.add((UpdatableItem) upMenuItem);
 
         /* clean up resource */
         final MyMenuItem cleanupMenuItem =
