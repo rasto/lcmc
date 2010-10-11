@@ -870,9 +870,7 @@ public class HbConnectionInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Returns whether the order score is negative.
-     */
+    /** Returns whether the order score is negative. */
     public final boolean isOrdScoreNull(final ServiceInfo first,
                                         final ServiceInfo then) {
         if (isNew()) {

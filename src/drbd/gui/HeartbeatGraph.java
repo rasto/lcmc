@@ -934,6 +934,18 @@ public class HeartbeatGraph extends ResourceGraph {
                 rightArrow = " \u219B"; /* -/> */
             }
         }
+        String colScore = "";
+        String ordScore = "";
+        if (edgeIsColocation
+            && colSType == HbConnectionInfo.ColScoreType.IS_NULL) {
+            colScore = "0";
+        }
+        if (edgeIsOrder
+            && hbci != null
+            && hbci.isOrdScoreNull(null, null)) {
+                ordScore = "0";
+        }
+
         if (edgeIsOrder && edgeIsColocation) {
             if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
                 || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
@@ -974,47 +986,42 @@ public class HeartbeatGraph extends ResourceGraph {
             s2X = loc2.getX();
         }
         final StringBuffer sb = new StringBuffer(15);
+        final boolean upsideDown = s1X < s2X;
+        final boolean left = hbci.isWithRsc(s2);
         if (edgeIsColocation) {
-            final boolean left = hbci.isWithRsc(s2);
-            if (s1X >= s2X) {
-                if (left) {
-                    sb.append(leftArrow); /* <- */
-                    sb.append(colDesc);
-                    if (edgeIsOrder) {
-                        sb.append('/');
-                    }
-                }
+            if ((left && !upsideDown) || (!left && upsideDown)) {
+                sb.append(leftArrow); /* <- */
+                sb.append(colScore);
+                sb.append(' ');
+                sb.append(colDesc);
                 if (edgeIsOrder) {
+                    sb.append('/');
                     sb.append(ordDesc);
+                    sb.append(' ');
+                    sb.append(ordScore);
                 }
-                if (!left) {
-                    if (edgeIsOrder) {
-                        sb.append('/');
-                    }
-                    sb.append(colDesc);
-                    sb.append(rightArrow); /* -> */
-                }
-            } else {
-                if (!left) {
-                    sb.append(leftArrow); /* <- */
-                    sb.append(colDesc);
-                    if (edgeIsOrder) {
-                        sb.append('/');
-                    }
-                }
+            } else if ((!left && !upsideDown) || (left && upsideDown)) {
                 if (edgeIsOrder) {
+                    sb.append(ordScore);
+                    sb.append(' ');
                     sb.append(ordDesc);
+                    sb.append('/');
                 }
-                if (left) {
-                    if (edgeIsOrder) {
-                        sb.append('/');
-                    }
-                    sb.append(colDesc);
-                    sb.append(rightArrow); /* -> */
-                }
+                sb.append(colDesc);
+                sb.append(' ');
+                sb.append(colScore);
+                sb.append(rightArrow); /* -> */
             }
         } else if (edgeIsOrder) {
-            sb.append(ordDesc);
+            if (left && !upsideDown) {
+                sb.append(ordDesc);
+                sb.append(' ');
+                sb.append(ordScore);
+            } else {
+                sb.append(ordScore);
+                sb.append(' ');
+                sb.append(ordDesc);
+            }
         }
         return sb.toString();
     }
