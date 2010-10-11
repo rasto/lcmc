@@ -2075,6 +2075,11 @@ public class TextResource extends
         {"VMSHardwareInfo.confirmRemove.No",
          "Cancel"},
 
+        {"ServiceInfo.PingdToolTip",
+         "<html><b>pingd</b><br>"
+         + "Set location according the connectivity. You have<br>"
+         + "to set a ping/pingd resource, for this to work.</html>"},
+
         {"EmptyViewPanel.HelpText",
 "<h3>Welcome to the DRBD Management Console</h3>"
 + "by Rasto Levrinc."

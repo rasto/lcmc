@@ -531,7 +531,9 @@ public final class CRM {
      */
     private static String getLocationXML(final String heartbeatId,
                                          final String onHost,
+                                         final String attribute,
                                          final String score,
+                                         final String scoreAttribute,
                                          final String op,
                                          final String locationId) {
         final StringBuffer xml = new StringBuffer(360);
@@ -539,7 +541,7 @@ public final class CRM {
         xml.append(locationId);
         xml.append("\" rsc=\"");
         xml.append(heartbeatId);
-        if (op == null || "eq".equals(op)) {
+        if (op == null || ("eq".equals(op) && !"pingd".equals(attribute))) {
             /* eq */
             if (onHost != null) {
                 xml.append("\" node=\"");
@@ -552,31 +554,38 @@ public final class CRM {
             xml.append("\"/>'");
         } else {
             /* ne, etc. */
-            xml.append("\"><rule id=\"loc_");
-            xml.append(heartbeatId);
+            xml.append("\"><rule id=\"");
+            xml.append(locationId);
             xml.append("-rule\"");
             if (score != null) {
                 xml.append(" score=\"");
                 xml.append(score);
                 xml.append('"');
+            }
+            if (scoreAttribute != null) {
+                xml.append(" score-attribute=\"");
+                xml.append(scoreAttribute);
+                xml.append('"');
+            }
+            if (attribute != null) {
+                xml.append("><expression attribute=\"");
+                xml.append(attribute);
+                xml.append("\" id=\"");
+                xml.append(locationId);
+                xml.append("-expression\" operation=\"");
+                xml.append(op);
                 if (onHost != null) {
-                    xml.append("><expression attribute=\"#uname\" id=\"loc_");
-                    xml.append(heartbeatId);
-                    xml.append("-expression\" operation=\"");
-                    xml.append(op);
                     xml.append("\" value=\"");
                     xml.append(onHost);
-                    xml.append("\"/");
                 }
+                xml.append("\"/");
             }
             xml.append("></rule></rsc_location>'");
         }
         return xml.toString();
     }
 
-    /**
-     * Sets location constraint.
-     */
+    /** Sets location constraint. */
     public static boolean setLocation(final Host host,
                                       final String heartbeatId,
                                       final String onHost,
@@ -596,7 +605,51 @@ public final class CRM {
         }
         final String xml = getLocationXML(heartbeatId,
                                           onHost,
+                                          "#uname",
                                           score,
+                                          null,
+                                          op,
+                                          locationId);
+        final SSH.SSHOutput ret = execCommand(
+                                    host,
+                                    getCibCommand(command, "constraints", xml),
+                                    true,
+                                    testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Sets ping location constraint. */
+    public static boolean setPingLocation(final Host host,
+                                          final String heartbeatId,
+                                          final String ruleType,
+                                          String locationId,
+                                          final boolean testOnly) {
+        String command = "-U";
+        String op = null;
+        String value = null;
+        String score = null;
+        String scoreAttribute = null;
+        String attribute = "pingd";
+        String idPart = "";
+        if ("defined".equals(ruleType)) {
+            scoreAttribute = "pingd";
+            op = "defined";
+            idPart = "prefer";
+        } else if ("eq0".equals(ruleType)) {
+            score = "-INFINITY";
+            op = "eq";
+            value = "0";
+            idPart = "exclude";
+        }
+        if (locationId == null) {
+            locationId = "loc_" + heartbeatId + "-ping-" + idPart;
+            command = "-C";
+        }
+        final String xml = getLocationXML(heartbeatId,
+                                          value,
+                                          attribute,
+                                          score,
+                                          scoreAttribute,
                                           op,
                                           locationId);
         final SSH.SSHOutput ret = execCommand(
@@ -613,15 +666,10 @@ public final class CRM {
     public static boolean removeLocation(final Host host,
                                          final String locationId,
                                          final String heartbeatId,
-                                         final HostLocation hostLocation,
                                          final boolean testOnly) {
-        String score = null;
-        String op = null;
-        if (hostLocation != null) {
-            score = hostLocation.getScore();
-            op = hostLocation.getOperation();
-        }
         final String xml = getLocationXML(heartbeatId,
+                                          null,
+                                          null,
                                           null,
                                           null,
                                           null,

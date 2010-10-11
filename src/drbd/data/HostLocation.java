@@ -36,28 +36,33 @@ public class HostLocation {
     private final String score;
     /** Operation, eq. "eq", "ne". */
     private final String op;
+    /** Value. */
+    private final String value;
 
     /**
      * Prepares a new <code>AisCastAddress</code> object.
      */
     public HostLocation(final String score,
-                        final String op) {
+                        final String op,
+                        final String value) {
         this.score = score;
         this.op    = op;
+        this.value = value;
     }
 
-    /**
-     * Returns score.
-     */
+    /** Returns score. */
     public final String getScore() {
         return score;
     }
 
-    /**
-     * Returns score.
-     */
+    /** Returns score. */
     public final String getOperation() {
         return op;
+    }
+
+    /** Returns value. */
+    public final String getValue() {
+        return value;
     }
 
     /**

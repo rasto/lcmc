@@ -92,12 +92,16 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * its arguments and execute operations on it.
  */
 public class ServiceInfo extends EditableInfo {
-    /** This is a map from host to the combobox with scores. */
+    /** A map from host to the combobox with scores. */
     private final Map<HostInfo, GuiComboBox> scoreComboBoxHash =
                                           new HashMap<HostInfo, GuiComboBox>();
     /** A map from host to stored score. */
     private final Map<HostInfo, HostLocation> savedHostLocations =
                                          new HashMap<HostInfo, HostLocation>();
+    /** A combobox with pingd constraint. */
+    private GuiComboBox pingComboBox = null;
+    /** Saved ping constraint. */
+    private String savedPingOperation = null;
     /** Saved meta attrs id. */
     private String savedMetaAttrsId = null;
     /** Saved operations id. */
@@ -210,6 +214,13 @@ public class ServiceInfo extends EditableInfo {
                                                  "cannot do that to an ophan";
     /** String that appears as a tooltip in menu items if item is new. */
     public static final String IS_NEW_STRING = "it is not applied yet";
+    /** Ping attributes. */
+    private static final Map<String, String> PING_ATTRIBUTES =
+                                                new HashMap<String, String>();
+    static {
+        PING_ATTRIBUTES.put("eq0", "no ping: stop"); /* eq 0 */
+        PING_ATTRIBUTES.put("defined", "most connections");
+    }
 
     /**
      * Prepares a new <code>ServiceInfo</code> object and creates
@@ -462,14 +473,14 @@ public class ServiceInfo extends EditableInfo {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 sameAsMetaAttrsCB.setValue(
-                                    META_ATTRS_DEFAULT_VALUES_TEXT);
+                                               META_ATTRS_DEFAULT_VALUES_TEXT);
                             }
                         });
                     } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 sameAsMetaAttrsCB.setValue(
-                                         GuiComboBox.NOTHING_SELECTED);
+                                                 GuiComboBox.NOTHING_SELECTED);
                             }
                         });
                     }
@@ -615,6 +626,34 @@ public class ServiceInfo extends EditableInfo {
                     final JLabel label = cb.getLabel();
                     final String text = getHostLocationLabel(hi.getName(), op);
                     label.setText(text);
+                }
+            }
+        }
+
+        /* set ping constraint */
+        final HostLocation hostLocation = cs.getPingScore(
+                                                getService().getHeartbeatId(),
+                                                false);
+        String pingOperation = null;
+        if (hostLocation != null) {
+            final String op = hostLocation.getOperation();
+            final String value = hostLocation.getValue();
+            if ("eq".equals(op) && "0".equals(value)) {
+                pingOperation = "eq0";
+            } else {
+                pingOperation = hostLocation.getOperation();
+            }
+        }
+        if (!Tools.areEqual(pingOperation, savedPingOperation)) {
+            savedPingOperation = pingOperation;
+        }
+        if (infoPanelOk) {
+            final GuiComboBox cb = pingComboBox;
+            if (cb != null) {
+                if (pingOperation == null) {
+                    cb.setValue(GuiComboBox.NOTHING_SELECTED);
+                } else {
+                    cb.setValue(PING_ATTRIBUTES.get(pingOperation));
                 }
             }
         }
@@ -947,15 +986,36 @@ public class ServiceInfo extends EditableInfo {
     }
 
 
-    /**
-     * Returns fail count.
-     */
+    /** Returns fail count. */
     protected String getFailCount(final String hostName,
                                   final boolean testOnly) {
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
         return cs.getFailCount(hostName, getHeartbeatId(testOnly), testOnly);
     }
+
+    /** Returns ping count. */
+    protected String getPingCount(final String hostName,
+                                  final boolean testOnly) {
+
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        return cs.getPingCount(hostName, testOnly);
+    }
+
+    /** Returns fail ping string that appears in the graph. */
+    protected String getPingCountString(final String hostName,
+                                        final boolean testOnly) {
+        if (!resourceAgent.isPingService()) {
+            return "";
+        }
+        final String pingCount = getPingCount(hostName, testOnly);
+        if (pingCount == null || "0".equals(pingCount)) {
+            return " / no ping";
+        } else {
+            return " / ping: " + pingCount;
+        }
+    }
+
 
     /**
      * Returns whether the resource failed on the specified host.
@@ -1104,9 +1164,16 @@ public class ServiceInfo extends EditableInfo {
             if (score == null || "".equals(score)) {
                 savedHostLocations.remove(hi);
             } else {
-                savedHostLocations.put(hi, new HostLocation(score, op));
+                savedHostLocations.put(hi, new HostLocation(score, op, null));
             }
         }
+        /* ping */
+        final Object o = pingComboBox.getValue();
+        String value = null;
+        if (o != null) {
+            value = ((StringInfo) o).getStringValue();
+        }
+        savedPingOperation = value;
     }
 
     /**
@@ -1229,6 +1296,17 @@ public class ServiceInfo extends EditableInfo {
                              opSavedLabel,
                              hsSaved,
                              false);
+        }
+        /* ping */
+        final GuiComboBox pcb = pingComboBox;
+        if (pcb != null) {
+            if (!Tools.areEqual(savedPingOperation,
+                                pcb.getValue())) {
+                changed = true;
+            }
+            pcb.setBackground(null,
+                              savedPingOperation,
+                              false);
         }
         return changed;
     }
@@ -1443,11 +1521,50 @@ public class ServiceInfo extends EditableInfo {
                      0);
             rows++;
         }
+        rows += addPingField(panel, leftWidth, rightWidth);
 
         SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
                                         1, 1,           /* initX, initY */
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
+    }
+
+    /** Adds field with ping constraint. */
+    private int addPingField(final JPanel panel,
+                             final int leftWidth,
+                             final int rightWidth) {
+        int rows = 0;
+        final JLabel pingLabel = new JLabel("pingd");
+        final GuiComboBox pingCB =
+          new GuiComboBox(savedPingOperation,
+                          new StringInfo[]{new StringInfo(
+                                             GuiComboBox.NOTHING_SELECTED,
+                                             null,
+                                             getBrowser()),
+                                           new StringInfo(
+                                             PING_ATTRIBUTES.get("defined"),
+                                             "defined",
+                                             getBrowser()),
+                                           new StringInfo(
+                                             PING_ATTRIBUTES.get("eq0"),
+                                             "eq0",
+                                             getBrowser())},
+                          null, /* units */
+                          null, /* type */
+                          null, /* regexp */
+                          rightWidth,
+                          null, /* abbreviations */
+                          new AccessMode(ConfigData.AccessType.ADMIN,
+                                         false));
+        addField(panel, pingLabel, pingCB, leftWidth, rightWidth, 0);
+        pingCB.setLabel(pingLabel,
+                        Tools.getString("ServiceInfo.PingdToolTip"));
+        if (resourceAgent.isPingService() && savedPingOperation == null) {
+            pingCB.setEnabled(false);
+        }
+        pingComboBox = pingCB;
+        rows++;
+        return rows;
     }
 
     /**
@@ -2258,11 +2375,60 @@ public class ServiceInfo extends EditableInfo {
                 }
             );
         }
+        pingComboBox.addListeners(
+            new ItemListener() {
+                public void itemStateChanged(final ItemEvent e) {
+                    if (pingComboBox.isCheckBox()
+                        || e.getStateChange() == ItemEvent.SELECTED) {
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                final boolean enable =
+                                  checkResourceFields(CACHED_FIELD, params);
+                                SwingUtilities.invokeLater(
+                                new Runnable() {
+                                    public void run() {
+                                        getApplyButton().setEnabled(enable);
+                                    }
+                                });
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            },
+
+            new DocumentListener() {
+                private void check() {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            final boolean enable =
+                                checkResourceFields(CACHED_FIELD, params);
+                            SwingUtilities.invokeLater(
+                            new Runnable() {
+                                public void run() {
+                                    getApplyButton().setEnabled(enable);
+                                }
+                            });
+                        }
+                    });
+                    thread.start();
+                }
+
+                public void insertUpdate(final DocumentEvent e) {
+                    check();
+                }
+
+                public void removeUpdate(final DocumentEvent e) {
+                    check();
+                }
+
+                public void changedUpdate(final DocumentEvent e) {
+                    check();
+                }
+            });
     }
 
-    /**
-     * Adds listeners for operation and parameter.
-     */
+    /** Adds listeners for operation and parameter. */
     private void addOperationListeners(final String op, final String param) {
         final String dv = resourceAgent.getOperationDefault(op, param);
         if (dv == null) {
@@ -2683,7 +2849,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final String onHost = hi.getName();
             final String op = getOpFromLabel(onHost, cb.getLabel().getText());
-            final HostLocation hostLoc = new HostLocation(hs, op);
+            final HostLocation hostLoc = new HostLocation(hs, op, null);
             if (!hostLoc.equals(hlSaved)) {
                 String locationId = cs.getLocationId(getHeartbeatId(testOnly),
                                                      onHost,
@@ -2694,7 +2860,6 @@ public class ServiceInfo extends EditableInfo {
                     CRM.removeLocation(dcHost,
                                        locationId,
                                        getHeartbeatId(testOnly),
-                                       hlSaved,
                                        testOnly);
                     locationId = null;
                 }
@@ -2705,6 +2870,35 @@ public class ServiceInfo extends EditableInfo {
                                     hostLoc,
                                     locationId,
                                     testOnly);
+                }
+            }
+        }
+        /* ping */
+        final GuiComboBox pcb = pingComboBox;
+        if (pcb != null) {
+            String value = null;
+            final Object o = pcb.getValue();
+            if (o != null) {
+                value = ((StringInfo) o).getStringValue();
+            }
+            final String locationId = null;
+            if (!Tools.areEqual(savedPingOperation,
+                                value)) {
+                String pingLocationId = cs.getPingLocationId(
+                                                    getHeartbeatId(testOnly),
+                                                    testOnly);
+                if (pingLocationId != null) {
+                    CRM.removeLocation(dcHost,
+                                       pingLocationId,
+                                       getHeartbeatId(testOnly),
+                                       testOnly);
+                }
+                if (value != null) {
+                    CRM.setPingLocation(dcHost,
+                                        getHeartbeatId(testOnly),
+                                        value,
+                                        null, /* location id */
+                                        testOnly);
                 }
             }
         }
@@ -3687,8 +3881,12 @@ public class ServiceInfo extends EditableInfo {
             }
             getBrowser().reloadAllComboBoxes(serviceInfo);
         }
-        if (reloadNode && ra != null && ra.isProbablyMasterSlave()) {
-            serviceInfo.changeType(MASTER_SLAVE_TYPE_STRING);
+        if (reloadNode && ra != null) {
+            if (ra.isProbablyMasterSlave()) {
+                serviceInfo.changeType(MASTER_SLAVE_TYPE_STRING);
+            } else if (ra.isProbablyClone()) {
+                serviceInfo.changeType(CLONE_TYPE_STRING);
+            }
         }
         getBrowser().getHeartbeatGraph().reloadServiceMenus();
         if (reloadNode) {
@@ -3874,13 +4072,9 @@ public class ServiceInfo extends EditableInfo {
                 for (final String locId : cs.getLocationIds(
                                               getHeartbeatId(testOnly),
                                               testOnly)) {
-                    // TODO: remove locationMap, is null anyway
-                    final HostLocation loc = cs.getHostLocationFromId(locId,
-                                                                      testOnly);
                     CRM.removeLocation(dcHost,
                                        locId,
                                        getHeartbeatId(testOnly),
-                                       loc,
                                        testOnly);
                 }
             }
@@ -5265,25 +5459,36 @@ public class ServiceInfo extends EditableInfo {
                                   ClusterBrowser.FILL_PAINT_STOPPED,
                                   Color.BLACK));
         } else {
+            Color textColor = Color.BLACK;
             String runningOnNodeString = null;
             if (getBrowser().allHostsDown()) {
                 runningOnNodeString = "unknown";
             } else {
                 final List<String> runningOnNodes = getRunningOnNodes(testOnly);
-                if (runningOnNodes != null && !runningOnNodes.isEmpty()) {
+                if (runningOnNodes != null
+                           && !runningOnNodes.isEmpty()) {
                     runningOnNodeString = runningOnNodes.get(0);
-                    color = getBrowser().getCluster().getHostColors(
+                    if (resourceAgent.isPingService()
+                        && "0".equals(
+                                getPingCount(runningOnNodeString, testOnly))) {
+                        color = Color.RED;
+                        textColor = Color.WHITE;
+                    } else {
+                        color = getBrowser().getCluster().getHostColors(
                                                         runningOnNodes).get(0);
+                    }
                 }
             }
             if (runningOnNodeString != null) {
-                texts.add(new Subtext("running on: " + runningOnNodeString,
+                texts.add(new Subtext("running on: " + runningOnNodeString
+                                      + getPingCountString(runningOnNodeString,
+                                                           testOnly),
                                       color,
-                                      Color.BLACK));
+                                      textColor));
             } else {
                 texts.add(new Subtext("not running",
                                       ClusterBrowser.FILL_PAINT_STOPPED,
-                                      Color.BLACK));
+                                      textColor));
             }
         }
         if (isOneFailedCount(testOnly)) {

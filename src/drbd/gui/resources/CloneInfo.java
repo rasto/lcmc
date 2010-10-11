@@ -211,9 +211,7 @@ public class CloneInfo extends ServiceInfo {
          }
     }
 
-    /**
-     * Returns fail count string that appears in the graph.
-     */
+    /** Returns fail count string that appears in the graph. */
     private String getFailCountString(final String hostName,
                                       final boolean testOnly) {
         String fcString = "";
@@ -278,6 +276,7 @@ public class CloneInfo extends ServiceInfo {
             int i = 0;
             for (final String n : runningOnNodes) {
                 texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
+                                      + getPingCountString(n, testOnly)
                                       + getFailCountString(n, testOnly),
                                       colors.get(i), Color.BLACK));
                 notRunningOnNodes.remove(n.toLowerCase(Locale.US));
@@ -328,6 +327,16 @@ public class CloneInfo extends ServiceInfo {
             }
         }
         return texts.toArray(new Subtext[texts.size()]);
+    }
+
+    /** Returns fail ping string that appears in the graph. */
+    protected String getPingCountString(final String hostName,
+                                        final boolean testOnly) {
+        final ServiceInfo cs = getContainedService();
+        if (cs != null) {
+            return cs.getPingCountString(hostName, testOnly);
+        }
+        return "";
     }
 
     /**

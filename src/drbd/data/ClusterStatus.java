@@ -347,9 +347,7 @@ public class ClusterStatus {
         }
     }
 
-    /**
-     * Returns score for resource and host.
-     */
+    /** Returns location object for resource and host. */
     public final HostLocation getScore(final String hbId,
                                     final String onHost,
                                     final boolean testOnly) {
@@ -365,6 +363,18 @@ public class ClusterStatus {
         return null;
     }
 
+    /** Returns ping location object for resource. */
+    public final HostLocation getPingScore(final String hbId,
+                                           final boolean testOnly) {
+        HostLocation hostLocation;
+        if (testOnly && ptestData != null) {
+            hostLocation = shadowCibQueryMap.getPingLocation().get(hbId);
+        } else {
+            hostLocation = cibQueryMap.getPingLocation().get(hbId);
+        }
+        return hostLocation;
+    }
+
     /**
      * Returns score from location id.
      */
@@ -377,9 +387,7 @@ public class ClusterStatus {
         }
     }
 
-    /**
-     * Returns location id for specified resource and host.
-     */
+    /** Returns location id for specified resource and host. */
     public final String getLocationId(final String rsc,
                                       final String node,
                                       final boolean testOnly) {
@@ -389,6 +397,17 @@ public class ClusterStatus {
                                                                       node);
         } else {
             return (String) cibQueryMap.getResHostToLocId().get(rsc, node);
+        }
+    }
+
+    /** Returns location id for ping for specified resource. */
+    public final String getPingLocationId(final String rsc,
+                                          final boolean testOnly) {
+        /* node should not have to be in lower case. */
+        if (testOnly && ptestData != null) {
+            return shadowCibQueryMap.getResPingToLocId().get(rsc);
+        } else {
+            return cibQueryMap.getResPingToLocId().get(rsc);
         }
     }
 
@@ -551,21 +570,30 @@ public class ClusterStatus {
 
 
     /** Returns fail count of the service on the specified node. */
-     public final String getFailCount(final String node,
-                                      final String res,
-                                      final boolean testOnly) {
-         return cibQueryMap.getFailCount(node.toLowerCase(Locale.US), res);
-     }
+    public final String getFailCount(final String node,
+                                     final String res,
+                                     final boolean testOnly) {
+        return cibQueryMap.getFailCount(node.toLowerCase(Locale.US), res);
+    }
 
-     /** Returns failed clones for the specified resource. */
-     public final Set<String> getFailedClones(final String res,
-                                              final boolean testOnly) {
-         return cibQueryMap.getFailedClones().get(res);
-     }
+    /** Returns ping count of the specified node. */
+    public final String getPingCount(final String node,
+                                     final boolean testOnly) {
+        if (testOnly && ptestData != null) {
+            return shadowCibQueryMap.getPingCount(node.toLowerCase(Locale.US));
+        }
+        return cibQueryMap.getPingCount(node.toLowerCase(Locale.US));
+    }
 
-     /**
-      * Returns value for specified node and parameter.
-      */
+    /** Returns failed clones for the specified resource. */
+    public final Set<String> getFailedClones(final String res,
+                                             final boolean testOnly) {
+        return cibQueryMap.getFailedClones().get(res);
+    }
+
+    /**
+     * Returns value for specified node and parameter.
+     */
     public final String getNodeParameter(final String node,
                                          final String param,
                                          final boolean testOnly) {

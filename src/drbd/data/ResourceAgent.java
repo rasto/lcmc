@@ -93,12 +93,16 @@ public class ResourceAgent {
     private final MultiKeyMap opToDefault = new MultiKeyMap();
     /** Whether the service is probably master/slave resource. */
     private boolean probablyMasterSlave = false;
+    /** Whether the service is probably clone resource. */
+    private boolean probablyClone = false;
     /** Sections for some parameters. */
     private final Map<String, String> sectionMap =
                                                 new HashMap<String, String>();
     /** Map to field types for some parameters. */
     private final Map<String, GuiComboBox.Type> fieldType =
                                        new HashMap<String, GuiComboBox.Type>();
+    /** Whether this resource agent is ping or pingd. */
+    private final boolean pingService;
     /**
      * Prepares a new <code>ResourceAgent</code> object.
      */
@@ -122,6 +126,7 @@ public class ResourceAgent {
         } else if (isGroup()) {
             section = "Group";
         }
+        pingService = "ping".equals(name) || "pingd".equals(name);
         addParameter(ServiceInfo.GUI_ID);
         sectionMap.put(ServiceInfo.GUI_ID, section);
         paramRequired.add(ServiceInfo.GUI_ID);
@@ -578,11 +583,21 @@ public class ResourceAgent {
         this.probablyMasterSlave = probablyMasterSlave;
     }
 
-    /**
-     * Returns whether the service is probably master/slave resource.
-     */
+    /** Returns whether the service is probably master/slave resource. */
     public final boolean isProbablyMasterSlave() {
         return probablyMasterSlave;
+    }
+
+    /**
+     * Sets if this service is clone service (with certain probability).
+     */
+    public final void setProbablyClone(final boolean probablyClone) {
+        this.probablyClone = probablyClone;
+    }
+
+    /** Returns whether the service is probably master/slave resource. */
+    public final boolean isProbablyClone() {
+        return probablyClone;
     }
 
     /**
@@ -604,5 +619,10 @@ public class ResourceAgent {
      */
     public final String getRAString() {
         return resourceClass + "::" + provider + ":" + name;
+    }
+
+    /** Returns whether this resource agent is ping or pingd. */
+    public final boolean isPingService() {
+        return pingService;
     }
 }

@@ -1090,10 +1090,16 @@ public class ServicesInfo extends EditableInfo {
                                 new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
             getBrowser().getServicesNode().add(newServiceNode);
-            if (interactive
-                && newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
-                /* only if it was added manually. */
-                newServiceInfo.changeType(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+            if (interactive) {
+                if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
+                    /* only if it was added manually. */
+                    newServiceInfo.changeType(
+                                        ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                } else if (
+                        newServiceInfo.getResourceAgent().isProbablyClone()) {
+                    newServiceInfo.changeType(
+                                        ServiceInfo.CLONE_TYPE_STRING);
+                }
             }
             if (reloadNode) {
                 /* show it */

@@ -1624,9 +1624,12 @@ public class CRMXML extends XML {
                         // Workaround, default is "0" and should be false
                         defaultValue = "false";
                     }
-                    if ("pingd".equals(ra.getName())
-                        || "ping".equals(ra.getName())) {
+                    if (ra.isPingService()) {
                         /* workaround: all types are integer in this ras. */
+                        ra.setProbablyClone(true);
+                        if ("host_list".equals(param)) {
+                            ra.setParamRequired(param, true);
+                        }
                     } else {
                         ra.setParamType(param, type);
                     }
@@ -2398,6 +2401,7 @@ public class CRMXML extends XML {
                               final Node transientAttrNode,
                               final MultiKeyMap failedMap,
                               final Map<String, Set<String>> failedClonesMap,
+                              final Map<String, String> pingCountMap,
                               final String hbV) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(transientAttrNode,
@@ -2419,7 +2423,9 @@ public class CRMXML extends XML {
                     final String name = getAttribute(optionNode, "name");
                     final String value = getAttribute(optionNode, "value");
                     /* TODO: last-failure-" */
-                    if (name.indexOf(FAIL_COUNT_PREFIX) == 0) {
+                    if ("pingd".equals(name)) {
+                        pingCountMap.put(uname, value);
+                    } else if (name.indexOf(FAIL_COUNT_PREFIX) == 0) {
                         final String resId =
                                     name.substring(FAIL_COUNT_PREFIX.length());
                         failedMap.put(uname.toLowerCase(Locale.US),
@@ -2714,6 +2720,7 @@ public class CRMXML extends XML {
         final MultiKeyMap failedMap = new MultiKeyMap();
         final Map<String, Set<String>> failedClonesMap =
                                      new LinkedHashMap<String, Set<String>>();
+        final Map<String, String> pingCountMap = new HashMap<String, String>();
         groupsToResourcesMap.put("none", new ArrayList<String>());
 
         final NodeList primitivesGroups = resourcesNode.getChildNodes();
@@ -2862,9 +2869,14 @@ public class CRMXML extends XML {
                                         new HashMap<String, List<OrderData>>();
         final Map<String, Map<String, HostLocation>> locationMap =
                               new HashMap<String, Map<String, HostLocation>>();
+        final Map<String, HostLocation> pingLocationMap =
+                                           new HashMap<String, HostLocation>();
         final Map<String, List<String>> locationsIdMap =
                                            new HashMap<String, List<String>>();
         final MultiKeyMap resHostToLocIdMap = new MultiKeyMap();
+
+        final Map<String, String> resPingToLocIdMap =
+                                               new HashMap<String, String>();
         final Node constraintsNode = getChildNode(confNode, "constraints");
         if (constraintsNode != null) {
             final NodeList constraints = constraintsNode.getChildNodes();
@@ -2993,7 +3005,8 @@ public class CRMXML extends XML {
                         resHostToLocIdMap.put(rsc, node, locId);
                     }
                     if (score != null) {
-                        hostScoreMap.put(node, new HostLocation(score, "eq"));
+                        hostScoreMap.put(node,
+                                         new HostLocation(score, "eq", null));
                     }
                     locs.add(locId);
                     final Node ruleNode = getChildNode(constraintNode,
@@ -3015,14 +3028,26 @@ public class CRMXML extends XML {
                                      getAttribute(expNode, "operation");
                             final String type =
                                      getAttribute(expNode, "type");
-                            final String node2 =
+                            final String value =
                                      getAttribute(expNode, "value");
                             if ((booleanOp == null
                                  || "and".equals(booleanOp))
                                 && "#uname".equals(attr)) {
-                                hostScoreMap.put(node2, new HostLocation(score2,
-                                                                         op));
-                                resHostToLocIdMap.put(rsc, node2, locId);
+                                hostScoreMap.put(value, new HostLocation(score2,
+                                                                         op,
+                                                                         null));
+                                resHostToLocIdMap.put(rsc, value, locId);
+                            } else if ((booleanOp == null
+                                      || "and".equals(booleanOp))
+                                     && "pingd".equals(attr)) {
+                                pingLocationMap.put(rsc,
+                                                    new HostLocation(score2,
+                                                                     op,
+                                                                     value));
+                                resPingToLocIdMap.put(rsc, locId);
+                            } else {
+                                Tools.appWarning(
+                                    "could not parse rsc_location: " + locId);
                             }
                         }
                     }
@@ -3042,7 +3067,6 @@ public class CRMXML extends XML {
                     final String ha = getAttribute(nodeStateNode, "ha");
                     final String join = getAttribute(nodeStateNode, "join");
                     final String inCCM = getAttribute(nodeStateNode, "in_ccm");
-                    /* TODO: check and use other stuff too. */
                     if ("active".equals(ha)
                         && "member".equals(join)
                         && "true".equals(inCCM)) {
@@ -3060,6 +3084,7 @@ public class CRMXML extends XML {
                                                      nodeStateChild,
                                                      failedMap,
                                                      failedClonesMap,
+                                                     pingCountMap,
                                                      hbV);
                         }
                     }
@@ -3097,8 +3122,10 @@ public class CRMXML extends XML {
         cibQueryData.setOrderRsc(orderRscMap);
 
         cibQueryData.setLocation(locationMap);
+        cibQueryData.setPingLocation(pingLocationMap);
         cibQueryData.setLocationsId(locationsIdMap);
         cibQueryData.setResHostToLocId(resHostToLocIdMap);
+        cibQueryData.setResPingToLocId(resPingToLocIdMap);
         cibQueryData.setOperations(operationsMap);
         cibQueryData.setOperationsId(operationsIdMap);
         cibQueryData.setOperationsRefs(operationsRefs);
@@ -3111,6 +3138,7 @@ public class CRMXML extends XML {
         cibQueryData.setMasterList(masterList);
         cibQueryData.setFailed(failedMap);
         cibQueryData.setFailedClones(failedClonesMap);
+        cibQueryData.setPingCount(pingCountMap);
         cibQueryData.setRscDefaultsId(rscDefaultsId);
         cibQueryData.setRscDefaultsParams(rscDefaultsParams);
         cibQueryData.setRscDefaultsParamsNvpairIds(rscDefaultsParamsNvpairIds);

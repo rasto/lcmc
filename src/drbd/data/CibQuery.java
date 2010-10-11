@@ -79,6 +79,9 @@ public class CibQuery {
     /** Location map. */
     private Map<String, Map<String, HostLocation>> location =
                               new HashMap<String, Map<String, HostLocation>>();
+    /** Ping location map. */
+    private Map<String, HostLocation> pingLocation =
+                                           new HashMap<String, HostLocation>();
     /** Locations id map. */
     private Map<String, List<String>> locationsId =
                                            new HashMap<String, List<String>>();
@@ -87,6 +90,8 @@ public class CibQuery {
                                            new HashMap<String, HostLocation>();
     /** Map from resource and host to location id. */
     private MultiKeyMap resHostToLocId = new MultiKeyMap();
+    /** Map from resource to location id for ping. */
+    private Map<String, String> resPingToLocId = new HashMap<String, String>();
     /** Operations map. */
     private MultiKeyMap operations = new MultiKeyMap();
     /** Operations refs map. */
@@ -117,6 +122,8 @@ public class CibQuery {
     /** Map from rsc id to list of clone ids for failed clones. */
     private Map<String, Set<String>> failedClones =
                                       new LinkedHashMap<String, Set<String>>();
+    /** Ping count per node. */
+    private Map<String, String> pingCount = new HashMap<String, String>();
     /** rsc_defaults meta attributes id. */
     private String rscDefaultsId = null;
     /** rsc_defaults parameters with values. */
@@ -317,19 +324,26 @@ public class CibQuery {
         return nodeParameters;
     }
 
-    /**
-     * Sets location map.
-     */
+    /** Sets location map. */
     public final void setLocation(
                        final Map<String, Map<String, HostLocation>> location) {
         this.location = location;
     }
 
-    /**
-     * Returns location map.
-     */
+    /** Returns location map. */
     public final Map<String, Map<String, HostLocation>> getLocation() {
         return location;
+    }
+
+    /** Sets ping location map. */
+    public final void setPingLocation(
+                                final Map<String, HostLocation> pingLocation) {
+        this.pingLocation = pingLocation;
+    }
+
+    /** Returns ping location map. */
+    public final Map<String, HostLocation> getPingLocation() {
+        return pingLocation;
     }
 
     /**
@@ -362,19 +376,27 @@ public class CibQuery {
         return idToLocation;
     }
 
-    /**
-     * Sets map from resource and host to the location id.
-     */
+    /** Sets map from resource and host to the location id. */
     public final void setResHostToLocId(final MultiKeyMap resHostToLocId) {
         this.resHostToLocId = resHostToLocId;
     }
 
-    /**
-     * Returns map from resource and host to the location id.
-     */
+    /** Returns map from resource and host to the location id. */
     public final MultiKeyMap getResHostToLocId() {
         return resHostToLocId;
     }
+
+    /** Sets map from resource to the location id for ping. */
+    public final void setResPingToLocId(
+                                    final Map<String, String> resPingToLocId) {
+        this.resPingToLocId = resPingToLocId;
+    }
+
+    /** Returns map from resource to the location id for ping. */
+    public final Map<String, String> getResPingToLocId() {
+        return resPingToLocId;
+    }
+
 
     /**
      * Sets operations map.
@@ -547,6 +569,16 @@ public class CibQuery {
         return failed;
     }
 
+    /** Sets node ping map. */
+    public final void setPingCount(final Map<String, String> pingCount) {
+        this.pingCount = pingCount;
+    }
+
+    /** Returns ping count map. */
+    public final Map<String, String> getPingCount() {
+        return pingCount;
+    }
+
     /** Sets failed clone map. */
     public final void setFailedClones(
                                 final Map<String, Set<String>> failedClones) {
@@ -559,9 +591,14 @@ public class CibQuery {
     }
 
     /** Returns fail-count. It can be "INFINITY" */
-     public final String getFailCount(final String node, final String res) {
-         return (String) failed.get(node, res);
-     }
+    public final String getFailCount(final String node, final String res) {
+        return (String) failed.get(node, res);
+    }
+
+    /** Returns ping count. */
+    public final String getPingCount(final String node) {
+        return pingCount.get(node);
+    }
 
     /** Sets rsc_defaults meta attributes id. */
     public final void setRscDefaultsId(final String rscDefaultsId) {
