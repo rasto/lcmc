@@ -153,7 +153,7 @@ public class ProgressIndicatorPanel extends JComponent
      * </ul>.
      */
     public ProgressIndicatorPanel() {
-        this(0.70f);
+        this(0.40f);
     }
 
     /**
@@ -229,6 +229,13 @@ public class ProgressIndicatorPanel extends JComponent
                 textsRightMovement.add(text);
             }
             mTextsLock.release();
+            try {
+                mRampLock.acquire();
+            } catch (java.lang.InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            animator.setRampUp(true);
+            mRampLock.release();
             mAnimatorLock.release();
             return;
         }
@@ -356,7 +363,7 @@ public class ProgressIndicatorPanel extends JComponent
                 final int he = Tools.getGUIData().getTerminalPanelPos()
                                     - startAtHeight;
                 g2.setColor(new Color(250, 133, 34,
-                                      (int) (alphaLevel * shield * 0.2)));
+                                      (int) (alphaLevel * shield * 0.3)));
                 if (barPos < width / 2) {
                     g2.fillRect((int) barPos,
                                 startAtHeight,
@@ -406,7 +413,7 @@ public class ProgressIndicatorPanel extends JComponent
                     if (failuresMap.contains(text)) {
                         f = new Color(255, 0, 0);
                     } else {
-                        f = new Color(0, 0, 0); //getForeground();
+                        f = new Color(214, 75, 42); //getForeground();
                     }
                     g2.setColor(new Color(f.getRed(),
                                           f.getGreen(),

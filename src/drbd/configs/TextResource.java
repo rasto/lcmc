@@ -1852,7 +1852,7 @@ public class TextResource extends
          "Cancel"},
 
         {"CIB.ExecutingCommand",
-         "Executing cibadmin..."},
+         "Executing CRM command..."},
 
         {"Openais.ExecutingCommand",
          "Executing OpenAIS command..."},
