@@ -474,7 +474,7 @@ public final class RoboTest {
 
         moveTo(robot, 1072, 405);
         leftClick(robot); /* pull down */
-        moveTo(robot, 1044, 442);
+        moveTo(robot, 1044, 450);
         leftClick(robot); /* choose */
         sleep(1000);
         press(robot, KeyEvent.VK_1);
@@ -605,14 +605,22 @@ public final class RoboTest {
         checkTest(host, "test1", 3.1); /* 3.1 */
 
         /* same as */
+
         moveTo(robot, 125, 345);
         sleep(1000);
         leftClick(robot);
+
+        moveTo(robot, 1105, 298);
+        leftPress(robot); /* scroll bar */
+        moveTo(robot, 1105, 510);
+        leftRelease(robot);
+
         sleep(1000);
-        moveTo(robot, 1078 , 612);
+        moveTo(robot, 1078 , 484);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078 , 670);
+        moveTo(robot, 1078 , 535);
+        sleep(1000);
         leftClick(robot); /* choose another dummy */
         sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
@@ -621,16 +629,19 @@ public final class RoboTest {
         sleep(4000);
         checkTest(host, "test1", 3.2); /* 3.2 */
 
-        moveTo(robot, 1078 , 612);
+        moveTo(robot, 1078 , 477);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078 , 642);
+        moveTo(robot, 1078 , 507);
         leftClick(robot); /* choose "nothing selected */
         sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
         sleep(4000);
         leftClick(robot); /* apply */
         sleep(5000);
+        leftPress(robot); /* scroll bar back */
+        moveTo(robot, 1105, 150);
+        leftRelease(robot);
         checkTest(host, "test1", 4); /* 4 */
 
         /* locations */
