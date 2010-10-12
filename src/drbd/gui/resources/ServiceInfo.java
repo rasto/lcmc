@@ -83,6 +83,7 @@ import javax.swing.JScrollPane;
 import javax.swing.DefaultListModel;
 import javax.swing.JRadioButton;
 import javax.swing.SpringLayout;
+import java.lang.reflect.InvocationTargetException;
 
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -3881,7 +3882,7 @@ public class ServiceInfo extends EditableInfo {
             }
             getBrowser().reloadAllComboBoxes(serviceInfo);
         }
-        if (reloadNode && ra != null) {
+        if (reloadNode && ra != null && serviceInfo.getResource().isNew()) {
             if (ra.isProbablyMasterSlave()) {
                 serviceInfo.changeType(MASTER_SLAVE_TYPE_STRING);
             } else if (ra.isProbablyClone()) {
@@ -3925,10 +3926,43 @@ public class ServiceInfo extends EditableInfo {
 
     /** Puts a resource up in a group. */
     public void upResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
-            setUpdated(true);
+        final GroupInfo gi = groupInfo;
+        final Enumeration e = gi.getNode().children();
+        final int index = gi.getNode().getIndex(getNode());
+        if (index > 0) {
+            List<String> newOrder = new ArrayList<String>();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                  (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                newOrder.add(child.getHeartbeatId(testOnly));
+            }
+            final String el = newOrder.remove(index);
+            newOrder.add(index - 1,  el);
+            if (!testOnly) {
+                setUpdated(true);
+                if (gi != null) {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                if (index > 0) {
+                                    getNode().removeFromParent();
+                                    gi.getNode().insert(getNode(), index - 1);
+                                }
+                            }
+                        });
+                    } catch (final InterruptedException ix) {
+                        Thread.currentThread().interrupt();
+                    } catch (final InvocationTargetException x) {
+                        Tools.printStackTrace();
+                    }
+                }
+            }
+            CRM.setGroupOrder(dcHost,
+                              gi.getHeartbeatId(testOnly),
+                              newOrder,
+                              testOnly);
         }
-        System.out.println("up resource not implemented");
     }
 
     /**
@@ -3982,26 +4016,6 @@ public class ServiceInfo extends EditableInfo {
             setUpdated(true);
         }
         CRM.unmigrateResource(dcHost, getHeartbeatId(testOnly), testOnly);
-    }
-
-    /**
-     * Moves resource up in the group.
-     */
-    public void moveGroupResUp(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
-            setUpdated(true);
-        }
-        CRM.moveGroupResUp(dcHost, getHeartbeatId(testOnly));
-    }
-
-    /**
-     * Moves resource down in the group.
-     */
-    public void moveGroupResDown(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
-            setUpdated(true);
-        }
-        CRM.moveGroupResDown(dcHost, getHeartbeatId(testOnly));
     }
 
     /**

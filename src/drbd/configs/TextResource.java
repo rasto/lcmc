@@ -1340,10 +1340,10 @@ public class TextResource extends
          "Stop"},
 
         {"ClusterBrowser.Hb.UpResource",
-         "Up The Group"},
+         "Move Up The Group"},
 
         {"ClusterBrowser.Hb.DownResource",
-         "Down The Group"},
+         "Move Down The Group"},
 
         {"ClusterBrowser.Hb.MigrateResource",
          "Migrate To"},

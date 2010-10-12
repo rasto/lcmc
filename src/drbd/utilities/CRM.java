@@ -744,9 +744,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Cleans up resource in crm.
-     */
+    /** Cleans up resource in crm. */
     public static boolean cleanupResource(final Host host,
                                           final String heartbeatId,
                                           final Host[] clusterHosts,
@@ -1189,22 +1187,23 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Moves resource up in a group.
-     */
-    public static void moveGroupResUp(final Host host,
-                                      final String heartbeatId) {
-        // TODO: not implemented
-        Tools.appError("not implemented");
-    }
-
-    /**
-     * Moves resource down in a group.
-     */
-    public static void moveGroupResDown(final Host host,
-                                        final String heartbeatId) {
-        // TODO: not implemented
-        Tools.appError("not implemented");
+    /** Sets new group order. */
+    public static boolean setGroupOrder(final Host host,
+                                        final String groupId,
+                                        final List<String> groupOrder,
+                                        final boolean testOnly) {
+        /* make cleanup on all cluster hosts. */
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@GROUPID@", groupId);
+        replaceHash.put("@RESOURCES@",
+                        Tools.join(" ", groupOrder.toArray(
+                                              new String[groupOrder.size()])));
+        final String command =
+                  host.getDistCommand("CRM.setGroupOrder",
+                                      replaceHash);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        final int exitCode = ret.getExitCode();
+        return exitCode == 0;
     }
 
     /**

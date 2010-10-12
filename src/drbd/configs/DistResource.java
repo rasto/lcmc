@@ -260,6 +260,10 @@ public class DistResource extends
         {"CRM.2.1.4.standByOff",
          "/usr/sbin/crm_standby -U @HOST@ -v false"},
 
+        {"CRM.setGroupOrder",
+         "echo group @GROUPID@ @RESOURCES@"
+         + "|/usr/sbin/crm configure load update -"},
+
         {"OpenAIS.getAisConfig",     "cat /etc/ais/openais.conf"},
         {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
 
