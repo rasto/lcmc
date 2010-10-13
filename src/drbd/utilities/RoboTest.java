@@ -604,8 +604,22 @@ public final class RoboTest {
         addConstraint(robot, gx, gy, 0, true, -1);
         checkTest(host, "test1", 3.1); /* 3.1 */
 
-        /* same as */
+        /* move up, move down */
+        moveTo(robot, 137, 344);
+        rightClick(robot);
+        sleep(1000);
+        moveTo(robot, 221, 493);
+        leftClick(robot); /* move res 3 up */
+        Tools.sleep(10000);
+        checkTest(host, "test1", 3.11); /* 3.11 */
+        moveTo(robot, 137, 328);
+        rightClick(robot);
+        moveTo(robot, 236, 515);
+        leftClick(robot); /* move res 3 down */
+        Tools.sleep(10000);
+        checkTest(host, "test1", 3.12); /* 3.12 */
 
+        /* same as */
         moveTo(robot, 125, 345);
         sleep(1000);
         leftClick(robot);

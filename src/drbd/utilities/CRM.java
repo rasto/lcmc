@@ -145,18 +145,10 @@ public final class CRM {
         return po;
     }
 
-    /**
-     * Adds or updates resource in the CIB.
-     */
-    public static boolean setParameters(
+    /** Returns xml of a primitive. */
+    private static String getPrimitiveXML(
                            final Host host,
-                           final String command, /* -R or -C */
-                           final String heartbeatId,
-                           final String cloneId,
-                           final boolean master,
-                           final Map<String, String> cloneMetaArgs,
-                           final Map<String, String> groupMetaArgs,
-                           final String groupId,
+                           final String resId,
                            final Map<String, String> pacemakerResAttrs,
                            final Map<String, String> pacemakerResArgs,
                            final Map<String, String> pacemakerMetaArgs,
@@ -165,52 +157,15 @@ public final class CRM {
                            final Map<String, Map<String, String>> pacemakerOps,
                            String operationsId,
                            final String metaAttrsRefId,
-                           final String cloneMetaAttrsRefId,
-                           final String groupMetaAttrsRefId,
                            final String operationsRefId,
                            final boolean stonith,
                            final boolean testOnly) {
-
         final StringBuffer xml = new StringBuffer(360);
-        xml.append('\'');
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
-        if (cloneId != null) {
-            if (master) {
-                if (pmV == null
-                    && hbV != null
-                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
-                    xml.append("<master_slave id=\"");
-                } else {
-                    xml.append("<master id=\"");
-                }
-            } else {
-                xml.append("<clone id=\"");
-            }
-            xml.append(cloneId);
-            xml.append("\">");
-            /* mater/slave meta_attributes */
-            //if (!cloneMetaArgs.isEmpty()) {
-            xml.append(getMetaAttributes(host,
-                                         cloneId,
-                                         cloneMetaArgs,
-                                         cloneMetaAttrsRefId));
-            //}
-        }
-        if (groupId != null) {
-            if (heartbeatId != null) {
-                xml.append("<group id=\"");
-                xml.append(groupId);
-                xml.append("\">");
-            }
-            xml.append(getMetaAttributes(host,
-                                         groupId,
-                                         groupMetaArgs,
-                                         groupMetaAttrsRefId));
-        }
-        if (heartbeatId != null) {
+        if (resId != null) {
             if (instanceAttrId == null) {
-                instanceAttrId = heartbeatId + "-instance_attributes";
+                instanceAttrId = resId + "-instance_attributes";
             }
             final StringBuffer attrsString = new StringBuffer(100);
             for (final String attrName : pacemakerResAttrs.keySet()) {
@@ -251,7 +206,7 @@ public final class CRM {
                     }
                     if (nvpairId == null) {
                         nvpairId = "nvpair-"
-                                   + heartbeatId
+                                   + resId
                                    + "-"
                                    + newParamName;
                     }
@@ -284,7 +239,7 @@ public final class CRM {
                 || Tools.compareVersions(hbV, "2.99.0") >= 0) {
                 /* 2.1.4 does not have the id. */
                 if (operationsId == null) {
-                    operationsId = heartbeatId + "-operations";
+                    operationsId = resId + "-operations";
                 }
                 xml.append("<operations id=\"");
                 xml.append(operationsId);
@@ -308,14 +263,90 @@ public final class CRM {
             xml.append("</operations>");
         }
         /* meta_attributes */
-        if (heartbeatId != null) {
+        if (resId != null) {
             xml.append(getMetaAttributes(host,
-                                         heartbeatId,
+                                         resId,
                                          pacemakerMetaArgs,
                                          metaAttrsRefId));
             xml.append("</primitive>");
         }
-        if (groupId != null && heartbeatId != null) {
+        return xml.toString();
+    }
+
+    /** Adds or updates resource in the CIB. */
+    public static boolean setParameters(
+                           final Host host,
+                           final String command, /* -R or -C */
+                           final String resId,
+                           final String cloneId,
+                           final boolean master,
+                           final Map<String, String> cloneMetaArgs,
+                           final Map<String, String> groupMetaArgs,
+                           final String groupId,
+                           final Map<String, String> pacemakerResAttrs,
+                           final Map<String, String> pacemakerResArgs,
+                           final Map<String, String> pacemakerMetaArgs,
+                           final String instanceAttrId,
+                           final Map<String, String> nvpairIdsHash,
+                           final Map<String, Map<String, String>> pacemakerOps,
+                           final String operationsId,
+                           final String metaAttrsRefId,
+                           final String cloneMetaAttrsRefId,
+                           final String groupMetaAttrsRefId,
+                           final String operationsRefId,
+                           final boolean stonith,
+                           final boolean testOnly) {
+        final StringBuffer xml = new StringBuffer(360);
+        xml.append('\'');
+        final String hbV = host.getHeartbeatVersion();
+        final String pmV = host.getPacemakerVersion();
+        if (cloneId != null) {
+            if (master) {
+                if (pmV == null
+                    && hbV != null
+                    && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                    xml.append("<master_slave id=\"");
+                } else {
+                    xml.append("<master id=\"");
+                }
+            } else {
+                xml.append("<clone id=\"");
+            }
+            xml.append(cloneId);
+            xml.append("\">");
+            /* mater/slave meta_attributes */
+            //if (!cloneMetaArgs.isEmpty()) {
+            xml.append(getMetaAttributes(host,
+                                         cloneId,
+                                         cloneMetaArgs,
+                                         cloneMetaAttrsRefId));
+            //}
+        }
+        if (groupId != null) {
+            if (resId != null) {
+                xml.append("<group id=\"");
+                xml.append(groupId);
+                xml.append("\">");
+            }
+            xml.append(getMetaAttributes(host,
+                                         groupId,
+                                         groupMetaArgs,
+                                         groupMetaAttrsRefId));
+        }
+        xml.append(getPrimitiveXML(host,
+                                   resId,
+                                   pacemakerResAttrs,
+                                   pacemakerResArgs,
+                                   pacemakerMetaArgs,
+                                   instanceAttrId,
+                                   nvpairIdsHash,
+                                   pacemakerOps,
+                                   operationsId,
+                                   metaAttrsRefId,
+                                   operationsRefId,
+                                   stonith,
+                                   testOnly));
+        if (groupId != null && resId != null) {
             xml.append("</group>");
         }
         if (cloneId != null) {
@@ -342,9 +373,60 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Adds group to the cib.
-     */
+    /** Replaces the whole group. */
+    public static boolean replaceGroup(
+               final Host host,
+               final List<String> resourceIds,
+               final Map<String, String> groupMetaArgs,
+               final String groupId,
+               final Map<String, Map<String, String>> pacemakerResAttrs,
+               final Map<String, Map<String, String>> pacemakerResArgs,
+               final Map<String, Map<String, String>> pacemakerMetaArgs,
+               final Map<String, String> instanceAttrId,
+               final Map<String, Map<String, String>> nvpairIdsHash,
+               final Map<String, Map<String, Map<String, String>>> pacemakerOps,
+               final Map<String, String> operationsId,
+               final Map<String, String> metaAttrsRefId,
+               final String groupMetaAttrsRefId,
+               final Map<String, String> operationsRefId,
+               final Map<String, Boolean> stonith,
+               final boolean testOnly) {
+        final StringBuffer xml = new StringBuffer(720);
+        xml.append("'<group id=\"");
+        xml.append(groupId);
+        xml.append("\">");
+        xml.append(getMetaAttributes(host,
+                                     groupId,
+                                     groupMetaArgs,
+                                     groupMetaAttrsRefId));
+        for (final String resId : resourceIds) {
+            xml.append(getPrimitiveXML(host,
+                                       resId,
+                                       pacemakerResAttrs.get(resId),
+                                       pacemakerResArgs.get(resId),
+                                       pacemakerMetaArgs.get(resId),
+                                       instanceAttrId.get(resId),
+                                       nvpairIdsHash.get(resId),
+                                       pacemakerOps.get(resId),
+                                       operationsId.get(resId),
+                                       metaAttrsRefId.get(resId),
+                                       operationsRefId.get(resId),
+                                       stonith.get(resId),
+                                       testOnly));
+        }
+        xml.append("</group>");
+        xml.append('\'');
+
+        final SSH.SSHOutput ret = execCommand(host,
+                                              getCibCommand("-R",
+                                                            "resources",
+                                                            xml.toString()),
+                                              true,
+                                              testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Adds group to the cib. */
     public static void addGroup(final Host host,
                                 final String args) {
         if (args == null) {
@@ -354,13 +436,13 @@ public final class CRM {
     }
 
     /**
-     * Sets colocation and order constraint between service with heartbeatId
+     * Sets colocation and order constraint between service with resId
      * and parents. If colAttrsList or ordAttrsList are null, there is only
      * colocation or order but not both defined.
      */
     public static void setOrderAndColocation(
                                 final Host host,
-                                final String heartbeatId,
+                                final String resId,
                                 final String[] parents,
                                 final List<Map<String, String>> colAttrsList,
                                 final List<Map<String, String>> ordAttrsList,
@@ -369,7 +451,7 @@ public final class CRM {
             if (colAttrsList.get(i) != null) {
                 addColocation(host,
                               null,
-                              heartbeatId,
+                              resId,
                               parents[i],
                               colAttrsList.get(i),
                               testOnly);
@@ -378,7 +460,7 @@ public final class CRM {
                 addOrder(host,
                          null,
                          parents[i],
-                         heartbeatId,
+                         resId,
                          ordAttrsList.get(i),
                          testOnly);
             }
@@ -529,7 +611,7 @@ public final class CRM {
     /**
      * Returns xml for location xml.
      */
-    private static String getLocationXML(final String heartbeatId,
+    private static String getLocationXML(final String resId,
                                          final String onHost,
                                          final String attribute,
                                          final String score,
@@ -540,7 +622,7 @@ public final class CRM {
         xml.append("'<rsc_location id=\"");
         xml.append(locationId);
         xml.append("\" rsc=\"");
-        xml.append(heartbeatId);
+        xml.append(resId);
         if (op == null || ("eq".equals(op) && !"pingd".equals(attribute))) {
             /* eq */
             if (onHost != null) {
@@ -587,14 +669,14 @@ public final class CRM {
 
     /** Sets location constraint. */
     public static boolean setLocation(final Host host,
-                                      final String heartbeatId,
+                                      final String resId,
                                       final String onHost,
                                       final HostLocation hostLocation,
                                       String locationId,
                                       final boolean testOnly) {
         String command = "-U";
         if (locationId == null) {
-            locationId = "loc_" + heartbeatId + "_" + onHost;
+            locationId = "loc_" + resId + "_" + onHost;
             command = "-C";
         }
         String score = null;
@@ -603,7 +685,7 @@ public final class CRM {
             score = hostLocation.getScore();
             op = hostLocation.getOperation();
         }
-        final String xml = getLocationXML(heartbeatId,
+        final String xml = getLocationXML(resId,
                                           onHost,
                                           "#uname",
                                           score,
@@ -620,7 +702,7 @@ public final class CRM {
 
     /** Sets ping location constraint. */
     public static boolean setPingLocation(final Host host,
-                                          final String heartbeatId,
+                                          final String resId,
                                           final String ruleType,
                                           String locationId,
                                           final boolean testOnly) {
@@ -642,10 +724,10 @@ public final class CRM {
             idPart = "exclude";
         }
         if (locationId == null) {
-            locationId = "loc_" + heartbeatId + "-ping-" + idPart;
+            locationId = "loc_" + resId + "-ping-" + idPart;
             command = "-C";
         }
-        final String xml = getLocationXML(heartbeatId,
+        final String xml = getLocationXML(resId,
                                           value,
                                           attribute,
                                           score,
@@ -665,9 +747,9 @@ public final class CRM {
      */
     public static boolean removeLocation(final Host host,
                                          final String locationId,
-                                         final String heartbeatId,
+                                         final String resId,
                                          final boolean testOnly) {
-        final String xml = getLocationXML(heartbeatId,
+        final String xml = getLocationXML(resId,
                                           null,
                                           null,
                                           null,
@@ -684,7 +766,7 @@ public final class CRM {
      * not, the whole group will be removed.
      */
     public static boolean removeResource(final Host host,
-                                         final String heartbeatId,
+                                         final String resId,
                                          final String groupId,
                                          final String cloneId,
                                          final boolean master,
@@ -715,9 +797,9 @@ public final class CRM {
             xml.append(groupId);
             xml.append("\">");
         }
-        if (heartbeatId != null) {
+        if (resId != null) {
             xml.append("<primitive id=\"");
-            xml.append(heartbeatId);
+            xml.append(resId);
             xml.append("\"></primitive>");
         }
         if (groupId != null) {
@@ -746,12 +828,12 @@ public final class CRM {
 
     /** Cleans up resource in crm. */
     public static boolean cleanupResource(final Host host,
-                                          final String heartbeatId,
+                                          final String resId,
                                           final Host[] clusterHosts,
                                           final boolean testOnly) {
         /* make cleanup on all cluster hosts. */
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
         int exitCode = 0;
         for (Host clusterHost : clusterHosts) {
             replaceHash.put("@HOST@", clusterHost.getName());
@@ -769,7 +851,7 @@ public final class CRM {
      * Starts resource.
      */
     public static boolean startResource(final Host host,
-                                        final String heartbeatId,
+                                        final String resId,
                                         final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
@@ -780,7 +862,7 @@ public final class CRM {
             cmd = "CRM.2.1.4.startResource";
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand(cmd, replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
@@ -790,7 +872,7 @@ public final class CRM {
      * Returns meta attributes xml.
      */
     private static String getMetaAttributes(final Host host,
-                                           final String heartbeatId,
+                                           final String resId,
                                            final Map<String, String> attrs,
                                            final String metaAttrsRefId) {
         final StringBuffer xml = new StringBuffer(360);
@@ -808,7 +890,7 @@ public final class CRM {
             xml.append("\"/>");
         } else {
             xml.append("<meta_attributes id=\"");
-            xml.append(heartbeatId);
+            xml.append(resId);
             xml.append(idPostfix);
             xml.append("\">");
 
@@ -820,7 +902,7 @@ public final class CRM {
             }
             for (final String attr : attrs.keySet()) {
                 xml.append("<nvpair id=\"");
-                xml.append(heartbeatId);
+                xml.append(resId);
                 xml.append(idPostfix);
                 xml.append('-');
                 xml.append(attr);
@@ -846,7 +928,7 @@ public final class CRM {
      * Sets whether the service should be managed or not.
      */
     public static boolean setManaged(final Host host,
-                                     final String heartbeatId,
+                                     final String resId,
                                      final boolean isManaged,
                                      final boolean testOnly) {
         String string;
@@ -864,7 +946,7 @@ public final class CRM {
             cmd = "CRM.2.1.4" + string;
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
@@ -873,9 +955,9 @@ public final class CRM {
 
     /** Stops resource. */
     public static boolean stopResource(final Host host,
-                                       final String heartbeatId,
+                                       final String resId,
                                        final boolean testOnly) {
-        if (heartbeatId == null) {
+        if (resId == null) {
             return false;
         }
         final String hbV = host.getHeartbeatVersion();
@@ -887,7 +969,7 @@ public final class CRM {
             cmd = "CRM.2.1.4.stopResource";
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
@@ -898,11 +980,11 @@ public final class CRM {
      * Migrates resource to the specified host.
      */
     public static boolean migrateResource(final Host host,
-                                          final String heartbeatId,
+                                          final String resId,
                                           final String onHost,
                                           final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
         replaceHash.put("@HOST@", onHost);
         final String command = host.getDistCommand("CRM.migrateResource",
                                                    replaceHash);
@@ -913,10 +995,10 @@ public final class CRM {
 
     /** Migrates resource from where it is running. */
     public static boolean migrateFromResource(final Host host,
-                                              final String heartbeatId,
+                                              final String resId,
                                               final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand("CRM.migrateFromResource",
                                                    replaceHash);
 
@@ -928,11 +1010,11 @@ public final class CRM {
      * Migrates resource to the specified host.
      */
     public static boolean forceMigrateResource(final Host host,
-                                               final String heartbeatId,
+                                               final String resId,
                                                final String onHost,
                                                final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
         replaceHash.put("@HOST@", onHost);
         final String command = host.getDistCommand("CRM.forceMigrateResource",
                                                    replaceHash);
@@ -945,10 +1027,10 @@ public final class CRM {
      * Unmigrates resource that was previously migrated.
      */
     public static boolean unmigrateResource(final Host host,
-                                            final String heartbeatId,
+                                            final String resId,
                                             final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@ID@", heartbeatId);
+        replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand(
                                              "CRM.unmigrateResource",
                                              replaceHash);
@@ -1049,10 +1131,10 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /** Adds colocation between service with heartbeatId and parentHbId. */
+    /** Adds colocation between service with resId and parentHbId. */
     public static boolean addColocation(final Host host,
                                         final String colId,
-                                        final String heartbeatId,
+                                        final String resId,
                                         final String parentHbId,
                                         Map<String, String> attrs,
                                         final boolean testOnly) {
@@ -1063,10 +1145,10 @@ public final class CRM {
         String cibadminOpt;
         if (colId == null) {
             cibadminOpt = "-C"; /* create */
-            if (parentHbId.compareTo(heartbeatId) < 0) {
-                colocationId = "col_" + heartbeatId + "_" + parentHbId;
+            if (parentHbId.compareTo(resId) < 0) {
+                colocationId = "col_" + resId + "_" + parentHbId;
             } else {
-                colocationId = "col_" + parentHbId + "_" + heartbeatId;
+                colocationId = "col_" + parentHbId + "_" + resId;
             }
         } else {
             cibadminOpt = "-R"; /* replace */
@@ -1077,7 +1159,7 @@ public final class CRM {
         if (attrs == null) {
             attrs = new LinkedHashMap<String, String>();
         }
-        attrs.put("rsc", heartbeatId);
+        attrs.put("rsc", resId);
         attrs.put("with-rsc", parentHbId);
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_colocation id=\"");
@@ -1134,14 +1216,14 @@ public final class CRM {
     public static boolean addOrder(final Host host,
                                    final String ordId,
                                    final String parentHbId,
-                                   final String heartbeatId,
+                                   final String resId,
                                    Map<String, String> attrs,
                                    final boolean testOnly) {
         String orderId;
         String cibadminOpt;
         if (ordId == null) {
             cibadminOpt = "-C"; /* create */
-            orderId = "ord_" + parentHbId + "_" + heartbeatId;
+            orderId = "ord_" + parentHbId + "_" + resId;
         } else {
             cibadminOpt = "-R"; /* replace */
             orderId = ordId;
@@ -1155,7 +1237,7 @@ public final class CRM {
         xml.append("'<rsc_order id=\"");
         xml.append(orderId);
         attrs.put("first", parentHbId);
-        attrs.put("then", heartbeatId);
+        attrs.put("then", resId);
         final Map<String, String> convertHash = new HashMap<String, String>();
         if (pmV == null
             && hbV != null

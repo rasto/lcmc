@@ -185,6 +185,12 @@ public class ServiceInfo extends EditableInfo {
     /** Unmigrate icon. */
     public static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.UnmigrateIcon"));
+    /** Group up icon. */
+    public static final ImageIcon GROUP_UP_ICON = Tools.createImageIcon(
+                                Tools.getDefault("HeartbeatGraph.GroupUp"));
+    /** Group down icon. */
+    public static final ImageIcon GROUP_DOWN_ICON = Tools.createImageIcon(
+                                Tools.getDefault("HeartbeatGraph.GroupDown"));
     /** Orphaned subtext. */
     private static final Subtext ORPHANED_SUBTEXT = new Subtext("(ORPHANED)",
                                                                 null,
@@ -1669,9 +1675,7 @@ public class ServiceInfo extends EditableInfo {
         return false;
     }
 
-    /**
-     * Returns selected operations id reference.
-     */
+    /** Returns selected operations id reference. */
     private Info getSameServiceOpIdRef() {
         try {
             mSavedOperationsLock.acquire();
@@ -1862,9 +1866,7 @@ public class ServiceInfo extends EditableInfo {
         mSavedOperationsLock.release();
     }
 
-    /**
-     * Creates operations combo boxes with labels.
-     */
+    /** Creates operations combo boxes with labels. */
     protected void addOperations(final JPanel optionsPanel,
                                  final int leftWidth,
                                  final int rightWidth) {
@@ -2049,9 +2051,7 @@ public class ServiceInfo extends EditableInfo {
         return null;
     }
 
-    /**
-     * Returns true if the value of the parameter is ok.
-     */
+    /** Returns true if the value of the parameter is ok. */
     protected boolean checkParam(final String param,
                                  final String newValue) {
         if (param.equals("ip")
@@ -2063,9 +2063,7 @@ public class ServiceInfo extends EditableInfo {
         return crmXML.checkParam(resourceAgent, param, newValue);
     }
 
-    /**
-     * Returns default value for specified parameter.
-     */
+    /** Returns default value for specified parameter. */
     protected String getParamDefault(final String param) {
         if (isMetaAttr(param)) {
             final String paramDefault = getBrowser().getRscDefaultsInfo()
@@ -2213,33 +2211,25 @@ public class ServiceInfo extends EditableInfo {
         return crmXML.isLabel(resourceAgent, param);
     }
 
-    /**
-     * Returns true if the specified parameter is of time type.
-     */
+    /** Returns true if the specified parameter is of time type. */
     protected boolean isTimeType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isTimeType(resourceAgent, param);
     }
 
-    /**
-     * Returns whether parameter is checkbox.
-     */
+    /** Returns whether parameter is checkbox. */
     protected boolean isCheckBox(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isBoolean(resourceAgent, param);
     }
 
-    /**
-     * Returns the type of the parameter according to the OCF.
-     */
+    /** Returns the type of the parameter according to the OCF. */
     protected String getParamType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getParamType(resourceAgent, param);
     }
 
-    /**
-     * Returns the type of the parameter.
-     */
+    /** Returns the type of the parameter. */
     protected GuiComboBox.Type getFieldType(final String param) {
         return resourceAgent.getFieldType(param);
     }
@@ -2912,8 +2902,8 @@ public class ServiceInfo extends EditableInfo {
      * Returns hash with changed operation ids and all name, value pairs.
      * This works for new heartbeats >= 2.99.0
      */
-    private Map<String, Map<String, String>> getOperations(
-                                                final String heartbeatId) {
+    protected Map<String, Map<String, String>> getOperations(
+                                                    final String heartbeatId) {
         final Map<String, Map<String, String>> operations =
                               new LinkedHashMap<String, Map<String, String>>();
 
@@ -2984,7 +2974,7 @@ public class ServiceInfo extends EditableInfo {
      * Returns id of the operations to which operations of this service are
      * referring to.
      */
-    private String getOperationsRefId() {
+    protected String getOperationsRefId() {
         String operationsRefId = null;
         if (sameAsOperationsCB != null) {
             final Info i = (Info) sameAsOperationsCB.getValue();
@@ -2999,9 +2989,83 @@ public class ServiceInfo extends EditableInfo {
         return operationsRefId;
     }
 
-    /**
-     * Applies the changes to the service parameters.
-     */
+    /** Returns attributes of this resource. */
+    protected Map<String, String> getPacemakerResAttrs(final boolean testOnly) {
+        final Map<String, String> pacemakerResAttrs =
+                                            new LinkedHashMap<String, String>();
+        final String raClass = getService().getResourceClass();
+        final String type = getName();
+        final String provider = resourceAgent.getProvider();
+        final String heartbeatId = getHeartbeatId(testOnly);
+
+        pacemakerResAttrs.put("id", heartbeatId);
+        pacemakerResAttrs.put("class", raClass);
+        if (!ClusterBrowser.HB_HEARTBEAT_CLASS.equals(raClass)
+            && !raClass.equals(ClusterBrowser.HB_LSB_CLASS)
+            && !raClass.equals(ClusterBrowser.HB_STONITH_CLASS)) {
+            pacemakerResAttrs.put("provider", provider);
+        }
+        pacemakerResAttrs.put("type", type);
+        return pacemakerResAttrs;
+    }
+
+    /** Returns arguments of this resource. */
+    protected Map<String, String> getPacemakerResArgs() {
+        final Map<String, String> pacemakerResArgs =
+                                           new LinkedHashMap<String, String>();
+        final String[] params = getParametersFromXML();
+        for (final String param : params) {
+            if (isMetaAttr(param)) {
+                continue;
+            }
+            if (GUI_ID.equals(param)
+                || PCMK_ID.equals(param)) {
+                continue;
+            }
+            String value = getComboBoxValue(param);
+            if (value == null) {
+                value = "";
+            }
+            if (value.equals(getParamDefault(param))) {
+                continue;
+            }
+            if (!"".equals(value)) {
+                /* for pacemaker */
+                pacemakerResArgs.put(param, value);
+            }
+        }
+        return pacemakerResArgs;
+    }
+
+    /** Returns meta arguments of this resource. */
+    protected Map<String, String> getPacemakerMetaArgs() {
+        final Map<String, String> pacemakerMetaArgs =
+                                           new LinkedHashMap<String, String>();
+        final String[] params = getParametersFromXML();
+        for (final String param : params) {
+            if (!isMetaAttr(param)) {
+                continue;
+            }
+            if (GUI_ID.equals(param)
+                || PCMK_ID.equals(param)) {
+                continue;
+            }
+            String value = getComboBoxValue(param);
+            if (value == null) {
+                value = "";
+            }
+            if (value.equals(getParamDefault(param))) {
+                continue;
+            }
+            if (!"".equals(value)) {
+                /* for pacemaker */
+                pacemakerMetaArgs.put(param, value);
+            }
+        }
+        return pacemakerMetaArgs;
+    }
+
+    /** Applies the changes to the service parameters. */
     public void apply(final Host dcHost, final boolean testOnly) {
         /* TODO: make progress indicator per resource. */
         if (!testOnly) {
@@ -3069,24 +3133,14 @@ public class ServiceInfo extends EditableInfo {
         final Map<String, String> groupMetaArgs =
                                             new LinkedHashMap<String, String>();
         final Map<String, String> pacemakerResAttrs =
-                                            new LinkedHashMap<String, String>();
-        final Map<String, String> pacemakerResArgs =
-                                            new LinkedHashMap<String, String>();
-        final Map<String, String> pacemakerMetaArgs =
-                                            new LinkedHashMap<String, String>();
+                                                getPacemakerResAttrs(testOnly);
+        final Map<String, String> pacemakerResArgs = getPacemakerResArgs();
+        final Map<String, String> pacemakerMetaArgs = getPacemakerMetaArgs();
         final String raClass = getService().getResourceClass();
         final String type = getName();
         final String provider = resourceAgent.getProvider();
         final String heartbeatId = getHeartbeatId(testOnly);
 
-        pacemakerResAttrs.put("id", heartbeatId);
-        pacemakerResAttrs.put("class", raClass);
-        if (!ClusterBrowser.HB_HEARTBEAT_CLASS.equals(raClass)
-            && !raClass.equals(ClusterBrowser.HB_LSB_CLASS)
-            && !raClass.equals(ClusterBrowser.HB_STONITH_CLASS)) {
-            pacemakerResAttrs.put("provider", provider);
-        }
-        pacemakerResAttrs.put("type", type);
         String groupId = null; /* for pacemaker */
         if (gInfo != null) {
             if (gInfo.getService().isNew()) {
@@ -3131,24 +3185,6 @@ public class ServiceInfo extends EditableInfo {
                     }
                     if (!GUI_ID.equals(param) && !"".equals(value)) {
                         groupMetaArgs.put(param, value);
-                    }
-                }
-            }
-            for (final String param : params) {
-                if (GUI_ID.equals(param)
-                    || PCMK_ID.equals(param)) {
-                    continue;
-                }
-                final String value = getComboBoxValue(param);
-                if (value.equals(getParamDefault(param))) {
-                    continue;
-                }
-                if (!"".equals(value)) {
-                    /* for pacemaker */
-                    if (isMetaAttr(param)) {
-                        pacemakerMetaArgs.put(param, value);
-                    } else {
-                        pacemakerResArgs.put(param, value);
                     }
                 }
             }
@@ -3289,26 +3325,6 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
-            /* update parameters */
-            final StringBuffer args = new StringBuffer("");
-            for (String param : params) {
-                if (GUI_ID.equals(param)
-                    || PCMK_ID.equals(param)) {
-                    continue;
-                }
-                final String value = getComboBoxValue(param);
-                if (value.equals(getParamDefault(param))) {
-                    continue;
-                }
-
-                if (!"".equals(value)) {
-                    if (isMetaAttr(param)) {
-                        pacemakerMetaArgs.put(param, value);
-                    } else {
-                        pacemakerResArgs.put(param, value);
-                    }
-                }
-            }
 
             groupId = null; /* we don't want to replace the whole group */
             //TODO: should not be called if only host locations have
@@ -3356,11 +3372,11 @@ public class ServiceInfo extends EditableInfo {
                 clInfo.storeComboBoxValues(cloneParams);
             }
 
-            getBrowser().reload(getNode());
+            getBrowser().reload(getNode(), false);
             getBrowser().getHeartbeatGraph().repaint();
             checkResourceFields(null, params);
         }
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), false);
     }
 
     /**
@@ -3877,8 +3893,8 @@ public class ServiceInfo extends EditableInfo {
 
             getBrowser().getServicesNode().add(newServiceNode);
             if (reloadNode) {
-                getBrowser().reload(getBrowser().getServicesNode());
-                getBrowser().reload(newServiceNode);
+                getBrowser().reload(getBrowser().getServicesNode(), false);
+                getBrowser().reload(newServiceNode, false);
             }
             getBrowser().reloadAllComboBoxes(serviceInfo);
         }
@@ -3927,13 +3943,13 @@ public class ServiceInfo extends EditableInfo {
     /** Puts a resource up in a group. */
     public void upResource(final Host dcHost, final boolean testOnly) {
         final GroupInfo gi = groupInfo;
-        final Enumeration e = gi.getNode().children();
         final int index = gi.getNode().getIndex(getNode());
         if (index > 0) {
-            List<String> newOrder = new ArrayList<String>();
+            final Enumeration e = gi.getNode().children();
+            final List<String> newOrder = new ArrayList<String>();
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode n =
-                                  (DefaultMutableTreeNode) e.nextElement();
+                                     (DefaultMutableTreeNode) e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
                 newOrder.add(child.getHeartbeatId(testOnly));
             }
@@ -3941,33 +3957,34 @@ public class ServiceInfo extends EditableInfo {
             newOrder.add(index - 1,  el);
             if (!testOnly) {
                 setUpdated(true);
-                if (gi != null) {
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            public void run() {
-                                if (index > 0) {
-                                    getNode().removeFromParent();
-                                    gi.getNode().insert(getNode(), index - 1);
-                                }
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException x) {
-                        Tools.printStackTrace();
-                    }
-                }
             }
-            CRM.setGroupOrder(dcHost,
-                              gi.getHeartbeatId(testOnly),
-                              newOrder,
-                              testOnly);
+            gi.applyWhole(dcHost, newOrder, testOnly);
         }
     }
 
-    /**
-     * Migrates resource in cluster from current location.
-     */
+    /** Puts a resource down in a group. */
+    public void downResource(final Host dcHost, final boolean testOnly) {
+        final GroupInfo gi = groupInfo;
+        final int index = gi.getNode().getIndex(getNode());
+        if (index < gi.getNode().getChildCount() - 1) {
+            final Enumeration e = gi.getNode().children();
+            final List<String> newOrder = new ArrayList<String>();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                     (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                newOrder.add(child.getHeartbeatId(testOnly));
+            }
+            final String el = newOrder.remove(index);
+            newOrder.add(index + 1,  el);
+            if (!testOnly) {
+                setUpdated(true);
+            }
+            gi.applyWhole(dcHost, newOrder, testOnly);
+        }
+    }
+
+    /** Migrates resource in cluster from current location. */
     public void migrateResource(final String onHost,
                                 final Host dcHost,
                                 final boolean testOnly) {
@@ -3980,9 +3997,7 @@ public class ServiceInfo extends EditableInfo {
                             testOnly);
     }
 
-    /**
-     * Migrates resource in heartbeat from current location.
-     */
+    /** Migrates resource in heartbeat from current location. */
     public void migrateFromResource(final Host dcHost,
                                     final boolean testOnly) {
         if (!testOnly) {
@@ -4008,9 +4023,7 @@ public class ServiceInfo extends EditableInfo {
                                  testOnly);
     }
 
-    /**
-     * Removes constraints created by resource migrate command.
-     */
+    /** Removes constraints created by resource migrate command. */
     public void unmigrateResource(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
@@ -4018,9 +4031,7 @@ public class ServiceInfo extends EditableInfo {
         CRM.unmigrateResource(dcHost, getHeartbeatId(testOnly), testOnly);
     }
 
-    /**
-     * Cleans up the resource.
-     */
+    /** Cleans up the resource. */
     public void cleanupResource(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
@@ -4177,9 +4188,7 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Removes the service from some global hashes and lists.
-     */
+    /** Removes the service from some global hashes and lists. */
     public void removeInfo() {
         getBrowser().mHeartbeatIdToServiceLock();
         getBrowser().getHeartbeatIdToServiceInfo().remove(
@@ -4189,16 +4198,12 @@ public class ServiceInfo extends EditableInfo {
         super.removeMyself(false);
     }
 
-    /**
-     * Sets this service as part of a group.
-     */
+    /** Sets this service as part of a group. */
     public void setGroupInfo(final GroupInfo groupInfo) {
         this.groupInfo = groupInfo;
     }
 
-    /**
-     * Sets this service as part of a clone set.
-     */
+    /** Sets this service as part of a clone set. */
     public void setCloneInfo(final CloneInfo cloneInfo) {
         try {
             mCloneInfo.acquire();
@@ -4889,8 +4894,7 @@ public class ServiceInfo extends EditableInfo {
         /* up group resource */
         final MyMenuItem upMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.UpResource"),
-                           //UP_ICON,
-                           null,
+                           GROUP_UP_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
@@ -4901,8 +4905,27 @@ public class ServiceInfo extends EditableInfo {
                 }
 
                 public String enablePredicate() {
+                    if (getResource().isNew()) {
+                        return IS_NEW_STRING;
+                    }
+                    final GroupInfo gi = groupInfo;
+                    if (gi == null) {
+                        return "no";
+                    }
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    }
+                    final DefaultMutableTreeNode gNode = gi.getNode();
+                    if (gNode == null) {
+                        return "no";
+                    }
+                    final DefaultMutableTreeNode node = getNode();
+                    if (node == null) {
+                        return "no";
+                    }
+                    final int index = gNode.getIndex(node);
+                    if (index == 0) {
+                        return "already up";
                     }
                     return null;
                 }
@@ -4920,6 +4943,59 @@ public class ServiceInfo extends EditableInfo {
         };
         addMouseOverListener(upMenuItem, upItemCallback);
         items.add((UpdatableItem) upMenuItem);
+
+        /* down group resource */
+        final MyMenuItem downMenuItem =
+            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.DownResource"),
+                           GROUP_DOWN_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public boolean visiblePredicate() {
+                    return groupInfo != null;
+                }
+
+                public String enablePredicate() {
+                    if (getResource().isNew()) {
+                        return IS_NEW_STRING;
+                    }
+                    final GroupInfo gi = groupInfo;
+                    if (gi == null) {
+                        return "no";
+                    }
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    }
+                    final DefaultMutableTreeNode gNode = gi.getNode();
+                    if (gNode == null) {
+                        return "no";
+                    }
+                    final DefaultMutableTreeNode node = getNode();
+                    if (node == null) {
+                        return "no";
+                    }
+                    final int index = gNode.getIndex(node);
+                    if (index >= gNode.getChildCount() - 1) {
+                        return "already down";
+                    }
+                    return null;
+                }
+
+                public void action() {
+                    hidePopup();
+                    downResource(getBrowser().getDCHost(), testOnly);
+                }
+            };
+        final ClusterBrowser.ClMenuItemCallback downItemCallback =
+                    getBrowser().new ClMenuItemCallback(downMenuItem, null) {
+            public void action(final Host dcHost) {
+                downResource(dcHost, true); /* testOnly */
+            }
+        };
+        addMouseOverListener(downMenuItem, downItemCallback);
+        items.add((UpdatableItem) downMenuItem);
 
         /* clean up resource */
         final MyMenuItem cleanupMenuItem =
@@ -5226,9 +5302,7 @@ public class ServiceInfo extends EditableInfo {
         items.add((UpdatableItem) unmigrateMenuItem);
     }
 
-    /**
-     * Adds "migrate from" and "force migrate" menuitems to the submenu.
-     */
+    /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
     protected void addMoreMigrateMenuItems(final MyMenu submenu) {
         final boolean testOnly = false;
         final ServiceInfo thisClass = this;
@@ -5375,9 +5449,7 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Adds advanced submenu.
-     */
+    /** Adds advanced submenu. */
     public final void addAdvancedMenu(final MyMenu submenu) {
         if (submenu.getItemCount() > 0) {
             return;
@@ -5416,9 +5488,7 @@ public class ServiceInfo extends EditableInfo {
         return sb.toString();
     }
 
-    /**
-     * Returns heartbeat service class.
-     */
+    /** Returns heartbeat service class. */
     public ResourceAgent getResourceAgent() {
         return resourceAgent;
     }
@@ -5433,9 +5503,7 @@ public class ServiceInfo extends EditableInfo {
         super.setUpdated(updated);
     }
 
-    /**
-     * Returns text that appears in the corner of the graph.
-     */
+    /** Returns text that appears in the corner of the graph. */
     public Subtext getRightCornerTextForGraph(final boolean testOnly) {
         if (getService().isOrphaned()) {
             if (isFailed(testOnly)) {
@@ -5522,23 +5590,17 @@ public class ServiceInfo extends EditableInfo {
         return texts.toArray(new Subtext[texts.size()]);
     }
 
-    /**
-     * Returns null, when this service is not a clone.
-     */
+    /** Returns null, when this service is not a clone. */
     public ServiceInfo getContainedService() {
         return null;
     }
 
-    /**
-     * Returns type radio group.
-     */
+    /** Returns type radio group. */
     public GuiComboBox getTypeRadioGroup() {
         return typeRadioGroup;
     }
 
-    /**
-     * Returns units.
-     */
+    /** Returns units. */
     protected final Unit[] getUnits() {
         return new Unit[]{
             new Unit("",    "s",  "Second",      "Seconds"), /* default unit */
@@ -5618,9 +5680,7 @@ public class ServiceInfo extends EditableInfo {
         return null;
     }
 
-    /**
-     * Returns hash with saved operations.
-     */
+    /** Returns hash with saved operations. */
     public MultiKeyMap getSavedOperation() {
         return savedOperation;
     }
@@ -5659,16 +5719,12 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Returns whether info panel is already created.
-     */
+    /** Returns whether info panel is already created. */
     public boolean isInfoPanelOk() {
         return infoPanel != null;
     }
 
-    /**
-     * Connects with VMSVirtualDomainInfo object.
-     */
+    /** Connects with VMSVirtualDomainInfo object. */
     public void connectWithVMS() {
         /* for VirtualDomainInfo */
     }

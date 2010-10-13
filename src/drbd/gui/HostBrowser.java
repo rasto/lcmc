@@ -215,7 +215,7 @@ public class HostBrowser extends Browser {
             setNode(resource);
             netInterfacesNode.add(resource);
         }
-        reload(netInterfacesNode);
+        reload(netInterfacesNode, false);
         mNetInfosLock.release();
 
         /* block devices */
@@ -239,7 +239,7 @@ public class HostBrowser extends Browser {
             //setNode(resource);
             blockDevicesNode.add(resource);
         }
-        reload(blockDevicesNode);
+        reload(blockDevicesNode, false);
         mBlockDevInfosLock.release();
 
         /* file systems */
@@ -261,7 +261,7 @@ public class HostBrowser extends Browser {
             setNode(resource);
             fileSystemsNode.add(resource);
         }
-        reload(fileSystemsNode);
+        reload(fileSystemsNode, false);
         mFileSystemsLock.release();
     }
 

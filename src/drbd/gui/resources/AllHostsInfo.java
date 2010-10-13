@@ -114,9 +114,7 @@ public class AllHostsInfo extends Info {
         host = null;
     }
 
-    /**
-     * Remove marked clusters.
-     */
+    /** Remove marked clusters. */
     private void removeMarkedClusters() {
         final Thread t = new Thread(new Runnable() {
             public void run() {
@@ -174,7 +172,7 @@ public class AllHostsInfo extends Info {
                                 allCheckboxes.remove(cluster);
                                 allLoadButtons.remove(cluster);
                                 mainPanel.remove(p);
-                                getBrowser().reload(getNode());
+                                getBrowser().reload(getNode(), false);
                                 getBrowser().repaintTree();
                             }
                         }

@@ -428,103 +428,119 @@ public class ServicesInfo extends EditableInfo {
         }
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         boolean newService = false;
+        int pos = 0;
         for (String hbId : clStatus.getGroupResources(grpOrCloneId, testOnly)) {
+            ServiceInfo newSi;
             if (allGroupsAndClones.contains(hbId)) {
                 if (newGi != null) {
                     Tools.appWarning("group in group not implemented");
                     continue;
                 }
                 /* clone group */
-                final GroupInfo gi = setCreateGroupInfo(hbId,
-                                                        newCi,
-                                                        testOnly);
+                final GroupInfo gi = setCreateGroupInfo(hbId, newCi, testOnly);
                 setGroupResources(allGroupsAndClones,
                                   hbId,
                                   gi,
                                   null,
                                   groupServiceIsPresent,
                                   testOnly);
-                continue;
-            }
-            final ResourceAgent newRA = clStatus.getResourceType(hbId);
-            if (newRA == null) {
-                /* This is bad. There is a service but we do not have
-                 * the heartbeat script of this service or the we look
-                 * in the wrong places.
-                 */
-                Tools.appWarning(hbId + ": could not find resource agent");
-            }
-            /* continue of creating/updating of the
-             * service in the gui.
-             */
-            ServiceInfo newSi = getBrowser().getServiceInfoFromCRMId(hbId);
-            final Map<String, String> resourceNode =
-                                       clStatus.getParamValuePairs(hbId);
-            if (newSi == null) {
-                newService = true;
-                // TODO: get rid of the service name? (everywhere)
-                String serviceName;
-                if (newRA == null) {
-                    serviceName = hbId;
-                } else {
-                    serviceName = newRA.getName();
-                }
-                if (newRA != null && newRA.isFilesystem()) {
-                    newSi = new FilesystemInfo(serviceName,
-                                               newRA,
-                                               hbId,
-                                               resourceNode,
-                                               getBrowser());
-                } else if (newRA != null && newRA.isLinbitDrbd()) {
-                    newSi = new LinbitDrbdInfo(serviceName,
-                                               newRA,
-                                               hbId,
-                                               resourceNode,
-                                               getBrowser());
-                } else if (newRA != null && newRA.isDrbddisk()) {
-                    newSi = new DrbddiskInfo(serviceName,
-                                             newRA,
-                                             hbId,
-                                             resourceNode,
-                                             getBrowser());
-                } else if (newRA != null && newRA.isIPaddr()) {
-                    newSi = new IPaddrInfo(serviceName,
-                                           newRA,
-                                           hbId,
-                                           resourceNode,
-                                           getBrowser());
-                } else if (newRA != null && newRA.isVirtualDomain()) {
-                    newSi = new VirtualDomainInfo(serviceName,
-                                                  newRA,
-                                                  hbId,
-                                                  resourceNode,
-                                                  getBrowser());
-                } else {
-                    newSi = new ServiceInfo(serviceName,
-                                            newRA,
-                                            hbId,
-                                            resourceNode,
-                                            getBrowser());
-                }
-                newSi.getService().setHeartbeatId(hbId);
-                getBrowser().addToHeartbeatIdList(newSi);
-                final Point2D p = null;
-                if (newGi != null) {
-                    newGi.addGroupServicePanel(newSi, false);
-                } else if (newCi != null) {
-                    newCi.addCloneServicePanel(newSi);
-                } else {
-                    addServicePanel(newSi, p, false, false, testOnly);
-                }
+                newSi = (ServiceInfo) gi;
             } else {
-                getBrowser().addNameToServiceInfoHash(newSi);
-                setParametersHash.put(newSi, resourceNode);
+                final ResourceAgent newRA = clStatus.getResourceType(hbId);
+                if (newRA == null) {
+                    /* This is bad. There is a service but we do not have
+                     * the heartbeat script of this service or the we look
+                     * in the wrong places.
+                     */
+                    Tools.appWarning(hbId + ": could not find resource agent");
+                }
+                /* continue of creating/updating of the
+                 * service in the gui.
+                 */
+                newSi = getBrowser().getServiceInfoFromCRMId(hbId);
+                final Map<String, String> resourceNode =
+                                                 clStatus.getParamValuePairs(hbId);
+                if (newSi == null) {
+                    newService = true;
+                    // TODO: get rid of the service name? (everywhere)
+                    String serviceName;
+                    if (newRA == null) {
+                        serviceName = hbId;
+                    } else {
+                        serviceName = newRA.getName();
+                    }
+                    if (newRA != null && newRA.isFilesystem()) {
+                        newSi = new FilesystemInfo(serviceName,
+                                                   newRA,
+                                                   hbId,
+                                                   resourceNode,
+                                                   getBrowser());
+                    } else if (newRA != null && newRA.isLinbitDrbd()) {
+                        newSi = new LinbitDrbdInfo(serviceName,
+                                                   newRA,
+                                                   hbId,
+                                                   resourceNode,
+                                                   getBrowser());
+                    } else if (newRA != null && newRA.isDrbddisk()) {
+                        newSi = new DrbddiskInfo(serviceName,
+                                                 newRA,
+                                                 hbId,
+                                                 resourceNode,
+                                                 getBrowser());
+                    } else if (newRA != null && newRA.isIPaddr()) {
+                        newSi = new IPaddrInfo(serviceName,
+                                               newRA,
+                                               hbId,
+                                               resourceNode,
+                                               getBrowser());
+                    } else if (newRA != null && newRA.isVirtualDomain()) {
+                        newSi = new VirtualDomainInfo(serviceName,
+                                                      newRA,
+                                                      hbId,
+                                                      resourceNode,
+                                                      getBrowser());
+                    } else {
+                        newSi = new ServiceInfo(serviceName,
+                                                newRA,
+                                                hbId,
+                                                resourceNode,
+                                                getBrowser());
+                    }
+                    newSi.getService().setHeartbeatId(hbId);
+                    getBrowser().addToHeartbeatIdList(newSi);
+                    final Point2D p = null;
+                    if (newGi != null) {
+                        newGi.addGroupServicePanel(newSi, false);
+                    } else if (newCi != null) {
+                        newCi.addCloneServicePanel(newSi);
+                    } else {
+                        addServicePanel(newSi, p, false, false, testOnly);
+                    }
+                } else {
+                    getBrowser().addNameToServiceInfoHash(newSi);
+                    setParametersHash.put(newSi, resourceNode);
+                }
+                newSi.getService().setNew(false);
+                hg.setVertexIsPresent(newSi);
+                if (newGi != null || newCi != null) {
+                    groupServiceIsPresent.add(newSi);
+                }
             }
-            newSi.getService().setNew(false);
-            hg.setVertexIsPresent(newSi);
-            if (newGi != null || newCi != null) {
-                groupServiceIsPresent.add(newSi);
+            final DefaultMutableTreeNode n = newSi.getNode();
+            final int i = n.getParent().getIndex(n);
+            if (i > pos) {
+                final int p = pos;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        final DefaultMutableTreeNode parent =
+                                        (DefaultMutableTreeNode) n.getParent();
+                        parent.remove(n);
+                        parent.insert(n, p);
+                        getBrowser().reload(parent, false);
+                    }
+                });
             }
+            pos++;
         }
 
         for (final ServiceInfo newSi : setParametersHash.keySet()) {
@@ -534,7 +550,7 @@ public class ServicesInfo extends EditableInfo {
             }
         }
         if (newService) {
-            getBrowser().reload(getBrowser().getServicesNode());
+            getBrowser().reload(getBrowser().getServicesNode(), false);
         }
         hg.repaint();
     }
@@ -549,7 +565,7 @@ public class ServicesInfo extends EditableInfo {
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         hg.clearVertexIsPresentList();
         final List<ServiceInfo> groupServiceIsPresent =
-                                                new ArrayList<ServiceInfo>();
+                                                  new ArrayList<ServiceInfo>();
         groupServiceIsPresent.clear();
         for (final String groupOrClone : allGroupsAndClones) {
             CloneInfo newCi = null;
@@ -1103,8 +1119,8 @@ public class ServicesInfo extends EditableInfo {
             }
             if (reloadNode) {
                 /* show it */
-                getBrowser().reload(getBrowser().getServicesNode());
-                getBrowser().reload(newServiceNode);
+                getBrowser().reload(getBrowser().getServicesNode(), false);
+                getBrowser().reload(newServiceNode, true);
             }
             getBrowser().reloadAllComboBoxes(newServiceInfo);
             SwingUtilities.invokeLater(new Runnable() {

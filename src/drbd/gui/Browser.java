@@ -35,6 +35,7 @@ import javax.swing.JTree;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath; 
 
 import java.awt.Color;
 import java.awt.Component;
@@ -123,17 +124,22 @@ public class Browser {
     public final DefaultMutableTreeNode getTreeTop() {
         return treeTop;
     }
-    //public DefaultMutableTreeNode getTreeTop(Info info) {
-    //    treeTop = new DefaultMutableTreeNode(info);
-    //    treeModel = new DefaultTreeModel(treeTop);
-    //    return treeTop;
-    //}
 
     /** Reloads the node. */
-    public final void reload(final DefaultMutableTreeNode node) {
+    public final void reload(final DefaultMutableTreeNode node,
+                             final boolean select) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-              treeModel.reload(node);
+                TreePath path = null;
+                final JTree t = tree;
+                if (t != null) {
+                    path = t.getSelectionPath();
+                }
+                treeModel.reload(node);
+                if (!select && t != null && path != null) {
+                    /* if don't want to select, we reselect the old path. */
+                    t.setSelectionPath(path);
+                }
             }
         });
     }

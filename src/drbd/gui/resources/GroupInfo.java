@@ -41,6 +41,7 @@ import drbd.utilities.ButtonCallback;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
@@ -65,9 +66,98 @@ public class GroupInfo extends ServiceInfo {
         super(ConfigData.PM_GROUP_NAME, ra, browser);
     }
 
-    /**
-     * Applies the changes to the group parameters.
-     */
+    /** Applies the the whole group if for example an order has changed. */
+    public final void applyWhole(final Host dcHost,
+                                 final List<String> newOrder,
+                                 final boolean testOnly) {
+        final String[] params = getParametersFromXML();
+        //if (!testOnly) {
+        //    SwingUtilities.invokeLater(new Runnable() {
+        //        public void run() {
+        //            getApplyButton().setEnabled(false);
+        //        }
+        //    });
+        //}
+
+        final Map<String, String> groupMetaArgs =
+                                        new LinkedHashMap<String, String>();
+        for (String param : params) {
+            if (GUI_ID.equals(param)
+                || PCMK_ID.equals(param)) {
+                continue;
+            }
+            String value = getComboBoxValue(param);
+            if (value == null) {
+                value = "";
+            }
+            if (value.equals(getParamDefault(param))) {
+                continue;
+            }
+            if (!"".equals(value)) {
+                groupMetaArgs.put(param, value);
+            }
+        }
+        final Map<String, Map<String, String>> pacemakerResAttrs =
+                                 new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> pacemakerResArgs =
+                                 new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> pacemakerMetaArgs =
+                                 new HashMap<String, Map<String, String>>();
+        final Map<String, String> instanceAttrId =
+                                              new HashMap<String, String>();
+        final Map<String, Map<String, String>> nvpairIdsHash =
+                                 new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, Map<String, String>>> pacemakerOps =
+                    new HashMap<String, Map<String, Map<String, String>>>();
+        final Map<String, String> operationsId =
+                                              new HashMap<String, String>();
+        final Map<String, String> metaAttrsRefId =
+                                              new HashMap<String, String>();
+        final Map<String, String> operationsRefId =
+                                              new HashMap<String, String>();
+        final Map<String, Boolean> stonith = new HashMap<String, Boolean>();
+
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        for (final String resId : newOrder) {
+            final ServiceInfo gsi =
+                               getBrowser().getServiceInfoFromCRMId(resId);
+            pacemakerResAttrs.put(resId,
+                                  gsi.getPacemakerResAttrs(testOnly));
+            pacemakerResArgs.put(resId, gsi.getPacemakerResArgs());
+            pacemakerMetaArgs.put(resId, gsi.getPacemakerMetaArgs());
+            instanceAttrId.put(resId, cs.getResourceInstanceAttrId(resId));
+            nvpairIdsHash.put(resId, cs.getParametersNvpairsIds(resId));
+            pacemakerOps.put(resId, gsi.getOperations(resId));
+            operationsId.put(resId, cs.getOperationsId(resId));
+            metaAttrsRefId.put(resId, gsi.getMetaAttrsRefId());
+            operationsRefId.put(resId, gsi.getOperationsRefId());
+            stonith.put(resId, gsi.getResourceAgent().isStonith());
+        }
+        CRM.replaceGroup(dcHost,
+                         newOrder,
+                         groupMetaArgs,
+                         getHeartbeatId(testOnly),
+                         pacemakerResAttrs,
+                         pacemakerResArgs,
+                         pacemakerMetaArgs,
+                         instanceAttrId,
+                         nvpairIdsHash,
+                         pacemakerOps,
+                         operationsId,
+                         metaAttrsRefId,
+                         getMetaAttrsRefId(),
+                         operationsRefId,
+                         stonith,
+                         testOnly);
+        if (!testOnly) {
+            storeComboBoxValues(params);
+            getBrowser().reload(getNode(), false);
+            checkResourceFields(null, params);
+        }
+        getBrowser().getHeartbeatGraph().repaint();
+    }
+
+    /** Applies the changes to the group parameters. */
     public final void apply(final Host dcHost, final boolean testOnly) {
         final String[] params = getParametersFromXML();
         if (!testOnly) {
@@ -186,7 +276,7 @@ public class GroupInfo extends ServiceInfo {
         setLocations(heartbeatId, dcHost, testOnly);
         if (!testOnly) {
             storeComboBoxValues(params);
-            getBrowser().reload(getNode());
+            getBrowser().reload(getNode(), false);
             checkResourceFields(null, params);
         }
         getBrowser().getHeartbeatGraph().repaint();
@@ -218,8 +308,8 @@ public class GroupInfo extends ServiceInfo {
         newServiceInfo.setNode(newServiceNode);
         getNode().add(newServiceNode);
         if (reloadNode) {
-            getBrowser().reload(getNode());
-            getBrowser().reload(newServiceNode);
+            getBrowser().reload(getNode(), false);
+            getBrowser().reload(newServiceNode, true);
         }
     }
 
@@ -758,12 +848,14 @@ public class GroupInfo extends ServiceInfo {
         Subtext prevSubtext = null;
         final Host dcHost = getBrowser().getDCHost();
 
-        final Enumeration e = getNode().children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                                  (DefaultMutableTreeNode) e.nextElement();
-            final ServiceInfo si = (ServiceInfo) n.getUserObject();
-            if (si != null) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                     getHeartbeatId(testOnly),
+                                                     testOnly);
+        if (resources != null) {
+            for (final String resId : resources) {
+                final ServiceInfo si =
+                                   getBrowser().getServiceInfoFromCRMId(resId);
                 final Subtext[] subtexts =
                                      si.getSubtextsForGraph(testOnly);
                 Subtext sSubtext = null;
@@ -780,73 +872,71 @@ public class GroupInfo extends ServiceInfo {
                                           Color.BLACK));
                     prevSubtext = sSubtext;
                 }
-                if (si != null) {
-                    String unmanaged = "";
-                    if (!si.isManaged(testOnly)) {
-                        unmanaged = " / unmanaged";
-                    }
-                    String migrated = "";
-                    if (si.getMigratedTo(testOnly) != null
-                        || si.getMigratedFrom(testOnly) != null) {
-                        migrated = " / migrated";
-                    }
-                    final HbConnectionInfo[] hbcis =
-                      getBrowser().getHeartbeatGraph().getHbConnections(si);
-                    String constraintLeft = "";
-                    String constraint = "";
-                    if (hbcis != null) {
-                        boolean scoreFirst = false;
-                        boolean scoreThen = false;
-                        boolean someConnection = false;
-                        for (final HbConnectionInfo hbci : hbcis) {
-                            if (hbci == null) {
-                                continue;
-                            }
-                            if (!someConnection
-                                && hbci.hasColocationOrOrder(si)) {
-                                someConnection = true;
-                            }
-                            if (!scoreFirst
-                                && !hbci.isOrdScoreNull(si, null)) {
-                                scoreFirst = true;
-                            }
-                            if (!scoreThen
-                                && !hbci.isOrdScoreNull(null, si)) {
-                                scoreThen = true;
-                            }
-                        }
-                        if (someConnection) {
-                            if (!scoreFirst && !scoreThen) {
-                                /* just colocation */
-                                constraint = " --"; /* -- */
-                            } else {
-                                if (scoreFirst) {
-                                    constraint = " \u2192"; /* -> */
-                                }
-                                if (scoreThen) {
-                                    constraintLeft = "\u2192 "; /* -> */
-                                }
-                            }
-                        }
-                    }
-                    texts.add(new Subtext("   "
-                                          + constraintLeft
-                                          + si.toString()
-                                          + unmanaged
-                                          + migrated
-                                          + constraint,
-                                          sSubtext.getColor(),
-                                          Color.BLACK));
-                    boolean skip = true;
-                    for (final Subtext st : subtexts) {
-                        if (skip) {
-                            skip = false;
+                String unmanaged = "";
+                if (!si.isManaged(testOnly)) {
+                    unmanaged = " / unmanaged";
+                }
+                String migrated = "";
+                if (si.getMigratedTo(testOnly) != null
+                    || si.getMigratedFrom(testOnly) != null) {
+                    migrated = " / migrated";
+                }
+                final HbConnectionInfo[] hbcis =
+                  getBrowser().getHeartbeatGraph().getHbConnections(si);
+                String constraintLeft = "";
+                String constraint = "";
+                if (hbcis != null) {
+                    boolean scoreFirst = false;
+                    boolean scoreThen = false;
+                    boolean someConnection = false;
+                    for (final HbConnectionInfo hbci : hbcis) {
+                        if (hbci == null) {
                             continue;
                         }
-                        texts.add(new Subtext("   " + st.getSubtext(),
-                                              st.getColor(),
-                                              Color.BLACK));
+                        if (!someConnection
+                            && hbci.hasColocationOrOrder(si)) {
+                            someConnection = true;
+                        }
+                        if (!scoreFirst
+                            && !hbci.isOrdScoreNull(si, null)) {
+                            scoreFirst = true;
+                        }
+                        if (!scoreThen
+                            && !hbci.isOrdScoreNull(null, si)) {
+                            scoreThen = true;
+                        }
                     }
+                    if (someConnection) {
+                        if (!scoreFirst && !scoreThen) {
+                            /* just colocation */
+                            constraint = " --"; /* -- */
+                        } else {
+                            if (scoreFirst) {
+                                constraint = " \u2192"; /* -> */
+                            }
+                            if (scoreThen) {
+                                constraintLeft = "\u2192 "; /* -> */
+                            }
+                        }
+                    }
+                }
+                texts.add(new Subtext("   "
+                                      + constraintLeft
+                                      + si.toString()
+                                      + unmanaged
+                                      + migrated
+                                      + constraint,
+                                      sSubtext.getColor(),
+                                      Color.BLACK));
+                boolean skip = true;
+                for (final Subtext st : subtexts) {
+                    if (skip) {
+                        skip = false;
+                        continue;
+                    }
+                    texts.add(new Subtext("   " + st.getSubtext(),
+                                          st.getColor(),
+                                          Color.BLACK));
                 }
             }
         }

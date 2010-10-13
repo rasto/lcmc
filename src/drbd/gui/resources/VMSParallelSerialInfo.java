@@ -318,7 +318,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             }
             getResource().setNew(false);
         }
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), false);
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }

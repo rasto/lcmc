@@ -444,7 +444,7 @@ public class Info implements Comparable {
             if (parent != null) {
                 parent.remove(node);
                 setNode(null);
-                getBrowser().reload(parent);
+                getBrowser().reload(parent, true);
             }
         }
     }
@@ -452,7 +452,7 @@ public class Info implements Comparable {
     /** Selects and highlights this node. */
     public void selectMyself() {
         // this fires an event in ViewPanel.
-        getBrowser().reload(node);
+        getBrowser().reload(node, true);
         getBrowser().nodeChanged(node);
     }
 

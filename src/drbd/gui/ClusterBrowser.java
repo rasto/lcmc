@@ -547,7 +547,7 @@ public class ClusterBrowser extends Browser {
                      new VMSInfo(Tools.getString("ClusterBrowser.VMs"), this));
             setNode(vmsNode);
             topAdd(vmsNode);
-            reload(getTreeTop());
+            reload(getTreeTop(), true);
         }
     }
 
@@ -645,7 +645,7 @@ public class ClusterBrowser extends Browser {
             setNode(resource);
             allHostsNode.add(resource);
         }
-        reload(allHostsNode);
+        reload(allHostsNode, false);
 
         /* cluster hosts */
         clusterHostsNode.removeAllChildren();
@@ -657,7 +657,7 @@ public class ClusterBrowser extends Browser {
             heartbeatGraph.addHost(hostBrowser.getHostInfo());
         }
 
-        reload(clusterHostsNode);
+        reload(clusterHostsNode, false);
 
         /* block devices */
         updateCommonBlockDevices();
@@ -1335,7 +1335,7 @@ public class ClusterBrowser extends Browser {
                 setNode(resource);
                 commonBlockDevicesNode.add(resource);
             }
-            reload(commonBlockDevicesNode);
+            reload(commonBlockDevicesNode, false);
         }
     }
 
@@ -1439,7 +1439,7 @@ public class ClusterBrowser extends Browser {
             nodeChanged = true;
         }
         if (nodeChanged) {
-            reload(vmsNode);
+            reload(vmsNode, false);
             for (final ServiceInfo si : getExistingServiceList(null)) {
                 si.connectWithVMS();
             }
@@ -1546,7 +1546,7 @@ public class ClusterBrowser extends Browser {
                 setNode(resource);
                 networksNode.add(resource);
             }
-            reload(networksNode);
+            reload(networksNode, false);
         }
     }
 
@@ -1658,7 +1658,7 @@ public class ClusterBrowser extends Browser {
      * Highlights drbd node.
      */
     public final void selectDrbd() {
-        reload(drbdNode);
+        reload(drbdNode, true);
     }
 
     /**

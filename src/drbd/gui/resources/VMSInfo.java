@@ -250,7 +250,7 @@ public class VMSInfo extends CategoryInfo {
                                            new DefaultMutableTreeNode(vmsdi);
         getBrowser().setNode(resource);
         getNode().add(resource);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 vmsdi.getInfoPanel();

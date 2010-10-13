@@ -81,9 +81,9 @@ public class CloneInfo extends ServiceInfo {
         final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), false);
         getNode().add(newServiceNode);
-        getBrowser().reload(newServiceNode);
+        getBrowser().reload(newServiceNode, true);
     }
 
     /**
@@ -99,7 +99,7 @@ public class CloneInfo extends ServiceInfo {
         setNode(node);
         getBrowser().getServicesNode().add(node);
         node.add(newServiceInfo.getNode());
-        getBrowser().reload(node);
+        getBrowser().reload(node, true);
     }
 
     /**

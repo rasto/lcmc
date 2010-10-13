@@ -575,10 +575,10 @@ public class DrbdInfo extends EditableInfo {
      */
     public final void selectMyself() {
         if (selectedBD == null || !selectedBD.getBlockDevice().isDrbd()) {
-            getBrowser().reload(getNode());
+            getBrowser().reload(getNode(), true);
             getBrowser().nodeChanged(getNode());
         } else {
-            getBrowser().reload(selectedBD.getNode());
+            getBrowser().reload(selectedBD.getNode(), true);
             getBrowser().nodeChanged(selectedBD.getNode());
         }
     }
@@ -730,7 +730,7 @@ public class DrbdInfo extends EditableInfo {
             final Thread thread = new Thread(new Runnable() {
                 public void run() {
                     //reload(getNode());
-                    getBrowser().reload(drbdResourceNode);
+                    getBrowser().reload(drbdResourceNode, true);
                     AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(driF);
                     adrd.showDialogs();
                     /* remove wizard parameters from hashes. */

@@ -938,7 +938,7 @@ public class DrbdResourceInfo extends EditableInfo
                                                                     getName());
         getBrowser().getDrbdResHash().remove(getName());
         dri.setName(null);
-        getBrowser().reload(getBrowser().getServicesNode());
+        getBrowser().reload(getBrowser().getDrbdNode(), true);
         getBrowser().getDrbdDevHash().remove(getDevice());
         blockDevInfo1.removeFromDrbd();
         blockDevInfo2.removeFromDrbd();
@@ -957,7 +957,6 @@ public class DrbdResourceInfo extends EditableInfo
         getBrowser().getDrbdGraph().updatePopupMenus();
         getBrowser().resetFilesystems();
         infoPanel = null;
-        getBrowser().reload(getBrowser().getDrbdNode());
     }
 
     /** Returns string of the drbd resource. */

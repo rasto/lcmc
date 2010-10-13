@@ -1592,7 +1592,11 @@ public class Host implements Serializable {
         if (!enableOnConnectList.contains(c)) {
             enableOnConnectList.add(c);
         }
-        c.setEnabled(isConnected());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                c.setEnabled(isConnected());
+            }
+        });
     }
 
     /**
@@ -1601,9 +1605,13 @@ public class Host implements Serializable {
      * connect.
      */
     public final void setConnected() {
-        for (final JComponent c : enableOnConnectList) {
-            c.setEnabled(isConnected());
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (final JComponent c : enableOnConnectList) {
+                    c.setEnabled(isConnected());
+                }
+            }
+        });
     }
 
     /**

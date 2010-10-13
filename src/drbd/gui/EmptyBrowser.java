@@ -120,7 +120,7 @@ public class EmptyBrowser extends Browser {
             //setNode(resource);
             allHostsNode.add(resource);
         }
-        reload(allHostsNode);
+        reload(allHostsNode, false);
     }
 }
 

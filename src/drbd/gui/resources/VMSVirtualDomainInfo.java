@@ -1509,7 +1509,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             || serialNodeChanged
             || parallelNodeChanged
             || vidoNodeChanged) {
-            getBrowser().reload(getNode());
+            getBrowser().reload(getNode(), false);
         }
         //final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
         //if (vmsi != null) {
@@ -1965,7 +1965,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             break;
         }
         getNode().insert(resource, i);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmsdi.selectMyself();
         return vmsdi;
     }
@@ -1992,7 +1992,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         getNode().insert(resource, i);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmsii.selectMyself();
         return vmsii;
     }
@@ -2020,7 +2020,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         getNode().insert(resource, i);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmsidi.selectMyself();
     }
 
@@ -2048,7 +2048,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         getNode().insert(resource, i);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmsgi.selectMyself();
         return vmsgi;
     }
@@ -2078,7 +2078,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         getNode().insert(resource, i);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmssi.selectMyself();
     }
 
@@ -2108,7 +2108,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         getNode().insert(resource, i);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmssi.selectMyself();
     }
 
@@ -2139,7 +2139,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         getNode().insert(resource, i);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmspi.selectMyself();
     }
 
@@ -2153,7 +2153,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         getBrowser().setNode(resource);
         /* all the way till the end */
         getNode().add(resource);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), true);
         vmsvi.selectMyself();
     }
 
@@ -3027,7 +3027,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         updateParameters();
         checkResourceFields(null, params);
-        getBrowser().reload(getNode());
+        getBrowser().reload(getNode(), false);
     }
 
     /** Returns parameters of all devices. */

@@ -227,8 +227,8 @@ public class AppDefaults extends
         {"Browser.CategoryIcon", "Icons/tango/16x16/folder_16x16.png"},
         {"Browser.ApplyIcon",    "Icons/tango/16x16/ok_16x16.png"},
         {"Browser.ApplyIconLarge", "Icons/tango/32x32/ok_32x32.png"},
-        {"Browser.ActionsIcon",  "Icons/32X32/Arrow-down.png"},
-
+        {"Browser.ActionsIcon",  "Icons/tango/32x32/Arrow-down.png"},
+                                  
         {"HostBrowser.NetIntIcon", "Icons/tango/16x16/netzwk_16x16.png"},
 
         {"HostBrowser.NetIntIconLarge",
@@ -307,6 +307,8 @@ public class AppDefaults extends
                                 "Icons/tango/32x32/service_migrated_32x32.png"},
         {"HeartbeatGraph.UnmigrateIcon",
                               "Icons/tango/32x32/service_unmigrate_32x32.png"},
+        {"HeartbeatGraph.GroupUp", "Icons/tango/32x32/group_up_32x32.png"},
+        {"HeartbeatGraph.GroupDown", "Icons/tango/32x32/group_down_32x32.png"},
 
         {"ClusterViewPanel.HostIcon",    "Icons/tango/32x32/host_32x32.png"},
         {"ClusterTab.ClusterIcon",      "Icons/tango/32x32/cluster_32x32.png"},
