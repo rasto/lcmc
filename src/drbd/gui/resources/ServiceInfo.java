@@ -2176,6 +2176,9 @@ public class ServiceInfo extends EditableInfo {
 
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
+        if (GUI_ID.equals(param) && !getResource().isNew()) {
+            return false;
+        }
         return true;
     }
 
