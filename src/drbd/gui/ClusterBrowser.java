@@ -548,6 +548,7 @@ public class ClusterBrowser extends Browser {
             setNode(vmsNode);
             topAdd(vmsNode);
             reload(getTreeTop(), true);
+            reload(servicesNode, true);
         }
     }
 
