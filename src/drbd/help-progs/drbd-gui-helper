@@ -77,6 +77,21 @@ if ($option eq "all") {
 	get_installation_info();
 	print "version-info\n";
 	get_version_info();
+} elsif ($option eq "hw-info-lazy") {
+	print "net-info\n";
+	get_net_info();
+	sleep 1;
+	print "disk-info\n";
+	get_disk_info();
+	sleep 1;
+	print "filesystems-info\n";
+	get_filesystems_info();
+	sleep 1;
+	print "mount-points-info\n";
+	get_mount_points_info();
+	sleep 1;
+	print "installation-info\n";
+	get_installation_info();
 } elsif ($option eq "installation-info") {
 	get_installation_info();
 } elsif ($option eq "get-net-info") {
@@ -582,15 +597,19 @@ sub get_version_info {
 }
 
 sub get_drbd_events {
+	if (! -e "/proc/drbd") {
+	       print "nm\n";
+	       exit 101;
+	}
 	my $kidpid;
 	my $pid = $$;
 	die "can't fork: $!" unless defined($kidpid = fork());
 	if ($kidpid) {
 		print "empty\n";
 		exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
-	} else {
-		sleep 20; # cannot be bigger than ssh timeout
-		kill("TERM", $pid);
+	#} else {
+	#	sleep 20;
+	#	kill("TERM", $pid);
 	}
 }
 
@@ -647,8 +666,7 @@ sub get_hb_lib_path {
 }
 
 #
-# Prints heartbeat info, then waits 25 seconds for events, then it quits, so it # can get restarted again. This timeout is required so that a connection loss 
-# can be detected.
+# Prints heartbeat info.
 #
 sub get_cluster_events {
 	my $info = get_cluster_info();
@@ -656,7 +674,6 @@ sub get_cluster_events {
 		print "---start---\n";
 		print $info;
 		print "---done---\n";
-		my $last_info = $info;
 
 		my $rw_socket_name;
 		if (-S "/var/run/crm/cib_rw") {
@@ -714,46 +731,35 @@ sub get_cluster_events {
 		fcntl($CB, F_SETFL, $flags | O_NONBLOCK)
 		    or return "ERROR: Couldn't set flags for $cb_socket_name: $!\n";
 
-		if (my $pid = fork) {
-			# wait 25 seconds and kill the child
-			sleep 25;
-			close $CB;
-			kill 1, $pid;
-			return "";
-		}  else {
-			my $cibevent = 0;
-			my $prev_byte = "";
-			while (1) {
-				my $len = sysread($CB, $byte, 1);
-				if ($! == EAGAIN || $len != 1) {
-					sleep 1;
-					if ($cibevent > 0) {
-						my $info = get_cluster_info();
-						if ($info
-						    && $info ne $last_info) {
-							print "---start---\n";
-							print $info;
-							print "---done---\n";
-						}
-						$cibevent = 0;
-					}
-					next;
+		my $cibevent = 0;
+		my $prev_byte = "";
+		while (1) {
+			my $len = sysread($CB, $byte, 1);
+			if ($! == EAGAIN || $len != 1) {
+				sleep 1;
+				if ($cibevent > 0) {
+					my $info = get_cluster_info();
+					print "---start---\n";
+					print $info;
+					print "---done---\n";
+					$cibevent = 0;
 				}
-				if ($prev_byte && $byte ne $prev_byte) {
-					$count = 0;
+				next;
+			}
+			if ($prev_byte && $byte ne $prev_byte) {
+				$count = 0;
+				$prev_byte = "";
+			} elsif ($byte eq "%" || $byte eq "<") {
+				$prev_byte = $byte;
+				$count++;
+				if ($count == 3) {
+					$cibevent++;
 					$prev_byte = "";
-				} elsif ($byte eq "%" || $byte eq "<") {
-					$prev_byte = $byte;
-					$count++;
-					if ($count == 3) {
-						$cibevent++;
-						$prev_byte = "";
-						$count = 0;
-					}
-				} else {
 					$count = 0;
-					$prev_byte = "";
 				}
+			} else {
+				$count = 0;
+				$prev_byte = "";
 			}
 		}
 		return "";

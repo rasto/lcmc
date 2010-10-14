@@ -32,6 +32,7 @@ import drbd.gui.ProgressBar;
 import drbd.gui.TerminalPanel;
 import drbd.gui.SSHGui;
 import drbd.gui.HostBrowser;
+import drbd.gui.ClusterBrowser;
 import drbd.gui.resources.CategoryInfo;
 import drbd.data.resources.NetInterface;
 import drbd.data.resources.BlockDevice;
@@ -135,6 +136,8 @@ public class Host implements Serializable {
     private Color defaultColor;
     /** Color of this host in graphs. */
     private Color savedColor;
+    /** Thread where connection status command is running. */
+    private ExecCommandThread connectionStatusThread = null;
     /** Thread where drbd status command is running. */
     private ExecCommandThread drbdStatusThread = null;
     /** Thread where hb status command is running. */
@@ -189,12 +192,6 @@ public class Host implements Serializable {
     private String sudoPassword = "";
     /** Browser panel (the one with menus and all the logic) of this host. */
     private HostBrowser browser;
-    /** Timeout after which the drbd status is considered hanging and will be
-     * killed. Drbd should return about after 20 seconds. Timing here is
-     * important. This timeout must be greater, that timeout of the drbd status
-     * in the helper script.
-     */
-    private static final int DRBD_STATUS_TIMEOUT = 30000;
     /** A gate that is used to synchronize the loading sequence. */
     private CountDownLatch isLoadingGate;
     /** List of gui elements that are to be enabled if the host is connected.*/
@@ -212,6 +209,8 @@ public class Host implements Serializable {
     private String oldHwInfo = null;
     /** Index of this host in its cluster. */
     private int index = 0;
+    /** Whether the last connection check was positive. */
+    private volatile boolean lastConnected = false;
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
@@ -1217,6 +1216,34 @@ public class Host implements Serializable {
                                commandTimeout);
     }
 
+    /** Executes connection status command. */
+    public final void execConnectionStatusCommand(
+                                            final ExecCallback execCallback) {
+        if (connectionStatusThread == null) {
+            connectionStatusThread = ssh.execCommand(
+                                Tools.getDistCommand(
+                                                "Host.getConnectionStatus",
+                                                dist,
+                                                distVersionString,
+                                                arch,
+                                                null), /* ConvertCmdCallback */
+                                    execCallback,
+                                    null,
+                                    false,
+                                    false,
+                                    10000);
+            try {
+                connectionStatusThread.join(0);
+            } catch (java.lang.InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            connectionStatusThread = null;
+        } else {
+            Tools.appWarning(getName()
+                             + ": trying to start started connection status");
+        }
+    }
+
     /**
      * Executes get status command which runs in the background and updates the
      * block device object. The command is 'drbdsetup /dev/drbdX events'
@@ -1237,15 +1264,13 @@ public class Host implements Serializable {
                                     outputCallback,
                                     false,
                                     false,
-                                    45000);
+                                    0);
         } else {
             Tools.appWarning("trying to start started drbd status");
         }
     }
 
-    /**
-     * Stops drbd status background process.
-     */
+    /** Stops drbd status background process. */
     public final void stopDrbdStatus() {
         if (drbdStatusThread == null) {
             Tools.appWarning("trying to stop stopped drbd status");
@@ -1263,7 +1288,7 @@ public class Host implements Serializable {
             try {
                 /* it probably hangs after this timeout, so it will be
                  * killed. */
-                drbdStatusThread.join(DRBD_STATUS_TIMEOUT);
+                drbdStatusThread.join();
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -1288,7 +1313,7 @@ public class Host implements Serializable {
                                 outputCallback,
                                 false,
                                 false,
-                                30000);
+                                0);
         } else {
             Tools.appWarning("trying to start started hb status");
         }
@@ -1605,13 +1630,27 @@ public class Host implements Serializable {
      * connect.
      */
     public final void setConnected() {
+        final boolean con = isConnected();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 for (final JComponent c : enableOnConnectList) {
-                    c.setEnabled(isConnected());
+                    c.setEnabled(con);
                 }
             }
         });
+        if (lastConnected != con) {
+            lastConnected = con;
+            if (con) {
+               Tools.info(getName() + ": connection established");
+            } else {
+               Tools.info(getName() + ": connection lost");
+            }
+            final ClusterBrowser cb = getBrowser().getClusterBrowser();
+            if (cb != null) {
+                cb.getHeartbeatGraph().repaint();
+                cb.getDrbdGraph().repaint();
+            }
+        }
     }
 
     /**
@@ -1683,11 +1722,40 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Gets and stores hardware info about the host.
-     */
+    /** Gets and stores hardware info about the host. */
     public final void getHWInfo(final CategoryInfo[] infosToUpdate) {
         final Thread t = execCommand("GetHostHWInfo",
+                         new ExecCallback() {
+                             public void done(final String ans) {
+                                 if (!ans.equals(oldHwInfo)) {
+                                    parseHostInfo(ans);
+                                    oldHwInfo = ans;
+                                    for (final CategoryInfo ci
+                                                        : infosToUpdate) {
+                                        ci.updateTable(CategoryInfo.MAIN_TABLE);
+                                    }
+                                 }
+                                 setLoadingDone();
+                             }
+
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
+                                 setLoadingError();
+                             }
+                         },
+                         null, /* ConvertCmdCallback */
+                         false,
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
+        try {
+            t.join(0);
+        } catch (java.lang.InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /** Gets and stores hardware info about the host. */
+    public final void getHWInfoLazy(final CategoryInfo[] infosToUpdate) {
+        final Thread t = execCommand("GetHostHWInfoLazy",
                          new ExecCallback() {
                              public void done(final String ans) {
                                  if (!ans.equals(oldHwInfo)) {
@@ -1723,8 +1791,6 @@ public class Host implements Serializable {
      */
     public final boolean isConnected() {
         if (ssh == null) {
-            ////TODO: maybe try to reconnect here
-            //ssh = new SSH();
             return false;
         }
         return ssh.isConnected();

@@ -1354,4 +1354,8 @@ public class Connection
 
 		this.generator = rnd;
 	}
+
+        public ChannelManager getChannelManager() {
+            return cm;
+        }
 }

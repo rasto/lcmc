@@ -751,6 +751,7 @@ public class ClusterBrowser extends Browser {
                 //});
                 Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
+                cluster.getBrowser().startConnectionStatus();
                 cluster.getBrowser().startServerStatus();
                 cluster.getBrowser().startDrbdStatus();
                 cluster.getBrowser().startClStatus();
@@ -786,6 +787,7 @@ public class ClusterBrowser extends Browser {
         final CategoryInfo[] infosToUpdate =
                                         new CategoryInfo[]{clusterHostsInfo};
         boolean firstTime = true;
+        long count = 0;
         while (true) {
             if (firstTime) {
                 Tools.startProgressIndicator(hostName,
@@ -793,7 +795,11 @@ public class ClusterBrowser extends Browser {
             }
 
             host.setIsLoading();
-            host.getHWInfo(infosToUpdate);
+            if (firstTime || count % 10 == 0) {
+                host.getHWInfo(infosToUpdate);
+            } else {
+                host.getHWInfoLazy(infosToUpdate);
+            }
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
             if (firstTime) {
@@ -814,11 +820,12 @@ public class ClusterBrowser extends Browser {
                     }
                 });
             try {
-                Thread.sleep(10000);
+                Thread.sleep(20000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
             firstTime = false;
+            count++;
             if (!serverStatus) {
                 break;
             }
@@ -858,9 +865,20 @@ public class ClusterBrowser extends Browser {
         serverStatus = false;
     }
 
-    /**
-     * Starts drbd status on all hosts.
-     */
+    /** Starts connection status on all hosts. */
+    public final void startConnectionStatus() {
+        final Host[] hosts = cluster.getHostsArray();
+        for (final Host host : hosts) {
+            final Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    startConnectionStatus(host);
+                }
+            });
+            thread.start();
+        }
+    }
+
+    /** Starts drbd status on all hosts. */
     public final void startDrbdStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
@@ -887,9 +905,39 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Starts drbd status on host.
-     */
+    /** Starts connection status. */
+    public final void startConnectionStatus(final Host host) {
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                while (true) {
+                    host.execConnectionStatusCommand(
+                          new ExecCallback() {
+                               public void done(final String ans) {
+                                   Tools.debug(this, "connection ok on "
+                                                     + host.getName(),
+                                               2);
+                                   host.setConnected();
+                               }
+
+                               public void doneError(final String ans,
+                                                     final int exitCode) {
+                                   Tools.debug(this, "connection lost on "
+                                                     + host.getName()
+                                                     + "exit code: "
+                                                     + exitCode,
+                                               2);
+                                   host.getSSH().forceReconnect();
+                                   host.setConnected();
+                               }
+                           });
+                    Tools.sleep(10000);
+                }
+            }
+        });
+        thread.start();
+    }
+
+    /** Starts drbd status on host. */
     public final void startDrbdStatus(final Host host) {
         final CountDownLatch firstTime = new CountDownLatch(1);
         host.setDrbdStatus(false);
@@ -934,9 +982,9 @@ public class ClusterBrowser extends Browser {
                                              final int exitCode) {
                            Tools.debug(this, "drbd status failed: "
                                              + host.getName()
-                                             + "exit code: "
+                                             + " exit code: "
                                              + exitCode,
-                                       2);
+                                       1);
                            if (exitCode != 143 && exitCode != 100) {
                                // TODO: exit code is null -> 100 all of the
                                // sudden
@@ -951,8 +999,8 @@ public class ClusterBrowser extends Browser {
                                }
                                if (exitCode == 255) {
                                    /* looks like connection was lost */
-                                   host.getSSH().forceReconnect();
-                                   host.setConnected();
+                                   //host.getSSH().forceReconnect();
+                                   //host.setConnected();
                                }
                            }
                            //TODO: repaint ok?
@@ -966,8 +1014,7 @@ public class ClusterBrowser extends Browser {
                        public void output(final String output) {
                            firstTime.countDown();
                            boolean updated = false;
-                           if (output.indexOf(
-                                    "modprobe drbd") >= 0) {
+                           if ("nm".equals(output.trim())) {
                                if (host.isDrbdStatus()) {
                                    Tools.debug(this, "drbd status update: "
                                                  + host.getName(), 1);
@@ -1035,10 +1082,12 @@ public class ClusterBrowser extends Browser {
                        }
                    });
             firstTime.countDown();
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+            while (!host.isConnected() || !host.isDrbdLoaded()) {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
             }
             host.waitOnDrbdStatus();
             if (drbdStatusCanceled) {
@@ -1257,9 +1306,9 @@ public class ClusterBrowser extends Browser {
                          clStatusUnlock();
                          if (exitCode == 255) {
                              /* looks like connection was lost */
-                             heartbeatGraph.repaint();
-                             host.getSSH().forceReconnect();
-                             host.setConnected();
+                             //heartbeatGraph.repaint();
+                             //host.getSSH().forceReconnect();
+                             //host.setConnected();
                          }
                          firstTime.countDown();
                      }

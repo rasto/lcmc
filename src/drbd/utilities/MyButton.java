@@ -182,7 +182,11 @@ public class MyButton extends JButton implements ComponentWithTest {
             robot.mouseMove((int) p.getX() + xOffset,
                             (int) p.getY());
         } else {
-            super.setToolTipText(toolTipText);
+            if (toolTipText == null) {
+                super.setToolTipText("");
+            } else {
+                super.setToolTipText(toolTipText);
+            }
         }
     }
 

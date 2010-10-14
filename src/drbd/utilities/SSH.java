@@ -43,6 +43,7 @@ import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.KnownHosts;
 import ch.ethz.ssh2.LocalPortForwarder;
 import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.channel.ChannelManager;
 
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
@@ -61,7 +62,7 @@ public class SSH {
     /** Host data object. */
     private Host host;
     /** This SSH connection object. */
-    private volatile Connection connection = null;
+    private volatile MyConnection connection = null;
     /** Connection thread object. */
     private volatile ConnectionThread connectionThread = null;
     /** Progress bar object. */
@@ -434,13 +435,8 @@ public class SSH {
                     return new SSHOutput("", 130);
                 }
                 /* requestPTY mixes stdout and strerr together, but it works
-                better at the moment. */
-                if (command.indexOf("/etc/init.d/openais start") < 0
-                    && command.indexOf("/etc/init.d/openais reload") < 0) {
-                    /* aisexec does not work when pty is requested for some
-                     * reason, so here is the workaround. */
-                    thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
-                }
+                   better at the moment. */
+                thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "
@@ -473,6 +469,7 @@ public class SSH {
                                             sshCommandTimeout);
                         }
                         if (cancelIt) {
+                            Tools.info("SSH cancel");
                             throw new IOException(
                                 "Canceled while waiting for data from peer.");
                         }
@@ -642,7 +639,7 @@ public class SSH {
                         execCallback.doneError("not connected", 139);
                     }
                 } else {
-                    final Connection conn = connection;
+                    final MyConnection conn = connection;
                     mConnectionLock.release();
                     exec(conn);
                 }
@@ -652,15 +649,36 @@ public class SSH {
         /**
          * Executes the command.
          */
-        private void exec(final Connection conn) {
+        private void exec(final MyConnection conn) {
             // ;;; separates commands, that are to be executed one after one,
             // if previous command has finished successfully.
             final String[] commands = command.split(";;;");
             final StringBuffer ans = new StringBuffer("");
             for (int i = 0; i < commands.length; i++) {
+                final Boolean[] cancelTimeout = new Boolean[1];
+                cancelTimeout[0] = false;
+                Thread tt = new Thread(new Runnable() {
+                    public void run() {
+                        Tools.sleep(10000);
+                        if (!cancelTimeout[0]) {
+                            Tools.debug(this,
+                                        host.getName()
+                                        + ": open ssh session: timeout.",
+                                        1);
+                            cancelTimeout[0] = true;
+                            conn.dmcCancel();
+                        }
+                    }
+                });
+                tt.start();
                 try {
-                    // TODO: it may hang here if we lost connection
+                    /* it may hang here if we lost connection, so it will be
+                     * interrupted after a timeout. */
                     sess = conn.openSession();
+                    if (cancelTimeout[0]) {
+                        throw new java.io.IOException("open session failed");
+                    }
+                    cancelTimeout[0] = true;
                 } catch (java.io.IOException e) {
                     try {
                         mConnectionLock.acquire();
@@ -669,7 +687,9 @@ public class SSH {
                     }
                     connection = null;
                     mConnectionLock.release();
-                    Tools.appWarning("Could not open session");
+                    if (execCallback != null) {
+                        execCallback.doneError("could not open session", 45);
+                    }
                     break;
                 }
                 commands[i].trim();
@@ -1128,6 +1148,24 @@ public class SSH {
         }
     }
 
+    /** Connection class that can cancel it's connection during openSession. */
+    class MyConnection extends Connection {
+        /** Creates new MyConnection object. */
+        public MyConnection(final String hostname, final int port) {
+            super(hostname, port);
+        }
+
+        public void dmcCancel() {
+            /* public getChannelManager() { return cm }
+               has to be added to the Connection.java till
+               it's sorted out. */
+            final ChannelManager cm = getChannelManager();
+            if (cm != null) {
+                cm.closeAllChannels();
+            }
+        }
+    }
+
     /**
      * The SSH-2 connection is established in this thread.
      * If we would not use a separate thread (e.g., put this code in
@@ -1160,8 +1198,8 @@ public class SSH {
                 callback.done(1);
             }
             host.setSudoPassword("");
-            final Connection conn = new Connection(hostname,
-                                                   host.getSSHPortInt());
+            final MyConnection conn = new MyConnection(hostname,
+                                                       host.getSSHPortInt());
             disconnectForGood = false;
 
             try {
@@ -1564,7 +1602,9 @@ public class SSH {
                     if (callback != null) {
                         callback.done(0);
                     }
-                    Tools.debug(this, "authentication ok");
+                    Tools.debug(this,
+                                host.getName() + ": authentication ok",
+                                1);
                 }
             } catch (IOException e) {
                 Tools.debug(this, "connecting: " + e.getMessage(), 1);

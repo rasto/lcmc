@@ -159,6 +159,7 @@ public class DistResource extends
 
         {"GetHostAllInfo", "@GUI-HELPER@ all"},
         {"GetHostHWInfo", "@GUI-HELPER@ hw-info"},
+        {"GetHostHWInfoLazy", "nice -n 19 @GUI-HELPER@ hw-info-lazy"},
         {"GetNetInfo",  "@GUI-HELPER@ get-net-info"},
 
         /* heartbeat crm commands */
@@ -365,5 +366,8 @@ public class DistResource extends
 
         {"VIRSH.Undefine",
          "virsh undefine @DOMAIN@"},
+
+        {"Host.getConnectionStatus",
+         ":"},
     };
 }
