@@ -2213,21 +2213,13 @@ public final class RoboTest {
             final int y = (int) p.getY();
             int directionX = 0;
             int directionY = 0;
-            if (x < destX - 2) {
-                directionX = 2;
-            } else if (x < destX) {
+            if (x < destX) {
                 directionX = 1;
-            } else if (x > destX + 2) {
-                directionX = -2;
             } else if (x > destX) {
                 directionX = -1;
             }
-            if (y < destY - 2) {
-                directionY = 2;
-            } else if (y < destY) {
+            if (y < destY) {
                 directionY = 1;
-            } else if (y > destY + 2) {
-                directionY = -2;
             } else if (y > destY) {
                 directionY = -1;
             }

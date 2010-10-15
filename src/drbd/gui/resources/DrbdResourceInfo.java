@@ -1068,6 +1068,7 @@ public class DrbdResourceInfo extends EditableInfo
         ldi.waitForInfoPanel();
         ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(getName());
         /* apply gets parents from graph and adds colocations. */
+        Tools.waitForSwing();
         ldi.apply(dcHost, testOnly);
     }
 

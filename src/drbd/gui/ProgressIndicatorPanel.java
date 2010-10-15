@@ -413,7 +413,7 @@ public class ProgressIndicatorPanel extends JComponent
                     if (failuresMap.contains(text)) {
                         f = new Color(255, 0, 0);
                     } else {
-                        f = new Color(214, 75, 42); //getForeground();
+                        f = new Color(144, 75, 42); //getForeground();
                     }
                     g2.setColor(new Color(f.getRed(),
                                           f.getGreen(),
