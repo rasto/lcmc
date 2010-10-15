@@ -855,7 +855,7 @@ public class HbConnectionInfo extends EditableInfo {
             }
             score += s;
         }
-        if (plusInf && minusInf) {
+        if ((plusInf && minusInf) || colocationIds.size() == 0) {
             return ColScoreType.MIXED;
         } else if (plusInf) {
             return ColScoreType.INFINITY;
@@ -873,7 +873,7 @@ public class HbConnectionInfo extends EditableInfo {
     /** Returns whether the order score is negative. */
     public final boolean isOrdScoreNull(final ServiceInfo first,
                                         final ServiceInfo then) {
-        if (isNew()) {
+        if (isNew() || orderIds.size() == 0) {
             return false;
         }
         int score = 0;

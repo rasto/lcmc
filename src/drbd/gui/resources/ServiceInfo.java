@@ -1635,7 +1635,7 @@ public class ServiceInfo extends EditableInfo {
                     if (sameAs) {
                         /* same as some other service */
                         defaultValue =
-                                 ((ServiceInfo) info).getParamSaved(param);
+                                 ((ServiceInfo) info).getParamValue(param);
                     }
                     final String newValue = defaultValue;
                     if (!Tools.areEqual(oldValue, newValue)) {
@@ -2079,7 +2079,7 @@ public class ServiceInfo extends EditableInfo {
     /**
      * Returns saved value for specified parameter.
      */
-    protected String getParamSaved(final String param) {
+    protected String getParamValue(final String param) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         if (isMetaAttr(param)) {
             final String crmId = getService().getHeartbeatId();
@@ -2166,7 +2166,7 @@ public class ServiceInfo extends EditableInfo {
     /** Returns whether this parameter is advanced. */
     protected boolean isAdvanced(final String param) {
         if (!Tools.areEqual(getParamDefault(param),
-                            getParamSaved(param))) {
+                            getParamValue(param))) {
             /* it changed, show it */
             return false;
         }

@@ -544,6 +544,35 @@ public final class RoboTest {
         leftClick(robot); /* apply */
         checkTest(host, "test1", 2); /* 2 */
 
+        /* pingd */
+        moveTo(robot, 1105, 298);
+        leftPress(robot); /* scroll bar */
+        moveTo(robot, 1105, 510);
+        leftRelease(robot);
+
+        moveTo(robot, 1076, 420);
+        leftClick(robot);
+        moveTo(robot, 1037, 475);
+        leftClick(robot); /* no ping */
+        moveTo(robot, 809, 192); /* ptest */
+        sleep(2000);
+        leftClick(robot); /*  apply */
+        sleep(2000);
+        checkTest(host, "test1", 2.1); /* 2.1 */
+
+        moveTo(robot, 1076, 420);
+        leftClick(robot);
+        moveTo(robot, 1067, 445);
+        leftClick(robot); /* default */
+        moveTo(robot, 809, 192); /* ptest */
+        sleep(2000);
+        leftClick(robot); /*  apply */
+
+        moveTo(robot, 1105, 298);
+        leftPress(robot); /* scroll bar */
+        moveTo(robot, 1105, 550);
+        leftRelease(robot);
+
         /* group with dummy resources */
         moveTo(robot, gx, gy);
         sleep(1000);
@@ -594,7 +623,7 @@ public final class RoboTest {
         sleep(1000);
         rightClick(robot);
         sleep(1000);
-        moveTo(robot, 150, 552);
+        moveTo(robot, 150, 611);
         leftClick(robot); /* remove service */
         removeResource(robot, gx, gy, 0);
 
@@ -710,6 +739,7 @@ public final class RoboTest {
         sleep(4000);
         leftClick(robot); /* apply */
         sleep(5000);
+        moveTo(robot, 1105, 298);
         leftPress(robot); /* scroll bar back */
         moveTo(robot, 1105, 150);
         leftRelease(robot);
@@ -2183,13 +2213,21 @@ public final class RoboTest {
             final int y = (int) p.getY();
             int directionX = 0;
             int directionY = 0;
-            if (x < destX) {
+            if (x < destX - 2) {
+                directionX = 2;
+            } else if (x < destX) {
                 directionX = 1;
+            } else if (x > destX + 2) {
+                directionX = -2;
             } else if (x > destX) {
                 directionX = -1;
             }
-            if (y < destY) {
+            if (y < destY - 2) {
+                directionY = 2;
+            } else if (y < destY) {
                 directionY = 1;
+            } else if (y > destY + 2) {
+                directionY = -2;
             } else if (y > destY) {
                 directionY = -1;
             }
