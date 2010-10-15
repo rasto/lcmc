@@ -62,13 +62,15 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 
-    /**
-     * Prepares a new <code>MyButton</code> object.
-     */
+    /** Prepares a new <code>MyButton</code> object. */
     public MyButton() {
         super();
+        try {
+            robot = new Robot(SCREEN_DEVICE);
+        } catch (java.awt.AWTException e) {
+            Tools.appError("Robot error");
+        }
         setContentAreaFilled(false);  // *
-    //    this(Color.WHITE, Tools.getDefaultColor("DefaultButton.Background"));
     }
 
     /**
@@ -79,9 +81,12 @@ public class MyButton extends JButton implements ComponentWithTest {
      */
     public MyButton(final String text) {
         super(text);
+        try {
+            robot = new Robot(SCREEN_DEVICE);
+        } catch (java.awt.AWTException e) {
+            Tools.appError("Robot error");
+        }
         setContentAreaFilled(false);  // *
-        //this();
-        //setText(text);
     }
 
     /**
@@ -94,10 +99,12 @@ public class MyButton extends JButton implements ComponentWithTest {
      */
     public MyButton(final String text, final ImageIcon icon) {
         super(text, icon);
+        try {
+            robot = new Robot(SCREEN_DEVICE);
+        } catch (java.awt.AWTException e) {
+            Tools.appError("Robot error");
+        }
         setContentAreaFilled(false);  // *
-        //this();
-        //setText(text);
-        //setIcon((Icon) icon);
     }
 
     /**
