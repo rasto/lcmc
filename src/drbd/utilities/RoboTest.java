@@ -29,6 +29,8 @@ import java.awt.MouseInfo;
 import java.awt.geom.Point2D;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import javax.swing.SwingUtilities;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * This class is used to test the GUI.
@@ -123,32 +125,73 @@ public final class RoboTest {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
                 Tools.sleep(10000);
-                Robot robot = null;
+                Robot rbt = null;
                 try {
-                    robot = new Robot(SCREEN_DEVICE);
+                    rbt = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
                     Tools.appWarning("Robot error");
                 }
-                if (robot == null) {
+                if (rbt == null) {
                     return;
                 }
+                final Robot robot = rbt;
                 final long startTime = System.currentTimeMillis();
                 while (true) {
-                    robot.mousePress(buttonMask);
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                robot.mousePress(buttonMask);
+                            }
+                        });
+                    } catch (final InterruptedException ix) {
+                        Thread.currentThread().interrupt();
+                    } catch (final InvocationTargetException itx) {
+                        Tools.printStackTrace();
+                    }
                     if (lazy) {
                         Tools.sleep(timeAfterClickLazy);
                     } else {
                         Tools.sleep(timeAfterClick);
                     }
-                    robot.mouseRelease(buttonMask);
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                robot.mouseRelease(buttonMask);
+                            }
+                        });
+                    } catch (final InterruptedException ix) {
+                        Thread.currentThread().interrupt();
+                    } catch (final InvocationTargetException itx) {
+                        Tools.printStackTrace();
+                    }
                     if (lazy) {
                         Tools.sleep(timeAfterRelaseLazy);
                     } else {
                         Tools.sleep(timeAfterRelase);
                     }
-                    robot.keyPress(KeyEvent.VK_ESCAPE);
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                robot.keyPress(KeyEvent.VK_ESCAPE);
+                            }
+                        });
+                    } catch (final InterruptedException ix) {
+                        Thread.currentThread().interrupt();
+                    } catch (final InvocationTargetException itx) {
+                        Tools.printStackTrace();
+                    }
                     Tools.sleep(100);
-                    robot.keyRelease(KeyEvent.VK_ESCAPE);
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                robot.keyRelease(KeyEvent.VK_ESCAPE);
+                            }
+                        });
+                    } catch (final InterruptedException ix) {
+                        Thread.currentThread().interrupt();
+                    } catch (final InvocationTargetException itx) {
+                        Tools.printStackTrace();
+                    }
                     if (abortWithMouseMovement()) {
                         break;
                     }
@@ -172,16 +215,17 @@ public final class RoboTest {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
                 Tools.sleep(10000);
-                Robot robot = null;
+                Robot rbt = null;
                 try {
-                    robot = new Robot(SCREEN_DEVICE);
+                    rbt = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
                     Tools.appWarning("Robot error");
                 }
-                if (robot == null) {
+                if (rbt == null) {
                     return;
                 }
-                int xOffset = getOffset();
+                final Robot robot = rbt;
+                final int xOffset = getOffset();
                 final Point2D origP = MouseInfo.getPointerInfo().getLocation();
                 final int origX = (int) origP.getX();
                 final int origY = (int) origP.getY();
@@ -228,8 +272,21 @@ public final class RoboTest {
                             directionY = 1;
                         }
                     }
-                    robot.mouseMove((int) p.getX() + xOffset + directionX,
-                                    (int) p.getY() + directionY);
+                    final int directionX0 = directionX;
+                    final int directionY0 = directionY;
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+                            public void run() {
+                                robot.mouseMove(
+                                            (int) p.getX() + xOffset + directionX0,
+                                            (int) p.getY() + directionY0);
+                            }
+                        });
+                    } catch (final InterruptedException ix) {
+                        Thread.currentThread().interrupt();
+                    } catch (final InvocationTargetException itx) {
+                        Tools.printStackTrace();
+                    }
                     if (lazy) {
                         Tools.sleep(40);
                     } else {
@@ -509,7 +566,7 @@ public final class RoboTest {
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 560, gy + 22);
+        moveTo(robot, gx + 580, gy + 22);
         sleep(1000);
         typeDummy(robot);
         sleep(1000);
@@ -528,7 +585,7 @@ public final class RoboTest {
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 560, gy + 22);
+        moveTo(robot, gx + 580, gy + 22);
         sleep(1000);
         typeDummy(robot);
         sleep(1000);
@@ -552,7 +609,7 @@ public final class RoboTest {
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 560, gy + 22);
+        moveTo(robot, gx + 580, gy + 22);
         sleep(1000);
         typeDummy(robot);
         sleep(1000);
@@ -572,7 +629,7 @@ public final class RoboTest {
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 560, gy + 22);
+        moveTo(robot, gx + 580, gy + 22);
         sleep(1000);
         typeDummy(robot);
         sleep(1000);
@@ -588,7 +645,7 @@ public final class RoboTest {
             sleep(2000 + i * 500);
             moveTo(robot, gx + 80, gy + 20);
             moveTo(robot, gx + 84, gy + 22);
-            moveTo(robot, gx + 560, gy + 22);
+            moveTo(robot, gx + 580, gy + 22);
             sleep(1000);
             typeDummy(robot);
             sleep(i * 300);
@@ -1466,13 +1523,33 @@ public final class RoboTest {
         sleep(2000);
         for (final int ev : events) {
             if (ev == KeyEvent.VK_PLUS) {
-                robot.keyPress(KeyEvent.VK_SHIFT);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            robot.keyPress(KeyEvent.VK_SHIFT);
+                        }
+                    });
+                } catch (final InterruptedException ix) {
+                    Thread.currentThread().interrupt();
+                } catch (final InvocationTargetException itx) {
+                    Tools.printStackTrace();
+                }
                 sleep(400);
             }
             press(robot, ev);
             sleep(400);
             if (ev == KeyEvent.VK_PLUS) {
-                robot.keyRelease(KeyEvent.VK_SHIFT);
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            robot.keyRelease(KeyEvent.VK_SHIFT);
+                        }
+                    });
+                } catch (final InterruptedException ix) {
+                    Thread.currentThread().interrupt();
+                } catch (final InvocationTargetException itx) {
+                    Tools.printStackTrace();
+                }
                 sleep(400);
             }
         }
@@ -1573,7 +1650,7 @@ public final class RoboTest {
         moveTo(robot, x + 57, y + 28);
         moveTo(robot, x + 290, y + 28);
         moveTo(robot, x + 290, y + 72);
-        moveTo(robot, x + 560, y + 72);
+        moveTo(robot, x + 580, y + 72);
         sleep(2000);
         typeDummy(robot);
         sleep(2000);
@@ -1810,7 +1887,7 @@ public final class RoboTest {
         moveTo(robot, x + 335, y + 50 + groupcor + skipY + 34);
         moveTo(robot, x + 500 + xCorrection, y + 50 + groupcor + skipY + 34);
         moveTo(robot,
-               x + 500 + xCorrection,
+               x + 520 + xCorrection,
                y + 50 + groupcor + skipY + 34 + with);
         sleep(6000); /* ptest */
         leftClick(robot); /* start before */
@@ -1841,7 +1918,7 @@ public final class RoboTest {
         moveTo(robot, x + 335, y + 50 + groupcor + skipY + 9);
         moveTo(robot, x + 500 + xCorrection, y + 50 + groupcor + skipY + 9);
         moveTo(robot,
-               x + 500 + xCorrection,
+               x + 520 + xCorrection,
                y + 50 + groupcor + skipY + 9 + with);
         sleep(6000); /* ptest */
         leftClick(robot); /* start before */
@@ -1935,9 +2012,29 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        robot.keyPress(ke);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.keyPress(ke);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
         //Tools.sleep(10);
-        robot.keyRelease(ke);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.keyRelease(ke);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
         Tools.sleep(200);
     }
 
@@ -1946,20 +2043,60 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        robot.mousePress(InputEvent.BUTTON1_MASK);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
         Tools.sleep(300);
-        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
     }
 
     /** Left press. */
     private static void leftPress(final Robot robot)  {
-        robot.mousePress(InputEvent.BUTTON1_MASK);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
         Tools.sleep(300);
     }
 
     /** Left release. */
     private static void leftRelease(final Robot robot)  {
-        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
         Tools.sleep(300);
     }
 
@@ -1969,9 +2106,29 @@ public final class RoboTest {
             return;
         }
         Tools.sleep(1000);
-        robot.mousePress(InputEvent.BUTTON3_MASK);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.mousePress(InputEvent.BUTTON3_MASK);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
         Tools.sleep(500);
-        robot.mouseRelease(InputEvent.BUTTON3_MASK);
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    robot.mouseRelease(InputEvent.BUTTON3_MASK);
+                }
+            });
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException itx) {
+            Tools.printStackTrace();
+        }
         sleep(6000);
     }
 
@@ -2001,7 +2158,17 @@ public final class RoboTest {
         final int endX = (int) endP.getX() + toX;
         final int endY = (int) endP.getY() + toY;
         if (MOVE_MOUSE_FAST) {
-            robot.mouseMove(endX, endY);
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        robot.mouseMove(endX, endY);
+                    }
+                });
+            } catch (final InterruptedException ix) {
+                Thread.currentThread().interrupt();
+            } catch (final InvocationTargetException itx) {
+                Tools.printStackTrace();
+            }
             return;
         }
         final int destX = endX;
@@ -2029,8 +2196,20 @@ public final class RoboTest {
             if (directionY == 0 && directionX == 0) {
                 break;
             }
-            robot.mouseMove((int) p.getX() + xOffset + directionX,
-                            (int) p.getY() + directionY);
+            final int directionX0 = directionX;
+            final int directionY0 = directionY;
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        robot.mouseMove((int) p.getX() + xOffset + directionX0,
+                                        (int) p.getY() + directionY0);
+                    }
+                });
+            } catch (final InterruptedException ix) {
+                Thread.currentThread().interrupt();
+            } catch (final InvocationTargetException itx) {
+                Tools.printStackTrace();
+            }
             sleep(5);
             if (abortWithMouseMovement()) {
                 break;

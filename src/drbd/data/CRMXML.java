@@ -2890,13 +2890,13 @@ public class CRMXML extends XML {
             String thenActionString  = "then-action";
             if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
                 rscString         = "from";
-                rscRoleString     = "from_role"; //TODO: just guessing
+                rscRoleString     = "from_role";
                 withRscString     = "to";
-                withRscRoleString = "to_role"; //TODO: just guessing
-                firstString       = "from";
-                thenString        = "to";
-                firstActionString = "action";
-                thenActionString  = "to_action";
+                withRscRoleString = "to_role";
+                firstString       = "to";
+                thenString        = "from";
+                firstActionString = "to_action";
+                thenActionString  = "action";
             }
             for (int i = 0; i < constraints.getLength(); i++) {
                 final Node constraintNode = constraints.item(i);
@@ -2959,7 +2959,7 @@ public class CRMXML extends XML {
                                                      thenActionString);
                     final String type = getAttribute(constraintNode,
                                                      "type");
-                    if (type != null && "after".equals(type)) {
+                    if (type != null && "before".equals(type)) {
                         /* exchange resoruces */
                         final String rsc = rscFirst;
                         rscFirst = rscThen;

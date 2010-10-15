@@ -1243,10 +1243,8 @@ public final class CRM {
             && hbV != null
             && Tools.compareVersions(hbV, "2.99.0") < 0) {
             /* <= 2.1.4 */
-            final String type = "before";
-            attrs.put("type", type);
-            convertHash.put("first", "from");
-            convertHash.put("then", "to");
+            convertHash.put("first", "to");
+            convertHash.put("then", "from");
             convertHash.put("first-action", "action");
             convertHash.put("then-action", "to_action");
         }
