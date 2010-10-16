@@ -48,10 +48,10 @@ public class DistResource_debian_LENNY extends
 
         /* corosync/pacemaker madkiss */
         {"PmInst.install.text.1",
-         "LINBIT/MADKISS repo: 1.0.x/1.1.x"},
+         "Backports repo: 1.0.x/1.1.x"},
 
         {"PmInst.install.1",
-         "echo 'deb http://people.debian.org/~madkiss/ha lenny main'"
+         "echo 'deb http://backports.debian.org/debian-backports lenny-backports main'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"

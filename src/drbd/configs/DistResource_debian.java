@@ -188,12 +188,13 @@ public class DistResource_debian extends
 
         /* heartbeat/pacemaker madkiss */
         {"HbPmInst.install.text.1",
-         "LINBIT/MADKISS repo: 1.0.x/3.0.x"},
+         "Backports repo: 1.0.x/3.0.x"},
 
         {"HbPmInst.install.1",
-         "echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
+         //"echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
+         "echo 'deb http://backports.debian.org/debian-backports lenny-backports main' > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
-         + " && apt-get -y -q  --allow-unauthenticated install"
+         + " && apt-get -y -q  --allow-unauthenticated -t lenny-backports install"
          + " -o 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"},
 
         /* heartbeat apt-get install */
