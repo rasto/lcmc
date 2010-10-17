@@ -54,7 +54,9 @@ public class DistResource_fedora extends
          "the Fedora way"},
 
         {"DrbdInst.install.1",
-         "yum -y install drbd-utils drbd-udev"},
+         "yum -y install drbd-utils drbd-udev "
+         + "&& if ( rpm -qa|grep pacemaker ); then"
+         + " yum -y install drbd-pacemaker; fi"},
         {"DrbdInst.install.method.1",       ""},
 
         /* Heartbeat/Pacemaker native */
@@ -62,7 +64,9 @@ public class DistResource_fedora extends
          "the Fedora way: 1.1.x/3.0.x"},
 
         {"HbPmInst.install.1",
-         "yum -y install pacemaker heartbeat drbd-pacemaker"},
+         "yum -y install pacemaker heartbeat "
+         + "&& if ( rpm -qa|grep drbd ); then"
+         + " yum -y install drbd-pacemaker; fi"},
         /* at least fedora 10 and fedora11 in version 2.1.3 and 2.14 has different
            ocf path. */
         {"Heartbeat.2.1.4.getOCFParameters",
@@ -83,7 +87,9 @@ public class DistResource_fedora extends
 
         /* Corosync/Pacemaker native */
         {"PmInst.install.1",
-         "yum -y install pacemaker corosync drbd-pacemaker"
+         "yum -y install pacemaker corosync"
+         + "&& if ( rpm -qa|grep drbd ); then"
+         + " yum -y install drbd-pacemaker; fi"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"
