@@ -37,6 +37,6 @@ public class DistResource_ubuntu_LUCID extends
     /** Contents. */
     private static Object[][] contents = {
         {"Support",            "ubuntu-LUCID"},
-        {"distributiondir",    "ubuntu-lucid-server"},
+        {"distributiondir",    "ubuntu-lucid"},
     };
 }
