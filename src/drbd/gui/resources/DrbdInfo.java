@@ -623,18 +623,18 @@ public class DrbdInfo extends EditableInfo {
      * @param interactive
      *              whether dialog box will be displayed
      */
-    public final void addDrbdResource(String name,
-                                      String drbdDevStr,
-                                      final BlockDevInfo bd1,
-                                      final BlockDevInfo bd2,
-                                      final boolean interactive,
-                                      final boolean testOnly) {
+    public final boolean addDrbdResource(String name,
+                                         String drbdDevStr,
+                                         final BlockDevInfo bd1,
+                                         final BlockDevInfo bd2,
+                                         final boolean interactive,
+                                         final boolean testOnly) {
         if (getBrowser().getDrbdResHash().containsKey(name)) {
-            return;
+            return false;
         }
         DrbdResourceInfo dri;
         if (bd1 == null || bd2 == null) {
-            return;
+            return false;
         }
         final DrbdXML dxml = getBrowser().getDrbdXML();
         if (name == null && drbdDevStr == null) {
@@ -685,10 +685,10 @@ public class DrbdInfo extends EditableInfo {
         bd2.setDefaultVIPort(viPort + 1);
 
         dri.getDrbdResource().setDefaultValue(
-                                        ClusterBrowser.DRBD_RES_PARAM_NAME,
+                                        DrbdResourceInfo.DRBD_RES_PARAM_NAME,
                                         name);
         dri.getDrbdResource().setDefaultValue(
-                                        ClusterBrowser.DRBD_RES_PARAM_DEV,
+                                        DrbdResourceInfo.DRBD_RES_PARAM_DEV,
                                         drbdDevStr);
         getBrowser().getDrbdResHash().put(name, dri);
         getBrowser().getDrbdDevHash().put(drbdDevStr, dri);
@@ -766,6 +766,7 @@ public class DrbdInfo extends EditableInfo {
         } else {
             getBrowser().resetFilesystems();
         }
+        return true;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */

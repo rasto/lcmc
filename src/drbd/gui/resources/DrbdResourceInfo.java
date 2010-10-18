@@ -82,6 +82,10 @@ public class DrbdResourceInfo extends EditableInfo
     private boolean haveToCreateMD = false;
     /** Last created filesystem. */
     private String createdFs = null;
+    /** Name of the drbd resource name parameter. */
+    public static final String DRBD_RES_PARAM_NAME = "name";
+    /** Name of the drbd device parameter. */
+    public static final String DRBD_RES_PARAM_DEV = "device";
     /** Name of the drbd after parameter. */
     private static final String DRBD_RES_PARAM_AFTER = "after";
     /** String that is displayed as a tool tip if a menu item is used by CRM. */
@@ -104,7 +108,7 @@ public class DrbdResourceInfo extends EditableInfo
         setResource(new DrbdResource(name, null)); // TODO: ?
         setResource(new DrbdResource(name, drbdDev)); // TODO: ?
         // TODO: drbdresource
-        getResource().setValue(ClusterBrowser.DRBD_RES_PARAM_DEV, drbdDev);
+        getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
         this.blockDevInfo1 = blockDevInfo1;
         this.blockDevInfo2 = blockDevInfo2;
     }
@@ -251,7 +255,7 @@ public class DrbdResourceInfo extends EditableInfo
         final String[] params = getBrowser().getDrbdXML().getSectionParams(
                                                                    "resource");
         for (String param : params) {
-            if ("device".equals(param)) {
+            if (DRBD_RES_PARAM_DEV.equals(param)) {
                 continue;
             }
             config.append('\t');
@@ -453,6 +457,11 @@ public class DrbdResourceInfo extends EditableInfo
 
     /** Whether the parameter should be enabled. */
     protected final boolean isEnabled(final String param) {
+        if (getDrbdResource().isCommited()
+            && (DRBD_RES_PARAM_NAME.equals(param)
+                || DRBD_RES_PARAM_DEV.equals(param))) {
+            return false;
+        }
         return true;
     }
 
@@ -531,11 +540,10 @@ public class DrbdResourceInfo extends EditableInfo
         GuiComboBox paramCb;
         final Object[] possibleChoices = getParamPossibleChoices(param);
         getResource().setPossibleChoices(param, possibleChoices);
-        if (ClusterBrowser.DRBD_RES_PARAM_NAME.equals(param)) {
+        if (DRBD_RES_PARAM_NAME.equals(param)) {
             String resName;
-            if (getParamSaved(ClusterBrowser.DRBD_RES_PARAM_NAME) == null) {
-                resName = getResource().getDefaultValue(
-                                            ClusterBrowser.DRBD_RES_PARAM_NAME);
+            if (getParamSaved(DRBD_RES_PARAM_NAME) == null) {
+                resName = getResource().getDefaultValue(DRBD_RES_PARAM_NAME);
             } else {
                 resName = getResource().getName();
             }
@@ -551,12 +559,11 @@ public class DrbdResourceInfo extends EditableInfo
                                            isEnabledOnlyInAdvancedMode(param)));
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
-        } else if (ClusterBrowser.DRBD_RES_PARAM_DEV.equals(param)) {
+        } else if (DRBD_RES_PARAM_DEV.equals(param)) {
             final List<String> drbdDevices = new ArrayList<String>();
-            if (getParamSaved(ClusterBrowser.DRBD_RES_PARAM_DEV) == null) {
+            if (getParamSaved(DRBD_RES_PARAM_DEV) == null) {
                 final String defaultItem =
-                        getDrbdResource().getDefaultValue(
-                                            ClusterBrowser.DRBD_RES_PARAM_DEV);
+                        getDrbdResource().getDefaultValue(DRBD_RES_PARAM_DEV);
                 drbdDevices.add(defaultItem);
                 int i = 0;
                 int index = 0;
@@ -741,10 +748,8 @@ public class DrbdResourceInfo extends EditableInfo
             getBrowser().getDrbdDevHash().remove(getDevice());
             storeComboBoxValues(params);
 
-            final String name = getParamSaved(
-                                           ClusterBrowser.DRBD_RES_PARAM_NAME);
-            final String drbdDevStr = getParamSaved(
-                                            ClusterBrowser.DRBD_RES_PARAM_DEV);
+            final String name = getParamSaved(DRBD_RES_PARAM_NAME);
+            final String drbdDevStr = getParamSaved(DRBD_RES_PARAM_DEV);
             getDrbdResource().setName(name);
             setName(name);
             getDrbdResource().setDevice(drbdDevStr);
@@ -752,6 +757,7 @@ public class DrbdResourceInfo extends EditableInfo
             getBrowser().getDrbdResHash().put(name, this);
             getBrowser().getDrbdDevHash().put(drbdDevStr, this);
             getBrowser().getDrbdGraph().repaint();
+            getDrbdResource().setCommited(true);
             checkResourceFields(null, params);
         }
     }
@@ -848,9 +854,9 @@ public class DrbdResourceInfo extends EditableInfo
         buttonPanel.add(mb, BorderLayout.EAST);
 
         /* resource name */
-        getResource().setValue(ClusterBrowser.DRBD_RES_PARAM_NAME,
+        getResource().setValue(DRBD_RES_PARAM_NAME,
                                getDrbdResource().getName());
-        getResource().setValue(ClusterBrowser.DRBD_RES_PARAM_DEV, getDevice());
+        getResource().setValue(DRBD_RES_PARAM_DEV, getDevice());
 
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
@@ -976,8 +982,8 @@ public class DrbdResourceInfo extends EditableInfo
             return false;
         }
         if (Tools.isStringClass(value)) {
-            return getDrbdResource().getValue(
-                    ClusterBrowser.DRBD_RES_PARAM_DEV).equals(value.toString());
+            return getDrbdResource().getValue(DRBD_RES_PARAM_DEV).equals(
+                                                             value.toString());
         } else {
             if (toString() == null) {
                 return false;
@@ -1457,5 +1463,31 @@ public class DrbdResourceInfo extends EditableInfo
             return blockDevInfo2.getBlockDevice().getUsed();
         }
         return -1;
+    }
+
+    /** Sets stored parameters. */
+    public final void setParameters() {
+        final DrbdXML dxml = getBrowser().getDrbdXML();
+        final String resName = getResource().getName();
+        for (String section : dxml.getSections()) {
+            for (final String param : dxml.getSectionParams(section)) {
+                if (DRBD_RES_PARAM_DEV.equals(param)) {
+                    continue;
+                }
+                String value = dxml.getConfigValue(resName, section, param);
+                final String defaultValue = getParamDefault(param);
+                if ("".equals(value)) {
+                    value = defaultValue;
+                }
+                final String oldValue = getParamSaved(param);
+                final GuiComboBox cb = paramComboBoxGet(param, null);
+                if (!Tools.areEqual(value, oldValue)) {
+                    getResource().setValue(param, value);
+                    if (cb != null) {
+                        cb.setValue(value);
+                    }
+                }
+            }
+        }
     }
 }

@@ -1708,43 +1708,42 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Sets stored parameters. */
     public final void setParameters(final String resName) {
-            final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
-            final String hostName = getHost().getName();
-            final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
-            String value = null;
-            for (final String param : getParametersFromXML()) {
-                if (DRBD_NI_PORT_PARAM.equals(param)) {
-                    value = dxml.getVirtualInterfacePort(hostName, resName);
-                } else if (DRBD_NI_PARAM.equals(param)) {
-                    value = dxml.getVirtualInterface(hostName, resName);
-                } else if (DRBD_MD_PARAM.equals(param)) {
-                    value = dxml.getMetaDisk(hostName, resName);
-                    if (!"internal".equals(value)) {
-                        final BlockDevInfo mdI =
-                                       drbdGraph.findBlockDevInfo(hostName, value);
-                        if (mdI != null) {
-                            getBlockDevice().setMetaDisk(mdI.getBlockDevice());
-                        }
+        final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
+        final String hostName = getHost().getName();
+        final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
+        String value = null;
+        for (final String param : getParametersFromXML()) {
+            if (DRBD_NI_PORT_PARAM.equals(param)) {
+                value = dxml.getVirtualInterfacePort(hostName, resName);
+            } else if (DRBD_NI_PARAM.equals(param)) {
+                value = dxml.getVirtualInterface(hostName, resName);
+            } else if (DRBD_MD_PARAM.equals(param)) {
+                value = dxml.getMetaDisk(hostName, resName);
+                if (!"internal".equals(value)) {
+                    final BlockDevInfo mdI =
+                                   drbdGraph.findBlockDevInfo(hostName, value);
+                    if (mdI != null) {
+                        getBlockDevice().setMetaDisk(mdI.getBlockDevice());
                     }
-                } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-                    value = dxml.getMetaDiskIndex(hostName, resName);
                 }
-                final String defaultValue = getParamDefault(param);
-                if (value == null) {
-                    value = defaultValue;
-                }
-                if (value == null) {
-                    value = "";
-                }
-                final String oldValue = getParamSaved(param);
-                final GuiComboBox cb = paramComboBoxGet(param, null);
-                if (!Tools.areEqual(value, oldValue)) {
-                    getResource().setValue(param, value);
-                    if (cb != null) {
-                        cb.setValue(value);
-                    }
+            } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
+                value = dxml.getMetaDiskIndex(hostName, resName);
+            }
+            final String defaultValue = getParamDefault(param);
+            if (value == null) {
+                value = defaultValue;
+            }
+            if (value == null) {
+                value = "";
+            }
+            final String oldValue = getParamSaved(param);
+            final GuiComboBox cb = paramComboBoxGet(param, null);
+            if (!Tools.areEqual(value, oldValue)) {
+                getResource().setValue(param, value);
+                if (cb != null) {
+                    cb.setValue(value);
                 }
             }
+        }
     }
-
 }

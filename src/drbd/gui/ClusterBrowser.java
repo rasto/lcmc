@@ -236,10 +236,6 @@ public class ClusterBrowser extends Browser {
                       Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
     /** Identation. */
     public static final String IDENT_4 = "    ";
-    /** Name of the drbd resource name parameter. */
-    public static final String DRBD_RES_PARAM_NAME = "name";
-    /** Name of the drbd device parameter. */
-    public static final String DRBD_RES_PARAM_DEV = "device";
     /** Name of the boolean type in drbd. */
     public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
     /** String array with all hb classes. */
@@ -1571,12 +1567,16 @@ public class ClusterBrowser extends Browser {
             }
             if (bd1 != null
                 && bd2 != null) {
-                drbdGraph.getDrbdInfo().addDrbdResource(resName,
-                                                        drbdDev,
-                                                        bd1,
-                                                        bd2,
-                                                        false,
-                                                        testOnly);
+                final boolean added = drbdGraph.getDrbdInfo().addDrbdResource(
+                                                                     resName,
+                                                                     drbdDev,
+                                                                     bd1,
+                                                                     bd2,
+                                                                     false,
+                                                                     testOnly);
+                if (!added) {
+                    bd1.getDrbdResourceInfo().setParameters();
+                }
             }
         }
     }
