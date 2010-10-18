@@ -120,6 +120,7 @@ public class Resource extends DrbdConfig {
      */
     protected final JComponent getInputPane() {
         getDrbdResourceInfo().waitForInfoPanel();
+        Tools.waitForSwing();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
 

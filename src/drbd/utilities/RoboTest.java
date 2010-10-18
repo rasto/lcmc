@@ -29,8 +29,6 @@ import java.awt.MouseInfo;
 import java.awt.geom.Point2D;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import javax.swing.SwingUtilities;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * This class is used to test the GUI.
@@ -137,61 +135,21 @@ public final class RoboTest {
                 final Robot robot = rbt;
                 final long startTime = System.currentTimeMillis();
                 while (true) {
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            public void run() {
-                                robot.mousePress(buttonMask);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException itx) {
-                        Tools.printStackTrace();
-                    }
+                    robot.mousePress(buttonMask);
                     if (lazy) {
                         Tools.sleep(timeAfterClickLazy);
                     } else {
                         Tools.sleep(timeAfterClick);
                     }
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            public void run() {
-                                robot.mouseRelease(buttonMask);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException itx) {
-                        Tools.printStackTrace();
-                    }
+                    robot.mouseRelease(buttonMask);
                     if (lazy) {
                         Tools.sleep(timeAfterRelaseLazy);
                     } else {
                         Tools.sleep(timeAfterRelase);
                     }
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            public void run() {
-                                robot.keyPress(KeyEvent.VK_ESCAPE);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException itx) {
-                        Tools.printStackTrace();
-                    }
+                    robot.keyPress(KeyEvent.VK_ESCAPE);
                     Tools.sleep(100);
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            public void run() {
-                                robot.keyRelease(KeyEvent.VK_ESCAPE);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException itx) {
-                        Tools.printStackTrace();
-                    }
+                    robot.keyRelease(KeyEvent.VK_ESCAPE);
                     if (abortWithMouseMovement()) {
                         break;
                     }
@@ -274,19 +232,9 @@ public final class RoboTest {
                     }
                     final int directionX0 = directionX;
                     final int directionY0 = directionY;
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            public void run() {
-                                robot.mouseMove(
-                                            (int) p.getX() + xOffset + directionX0,
-                                            (int) p.getY() + directionY0);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException itx) {
-                        Tools.printStackTrace();
-                    }
+                    robot.mouseMove(
+                                (int) p.getX() + xOffset + directionX0,
+                                (int) p.getY() + directionY0);
                     if (lazy) {
                         Tools.sleep(40);
                     } else {
@@ -552,7 +500,7 @@ public final class RoboTest {
 
         moveTo(robot, 1076, 420);
         leftClick(robot);
-        moveTo(robot, 1037, 475);
+        moveTo(robot, 1037, 490);
         leftClick(robot); /* no ping */
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
@@ -1553,33 +1501,13 @@ public final class RoboTest {
         sleep(2000);
         for (final int ev : events) {
             if (ev == KeyEvent.VK_PLUS) {
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            robot.keyPress(KeyEvent.VK_SHIFT);
-                        }
-                    });
-                } catch (final InterruptedException ix) {
-                    Thread.currentThread().interrupt();
-                } catch (final InvocationTargetException itx) {
-                    Tools.printStackTrace();
-                }
+                robot.keyPress(KeyEvent.VK_SHIFT);
                 sleep(400);
             }
             press(robot, ev);
             sleep(400);
             if (ev == KeyEvent.VK_PLUS) {
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            robot.keyRelease(KeyEvent.VK_SHIFT);
-                        }
-                    });
-                } catch (final InterruptedException ix) {
-                    Thread.currentThread().interrupt();
-                } catch (final InvocationTargetException itx) {
-                    Tools.printStackTrace();
-                }
+                robot.keyRelease(KeyEvent.VK_SHIFT);
                 sleep(400);
             }
         }
@@ -2042,29 +1970,8 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.keyPress(ke);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
-        //Tools.sleep(10);
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.keyRelease(ke);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
+        robot.keyPress(ke);
+        robot.keyRelease(ke);
         Tools.sleep(200);
     }
 
@@ -2073,60 +1980,20 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.mousePress(InputEvent.BUTTON1_MASK);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
+        robot.mousePress(InputEvent.BUTTON1_MASK);
         Tools.sleep(300);
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
     }
 
     /** Left press. */
     private static void leftPress(final Robot robot)  {
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.mousePress(InputEvent.BUTTON1_MASK);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
+        robot.mousePress(InputEvent.BUTTON1_MASK);
         Tools.sleep(300);
     }
 
     /** Left release. */
     private static void leftRelease(final Robot robot)  {
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
         Tools.sleep(300);
     }
 
@@ -2136,29 +2003,9 @@ public final class RoboTest {
             return;
         }
         Tools.sleep(1000);
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.mousePress(InputEvent.BUTTON3_MASK);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
+        robot.mousePress(InputEvent.BUTTON3_MASK);
         Tools.sleep(500);
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    robot.mouseRelease(InputEvent.BUTTON3_MASK);
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException itx) {
-            Tools.printStackTrace();
-        }
+        robot.mouseRelease(InputEvent.BUTTON3_MASK);
         sleep(6000);
     }
 
@@ -2188,17 +2035,7 @@ public final class RoboTest {
         final int endX = (int) endP.getX() + toX;
         final int endY = (int) endP.getY() + toY;
         if (MOVE_MOUSE_FAST) {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-                        robot.mouseMove(endX, endY);
-                    }
-                });
-            } catch (final InterruptedException ix) {
-                Thread.currentThread().interrupt();
-            } catch (final InvocationTargetException itx) {
-                Tools.printStackTrace();
-            }
+            robot.mouseMove(endX, endY);
             return;
         }
         final int destX = endX;
@@ -2228,18 +2065,8 @@ public final class RoboTest {
             }
             final int directionX0 = directionX;
             final int directionY0 = directionY;
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-                        robot.mouseMove((int) p.getX() + xOffset + directionX0,
-                                        (int) p.getY() + directionY0);
-                    }
-                });
-            } catch (final InterruptedException ix) {
-                Thread.currentThread().interrupt();
-            } catch (final InvocationTargetException itx) {
-                Tools.printStackTrace();
-            }
+            robot.mouseMove((int) p.getX() + xOffset + directionX0,
+                            (int) p.getY() + directionY0);
             sleep(5);
             if (abortWithMouseMovement()) {
                 break;

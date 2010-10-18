@@ -795,7 +795,7 @@ public class ClusterBrowser extends Browser {
             }
 
             host.setIsLoading();
-            if (firstTime || count % 10 == 0) {
+            if (firstTime || count % 5 == 0) {
                 host.getHWInfo(infosToUpdate);
             } else {
                 host.getHWInfoLazy(infosToUpdate);
@@ -820,7 +820,7 @@ public class ClusterBrowser extends Browser {
                     }
                 });
             try {
-                Thread.sleep(20000);
+                Thread.sleep(10000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
