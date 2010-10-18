@@ -1539,29 +1539,30 @@ public class ClusterBrowser extends Browser {
                         continue;
                     }
                 }
-                bdi.getBlockDevice().setValue(
-                                      "DrbdNetInterfacePort",
-                                      dxml.getVirtualInterfacePort(hostName,
-                                                                   resName));
-                bdi.getBlockDevice().setValue(
-                                          "DrbdNetInterface",
-                                          dxml.getVirtualInterface(hostName,
-                                                                   resName));
-                final String drbdMetaDisk = dxml.getMetaDisk(hostName,
-                                                             resName);
-                bdi.getBlockDevice().setValue("DrbdMetaDisk", drbdMetaDisk);
-                bdi.getBlockDevice().setValue(
-                                            "DrbdMetaDiskIndex",
-                                            dxml.getMetaDiskIndex(hostName,
-                                                                  resName));
-                if (!"internal".equals(drbdMetaDisk)) {
-                    final BlockDevInfo mdI =
-                                      drbdGraph.findBlockDevInfo(hostName,
-                                                                 drbdMetaDisk);
-                    if (mdI != null) {
-                        bdi.getBlockDevice().setMetaDisk(mdI.getBlockDevice());
-                    }
-                }
+                bdi.setParameters(resName);
+                //bdi.getBlockDevice().setValue(
+                //                      "DrbdNetInterfacePort",
+                //                      dxml.getVirtualInterfacePort(hostName,
+                //                                                   resName));
+                //bdi.getBlockDevice().setValue(
+                //                          "DrbdNetInterface",
+                //                          dxml.getVirtualInterface(hostName,
+                //                                                   resName));
+                //final String drbdMetaDisk = dxml.getMetaDisk(hostName,
+                //                                             resName);
+                //bdi.getBlockDevice().setValue("DrbdMetaDisk", drbdMetaDisk);
+                //bdi.getBlockDevice().setValue(
+                //                            "DrbdMetaDiskIndex",
+                //                            dxml.getMetaDiskIndex(hostName,
+                //                                                  resName));
+                //if (!"internal".equals(drbdMetaDisk)) {
+                //    final BlockDevInfo mdI =
+                //                      drbdGraph.findBlockDevInfo(hostName,
+                //                                                 drbdMetaDisk);
+                //    if (mdI != null) {
+                //        bdi.getBlockDevice().setMetaDisk(mdI.getBlockDevice());
+                //    }
+                //}
                 if (bd1 == null) {
                     bd1 = bdi;
                 } else {

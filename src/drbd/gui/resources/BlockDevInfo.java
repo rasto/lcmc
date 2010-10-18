@@ -41,6 +41,7 @@ import drbd.data.Cluster;
 import drbd.data.DRBDtestData;
 import drbd.data.resources.BlockDevice;
 import drbd.data.AccessMode;
+import drbd.data.DrbdXML;
 
 import java.awt.Dimension;
 import java.awt.Component;
@@ -409,11 +410,11 @@ public class BlockDevInfo extends EditableInfo {
             final GuiComboBox gcb =
                                 super.getParamComboBox(param, prefix, width);
             paramCb = gcb;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    gcb.setAlwaysEditable(true);
-                }
-            });
+            //SwingUtilities.invokeLater(new Runnable() {
+            //    public void run() {
+            //        gcb.setAlwaysEditable(true);
+            //    }
+            //});
         } else {
             final GuiComboBox gcb =
                                  super.getParamComboBox(param, prefix, width);
@@ -435,28 +436,30 @@ public class BlockDevInfo extends EditableInfo {
         if ("".equals(value) && isRequired(param)) {
             ret = false;
         } else if (DRBD_MD_PARAM.equals(param)) {
-            final boolean internal = "internal".equals(value);
-            final GuiComboBox ind = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
-                                                     null);
-            final GuiComboBox indW = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
-                                                      "wizard");
-            if (internal) {
-                ind.setValue(DRBD_MD_TYPE_FLEXIBLE);
-                if (indW != null) {
-                    indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
+            if (infoPanel != null) {
+                final boolean internal = "internal".equals(value);
+                final GuiComboBox ind = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
+                                                         null);
+                final GuiComboBox indW = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
+                                                          "wizard");
+                if (internal) {
+                    ind.setValue(DRBD_MD_TYPE_FLEXIBLE);
+                    if (indW != null) {
+                        indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
+                    }
                 }
-            }
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    ind.setEnabled(!internal);
-                }
-            });
-            if (indW != null) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        indW.setEnabled(!internal);
+                        ind.setEnabled(!internal);
                     }
                 });
+                if (indW != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            indW.setEnabled(!internal);
+                        }
+                    });
+                }
             }
         } else if (DRBD_NI_PORT_PARAM.equals(param)) {
             if (getBrowser().getDrbdVIPortList().contains(value)
@@ -1701,6 +1704,47 @@ public class BlockDevInfo extends EditableInfo {
             oName = ((BlockDevInfo) o).getName();
         }
         return name.compareToIgnoreCase(oName);
+    }
+
+    /** Sets stored parameters. */
+    public final void setParameters(final String resName) {
+            final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
+            final String hostName = getHost().getName();
+            final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
+            String value = null;
+            for (final String param : getParametersFromXML()) {
+                if (DRBD_NI_PORT_PARAM.equals(param)) {
+                    value = dxml.getVirtualInterfacePort(hostName, resName);
+                } else if (DRBD_NI_PARAM.equals(param)) {
+                    value = dxml.getVirtualInterface(hostName, resName);
+                } else if (DRBD_MD_PARAM.equals(param)) {
+                    value = dxml.getMetaDisk(hostName, resName);
+                    if (!"internal".equals(value)) {
+                        final BlockDevInfo mdI =
+                                       drbdGraph.findBlockDevInfo(hostName, value);
+                        if (mdI != null) {
+                            getBlockDevice().setMetaDisk(mdI.getBlockDevice());
+                        }
+                    }
+                } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
+                    value = dxml.getMetaDiskIndex(hostName, resName);
+                }
+                final String defaultValue = getParamDefault(param);
+                if (value == null) {
+                    value = defaultValue;
+                }
+                if (value == null) {
+                    value = "";
+                }
+                final String oldValue = getParamSaved(param);
+                final GuiComboBox cb = paramComboBoxGet(param, null);
+                if (!Tools.areEqual(value, oldValue)) {
+                    getResource().setValue(param, value);
+                    if (cb != null) {
+                        cb.setValue(value);
+                    }
+                }
+            }
     }
 
 }
