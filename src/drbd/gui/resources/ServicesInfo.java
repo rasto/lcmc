@@ -534,9 +534,11 @@ public class ServicesInfo extends EditableInfo {
                     public void run() {
                         final DefaultMutableTreeNode parent =
                                         (DefaultMutableTreeNode) n.getParent();
-                        parent.remove(n);
-                        parent.insert(n, p);
-                        getBrowser().reload(parent, false);
+                        if (parent != null) {
+                            parent.remove(n);
+                            parent.insert(n, p);
+                            getBrowser().reload(parent, false);
+                        }
                     }
                 });
             }
