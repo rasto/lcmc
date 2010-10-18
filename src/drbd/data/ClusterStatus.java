@@ -358,7 +358,7 @@ public class ClusterStatus {
             hostToScoreMap = cibQueryMap.getLocation().get(hbId);
         }
         if (hostToScoreMap != null) {
-            return hostToScoreMap.get(onHost);
+            return hostToScoreMap.get(onHost.toLowerCase(Locale.US));
         }
         return null;
     }
@@ -377,6 +377,7 @@ public class ClusterStatus {
 
     /**
      * Returns score from location id.
+     * TODO: not used?
      */
     public final HostLocation getHostLocationFromId(final String locationId,
                                                     final boolean testOnly) {
@@ -393,10 +394,13 @@ public class ClusterStatus {
                                       final boolean testOnly) {
         /* node should not have to be in lower case. */
         if (testOnly && ptestData != null) {
-            return (String) shadowCibQueryMap.getResHostToLocId().get(rsc,
-                                                                      node);
+            return (String) shadowCibQueryMap.getResHostToLocId().get(
+                                                rsc,
+                                                node.toLowerCase(Locale.US));
         } else {
-            return (String) cibQueryMap.getResHostToLocId().get(rsc, node);
+            return (String) cibQueryMap.getResHostToLocId().get(
+                                                rsc,
+                                                node.toLowerCase(Locale.US));
         }
     }
 

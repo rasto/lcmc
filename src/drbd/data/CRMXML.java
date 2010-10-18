@@ -3002,10 +3002,12 @@ public class CRMXML extends XML {
                         locationMap.put(rsc, hostScoreMap);
                     }
                     if (node != null) {
-                        resHostToLocIdMap.put(rsc, node, locId);
+                        resHostToLocIdMap.put(rsc,
+                                              node.toLowerCase(Locale.US),
+                                              locId);
                     }
                     if (score != null) {
-                        hostScoreMap.put(node,
+                        hostScoreMap.put(node.toLowerCase(Locale.US),
                                          new HostLocation(score, "eq", null));
                     }
                     locs.add(locId);
@@ -3033,13 +3035,17 @@ public class CRMXML extends XML {
                             if ((booleanOp == null
                                  || "and".equals(booleanOp))
                                 && "#uname".equals(attr)) {
-                                hostScoreMap.put(value, new HostLocation(score2,
-                                                                         op,
-                                                                         null));
-                                resHostToLocIdMap.put(rsc, value, locId);
+                                hostScoreMap.put(value.toLowerCase(Locale.US),
+                                                 new HostLocation(score2,
+                                                                  op,
+                                                                  null));
+                                resHostToLocIdMap.put(
+                                                  rsc,
+                                                  value.toLowerCase(Locale.US),
+                                                  locId);
                             } else if ((booleanOp == null
-                                      || "and".equals(booleanOp))
-                                     && "pingd".equals(attr)) {
+                                        || "and".equals(booleanOp))
+                                       && "pingd".equals(attr)) {
                                 pingLocationMap.put(rsc,
                                                     new HostLocation(score2,
                                                                      op,
