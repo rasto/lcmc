@@ -768,7 +768,7 @@ public class CoroConfig extends DialogCluster {
         config.append(tab);
         config.append("# nodeid: 1234\n");
         config.append(tab);
-        config.append("rrp_mode: none\n");
+        config.append("rrp_mode: active\n");
         return config;
     }
 
