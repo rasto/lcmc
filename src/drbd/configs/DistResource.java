@@ -37,7 +37,7 @@ public class DistResource extends
     /** Contents. */
     private static Object[][] contents = {
         {"Support", "no"},
-        {"arch:i686", "i386"}, // convert arch to arch in the drbd download file
+        {"arch:i686", "i[3-6]86"}, // convert arch to arch in the drbd download file
         {"arch:x86_64", "x86_64"}, // convert arch to arch in the drbd download file
         {"distribution", "undefined"},
 
