@@ -238,7 +238,7 @@ public class HostInfo extends Info {
         final MyMenuItem hostWizardItem =
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
-                           null,
+                           "",
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
@@ -259,11 +259,11 @@ public class HostInfo extends Info {
         final MyMenuItem standbyItem =
             new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
                            HOST_STANDBY_ICON,
-                           null,
+                           "",
 
                            Tools.getString("HostBrowser.CRM.StandByOff"),
                            HOST_STANDBY_OFF_ICON,
-                           null,
+                           "",
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -307,7 +307,7 @@ public class HostInfo extends Info {
         final MyMenuItem allMigrateFromItem =
             new MyMenuItem(Tools.getString("HostInfo.CRM.AllMigrateFrom"),
                            HOST_STANDBY_ICON,
-                           null,
+                           "",
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;

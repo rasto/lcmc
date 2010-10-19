@@ -129,7 +129,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         setNormalFont();
         this.text1 = text;
         this.icon1 = icon;
-        this.shortDesc1 = shortDesc;
+        if (shortDesc1 == null) {
+            this.shortDesc1 = "";
+        } else {
+            this.shortDesc1 = shortDesc;
+        }
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         addActionListener(this);
@@ -168,7 +172,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this(text1a, icon1a, shortDesc1a, enableAccessMode, visibleAccessMode);
         this.text2 = text2;
         this.icon2 = icon2;
-        this.shortDesc2 = shortDesc2;
+        if (shortDesc2 == null) {
+            this.shortDesc2 = "";
+        } else {
+            this.shortDesc2 = shortDesc2;
+        }
     }
     /**
      * Sets the pos of the click that can be used in the overriden action
