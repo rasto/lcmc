@@ -10,7 +10,6 @@
 
 package edu.uci.ics.jung.visualization.control;
 
-import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -24,7 +23,7 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
 /**
  * a GraphMouse that accepts plugins for various mouse events.
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  *
  */
@@ -33,9 +32,9 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
     MouseListener[] mouseListeners;
     MouseMotionListener[] mouseMotionListeners;
     MouseWheelListener[] mouseWheelListeners;
-    Set mousePluginList = new LinkedHashSet();
-    Set mouseMotionPluginList = new LinkedHashSet();
-    Set mouseWheelPluginList = new LinkedHashSet();
+    Set<GraphMousePlugin> mousePluginList = new LinkedHashSet<GraphMousePlugin>();
+    Set<MouseMotionListener> mouseMotionPluginList = new LinkedHashSet<MouseMotionListener>();
+    Set<MouseWheelListener> mouseWheelPluginList = new LinkedHashSet<MouseWheelListener>();
 
     public void add(GraphMousePlugin plugin) {
         if(plugin instanceof MouseListener) {
@@ -43,11 +42,11 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseListeners = null;
         }
         if(plugin instanceof MouseMotionListener) {
-            mouseMotionPluginList.add(plugin);
+            mouseMotionPluginList.add((MouseMotionListener)plugin);
             mouseMotionListeners = null;
         }
         if(plugin instanceof MouseWheelListener) {
-            mouseWheelPluginList.add(plugin);
+            mouseWheelPluginList.add((MouseWheelListener)plugin);
             mouseWheelListeners = null;
         }
     }
@@ -94,7 +93,6 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseListeners[i].mouseClicked(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
     
     public void mousePressed(MouseEvent e) {
@@ -103,7 +101,6 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseListeners[i].mousePressed(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
     
     public void mouseReleased(MouseEvent e) {
@@ -112,7 +109,6 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseListeners[i].mouseReleased(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
     
     public void mouseEntered(MouseEvent e) {
@@ -121,7 +117,6 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseListeners[i].mouseEntered(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
     
     public void mouseExited(MouseEvent e) {
@@ -130,7 +125,6 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseListeners[i].mouseExited(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
     
     public void mouseDragged(MouseEvent e) {
@@ -139,7 +133,6 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseMotionListeners[i].mouseDragged(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
     
     public void mouseMoved(MouseEvent e) {
@@ -148,7 +141,6 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseMotionListeners[i].mouseMoved(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
     
     public void mouseWheelMoved(MouseWheelEvent e) {
@@ -157,6 +149,5 @@ public class PluggableGraphMouse implements VisualizationViewer.GraphMouse {
             mouseWheelListeners[i].mouseWheelMoved(e);
             if(e.isConsumed()) break;
         }
-        ((Component) e.getSource()).repaint();
     }
 }

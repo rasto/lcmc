@@ -11,23 +11,21 @@
  */
 package edu.uci.ics.jung.algorithms.shortestpath;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import edu.uci.ics.jung.graph.ArchetypeEdge;
-import edu.uci.ics.jung.graph.ArchetypeGraph;
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.graph.Hypervertex;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.ConstantEdgeValue;
-import edu.uci.ics.jung.graph.decorators.NumberEdgeValue;
-import edu.uci.ics.jung.utils.MapBinaryHeap;
-import edu.uci.ics.jung.utils.Pair;
+import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.functors.ConstantTransformer;
+
+import edu.uci.ics.jung.algorithms.util.BasicMapEntry;
+import edu.uci.ics.jung.algorithms.util.MapBinaryHeap;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Hypergraph;
 
 /**
  * <p>Calculates distances in a specified graph, using  
@@ -62,14 +60,14 @@ import edu.uci.ics.jung.utils.Pair;
  * when appropriate so that the distances can be recalculated.</p>
  * 
  * @author Joshua O'Madadhain
+ * @author Tom Nelson converted to jung2
  */
-public class DijkstraDistance implements Distance
+public class DijkstraDistance<V,E> implements Distance<V>
 {
-    protected ArchetypeGraph g;
-    protected NumberEdgeValue nev;
-    protected Map sourceMap;   // a map of source vertices to an instance of SourceData
+    protected Hypergraph<V,E> g;
+    protected Transformer<E,? extends Number> nev;
+    protected Map<V,SourceData> sourceMap;   // a map of source vertices to an instance of SourceData
     protected boolean cached;
-    protected static final NumberEdgeValue dev = new ConstantEdgeValue(new Integer(1));
     protected double max_distance;
     protected int max_targets;
     
@@ -83,11 +81,10 @@ public class DijkstraDistance implements Distance
      * @param nev   the class responsible for returning weights for edges
      * @param cached    specifies whether the results are to be cached
      */
-    public DijkstraDistance(ArchetypeGraph g, NumberEdgeValue nev, boolean cached)
-    {
+    public DijkstraDistance(Hypergraph<V,E> g, Transformer<E,? extends Number> nev, boolean cached) {
         this.g = g;
         this.nev = nev;
-        this.sourceMap = new HashMap();
+        this.sourceMap = new HashMap<V,SourceData>();
         this.cached = cached;
         this.max_distance = Double.POSITIVE_INFINITY;
         this.max_targets = Integer.MAX_VALUE;
@@ -101,8 +98,7 @@ public class DijkstraDistance implements Distance
      * @param g     the graph on which distances will be calculated
      * @param nev   the class responsible for returning weights for edges
      */
-    public DijkstraDistance(ArchetypeGraph g, NumberEdgeValue nev)
-    {
+    public DijkstraDistance(Hypergraph<V,E> g, Transformer<E,? extends Number> nev) {
         this(g, nev, true);
     }
     
@@ -113,9 +109,9 @@ public class DijkstraDistance implements Distance
      * 
      * @param g     the graph on which distances will be calculated
      */ 
-    public DijkstraDistance(ArchetypeGraph g)
-    {
-        this(g, dev, true);
+    @SuppressWarnings("unchecked")
+    public DijkstraDistance(Graph<V,E> g) {
+        this(g, new ConstantTransformer(1), true);
     }
 
     /**
@@ -126,9 +122,9 @@ public class DijkstraDistance implements Distance
      * @param g     the graph on which distances will be calculated
      * @param cached    specifies whether the results are to be cached
      */ 
-    public DijkstraDistance(ArchetypeGraph g, boolean cached)
-    {
-        this(g, dev, cached);
+    @SuppressWarnings("unchecked")
+    public DijkstraDistance(Graph<V,E> g, boolean cached) {
+        this(g, new ConstantTransformer(1), cached);
     }
     
     /**
@@ -140,8 +136,9 @@ public class DijkstraDistance implements Distance
      * of priority):
      * <ul>
      * <li> the distance to the specified target (if any) has been found
-     * <li/> no more vertices are reachable 
-     * <li> the specified # of distances have been found
+     * <li> no more vertices are reachable 
+     * <li> the specified # of distances have been found, or the maximum distance 
+     * desired has been exceeded
      * <li> all distances have been found
      * </ul>
      * 
@@ -149,18 +146,15 @@ public class DijkstraDistance implements Distance
      * @param numDests  the number of distances to measure
      * @param targets   the set of vertices to which distances are to be measured
      */
-    protected LinkedHashMap singleSourceShortestPath(ArchetypeVertex source, Set targets, int numDests)
+    protected LinkedHashMap<V,Number> singleSourceShortestPath(V source, Collection<V> targets, int numDests)
     {
         SourceData sd = getSourceData(source);
 
-        Set to_get = new HashSet();
-        if (targets != null)
-        {
+        Set<V> to_get = new HashSet<V>();
+        if (targets != null) {
             to_get.addAll(targets);
-            Set existing_dists = sd.distances.keySet();
-            for (Iterator iter = targets.iterator(); iter.hasNext(); )
-            {
-                Object o = iter.next();
+            Set<V> existing_dists = sd.distances.keySet();
+            for(V o : targets) {
                 if (existing_dists.contains(o))
                     to_get.remove(o);
             }
@@ -170,37 +164,43 @@ public class DijkstraDistance implements Distance
         // if we already have all the distances we need, 
         // terminate
         if (sd.reached_max ||
-                (targets != null && to_get.isEmpty()) ||
-                (sd.distances.size() >= numDests))
+            (targets != null && to_get.isEmpty()) ||
+            (sd.distances.size() >= numDests))
         {
             return sd.distances;
         }
         
         while (!sd.unknownVertices.isEmpty() && (sd.distances.size() < numDests || !to_get.isEmpty()))
         {
-            Pair p = sd.getNextVertex();
-            ArchetypeVertex v = (ArchetypeVertex)p.getFirst();
-            double v_dist = ((Double)p.getSecond()).doubleValue();
-            sd.dist_reached = v_dist;
+            Map.Entry<V,Number> p = sd.getNextVertex();
+            V v = p.getKey();
+            double v_dist = p.getValue().doubleValue();
             to_get.remove(v);
-            if ((sd.dist_reached >= this.max_distance) || (sd.distances.size() >= max_targets))
+            if (v_dist > this.max_distance) 
+            {
+                // we're done; put this vertex back in so that we're not including
+                // a distance beyond what we specified
+                sd.restoreVertex(v, v_dist);
+                sd.reached_max = true;
+                break;
+            }
+            sd.dist_reached = v_dist;
+
+            if (sd.distances.size() >= this.max_targets)
             {
                 sd.reached_max = true;
                 break;
             }
             
-            for (Iterator out_iter = getIncidentEdges(v).iterator(); out_iter.hasNext(); )
+            for (E e : getEdgesToCheck(v) )
             {
-                ArchetypeEdge e = (ArchetypeEdge)out_iter.next();
-//              Vertex w = e.getOpposite(v);
-                for (Iterator e_iter = e.getIncidentVertices().iterator(); e_iter.hasNext(); )
+                for (V w : g.getIncidentVertices(e))
                 {
-                    ArchetypeVertex w = (ArchetypeVertex)e_iter.next();
                     if (!sd.distances.containsKey(w))
                     {
-                        double edge_weight = nev.getNumber(e).doubleValue();
+                        double edge_weight = nev.transform(e).doubleValue();
                         if (edge_weight < 0)
-                            throw new IllegalArgumentException("Edge weights must be non-negative");
+                            throw new IllegalArgumentException("Edges weights must be non-negative");
                         double new_dist = v_dist + edge_weight;
                         if (!sd.estimatedDistances.containsKey(w))
                         {
@@ -215,17 +215,13 @@ public class DijkstraDistance implements Distance
                     }
                 }
             }
-//            // if we have calculated the distance to the target, stop
-//            if (v == target)
-//                break;
-
         }
         return sd.distances;
     }
 
-    protected SourceData getSourceData(ArchetypeVertex source)
+    protected SourceData getSourceData(V source)
     {
-        SourceData sd = (SourceData)sourceMap.get(source);
+        SourceData sd = sourceMap.get(source);
         if (sd == null)
             sd = new SourceData(source);
         return sd;
@@ -233,18 +229,17 @@ public class DijkstraDistance implements Distance
     
     /**
      * Returns the set of edges incident to <code>v</code> that should be tested.
-     * By default, this is the set of outgoing edges for instances of <code>Vertex</code>,
-     * the set of incident edges for instances of <code>Hypervertex</code>,
+     * By default, this is the set of outgoing edges for instances of <code>Graph</code>,
+     * the set of incident edges for instances of <code>Hypergraph</code>,
      * and is otherwise undefined.
      */
-    protected Set getIncidentEdges(ArchetypeVertex v)
+    protected Collection<E> getEdgesToCheck(V v)
     {
-        if (v instanceof Vertex)
-            return ((Vertex)v).getOutEdges();
-        else if (v instanceof Hypervertex)
-            return v.getIncidentEdges();
+        if (g instanceof Graph)
+            return ((Graph<V,E>)g).getOutEdges(v);
         else
-            throw new IllegalArgumentException("Unrecognized vertex type: " + v.getClass().getName());
+            return g.getIncidentEdges(v);
+
     }
 
     
@@ -254,34 +249,41 @@ public class DijkstraDistance implements Distance
      * If either vertex is not in the graph for which this instance
      * was created, throws <code>IllegalArgumentException</code>.
      * 
-     * @see #getDistanceMap(ArchetypeVertex)
-     * @see #getDistanceMap(ArchetypeVertex,int)
+     * @see #getDistanceMap(Object)
+     * @see #getDistanceMap(Object,int)
      */
-    public Number getDistance(ArchetypeVertex source, ArchetypeVertex target)
+    public Number getDistance(V source, V target)
     {
-        if (target.getGraph() != g)
+        if (g.containsVertex(target) == false)
             throw new IllegalArgumentException("Specified target vertex " + 
                     target + " is not part of graph " + g);
+        if (g.containsVertex(source) == false)
+            throw new IllegalArgumentException("Specified source vertex " + 
+                    source + " is not part of graph " + g);
         
-        Set targets = new HashSet();
+        Set<V> targets = new HashSet<V>();
         targets.add(target);
-        Map distanceMap = getDistanceMap(source, targets);
-        return (Double)distanceMap.get(target);
+        Map<V,Number> distanceMap = getDistanceMap(source, targets);
+        return distanceMap.get(target);
     }
     
 
-    public Map getDistanceMap(ArchetypeVertex source, Set targets)
+    /**
+     * Returns a {@code Map} from each element {@code t} of {@code targets} to the 
+     * shortest-path distance from {@code source} to {@code t}. 
+     */
+    public Map<V,Number> getDistanceMap(V source, Collection<V> targets)
     {
-        if (source.getGraph() != g)
+       if (g.containsVertex(source) == false)
             throw new IllegalArgumentException("Specified source vertex " + 
                     source + " is not part of graph " + g);
-
-        if (targets.size() > max_targets)
+       if (targets.size() > max_targets)
             throw new IllegalArgumentException("size of target set exceeds maximum " +
                     "number of targets allowed: " + this.max_targets);
         
-        Map distanceMap = singleSourceShortestPath(source, targets, (int)Math.min(g.numVertices(), max_targets));
-        
+        Map<V,Number> distanceMap = 
+        	singleSourceShortestPath(source, targets, 
+        			Math.min(g.getVertexCount(), max_targets));
         if (!cached)
             reset(source);
         
@@ -298,13 +300,13 @@ public class DijkstraDistance implements Distance
      * <p>The size of the map returned will be the number of 
      * vertices reachable from <code>source</code>.</p>
      * 
-     * @see #getDistanceMap(ArchetypeVertex,int)
-     * @see #getDistance(ArchetypeVertex,ArchetypeVertex)
+     * @see #getDistanceMap(Object,int)
+     * @see #getDistance(Object,Object)
      * @param source    the vertex from which distances are measured
      */
-    public Map getDistanceMap(ArchetypeVertex source)
+    public Map<V,Number> getDistanceMap(V source)
     {
-        return getDistanceMap(source, (int)Math.min(g.numVertices(), max_targets));
+        return getDistanceMap(source, Math.min(g.getVertexCount(), max_targets));
     }
     
 
@@ -323,18 +325,20 @@ public class DijkstraDistance implements Distance
      * <code>numDests</code> and the number of vertices reachable from
      * <code>source</code>. 
      * 
-     * @see #getDistanceMap(ArchetypeVertex)
-     * @see #getDistance(ArchetypeVertex,ArchetypeVertex)
+     * @see #getDistanceMap(Object)
+     * @see #getDistance(Object,Object)
      * @param source    the vertex from which distances are measured
      * @param numDests  the number of vertices for which to measure distances
      */
-    public LinkedHashMap getDistanceMap(ArchetypeVertex source, int numDests)
+    public LinkedHashMap<V,Number> getDistanceMap(V source, int numDests)
     {
-        if (source.getGraph() != g)
-            throw new IllegalArgumentException("Specified source vertex " + 
-                source + " is not part of graph " + g);
 
-        if (numDests < 1 || numDests > g.numVertices())
+    	if(g.getVertices().contains(source) == false) {
+            throw new IllegalArgumentException("Specified source vertex " + 
+                    source + " is not part of graph " + g);
+    		
+    	}
+        if (numDests < 1 || numDests > g.getVertexCount())
             throw new IllegalArgumentException("numDests must be >= 1 " + 
                 "and <= g.numVertices()");
 
@@ -342,7 +346,8 @@ public class DijkstraDistance implements Distance
             throw new IllegalArgumentException("numDests must be <= the maximum " +
                     "number of targets allowed: " + this.max_targets);
             
-        LinkedHashMap distanceMap = singleSourceShortestPath(source, null, numDests);
+        LinkedHashMap<V,Number> distanceMap = 
+        	singleSourceShortestPath(source, null, numDests);
                 
         if (!cached)
             reset(source);
@@ -363,14 +368,14 @@ public class DijkstraDistance implements Distance
      * <p>Note: if this instance has already calculated distances greater than <code>max_dist</code>,
      * and the results are cached, those results will still be valid and available; this limit
      * applies only to subsequent distance calculations.</p>
-     * @see #setMaxTargets(double)
+     * @see #setMaxTargets(int)
      */
     public void setMaxDistance(double max_dist)
     {
         this.max_distance = max_dist;
-        for (Iterator iter = sourceMap.keySet().iterator(); iter.hasNext(); )
+        for (V v : sourceMap.keySet())
         {
-            SourceData sd = (SourceData)sourceMap.get(iter.next());
+            SourceData sd = sourceMap.get(v);
             sd.reached_max = (this.max_distance <= sd.dist_reached) || (sd.distances.size() >= max_targets);
         }
     }
@@ -394,9 +399,9 @@ public class DijkstraDistance implements Distance
     public void setMaxTargets(int max_targets)
     {
         this.max_targets = max_targets;
-        for (Iterator iter = sourceMap.keySet().iterator(); iter.hasNext(); )
+        for (V v : sourceMap.keySet())
         {
-            SourceData sd = (SourceData)sourceMap.get(iter.next());
+            SourceData sd = sourceMap.get(v);
             sd.reached_max = (this.max_distance <= sd.dist_reached) || (sd.distances.size() >= max_targets);
         }
     }
@@ -406,13 +411,13 @@ public class DijkstraDistance implements Distance
      * Should be called whenever the graph is modified (edge weights 
      * changed or edges added/removed).  If the user knows that
      * some currently calculated distances are unaffected by a
-     * change, <code>reset(Vertex)</code> may be appropriate instead.
+     * change, <code>reset(V)</code> may be appropriate instead.
      * 
-     * @see #reset(Vertex)
+     * @see #reset(Object)
      */
     public void reset()
     {
-        sourceMap = new HashMap();
+        sourceMap = new HashMap<V,SourceData>();
     }
         
     /**
@@ -434,7 +439,7 @@ public class DijkstraDistance implements Distance
      * 
      * @see #reset()
      */
-    public void reset(ArchetypeVertex source)
+    public void reset(V source)
     {
         sourceMap.put(source, null);
     }
@@ -443,42 +448,42 @@ public class DijkstraDistance implements Distance
      * Compares according to distances, so that the BinaryHeap knows how to 
      * order the tree.  
      */
-    protected class VertexComparator implements Comparator
+    protected static class VertexComparator<V> implements Comparator<V>
     {
-        private Map distances;
+        private Map<V,Number> distances;
         
-        public VertexComparator(Map distances)
+        protected VertexComparator(Map<V,Number> distances)
         {
             this.distances = distances;
         }
 
-        public int compare(Object o1, Object o2)
+        public int compare(V o1, V o2)
         {
-            return ((Comparable)distances.get(o1)).compareTo(distances.get(o2));
+            return ((Double) distances.get(o1)).compareTo((Double) distances.get(o2));
         }
     }
     
     /**
      * For a given source vertex, holds the estimated and final distances, 
      * tentative and final assignments of incoming edges on the shortest path from
-     * the source vertex, and a priority queue (ordered by estimaed distance)
+     * the source vertex, and a priority queue (ordered by estimated distance)
      * of the vertices for which distances are unknown.
      * 
      * @author Joshua O'Madadhain
      */
     protected class SourceData
     {
-        public LinkedHashMap distances;
-        public Map estimatedDistances;
-        public MapBinaryHeap unknownVertices;
-        public boolean reached_max = false;
-        public double dist_reached = 0;
+        protected LinkedHashMap<V,Number> distances;
+        protected Map<V,Number> estimatedDistances;
+        protected MapBinaryHeap<V> unknownVertices;
+        protected boolean reached_max = false;
+        protected double dist_reached = 0;
 
-        public SourceData(ArchetypeVertex source)
+        protected SourceData(V source)
         {
-            distances = new LinkedHashMap();
-            estimatedDistances = new HashMap();
-            unknownVertices = new MapBinaryHeap(new VertexComparator(estimatedDistances));
+            distances = new LinkedHashMap<V,Number>();
+            estimatedDistances = new HashMap<V,Number>();
+            unknownVertices = new MapBinaryHeap<V>(new VertexComparator<V>(estimatedDistances));
             
             sourceMap.put(source, this);
             
@@ -489,24 +494,31 @@ public class DijkstraDistance implements Distance
             dist_reached = 0;
         }
         
-        public Pair getNextVertex()
+        protected Map.Entry<V,Number> getNextVertex()
         {
-            ArchetypeVertex v = (ArchetypeVertex)unknownVertices.pop();
+            V v = unknownVertices.remove();
             Double dist = (Double)estimatedDistances.remove(v);
             distances.put(v, dist);
-            return new Pair(v, dist);
+            return new BasicMapEntry<V,Number>(v, dist);
         }
         
-        public void update(ArchetypeVertex dest, ArchetypeEdge tentative_edge, double new_dist)
+        protected void update(V dest, E tentative_edge, double new_dist)
         {
-            estimatedDistances.put(dest, new Double(new_dist));
+            estimatedDistances.put(dest, new_dist);
             unknownVertices.update(dest);
         }
         
-        public void createRecord(ArchetypeVertex w, ArchetypeEdge e, double new_dist)
+        protected void createRecord(V w, E e, double new_dist)
         {
-            estimatedDistances.put(w, new Double(new_dist));
+            estimatedDistances.put(w, new_dist);
             unknownVertices.add(w);
+        }
+        
+        protected void restoreVertex(V v, double dist) 
+        {
+            estimatedDistances.put(v, dist);
+            unknownVertices.add(v);
+            distances.remove(v);
         }
     }
 }

@@ -17,7 +17,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 
-import edu.uci.ics.jung.visualization.Layout;
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 
 /** 
@@ -28,7 +29,7 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
  * @see AnimatedPickingGraphMousePlugin
  * @author Tom Nelson
  */
-public class SatelliteAnimatedPickingGraphMousePlugin extends AnimatedPickingGraphMousePlugin
+public class SatelliteAnimatedPickingGraphMousePlugin<V,E> extends AnimatedPickingGraphMousePlugin<V,E>
     implements MouseListener, MouseMotionListener {
 
     /**
@@ -48,18 +49,19 @@ public class SatelliteAnimatedPickingGraphMousePlugin extends AnimatedPickingGra
      * of this satellite view
      * 
      */
+    @SuppressWarnings("unchecked")
     public void mouseReleased(MouseEvent e) {
     		if (e.getModifiers() == modifiers) {
-			final VisualizationViewer vv = (VisualizationViewer) e.getSource();
+			final VisualizationViewer<V,E> vv = (VisualizationViewer) e.getSource();
 			if (vv instanceof SatelliteVisualizationViewer) {
-				final VisualizationViewer vvMaster = 
+				final VisualizationViewer<V,E> vvMaster = 
 					((SatelliteVisualizationViewer) vv).getMaster();
 
 				if (vertex != null) {
-					Layout layout = vvMaster.getGraphLayout();
-					Point2D q = layout.getLocation(vertex);
+					Layout<V,E> layout = vvMaster.getGraphLayout();
+					Point2D q = layout.transform(vertex);
 					Point2D lvc = 
-						vvMaster.inverseLayoutTransform(vvMaster.getCenter());
+						vvMaster.getRenderContext().getMultiLayerTransformer().inverseTransform(Layer.LAYOUT, vvMaster.getCenter());
 					final double dx = (lvc.getX() - q.getX()) / 10;
 					final double dy = (lvc.getY() - q.getY()) / 10;
 
@@ -67,7 +69,7 @@ public class SatelliteAnimatedPickingGraphMousePlugin extends AnimatedPickingGra
 
 						public void run() {
 							for (int i = 0; i < 10; i++) {
-								vvMaster.getLayoutTransformer().translate(dx,
+								vvMaster.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).translate(dx,
 										dy);
 								try {
 									Thread.sleep(100);

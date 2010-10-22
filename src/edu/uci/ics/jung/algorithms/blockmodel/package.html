@@ -14,37 +14,19 @@ IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT
 </head>
 <body>
 
-Implementations of a notion of graph equivalence for blockmodeling, and a mechanism for collapsing blocks.
+Support for establishing and maintaining graph element equivalence (such as in blockmodeling).
 <P/>
-The definition of "equivalence" used here is <b>different from</b> the equivalence functions defined
-between graphs. This equivalence refers to the network measure forms of equivalence used for blockmodeling. 
-In blockmodeling, groups of vertices are clustered together by similarity (as if "blocked" together on the
-diagonal of a matrix). 
+In blockmodeling, groups of vertices are clustered together by similarity 
+(as if members of a "block" appearing on the diagonal of the graph's adjacency 
+matrix).
 <p/>
-This implementation provides:
-<dl>
-<dt>{@link EquivalenceAlgorithm EquivalenceAlgorithm}</dt>
-<dd>An interface for an algorithm that returns an EquivalenceRelation.</dd>
-<dt>{@link EquivalenceRelation EquivalenceRelation}</dt>
-<dd>A class that represents several mutually-exclusive partitions of a set. The object is constructed with a Set of Sets; the 
-members of each set are all vertices from the graph. The ER needn't cover all vertices; it contains a funtion called
-"getSingletons" that returns vertices that are not equivalent to any other vertex.</dd>
-<dt>{@link StructurallyEquivalent StructurallyEquivalent}</dt>
-<dd>An algorithm that finds sets of vertices that are structurally equivalent. In order for
-two vertices <i>i</i> and <i>j</i> to be structurally equivalent, the set of <i>i</i>'s
-neighbors must be identical to the set of <i>j</i>'s neighbors, with the exception of <i>i</i> and
-<i>j</i> themselves. (In those cases, a directed edge may join <i>i</i> to <i>j</i> only if another
-directed edge runs the other way.)
-<dt>{@link GraphCollapser GraphCollapser}</dt>
-<dd>Runs through an EquivalenceRelation, replacing all the vertices in each set of the relation
-with one vertex of type {@link GraphCollapser.CollapsedVertex GraphCollapser.CollapsedVertex}. 
-It also replaces all the edges from 
-each vertex to the graph with a {@link GraphCollapser.CollapsedEdge GraphCollapser.CollapsedEdge}. 
-(See the class documentation to see 
-how this is done.)</dd>
-<dt>{@link BipartiteGraphCollapser BipartiteGraphCollapser}</dt>
-<dd>Extends the GraphCollapser to work for BipartiteGraphs.</dd>
-</dl> 
+This support currently includes:
+<ul>
+<li/><code>VertexPartition</code>: A class that maintains information on a 
+division of the vertices of a graph into disjoint sets.
+<li/><code>StructurallyEquivalent</code>: An algorithm that finds sets of vertices that are 
+structurally equivalent.
+</ul> 
 
 <p/>
 </body>

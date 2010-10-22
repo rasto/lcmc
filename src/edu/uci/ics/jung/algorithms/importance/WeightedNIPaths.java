@@ -10,20 +10,17 @@
 package edu.uci.ics.jung.algorithms.importance;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import edu.uci.ics.jung.graph.DirectedEdge;
+import org.apache.commons.collections15.Factory;
+
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Element;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.impl.SparseVertex;
-import edu.uci.ics.jung.utils.GraphUtils;
-import edu.uci.ics.jung.utils.MutableDouble;
-import edu.uci.ics.jung.utils.UserData;
+
 
 
 /**
@@ -45,11 +42,16 @@ import edu.uci.ics.jung.utils.UserData;
  * @author Scott White
  * @see "Algorithms for Estimating Relative Importance in Graphs by Scott White and Padhraic Smyth, 2003"
  */
-public class WeightedNIPaths extends AbstractRanker {
+public class WeightedNIPaths<V,E> extends AbstractRanker<V,E> {
     public final static String WEIGHTED_NIPATHS_KEY = "jung.algorithms.importance.WEIGHTED_NIPATHS_KEY";
     private double mAlpha;
     private int mMaxDepth;
-    private Set mPriors;
+    private Set<V> mPriors;
+    private Map<E,Number> pathIndices = new HashMap<E,Number>();
+    private Map<Object,V> roots = new HashMap<Object,V>();
+    private Map<V,Set<Number>> pathsSeenMap = new HashMap<V,Set<Number>>();
+    private Factory<V> vertexFactory;
+    private Factory<E> edgeFactory;
 
     /**
      * Constructs and initializes the algorithm.
@@ -58,70 +60,66 @@ public class WeightedNIPaths extends AbstractRanker {
      * @param maxDepth the maximal depth to search out from the root set
      * @param priors the root set (starting vertices)
      */
-    public WeightedNIPaths(DirectedGraph graph, double alpha, int maxDepth, Set priors) {
+    public WeightedNIPaths(DirectedGraph<V,E> graph, Factory<V> vertexFactory,
+    		Factory<E> edgeFactory, double alpha, int maxDepth, Set<V> priors) {
         super.initialize(graph, true,false);
+        this.vertexFactory = vertexFactory;
+        this.edgeFactory = edgeFactory;
         mAlpha = alpha;
         mMaxDepth = maxDepth;
         mPriors = priors;
-        for (Iterator vIt = graph.getVertices().iterator(); vIt.hasNext();) {
-            Vertex currentVertex = (Vertex) vIt.next();
-            currentVertex.setUserDatum(WEIGHTED_NIPATHS_KEY, new MutableDouble(0), UserData.SHARED);
+        for (V v : graph.getVertices()) {
+        	super.setVertexRankScore(v, 0.0);
         }
     }
 
-    /**
-     * Given a node, returns the corresponding rank score. This implementation of <code>getRankScore</code> assumes
-     * the decoration representing the rank score is of type <code>MutableDouble</code>.
-     * @return  the rank score for this node
-     */
-    public String getRankScoreKey() {
-        return WEIGHTED_NIPATHS_KEY;
+    protected void incrementRankScore(V v, double rankValue) {
+        setVertexRankScore(v, getVertexRankScore(v) + rankValue);
     }
 
-    protected void incrementRankScore(Element v, double rankValue) {
-        setRankScore(v, getRankScore(v) + rankValue);
-    }
-
-    protected void computeWeightedPathsFromSource(Vertex root, int depth) {
+    protected void computeWeightedPathsFromSource(V root, int depth) {
 
         int pathIdx = 1;
-        for (Iterator rootEdgeIt = root.getOutEdges().iterator(); rootEdgeIt.hasNext();) {
-            DirectedEdge currentEdge = (DirectedEdge) rootEdgeIt.next();
-            Integer pathIdxValue = new Integer(pathIdx);
-            currentEdge.setUserDatum(PATH_INDEX_KEY, pathIdxValue, UserData.REMOVE);
-            currentEdge.setUserDatum(ROOT_KEY, root, UserData.REMOVE);
-            newVertexEncountered(pathIdxValue, currentEdge.getDest(), root);
+
+        for (E e : getGraph().getOutEdges(root)) {
+            this.pathIndices.put(e, pathIdx);
+            this.roots.put(e, root);
+            newVertexEncountered(pathIdx, getGraph().getEndpoints(e).getSecond(), root);
             pathIdx++;
         }
 
-        List edges = new ArrayList();
+        List<E> edges = new ArrayList<E>();
 
-        Vertex virtualNode = getGraph().addVertex(new SparseVertex());
-        Edge virtualSinkEdge = GraphUtils.addEdge(getGraph(), virtualNode, root);
+        V virtualNode = vertexFactory.create();
+        getGraph().addVertex(virtualNode);
+        E virtualSinkEdge = edgeFactory.create();
+
+        getGraph().addEdge(virtualSinkEdge, virtualNode, root);
         edges.add(virtualSinkEdge);
 
         int currentDepth = 0;
         while (currentDepth <= depth) {
 
             double currentWeight = Math.pow(mAlpha, -1.0 * currentDepth);
-
-            for (Iterator it = edges.iterator(); it.hasNext();) {
-                DirectedEdge currentEdge = (DirectedEdge) it.next();
-                incrementRankScore(currentEdge.getDest(), currentWeight);
+            for (E currentEdge : edges) { 
+                incrementRankScore(getGraph().getEndpoints(currentEdge).getSecond(),//
+                		currentWeight);
             }
 
             if ((currentDepth == depth) || (edges.size() == 0)) break;
 
-            List newEdges = new ArrayList();
+            List<E> newEdges = new ArrayList<E>();
 
-            for (Iterator sourceEdgeIt = edges.iterator(); sourceEdgeIt.hasNext();) {
-                DirectedEdge currentSourceEdge = (DirectedEdge) sourceEdgeIt.next();
-                Integer sourcePathIndex = (Integer) currentSourceEdge.getUserDatum(PATH_INDEX_KEY);
+            for (E currentSourceEdge : edges) { //Iterator sourceEdgeIt = edges.iterator(); sourceEdgeIt.hasNext();) {
+                Number sourcePathIndex = this.pathIndices.get(currentSourceEdge);
 
-                for (Iterator edgeIt = currentSourceEdge.getDest().getOutEdges().iterator(); edgeIt.hasNext();) {
-                    DirectedEdge currentDestEdge = (DirectedEdge) edgeIt.next();
-                    Vertex destEdgeRoot = (Vertex) currentDestEdge.getUserDatum(ROOT_KEY);
-                    Vertex destEdgeDest = currentDestEdge.getDest();
+                // from the currentSourceEdge, get its opposite end
+                // then iterate over the out edges of that opposite end
+                V newDestVertex = getGraph().getEndpoints(currentSourceEdge).getSecond();
+                Collection<E> outs = getGraph().getOutEdges(newDestVertex);
+                for (E currentDestEdge : outs) {
+                	V destEdgeRoot = this.roots.get(currentDestEdge);
+                	V destEdgeDest = getGraph().getEndpoints(currentDestEdge).getSecond();
 
                     if (currentSourceEdge == virtualSinkEdge) {
                         newEdges.add(currentDestEdge);
@@ -130,23 +128,15 @@ public class WeightedNIPaths extends AbstractRanker {
                     if (destEdgeRoot == root) {
                         continue;
                     }
-                    if (destEdgeDest == currentSourceEdge.getSource()) {
+                    if (destEdgeDest == getGraph().getEndpoints(currentSourceEdge).getFirst()) {//currentSourceEdge.getSource()) {
                         continue;
                     }
-
-                    Set pathsSeen = (Set) destEdgeDest.getUserDatum(PATHS_SEEN_KEY);
-
-                    /*
-                    Set pathsSeen = new HashSet();
-        pathsSeen.add(sourcePathIndex);
-        dest.setUserDatum(PATHS_SEEN_KEY, pathsSeen, UserData.REMOVE);
-        dest.setUserDatum(ROOT_KEY, root, UserData.REMOVE);
-        */
+                    Set<Number> pathsSeen = this.pathsSeenMap.get(destEdgeDest);
 
                     if (pathsSeen == null) {
-                        newVertexEncountered(sourcePathIndex, destEdgeDest, root);
-                    } else if (destEdgeDest.getUserDatum(ROOT_KEY) != root) {
-                        destEdgeDest.setUserDatum(ROOT_KEY, root, UserData.REMOVE);
+                        newVertexEncountered(sourcePathIndex.intValue(), destEdgeDest, root);
+                    } else if (roots.get(destEdgeDest) != root) {
+                        roots.put(destEdgeDest,root);
                         pathsSeen.clear();
                         pathsSeen.add(sourcePathIndex);
                     } else if (!pathsSeen.contains(sourcePathIndex)) {
@@ -155,8 +145,8 @@ public class WeightedNIPaths extends AbstractRanker {
                         continue;
                     }
 
-                    currentDestEdge.setUserDatum(PATH_INDEX_KEY, sourcePathIndex, UserData.REMOVE);
-                    currentDestEdge.setUserDatum(ROOT_KEY, root, UserData.REMOVE);
+                    this.pathIndices.put(currentDestEdge, sourcePathIndex);
+                    this.roots.put(currentDestEdge, root);
                     newEdges.add(currentDestEdge);
                 }
             }
@@ -168,29 +158,37 @@ public class WeightedNIPaths extends AbstractRanker {
         getGraph().removeVertex(virtualNode);
     }
 
-    private void newVertexEncountered(Integer sourcePathIndex, Vertex dest, Vertex root) {
-        Set pathsSeen = new HashSet();
+    private void newVertexEncountered(int sourcePathIndex, V dest, V root) {
+        Set<Number> pathsSeen = new HashSet<Number>();
         pathsSeen.add(sourcePathIndex);
-        dest.setUserDatum(PATHS_SEEN_KEY, pathsSeen, UserData.REMOVE);
-        dest.setUserDatum(ROOT_KEY, root, UserData.REMOVE);
+        this.pathsSeenMap.put(dest, pathsSeen);
+        roots.put(dest, root);
     }
 
-    protected double evaluateIteration() {
-        for (Iterator it = mPriors.iterator(); it.hasNext();) {
-            computeWeightedPathsFromSource((Vertex) it.next(), mMaxDepth);
+    @Override
+    public void step() {
+        for (V v : mPriors) {
+            computeWeightedPathsFromSource(v, mMaxDepth);
         }
 
         normalizeRankings();
-        return 0;
+//        return 0;
+    }
+    
+    /**
+     * Given a node, returns the corresponding rank score. This implementation of <code>getRankScore</code> assumes
+     * the decoration representing the rank score is of type <code>MutableDouble</code>.
+     * @return  the rank score for this node
+     */
+    @Override
+    public String getRankScoreKey() {
+        return WEIGHTED_NIPATHS_KEY;
     }
 
-    protected void onFinalize(Element udc) {
-        udc.removeUserDatum(PATH_INDEX_KEY);
-        udc.removeUserDatum(ROOT_KEY);
-        udc.removeUserDatum(PATHS_SEEN_KEY);
+    @Override
+    protected void onFinalize(Object udc) {
+    	pathIndices.remove(udc);
+    	roots.remove(udc);
+    	pathsSeenMap.remove(udc);
     }
-
-    private static final String PATH_INDEX_KEY = "WeightedNIPathsII.PathIndexKey";
-    private static final String ROOT_KEY = "WeightedNIPathsII.RootKey";
-    private static final String PATHS_SEEN_KEY = "WeightedNIPathsII.PathsSeenKey";
 }

@@ -16,9 +16,9 @@ import java.awt.geom.Point2D;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
-import edu.uci.ics.jung.utils.ChangeEventSupport;
-import edu.uci.ics.jung.utils.DefaultChangeEventSupport;
 import edu.uci.ics.jung.visualization.transform.shape.ShapeTransformer;
+import edu.uci.ics.jung.visualization.util.ChangeEventSupport;
+import edu.uci.ics.jung.visualization.util.DefaultChangeEventSupport;
 
 /**
  *
@@ -27,7 +27,7 @@ import edu.uci.ics.jung.visualization.transform.shape.ShapeTransformer;
  * another.
  * 
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson
  *
  * 
  */

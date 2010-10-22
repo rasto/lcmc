@@ -34,7 +34,7 @@ import javax.imageio.ImageIO;
  * The methods try to detect lines in order to minimize points
  * in the path
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  * 
  */

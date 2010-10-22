@@ -13,6 +13,8 @@ package edu.uci.ics.jung.visualization.control;
 
 import java.awt.geom.Point2D;
 
+import edu.uci.ics.jung.visualization.Layer;
+import edu.uci.ics.jung.visualization.VisualizationServer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
@@ -52,28 +54,28 @@ public class CrossoverScalingControl implements ScalingControl {
 	/**
      * @see edu.uci.ics.jung.visualization.control.ScalingControl#scale(VisualizationViewer, float, Point2D)
      */
-	public void scale(VisualizationViewer vv, float amount, Point2D at) {
+	public void scale(VisualizationServer<?,?> vv, float amount, Point2D at) {
 	        
-	    MutableTransformer layoutTransformer = vv.getLayoutTransformer();
-	    MutableTransformer viewTransformer = vv.getViewTransformer();
+	    MutableTransformer layoutTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
+	    MutableTransformer viewTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW);
 	    double modelScale = layoutTransformer.getScale();
 	    double viewScale = viewTransformer.getScale();
 	    double inverseModelScale = Math.sqrt(crossover)/modelScale;
 	    double inverseViewScale = Math.sqrt(crossover)/viewScale;
 	    double scale = modelScale * viewScale;
 	    
-	    Point2D transformedAt = vv.inverseViewTransform(at);
+	    Point2D transformedAt = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(Layer.VIEW, at);
 	    
         if((scale*amount - crossover)*(scale*amount - crossover) < 0.001) {
-            // close to the control point, return both transformers to a scale of 1.0
+            // close to the control point, return both transformers to a scale of sqrt crossover value
             layoutTransformer.scale(inverseModelScale, inverseModelScale, transformedAt);
             viewTransformer.scale(inverseViewScale, inverseViewScale, at);
         } else if(scale*amount < crossover) {
-            // scale the viewTransformer, return the layoutTransformer to 1.0
+            // scale the viewTransformer, return the layoutTransformer to sqrt crossover value
 	        viewTransformer.scale(amount, amount, at);
 	        layoutTransformer.scale(inverseModelScale, inverseModelScale, transformedAt);
 	    } else {
-            // scale the layoutTransformer, return the viewTransformer to 1.0
+            // scale the layoutTransformer, return the viewTransformer to crossover value
 	        layoutTransformer.scale(amount, amount, transformedAt);
 	        viewTransformer.scale(inverseViewScale, inverseViewScale, at);
 	    }

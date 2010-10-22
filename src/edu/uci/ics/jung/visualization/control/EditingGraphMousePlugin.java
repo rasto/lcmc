@@ -1,14 +1,7 @@
-/*
- * Copyright (c) 2003, the JUNG Project and the Regents of the University of
- * California All rights reserved.
- * 
- * This software is open-source under the BSD license; see either "license.txt"
- * or http://jung.sourceforge.net/license.txt for a description.
- * 
- */
 package edu.uci.ics.jung.visualization.control;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -18,72 +11,70 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
 
+import javax.swing.JComponent;
+
+import org.apache.commons.collections15.Factory;
+
+import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.SparseVertex;
-import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
-import edu.uci.ics.jung.visualization.ArrowFactory;
-import edu.uci.ics.jung.visualization.Layout;
-import edu.uci.ics.jung.visualization.PickSupport;
-import edu.uci.ics.jung.visualization.SettableVertexLocationFunction;
+import edu.uci.ics.jung.graph.UndirectedGraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
+import edu.uci.ics.jung.visualization.VisualizationServer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.VisualizationViewer.Paintable;
+import edu.uci.ics.jung.visualization.util.ArrowFactory;
 
 /**
  * A plugin that can create vertices, undirected edges, and directed edges
  * using mouse gestures.
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson
  *
  */
-public class EditingGraphMousePlugin extends AbstractGraphMousePlugin implements
+public class EditingGraphMousePlugin<V,E> extends AbstractGraphMousePlugin implements
     MouseListener, MouseMotionListener {
     
-    SettableVertexLocationFunction vertexLocations;
-    Vertex startVertex;
-    Point2D down;
+    protected V startVertex;
+    protected Point2D down;
     
-    CubicCurve2D rawEdge = new CubicCurve2D.Float();
-    Shape edgeShape;
-    Shape rawArrowShape;
-    Shape arrowShape;
-    Paintable edgePaintable;
-    Paintable arrowPaintable;
-    boolean edgeIsDirected;
+    protected CubicCurve2D rawEdge = new CubicCurve2D.Float();
+    protected Shape edgeShape;
+    protected Shape rawArrowShape;
+    protected Shape arrowShape;
+    protected VisualizationServer.Paintable edgePaintable;
+    protected VisualizationServer.Paintable arrowPaintable;
+    protected EdgeType edgeIsDirected;
+    protected Factory<V> vertexFactory;
+    protected Factory<E> edgeFactory;
     
-    public EditingGraphMousePlugin() {
-        this(MouseEvent.BUTTON1_MASK);
+    public EditingGraphMousePlugin(Factory<V> vertexFactory, Factory<E> edgeFactory) {
+        this(MouseEvent.BUTTON1_MASK, vertexFactory, edgeFactory);
     }
 
     /**
      * create instance and prepare shapes for visual effects
      * @param modifiers
      */
-    public EditingGraphMousePlugin(int modifiers) {
+    public EditingGraphMousePlugin(int modifiers, Factory<V> vertexFactory, Factory<E> edgeFactory) {
         super(modifiers);
+        this.vertexFactory = vertexFactory;
+        this.edgeFactory = edgeFactory;
         rawEdge.setCurve(0.0f, 0.0f, 0.33f, 100, .66f, -50,
                 1.0f, 0.0f);
         rawArrowShape = ArrowFactory.getNotchedArrow(20, 16, 8);
         edgePaintable = new EdgePaintable();
         arrowPaintable = new ArrowPaintable();
+		this.cursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
     }
     
     /**
-     * sets the vertex locations. Needed to place new vertices
-     * @param vertexLocations
-     */
-    public void setVertexLocations(SettableVertexLocationFunction vertexLocations) {
-        this.vertexLocations = vertexLocations;
-    }
-    
-    /**
-     * overrided to be more flexible, and pass events with
+     * Overridden to be more flexible, and pass events with
      * key combinations. The default responds to both ButtonOne
      * and ButtonOne+Shift
      */
+    @Override
     public boolean checkModifiers(MouseEvent e) {
         return (e.getModifiers() & modifiers) != 0;
     }
@@ -93,40 +84,45 @@ public class EditingGraphMousePlugin extends AbstractGraphMousePlugin implements
      * If the mouse is pressed on an existing vertex, prepare to create
      * an edge from that vertex to another
      */
-    public void mousePressed(MouseEvent e) {
+    @SuppressWarnings("unchecked")
+	public void mousePressed(MouseEvent e) {
         if(checkModifiers(e)) {
-            final VisualizationViewer vv =
-                (VisualizationViewer)e.getSource();
-            final Point2D p = vv.inverseViewTransform(e.getPoint());
-            PickSupport pickSupport = vv.getPickSupport();
+            final VisualizationViewer<V,E> vv =
+                (VisualizationViewer<V,E>)e.getSource();
+            final Point2D p = e.getPoint();
+            GraphElementAccessor<V,E> pickSupport = vv.getPickSupport();
             if(pickSupport != null) {
-                final Vertex vertex = pickSupport.getVertex(p.getX(), p.getY());
+            	Graph<V,E> graph = vv.getModel().getGraphLayout().getGraph();
+            	// set default edge type
+            	if(graph instanceof DirectedGraph) {
+            		edgeIsDirected = EdgeType.DIRECTED;
+            	} else {
+            		edgeIsDirected = EdgeType.UNDIRECTED;
+            	}
+            	
+                final V vertex = pickSupport.getVertex(vv.getModel().getGraphLayout(), p.getX(), p.getY());
                 if(vertex != null) { // get ready to make an edge
                     startVertex = vertex;
                     down = e.getPoint();
                     transformEdgeShape(down, down);
                     vv.addPostRenderPaintable(edgePaintable);
-                    if((e.getModifiers() & MouseEvent.SHIFT_MASK) != 0) {
-                        edgeIsDirected = true;
+                    if((e.getModifiers() & MouseEvent.SHIFT_MASK) != 0
+                    		&& vv.getModel().getGraphLayout().getGraph() instanceof UndirectedGraph == false) {
+                        edgeIsDirected = EdgeType.DIRECTED;
+                    }
+                    if(edgeIsDirected == EdgeType.DIRECTED) {
                         transformArrowShape(down, e.getPoint());
                         vv.addPostRenderPaintable(arrowPaintable);
-                    } 
+                    }
                 } else { // make a new vertex
-                    Graph graph = vv.getGraphLayout().getGraph();
-                    Vertex newVertex = new SparseVertex();
-                    vertexLocations.setLocation(newVertex, vv.inverseTransform(e.getPoint()));
-                    Layout layout = vv.getGraphLayout();
-                    for(Iterator iterator=graph.getVertices().iterator(); iterator.hasNext(); ) {
-                        layout.lockVertex((Vertex)iterator.next());
-                    }
+
+                    V newVertex = vertexFactory.create();
+                    Layout<V,E> layout = vv.getModel().getGraphLayout();
                     graph.addVertex(newVertex);
-                    vv.getModel().restart();
-                    for(Iterator iterator=graph.getVertices().iterator(); iterator.hasNext(); ) {
-                        layout.unlockVertex((Vertex)iterator.next());
-                    }
-                    vv.repaint();
+                    layout.setLocation(newVertex, vv.getRenderContext().getMultiLayerTransformer().inverseTransform(e.getPoint()));
                 }
             }
+            vv.repaint();
         }
     }
     
@@ -136,27 +132,27 @@ public class EditingGraphMousePlugin extends AbstractGraphMousePlugin implements
      * the vertex under the mouse pointer. If shift was also pressed,
      * create a directed edge instead.
      */
-    public void mouseReleased(MouseEvent e) {
+    @SuppressWarnings("unchecked")
+	public void mouseReleased(MouseEvent e) {
         if(checkModifiers(e)) {
-            final VisualizationViewer vv =
-                (VisualizationViewer)e.getSource();
-            final Point2D p = vv.inverseViewTransform(e.getPoint());
-            PickSupport pickSupport = vv.getPickSupport();
+            final VisualizationViewer<V,E> vv =
+                (VisualizationViewer<V,E>)e.getSource();
+            final Point2D p = e.getPoint();
+            Layout<V,E> layout = vv.getModel().getGraphLayout();
+            GraphElementAccessor<V,E> pickSupport = vv.getPickSupport();
             if(pickSupport != null) {
-                final Vertex vertex = pickSupport.getVertex(p.getX(), p.getY());
+                final V vertex = pickSupport.getVertex(layout, p.getX(), p.getY());
                 if(vertex != null && startVertex != null) {
-                    Graph graph = vv.getGraphLayout().getGraph();
-                    if(edgeIsDirected) {
-                        graph.addEdge(new DirectedSparseEdge(startVertex, vertex));
-                    } else {
-                        graph.addEdge(new UndirectedSparseEdge(startVertex, vertex));
-                    }
+                    Graph<V,E> graph = 
+                    	vv.getGraphLayout().getGraph();
+                        graph.addEdge(edgeFactory.create(),
+                        		startVertex, vertex, edgeIsDirected);
                     vv.repaint();
                 }
             }
             startVertex = null;
             down = null;
-            edgeIsDirected = false;
+            edgeIsDirected = EdgeType.UNDIRECTED;
             vv.removePostRenderPaintable(edgePaintable);
             vv.removePostRenderPaintable(arrowPaintable);
         }
@@ -166,14 +162,18 @@ public class EditingGraphMousePlugin extends AbstractGraphMousePlugin implements
      * If startVertex is non-null, stretch an edge shape between
      * startVertex and the mouse pointer to simulate edge creation
      */
+    @SuppressWarnings("unchecked")
     public void mouseDragged(MouseEvent e) {
         if(checkModifiers(e)) {
             if(startVertex != null) {
                 transformEdgeShape(down, e.getPoint());
-                if(edgeIsDirected) {
+                if(edgeIsDirected == EdgeType.DIRECTED) {
                     transformArrowShape(down, e.getPoint());
                 }
             }
+            VisualizationViewer<V,E> vv =
+                (VisualizationViewer<V,E>)e.getSource();
+            vv.repaint();
         }
     }
     
@@ -216,7 +216,7 @@ public class EditingGraphMousePlugin extends AbstractGraphMousePlugin implements
     /**
      * Used for the edge creation visual effect during mouse drag
      */
-    class EdgePaintable implements Paintable {
+    class EdgePaintable implements VisualizationServer.Paintable {
         
         public void paint(Graphics g) {
             if(edgeShape != null) {
@@ -235,7 +235,7 @@ public class EditingGraphMousePlugin extends AbstractGraphMousePlugin implements
     /**
      * Used for the directed edge creation visual effect during mouse drag
      */
-    class ArrowPaintable implements Paintable {
+    class ArrowPaintable implements VisualizationServer.Paintable {
         
         public void paint(Graphics g) {
             if(arrowShape != null) {
@@ -251,7 +251,13 @@ public class EditingGraphMousePlugin extends AbstractGraphMousePlugin implements
         }
     }
     public void mouseClicked(MouseEvent e) {}
-    public void mouseEntered(MouseEvent e) {}
-    public void mouseExited(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+        JComponent c = (JComponent)e.getSource();
+        c.setCursor(cursor);
+    }
+    public void mouseExited(MouseEvent e) {
+        JComponent c = (JComponent)e.getSource();
+        c.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
     public void mouseMoved(MouseEvent e) {}
 }

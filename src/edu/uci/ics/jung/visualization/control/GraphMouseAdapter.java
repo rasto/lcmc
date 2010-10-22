@@ -17,7 +17,7 @@ import java.awt.event.MouseEvent;
  * Simple extension of MouseAdapter that supplies modifier
  * checking
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public class GraphMouseAdapter extends MouseAdapter {

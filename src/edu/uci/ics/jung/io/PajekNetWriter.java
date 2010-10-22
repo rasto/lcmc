@@ -16,38 +16,38 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
-import edu.uci.ics.jung.graph.DirectedEdge;
+import org.apache.commons.collections15.Transformer;
+
+import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.UndirectedEdge;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.ConstantEdgeValue;
-import edu.uci.ics.jung.graph.decorators.Indexer;
-import edu.uci.ics.jung.graph.decorators.NumberEdgeValue;
-import edu.uci.ics.jung.graph.decorators.VertexStringer;
-import edu.uci.ics.jung.utils.Pair;
-import edu.uci.ics.jung.utils.PredicateUtils;
-import edu.uci.ics.jung.visualization.VertexLocationFunction;
-
+import edu.uci.ics.jung.graph.UndirectedGraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
+import edu.uci.ics.jung.graph.util.Pair;
 
 /**
  * Writes graphs in the Pajek NET format.
  * 
  * <p>Labels for vertices may optionally be specified by implementations of 
  * <code>VertexStringer</code>.  Edge weights are optionally specified by 
- * implementations of <code>NumberEdgeValue</code>.  Vertex locations
+ * implementations of <code>Transformer<E, Number></code>.  Vertex locations
  * are optionally specified by implementations of 
- * <code>VertexLocationFunction</code>.  Note that vertex location coordinates 
+ * <code>Transformer<V, Point2D></code>.  Note that vertex location coordinates 
  * must be normalized to the interval [0, 1] on each axis in order to conform to the 
  * Pajek specification.</p>
  * 
  * @author Joshua O'Madadhain
+ * @author Tom Nelson - converted to jung2
  */
-public class PajekNetWriter
+public class PajekNetWriter<V,E>
 {
+    /**
+     * Creates a new instance.
+     */
     public PajekNetWriter()
     {
     }
@@ -55,18 +55,26 @@ public class PajekNetWriter
     /**
      * Saves <code>g</code> to <code>filename</code>.  Labels for vertices may
      * be supplied by <code>vs</code>.  Edge weights are specified by <code>nev</code>.
-     * 
-     * @see #save(Graph, Writer, VertexStringer, NumberEdgeValue, VertexLocationFunction)
      * @throws IOException
      */
-    public void save(Graph g, String filename, VertexStringer vs, 
-            NumberEdgeValue nev, VertexLocationFunction vld) throws IOException
+    public void save(Graph<V,E> g, String filename, Transformer<V,String> vs, 
+            Transformer<E,Number> nev, Transformer<V,Point2D> vld) throws IOException
     {
         save(g, new FileWriter(filename), vs, nev, vld);
     }
     
-    public void save(Graph g, String filename, VertexStringer vs, 
-            NumberEdgeValue nev) throws IOException
+    /**
+     * Saves <code>g</code> to <code>filename</code>.  Labels are specified by
+     * <code>vs</code>, and edge weights by <code>nev</code>; vertex coordinates
+     * are not written out.
+     * @param g         the graph to write out
+     * @param filename  
+     * @param vs
+     * @param nev
+     * @throws IOException
+     */
+    public void save(Graph<V,E> g, String filename, Transformer<V,String> vs, 
+            Transformer<E,Number> nev) throws IOException
     {
         save(g, new FileWriter(filename), vs, nev, null);
     }
@@ -77,7 +85,7 @@ public class PajekNetWriter
      * 
      * @throws IOException
      */
-    public void save(Graph g, String filename) throws IOException
+    public void save(Graph<V,E> g, String filename) throws IOException
     {
         save(g, filename, null, null, null);
     }
@@ -88,13 +96,22 @@ public class PajekNetWriter
      * 
      * @throws IOException
      */
-    public void save(Graph g, Writer w) throws IOException
+    public void save(Graph<V,E> g, Writer w) throws IOException
     {
         save(g, w, null, null, null);
     }
 
-    public void save(Graph g, Writer w, VertexStringer vs, 
-            NumberEdgeValue nev) throws IOException
+    /**
+     * Saves <code>g</code> to <code>w</code>; vertex labels are given by 
+     * <code>vs</code> and edge weights by <code>nev</code>.
+     * @param g
+     * @param w
+     * @param vs
+     * @param nev
+     * @throws IOException
+     */
+    public void save(Graph<V,E> g, Writer w, Transformer<V,String> vs, 
+            Transformer<E,Number> nev) throws IOException
     {
         save(g, w, vs, nev, null);
     }
@@ -107,7 +124,8 @@ public class PajekNetWriter
      * and vertex locations may be specified by <code>vld</code> (defaults
      * to no locations if null). 
      */
-    public void save(Graph graph, Writer w, VertexStringer vs, NumberEdgeValue nev, VertexLocationFunction vld) throws IOException
+	public void save(Graph<V,E> graph, Writer w, Transformer<V,String> vs, 
+	        Transformer<E,Number> nev, Transformer<V,Point2D> vld) throws IOException
     {
         /*
          * TODO: Changes we might want to make:
@@ -116,50 +134,54 @@ public class PajekNetWriter
         
         BufferedWriter writer = new BufferedWriter(w);
         if (nev == null)
-            nev = new ConstantEdgeValue(1);
-        writer.write("*Vertices " + graph.numVertices());
+            nev = new Transformer<E, Number>() { public Number transform(E e) { return 1; } };
+        writer.write("*Vertices " + graph.getVertexCount());
         writer.newLine();
-        Vertex currentVertex = null;
-
-//        if (vld != null)
-//            vld = VertexLocationUtils.scale(vld, 1.0, 1.0);
         
-        Indexer id = Indexer.getIndexer(graph);
-        for (Iterator i = graph.getVertices().iterator(); i.hasNext();)
+        List<V> id = new ArrayList<V>(graph.getVertices());//Indexer.getIndexer(graph);
+        for (V currentVertex : graph.getVertices())
         {
-            currentVertex = (Vertex) i.next();
             // convert from 0-based to 1-based index
-            Integer v_id = new Integer(id.getIndex(currentVertex) + 1);
-            writer.write(v_id.toString()); 
+            int v_id = id.indexOf(currentVertex) + 1;
+            writer.write(""+v_id); 
             if (vs != null)
             { 
-                String label = vs.getLabel(currentVertex);
+                String label = vs.transform(currentVertex);
                 if (label != null)
                     writer.write (" \"" + label + "\"");
             }
             if (vld != null)
             {
-                Point2D location = vld.getLocation(currentVertex);
+                Point2D location = vld.transform(currentVertex);
                 if (location != null)
                     writer.write (" " + location.getX() + " " + location.getY() + " 0.0");
             }
             writer.newLine();
         }
 
-        Set d_set = new HashSet();
-        Set u_set = new HashSet();
+        Collection<E> d_set = new HashSet<E>();
+        Collection<E> u_set = new HashSet<E>();
 
-        boolean directed = PredicateUtils.enforcesDirected(graph);
-        boolean undirected = PredicateUtils.enforcesUndirected(graph);
+        boolean directed = graph instanceof DirectedGraph;
+
+        boolean undirected = graph instanceof UndirectedGraph;
+
         // if it's strictly one or the other, no need to create extra sets
         if (directed)
-            d_set = graph.getEdges();
+            d_set.addAll(graph.getEdges());
         if (undirected)
-            u_set = graph.getEdges();
+            u_set.addAll(graph.getEdges());
         if (!directed && !undirected) // mixed-mode graph
         {
-            d_set = PredicateUtils.getEdges(graph, Graph.DIRECTED_EDGE);
-            u_set = PredicateUtils.getEdges(graph, Graph.UNDIRECTED_EDGE);
+        	u_set.addAll(graph.getEdges());
+        	d_set.addAll(graph.getEdges());
+        	for(E e : graph.getEdges()) {
+        		if(graph.getEdgeType(e) == EdgeType.UNDIRECTED) {
+        			d_set.remove(e);
+        		} else {
+        			u_set.remove(e);
+        		}
+        	}
         }
 
         // write out directed edges
@@ -168,12 +190,11 @@ public class PajekNetWriter
             writer.write("*Arcs");
             writer.newLine();
         }
-        for (Iterator eIt = d_set.iterator(); eIt.hasNext();)
+        for (E e : d_set)
         {
-            DirectedEdge e = (DirectedEdge) eIt.next();
-            int source_id = id.getIndex(e.getSource()) + 1;
-            int target_id = id.getIndex(e.getDest()) + 1;
-            float weight = nev.getNumber(e).floatValue();
+            int source_id = id.indexOf(graph.getEndpoints(e).getFirst()) + 1;
+            int target_id = id.indexOf(graph.getEndpoints(e).getSecond()) + 1;
+            float weight = nev.transform(e).floatValue();
             writer.write(source_id + " " + target_id + " " + weight);
             writer.newLine();
         }
@@ -184,13 +205,12 @@ public class PajekNetWriter
             writer.write("*Edges");
             writer.newLine();
         }
-        for (Iterator eIt = u_set.iterator(); eIt.hasNext();)
+        for (E e : u_set)
         {
-            UndirectedEdge e = (UndirectedEdge) eIt.next();
-            Pair endpoints = e.getEndpoints();
-            int v1_id = id.getIndex((Vertex) endpoints.getFirst()) + 1;
-            int v2_id = id.getIndex((Vertex) endpoints.getSecond()) + 1;
-            float weight = nev.getNumber(e).floatValue();
+            Pair<V> endpoints = graph.getEndpoints(e);
+            int v1_id = id.indexOf(endpoints.getFirst()) + 1;
+            int v2_id = id.indexOf(endpoints.getSecond()) + 1;
+            float weight = nev.transform(e).floatValue();
             writer.write(v1_id + " " + v2_id + " " + weight);
             writer.newLine();
         }

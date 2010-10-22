@@ -15,9 +15,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.util.Pair;
 
+/**
+ * Utilities relating to the shortest paths in a graph.
+ */
 public class ShortestPathUtils
 {
     /**
@@ -25,20 +28,26 @@ public class ShortestPathUtils
      * <code>source</code> to <code>target</code>, in order of their
      * occurrence on this path.  
      */
-    public static List getPath(ShortestPath sp, Vertex source, Vertex target)
+    public static <V, E> List<E> getPath(Graph<V,E> graph, ShortestPath<V,E> sp, V source, V target)
     {
-        LinkedList path = new LinkedList();
+        LinkedList<E> path = new LinkedList<E>();
         
-        Map incomingEdges = sp.getIncomingEdgeMap(source);
+        Map<V,E> incomingEdges = sp.getIncomingEdgeMap(source);
         
         if (incomingEdges.isEmpty() || incomingEdges.get(target) == null)
             return path;
-        Vertex current = target;
-        while (current != source)
+        V current = target;
+        while (!current.equals(source))
         {
-            Edge incoming = (Edge)incomingEdges.get(current);
+            E incoming = incomingEdges.get(current);
             path.addFirst(incoming);
-            current = incoming.getOpposite(current);
+            Pair<V> endpoints = graph.getEndpoints(incoming);
+            if(endpoints.getFirst().equals(current)) {	
+            	current = endpoints.getSecond();
+            } else {
+            	current = endpoints.getFirst();
+            }
+            		//incoming.getOpposite(current);
         }
         return path;
     }

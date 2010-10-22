@@ -10,7 +10,7 @@ package edu.uci.ics.jung.visualization.control;
 
 import java.awt.geom.Point2D;
 
-import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.VisualizationServer;
 
 public interface ScalingControl {
 
@@ -20,6 +20,6 @@ public interface ScalingControl {
      * @param amount how much to adjust scale by
      * @param at where to adjust scale from
      */
-    void scale(VisualizationViewer vv, float amount, Point2D at);
+    void scale(VisualizationServer<?,?> vv, float amount, Point2D at);
 
 }

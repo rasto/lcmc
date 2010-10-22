@@ -12,11 +12,14 @@ package edu.uci.ics.jung.visualization.transform.shape;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ImageObserver;
 
-import edu.uci.ics.jung.visualization.transform.HyperbolicTransformer;
-import edu.uci.ics.jung.visualization.transform.Transformer;
+import edu.uci.ics.jung.visualization.transform.BidirectionalTransformer;
 
 
 /**
@@ -25,7 +28,7 @@ import edu.uci.ics.jung.visualization.transform.Transformer;
  * This is useful when you want to apply non-affine transformations
  * to the Graphics2D used to draw elements of the graph.
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  *
  */
@@ -34,13 +37,13 @@ public class TransformingGraphics extends GraphicsDecorator {
     /**
      * the transformer to apply
      */
-    protected Transformer transformer;
+    protected BidirectionalTransformer transformer;
     
-    public TransformingGraphics(Transformer transformer) {
+    public TransformingGraphics(BidirectionalTransformer transformer) {
         this(transformer, null);
     }
     
-    public TransformingGraphics(Transformer transformer, Graphics2D delegate) {
+    public TransformingGraphics(BidirectionalTransformer transformer, Graphics2D delegate) {
         super(delegate);
         this.transformer = transformer;
     }
@@ -48,14 +51,14 @@ public class TransformingGraphics extends GraphicsDecorator {
     /**
      * @return Returns the transformer.
      */
-    public Transformer getTransformer() {
+    public BidirectionalTransformer getTransformer() {
         return transformer;
     }
     
     /**
      * @param transformer The transformer to set.
      */
-    public void setTransformer(Transformer transformer) {
+    public void setTransformer(BidirectionalTransformer transformer) {
         this.transformer = transformer;
     }
     
@@ -69,8 +72,8 @@ public class TransformingGraphics extends GraphicsDecorator {
     
     public void draw(Shape s, float flatness) {
         Shape shape = null;
-        if(transformer instanceof HyperbolicTransformer) {
-            shape = ((HyperbolicShapeTransformer)transformer).transform(s, flatness);
+        if(transformer instanceof ShapeFlatnessTransformer) {
+            shape = ((ShapeFlatnessTransformer)transformer).transform(s, flatness);
         } else {
             shape = ((ShapeTransformer)transformer).transform(s);
         }
@@ -88,14 +91,45 @@ public class TransformingGraphics extends GraphicsDecorator {
     
     public void fill(Shape s, float flatness) {
         Shape shape = null;
-        if(transformer instanceof HyperbolicTransformer) {
-            shape = ((HyperbolicShapeTransformer)transformer).transform(s, flatness);
+        if(transformer instanceof ShapeFlatnessTransformer) {
+            shape = ((ShapeFlatnessTransformer)transformer).transform(s, flatness);
         } else {
             shape = ((ShapeTransformer)transformer).transform(s);
         }
         delegate.fill(shape);
     }
     
+    public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
+    	Image image = null;
+        if(transformer instanceof ShapeFlatnessTransformer) {
+        	Rectangle2D r = new Rectangle2D.Double(x,y,img.getWidth(observer),img.getHeight(observer));
+        	Rectangle2D s = ((ShapeTransformer)transformer).transform(r).getBounds2D();
+        	image = img.getScaledInstance((int)s.getWidth(), (int)s.getHeight(), Image.SCALE_SMOOTH);
+        	x = (int) s.getMinX();
+        	y = (int) s.getMinY();
+        } else {
+            image = img;
+        }
+         return delegate.drawImage(image, x, y, observer);
+    }
+
+    public boolean drawImage(Image img, AffineTransform at, ImageObserver observer) {
+    	Image image = null;
+    	int x = (int)at.getTranslateX();
+    	int y = (int)at.getTranslateY();
+        if(transformer instanceof ShapeFlatnessTransformer) {
+        	Rectangle2D r = new Rectangle2D.Double(x,y,img.getWidth(observer),img.getHeight(observer));
+        	Rectangle2D s = ((ShapeTransformer)transformer).transform(r).getBounds2D();
+        	image = img.getScaledInstance((int)s.getWidth(), (int)s.getHeight(), Image.SCALE_SMOOTH);
+        	x = (int) s.getMinX();
+        	y = (int) s.getMinY();
+        	at.setToTranslation(s.getMinX(), s.getMinY());
+        } else {
+            image = img;
+        }
+         return delegate.drawImage(image, at, observer);
+    }
+
     /**
      * transform the shape before letting the delegate apply 'hit'
      * with it

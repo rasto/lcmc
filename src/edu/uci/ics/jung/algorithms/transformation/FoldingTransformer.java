@@ -12,358 +12,314 @@
  */
 package edu.uci.ics.jung.algorithms.transformation;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import org.apache.commons.collections.BidiMap;
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections15.Factory;
+import org.apache.commons.collections15.Predicate;
 
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Element;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Hypergraph;
 import edu.uci.ics.jung.graph.KPartiteGraph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.NumberEdgeValue;
-import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
-import edu.uci.ics.jung.utils.GraphUtils;
-import edu.uci.ics.jung.utils.PredicateUtils;
-import edu.uci.ics.jung.utils.TypedVertexGenerator;
-import edu.uci.ics.jung.utils.UserData;
-import edu.uci.ics.jung.utils.VertexGenerator;
-import edu.uci.ics.jung.utils.UserDataContainer.CopyAction;
 
 /**
- * A class for creating a "folded" graph based on a k-partite graph or a
+ * Methods for creating a "folded" graph based on a k-partite graph or a
  * hypergraph.  
  * 
  * <p>A "folded" graph is derived from a k-partite graph by identifying
  * a partition of vertices which will become the vertices of the new graph, copying
  * these vertices into the new graph, and then connecting those vertices whose
  * original analogues were connected indirectly through elements
- * of other partitions.  (See <code>fold(KPartiteGraph, Predicate, NumberEdgeValue)</code>
- * for more details.)</p>
+ * of other partitions.</p>
  * 
  * <p>A "folded" graph is derived from a hypergraph by creating vertices based on
  * either the vertices or the hyperedges of the original graph, and connecting 
  * vertices in the new graph if their corresponding vertices/hyperedges share a 
- * connection with a common hyperedge/vertex.  (See <code>fold(Hypergraph, 
- * boolean, NumberEdgeValue)</code> for more details.)</p>   
+ * connection with a common hyperedge/vertex.</p>   
  * 
  * @author Danyel Fisher
  * @author Joshua O'Madadhain
  */
-public class FoldingTransformer 
+public class FoldingTransformer<V,E>
 {
-    /**
-     * Used in <code>fold()</code> as a user data key to the data attached to
-     * the edges in the folded graph.
-     */
-    public static final String FOLDED_DATA = "edu.uci.ics.jung.graph.KPartiteFolder:Folded Data";
-
-    protected boolean parallel;
-    protected CopyAction copy_action = UserData.REMOVE;
     
     /**
-     * Specifies whether the graph being folded is undirected or not.
-     * Set by <code>checkGraphConstraints</code>.
-     */
-    private boolean undirected;
-    
-    /**
-     * Creates an instance of this Folder. See the discussion of fold for notes
-     * on the "parallel" argument.
-     *  
-     */
-    public FoldingTransformer(boolean parallel) {
-        this.parallel = parallel;
-    }
-
-    /**
-     * Specifies whether the folded graphs create parallel edges or a decorated
-     * single edge.
-     * @param parallel
-     */
-    public void setParallel(boolean parallel) {
-        this.parallel = parallel;
-    }
-    
-    /**
-     * Specifies the copy action used to attach data to edges.
-     * @param copy_action
-     */
-    public void setCopyAction(CopyAction copy_action)
-    {
-        this.copy_action = copy_action;
-    }
-
-    /**
-     * Equivalent to <code>fold(g, p, null)</code>.
-     */
-    public Graph fold(KPartiteGraph g, Predicate p) 
-    {
-        return fold(g, p, null);
-    }
-
-    /**
-     * <p>
      * Converts <code>g</code> into a unipartite graph whose vertex set is the
-     * vertices whose partition is specified by <code>p</code>. For vertices
+     * vertices of <code>g</code>'s partition <code>p</code>.  For vertices
      * <code>a</code> and <code>b</code> in this partition, the resultant
      * graph will include the edge <code>(a,b)</code> if the original graph
      * contains edges <code>(a,c)</code> and <code>(c,b)</code> for at least
      * one vertex <code>c</code>.
-     * </p>
      * 
-     * <p>
-     * If <code>parallel</code> is true, then each such connecting vertex
-     * <code>c</code> will be represented by a single edge in the resultant
-     * graph, and the resultant graph may therefore contain parallel edges.
-     * Otherwise, each edge <code>(a,b)</code> in the resultant graph will be
-     * annotated with the set of vertices <code>c</code> that connected
-     * <code>a</code> to <code>b</code> in the original graph, and the
-     * graph's edge requirements will be set to refuse parallel edges.
-     * </p>
+     * <p>The vertices of the new graph are the same as the vertices of the
+     * appropriate partition in the old graph; the edges in the new graph are
+     * created by the input edge <code>Factory</code>.</p>
      * 
-     * <p>In either case, if the original graph contains both a directed edge from 
-     * <code>a</code> to <code>b</code>, and a directed edge from <code>b</code>
-     * <code>a</code>, then a self-loop will be created from <code>a</code>
-     * to itself in the folded graph.  Undirected edges do not result in 
-     * self-loops.
-     * </p>
+     * <p>If there is more than 1 such vertex <code>c</code> for a given pair
+     * <code>(a,b)</code>, the type of the output graph will determine whether
+     * it will contain parallel edges or not.</p>
      * 
-     * <p>
-     * If <code>g</code> is neither strictly directed nor strictly undirected,
-     * this method throws <code>IllegalArgumentException</code>.  Parallel edges
-     * in the original graph have no effect on the resultant graph: only one edge
-     * <code>(a,c)</code> and one edge <code>(c,b)</code> are necessary to 
-     * induce a connection between <code>a</code> and <code>b</code> in the folded
-     * graph, and any additional such edges are ignored.</p>
+     * <p>This function will not create self-loops.</p>
      * 
-     * <p>If <code>nev</code> is null, 
-     * adds the connecting element as a decoration on the corresponding edge in the new
-     * graph; otherwise, sets the weight of each edge to the number of parallel 
-     * paths between the corresponding vertices in the original graph that are 
-     * encountered in the folding process.</p>
-     * 
-     * @param g the graph to fold
-     * @param p the predicate which specifies the partition to fold into
-     * @return the folded graph
-     * @throws IllegalArgumentException
+     * @param <V> vertex type
+     * @param <E> input edge type
+     * @param g input k-partite graph
+     * @param p predicate specifying vertex partition
+     * @param graph_factory factory used to create the output graph 
+     * @param edge_factory factory used to create the edges in the new graph
+     * @return a copy of the input graph folded with respect to the input partition
      */
-    public Graph fold(KPartiteGraph g, Predicate p, NumberEdgeValue nev)
+    public static <V,E> Graph<V,E> foldKPartiteGraph(KPartiteGraph<V,E> g, Predicate<V> p, 
+            Factory<Graph<V,E>> graph_factory, Factory<E> edge_factory)
     {
-        checkGraphConstraints(g);
+        Graph<V,E> newGraph = graph_factory.create();
 
-        Graph newGraph = createGraph();
-
-        // get vertices for the specified partition, copy into new graph
-        Set vertices = PredicateUtils.getVertices(g, p);
-        for (Iterator iter = vertices.iterator(); iter.hasNext();) {
-            ArchetypeVertex v = (ArchetypeVertex) iter.next();
-            v.copy(newGraph);
-        }
-
-        for (Iterator iter = vertices.iterator(); iter.hasNext();) {
-            Vertex v = (Vertex) iter.next();
-            Vertex v_new = (Vertex) v.getEqualVertex(newGraph);
-            Set succs = v.getSuccessors();
-
-            for (Iterator s_iter = succs.iterator(); s_iter.hasNext();) {
-                Vertex s = (Vertex) s_iter.next();
-                Set s_succs = s.getSuccessors();
-
-                for (Iterator t_iter = s_succs.iterator(); t_iter.hasNext();) {
-                    Vertex t = (Vertex) t_iter.next();
-
-                    // if t is in the partition of interest
-                    // and has not been covered (undirected graphs only)
-                    if (!vertices.contains(t)) continue;
-
-                    Vertex t_new = (Vertex) t.getEqualVertex(newGraph);
-                    addEdge(newGraph, v_new, s, t_new, nev);
-
+        // get vertices for the specified partition
+        Collection<V> vertices = g.getVertices(p);
+        for (V v : vertices)
+        {
+            newGraph.addVertex(v);
+            for (V s : g.getSuccessors(v))
+            {
+                for (V t : g.getSuccessors(s))
+                {
+                    if (!vertices.contains(t) || t.equals(v)) 
+                        continue;
+                    newGraph.addVertex(t);
+                    newGraph.addEdge(edge_factory.create(), v, t);
                 }
             }
         }
         return newGraph;
     }
 
-//    /**
-//     * Equivalent to <code>fold(h, use_vertices, null)</code>.
-//     */
-//    public Graph fold(Hypergraph h, boolean use_vertices)
-//    {
-//        return fold(h, use_vertices, null);
-//    }
-//    
-//    public Graph fold(Hypergraph h, boolean use_vertices, NumberEdgeValue nev)
-//    {
-//        return fold(h, null, use_vertices, nev, new BidirectionalHashMap());
-//    }
+    /**
+     * Converts <code>g</code> into a unipartite graph whose vertices are the
+     * vertices of <code>g</code>'s partition <code>p</code>, and whose edges
+     * consist of collections of the intermediate vertices from other partitions.  
+     * For vertices
+     * <code>a</code> and <code>b</code> in this partition, the resultant
+     * graph will include the edge <code>(a,b)</code> if the original graph
+     * contains edges <code>(a,c)</code> and <code>(c,b)</code> for at least
+     * one vertex <code>c</code>.
+     * 
+     * <p>The vertices of the new graph are the same as the vertices of the
+     * appropriate partition in the old graph; the edges in the new graph are
+     * collections of the intermediate vertices <code>c</code>.</p>
+     * 
+     * <p>This function will not create self-loops.</p>
+     * 
+     * @param <V> vertex type
+     * @param <E> input edge type
+     * @param g input k-partite graph
+     * @param p predicate specifying vertex partition
+     * @param graph_factory factory used to create the output graph 
+     * @return the result of folding g into unipartite graph whose vertices
+     * are those of the <code>p</code> partition of g
+     */
+    public static <V,E> Graph<V, Collection<V>> foldKPartiteGraph(KPartiteGraph<V,E> g, Predicate<V> p, 
+            Factory<Graph<V, Collection<V>>> graph_factory)
+    {
+        Graph<V, Collection<V>> newGraph = graph_factory.create();
+
+        // get vertices for the specified partition, copy into new graph
+        Collection<V> vertices = g.getVertices(p);
+
+        for (V v : vertices)
+        {
+            newGraph.addVertex(v);
+            for (V s : g.getSuccessors(v))
+            {
+                for (V t : g.getSuccessors(s))
+                {
+                    if (!vertices.contains(t) || t.equals(v)) 
+                        continue;
+                    newGraph.addVertex(t);
+                    Collection<V> v_coll = newGraph.findEdge(v, t);
+                    if (v_coll == null)
+                    {
+                        v_coll = new ArrayList<V>();
+                        newGraph.addEdge(v_coll, v, t);
+                    }
+                    v_coll.add(s);
+                }
+            }
+        }
+        return newGraph;
+    }
     
     /**
-     * Creates a <code>Graph</code> which is a "folded" version of <code>h</code>.
+     * Creates a <code>Graph</code> which is an edge-folded version of <code>h</code>, where
+     * hyperedges are replaced by k-cliques in the output graph.
      * 
-     * <p>If <code>use_vertices</code> is true, the vertices of the new graph 
-     * correspond to the vertices of <code>h</code>, and <code>a</code> 
+     * <p>The vertices of the new graph are the same objects as the vertices of 
+     * <code>h</code>, and <code>a</code> 
      * is connected to <code>b</code> in the new graph if the corresponding vertices
      * in <code>h</code> are connected by a hyperedge.  Thus, each hyperedge with 
-     * <i>k</i> vertices in <code>h</code> would induce a <i>k</i>-clique in the new graph.</p>
+     * <i>k</i> vertices in <code>h</code> induces a <i>k</i>-clique in the new graph.</p>
      * 
-     * <p>If <code>use_vertices</code> is false, then the vertices of the new
-     * graph correspond to the hyperedges of <code>h</code>, and <code>a</code>
-     * is connected to <code>b</code> in the new graph if the corresponding hyperedges
-     * in <code>h</code> share a vertex.  Thus, each vertex connected to <i>k</i> 
-     * hyperedges in <code>h</code> would induce a <i>k</i>-clique in the new graph.</p>
+     * <p>The edges of the new graph consist of collections of each hyperedge that connected
+     * the corresponding vertex pair in the original graph.</p>
      * 
-     * <p>If <code>nev</code> is null, 
-     * adds the connecting element as a decoration on the corresponding edge in the new
-     * graph; otherwise, sets the weight of each edge to the number of parallel 
-     * paths between the corresponding vertices in the original graph that are 
-     * encountered in the folding process.</p>
+     * @param <V> vertex type
+     * @param <E> input edge type
+     * @param h hypergraph to be folded
+     * @param graph_factory factory used to generate the output graph
+     * @return a copy of the input graph where hyperedges are replaced by cliques
      */
-    public Graph fold(Hypergraph h, Graph target, boolean use_vertices, NumberEdgeValue nev, BidiMap map)
+    public static <V,E> Graph<V, Collection<E>> foldHypergraphEdges(Hypergraph<V,E> h, 
+            Factory<Graph<V, Collection<E>>> graph_factory)
     {
-        undirected = true;
-        
-        if (target == null)
-            target = createGraph();
+        Graph<V, Collection<E>> target = graph_factory.create();
 
-        VertexGenerator vg = GraphUtils.getVertexGenerator(target);
-        if (vg == null)
-            vg = new TypedVertexGenerator(target);
-        
-        Map m = new HashMap();
-        Set vertices;
-        Set edges;
-        
-        // vertices and hyperedges are duals of one another; we can treat
-        // them equivalently for this purpose
-        if (use_vertices)
-        {
-            vertices = h.getVertices();
-            edges = h.getEdges();
-        }
-        else
-        {
-            vertices = h.getEdges();
-            edges = h.getVertices();
-        }
-        
-        // create vertices:
-        // for each "vertex", create a new vertex and import user data
-        for (Iterator iter = vertices.iterator(); iter.hasNext(); )
-        {
-            Element av = (Element)iter.next();
-            Vertex v = vg.create();
-            v.importUserData(av);
+        for (V v : h.getVertices())
             target.addVertex(v);
-            m.put(av, v);
-            map.put(v, av);
-        }
         
-        // create edges:
-        // for each "hyperedge", create an edge between each incident vertex pair
-        for (Iterator iter = edges.iterator(); iter.hasNext(); )
+        for (E e : h.getEdges())
         {
-            Element he = (Element)iter.next();
-            Set elts = he.getIncidentElements();
-            Vertex[] v_array = new Vertex[elts.size()];
-            int i = 0;
-            for (Iterator e_iter = elts.iterator(); e_iter.hasNext(); )
-                v_array[i++] = (Vertex)(m.get(e_iter.next()));
-            for (i = 0; i < v_array.length; i++)
-                for (int j = i + 1; j < v_array.length; j++)
-                    addEdge(target, v_array[i], he, v_array[j], nev);
+            ArrayList<V> incident = new ArrayList<V>(h.getIncidentVertices(e));
+            populateTarget(target, e, incident);
+        }
+        return target;
+    }
+
+
+    /**
+     * Creates a <code>Graph</code> which is an edge-folded version of <code>h</code>, where
+     * hyperedges are replaced by k-cliques in the output graph.
+     * 
+     * <p>The vertices of the new graph are the same objects as the vertices of 
+     * <code>h</code>, and <code>a</code> 
+     * is connected to <code>b</code> in the new graph if the corresponding vertices
+     * in <code>h</code> are connected by a hyperedge.  Thus, each hyperedge with 
+     * <i>k</i> vertices in <code>h</code> induces a <i>k</i>-clique in the new graph.</p>
+     * 
+     * <p>The edges of the new graph are generated by the specified edge factory.</p>
+     * 
+     * @param <V> vertex type
+     * @param <E> input edge type
+     * @param h hypergraph to be folded
+     * @param graph_factory factory used to generate the output graph
+     * @param edge_factory factory used to create the new edges 
+     * @return a copy of the input graph where hyperedges are replaced by cliques
+     */
+    public static <V,E> Graph<V,E> foldHypergraphEdges(Hypergraph<V,E> h, 
+            Factory<Graph<V,E>> graph_factory, Factory<E> edge_factory)
+    {
+        Graph<V,E> target = graph_factory.create();
+
+        for (V v : h.getVertices())
+            target.addVertex(v);
+        
+        for (E e : h.getEdges())
+        {
+            ArrayList<V> incident = new ArrayList<V>(h.getIncidentVertices(e));
+            for (int i = 0; i < incident.size(); i++)
+                for (int j = i+1; j < incident.size(); j++)
+                    target.addEdge(edge_factory.create(), incident.get(i), incident.get(j));
+        }
+        return target;
+    }
+
+    /**
+     * Creates a <code>Graph</code> which is a vertex-folded version of <code>h</code>, whose
+     * vertices are the input's hyperedges and whose edges are induced by adjacent hyperedges
+     * in the input.
+     * 
+     * <p>The vertices of the new graph are the same objects as the hyperedges of 
+     * <code>h</code>, and <code>a</code> 
+     * is connected to <code>b</code> in the new graph if the corresponding edges
+     * in <code>h</code> have a vertex in common.  Thus, each vertex incident to  
+     * <i>k</i> edges in <code>h</code> induces a <i>k</i>-clique in the new graph.</p>
+     * 
+     * <p>The edges of the new graph are created by the specified factory.</p>
+     * 
+     * @param <V> vertex type
+     * @param <E> input edge type
+     * @param <F> output edge type
+     * @param h hypergraph to be folded
+     * @param graph_factory factory used to generate the output graph
+     * @param edge_factory factory used to generate the output edges
+     * @return a transformation of the input graph whose vertices correspond to the input's hyperedges 
+     * and edges are induced by hyperedges sharing vertices in the input
+     */
+    public static <V,E,F> Graph<E,F> foldHypergraphVertices(Hypergraph<V,E> h, 
+            Factory<Graph<E,F>> graph_factory, Factory<F> edge_factory)
+    {
+        Graph<E,F> target = graph_factory.create();
+        
+        for (E e : h.getEdges())
+            target.addVertex(e);
+        
+        for (V v : h.getVertices())
+        {
+            ArrayList<E> incident = new ArrayList<E>(h.getIncidentEdges(v));
+            for (int i = 0; i < incident.size(); i++)
+                for (int j = i+1; j < incident.size(); j++)
+                    target.addEdge(edge_factory.create(), incident.get(i), incident.get(j));
         }
         
         return target;
     }
 
+    /**
+     * Creates a <code>Graph</code> which is a vertex-folded version of <code>h</code>, whose
+     * vertices are the input's hyperedges and whose edges are induced by adjacent hyperedges
+     * in the input.
+     * 
+     * <p>The vertices of the new graph are the same objects as the hyperedges of 
+     * <code>h</code>, and <code>a</code> 
+     * is connected to <code>b</code> in the new graph if the corresponding edges
+     * in <code>h</code> have a vertex in common.  Thus, each vertex incident to  
+     * <i>k</i> edges in <code>h</code> induces a <i>k</i>-clique in the new graph.</p>
+     * 
+     * <p>The edges of the new graph consist of collections of each vertex incident to 
+     * the corresponding hyperedge pair in the original graph.</p>
+     * 
+     * @param h hypergraph to be folded
+     * @param graph_factory factory used to generate the output graph
+     * @return a transformation of the input graph whose vertices correspond to the input's hyperedges 
+     * and edges are induced by hyperedges sharing vertices in the input
+     */
+    public Graph<E,Collection<V>> foldHypergraphVertices(Hypergraph<V,E> h, 
+            Factory<Graph<E,Collection<V>>> graph_factory)
+    {
+        Graph<E,Collection<V>> target = graph_factory.create();
+
+        for (E e : h.getEdges())
+            target.addVertex(e);
+        
+        for (V v : h.getVertices())
+        {
+            ArrayList<E> incident = new ArrayList<E>(h.getIncidentEdges(v));
+            populateTarget(target, v, incident);
+        }
+        return target;
+    }
     
     /**
-     * Creates a new edge from <code>firstEnd</code> to <code>secondEnd</code> 
-     * in <code>newGraph</code>. Note that
-     * <code>firstEnd</code> and <code>secondEnd</code> are both parts of 
-     * <code>newGraph</code>, while
-     * <code>intermediate</code> is part of the original graph. If <code>parallel</code> is set,
-     * adds a new edge from <code>firstEnd</code> to <code>secondEnd</code>.
-     * If <code>parallel</code> is not set, then (as appropriate) adds an edge
-     * or creates one from <code>firstEnd</code> to <code>secondEnd</code>. 
+     * @param target
+     * @param e
+     * @param incident
      */
-    protected void addEdge(Graph newGraph, Vertex firstEnd,
-            Element intermediate, Vertex secondEnd, NumberEdgeValue nev) 
+    private static <S,T> void populateTarget(Graph<S, Collection<T>> target, T e,
+            ArrayList<S> incident)
     {
-        if( undirected && firstEnd == secondEnd ) return;
-        if (parallel) {
-            Edge v_t;
-            if (undirected)
-                v_t = new UndirectedSparseEdge(firstEnd, secondEnd);
-            else
-                v_t = new DirectedSparseEdge(firstEnd, secondEnd);
-            if (nev != null)
-                nev.setNumber(v_t, new Integer(1));
-            else
-                v_t.addUserDatum(FOLDED_DATA, intermediate, copy_action);
-            newGraph.addEdge(v_t);
-        } else {
-            Edge v_t = firstEnd.findEdge(secondEnd);
-            if (v_t == null) {
-                if (undirected)
-                    v_t = new UndirectedSparseEdge(firstEnd, secondEnd);
-                else
-                    v_t = new DirectedSparseEdge(firstEnd, secondEnd);
-                if (nev != null)
-                    nev.setNumber(v_t, new Integer(0));
-                else
-                    v_t.addUserDatum(FOLDED_DATA, new HashSet(), copy_action);
-                newGraph.addEdge(v_t);
-            }
-            if (nev != null)
-                nev.setNumber(v_t, new Integer(nev.getNumber(v_t).intValue() + 1));
-            else
+        for (int i = 0; i < incident.size(); i++)
+        {
+            S v1 = incident.get(i);
+            for (int j = i+1; j < incident.size(); j++)
             {
-                Set folded_vertices = (Set) v_t.getUserDatum(FOLDED_DATA);
-                folded_vertices.add(intermediate);
+                S v2 = incident.get(j);
+                Collection<T> e_coll = target.findEdge(v1, v2);
+                if (e_coll == null)
+                {
+                    e_coll = new ArrayList<T>();
+                    target.addEdge(e_coll, v1, v2);
+                }
+                e_coll.add(e);
             }
         }
-    }
-
-    /**
-     * Returns a base graph to use.
-     */
-    protected Graph createGraph() 
-    {
-        Graph newGraph;
-        if (undirected)
-            newGraph = new UndirectedSparseGraph();
-        else
-            newGraph = new DirectedSparseGraph();
-        
-        if (parallel) 
-            newGraph.getEdgeConstraints().remove(Graph.NOT_PARALLEL_EDGE);
-
-        return newGraph;
-    }
-
-    /**
-     * Checks for, and rejects, mixed-mode graphs, and sets the <code>undirected</code>
-     * class variable state.
-     */
-    protected void checkGraphConstraints(KPartiteGraph g) {
-        undirected = PredicateUtils.enforcesUndirected(g);
-        if (!undirected && !PredicateUtils.enforcesDirected(g))
-                throw new IllegalArgumentException(
-                        "Graph must be strictly "
-                                + "directed or strictly undirected (no mixed graphs allowed)");
     }
 
 }

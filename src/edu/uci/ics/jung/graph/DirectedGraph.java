@@ -1,27 +1,24 @@
 /*
-* Copyright (c) 2003, the JUNG Project and the Regents of the University 
-* of California
-* All rights reserved.
-*
-* This software is open-source under the BSD license; see either
-* "license.txt" or
-* http://jung.sourceforge.net/license.txt for a description.
-*/
+ * Created on Oct 17, 2005
+ *
+ * Copyright (c) 2005, the JUNG Project and the Regents of the University 
+ * of California
+ * All rights reserved.
+ *
+ * This software is open-source under the BSD license; see either
+ * "license.txt" or
+ * http://jung.sourceforge.net/license.txt for a description.
+ */
 package edu.uci.ics.jung.graph;
 
 /**
  * A tagging interface for implementations of <code>Graph</code> 
- * whose edge set consists of implementations of <code>DirectedEdge</code>.
- * Used for enforcing algorithm constraints (for example, to provide a 
- * compile-time parameter check for algorithms that only operate on 
- * directed graphs).
+ * that accept only directed edges.
  * 
- * @author Joshua O'Madadhain
- * @author Scott White
- * @author Danyel Fisher
- * 
- * @see DirectedEdge
+ * @author Tom Nelson - tomnelson@dev.java.net
+ *
+ * @param <V>   type specification for vertices
+ * @param <E>   type specification for edges
  */
-public interface DirectedGraph extends Graph 
-{
+public interface DirectedGraph<V,E> extends Graph<V,E> {
 }

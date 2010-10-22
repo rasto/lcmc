@@ -17,13 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.uci.ics.jung.graph.ArchetypeEdge;
-import edu.uci.ics.jung.graph.ArchetypeGraph;
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.NumberEdgeValue;
-import edu.uci.ics.jung.utils.Pair;
+import org.apache.commons.collections15.Transformer;
+
+import edu.uci.ics.jung.graph.Graph;
 
 /**
  * <p>Calculates distances and shortest paths using Dijkstra's   
@@ -36,9 +32,10 @@ import edu.uci.ics.jung.utils.Pair;
  * by the iterator) by nondecreasing distance from <code>source</code>.</p>
  * 
  * @author Joshua O'Madadhain
+ * @author Tom Nelson converted to jung2
  * @see DijkstraDistance
  */
-public class DijkstraShortestPath extends DijkstraDistance implements ShortestPath
+public class DijkstraShortestPath<V,E> extends DijkstraDistance<V,E> implements ShortestPath<V,E>
 {
     /**
      * <p>Creates an instance of <code>DijkstraShortestPath</code> for 
@@ -50,7 +47,7 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * @param nev   the class responsible for returning weights for edges
      * @param cached    specifies whether the results are to be cached
      */
-    public DijkstraShortestPath(ArchetypeGraph g, NumberEdgeValue nev, boolean cached)
+    public DijkstraShortestPath(Graph<V,E> g, Transformer<E, ? extends Number> nev, boolean cached)
     {
         super(g, nev, cached);
     }
@@ -63,7 +60,7 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * @param g     the graph on which distances will be calculated
      * @param nev   the class responsible for returning weights for edges
      */
-    public DijkstraShortestPath(ArchetypeGraph g, NumberEdgeValue nev)
+    public DijkstraShortestPath(Graph<V,E> g, Transformer<E, ? extends Number> nev)
     {
         super(g, nev);
     }
@@ -75,7 +72,7 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * 
      * @param g     the graph on which distances will be calculated
      */ 
-    public DijkstraShortestPath(ArchetypeGraph g)
+    public DijkstraShortestPath(Graph<V,E> g)
     {
         super(g);
     }
@@ -88,14 +85,15 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * @param g     the graph on which distances will be calculated
      * @param cached    specifies whether the results are to be cached
      */ 
-    public DijkstraShortestPath(ArchetypeGraph g, boolean cached)
+    public DijkstraShortestPath(Graph<V,E> g, boolean cached)
     {
         super(g, cached);
     }
     
-    protected SourceData getSourceData(ArchetypeVertex source)
+    @Override
+    protected SourceData getSourceData(V source)
     {
-        SourceData sd = (SourcePathData)sourceMap.get(source);
+        SourceData sd = sourceMap.get(source);
         if (sd == null)
             sd = new SourcePathData(source);
         return sd;
@@ -109,22 +107,22 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * <p>If either vertex is not in the graph for which this instance
      * was created, throws <code>IllegalArgumentException</code>.</p>
      */
-	public Edge getIncomingEdge(Vertex source, Vertex target)
+	public E getIncomingEdge(V source, V target)
 	{
-        if (source.getGraph() != g)
+        if (!g.containsVertex(source))
             throw new IllegalArgumentException("Specified source vertex " + 
                     source + " is not part of graph " + g);
-
-        if (target.getGraph() != g)
+        
+        if (!g.containsVertex(target))
             throw new IllegalArgumentException("Specified target vertex " + 
                     target + " is not part of graph " + g);
 
-        Set targets = new HashSet();
+        Set<V> targets = new HashSet<V>();
         targets.add(target);
-        singleSourceShortestPath(source, targets, g.numVertices());
-        Map incomingEdgeMap = 
+        singleSourceShortestPath(source, targets, g.getVertexCount());
+        Map<V,E> incomingEdgeMap = 
             ((SourcePathData)sourceMap.get(source)).incomingEdges;
-        Edge incomingEdge = (Edge)incomingEdgeMap.get(target);
+        E incomingEdge = incomingEdgeMap.get(target);
         
         if (!cached)
             reset(source);
@@ -140,13 +138,13 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * The map's iterator will return the elements in order of 
      * increasing distance from <code>source</code>.</p>
      * 
-     * @see DijkstraDistance#getDistanceMap(Vertex,int)
-     * @see DijkstraDistance#getDistance(Vertex,Vertex)
+     * @see DijkstraDistance#getDistanceMap(Object,int)
+     * @see DijkstraDistance#getDistance(Object,Object)
      * @param source    the vertex from which distances are measured
      */
-    public Map getIncomingEdgeMap(Vertex source)
+    public Map<V,E> getIncomingEdgeMap(V source)
 	{
-		return getIncomingEdgeMap(source, g.numVertices());
+		return getIncomingEdgeMap(source, g.getVertexCount());
 	}
 
     /**
@@ -156,35 +154,35 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * If either vertex is not in the graph for which this instance
      * was created, throws <code>IllegalArgumentException</code>.
      */
-	public List getPath(Vertex source, Vertex target)
+	public List<E> getPath(V source, V target)
 	{
-        if (source.getGraph() != g)
+		if(!g.containsVertex(source)) 
             throw new IllegalArgumentException("Specified source vertex " + 
                     source + " is not part of graph " + g);
-
-        if (target.getGraph() != g)
+        
+		if(!g.containsVertex(target)) 
             throw new IllegalArgumentException("Specified target vertex " + 
                     target + " is not part of graph " + g);
         
-        LinkedList path = new LinkedList();
+        LinkedList<E> path = new LinkedList<E>();
 
         // collect path data; must use internal method rather than
         // calling getIncomingEdge() because getIncomingEdge() may
         // wipe out results if results are not cached
-        Set targets = new HashSet();
+        Set<V> targets = new HashSet<V>();
         targets.add(target);
-        singleSourceShortestPath(source, targets, g.numVertices());
-        Map incomingEdges = 
+        singleSourceShortestPath(source, targets, g.getVertexCount());
+        Map<V,E> incomingEdges = 
             ((SourcePathData)sourceMap.get(source)).incomingEdges;
         
         if (incomingEdges.isEmpty() || incomingEdges.get(target) == null)
             return path;
-        Vertex current = target;
-        while (current != source)
+        V current = target;
+        while (!current.equals(source))
         {
-            Edge incoming = (Edge)incomingEdges.get(current);
+            E incoming = incomingEdges.get(current);
             path.addFirst(incoming);
-            current = incoming.getOpposite(current);
+            current = ((Graph<V,E>)g).getOpposite(current, incoming);
         }
 		return path;
 	}
@@ -200,24 +198,24 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      * either less than 1 or greater than the number of vertices in the 
      * graph.
      * 
-     * @see #getIncomingEdgeMap(Vertex)
-     * @see #getPath(Vertex,Vertex)
+     * @see #getIncomingEdgeMap(Object)
+     * @see #getPath(Object,Object)
      * @param source    the vertex from which distances are measured
      * @param numDests  the number of vertics for which to measure distances
      */
-	public LinkedHashMap getIncomingEdgeMap(Vertex source, int numDests)
+	public LinkedHashMap<V,E> getIncomingEdgeMap(V source, int numDests)
 	{
-        if (source.getGraph() != g)
+        if (g.getVertices().contains(source) == false)
             throw new IllegalArgumentException("Specified source vertex " + 
                     source + " is not part of graph " + g);
 
-        if (numDests < 1 || numDests > g.numVertices())
+        if (numDests < 1 || numDests > g.getVertexCount())
             throw new IllegalArgumentException("numDests must be >= 1 " + 
             "and <= g.numVertices()");
 
         singleSourceShortestPath(source, null, numDests);
         
-        LinkedHashMap incomingEdgeMap = 
+        LinkedHashMap<V,E> incomingEdgeMap = 
             ((SourcePathData)sourceMap.get(source)).incomingEdges;
         
         if (!cached)
@@ -237,32 +235,43 @@ public class DijkstraShortestPath extends DijkstraDistance implements ShortestPa
      */
     protected class SourcePathData extends SourceData
     {
-        public Map tentativeIncomingEdges;
-		public LinkedHashMap incomingEdges;
+        protected Map<V,E> tentativeIncomingEdges;
+		protected LinkedHashMap<V,E> incomingEdges;
 
-		public SourcePathData(ArchetypeVertex source)
+		protected SourcePathData(V source)
 		{
             super(source);
-            incomingEdges = new LinkedHashMap();
-            tentativeIncomingEdges = new HashMap();
+            incomingEdges = new LinkedHashMap<V,E>();
+            tentativeIncomingEdges = new HashMap<V,E>();
 		}
         
-        public void update(ArchetypeVertex dest, ArchetypeEdge tentative_edge, double new_dist)
+        @Override
+        public void update(V dest, E tentative_edge, double new_dist)
         {
             super.update(dest, tentative_edge, new_dist);
             tentativeIncomingEdges.put(dest, tentative_edge);
         }
         
-        public Pair getNextVertex()
+        @Override
+        public Map.Entry<V,Number> getNextVertex()
         {
-            Pair p = super.getNextVertex();
-            ArchetypeVertex v = (ArchetypeVertex)p.getFirst();
-            Edge incoming = (Edge)tentativeIncomingEdges.remove(v);
+            Map.Entry<V,Number> p = super.getNextVertex();
+            V v = p.getKey();
+            E incoming = tentativeIncomingEdges.remove(v);
             incomingEdges.put(v, incoming);
             return p;
         }
         
-        public void createRecord(ArchetypeVertex w, ArchetypeEdge e, double new_dist)
+        @Override
+        public void restoreVertex(V v, double dist)
+        {
+            super.restoreVertex(v, dist);
+            E incoming = incomingEdges.get(v);
+            tentativeIncomingEdges.put(v, incoming);
+        }
+        
+        @Override
+        public void createRecord(V w, E e, double new_dist)
         {
             super.createRecord(w, e, new_dist);
             tentativeIncomingEdges.put(w, e);

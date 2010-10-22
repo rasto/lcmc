@@ -25,9 +25,9 @@ import edu.uci.ics.jung.visualization.transform.shape.ShapeTransformer;
  * another, by delegating to a wrapped AffineTransform (uniform)
  * and its inverse.
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson
  */
-public class AffineTransformer implements Transformer, ShapeTransformer {
+public class AffineTransformer implements BidirectionalTransformer, ShapeTransformer {
 
     protected AffineTransform inverse;
 
@@ -263,6 +263,7 @@ public class AffineTransformer implements Transformer, ShapeTransformer {
         return rotation;
     }
 
+    @Override
     public String toString() {
         return "Transformer using "+transform;
     }

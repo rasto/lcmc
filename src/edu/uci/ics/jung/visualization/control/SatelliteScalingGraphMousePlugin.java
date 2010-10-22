@@ -11,17 +11,15 @@
 package edu.uci.ics.jung.visualization.control;
 
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.Point2D;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
 /**
  * Overrides ScalingGraphMousePlugin so that mouse events in the
  * satellite view will cause scaling in the main view
  * 
  * @see ScalingGraphMousePlugin
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public class SatelliteScalingGraphMousePlugin extends ScalingGraphMousePlugin {

@@ -9,13 +9,13 @@
  */
 package edu.uci.ics.jung.algorithms.importance;
 
-import java.util.Iterator;
+import org.apache.commons.collections15.BidiMap;
 
 import cern.colt.matrix.DoubleMatrix2D;
-import edu.uci.ics.jung.algorithms.GraphMatrixOperations;
+import edu.uci.ics.jung.algorithms.matrix.GraphMatrixOperations;
+import edu.uci.ics.jung.algorithms.util.Indexer;
 import edu.uci.ics.jung.graph.UndirectedGraph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.Indexer;
+
 
 /**
  * /**
@@ -34,13 +34,13 @@ import edu.uci.ics.jung.graph.decorators.Indexer;
 
  * @author Scott White
  */
-public class RandomWalkSTBetweenness extends AbstractRanker {
+public class RandomWalkSTBetweenness<V,E> extends AbstractRanker<V,E> {
 
     public static final String CENTRALITY = "centrality.RandomWalkSTBetweennessCentrality";
     private DoubleMatrix2D mVoltageMatrix;
-    private Indexer mIndexer;
-    Vertex mSource;
-    Vertex mTarget;
+    private BidiMap<V,Integer> mIndexer;
+    V mSource;
+    V mTarget;
 
    /**
     * Constructor which initializes the algorithm
@@ -48,13 +48,13 @@ public class RandomWalkSTBetweenness extends AbstractRanker {
     * @param s the source vertex
     * @param t the target vertex
     */
-    public RandomWalkSTBetweenness(UndirectedGraph g, Vertex s, Vertex t) {
+    public RandomWalkSTBetweenness(UndirectedGraph<V,E> g, V s, V t) {
         initialize(g, true, false);
         mSource = s;
         mTarget = t;
     }
 
-    protected Indexer getIndexer() {
+    protected BidiMap<V,Integer> getIndexer() {
         return mIndexer;
     }
 
@@ -63,33 +63,30 @@ public class RandomWalkSTBetweenness extends AbstractRanker {
     }
 
     protected void setUp() {
-        mVoltageMatrix = GraphMatrixOperations.computeVoltagePotentialMatrix((UndirectedGraph) getGraph());
-        mIndexer = Indexer.getIndexer(getGraph());
+        mVoltageMatrix = GraphMatrixOperations.<V,E>computeVoltagePotentialMatrix((UndirectedGraph<V,E>) getGraph());
+        mIndexer = Indexer.<V>create(getGraph().getVertices());
     }
 
     protected void computeBetweenness() {
         setUp();
 
-        for (Iterator iIt = getGraph().getVertices().iterator();iIt.hasNext();) {
-            Vertex ithVertex = (Vertex) iIt.next();
-
-            setRankScore(ithVertex,computeSTBetweenness(ithVertex,mSource, mTarget));
+        for (V v : getGraph().getVertices()) {
+            setVertexRankScore(v,computeSTBetweenness(v,mSource, mTarget));
         }
     }
 
-    public double computeSTBetweenness(Vertex ithVertex, Vertex source, Vertex target) {
+    public double computeSTBetweenness(V ithVertex, V source, V target) {
         if (ithVertex == source || ithVertex == target) return 1;
         if (mVoltageMatrix == null) {
             setUp();
         }
-        int i = mIndexer.getIndex(ithVertex);
-        int s = mIndexer.getIndex(source);
-        int t = mIndexer.getIndex(target);
-
+        int i = mIndexer.get(ithVertex);
+        int s = mIndexer.get(source);
+        int t = mIndexer.get(target);
+        
         double betweenness = 0;
-        for (Iterator vIt = ithVertex.getSuccessors().iterator();vIt.hasNext();) {
-            Vertex jthVertex = (Vertex) vIt.next();
-            int j = mIndexer.getIndex(jthVertex);
+        for (V jthVertex : getGraph().getSuccessors(ithVertex)) {
+            int j = mIndexer.get(jthVertex);
             double currentFlow = 0;
             currentFlow += mVoltageMatrix.get(i,s);
             currentFlow -= mVoltageMatrix.get(i,t);
@@ -97,21 +94,20 @@ public class RandomWalkSTBetweenness extends AbstractRanker {
             currentFlow += mVoltageMatrix.get(j,t);
             betweenness += Math.abs(currentFlow);
         }
-
         return betweenness/2.0;
-
     }
 
     /**
      * the user datum key used to store the rank scores
      * @return the key
      */
+    @Override
     public String getRankScoreKey() {
         return CENTRALITY;
     }
 
-    protected double evaluateIteration() {
+    @Override
+    public void step() {
         computeBetweenness();
-        return 0;
     }
 }

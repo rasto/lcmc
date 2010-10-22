@@ -9,10 +9,8 @@
  */
 package edu.uci.ics.jung.algorithms.importance;
 
-import java.util.Iterator;
-
 import edu.uci.ics.jung.graph.UndirectedGraph;
-import edu.uci.ics.jung.graph.Vertex;
+
 
 /**
  * Computes betweenness centrality for each vertex in the graph. The betweenness values in this case
@@ -30,7 +28,7 @@ import edu.uci.ics.jung.graph.Vertex;
 
  * @author Scott White
  */
-public class RandomWalkBetweenness extends RandomWalkSTBetweenness {
+public class RandomWalkBetweenness<V,E> extends RandomWalkSTBetweenness<V,E> {
 
     public static final String CENTRALITY = "centrality.RandomWalkBetweennessCentrality";
 
@@ -38,28 +36,28 @@ public class RandomWalkBetweenness extends RandomWalkSTBetweenness {
      * Constructor which initializes the algorithm
      * @param g the graph whose nodes are to be analyzed
      */
-    public RandomWalkBetweenness(UndirectedGraph g) {
+    public RandomWalkBetweenness(UndirectedGraph<V,E> g) {
        super(g,null,null);
     }
 
+    @Override
     protected void computeBetweenness() {
         setUp();
 
-        int numVertices = getGraph().numVertices();
+        int numVertices = getGraph().getVertexCount();
         double normalizingConstant = numVertices*(numVertices-1)/2.0;
 
-        for (Iterator iIt = getGraph().getVertices().iterator();iIt.hasNext();) {
-            Vertex ithVertex = (Vertex) iIt.next();
+        for (V ithVertex : getGraph().getVertices()) {
 
             double ithBetweenness = 0;
             for (int t=0;t<numVertices;t++) {
                 for (int s=0;s<t;s++) {
-                    Vertex sthVertex = (Vertex) getIndexer().getVertex(s);
-                    Vertex tthVertex = (Vertex) getIndexer().getVertex(t);
+                    V sthVertex = getIndexer().getKey(s);
+                    V tthVertex = getIndexer().getKey(t);
                     ithBetweenness += computeSTBetweenness(ithVertex,sthVertex, tthVertex);
                 }
             }
-            setRankScore(ithVertex,ithBetweenness/normalizingConstant);
+            setVertexRankScore(ithVertex,ithBetweenness/normalizingConstant);
         }
     }
 
@@ -69,6 +67,7 @@ public class RandomWalkBetweenness extends RandomWalkSTBetweenness {
      * the user datum key used to store the rank scores
      * @return the key
      */
+    @Override
     public String getRankScoreKey() {
         return CENTRALITY;
     }

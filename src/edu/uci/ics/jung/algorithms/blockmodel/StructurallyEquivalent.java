@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2003, the JUNG Project and the Regents of the University 
+ * Copyright (c) 2004, the JUNG Project and the Regents of the University 
  * of California
  * All rights reserved.
+ * Created on Jan 28, 2004
  *
  * This software is open-source under the BSD license; see either
  * "license.txt" or
  * http://jung.sourceforge.net/license.txt for a description.
  */
-/*
- * Created on Jan 28, 2004
- */
 package edu.uci.ics.jung.algorithms.blockmodel;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,69 +20,62 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections15.CollectionUtils;
+import org.apache.commons.collections15.Transformer;
+
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.utils.Pair;
+import edu.uci.ics.jung.graph.util.Pair;
 
 /**
- * Checks a graph for sets of structurally equivalent vertices: vertices that
- * share all the same edges. Specifically, In order for a pair of vertices <i>
- * i</i> and <i>j</i> to be structurally equivalent, the set of <i>i</i>'s
- * neighbors must be identical to the set of <i>j</i>'s neighbors, with the
+ * Identifies sets of structurally equivalent vertices in a graph. Vertices <i>
+ * i</i> and <i>j</i> are structurally equivalent iff the set of <i>i</i>'s
+ * neighbors is identical to the set of <i>j</i>'s neighbors, with the
  * exception of <i>i</i> and <i>j</i> themselves. This algorithm finds all
  * sets of equivalent vertices in O(V^2) time.
  * 
- * You can extend this class to have a different definition of equivalence (by
- * overriding "isStructurallyEquivalent"), and may give it hints for
- * accelerating the process by overriding canpossiblycompare. (For example, in
- * a bipartitegraph, canPossiblyCompare may return false for vertices in
+ * <p>You can extend this class to have a different definition of equivalence (by
+ * overriding <code>isStructurallyEquivalent</code>), and may give it hints for
+ * accelerating the process by overriding <code>canPossiblyCompare</code>. 
+ * (For example, in a bipartite graph, <code>canPossiblyCompare</code> may 
+ * return <code>false</code> for vertices in
  * different partitions. This function should be fast.)
  * 
- * @author danyelf
+ * @author Danyel Fisher
  */
-public class StructurallyEquivalent implements EquivalenceAlgorithm {
+public class StructurallyEquivalent<V,E> implements Transformer<Graph<V,E>, VertexPartition<V,E>> 
+{
+	public VertexPartition<V,E> transform(Graph<V,E> g) 
+	{
+	    Set<Pair<V>> vertex_pairs = getEquivalentPairs(g);
+	    
+	    Set<Set<V>> rv = new HashSet<Set<V>>();
+        Map<V, Set<V>> intermediate = new HashMap<V, Set<V>>();
+        for (Pair<V> p : vertex_pairs)
+        {
+            Set<V> res = intermediate.get(p.getFirst());
+            if (res == null)
+                res = intermediate.get(p.getSecond());
+            if (res == null)  // we haven't seen this one before
+                res = new HashSet<V>();
+            res.add(p.getFirst());
+            res.add(p.getSecond());
+            intermediate.put(p.getFirst(), res);
+            intermediate.put(p.getSecond(), res);
+        }
+        rv.addAll(intermediate.values());
 
-	static StructurallyEquivalent instance = null;
-	
-	public static StructurallyEquivalent getInstance() {
-		if ( instance == null ) {
-			instance = new StructurallyEquivalent();
-		}
-		return instance;
-	}
-	
-	public StructurallyEquivalent() {
+        // pick up the vertices which don't appear in intermediate; they are
+        // singletons (equivalence classes of size 1)
+        Collection<V> singletons = CollectionUtils.subtract(g.getVertices(),
+                intermediate.keySet());
+        for (V v : singletons)
+        {
+            Set<V> v_set = Collections.singleton(v);
+            intermediate.put(v, v_set);
+            rv.add(v_set);
+        }
 
-	}
-
-	public EquivalenceRelation getEquivalences(Graph g) {
-		return createEquivalenceClasses(g, checkEquivalent(g));
-	}
-
-	/**
-	 * Takes in a Set of Pairs (as in the resutls of checkEquivalent) and
-	 * massages into a Set of Sets, where each Set is an equivalence class.
-	 */
-	protected EquivalenceRelation createEquivalenceClasses(Graph g, Set s) {
-		Set rv = new HashSet();
-		Map intermediate = new HashMap();
-		for (Iterator iter = s.iterator(); iter.hasNext();) {
-			Pair p = (Pair) iter.next();
-			Set res = (Set) intermediate.get(p.getFirst());
-			if (res == null)
-				res = (Set) intermediate.get(p.getSecond());
-			if (res == null) {
-				// we haven't seen this one before
-				res = new HashSet();
-			}
-			res.add(p.getFirst());
-			res.add(p.getSecond());
-			intermediate.put(p.getFirst(), res);
-			intermediate.put(p.getSecond(), res);
-
-		}
-		rv.addAll(intermediate.values());
-		return new EquivalenceRelation(rv, g);
+        return new VertexPartition<V, E>(g, intermediate, rv);
 	}
 
 	/**
@@ -95,39 +88,36 @@ public class StructurallyEquivalent implements EquivalenceAlgorithm {
 	 * 
 	 * @param g
 	 */
-	public Set checkEquivalent(Graph g) {
+	protected Set<Pair<V>> getEquivalentPairs(Graph<V,?> g) {
 
-		Set rv = new HashSet();
-		Set alreadyEquivalent = new HashSet();
+		Set<Pair<V>> rv = new HashSet<Pair<V>>();
+		Set<V> alreadyEquivalent = new HashSet<V>();
 
-		List l = new ArrayList(g.getVertices());
+		List<V> l = new ArrayList<V>(g.getVertices());
 
-		for (Iterator iter = l.iterator(); iter.hasNext();) {
-			Vertex v1 = (Vertex) iter.next();
-
+		for (V v1 : l)
+		{
 			if (alreadyEquivalent.contains(v1))
 				continue;
 
-			for (Iterator iterator = l.listIterator(l.indexOf(v1) + 1); iterator.hasNext();) {
-				Vertex v2 = (Vertex) iterator.next();
+			for (Iterator<V> iterator = l.listIterator(l.indexOf(v1) + 1); iterator.hasNext();) {
+			    V v2 = iterator.next();
 
 				if (alreadyEquivalent.contains(v2))
 					continue;
 
-				if (!canpossiblycompare(v1, v2))
+				if (!canPossiblyCompare(v1, v2))
 					continue;
 
-				if (isStructurallyEquivalent(v1, v2)) {
-					Pair p = new Pair(v1, v2);
+				if (isStructurallyEquivalent(g, v1, v2)) {
+					Pair<V> p = new Pair<V>(v1, v2);
 					alreadyEquivalent.add(v2);
 					rv.add(p);
 				}
-
 			}
 		}
-
+		
 		return rv;
-
 	}
 
 	/**
@@ -135,26 +125,25 @@ public class StructurallyEquivalent implements EquivalenceAlgorithm {
 	 * Specifically, whether v1's predecessors are equal to v2's predecessors,
 	 * and same for successors.
 	 * 
-	 * @param v1
-	 * @param v2
+	 * @param g the graph in which the structural equivalence comparison is to take place
+	 * @param v1 the vertex to check for structural equivalence to v2
+	 * @param v2 the vertex to check for structural equivalence to v1
 	 */
-	protected boolean isStructurallyEquivalent(Vertex v1, Vertex v2) {
+	protected boolean isStructurallyEquivalent(Graph<V,?> g, V v1, V v2) {
 		
-		count ++;
-		
-		if( v1.degree() != v2.degree()) {
+		if( g.degree(v1) != g.degree(v2)) {
 			return false;
 		}
 
-		Set n1 = new HashSet(v1.getPredecessors());
+		Set<V> n1 = new HashSet<V>(g.getPredecessors(v1));
 		n1.remove(v2);
 		n1.remove(v1);
-		Set n2 = new HashSet(v2.getPredecessors());
+		Set<V> n2 = new HashSet<V>(g.getPredecessors(v2));
 		n2.remove(v1);
 		n2.remove(v2);
 
-		Set o1 = new HashSet(v1.getSuccessors());
-		Set o2 = new HashSet(v2.getSuccessors());
+		Set<V> o1 = new HashSet<V>(g.getSuccessors(v1));
+		Set<V> o2 = new HashSet<V>(g.getSuccessors(v2));
 		o1.remove(v1);
 		o1.remove(v2);
 		o2.remove(v1);
@@ -166,25 +155,23 @@ public class StructurallyEquivalent implements EquivalenceAlgorithm {
 			return b;
 		
 		// if there's a directed edge v1->v2 then there's a directed edge v2->v1
-		b &= ( v1.isSuccessorOf(v2) == v1.isSuccessorOf(v2));
+		b &= ( g.isSuccessor(v1, v2) == g.isSuccessor(v2, v1));
 		
 		// self-loop check
-		b &= ( v1.isSuccessorOf(v1) == v2.isSuccessorOf(v2));
+		b &= ( g.isSuccessor(v1, v1) == g.isSuccessor(v2, v2));
 
 		return b;
 
 	}
 
-	public static int count = 0;
-	
 	/**
-	 * This is a space for optimizations. For example, for a bipartitegraph,
-	 * vertices from class_A and class_B cannot possibly be compared.
+	 * This is a space for optimizations. For example, for a bipartite graph,
+	 * vertices from different partitions cannot possibly be compared.
 	 * 
 	 * @param v1
 	 * @param v2
 	 */
-	protected boolean canpossiblycompare(Vertex v1, Vertex v2) {
+	protected boolean canPossiblyCompare(V v1, V v2) {
 		return true;
 	}
 

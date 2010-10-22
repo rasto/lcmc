@@ -5,32 +5,34 @@
 
   @(#)package.html
 
- Copyright © 2003 The Regents of the University of California. All Rights Reserved. Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice, this paragraph and the following two paragraphs appear in all copies. This software program and documentation are copyrighted by The Regents of the University of California ("The University of California").
+ Copyright © 2003 The Regents of the University of California. All Rights Reserved. 
+ Permission to use, copy, modify, and distribute this software and its documentation 
+ for educational, research and non-profit purposes, without fee, and without a written 
+ agreement is hereby granted, provided that the above copyright notice, this paragraph 
+ and the following two paragraphs appear in all copies. This software program and 
+ documentation are copyrighted by The Regents of the University of California 
+ ("The University of California").
 
-THE SOFTWARE PROGRAM AND DOCUMENTATION ARE SUPPLIED "AS IS," WITHOUT ANY ACCOMPANYING SERVICES FROM THE UNIVERSITY OF CALFORNIA. FURTHERMORE, THE UNIVERSITY OF CALIFORNIA DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE UNINTERRUPTED OR ERROR-FREE. THE END-USER UNDERSTANDS THAT THE PROGRAM WAS DEVELOPED FOR RESEARCH PURPOSES AND IS ADVISED NOT TO RELY EXCLUSIVELY ON THE PROGRAM FOR ANY REASON.
+THE SOFTWARE PROGRAM AND DOCUMENTATION ARE SUPPLIED "AS IS," WITHOUT ANY ACCOMPANYING 
+SERVICES FROM THE UNIVERSITY OF CALFORNIA. FURTHERMORE, THE UNIVERSITY OF CALIFORNIA 
+DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE UNINTERRUPTED OR 
+ERROR-FREE. THE END-USER UNDERSTANDS THAT THE PROGRAM WAS DEVELOPED FOR RESEARCH 
+PURPOSES AND IS ADVISED NOT TO RELY EXCLUSIVELY ON THE PROGRAM FOR ANY REASON.
 
-IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS. 
+IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT, 
+INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, 
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE 
+UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, 
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, 
+SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 -->
 </head>
 <body>
 
-Provides a visualization mechanism for drawing and rendering <tt>Graph</tt>s. Current default implementation is for Swing, but most subsystems are extensible for other toolkits.
-<p>
-In general, a visualization is accomplished with
-<ul>
-<li>a (Swing) Component, into which the data is rendered. This implementation uses a <code>{@link edu.uci.ics.jung.visualization.VisualizationViewer VisualizationViewer}</code></li>
-<li>a <code>{@link edu.uci.ics.jung.visualization.Renderer Renderer}</code>, which determines how specific Vertices are drawn on screen.
-<li>a <code>{@link edu.uci.ics.jung.visualization.Layout Layout}</code>, which determines where Vertices are drawn on screen.</li>
-</ul>
-Thus, by selecting one of each of these three, it is possible to coordinate drawing. The default implementation traverses the <code>Visualizer</code>, asking it for locations of vertices, and then paints them individually with the <code>Renderer</code> inside the Swing component. In addition, the <code>{@link edu.uci.ics.jung.visualization.GraphDraw GraphDraw}</code> infrastructure simplifies many of these transformations by packaging the <tt>VisualizationViewer</tt>, the <tt>Renderer</tt>, and the <tt>Visualizer</tt> together. Users may then substitute out parts as it is appropriate. (Sample code is available in the <tt>GraphDraw</tt> documentation.)
-<p>
-The current implementation supports only 2-D layout algorithms (because it doesn't contain code to transform 3D coordinates
-to 2D) and only visualizes <tt>{@link edu.uci.ics.jung.graph.Graph Graph}</tt>s (as opposed to the more general <tt>ArchetypeGraph</tt>s.)
-<p>
-In order to set up fading effects when vertices are filtered
-out and filtered in, see the notes at 
-<code>{@link edu.uci.ics.jung.visualization.FadingVertexLayout FadingVertexLayout}</code>.
+<p>Frameworks and mechanisms for visualizing JUNG graphs using Swing/AWT.</p>
 
 </body>
 </html>
-

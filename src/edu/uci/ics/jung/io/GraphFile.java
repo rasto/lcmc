@@ -15,24 +15,26 @@ package edu.uci.ics.jung.io;
 
 import edu.uci.ics.jung.graph.Graph;
 
+
 /**
- * General interface for loading and saving a graph from/to disk
+ * General interface for loading and saving a graph from/to disk.
  * @author Scott
+ * @author Tom Nelson - converted to jung2
  *
  */
-public interface GraphFile {
+public interface GraphFile<V,E> {
 	
 	/**
 	 * Loads a graph from a file per the appropriate format
 	 * @param filename the location and name of the file
 	 * @return the graph
 	 */
-	Graph load(String filename);
+	Graph<V,E> load(String filename);
 	
 	/**
 	 * Save a graph to disk per the appropriate format
 	 * @param graph the location and name of the file
 	 * @param filename the graph
 	 */
-	void save(Graph graph,String filename);
+	void save(Graph<V,E> graph, String filename);
 }

@@ -14,72 +14,25 @@ import java.awt.Dimension;
 
 import javax.swing.event.ChangeListener;
 
-import edu.uci.ics.jung.utils.ChangeEventSupport;
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.algorithms.layout.util.Relaxer;
+import edu.uci.ics.jung.visualization.util.ChangeEventSupport;
 
 /**
  * Interface for the state holding model of the VisualizationViewer.
  * Refactored and extracted from the 1.6.0 version of VisualizationViewer
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  */
-public interface VisualizationModel extends ChangeEventSupport {
+public interface VisualizationModel<V, E> extends ChangeEventSupport {
 
-    /**
-     * 
-     * @return the sleep time of the relaxer thread
-     */
-    long getRelaxerThreadSleepTime();
-    
-    /**
-     * set a callback to be called during the relaxer iteration
-     * @param scb
-     */
-	void setTextCallback(StatusCallback scb);
 
-    /**
-     * restart the layout
-     */
-    void restart();
-    
-    /**
-     * initialize the layout
-     *
-     */
-    void init();
-    
-    /**
-     * start the relaxer
-     *
-     */
-    void start();
-    
-    /**
-     * suspend the relaxer
-     *
-     */
-    void suspend();
-    /**
-     * unsuspend the relaxer
-     *
-     */
-    void unsuspend();
-    /**
-     * iterate over the layout algorithm prior to displaying the graph
-     *
-     */
-    void prerelax();
-    
-    /**
-     * Sets the relaxerThreadSleepTime. @see #getRelaxerThreadSleepTime()
-     * @param relaxerThreadSleepTime The relaxerThreadSleepTime to set.
-     */
-    void setRelaxerThreadSleepTime(long relaxerThreadSleepTime);
-
+	Relaxer getRelaxer();
     /**
      * set the graph Layout
      * @param layout
      */
-    void setGraphLayout(Layout layout);
+    void setGraphLayout(Layout<V,E> layout);
     
     /**
      * Sets the graph Layout and initialize the Layout size to
@@ -88,26 +41,12 @@ public interface VisualizationModel extends ChangeEventSupport {
      * @param layout
      * @param d
      */
-    void setGraphLayout(Layout layout, Dimension d);
+    void setGraphLayout(Layout<V,E> layout, Dimension d);
 
     /**
      * Returns the current graph layout.
      */
-    Layout getGraphLayout();
-
-    void restartThreadOnly();
-
-    /**
-     * Returns a flag that says whether the visRunner thread is running. If
-     * it is not, then you may need to restart the thread. 
-     */
-    boolean isVisRunnerRunning();
-    
-    /**
-     * Request that the relaxer be stopped. The Thread
-     * will terminate.
-     */
-    void stop();
+    Layout<V,E> getGraphLayout();
 
     /**
      * Register <code>l</code> as a listeners to changes in the model. The View registers

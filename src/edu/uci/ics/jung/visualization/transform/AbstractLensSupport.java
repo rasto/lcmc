@@ -13,10 +13,11 @@ package edu.uci.ics.jung.visualization.transform;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
+import java.awt.Paint;
+import java.awt.geom.RectangularShape;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.VisualizationViewer.Paintable;
+import edu.uci.ics.jung.visualization.VisualizationServer.Paintable;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 /**
  * A class to make it easy to add an
@@ -24,15 +25,14 @@ import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
  * ViewLensSupport and LayoutLensSupport
  * for examples of how to use it.
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson
  *
  *
  */
-public abstract class AbstractLensSupport implements LensSupport {
+public abstract class AbstractLensSupport<V,E> implements LensSupport {
 
-    protected VisualizationViewer vv;
+    protected VisualizationViewer<V,E> vv;
     protected VisualizationViewer.GraphMouse graphMouse;
-    protected MutableTransformer savedViewTransformer;
     protected LensTransformer lensTransformer;
     protected ModalGraphMouse lensGraphMouse;
     protected Lens lens;
@@ -49,13 +49,11 @@ public abstract class AbstractLensSupport implements LensSupport {
      * a custom GraphMouse
      * @param vv the VisualizationViewer to work on
      */
-    public AbstractLensSupport(VisualizationViewer vv, ModalGraphMouse lensGraphMouse) {
+    public AbstractLensSupport(VisualizationViewer<V,E> vv, ModalGraphMouse lensGraphMouse) {
         this.vv = vv;
-        this.savedViewTransformer = vv.getViewTransformer();
         this.graphMouse = vv.getGraphMouse();
         this.defaultToolTipText = vv.getToolTipText();
-
-        this.lensGraphMouse = lensGraphMouse;//new ModalLensGraphMouse();
+        this.lensGraphMouse = lensGraphMouse;
     }
 
     public void activate(boolean state) {
@@ -76,67 +74,125 @@ public abstract class AbstractLensSupport implements LensSupport {
 
     /**
      * the background for the hyperbolic projection
-     * @author Tom Nelson - RABA Technologies
+     * @author Tom Nelson 
      *
      *
      */
     public static class Lens implements Paintable {
         LensTransformer lensTransformer;
-        Ellipse2D ellipse;
+        RectangularShape lensShape;
+        Paint paint = Color.decode("0xdddddd");
         
         public Lens(LensTransformer lensTransformer) {
             this.lensTransformer = lensTransformer;
-            this.ellipse = lensTransformer.getEllipse();
+            this.lensShape = lensTransformer.getLensShape();
         }
         
         /**
+		 * @return the paint
+		 */
+		public Paint getPaint() {
+			return paint;
+		}
+
+		/**
+		 * @param paint the paint to set
+		 */
+		public void setPaint(Paint paint) {
+			this.paint = paint;
+		}
+
+		/**
          * @return Returns the hyperbolicTransformer.
          */
 
         public void paint(Graphics g) {
             
             Graphics2D g2d = (Graphics2D)g;
-            g.setColor(Color.decode("0xdddddd"));
-            g2d.fill(ellipse);
+            g2d.setPaint(paint);
+            g2d.fill(lensShape);
         }
 
         public boolean useTransform() {
-            return false;
+            return true;
         }
     }
     
     /**
      * the background for the hyperbolic projection
-     * @author Tom Nelson - RABA Technologies
+     * @author Tom Nelson 
      *
      *
      */
     public static class LensControls  implements Paintable {
         LensTransformer lensTransformer;
-        Ellipse2D ellipse;
+        RectangularShape lensShape;
+        Paint paint = Color.gray;
         
         public LensControls(LensTransformer lensTransformer) {
             this.lensTransformer = lensTransformer;
-            this.ellipse = lensTransformer.getEllipse();
+            this.lensShape = lensTransformer.getLensShape();
         }
         
         /**
+		 * @return the paint
+		 */
+		public Paint getPaint() {
+			return paint;
+		}
+
+		/**
+		 * @param paint the paint to set
+		 */
+		public void setPaint(Paint paint) {
+			this.paint = paint;
+		}
+
+		/**
          * @return Returns the hyperbolicTransformer.
          */
 
         public void paint(Graphics g) {
             
             Graphics2D g2d = (Graphics2D)g;
-            g.setColor(Color.gray);
-            g2d.draw(ellipse);
-            int centerX = (int)Math.round(ellipse.getCenterX());
-            int centerY = (int)Math.round(ellipse.getCenterY());
+            g2d.setPaint(paint);
+            g2d.draw(lensShape);
+            int centerX = (int)Math.round(lensShape.getCenterX());
+            int centerY = (int)Math.round(lensShape.getCenterY());
             g.drawOval(centerX-10, centerY-10, 20, 20);
         }
 
         public boolean useTransform() {
-            return false;
+            return true;
         }
     }
+
+	/**
+	 * @return the lens
+	 */
+	public Lens getLens() {
+		return lens;
+	}
+
+	/**
+	 * @param lens the lens to set
+	 */
+	public void setLens(Lens lens) {
+		this.lens = lens;
+	}
+
+	/**
+	 * @return the lensControls
+	 */
+	public LensControls getLensControls() {
+		return lensControls;
+	}
+
+	/**
+	 * @param lensControls the lensControls to set
+	 */
+	public void setLensControls(LensControls lensControls) {
+		this.lensControls = lensControls;
+	}
 
 }

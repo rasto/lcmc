@@ -13,6 +13,7 @@ package edu.uci.ics.jung.visualization.control;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
@@ -20,7 +21,7 @@ import edu.uci.ics.jung.visualization.transform.MutableTransformer;
  * Mouse events in the SatelliteView that match the modifiers
  * will cause the Main view to rotate
  * @see RotatingGraphMousePlugin
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public class SatelliteRotatingGraphMousePlugin extends RotatingGraphMousePlugin {
@@ -45,7 +46,8 @@ public class SatelliteRotatingGraphMousePlugin extends RotatingGraphMousePlugin 
                 VisualizationViewer vvMaster = 
                     ((SatelliteVisualizationViewer)vv).getMaster();
                 
-                MutableTransformer modelTransformerMaster = vvMaster.getLayoutTransformer();
+                MutableTransformer modelTransformerMaster = 
+                	vvMaster.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
 
                 // rotate
                 vv.setCursor(cursor);
@@ -53,14 +55,14 @@ public class SatelliteRotatingGraphMousePlugin extends RotatingGraphMousePlugin 
                 // lens center in the satellite view.
                 // translate the master view center to layout coords, then translate
                 // that point to the satellite view's view coordinate system....
-                Point2D center = vv.transform(vvMaster.inverseTransform(vvMaster.getCenter()));
+                Point2D center = vv.getRenderContext().getMultiLayerTransformer().transform(vvMaster.getRenderContext().getMultiLayerTransformer().inverseTransform(vvMaster.getCenter()));
                 Point2D q = down;
                 Point2D p = e.getPoint();
                 Point2D v1 = new Point2D.Double(center.getX()-p.getX(), center.getY()-p.getY());
                 Point2D v2 = new Point2D.Double(center.getX()-q.getX(), center.getY()-q.getY());
                 double theta = angleBetween(v1, v2);
                 modelTransformerMaster.rotate(-theta, 
-                        vvMaster.inverseViewTransform(vvMaster.getCenter()));
+                        vvMaster.getRenderContext().getMultiLayerTransformer().inverseTransform(Layer.VIEW, vvMaster.getCenter()));
                 down.x = e.getX();
                 down.y = e.getY();
             } 

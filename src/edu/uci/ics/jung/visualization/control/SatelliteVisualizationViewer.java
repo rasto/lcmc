@@ -17,10 +17,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
-import edu.uci.ics.jung.visualization.DefaultVisualizationModel;
-import edu.uci.ics.jung.visualization.Layout;
-import edu.uci.ics.jung.visualization.Renderer;
-import edu.uci.ics.jung.visualization.ShapePickSupport;
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationModel;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.MutableAffineTransformer;
@@ -34,24 +31,25 @@ import edu.uci.ics.jung.visualization.transform.shape.ShapeTransformer;
  * A rectangular shape in the satellite view shows the visible bounds of
  * the master view. 
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  * 
  */
-public class SatelliteVisualizationViewer extends VisualizationViewer {
+@SuppressWarnings("serial")
+public class SatelliteVisualizationViewer<V, E> 
+	extends VisualizationViewer<V,E> {
     
     /**
      * the master VisualizationViewer that this is a satellite view for
      */
-    protected VisualizationViewer master;
+    protected VisualizationViewer<V,E> master;
     
     /**
      * @param layout
      * @param renderer
      */
-    public SatelliteVisualizationViewer(VisualizationViewer master, Layout layout, 
-            Renderer renderer) {
-        this(master, new DefaultVisualizationModel(layout), renderer);
+    public SatelliteVisualizationViewer(VisualizationViewer<V,E> master) {
+        this(master, master.getModel());
     }
 
     /**
@@ -59,29 +57,31 @@ public class SatelliteVisualizationViewer extends VisualizationViewer {
      * @param renderer
      * @param preferredSize
      */
-    public SatelliteVisualizationViewer(VisualizationViewer master, Layout layout, Renderer renderer,
+    public SatelliteVisualizationViewer(VisualizationViewer<V,E> master,
             Dimension preferredSize) {
-        this(master, new DefaultVisualizationModel(layout, preferredSize), renderer, preferredSize);
+        this(master, master.getModel(), preferredSize);
     }
 
     /**
+     * used internally, as the sattellite should always share the model of
+     * the master
      * @param model
      * @param renderer
      */
-    public SatelliteVisualizationViewer(VisualizationViewer master, VisualizationModel model,
-            Renderer renderer) {
-        this(master, model, renderer, new Dimension(300,300));
+    protected SatelliteVisualizationViewer(VisualizationViewer<V,E> master, VisualizationModel<V,E> model) {
+        this(master, model, new Dimension(300,300));
     }
 
     /**
+     * Used internally, as the satellite should always share the model of the master
      * @param master the master view
      * @param model
      * @param renderer
      * @param preferredSize
      */
-    public SatelliteVisualizationViewer(VisualizationViewer master, VisualizationModel model,
-            Renderer renderer, Dimension preferredSize) {
-        super(model, renderer, preferredSize);
+    protected SatelliteVisualizationViewer(VisualizationViewer<V,E> master, VisualizationModel<V,E> model,
+            Dimension preferredSize) {
+        super(model, preferredSize);
         this.master = master;
         
         // create a graph mouse with custom plugins to affect the master view
@@ -89,53 +89,54 @@ public class SatelliteVisualizationViewer extends VisualizationViewer {
         setGraphMouse(gm);
         
         // this adds the Lens to the satellite view
-        addPreRenderPaintable(new ViewLens(this, master));
+        addPreRenderPaintable(new ViewLens<V,E>(this, master));
         
         // get a copy of the current layout transform
         // it may have been scaled to fit the graph
         AffineTransform modelLayoutTransform =
-            new AffineTransform(master.getLayoutTransformer().getTransform());
+            new AffineTransform(master.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).getTransform());
         
         // I want no layout transformations in the satellite view
         // this resets the auto-scaling that occurs in the super constructor
-        setLayoutTransformer(new MutableAffineTransformer(modelLayoutTransform));
+        getRenderContext().getMultiLayerTransformer().setTransformer(Layer.LAYOUT, new MutableAffineTransformer(modelLayoutTransform));
         
         // make sure the satellite listens for changes in the master
         master.addChangeListener(this);
         
         // share the picked state of the master
-        setPickedState(master.getPickedState());
-        setPickSupport(new ShapePickSupport());
+        setPickedVertexState(master.getPickedVertexState());
+        setPickedEdgeState(master.getPickedEdgeState());
     }
 
     /**
      * @return Returns the master.
      */
-    public VisualizationViewer getMaster() {
+    public VisualizationViewer<V,E> getMaster() {
         return master;
     }
-
+    
     /**
      * A four-sided shape that represents the visible part of the
      * master view and is drawn in the satellite view
      * 
-     * @author Tom Nelson - RABA Technologies
+     * @author Tom Nelson 
      *
      *
      */
-    static class ViewLens implements Paintable {
+    static class ViewLens<V,E> implements Paintable {
 
-        VisualizationViewer master;
-        VisualizationViewer vv;
+        VisualizationViewer<V,E> master;
+        VisualizationViewer<V,E> vv;
         
-        public ViewLens(VisualizationViewer vv, VisualizationViewer master) {
+        public ViewLens(VisualizationViewer<V,E> vv, VisualizationViewer<V,E> master) {
             this.vv = vv;
             this.master = master;
         }
         public void paint(Graphics g) {
-            ShapeTransformer masterViewTransformer = master.getViewTransformer();
-            ShapeTransformer masterLayoutTransformer = master.getLayoutTransformer();
-            ShapeTransformer vvLayoutTransformer = vv.getLayoutTransformer();
+            ShapeTransformer masterViewTransformer = 
+            	master.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW);
+            ShapeTransformer masterLayoutTransformer = master.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
+            ShapeTransformer vvLayoutTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
 
             Shape lens = master.getBounds();
             lens = masterViewTransformer.inverseTransform(lens);

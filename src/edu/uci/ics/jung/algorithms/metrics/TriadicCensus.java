@@ -9,15 +9,16 @@
  */
 package edu.uci.ics.jung.algorithms.metrics;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections15.CollectionUtils;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.Indexer;
+import edu.uci.ics.jung.graph.Graph;
+
 
 /**
  * TriadicCensus is a standard social network tool that counts, for each of the 
@@ -75,6 +76,7 @@ import edu.uci.ics.jung.graph.decorators.Indexer;
  * Vladimir Batagelj and Andrej Mrvar, University of Ljubljana
  * Published in Social Networks.
  * @author Danyel Fisher
+ * @author Tom Nelson - converted to jung2
  *
  */
 public class TriadicCensus {
@@ -95,35 +97,30 @@ public class TriadicCensus {
 	 * 
 	 * @param g
 	 */
-    public static long[] getCounts(DirectedGraph g)
-    {
+    public static <V,E> long[] getCounts(DirectedGraph<V,E> g) {
         long[] count = new long[MAX_TRIADS];
 
-        Indexer id = Indexer.getIndexer(g);
+        List<V> id = new ArrayList<V>(g.getVertices());
 
 		// apply algorithm to each edge, one at at time
-		for (int i_v = 0; i_v < g.numVertices(); i_v++) {
-			Vertex v = (Vertex) id.getVertex(i_v);
-			for (Iterator iter = v.getNeighbors().iterator(); iter.hasNext();) {
+		for (int i_v = 0; i_v < g.getVertexCount(); i_v++) {
+			V v = id.get(i_v);
+			for(V u : g.getNeighbors(v)) {
 				int triType = -1;
-				Vertex u = (Vertex) iter.next();
-				if (id.getIndex(u) <= i_v)
+				if (id.indexOf(u) <= i_v)
 					continue;
-				Set neighbors = new HashSet(CollectionUtils.union(u
-						.getNeighbors(), v.getNeighbors()));
+				Set<V> neighbors = new HashSet<V>(CollectionUtils.union(g.getNeighbors(u), g.getNeighbors(v)));
 				neighbors.remove(u);
 				neighbors.remove(v);
-				if (u.isSuccessorOf(v) && v.isSuccessorOf(u)) {
+				if (g.isSuccessor(v,u) && g.isSuccessor(u,v)) {
 					triType = 3;
 				} else {
 					triType = 2;
 				}
-				count[triType] += g.numVertices() - neighbors.size() - 2;
-				for (Iterator iterator = neighbors.iterator(); iterator
-						.hasNext();) {
-					Vertex w = (Vertex) iterator.next();
-					if (shouldCount(id, u, v, w)) {
-						count [ triType ( triCode(u, v, w) ) ] ++;
+				count[triType] += g.getVertexCount() - neighbors.size() - 2;
+				for (V w : neighbors) {
+					if (shouldCount(g, id, u, v, w)) {
+						count [ triType ( triCode(g, u, v, w) ) ] ++;
 					}
 				}
 			}
@@ -132,7 +129,7 @@ public class TriadicCensus {
 		for (int i = 2; i <= 16; i++) {
 			sum += count[i];
 		}
-		int n = g.numVertices();
+		int n = g.getVertexCount();
 		count[1] = n * (n-1) * (n-2) / 6 - sum;
 		return count;		
 	}
@@ -142,26 +139,26 @@ public class TriadicCensus {
 	 * 65 based on: WU -> 32 UW -> 16 WV -> 8 VW -> 4 UV -> 2 VU -> 1
 	 * 
 	 */
-	public static int triCode(Vertex u, Vertex v, Vertex w) {
+	public static <V,E> int triCode(Graph<V,E> g, V u, V v, V w) {
 		int i = 0;
-		i += link( v, u ) ? 1 : 0;
-		i += link( u, v ) ? 2 : 0;
-		i += link( v, w ) ? 4 : 0;
-		i += link( w, v ) ? 8 : 0;
-		i += link( u, w ) ? 16 : 0;
-		i += link( w, u ) ? 32 : 0;
+		i += link(g, v, u ) ? 1 : 0;
+		i += link(g, u, v ) ? 2 : 0;
+		i += link(g, v, w ) ? 4 : 0;
+		i += link(g, w, v ) ? 8 : 0;
+		i += link(g, u, w ) ? 16 : 0;
+		i += link(g, w, u ) ? 32 : 0;
 		return i;
 	}
 
-	protected static boolean link( Vertex a, Vertex b) {
-		return a.isPredecessorOf(b);
+	protected static <V,E> boolean link(Graph<V,E> g, V a, V b) {
+		return g.isPredecessor(b, a);
 	}
 	
 	
 	/**
 	 * Simply returns the triCode. 
 	 * @param triCode
-	 * @return
+	 * @return the string code associated with the numeric type
 	 */
 	public static int triType( int triCode ) {
 		return codeToType[ triCode ];
@@ -184,36 +181,16 @@ public class TriadicCensus {
 	 * @param u
 	 * @param v
 	 * @param w
-	 * @return
+	 * @return true if u < w, or if v < w < u and v doesn't link to w; false otherwise
 	 */
-	protected static boolean shouldCount(Indexer id, Vertex u, Vertex v, Vertex w) {
-		int i_u = id.getIndex(u);
-		int i_w = id.getIndex(w);
+	protected static <V,E> boolean shouldCount(Graph<V,E> g, List<V> id, V u, V v, V w) {
+		int i_u = id.indexOf(u);
+		int i_w = id.indexOf(w);
 		if (i_u < i_w)
 			return true;
-		int i_v = id.getIndex(v);
-		if ((i_v < i_w) && (i_w < i_u) && (!v.isNeighborOf(w)))
+		int i_v = id.indexOf(v);
+		if ((i_v < i_w) && (i_w < i_u) && (!g.isNeighbor(w,v)))
 			return true;
 		return false;
 	}
-
-//	protected void initializeCounts() {
-//		for (int i = 0; i < count.length; i++) {
-//			count[i] = 0;
-//		}
-//	}
-
-//	/**
-//	 * Once you've created a triad, here's the census for that number. A triad
-//	 * census looks a little like an array: n elements inside it
-//	 * 
-//	 * @param i
-//	 * @return
-//	 */
-//	public long getCount(int i) throws IllegalArgumentException {
-//		if ( i < 1  || i > 16)
-//			throw new IllegalArgumentException("TriType must be 1-16");
-//		return count[i];
-//	}
-
 }

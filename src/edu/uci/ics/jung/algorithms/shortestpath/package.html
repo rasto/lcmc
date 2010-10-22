@@ -14,8 +14,18 @@ IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT
 </head>
 <body>
 
-Provides a set of algorithms for computing the shortest path between two nodes or between each pair of nodes in a graph.
-Depending on the properties of the graph will determine which algorithm to use.
+Provides interfaces and classes for calculating (geodesic) distances and shortest paths.  Currently includes:
+<ul>
+<li/><code>DijkstraDistance</code>: finds the distances from a specified source vertex to other vertices in a 
+weighted graph with no negative cycles
+<li/><code>DijkstraShortestPath</code>: extends <code>DijkstraDistance</code>, also finds shortest paths
+<li/><code>Distance</code>: an interface for defining vertex-vertex distances
+<li/><code>PrimMinimumSpanningTree</code>: identifies the spanning tree for a graph of least total edge weight
+<li/><code>ShortestPath</code>: an interface for shortest-path algorithms
+<li/><code>ShortestPathUtils</code>: utility functions for manipulating shortest paths
+<li/><code>UnweightedShortestPath</code>: finds the distances from a specified source vertex to other vertices in an
+unweighted graph
+</ul>
 
 </body>
 </html>

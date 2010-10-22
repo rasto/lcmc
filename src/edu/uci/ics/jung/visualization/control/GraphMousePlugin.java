@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 
 /**
  * the interface for all plugins to the PluggableGraphMouse
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public interface GraphMousePlugin {

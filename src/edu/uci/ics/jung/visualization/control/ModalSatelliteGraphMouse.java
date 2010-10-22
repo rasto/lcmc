@@ -13,7 +13,7 @@ package edu.uci.ics.jung.visualization.control;
 import java.awt.event.InputEvent;
 /**
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public class ModalSatelliteGraphMouse extends DefaultModalGraphMouse implements

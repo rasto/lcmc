@@ -15,7 +15,7 @@ package edu.uci.ics.jung.algorithms.importance;
  * the original position of the instance in the list and the actual ranking score.
  * @author Scott White
  */
-public abstract class Ranking implements Comparable {
+public class Ranking<V> implements Comparable {
     /**
      * The original (0-indexed) position of the instance being ranked
      */
@@ -24,15 +24,21 @@ public abstract class Ranking implements Comparable {
      * The actual rank score (normally between 0 and 1)
      */
     public double rankScore;
+    
+    /**
+     * what is being ranked
+     */
+    private V ranked;
 
     /**
      * Constructor which allows values to be set on construction
      * @param originalPos The original (0-indexed) position of the instance being ranked
      * @param rankScore The actual rank score (normally between 0 and 1)
      */
-    public Ranking(int originalPos, double rankScore) {
+    public Ranking(int originalPos, double rankScore, V ranked) {
         this.originalPos = originalPos;
         this.rankScore = rankScore;
+        this.ranked = ranked;
     }
 
     /**
@@ -50,7 +56,22 @@ public abstract class Ranking implements Comparable {
      * Returns the rank score as a string.
      * @return the stringified rank score
      */
+    @Override
     public String toString() {
         return String.valueOf(rankScore);
     }
+
+	/**
+	 * @return the ranked
+	 */
+	public V getRanked() {
+		return ranked;
+	}
+
+	/**
+	 * @param ranked the ranked to set
+	 */
+	public void setRanked(V ranked) {
+		this.ranked = ranked;
+	}
 }

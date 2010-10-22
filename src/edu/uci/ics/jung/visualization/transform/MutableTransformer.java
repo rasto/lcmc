@@ -13,14 +13,14 @@ package edu.uci.ics.jung.visualization.transform;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
-import edu.uci.ics.jung.utils.ChangeEventSupport;
 import edu.uci.ics.jung.visualization.transform.shape.ShapeTransformer;
+import edu.uci.ics.jung.visualization.util.ChangeEventSupport;
 
 /**
  * Provides an API for the mutation of a transformer
  * and for adding listeners for changes on the transformer
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  *
  */

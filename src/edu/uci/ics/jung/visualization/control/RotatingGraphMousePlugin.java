@@ -26,6 +26,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
@@ -61,12 +62,26 @@ public class RotatingGraphMousePlugin extends AbstractGraphMousePlugin
         g.setColor(new Color(0,0,0,0));
         g.fillRect(0,0,16,16);
 
-        g.setColor(Color.white);
-        g.setStroke(new BasicStroke(3));
         int left = 0;
         int top = 0;
         int right = 15;
         int bottom = 15;
+        
+        g.setColor(Color.white);
+        g.setStroke(new BasicStroke(3));
+        // top bent line
+        g.drawLine(left+2,top+6,right/2+1,top);
+        g.drawLine(right/2+1,top,right-2,top+5);
+        // bottom bent line
+        g.drawLine(left+2,bottom-6,right/2,bottom);
+        g.drawLine(right/2,bottom,right-2,bottom-6);
+        // top arrow
+        g.drawLine(left+2,top+6,left+5,top+6);
+        g.drawLine(left+2,top+6,left+2,top+3);
+        // bottom arrow
+        g.drawLine(right-2,bottom-6,right-6,bottom-6);
+        g.drawLine(right-2, bottom-6,right-2,bottom-3);
+
         
         g.setColor(Color.black);
         g.setStroke(new BasicStroke(1));
@@ -121,7 +136,7 @@ public class RotatingGraphMousePlugin extends AbstractGraphMousePlugin
         boolean accepted = checkModifiers(e);
         if(accepted) {
             MutableTransformer modelTransformer =
-                vv.getLayoutTransformer();
+                vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
             // rotate
             vv.setCursor(cursor);
             
@@ -131,7 +146,7 @@ public class RotatingGraphMousePlugin extends AbstractGraphMousePlugin
             Point2D v1 = new Point2D.Double(center.getX()-p.getX(), center.getY()-p.getY());
             Point2D v2 = new Point2D.Double(center.getX()-q.getX(), center.getY()-q.getY());
             double theta = angleBetween(v1, v2);
-            modelTransformer.rotate(theta, vv.inverseViewTransform(center));
+            modelTransformer.rotate(theta, vv.getRenderContext().getMultiLayerTransformer().inverseTransform(Layer.VIEW, center));
             down.x = e.getX();
             down.y = e.getY();
         

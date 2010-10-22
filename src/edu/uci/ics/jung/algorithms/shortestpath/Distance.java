@@ -13,8 +13,6 @@ package edu.uci.ics.jung.algorithms.shortestpath;
 
 import java.util.Map;
 
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-
 
 /**
  * An interface for classes which calculate the distance between
@@ -22,14 +20,14 @@ import edu.uci.ics.jung.graph.ArchetypeVertex;
  * 
  * @author Joshua O'Madadhain
  */
-public interface Distance
+public interface Distance<V>
 {
     /**
      * Returns the distance from the <code>source</code> vertex 
      * to the <code>target</code> vertex.  If <code>target</code> 
      * is not reachable from <code>source</code>, returns null.
      */ 
-     public abstract Number getDistance(ArchetypeVertex source, ArchetypeVertex target);
+     Number getDistance(V source, V target);
 
     /**
      * <p>Returns a <code>Map</code> which maps each vertex 
@@ -39,5 +37,5 @@ public interface Distance
      * is not reachable from <code>source</code>, no 
      * distance is stored for that vertex.
      */
-     public abstract Map getDistanceMap(ArchetypeVertex source);
+     Map<V,Number> getDistanceMap(V source);
 }

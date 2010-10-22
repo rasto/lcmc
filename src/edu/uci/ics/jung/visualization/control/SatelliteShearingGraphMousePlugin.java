@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
@@ -22,7 +23,7 @@ import edu.uci.ics.jung.visualization.transform.MutableTransformer;
  * satellite view cause shearing of the main view
  * 
  * @see ShearingGraphMousePlugin
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public class SatelliteShearingGraphMousePlugin extends ShearingGraphMousePlugin {
@@ -47,7 +48,8 @@ public class SatelliteShearingGraphMousePlugin extends ShearingGraphMousePlugin 
                 VisualizationViewer vvMaster = 
                     ((SatelliteVisualizationViewer)vv).getMaster();
                 
-                MutableTransformer modelTransformerMaster = vvMaster.getLayoutTransformer();
+                MutableTransformer modelTransformerMaster = 
+                	vvMaster.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
 
                 vv.setCursor(cursor);
                 Point2D q = down;
@@ -62,7 +64,7 @@ public class SatelliteShearingGraphMousePlugin extends ShearingGraphMousePlugin 
                 // lens center in the satellite view.
                 // translate the master view center to layout coords, then translate
                 // that point to the satellite view's view coordinate system....
-                Point2D center = vv.transform(vvMaster.inverseTransform(vvMaster.getCenter()));
+                Point2D center = vv.getRenderContext().getMultiLayerTransformer().transform(vvMaster.getRenderContext().getMultiLayerTransformer().inverseTransform(vvMaster.getCenter()));
                 if(p.getX() < center.getX()) {
                     shy = -shy;
                 }

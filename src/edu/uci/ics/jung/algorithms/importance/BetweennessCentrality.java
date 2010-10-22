@@ -10,24 +10,17 @@
 package edu.uci.ics.jung.algorithms.importance;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.Stack;
 
-import org.apache.commons.collections.Buffer;
-import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
+import org.apache.commons.collections15.Buffer;
+import org.apache.commons.collections15.buffer.UnboundedFifoBuffer;
 
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Element;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.Decorator;
-import edu.uci.ics.jung.graph.decorators.NumericDecorator;
-import edu.uci.ics.jung.utils.MutableDouble;
-import edu.uci.ics.jung.utils.PredicateUtils;
-import edu.uci.ics.jung.utils.UserData;
-import edu.uci.ics.jung.utils.UserDataUtils;
+import edu.uci.ics.jung.graph.UndirectedGraph;
 
 /**
  * Computes betweenness centrality for each vertex and edge in the graph. The result is that each vertex
@@ -45,9 +38,10 @@ import edu.uci.ics.jung.utils.UserDataUtils;
  * Running time is: O(n^2 + nm).
  * @see "Ulrik Brandes: A Faster Algorithm for Betweenness Centrality. Journal of Mathematical Sociology 25(2):163-177, 2001."
  * @author Scott White
+ * @author Tom Nelson converted to jung2
  */
 
-public class BetweennessCentrality extends AbstractRanker {
+public class BetweennessCentrality<V,E> extends AbstractRanker<V,E> {
 
     public static final String CENTRALITY = "centrality.BetweennessCentrality";
 
@@ -55,157 +49,141 @@ public class BetweennessCentrality extends AbstractRanker {
      * Constructor which initializes the algorithm
      * @param g the graph whose nodes are to be analyzed
      */
-    public BetweennessCentrality(Graph g) {
+    public BetweennessCentrality(Graph<V,E> g) {
         initialize(g, true, true);
     }
 
-    public BetweennessCentrality(Graph g, boolean rankNodes) {
+    public BetweennessCentrality(Graph<V,E> g, boolean rankNodes) {
         initialize(g, rankNodes, true);
     }
 
-    public BetweennessCentrality(Graph g, boolean rankNodes, boolean rankEdges)
+    public BetweennessCentrality(Graph<V,E> g, boolean rankNodes, boolean rankEdges)
     {
         initialize(g, rankNodes, rankEdges);
     }
     
-    protected void computeBetweenness(Graph graph) {
+	protected void computeBetweenness(Graph<V,E> graph) {
 
-        BetweennessDataDecorator decorator = new BetweennessDataDecorator();
-        NumericDecorator bcDecorator = new NumericDecorator(CENTRALITY, UserData.SHARED);
-
+    	Map<V,BetweennessData> decorator = new HashMap<V,BetweennessData>();
+    	Map<V,Number> bcVertexDecorator = 
+    		vertexRankScores.get(getRankScoreKey());
+    	bcVertexDecorator.clear();
+    	Map<E,Number> bcEdgeDecorator = 
+    		edgeRankScores.get(getRankScoreKey());
+    	bcEdgeDecorator.clear();
         
-        Set vertices = graph.getVertices();
+        Collection<V> vertices = graph.getVertices();
         
-        // clean up previous decorations, if any; otherwise the new calculations will 
-        // incorporate the old data
-        UserDataUtils.cleanup(vertices, getRankScoreKey());
-        UserDataUtils.cleanup(graph.getEdges(), getRankScoreKey());
-
-        for (Iterator vIt = vertices.iterator(); vIt.hasNext();) {
-            Vertex s = (Vertex) vIt.next();
+        for (V s : vertices) {
 
             initializeData(graph,decorator);
 
-            decorator.data(s).numSPs = 1;
-            decorator.data(s).distance = 0;
+            decorator.get(s).numSPs = 1;
+            decorator.get(s).distance = 0;
 
-            Stack stack = new Stack();
-            Buffer queue = new UnboundedFifoBuffer();
+            Stack<V> stack = new Stack<V>();
+            Buffer<V> queue = new UnboundedFifoBuffer<V>();
             queue.add(s);
 
             while (!queue.isEmpty()) {
-                Vertex v = (Vertex) queue.remove();
+                V v = queue.remove();
                 stack.push(v);
 
-                for (Iterator nIt = v.getSuccessors().iterator(); nIt.hasNext();) {
-                    Vertex w = (Vertex) nIt.next();
+                for(V w : getGraph().getSuccessors(v)) {
 
-                    if (decorator.data(w).distance < 0) {
+                    if (decorator.get(w).distance < 0) {
                         queue.add(w);
-                        decorator.data(w).distance = decorator.data(v).distance + 1;
+                        decorator.get(w).distance = decorator.get(v).distance + 1;
                     }
 
-                    if (decorator.data(w).distance == decorator.data(v).distance + 1) {
-                        decorator.data(w).numSPs += decorator.data(v).numSPs;
-                        decorator.data(w).predecessors.add(v);
+                    if (decorator.get(w).distance == decorator.get(v).distance + 1) {
+                        decorator.get(w).numSPs += decorator.get(v).numSPs;
+                        decorator.get(w).predecessors.add(v);
                     }
                 }
             }
-
+            
             while (!stack.isEmpty()) {
-                Vertex w = (Vertex) stack.pop();
+                V w = stack.pop();
 
-                for (Iterator v2It = decorator.data(w).predecessors.iterator(); v2It.hasNext();) {
-                    Vertex v = (Vertex) v2It.next();
-                    double partialDependency = (decorator.data(v).numSPs / decorator.data(w).numSPs);
-                    partialDependency *= (1.0 + decorator.data(w).dependency);
-                    decorator.data(v).dependency +=  partialDependency;
-                    Edge currentEdge = v.findEdge(w);
-                    MutableDouble edgeValue = (MutableDouble) bcDecorator.getValue(currentEdge);
-                    edgeValue.add(partialDependency);
+                for (V v : decorator.get(w).predecessors) {
+
+                    double partialDependency = (decorator.get(v).numSPs / decorator.get(w).numSPs);
+                    partialDependency *= (1.0 + decorator.get(w).dependency);
+                    decorator.get(v).dependency +=  partialDependency;
+                    E currentEdge = getGraph().findEdge(v, w);
+                    double edgeValue = bcEdgeDecorator.get(currentEdge).doubleValue();
+                    edgeValue += partialDependency;
+                    bcEdgeDecorator.put(currentEdge, edgeValue);
                 }
                 if (w != s) {
-                    MutableDouble bcValue = (MutableDouble) bcDecorator.getValue(w);
-                    bcValue.add(decorator.data(w).dependency);
+                	double bcValue = bcVertexDecorator.get(w).doubleValue();
+                	bcValue += decorator.get(w).dependency;
+                	bcVertexDecorator.put(w, bcValue);
                 }
             }
         }
 
-        if (PredicateUtils.enforcesEdgeConstraint(graph, Graph.UNDIRECTED_EDGE)) {
-            for (Iterator v3It = vertices.iterator(); v3It.hasNext();) {
-                MutableDouble bcValue = (MutableDouble) bcDecorator.getValue((Vertex) v3It.next());
-                bcValue.setDoubleValue(bcValue.doubleValue() / 2.0);
+        if(graph instanceof UndirectedGraph) {
+            for (V v : vertices) { 
+            	double bcValue = bcVertexDecorator.get(v).doubleValue();
+            	bcValue /= 2.0;
+            	bcVertexDecorator.put(v, bcValue);
             }
-            for (Iterator eIt = graph.getEdges().iterator(); eIt.hasNext();) {
-                MutableDouble bcValue = (MutableDouble) bcDecorator.getValue((Edge) eIt.next());
-                bcValue.setDoubleValue(bcValue.doubleValue() / 2.0);
+            for (E e : graph.getEdges()) {
+            	double bcValue = bcEdgeDecorator.get(e).doubleValue();
+            	bcValue /= 2.0;
+            	bcEdgeDecorator.put(e, bcValue);
             }
         }
 
-        for (Iterator vIt = vertices.iterator(); vIt.hasNext();) {
-            Vertex vertex = (Vertex) vIt.next();
-            decorator.removeValue(vertex);
-        }
-
-    }
-
-    private void initializeData(Graph g, BetweennessDataDecorator decorator) {
-        for (Iterator vIt = g.getVertices().iterator(); vIt.hasNext();) {
-            Vertex vertex = (Vertex) vIt.next();
-
-            if (vertex.getUserDatum(CENTRALITY) == null) {
-                vertex.addUserDatum(CENTRALITY, new MutableDouble(), UserData.SHARED);
-            }
-
-            decorator.setData(new BetweennessData(), vertex);
-        }
-        for (Iterator eIt = g.getEdges().iterator(); eIt.hasNext();) {
-            Edge e = (Edge) eIt.next();
-
-            if (e.getUserDatum(CENTRALITY) == null) {
-                e.addUserDatum(CENTRALITY, new MutableDouble(), UserData.SHARED);
-            }
+        for (V vertex : vertices) {
+            decorator.remove(vertex);
         }
     }
 
+    private void initializeData(Graph<V,E> g, Map<V,BetweennessData> decorator) {
+        for (V vertex : g.getVertices()) {
+
+        	Map<V,Number> bcVertexDecorator = vertexRankScores.get(getRankScoreKey());
+        	if(bcVertexDecorator.containsKey(vertex) == false) {
+        		bcVertexDecorator.put(vertex, 0.0);
+        	}
+            decorator.put(vertex, new BetweennessData());
+        }
+        for (E e : g.getEdges()) {
+
+        	Map<E,Number> bcEdgeDecorator = edgeRankScores.get(getRankScoreKey());
+        	if(bcEdgeDecorator.containsKey(e) == false) {
+        		bcEdgeDecorator.put(e, 0.0);
+        	}
+        }
+    }
+    
     /**
      * the user datum key used to store the rank scores
      * @return the key
      */
+    @Override
     public String getRankScoreKey() {
         return CENTRALITY;
     }
 
-    protected double evaluateIteration() {
+    @Override
+    public void step() {
         computeBetweenness(getGraph());
-        return 0;
-    }
-
-    class BetweennessDataDecorator extends Decorator {
-        public BetweennessDataDecorator() {
-            super("centrality.BetwennessData", UserData.REMOVE);
-        }
-
-        public BetweennessData data(Element udc) {
-            return (BetweennessData) udc.getUserDatum(getKey());
-        }
-
-        public void setData(BetweennessData value, Element udc) {
-            udc.setUserDatum(getKey(), value, getCopyAction());
-        }
-
     }
 
     class BetweennessData {
         double distance;
         double numSPs;
-        List predecessors;
+        List<V> predecessors;
         double dependency;
 
         BetweennessData() {
             distance = -1;
             numSPs = 0;
-            predecessors = new ArrayList();
+            predecessors = new ArrayList<V>();
             dependency = 0;
         }
     }

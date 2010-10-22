@@ -32,25 +32,41 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 </head>
 <body>
 
-<p>Specifies the interfaces for and capabilities of the JUNG vertex, edge, and graph classes.</p>
+<p>Interfaces for the JUNG graph types, and some representative implementations.</p>
 
-<P>In general, a graph consists of a vertex set and an edge set.  The Archetype
-interfaces are the most general, and should encompass all types of graphs 
-including hypergraphs and graphs with parallel edges.  The Graph, Vertex,
-and Edge interfaces specify the behavior for (binary) graphs in which each
-edge connects exactly two vertices, and the Directed and Undirected interfaces
-describe the specific operations available to graphs which contain 
-directed and undirected edges, respectively.</p>
+<P>A graph consists of a set of vertices set and a set of edges which connect the
+vertices.  The base interface is <code>Hypergraph</code>, which defines the most
+general type of graph; other interfaces (<code>Graph</code>, <code>DirectedGraph</code>, etc.)
+define more restrictive graph types.
+<p>Vertex and edge types are specified at compile type using Java 1.5 generics.  
 
-<p>The <code>impl</code> package contains implementations of these 
-interfaces, including <code>SparseGraph</code>, <code>BipartiteGraph</code>,
-and <code>KPartiteSparseGraph</code>.</p>
-
-<p>
-In addition, the Hypergraph, -Vertex, and -Edge interfaces specify the
-behavior for the general Hypergraph, in which an edge can contain
-any number of vertices. The impl package contains HypergraphBPG,
-an implementation of Hypergraph that uses BipartiteGraph as an underlying
-data type.
+<p>Types of graphs which are supported include (but are not limited to)
+<ul>
+<li/>edges (these have have exactly two endpoints, which may or may not be distinct)
+<li/>self-loops (edges which connect exactly one vertex)
+<li> directed and undirected edges
+<li> vertices and edges with attributes (for example, weighted edges)
+<li> vertices and edges with different constraints or properties (examples: trees, bipartite 
+     graphs, or multimodal)
+<li> parallel edges (multiple edges which connect a single set of vertices)
+<li> internal representations as matrices or as adjacency lists or adjacency maps
+<li/>internal representations that order their elements according to insertion time,
+natural ordering, or a specified <code>Comparator</code>
+</ul> 
+Extensions or implementations of this interface 
+may enforce or disallow any or all of these variations.
+<p><b>Notes</b>:
+<ul>
+<li/> The collections returned by graph instances
+should be treated in general as if read-only.  While they are not contractually 
+guaranteed (or required) to be immutable,
+these interfaces do not define the outcome if they are mutated.
+Mutations should be done via <code>{add,remove}{Edge,Vertex}</code>, or
+in the constructor.
+<li/> "Wrapper" graphs are available through <code>GraphDecorator</code>; these are useful
+if you want to create a graph implementation that uses another implementation to do the work,
+and adds some extra behavior.  (One example: <code>ObservableGraph</code>, which notifies 
+registered listeners when graph mutations occur.)
+</ul>
 </body>
 </html>

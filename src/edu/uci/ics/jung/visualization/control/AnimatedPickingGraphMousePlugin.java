@@ -20,11 +20,11 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JComponent;
 
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.visualization.Layout;
-import edu.uci.ics.jung.visualization.PickSupport;
-import edu.uci.ics.jung.visualization.PickedState;
+import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.picking.PickedState;
 
 /** 
  * AnimatedPickingGraphMousePlugin supports the picking of one Graph
@@ -35,13 +35,13 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
  * 
  * @author Tom Nelson
  */
-public class AnimatedPickingGraphMousePlugin extends AbstractGraphMousePlugin
+public class AnimatedPickingGraphMousePlugin<V, E> extends AbstractGraphMousePlugin
     implements MouseListener, MouseMotionListener {
 
 	/**
 	 * the picked Vertex
 	 */
-    protected Vertex vertex;
+    protected V vertex;
     
     /**
 	 * create an instance with default modifiers
@@ -64,22 +64,21 @@ public class AnimatedPickingGraphMousePlugin extends AbstractGraphMousePlugin
 	 * If the event occurs on a Vertex, pick that single Vertex
 	 * @param e the event
 	 */
+    @SuppressWarnings("unchecked")
     public void mousePressed(MouseEvent e) {
 		if (e.getModifiers() == modifiers) {
-			VisualizationViewer vv = (VisualizationViewer) e.getSource();
-			PickSupport pickSupport = vv.getPickSupport();
-			PickedState pickedState = vv.getPickedState();
-			if (pickSupport != null && pickedState != null) {
+			VisualizationViewer<V,E> vv = (VisualizationViewer) e.getSource();
+			GraphElementAccessor<V, E> pickSupport = vv.getPickSupport();
+			PickedState<V> pickedVertexState = vv.getPickedVertexState();
+            Layout<V,E> layout = vv.getGraphLayout();
+			if (pickSupport != null && pickedVertexState != null) {
 				// p is the screen point for the mouse event
 				Point2D p = e.getPoint();
-				// take away the view transform
-				Point2D ip = vv.inverseViewTransform(p);
-
-				vertex = pickSupport.getVertex(ip.getX(), ip.getY());
+				vertex = pickSupport.getVertex(layout, p.getX(), p.getY());
 				if (vertex != null) {
-					if (pickedState.isPicked(vertex) == false) {
-						pickedState.clearPickedVertices();
-						pickedState.pick(vertex, true);
+					if (pickedVertexState.isPicked(vertex) == false) {
+						pickedVertexState.clear();
+						pickedVertexState.pick(vertex, true);
 					}
 				}
 			}
@@ -95,13 +94,14 @@ public class AnimatedPickingGraphMousePlugin extends AbstractGraphMousePlugin
  * 
  * @param e the event
  */
+    @SuppressWarnings("unchecked")
     public void mouseReleased(MouseEvent e) {
 		if (e.getModifiers() == modifiers) {
-			final VisualizationViewer vv = (VisualizationViewer) e.getSource();
+			final VisualizationViewer<V,E> vv = (VisualizationViewer<V,E>) e.getSource();
 			if (vertex != null) {
-				Layout layout = vv.getGraphLayout();
-				Point2D q = layout.getLocation(vertex);
-				Point2D lvc = vv.inverseTransform(vv.getCenter());
+				Layout<V,E> layout = vv.getGraphLayout();
+				Point2D q = layout.transform(vertex);
+				Point2D lvc = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(vv.getCenter());
 				final double dx = (lvc.getX() - q.getX()) / 10;
 				final double dy = (lvc.getY() - q.getY()) / 10;
 
@@ -109,7 +109,7 @@ public class AnimatedPickingGraphMousePlugin extends AbstractGraphMousePlugin
 
 					public void run() {
 						for (int i = 0; i < 10; i++) {
-							vv.getLayoutTransformer().translate(dx, dy);
+							vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).translate(dx, dy);
 							try {
 								Thread.sleep(100);
 							} catch (InterruptedException ex) {

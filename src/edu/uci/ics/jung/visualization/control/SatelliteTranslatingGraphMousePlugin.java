@@ -14,6 +14,7 @@ import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
@@ -22,7 +23,7 @@ import edu.uci.ics.jung.visualization.transform.MutableTransformer;
  * the satellite view cause translating of the main view
  * 
  * @see TranslatingGraphMousePlugin
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public class SatelliteTranslatingGraphMousePlugin extends
@@ -49,11 +50,12 @@ public class SatelliteTranslatingGraphMousePlugin extends
                 VisualizationViewer vvMaster = 
                     ((SatelliteVisualizationViewer)vv).getMaster();
                 
-                MutableTransformer modelTransformerMaster = vvMaster.getLayoutTransformer();
+                MutableTransformer modelTransformerMaster = 
+                	vvMaster.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
                 vv.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
                 try {
-                    Point2D q = vv.inverseTransform(down);
-                    Point2D p = vv.inverseTransform(e.getPoint());
+                    Point2D q = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(down);
+                    Point2D p = vv.getRenderContext().getMultiLayerTransformer().inverseTransform(e.getPoint());
                     float dx = (float) (p.getX()-q.getX());
                     float dy = (float) (p.getY()-q.getY());
                     

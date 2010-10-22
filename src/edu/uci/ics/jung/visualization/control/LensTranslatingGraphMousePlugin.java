@@ -17,6 +17,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.LensTransformer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
@@ -60,11 +61,16 @@ implements MouseListener, MouseMotionListener {
      */
     public void mousePressed(MouseEvent e) {
         VisualizationViewer vv = (VisualizationViewer)e.getSource();
+        MutableTransformer vt = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW);
+        if(vt instanceof LensTransformer) {
+        	vt = ((LensTransformer)vt).getDelegate();
+        }
+        Point2D p = vt.inverseTransform(e.getPoint());
         boolean accepted = checkModifiers(e);
         if(accepted) {
             vv.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-            testViewCenter(vv.getLayoutTransformer(), e.getPoint());
-            testViewCenter(vv.getViewTransformer(), e.getPoint());
+            testViewCenter(vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT), p);
+            testViewCenter(vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW), p);
             vv.repaint();
         }
         super.mousePressed(e);
@@ -136,27 +142,42 @@ implements MouseListener, MouseMotionListener {
      */
     public void mouseDragged(MouseEvent e) {
         VisualizationViewer vv = (VisualizationViewer)e.getSource();
+        MutableTransformer vt = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW);
+        if(vt instanceof LensTransformer) {
+        	vt = ((LensTransformer)vt).getDelegate();
+        }
+        Point2D p = vt.inverseTransform(e.getPoint());
         boolean accepted = checkModifiers(e);
+
         if(accepted ) {
-            MutableTransformer modelTransformer = vv.getLayoutTransformer();
+            MutableTransformer modelTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
             vv.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-            
             if(dragOnLens) {
-                
-                setViewCenter(modelTransformer, vv.inverseViewTransform(e.getPoint()));
-                setViewCenter(vv.getViewTransformer(), e.getPoint());
+                setViewCenter(modelTransformer, p);
+                setViewCenter(vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW), p);
                 e.consume();
                 vv.repaint();
 
             } else if(dragOnEdge) {
-                
-                setViewRadius(modelTransformer, e.getPoint());
-                setViewRadius(vv.getViewTransformer(), e.getPoint());
+
+                setViewRadius(modelTransformer, p);
+                setViewRadius(vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW), p);
                 e.consume();
                 vv.repaint();
                 
             } else {
-                super.mouseDragged(e);
+            	
+            	MutableTransformer mt = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
+                Point2D iq = vt.inverseTransform(down);
+                iq = mt.inverseTransform(iq);
+                Point2D ip = vt.inverseTransform(e.getPoint());
+                ip = mt.inverseTransform(ip);
+                float dx = (float) (ip.getX()-iq.getX());
+                float dy = (float) (ip.getY()-iq.getY());
+                
+                modelTransformer.translate(dx, dy);
+                down.x = e.getX();
+                down.y = e.getY();
             }
         }
     }

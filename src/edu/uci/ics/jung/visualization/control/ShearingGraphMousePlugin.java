@@ -27,6 +27,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 
@@ -76,14 +77,14 @@ public class ShearingGraphMousePlugin extends AbstractGraphMousePlugin
         int right = 15;
         int bottom = 15;
         
-//        g.setColor(Color.white);
-//        g2.setStroke(new BasicStroke(3));
-//        g.drawLine(left+2,top+5,right-2,top+5);
-//        g.drawLine(left+2,bottom-5,right-2,bottom-5);
-//        g.drawLine(left+2,top+5,left+4,top+3);
-//        g.drawLine(left+2,top+5,left+4,top+7);
-//        g.drawLine(right-2,bottom-5,right-4,bottom-3);
-//        g.drawLine(right-2,bottom-5,right-4,bottom-7);
+        g.setColor(Color.white);
+        g2.setStroke(new BasicStroke(3));
+        g.drawLine(left+2,top+5,right-2,top+5);
+        g.drawLine(left+2,bottom-5,right-2,bottom-5);
+        g.drawLine(left+2,top+5,left+4,top+3);
+        g.drawLine(left+2,top+5,left+4,top+7);
+        g.drawLine(right-2,bottom-5,right-4,bottom-3);
+        g.drawLine(right-2,bottom-5,right-4,bottom-7);
 
         g.setColor(Color.black);
         g2.setStroke(new BasicStroke(1));
@@ -131,7 +132,8 @@ public class ShearingGraphMousePlugin extends AbstractGraphMousePlugin
         VisualizationViewer vv = (VisualizationViewer)e.getSource();
         boolean accepted = checkModifiers(e);
         if(accepted) {
-            MutableTransformer modelTransformer = vv.getLayoutTransformer();
+            MutableTransformer modelTransformer = 
+            	vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
             vv.setCursor(cursor);
             Point2D q = down;
             Point2D p = e.getPoint();

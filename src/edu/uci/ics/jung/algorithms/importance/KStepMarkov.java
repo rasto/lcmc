@@ -9,16 +9,13 @@
 */
 package edu.uci.ics.jung.algorithms.importance;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Element;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.utils.MutableDouble;
-import edu.uci.ics.jung.utils.UserData;
+
 
 /**
  * Algorithm variant of <code>PageRankWithPriors</code> that computes the importance of a node based upon taking fixed-length random
@@ -35,13 +32,14 @@ import edu.uci.ics.jung.utils.UserData;
  * <p>
  *
  * @author Scott White
+ * @author Tom Nelson - adapter to jung2
  * @see "Algorithms for Estimating Relative Importance in Graphs by Scott White and Padhraic Smyth, 2003"
  */
-public class KStepMarkov extends RelativeAuthorityRanker {
+public class KStepMarkov<V,E> extends RelativeAuthorityRanker<V,E> {
     public final static String RANK_SCORE = "jung.algorithms.importance.KStepMarkovExperimental.RankScore";
     private final static String CURRENT_RANK = "jung.algorithms.importance.KStepMarkovExperimental.CurrentRank";
     private int mNumSteps;
-    HashMap mPreviousRankingsMap;
+    HashMap<V,Number> mPreviousRankingsMap;
 
     /**
      * Construct the algorihm instance and initializes the algorithm.
@@ -50,17 +48,17 @@ public class KStepMarkov extends RelativeAuthorityRanker {
      * @param k positive integer parameter which controls the relative tradeoff between a distribution "biased" towards
      * R and the steady-state distribution which is independent of where the Markov-process started. Generally values
      * between 4-8 are reasonable
-     * @param edgeWeightKeyName
+     * @param edgeWeights the weight for each edge 
      */
-    public KStepMarkov(DirectedGraph graph, Set priors, int k, String edgeWeightKeyName) {
+    public KStepMarkov(DirectedGraph<V,E> graph, Set<V> priors, int k, Map<E,Number> edgeWeights) {
         super.initialize(graph,true,false);
         mNumSteps = k;
         setPriors(priors);
         initializeRankings();
-        if (edgeWeightKeyName == null) {
+        if (edgeWeights == null) {
             assignDefaultEdgeTransitionWeights();
         } else {
-            setUserDefinedEdgeWeightKey(edgeWeightKeyName);
+            setEdgeWeights(edgeWeights);
         }
         normalizeEdgeTransitionWeights();
     }
@@ -69,94 +67,69 @@ public class KStepMarkov extends RelativeAuthorityRanker {
      * The user datum key used to store the rank scores.
      * @return the key
      */
+    @Override
     public String getRankScoreKey() {
         return RANK_SCORE;
     }
 
-    protected void incrementRankScore(Element v, double rankValue) {
-        MutableDouble value = (MutableDouble) v.getUserDatum(RANK_SCORE);
-
-        value.add(rankValue);
+    protected void incrementRankScore(V v, double rankValue) {
+    	double value = getVertexRankScore(v, RANK_SCORE);
+    	value += rankValue;
+    	setVertexRankScore(v, value, RANK_SCORE);
     }
 
-    protected double getCurrentRankScore(Element v) {
-        return ((MutableDouble) v.getUserDatum(CURRENT_RANK)).doubleValue();
+    protected double getCurrentRankScore(V v) {
+    	return getVertexRankScore(v, CURRENT_RANK);
     }
 
-    protected void setCurrentRankScore(Element v, double rankValue) {
-        MutableDouble value = (MutableDouble) v.getUserDatum(CURRENT_RANK);
-
-        if (value == null) {
-            v.setUserDatum(CURRENT_RANK,new MutableDouble(rankValue),UserData.SHARED);
-        } else {
-            value.setDoubleValue(rankValue);
-        }
+    protected void setCurrentRankScore(V v, double rankValue) {
+    	setVertexRankScore(v, rankValue, CURRENT_RANK);
     }
 
     protected void initializeRankings() {
-         mPreviousRankingsMap = new HashMap();
-         for (Iterator vIt = getVertices().iterator();vIt.hasNext();) {
-            Vertex currentVertex = (Vertex) vIt.next();
-            Set priors = getPriors();
+         mPreviousRankingsMap = new HashMap<V,Number>();
+         for (V v : getVertices()) {
+            Set<V> priors = getPriors();
             double numPriors = priors.size();
 
-            if (getPriors().contains(currentVertex)) {
-                setRankScore(currentVertex, 1.0/ numPriors);
-                setCurrentRankScore(currentVertex, 1.0/ numPriors);
-                mPreviousRankingsMap.put(currentVertex,new MutableDouble(1.0/numPriors));
+            if (getPriors().contains(v)) {
+                setVertexRankScore(v, 1.0/ numPriors);
+                setCurrentRankScore(v, 1.0/ numPriors);
+                mPreviousRankingsMap.put(v,1.0/numPriors);
             } else {
-                setRankScore(currentVertex, 0);
-                setCurrentRankScore(currentVertex, 0);
-                mPreviousRankingsMap.put(currentVertex,new MutableDouble(0));
-
+                setVertexRankScore(v, 0);
+                setCurrentRankScore(v, 0);
+                mPreviousRankingsMap.put(v, 0);
             }
         }
      }
-    protected double evaluateIteration() {
+    @Override
+    public void step() {
 
         for (int i=0;i<mNumSteps;i++) {
             updateRankings();
-            for (Iterator vIt = getVertices().iterator(); vIt.hasNext();) {
-                Vertex currentVertex = (Vertex) vIt.next();
-                double currentRankScore = getCurrentRankScore(currentVertex);
-                MutableDouble previousRankScore = (MutableDouble) mPreviousRankingsMap.get(currentVertex);
-                incrementRankScore(currentVertex,currentRankScore);
-                previousRankScore.setDoubleValue(currentRankScore);
+            for (V v : getVertices()) {
+                double currentRankScore = getCurrentRankScore(v);
+                incrementRankScore(v,currentRankScore);
+                mPreviousRankingsMap.put(v, currentRankScore);
             }
         }
-
         normalizeRankings();
-
-        return 0;
-    }
-
-    protected void onFinalize(Element udc) {
-        udc.removeUserDatum(CURRENT_RANK);
-
     }
 
     protected void updateRankings() {
 
-        for (Iterator vIt = getVertices().iterator(); vIt.hasNext();) {
-            Vertex currentVertex = (Vertex) vIt.next();
+        for (V v : getVertices()) {
 
-//            Set incomingEdges = null;
-//            if (getGraph().isDirected()) {
-//                incomingEdges = currentVertex.getInEdges();
-//            } else {
-//                incomingEdges = currentVertex.getIncidentEdges();
-//            }
-            Set incomingEdges = currentVertex.getInEdges();
+            Collection<E> incomingEdges = getGraph().getInEdges(v);
 
             double currentPageRankSum = 0;
-            for (Iterator edgeIt = incomingEdges.iterator(); edgeIt.hasNext();) {
-                Edge incomingEdge = (Edge) edgeIt.next();
-                double currentWeight = getEdgeWeight(incomingEdge);
-                currentPageRankSum += ((MutableDouble) mPreviousRankingsMap.get(incomingEdge.getOpposite(currentVertex))).doubleValue()*currentWeight;
+            for (E e : incomingEdges) {
+                double currentWeight = getEdgeWeight(e);
+                currentPageRankSum += 
+                	mPreviousRankingsMap.get(getGraph().getOpposite(v,e)).doubleValue()*currentWeight;
             }
-
-            setCurrentRankScore(currentVertex,currentPageRankSum);
+            setCurrentRankScore(v,currentPageRankSum);
         }
-
     }
 }

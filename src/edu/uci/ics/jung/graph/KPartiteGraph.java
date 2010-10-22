@@ -1,7 +1,7 @@
 /*
- * Created on Apr 13, 2004
+ * Created on May 24, 2008
  *
- * Copyright (c) 2004, the JUNG Project and the Regents of the University 
+ * Copyright (c) 2008, the JUNG Project and the Regents of the University 
  * of California
  * All rights reserved.
  *
@@ -13,20 +13,28 @@ package edu.uci.ics.jung.graph;
 
 import java.util.Collection;
 
+import org.apache.commons.collections15.Predicate;
 
 /**
- * An interface for k-partite graphs.  k-partite graphs'
- * vertices are distributed among k partitions 
- * (disjoint subsets), and their edges are constrained to 
- * connect vertices in distinct partitions.
+ * An interface for graphs whose vertices are each members of one of 2 or more 
+ * disjoint sets (partitions), and whose edges connect only vertices in distinct
+ * partitions.
  * 
  * @author Joshua O'Madadhain
  */
-public interface KPartiteGraph extends Graph
+public interface KPartiteGraph<V,E> extends Graph<V,E>
 {
     /**
-     * Returns the array of predicates which define the partitions
-     * of this graph.
+     * Returns all vertices which satisfy the specified <code>partition</code> predicate.
+     * @param partition <code>Predicate</code> which defines a partition
+     * @return all vertices satisfying <code>partition</code>
      */
-    public Collection getPartitions();
+    public Collection<V> getVertices(Predicate<V> partition);
+
+    /**
+     * Returns the set of <code>Predicate</code> instances which define this graph's partitions.
+     * @return the set of <code>Predicate</code> instances which define this graph's partitions
+     */
+    public Collection<Predicate<V>> getPartitions();
+
 }

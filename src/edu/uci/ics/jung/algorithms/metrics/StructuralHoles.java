@@ -11,21 +11,21 @@
  */
 package edu.uci.ics.jung.algorithms.metrics;
 
-import java.util.Iterator;
+import org.apache.commons.collections15.Transformer;
 
-import edu.uci.ics.jung.graph.ArchetypeEdge;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.NumberEdgeValue;
+import edu.uci.ics.jung.graph.Graph;
 
 /**
- * Calculates some of the measures from Burt's text "Structural Holes: The Social Structure of Competition".
+ * Calculates some of the measures from Burt's text "Structural Holes: 
+ * The Social Structure of Competition".
  * 
  * <p><b>Notes</b>: 
  * <ul>
- * <li/>Each of these measures assumes that each edge has an associated non-null weight
- * whose value is accessed through the specified <code>NumberEdgeValue</code> instance.
- * <li/>Nonexistent edges are treated as edges with weight 0 for purposes of edge weight
- * calculations.
+ * <li/>Each of these measures assumes that each edge has an associated 
+ * non-null weight whose value is accessed through the specified 
+ * <code>Transformer</code> instance.
+ * <li/>Nonexistent edges are treated as edges with weight 0 for purposes 
+ * of edge weight calculations.
  * </ul>
  *  
  * <p>Based on code donated by Jasper Voskuilen and 
@@ -35,18 +35,21 @@ import edu.uci.ics.jung.graph.decorators.NumberEdgeValue;
  * @author Joshua O'Madadhain
  * @author Jasper Voskuilen
  * @see "Ronald Burt, Structural Holes: The Social Structure of Competition"
+ * @author Tom Nelson - converted to jung2
  */
-public class StructuralHoles
-{
-    protected NumberEdgeValue nev;
+public class StructuralHoles<V,E> {
+	
+    protected Transformer<E, ? extends Number> edge_weight;
+    protected Graph<V,E> g;
     
     /**
      * Creates a <code>StructuralHoles</code> instance based on the 
      * edge weights specified by <code>nev</code>.
      */
-    public StructuralHoles(NumberEdgeValue nev)
+    public StructuralHoles(Graph<V,E> graph, Transformer<E, ? extends Number> nev) 
     {
-        this.nev = nev;
+        this.g = graph;
+        this.edge_weight = nev;
     }
 
     /**
@@ -62,20 +65,19 @@ public class StructuralHoles
      * <li/><code>p(v,w) =</code> normalized mutual edge weight of v and w
      * <li/><code>m(u,w)</code> = maximum-scaled mutual edge weight of u and w
      * </ul>
-     * @see #normalizedMutualEdgeWeight(Vertex, Vertex)
-     * @see #maxScaledMutualEdgeWeight(Vertex, Vertex) 
+     * @see #normalizedMutualEdgeWeight(Object, Object)
+     * @see #maxScaledMutualEdgeWeight(Object, Object) 
      */
-    public double effectiveSize(Vertex v)
+    public double effectiveSize(V v)
     {
-        double result = v.degree();
-        for (Iterator v_iter = v.getNeighbors().iterator(); v_iter.hasNext(); )
-        {
-            Vertex u = (Vertex)v_iter.next();
-            for (Iterator u_iter = u.getNeighbors().iterator(); u_iter.hasNext(); )
-            {
-                Vertex w = (Vertex)u_iter.next();
+        double result = g.degree(v);
+        for(V u : g.getNeighbors(v)) {
+
+            for(V w : g.getNeighbors(u)) {
+
                 if (w != v && w != u)
-                    result -= normalizedMutualEdgeWeight(v,w)*maxScaledMutualEdgeWeight(u,w);
+                    result -= normalizedMutualEdgeWeight(v,w) * 
+                              maxScaledMutualEdgeWeight(u,w);
             }
         }
         return result;
@@ -87,9 +89,8 @@ public class StructuralHoles
      * <code>effectiveSize(v) / v.degree()</code>.)
      * If <code>v.degree() == 0</code>, returns 0.
      */
-    public double efficiency(Vertex v)
-    {
-        double degree = v.degree();
+    public double efficiency(V v) {
+        double degree = g.degree(v);
         
         if (degree == 0)
             return 0;
@@ -106,15 +107,13 @@ public class StructuralHoles
      * constraint(v) = sum_{w in MP(v), w != v} localConstraint(v,w)
      * </pre>
      * where MP(v) is the subset of v's neighbors that are both predecessors and successors of v. 
-     * @see #localConstraint(Vertex, Vertex)
+     * @see #localConstraint(Object, Object)
      */
-    public double constraint(Vertex v)
-    {
+    public double constraint(V v) {
         double result = 0;
-        for (Iterator v_iter = v.getSuccessors().iterator(); v_iter.hasNext(); )
-        {
-            Vertex w = (Vertex)v_iter.next();
-            if (v != w && w.isPredecessorOf(v))
+        for(V w : g.getSuccessors(v)) {
+
+            if (v != w && g.isPredecessor(v,w))
             {
                 result += localConstraint(v, w);
             }
@@ -136,12 +135,12 @@ public class StructuralHoles
      * <li/><code>N(v) = v.getNeighbors()</code> 
      * <li/><code>s(v,w) = localConstraint(v,w) / (aggregateConstraint(v) / v.degree())</code>
      * </ul>
-     * @see #localConstraint(Vertex, Vertex)
-     * @see #aggregateConstraint(Vertex)
+     * @see #localConstraint(Object, Object)
+     * @see #aggregateConstraint(Object)
      */
-    public double hierarchy(Vertex v)
+    public double hierarchy(V v)
     {
-        double v_degree = v.degree();
+        double v_degree = g.degree(v);
         
         if (v_degree == 0)
             return Double.NaN;
@@ -151,9 +150,8 @@ public class StructuralHoles
         double v_constraint = aggregateConstraint(v);
 
         double numerator = 0;
-        for (Iterator iter = v.getNeighbors().iterator(); iter.hasNext(); )
-        {
-            Vertex w = (Vertex)iter.next();
+        for (V w : g.getNeighbors(v)) {
+        
             if (v != w)
             {
                 double sl_constraint = localConstraint(v, w) / (v_constraint / v_degree);
@@ -176,15 +174,14 @@ public class StructuralHoles
      * <li/><code>N(v) = v.getNeighbors()</code>
      * <li/><code>p(v,w) =</code> normalized mutual edge weight of v and w
      * </ul>
-     * @see #normalizedMutualEdgeWeight(Vertex, Vertex)
+     * @see #normalizedMutualEdgeWeight(Object, Object)
      */
-    public double localConstraint(Vertex v1, Vertex v2) 
+    public double localConstraint(V v1, V v2) 
     {
         double nmew_vw = normalizedMutualEdgeWeight(v1, v2);
         double inner_result = 0;
-        for (Iterator v_iter = v1.getNeighbors().iterator(); v_iter.hasNext(); )
-        {
-            Vertex w = (Vertex)v_iter.next();
+        for (V w : g.getNeighbors(v1)) {
+
             inner_result += normalizedMutualEdgeWeight(v1,w) * 
                 normalizedMutualEdgeWeight(w,v2);
         }
@@ -203,13 +200,12 @@ public class StructuralHoles
      * <li/><code>O(w) = organizationalMeasure(w)</code>
      * </ul>
      */
-    public double aggregateConstraint(Vertex v)
+    public double aggregateConstraint(V v)
     {
         double result = 0;
-        for (Iterator v_iter = v.getNeighbors().iterator(); v_iter.hasNext(); )
-        {
-            Vertex w = (Vertex)v_iter.next();
-            result += localConstraint(v, w) * organizationalMeasure(w);
+        for (V w : g.getNeighbors(v)) {
+
+            result += localConstraint(v, w) * organizationalMeasure(g, w);
         }
         return result;
     }
@@ -224,8 +220,7 @@ public class StructuralHoles
      * <p>This implementation returns 1.  Users may wish to override this
      * method in order to define their own behavior.</p>
      */
-    protected double organizationalMeasure(Vertex v) 
-    {
+    protected double organizationalMeasure(Graph<V,E> g, V v) {
         return 1.0;
     }
     
@@ -237,9 +232,9 @@ public class StructuralHoles
      * normalizedMutualEdgeWeight(a,b) = mutual_weight(a,b) / (sum_c mutual_weight(a,c))
      * </pre>
      * Returns 0 if either numerator or denominator = 0, or if <code>v1 == v2</code>.
-     * @see #mutualWeight(Vertex, Vertex)
+     * @see #mutualWeight(Object, Object)
      */
-    protected double normalizedMutualEdgeWeight(Vertex v1, Vertex v2)
+    protected double normalizedMutualEdgeWeight(V v1, V v2)
     {
         if (v1 == v2)
             return 0;
@@ -250,9 +245,9 @@ public class StructuralHoles
             return 0;
         
         double denominator = 0;
-        for (Iterator iter = v1.getNeighbors().iterator(); iter.hasNext(); )
-            denominator += mutualWeight(v1, (Vertex)iter.next());
-
+        for (V v : g.getNeighbors(v1)) {
+            denominator += mutualWeight(v1, v);
+        }
         if (denominator == 0)
             return 0;
         
@@ -271,12 +266,12 @@ public class StructuralHoles
      * present but not assigned a weight by the constructor-specified
      * <code>NumberEdgeValue</code>.
      */
-    protected double mutualWeight(Vertex v1, Vertex v2)
+    protected double mutualWeight(V v1, V v2)
     {
-        ArchetypeEdge e12 = v1.findEdge(v2);
-        ArchetypeEdge e21 = v2.findEdge(v1);
-        double w12 = (e12 != null ? nev.getNumber(e12).doubleValue() : 0);
-        double w21 = (e21 != null ? nev.getNumber(e21).doubleValue() : 0);
+        E e12 = g.findEdge(v1,v2);
+        E e21 = g.findEdge(v2,v1);
+        double w12 = (e12 != null ? edge_weight.transform(e12).doubleValue() : 0);
+        double w21 = (e21 != null ? edge_weight.transform(e21).doubleValue() : 0);
         
         return w12 + w21;
     }
@@ -288,9 +283,9 @@ public class StructuralHoles
      * normalized_mutual_weight = mutual_weight(a,b) / (max_c mutual_weight(a,c))
      * </pre>
      * Returns 0 if either numerator or denominator is 0, or if <code>v1 == v2</code>.
-     * @see #mutualWeight(Vertex, Vertex)
+     * @see #mutualWeight(Object, Object)
      */
-    protected double maxScaledMutualEdgeWeight(Vertex v1, Vertex v2)
+    protected double maxScaledMutualEdgeWeight(V v1, V v2)
     {
         if (v1 == v2)
             return 0;
@@ -301,9 +296,8 @@ public class StructuralHoles
             return 0;
         
         double denominator = 0;
-        for (Iterator iter = v1.getNeighbors().iterator(); iter.hasNext(); )
-        {
-            Vertex w = (Vertex)iter.next();
+        for (V w : g.getNeighbors(v1)) {
+
             if (v2 != w)
                 denominator = Math.max(numerator, mutualWeight(v1, w));
         }

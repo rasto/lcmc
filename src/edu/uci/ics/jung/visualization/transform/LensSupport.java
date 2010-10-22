@@ -15,7 +15,7 @@ import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 /**
  * basic API for implementing lens projection support
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public interface LensSupport {

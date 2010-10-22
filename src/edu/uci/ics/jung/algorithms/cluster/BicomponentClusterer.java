@@ -11,16 +11,14 @@ package edu.uci.ics.jung.algorithms.cluster;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import edu.uci.ics.jung.graph.ArchetypeGraph;
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.utils.PredicateUtils;
+import org.apache.commons.collections15.Transformer;
+
+import edu.uci.ics.jung.graph.UndirectedGraph;
 
 /**
  * Finds all biconnected components (bicomponents) of an undirected graph.  
@@ -35,12 +33,12 @@ import edu.uci.ics.jung.utils.PredicateUtils;
  * 
  * @author Joshua O'Madadhain
  */
-public class BicomponentClusterer implements GraphClusterer 
+public class BicomponentClusterer<V,E> implements Transformer<UndirectedGraph<V,E>, Set<Set<V>>> 
 {
-    protected Map dfs_num;
-    protected Map high;
-    protected Map parents;
-    protected Stack stack;
+    protected Map<V,Number> dfs_num;
+    protected Map<V,Number> high;
+    protected Map<V,V> parents;
+    protected Stack<E> stack;
     protected int converse_depth;
 
     /**
@@ -50,48 +48,42 @@ public class BicomponentClusterer implements GraphClusterer
     }
 
     /**
-    * Extracts the bicomponents from the graph
+    * Extracts the bicomponents from the graph.
     * @param theGraph the graph whose bicomponents are to be extracted
     * @return the <code>ClusterSet</code> of bicomponents
     */
-    public ClusterSet extract(ArchetypeGraph theGraph) 
+    public Set<Set<V>> transform(UndirectedGraph<V,E> theGraph) 
     {
-        if (!PredicateUtils.enforcesEdgeConstraint(theGraph, Graph.UNDIRECTED_EDGE)) {
-            throw new IllegalArgumentException("Algorithm currently only handles undirected graphs.");
-        }
-        
-        ClusterSet bicomponents = new VertexClusterSet(theGraph);
+    	Set<Set<V>> bicomponents = new LinkedHashSet<Set<V>>();
 
         if (theGraph.getVertices().isEmpty())
             return bicomponents;
 
         // initialize DFS number for each vertex to 0
-        dfs_num = new HashMap();
-        for (Iterator it = theGraph.getVertices().iterator(); it.hasNext(); )
+        dfs_num = new HashMap<V,Number>();
+        for (V v : theGraph.getVertices())
         {
-            Vertex v = (Vertex)it.next();
-            set(v, dfs_num, 0);
+        	dfs_num.put(v, 0);
         }
 
-        for (Iterator iter = theGraph.getVertices().iterator(); iter.hasNext(); )
+        for (V v : theGraph.getVertices())
         {
-            Vertex v = (Vertex)iter.next(); 
-            if (get(v, dfs_num) == 0) // if we haven't hit this vertex yet...
+            if (dfs_num.get(v).intValue() == 0) // if we haven't hit this vertex yet...
             {
-                high = new HashMap();
-                stack = new Stack();
-                parents = new HashMap();
-                converse_depth = theGraph.numVertices();
+                high = new HashMap<V,Number>();
+                stack = new Stack<E>();
+                parents = new HashMap<V,V>();
+                converse_depth = theGraph.getVertexCount();
                 // find the biconnected components for this subgraph, starting from v
-                findBiconnectedComponents(v, bicomponents);
+                findBiconnectedComponents(theGraph, v, bicomponents);
                 
                 // if we only visited one vertex, this method won't have
                 // ID'd it as a biconnected component, so mark it as one
-                if (theGraph.numVertices() - converse_depth == 1)
+                if (theGraph.getVertexCount() - converse_depth == 1)
                 {
-                    Set s = new HashSet();
+                    Set<V> s = new HashSet<V>();
                     s.add(v);
-                    bicomponents.addCluster(s);
+                    bicomponents.add(s);
                 }
             }
         }
@@ -128,63 +120,43 @@ public class BicomponentClusterer implements GraphClusterer
      * have saved myself a few days.  JRTOM)</p>
      * 
      */
-    protected void findBiconnectedComponents(Vertex v, ClusterSet bicomponents)
+    protected void findBiconnectedComponents(UndirectedGraph<V,E> g, V v, Set<Set<V>> bicomponents)
     {
         int v_dfs_num = converse_depth;
-        set(v, dfs_num, v_dfs_num);
+        dfs_num.put(v, v_dfs_num);
         converse_depth--;
-        set(v, high, v_dfs_num);
+        high.put(v, v_dfs_num);
 
-        for (Iterator iter = v.getNeighbors().iterator(); iter.hasNext();)
+        for (V w : g.getNeighbors(v))
         {
-            Vertex w = (Vertex) iter.next();
-            int w_dfs_num = get(w, dfs_num);
-            Edge vw = v.findEdge(w);
+            int w_dfs_num = dfs_num.get(w).intValue();//get(w, dfs_num);
+            E vw = g.findEdge(v,w);
             if (w_dfs_num == 0) // w hasn't yet been visited
             {
                 parents.put(w, v); // v is w's parent in the DFS tree
                 stack.push(vw);
-                findBiconnectedComponents(w, bicomponents);
-                int w_high = get(w, high);
+                findBiconnectedComponents(g, w, bicomponents);
+                int w_high = high.get(w).intValue();//get(w, high);
                 if (w_high <= v_dfs_num)
                 {
                     // v disconnects w from the rest of the graph,
                     // i.e., v is an articulation point
                     // thus, everything between the top of the stack and
                     // v is part of a single biconnected component
-                    Set bicomponent = new HashSet();
-                    Edge e;
+                    Set<V> bicomponent = new HashSet<V>();
+                    E e;
                     do
                     {
-                        e = (Edge) stack.pop();
-                        bicomponent.addAll(e.getIncidentVertices());
+                        e = stack.pop();
+                        bicomponent.addAll(g.getIncidentVertices(e));
                     }
                     while (e != vw);
-                    bicomponents.addCluster(bicomponent);
+                    bicomponents.add(bicomponent);
                 }
-                set(v, high, (int) Math.max(w_high, get(v, high)));
+                high.put(v, Math.max(w_high, high.get(v).intValue()));
             }
             else if (w != parents.get(v)) // (v,w) is a back or a forward edge
-                set(v, high, (int) Math.max(w_dfs_num, get(v, high)));
+            	high.put(v, Math.max(w_dfs_num, high.get(v).intValue()));
         }
-    }
-
-    /**
-     * A convenience method for getting the integer value for
-     * <code>v</code> which is stored in Map <code>m</code>.
-     * Does no error checking.
-     */
-    protected int get(Vertex v, Map m)
-    {
-        return ((Integer)m.get(v)).intValue();
-    }
-
-    /**
-     * A convenience method for setting an integer value
-     * for <code>v</code> in Map <code>m</code>.
-     */
-    protected void set(Vertex v, Map m, int value)
-    {
-        m.put(v, new Integer(value));
     }
 }

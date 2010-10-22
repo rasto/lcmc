@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.transform.LensTransformer;
 import edu.uci.ics.jung.visualization.transform.MutableTransformer;
@@ -28,11 +29,11 @@ import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 public class LensMagnificationGraphMousePlugin extends AbstractGraphMousePlugin
     implements MouseWheelListener {
 
-    protected float floor = .5f;
+    protected float floor = 1.0f;
     
-    protected float ceiling = .9f;
+    protected float ceiling = 5.0f;
     
-    protected float delta = .02f;
+    protected float delta = .2f;
     
 	/**
 	 * create an instance with default zoom in/out values
@@ -50,7 +51,7 @@ public class LensMagnificationGraphMousePlugin extends AbstractGraphMousePlugin
     }
     
     public LensMagnificationGraphMousePlugin(int modifiers) {
-        this(modifiers, .5f, .9f, .02f);
+        this(modifiers, 1.0f, 4.0f, .2f);
     }
     public LensMagnificationGraphMousePlugin(int modifiers, float floor, float ceiling, float delta) {
         super(modifiers);
@@ -83,8 +84,8 @@ public class LensMagnificationGraphMousePlugin extends AbstractGraphMousePlugin
         float delta = this.delta;
         if(accepted == true) {
             VisualizationViewer vv = (VisualizationViewer)e.getSource();
-            MutableTransformer modelTransformer = vv.getLayoutTransformer();
-            MutableTransformer viewTransformer = vv.getViewTransformer();
+            MutableTransformer modelTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT);
+            MutableTransformer viewTransformer = vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW);
             int amount = e.getWheelRotation();
             if(amount < 0) {
                 delta = -delta;

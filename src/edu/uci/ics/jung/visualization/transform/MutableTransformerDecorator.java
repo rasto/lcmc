@@ -18,7 +18,7 @@ import javax.swing.event.ChangeListener;
  * a complete decorator that wraps a MutableTransformer. Subclasses
  * use this to allow them to only declare methods they need to change.
  * 
- * @author Tom Nelson - RABA Technologies
+ * @author Tom Nelson 
  *
  */
 public abstract class MutableTransformerDecorator implements MutableTransformer {

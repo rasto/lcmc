@@ -16,28 +16,21 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.functors.OrPredicate;
+import org.apache.commons.collections15.Factory;
+import org.apache.commons.collections15.Predicate;
+import org.apache.commons.collections15.functors.OrPredicate;
 
-import edu.uci.ics.jung.exceptions.FatalException;
-import edu.uci.ics.jung.graph.Edge;
+import edu.uci.ics.jung.algorithms.util.MapSettableTransformer;
+import edu.uci.ics.jung.algorithms.util.SettableTransformer;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.Indexer;
-import edu.uci.ics.jung.graph.decorators.NumberEdgeValue;
-import edu.uci.ics.jung.graph.decorators.StringLabeller;
-import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.SparseGraph;
-import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
-import edu.uci.ics.jung.graph.predicates.ParallelEdgePredicate;
-import edu.uci.ics.jung.utils.PredicateUtils;
-import edu.uci.ics.jung.utils.TypedVertexGenerator;
-import edu.uci.ics.jung.utils.UserData;
-import edu.uci.ics.jung.utils.VertexGenerator;
-import edu.uci.ics.jung.visualization.DefaultSettableVertexLocationFunction;
-import edu.uci.ics.jung.visualization.SettableVertexLocationFunction;
+import edu.uci.ics.jung.graph.UndirectedGraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
 
 
 /**
@@ -94,197 +87,106 @@ import edu.uci.ics.jung.visualization.SettableVertexLocationFunction;
  * 
  * @author Joshua O'Madadhain
  * @see "'Pajek - Program for Analysis and Visualization of Large Networks', Vladimir Batagelj and Andrej Mrvar, http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf"
+ * @author Tom Nelson - converted to jung2
  */
-public class PajekNetReader
+public class PajekNetReader<G extends Graph<V,E>,V,E>
 {
-    protected boolean unique_labels;
+	protected Factory<V> vertex_factory;
+	protected Factory<E> edge_factory;
 
     /**
-     * The key used to identify the vertex labels (if any) created by this class.
+     * The map for vertex labels (if any) created by this class.
      */
-    public static final String LABEL = "jung.io.PajekNetReader.LABEL";
-
+	protected SettableTransformer<V, String> vertex_labels = new MapSettableTransformer<V,String>(new HashMap<V,String>());
+    
     /**
-     * The user data key used to retrieve the vertex locations (if any) defined by this class.
+     * The map for vertex locations (if any) defined by this class.
      */
-    public static final String LOCATIONS = "jung.io.PajekNetReader.LOCATIONS";
+	protected SettableTransformer<V, Point2D> vertex_locations = new MapSettableTransformer<V,Point2D>(new HashMap<V,Point2D>());
     
-    protected SettableVertexLocationFunction v_locations;
-    protected boolean get_locations = false;
-    
+	protected SettableTransformer<E, Number> edge_weights = 
+	    new MapSettableTransformer<E, Number>(new HashMap<E, Number>());
+	
     /**
      * Used to specify whether the most recently read line is a 
      * Pajek-specific tag.
      */
-    private static final Predicate v_pred = new TagPred("*vertices");
-    private static final Predicate a_pred = new TagPred("*arcs");
-    private static final Predicate e_pred = new TagPred("*edges");
-    private static final Predicate t_pred = new TagPred("*");
-    private static final Predicate c_pred = OrPredicate.getInstance(a_pred, e_pred);
-    protected static final Predicate l_pred = ListTagPred.getInstance();
-    protected static final Predicate p_pred = ParallelEdgePredicate.getInstance();
+    private static final Predicate<String> v_pred = new StartsWithPredicate("*vertices");
+    private static final Predicate<String> a_pred = new StartsWithPredicate("*arcs");
+    private static final Predicate<String> e_pred = new StartsWithPredicate("*edges");
+    private static final Predicate<String> t_pred = new StartsWithPredicate("*");
+    private static final Predicate<String> c_pred = OrPredicate.getInstance(a_pred, e_pred);
+    protected static final Predicate<String> l_pred = ListTagPred.getInstance();
     
     /**
-     * Creates a PajekNetReader with the specified labeling behavior, which does not 
-     * read location information (if any).
-     * 
-     * @see #PajekNetReader(boolean, boolean)
+     * Creates a PajekNetReader instance with the specified vertex and edge factories.
+     * @param vertex_factory the factory to use to create vertex objects
+     * @param edge_factory the factory to use to create edge objects
      */
-    public PajekNetReader(boolean unique_labels)
-    {
-        this(unique_labels, false);
-    }
-    
-    /**
-     * Creates a PajekNetReader with the specified labeling behavior and 
-     * location assignment behavior.
-     * 
-     * <p>If <code>unique_labels</code> is true, vertices will be labelled 
-     * using a <code>StringLabeller</code> with key <code>jung.io.PajekNetReader.LABEL</code>.
-     * Otherwise, they will be labeled with a user data <code>String</code> with key 
-     * <code>PajekNetReader.LABEL</code>.  (Vertices that have no apparent label
-     * information will not be labelled.)</p>
-     * 
-     * <p>If <code>get_locations</code> is true, each vertex line in the file
-     * will be assumed to contain (x,y) coordinates in the range [0,1]; if any line
-     * lacks this data, an <code>IllegalArgumentException</code> will be thrown.  (The Pajek
-     * format assumes coordinates are (x,y,z) but we ignore the z-coordinate.)  Location
-     * data will be stored in a <code>SettabelVertexLocationDecorator</code> instance
-     * in the graph's user data with key<code>jung.io.PajekNetReader.LOCATIONS</code>.</p>
-     */
-    public PajekNetReader(boolean unique_labels, boolean get_locations)
-    {
-        this.unique_labels = unique_labels;
-        this.get_locations = get_locations;
-        if (get_locations)
-            this.v_locations = new DefaultSettableVertexLocationFunction();
-    }
-    
-    /**
-     * Creates a PajekNetReader with the specified labeling behavior and 
-     * location assignment behavior.
-     * 
-     * <p>If <code>unique_labels</code> is true, vertices will be labelled 
-     * using a <code>StringLabeller</code> with key <code>jung.io.PajekNetReader.LABEL</code>.
-     * Otherwise, they will be labeled with a user data <code>String</code> with key 
-     * <code>PajekNetReader.LABEL</code>.  (Vertices that have no apparent label
-     * information will not be labelled.)</p>
-     * 
-     * <p>If <code>get_locations</code> is true, each vertex line in the file
-     * will be assumed to contain (x,y) coordinates in the range [0,1]; if any line
-     * lacks this data, an <code>IllegalArgumentException</code> will be thrown.  (The Pajek
-     * format assumes coordinates are (x,y,z) but we ignore the z-coordinate.)  Location
-     * data will be stored in <code>v_locations</code>, a reference to which will be
-     * stored in the graph's user data with key <code>jung.io.PajekNetReader.LOCATIONS</code>.</p>
-     */
-    public PajekNetReader(boolean unique_labels, SettableVertexLocationFunction v_locations)
-    {
-        this.unique_labels = unique_labels;
-        this.get_locations = true;
-        this.v_locations = v_locations;
-    }
-    
-    /**
-     * Creates a PajekNetReader whose labels are not required to be unique.
-     */
-    public PajekNetReader()
-    {
-        this(false, false);
-    }
-    
-    /**
-     * Returns <code>load(filename, new SparseGraph(), null)</code>.
-     * @throws IOException
-     */
-    public Graph load(String filename) throws IOException
-    {
-        return load(filename, new SparseGraph(), null);
+    public PajekNetReader(Factory<V> vertex_factory, Factory<E> edge_factory) 
+    { 
+        this.vertex_factory = vertex_factory;
+        this.edge_factory = edge_factory;
     }
 
     /**
-     * Returns <code>load(filename, new SparseGraph(), nev)</code>.
-     * @throws IOException
+     * Creates a PajekNetReader instance with the specified edge factory,
+     * and whose vertex objects correspond to the integer IDs assigned in the file.
+     * Note that this requires <code>V</code> to be assignment-compatible with
+     * an <code>Integer</code> value.
+     * @param edge_factory the factory to use to create edge objects
      */
-    public Graph load(String filename, NumberEdgeValue nev) throws IOException
+    public PajekNetReader(Factory<E> edge_factory)
     {
-        return load(filename, new SparseGraph(), nev);
+        this(null, edge_factory);
     }
     
     /**
-     * Returns <code>load(filename, g, null)</code>.
+     * Returns the graph created by parsing the specified file, as created
+     * by the specified factory.
      * @throws IOException
      */
-    public Graph load(String filename, Graph g) throws IOException
+    public G load(String filename, Factory<? extends G> graph_factory) throws IOException
     {
-        return load(filename, g, null);
+        return load(new FileReader(filename), graph_factory.create());
     }
     
     /**
-     * Creates a <code>FileReader</code> from <code>filename</code>, calls
-     * <code>load(reader, g, nev)</code>, closes the reader, and returns
-     * the resultant graph.
+     * Returns the graph created by parsing the specified reader, as created
+     * by the specified factory.
      * @throws IOException
      */
-    public Graph load(String filename, Graph g, NumberEdgeValue nev) throws IOException
+    public G load(Reader reader, Factory<? extends G> graph_factory) throws IOException
     {
-        Reader reader = new FileReader(filename);
-        Graph graph = load(reader, g, nev);
-        reader.close();
-        return graph;
+        return load(reader, graph_factory.create());
     }
-    
+
     /**
-     * Returns <code>load(reader, g, null)</code>.
+     * Returns the graph created by parsing the specified file, by populating the
+     * specified graph.
      * @throws IOException
      */
-    public Graph load(Reader reader, Graph g) throws IOException
+    public G load(String filename, G g) throws IOException
     {
-        return load(reader, g, null);
-    }
-    
-    /**
-     * Returns <code>load(reader, new SparseGraph(), nev)</code>.
-     * @throws IOException
-     */
-    public Graph load(Reader reader, NumberEdgeValue nev) throws IOException
-    {
-        return load(reader, new SparseGraph(), nev);
-    }
-    
-    /**
-     * Returns <code>load(reader, new SparseGraph(), null)</code>.
-     * @throws IOException
-     */
-    public Graph load(Reader reader) throws IOException
-    {
-        return load(reader, new SparseGraph(), null);
-    }
-    
-    /**
-     * Returns <code>load(reader, g, nev, new TypedVertexGenerator(g))</code>.
-     * @throws IOException
-     * @see edu.uci.ics.jung.utils.TypedVertexGenerator
-     */
-    public Graph load(Reader reader, Graph g, NumberEdgeValue nev) throws IOException
-    {
-        return load(reader, g, nev, new TypedVertexGenerator(g));
+        if (g == null)
+            throw new IllegalArgumentException("Graph provided must be non-null");
+        return load(new FileReader(filename), g);
     }
     
     /**
      * Populates the graph <code>g</code> with the graph represented by the
      * Pajek-format data supplied by <code>reader</code>.  Stores edge weights,
      * if any, according to <code>nev</code> (if non-null).
-     * Any existing vertices/edges of <code>g</code>, if any, are unaffected.
-     * The edge data are filtered according to <code>g</code>'s constraints, if any; thus, if 
+     * 
+     * <p>Any existing vertices/edges of <code>g</code>, if any, are unaffected.
+     * 
+     * <p>The edge data are filtered according to <code>g</code>'s constraints, if any; thus, if 
      * <code>g</code> only accepts directed edges, any undirected edges in the 
      * input are ignored.
-     * Vertices are created with the generator <code>vg</code>.  The user is responsible
-     * for supplying a generator whose output is compatible with this graph and its contents;
-     * users that don't want to deal with this issue may use a <code>TypedVertexGenerator</code>
-     * or call <code>load(reader, g, nev)</code> for a default generator.
+     * 
      * @throws IOException
      */
-    public Graph load(Reader reader, Graph g, NumberEdgeValue nev, VertexGenerator vg) throws IOException
+    public G load(Reader reader, G g) throws IOException
     {
         BufferedReader br = new BufferedReader(reader);
                 
@@ -294,16 +196,17 @@ public class PajekNetReader
         if (curLine == null) // no vertices in the graph; return empty graph
             return g;
         
-        if (get_locations)
-            g.addUserDatum(LOCATIONS, v_locations, UserData.SHARED);
-        
         // create appropriate number of vertices
         StringTokenizer st = new StringTokenizer(curLine);
         st.nextToken(); // skip past "*vertices";
         int num_vertices = Integer.parseInt(st.nextToken());
-        for (int i = 1; i <= num_vertices; i++)
-            g.addVertex(vg.create());
-        Indexer id = Indexer.getIndexer(g);
+        List<V> id = null;
+        if (vertex_factory != null)
+        {
+            for (int i = 1; i <= num_vertices; i++)
+                g.addVertex(vertex_factory.create());
+            id = new ArrayList<V>(g.getVertices());
+        }
 
         // read vertices until we see any Pajek format tag ('*...')
         curLine = null;
@@ -329,10 +232,10 @@ public class PajekNetReader
 
         // skip over the intermediate stuff (if any) 
         // and read the next arcs/edges section that we find
-        curLine = readArcsOrEdges(curLine, br, g, nev);
+        curLine = readArcsOrEdges(curLine, br, g, id, edge_factory);
 
         // ditto
-        readArcsOrEdges(curLine, br, g, nev);
+        readArcsOrEdges(curLine, br, g, id, edge_factory);
         
         br.close();
         reader.close();
@@ -343,11 +246,11 @@ public class PajekNetReader
     /**
      * Parses <code>curLine</code> as a reference to a vertex, and optionally assigns 
      * label and location information.
-     * @throws IOException
      */
-    private void readVertex(String curLine, Indexer id, int num_vertices) throws IOException
+    @SuppressWarnings("unchecked")
+    private void readVertex(String curLine, List<V> id, int num_vertices)
     {
-        Vertex v;
+        V v;
         String[] parts = null;
         int coord_idx = -1;     // index of first coordinate in parts; -1 indicates no coordinates found
         String index;
@@ -358,7 +261,8 @@ public class PajekNetReader
             String[] initial_split = curLine.trim().split("\"");
             // if there are any quote marks, there should be exactly 2
             if (initial_split.length < 2 || initial_split.length > 3)
-                throw new IllegalArgumentException("Unbalanced (or too many) quote marks in " + curLine);
+                throw new IllegalArgumentException("Unbalanced (or too many) " +
+                		"quote marks in " + curLine);
             index = initial_split[0].trim();
             label = initial_split[1].trim();
             if (initial_split.length == 3)
@@ -379,7 +283,7 @@ public class PajekNetReader
                 case 3:         // ID, no label, coordinates
                     coord_idx = 1;
                     break;
-                case 4:         // ID, label, (x,y) coordinates
+                default:         // ID, label, (x,y) coordinates, maybe some other stuff
                     coord_idx = 2;
                     break;
             }
@@ -388,71 +292,60 @@ public class PajekNetReader
         if (v_id >= num_vertices || v_id < 0)
             throw new IllegalArgumentException("Vertex number " + v_id +
                     "is not in the range [1," + num_vertices + "]");
-        v = (Vertex) id.getVertex(v_id);
+        if (id != null)
+          v = id.get(v_id);
+        else
+          v = (V)(new Integer(v_id));
         // only attach the label if there's one to attach
-        if (label != null && label.length() > 0)
-            attachLabel(v, label);
+        if (label != null && label.length() > 0 && vertex_labels != null)
+        	vertex_labels.set(v, label);
+
         // parse the rest of the line
-        if (get_locations)
+        if (coord_idx != -1 && parts != null && parts.length >= coord_idx+2 && vertex_locations != null)
         {
-            if (coord_idx == -1 || parts == null || parts.length < coord_idx+2)
-                throw new IllegalArgumentException("Coordinates requested, but" +
-                        curLine + " does not include coordinates");
             double x = Double.parseDouble(parts[coord_idx]);
             double y = Double.parseDouble(parts[coord_idx+1]);
-//            if (x < 0 || x > 1 || y < 0 || y > 1)
-//                throw new IllegalArgumentException("Coordinates in line " + 
-//                        curLine + " are not all in the range [0,1]");
-                
-            v_locations.setLocation(v, new Point2D.Double(x,y));
+            vertex_locations.set(v, new Point2D.Double(x,y));
         }
     }
 
     
     
-    private String readArcsOrEdges(String curLine, BufferedReader br, Graph g,
-            NumberEdgeValue nev) 
+    @SuppressWarnings("unchecked")
+    private String readArcsOrEdges(String curLine, BufferedReader br, Graph<V,E> g, List<V> id, Factory<E> edge_factory)
         throws IOException
     {
         String nextLine = curLine;
         
-        Indexer id = Indexer.getIndexer(g);
-        
         // in case we're not there yet (i.e., format tag isn't arcs or edges)
         if (! c_pred.evaluate(curLine))
-//            nextLine = skip(br, e_pred);
             nextLine = skip(br, c_pred);
-
-        // in "*Arcs" and this graph is not strictly undirected
-//        boolean reading_arcs = a_pred.evaluate(nextLine) && 
-//            !PredicateUtils.enforcesUndirected(g);
-//        // in "*Edges" and this graph is not strictly directed
-//        boolean reading_edges = e_pred.evaluate(nextLine) && 
-//            !PredicateUtils.enforcesDirected(g);
 
         boolean reading_arcs = false;
         boolean reading_edges = false;
+        EdgeType directedness = null;
         if (a_pred.evaluate(nextLine))
         {
-            if (PredicateUtils.enforcesUndirected(g))
+            if (g instanceof UndirectedGraph) {
                 throw new IllegalArgumentException("Supplied undirected-only graph cannot be populated with directed edges");
-            else
+            } else {
                 reading_arcs = true;
+                directedness = EdgeType.DIRECTED;
+            }
         }
         if (e_pred.evaluate(nextLine))
         {
-            if (PredicateUtils.enforcesDirected(g))
+            if (g instanceof DirectedGraph)
                 throw new IllegalArgumentException("Supplied directed-only graph cannot be populated with undirected edges");
             else
                 reading_edges = true;
+            directedness = EdgeType.UNDIRECTED;
         }
         
         if (!(reading_arcs || reading_edges))
             return nextLine;
         
         boolean is_list = l_pred.evaluate(nextLine);
-
-        boolean parallel_ok = !PredicateUtils.enforcesNotParallel(g);
 
         while (br.ready())
         {
@@ -465,42 +358,46 @@ public class PajekNetReader
             StringTokenizer st = new StringTokenizer(nextLine.trim());
             
             int vid1 = Integer.parseInt(st.nextToken()) - 1;
-            Vertex v1 = (Vertex) id.getVertex(vid1);
+            V v1;
+            if (id != null)
+              v1 = id.get(vid1);
+            else
+              v1 = (V)new Integer(vid1);
+
             
             if (is_list) // one source, multiple destinations
             {
                 do
                 {
-                    createAddEdge(st, v1, reading_arcs, g, id, parallel_ok);
+                    createAddEdge(st, v1, directedness, g, id, edge_factory);
                 } while (st.hasMoreTokens());
             }
             else // one source, one destination, at most one weight
             {
-                Edge e = createAddEdge(st, v1, reading_arcs, g, id, parallel_ok);
+                E e = createAddEdge(st, v1, directedness, g, id, edge_factory);
                 // get the edge weight if we care
-                if (nev != null)
-                    nev.setNumber(e, new Float(st.nextToken()));
+                if (edge_weights != null && st.hasMoreTokens())
+                    edge_weights.set(e, new Float(st.nextToken()));
             }
         }
         return nextLine;
     }
 
-    protected Edge createAddEdge(StringTokenizer st, Vertex v1, 
-            boolean directed, Graph g, Indexer id, boolean parallel_ok)
+    @SuppressWarnings("unchecked")
+    protected E createAddEdge(StringTokenizer st, V v1, 
+            EdgeType directed, Graph<V,E> g, List<V> id, Factory<E> edge_factory)
     {
         int vid2 = Integer.parseInt(st.nextToken()) - 1;
-        Vertex v2 = (Vertex) id.getVertex(vid2);
-        Edge e = null;
-        if (directed)
-            e = new DirectedSparseEdge(v1, v2);
+        V v2;
+        if (id != null)
+          v2 = id.get(vid2);
         else
-            e = new UndirectedSparseEdge(v1, v2);
+          v2 = (V)new Integer(vid2);
+        E e = edge_factory.create();
 
-        // add this edge if parallel edges are OK,
-        // or if this isn't one; otherwise ignore it
-        if (parallel_ok || !p_pred.evaluate(e))
-            g.addEdge(e);
-
+        // don't error-check this: let the graph implementation do whatever it's going to do 
+        // (add the edge, replace the existing edge, throw an exception--depends on the graph implementation)
+     	g.addEdge(e, v1, v2, directed);
         return e;
     }
     
@@ -510,7 +407,7 @@ public class PajekNetReader
      * such line.
      * @throws IOException
      */
-    protected String skip(BufferedReader br, Predicate p) throws IOException
+    protected String skip(BufferedReader br, Predicate<String> p) throws IOException
     {
         while (br.ready())
         {
@@ -525,75 +422,23 @@ public class PajekNetReader
     }
     
     /**
-     * Labels <code>v</code> with <code>string</code>, according to the 
-     * labeling mechanism specified by <code>unique_labels</code>.
-     * Removes quotation marks from the string if present.
-     */
-    private void attachLabel(Vertex v, String string) throws IOException
-    {
-        if (string == null || string.length() == 0)
-            return;
-        String label = string.trim();
-//        String label = trimQuotes(string).trim();
-//        if (label.length() == 0)
-//            return;
-        if (unique_labels)
-        {
-            try
-            {
-                StringLabeller sl = StringLabeller.getLabeller((Graph)v.getGraph(), LABEL);
-                sl.setLabel(v, label);
-            }
-            catch (StringLabeller.UniqueLabelException slule)
-            {
-                throw new FatalException("Non-unique label found: " + slule);
-            }
-        }
-        else
-        {
-            v.addUserDatum(LABEL, label, UserData.SHARED);
-        }
-    }
-
-    /**
-     * Sets or clears the <code>unique_labels</code> boolean.
-     * @see #PajekNetReader(boolean, boolean)
-     */
-    public void setUniqueLabels(boolean unique_labels)
-    {
-        this.unique_labels = unique_labels;
-    }
-
-    /**
-     * Sets or clears the <code>get_locations</code> boolean.
-     * @see #PajekNetReader(boolean, boolean)
-     */
-    public void setGetLocations(boolean get_locations)
-    {
-        this.get_locations = get_locations;
-    }
-    
-    /**
      * A Predicate which evaluates to <code>true</code> if the
      * argument starts with the constructor-specified String.
      * 
      * @author Joshua O'Madadhain
      */
-    protected static class TagPred implements Predicate
-    {
+    protected static class StartsWithPredicate implements Predicate<String> {
         private String tag;
         
-        public TagPred(String s)
-        {
+        protected StartsWithPredicate(String s) {
             this.tag = s;
         }
         
-        public boolean evaluate(Object arg0)
-        {
-            String s = (String)arg0;
-            return (s != null && s.toLowerCase().startsWith(tag));
+        public boolean evaluate(String str) {
+            return (str != null && str.toLowerCase().startsWith(tag));
         }
     }
+    
     
     /**
      * A Predicate which evaluates to <code>true</code> if the
@@ -601,25 +446,69 @@ public class PajekNetReader
      * 
      * @author Joshua O'Madadhain
      */
-    protected static class ListTagPred implements Predicate
+    protected static class ListTagPred implements Predicate<String>
     {
         protected static ListTagPred instance;
         
         protected ListTagPred() {}
         
-        public static ListTagPred getInstance()
+        protected static ListTagPred getInstance()
         {
             if (instance == null)
                 instance = new ListTagPred();
             return instance;
         }
         
-        public boolean evaluate(Object arg0)
+        public boolean evaluate(String s)
         {
-            String s = (String)arg0;
             return (s != null && s.toLowerCase().endsWith("list"));
         }
     }
+
+	/**
+	 * @return the vertexLocationTransformer
+	 */
+	public SettableTransformer<V, Point2D> getVertexLocationTransformer() {
+		return vertex_locations;
+	}
+
+	/**
+	 * Provides a transformer which will be used to write out the vertex locations.
+	 */
+	public void setVertexLocationTransformer(SettableTransformer<V, Point2D> vertex_locations)
+	{
+	    this.vertex_locations = vertex_locations;
+	}
+	
+	/**
+	 * Returns a transformer from vertices to their labels.
+	 */
+	public SettableTransformer<V, String> getVertexLabeller() {
+		return vertex_labels;
+	}
+	
+	/**
+	 * Provides a transformer which will be used to write out the vertex labels.
+	 */
+	public void setVertexLabeller(SettableTransformer<V, String> vertex_labels)
+	{
+	    this.vertex_labels = vertex_labels;
+	}
     
+	/**
+	 * Returns a transformer from edges to their weights.
+	 */
+	public SettableTransformer<E, Number> getEdgeWeightTransformer() 
+	{
+	    return edge_weights;
+	}
+	
+	/**
+	 * Provides a transformer which will be used to write out edge weights.
+	 */
+	public void setEdgeWeightTransformer(SettableTransformer<E, Number> edge_weights)
+	{
+	    this.edge_weights = edge_weights;
+	}
 
 }

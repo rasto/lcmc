@@ -1,51 +1,106 @@
-/*
- * Copyright (c) 2003, the JUNG Project and the Regents of the University 
- * of California
- * All rights reserved.
- *
- * This software is open-source under the BSD license; see either
- * "license.txt" or
- * http://jung.sourceforge.net/license.txt for a description.
- */
 package edu.uci.ics.jung.graph.event;
 
-import java.util.EventObject;
-
-import edu.uci.ics.jung.graph.ArchetypeEdge;
-import edu.uci.ics.jung.graph.ArchetypeGraph;
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.graph.Element;
+import edu.uci.ics.jung.graph.Graph;
 
 /**
- *  An event which indicates that a change in the graph structure has occurred. Every
- * graph listener when notified of a change is passed a GraphEvent which contains a
- * reference to the object (Node, Edge, or EventSequence) that was involved in the
- * change as well as the graph whose structure was changed.
- * @author Scott White
+ * 
+ * 
+ * @author tom nelson
+ *
+ * @param <V> the vertex type
+ * @param <E> the edge type
  */
-public class GraphEvent extends EventObject {
-    private Element mGraphElement;
+public abstract class GraphEvent<V,E> {
+	
+	protected Graph<V,E> source;
+	protected Type type;
 
-    public GraphEvent(ArchetypeGraph g, Element graphElement) {
-        super(g);
-        mGraphElement = graphElement;
-    }
-
-    public Element getGraphElement() {
-        return mGraphElement;
-    }
-
-    public ArchetypeGraph getGraph() {
-        return (ArchetypeGraph) getSource();
-    }
-
-    public String toString() {
-    	String geType = null;
-		if (mGraphElement instanceof ArchetypeVertex) {
-			geType = "vertex";
-	   } else if (mGraphElement instanceof ArchetypeEdge) {
-			geType = "edge";
-	   }
-    	return "Graph Element type: " + geType;
-    }
+	/**
+	 * Creates an instance with the specified {@code source} graph and {@code Type}
+	 * (vertex/edge addition/removal).
+	 */
+	public GraphEvent(Graph<V, E> source, Type type) {
+		this.source = source;
+		this.type = type;
+	}
+	
+	/**
+	 * Types of graph events.
+	 */
+	public static enum Type {
+		VERTEX_ADDED,
+		VERTEX_REMOVED,
+		EDGE_ADDED,
+		EDGE_REMOVED
+	}
+	
+    /**
+     * An event type pertaining to graph vertices.
+     */
+	public static class Vertex<V,E> extends GraphEvent<V,E> {
+		protected V vertex;
+		
+		/**
+		 * Creates a graph event for the specified graph, vertex, and type.
+		 */
+		public Vertex(Graph<V,E> source, Type type, V vertex) {
+			super(source,type);
+			this.vertex = vertex;
+		}
+		
+		/**
+		 * Retrieves the vertex associated with this event.
+		 */
+		public V getVertex() {
+			return vertex;
+		}
+		
+		@Override
+	    public String toString() {
+			return "GraphEvent type:"+type+" for "+vertex;
+		}
+		
+	}
+	
+	/**
+	 * An event type pertaining to graph edges.
+	 */
+	public static class Edge<V,E> extends GraphEvent<V,E> {
+		protected E edge;
+		
+        /**
+         * Creates a graph event for the specified graph, edge, and type.
+         */
+		public Edge(Graph<V,E> source, Type type, E edge) {
+			super(source,type);
+			this.edge = edge;
+		}
+		
+		/**
+		 * Retrieves the edge associated with this event.
+		 */
+		public E getEdge() {
+			return edge;
+		}
+		
+		@Override
+    	public String toString() {
+			return "GraphEvent type:"+type+" for "+edge;
+		}
+		
+	}
+	
+	/**
+	 * @return the source
+	 */
+	public Graph<V, E> getSource() {
+		return source;
+	}
+	
+	/**
+	 * @return the type
+	 */
+	public Type getType() {
+		return type;
+	}
 }
