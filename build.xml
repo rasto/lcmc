@@ -53,6 +53,12 @@
 		 srcdir="${src.dir}" destdir="${classes.dir}"
 		 encoding="utf8"
 		>
+		  <classpath>
+		   <pathelement location="/usr/share/java/j3dcore.jar"/>
+		   <pathelement location="/usr/share/java/j3dutils.jar"/>
+		   <pathelement location="/usr/share/java/vecmath.jar"/>
+		   <pathelement location="jai_core.jar"/>
+		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xlint"/> 
 		</javac>
@@ -80,16 +86,21 @@
 		<javac 
 		 fork="true" 
 		 debug="true"
-		 deprecation="true"
 		 memoryInitialSize="512m"
 		 memoryMaximumSize="512m"
 		 srcdir="${src.dir}" destdir="${classes.dir}"
 		 encoding="utf8"
 		>
+		  <classpath>
+		   <pathelement location="/usr/share/java/j3dcore.jar"/>
+		   <pathelement location="/usr/share/java/j3dutils.jar"/>
+		   <pathelement location="/usr/share/java/vecmath.jar"/>
+		   <pathelement location="jai_core.jar"/>
+		  </classpath>
 		  <compilerarg value="-g"/> 
-		  <compilerarg value="-Xlint"/> 
 		  <compilerarg value="-Xmaxerrs"/> 
 		  <compilerarg value="1"/> 
+		  <compilerarg value="-Xlint:none"/> 
 		</javac>
 	</target>
 	
@@ -111,11 +122,18 @@
 		  <!--  <jvmarg value="-verbose:jni"/> -->
 		  <!--  <jvmarg value="-agentlib:hprof=heap=dump,format=b,depth=20"/>  -->
 		    <jvmarg value="-agentlib:hprof=heap=sites,depth=500"/>
+			<jvmarg value="-Xmx64m"/>
 			<!-- <jvmarg value="-Xrunhprof"/> -->
 		<!--	<jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/> -->
 			<classpath>
 				<path location="${jar.dir}/${ant.project.name}.jar"/>
 			</classpath>
+		  <classpath>
+		   <pathelement location="/usr/share/java/j3dcore.jar"/>
+		   <pathelement location="/usr/share/java/j3dutils.jar"/>
+		   <pathelement location="/usr/share/java/vecmath.jar"/>
+		   <pathelement location="jai_core.jar"/>
+		  </classpath>
 		</java>
 	</target>
 	

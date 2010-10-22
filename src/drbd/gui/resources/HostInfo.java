@@ -369,7 +369,7 @@ public class HostInfo extends Info {
         final MyMenuItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            null,
-                           null,
+                           "",
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
@@ -395,7 +395,7 @@ public class HostInfo extends Info {
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
-                           null,
+                           "",
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
@@ -439,7 +439,7 @@ public class HostInfo extends Info {
         final MyMenuItem removeHostItem =
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
-                           null,
+                           "",
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;

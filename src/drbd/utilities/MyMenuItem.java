@@ -99,6 +99,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
+        toolTip.setTipText(text);
         setNormalFont();
         addActionListener(this);
         try {
@@ -126,6 +127,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                       final AccessMode visibleAccessMode) {
         super(text);
         toolTip = createToolTip();
+        toolTip.setTipText(shortDesc);
         setNormalFont();
         this.text1 = text;
         this.icon1 = icon;
