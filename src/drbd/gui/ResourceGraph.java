@@ -30,10 +30,12 @@ import drbd.data.Subtext;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Context;
 import edu.uci.ics.jung.graph.util.Pair;
-import edu.uci.ics.jung.visualization.decorators.ConstantDirectionalEdgeValueTransformer;
+import edu.uci.ics.jung.visualization.decorators
+                                     .ConstantDirectionalEdgeValueTransformer;
 import edu.uci.ics.jung.visualization.decorators.AbstractVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.PickableEdgePaintTransformer;
-import edu.uci.ics.jung.visualization.decorators.DirectionalEdgeArrowTransformer;
+import
+     edu.uci.ics.jung.visualization.decorators.DirectionalEdgeArrowTransformer;
 import edu.uci.ics.jung.visualization.decorators.PickableVertexPaintTransformer;
 
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
@@ -176,9 +178,9 @@ public abstract class ResourceGraph {
     /** Interval beetween two animation frames. */
     private final int animInterval =
                              (int) (1000 / Tools.getConfigData().getAnimFPS());
-    /** Singleton instance of the Line2D edge shape */
+    /** Singleton instance of the Line2D edge shape. */
     private static Line2D instance = new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
-    /** Singleton instance of dotted line edge shape */
+    /** Singleton instance of dotted line edge shape. */
     private static Path2D hollowInstance = new Path2D.Float();
     static {
         final float d = 0.05f;
@@ -409,7 +411,7 @@ public abstract class ResourceGraph {
 
 
         layout = new StaticLayout<Vertex, Edge>(graph, vlf) {
-            final public void setSize(final Dimension size) {
+            public final void setSize(final Dimension size) {
                 this.size = size;
                 initialize();
             }
@@ -467,10 +469,10 @@ public abstract class ResourceGraph {
         /* scaling */
         /* overwriting scaler so that zooming starts from point (0, 0) */
         myScaler = new ViewScalingControl() {
-            public void scale(final VisualizationServer vv,
+            public void scale(final VisualizationServer thisVV,
                               final float amount,
                               final Point2D from) {
-                super.scale(vv, amount, new Point2D.Double(0, 0));
+                super.scale(thisVV, amount, new Point2D.Double(0, 0));
             }
         };
 
@@ -491,7 +493,6 @@ public abstract class ResourceGraph {
         vv.setPickSupport(new ShapePickSupport<Vertex, Edge>(vv, 50));
         graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
         layout.initialize();
-        
         scrollPane = new GraphZoomScrollPane(vv);
     }
 
@@ -614,8 +615,8 @@ public abstract class ResourceGraph {
      */
     public void scale() {
         Point2D max = getFilledGraphSize();
-        final float maxXPos = (float)max.getX();
-        final float maxYPos = (float)max.getY();
+        final float maxXPos = (float) max.getX();
+        final float maxYPos = (float) max.getY();
         if (maxXPos <= 0 || maxYPos <= 0) {
             return;
         }
@@ -634,13 +635,11 @@ public abstract class ResourceGraph {
 
     /** This class allows to change direction of the edge. */
     class Vertex {
-        int id;
         public Vertex() {
-            id = 10;
         }
 
         public String toString() {
-            return "V" + id;
+            return "V";
         }
     }
 
@@ -715,7 +714,7 @@ public abstract class ResourceGraph {
     /** This class provides tool tips for the vertices. */
     class MyVertexToolTipFunction<V> implements Transformer<V, String> {
         /** Returns tool tip for vertex v. */
-        public String transform(V v) {
+        public String transform(final V v) {
             return Tools.html(getVertexToolTip((Vertex) v));
         }
     }
@@ -723,7 +722,7 @@ public abstract class ResourceGraph {
     /** This class provides tool tips for the vertices. */
     class MyEdgeToolTipFunction<E> implements Transformer<E, String> {
         /** Returns tool tip for edge. */
-        public String transform(E edge) {
+        public String transform(final E edge) {
             return Tools.html(getEdgeToolTip((Edge) edge));
         }
     }
@@ -787,25 +786,27 @@ public abstract class ResourceGraph {
     /** Controls the shape, size, and aspect ratio for each vertex. */
     private final class MyVertexShapeSize<V, E>
                                     extends AbstractVertexShapeTransformer<V>
-                                    implements Transformer<V,Shape>  {
-        protected Transformer<Vertex, Point2D> vlf;
-        protected Graph<V,E> graph;
-        
+                                    implements Transformer<V, Shape>  {
+        private Transformer<Vertex, Point2D> vlf;
+        private Graph<V, E> graph;
+
         public MyVertexShapeSize(final Graph<V, E> graphIn,
                                  final Transformer<Vertex, Point2D> vlfIn) {
             this.graph = graphIn;
             this.vlf = vlfIn;
             setSizeTransformer(new Transformer<V, Integer>() {
-                                    public Integer transform(V v) {
+                                    public Integer transform(final V v) {
                                         return getVertexWidth((Vertex) v);
-                                    }});
-            setAspectRatioTransformer(new Transformer<V,Float>() {
-                            public Float transform(V v) {
-                                return getVertexAspectRatio((Vertex) v);
-                            }});
+                                    }
+                               });
+            setAspectRatioTransformer(new Transformer<V, Float>() {
+                                public Float transform(final V v) {
+                                    return getVertexAspectRatio((Vertex) v);
+                                }
+                            });
         }
-        
-        public Shape transform(V v) {
+
+        public Shape transform(final V v) {
             return getVertexShape((Vertex) v, factory);
         }
     }
@@ -864,7 +865,7 @@ public abstract class ResourceGraph {
             this(MouseEvent.BUTTON3_MASK);
         }
 
-        MyPopupGraphMousePlugin(int modifiers) {
+        MyPopupGraphMousePlugin(final int modifiers) {
             super(modifiers);
         }
 
@@ -1097,6 +1098,7 @@ public abstract class ResourceGraph {
      */
     class MyPickableVertexPaintFunction<V>
                                     extends PickableVertexPaintTransformer<V> {
+        /** Whether it is the draw paint. */
         private boolean draw;
 
         /** Creates new <code>MyPickableVertexPaintFunction</code> object. */
@@ -1179,7 +1181,7 @@ public abstract class ResourceGraph {
         }
 
         /** Returns paint color for border of edge e. */
-        public Paint transform(E e)  {
+        public Paint transform(final E e)  {
             return getDrawPaint((Edge) e);
         }
     }
@@ -1205,7 +1207,7 @@ public abstract class ResourceGraph {
         }
 
         /** Returns paint color for border of edge e. */
-        public Paint transform(E e)  {
+        public Paint transform(final E e)  {
             if (showHollowArrow((Edge) e)) {
                 return Color.WHITE;
             }
@@ -1297,7 +1299,8 @@ public abstract class ResourceGraph {
             int shapeWidth = getDefaultVertexWidth((Vertex) v);
             int shapeHeight = getDefaultVertexHeight((Vertex) v);
             /* icons */
-            final List<ImageIcon> icons = getIconsForVertex((Vertex) v, isTestOnly());
+            final List<ImageIcon> icons =
+                                   getIconsForVertex((Vertex) v, isTestOnly());
             /* main text */
             final String mainText = getMainText((Vertex) v, isTestOnly());
             TextLayout mainTextLayout = null;
@@ -1388,11 +1391,11 @@ public abstract class ResourceGraph {
                     double y = pos.getY();
                     if (widthChanged) {
                         setVertexWidth((Vertex) v, shapeWidth);
-                        x = x - (oldShapeWidth - getVertexWidth((Vertex) v)) / 2;
+                        x -= (oldShapeWidth - getVertexWidth((Vertex) v)) / 2;
                     }
                     if (heightChanged) {
                         setVertexHeight((Vertex) v, shapeHeight);
-                        y = y - (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
+                        y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
                     SwingUtilities.invokeLater(new Runnable() {
@@ -1642,7 +1645,7 @@ public abstract class ResourceGraph {
     }
 
     /** Removes test edges. */
-    protected void removeTestEdge() {
+    protected final void removeTestEdge() {
         try {
             mTestEdgeLock.acquire();
         } catch (java.lang.InterruptedException ie) {
@@ -1745,12 +1748,12 @@ public abstract class ResourceGraph {
          * shared instance or, in the case of self-loop edges, the
          * SimpleLoop shared instance.
          */
-        public Shape transform(Context<Graph<V,E>,E> context) {
-            Graph<V,E> graph = context.graph;
-            E e = context.element;
-            
-            Pair<V> endpoints = graph.getEndpoints(e);
-            if(endpoints != null) {
+        public Shape transform(final Context<Graph<V, E>, E> context) {
+            final Graph<V, E> g = context.graph;
+            final E e = context.element;
+
+            final Pair<V> endpoints = g.getEndpoints(e);
+            if (endpoints != null) {
                 boolean isLoop = endpoints.getFirst().equals(
                                                         endpoints.getSecond());
                 if (isLoop) {

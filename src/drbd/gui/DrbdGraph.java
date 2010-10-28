@@ -402,7 +402,7 @@ public class DrbdGraph extends ResourceGraph {
             if (bdi != null && bdi.getBlockDevice().isDrbd()
                 && bdi.getBlockDevice().getConnectionState() != null
                 && bdi.getBlockDevice().getDiskState() != null) {
-                final String connState = 
+                final String connState =
                                   bdi.getBlockDevice().getConnectionState();
                 final String diskState = bdi.getBlockDevice().getDiskState();
                 Color color = null;

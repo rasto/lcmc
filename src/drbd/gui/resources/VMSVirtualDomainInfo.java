@@ -776,7 +776,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                         (VMSHardwareInfo) prev.getUserObject();
                 if (prevI.getClass().getName().equals(v.getClass().getName())) {
                     final String prevN = prevI.getName();
-                    if (!prevI.getResource().isNew() 
+                    if (!prevI.getResource().isNew()
                         && !v.getResource().isNew()
                         && prevN.compareTo(n) > 0) {
                         getNode().remove(j);

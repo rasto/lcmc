@@ -35,7 +35,7 @@ import javax.swing.JTree;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath; 
+import javax.swing.tree.TreePath;
 
 import java.awt.Color;
 import java.awt.Component;

@@ -4455,7 +4455,7 @@ public class ServiceInfo extends EditableInfo {
             }
         };
     }
-   
+
     /** Adds Linbit DRBD RA menu item. It is called in swing thread. */
     private void addDrbdLinbitMenu(final MyMenu menu,
                                    final CRMXML crmXML,

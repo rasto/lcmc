@@ -225,7 +225,7 @@ public class GuiComboBox extends JPanel {
         } else {
             this.type = type;
         }
-        
+
         JComponent newComp = null;
         switch(this.type) {
             case LABELFIELD:
