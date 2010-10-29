@@ -411,7 +411,7 @@ public class MainMenu extends JPanel implements ActionListener {
 
                     UIManager.setLookAndFeel(lookAndFeel);
                     final JComponent componentToSwitch =
-                            Tools.getGUIData().getMainFrame().getRootPane();
+                            Tools.getGUIData().getMainFrameRootPane();
                     SwingUtilities.updateComponentTreeUI(componentToSwitch);
                     componentToSwitch.invalidate();
                     componentToSwitch.validate();

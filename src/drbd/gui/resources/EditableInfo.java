@@ -165,8 +165,7 @@ public abstract class EditableInfo extends Info {
     /** Creates apply button and adds it to the panel. */
     protected final void addApplyButton(final JPanel panel) {
         panel.add(applyButton, BorderLayout.WEST);
-        Tools.getGUIData().getMainFrame().getRootPane().setDefaultButton(
-                                                              applyButton);
+        Tools.getGUIData().getMainFrameRootPane().setDefaultButton(applyButton);
     }
 
     /** Adds jlabel field with tooltip. */

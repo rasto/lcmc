@@ -40,8 +40,10 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.JMenuBar;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
+import java.awt.Container;
 import java.util.Arrays;
 import javax.swing.plaf.metal.OceanTheme;
 
@@ -66,7 +68,7 @@ public final class DrbdMC extends JPanel {
     /**
      * Create the GUI and show it.
      */
-    private static void createAndShowGUI() {
+    protected static void createAndShowGUI(final Container mainFrame) {
         final java.util.List<Object> buttonGradient = Arrays.asList(
           new Object[] {new Float(.3f),
                         new Float(0f),
@@ -154,36 +156,42 @@ public final class DrbdMC extends JPanel {
 
 
         /* Create and set up the window. */
-        final JFrame mainFrame = new JFrame(
-               Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
         Tools.getGUIData().setMainFrame(mainFrame);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        /* Create the Main Panel */
-        final JPanel mainPanel = new MainPanel();
-        mainPanel.setOpaque(true); //content panes must be opaque
-        final MainMenu menu = new MainMenu();
-        Tools.getGUIData().setMainMenu(menu);
-        mainFrame.setContentPane(mainPanel);
-        mainFrame.setJMenuBar(menu.getMenuBar());
 
         /* Display the window. */
         mainFrame.setSize(Tools.getDefaultInt("DrbdMC.width"),
                           Tools.getDefaultInt("DrbdMC.height"));
-        mainFrame.addWindowListener(new ExitListener());
         mainFrame.setVisible(true);
 
-        /* glass pane is used for progress bar etc. */
-        final ProgressIndicatorPanel mainGlassPane =
-                                             new ProgressIndicatorPanel();
-        Tools.getGUIData().setMainGlassPane(mainGlassPane);
-        mainFrame.setGlassPane(mainGlassPane);
 
     }
 
-    /**
-     * Adds te exit listener and disconnects all hosts prior to exiting.
-     */
+    /** Returns the main panel. */
+    protected static JPanel getMainPanel() {
+        final JPanel mainPanel = new MainPanel();
+        Tools.getGUIData().setMainPanel(mainPanel);
+        mainPanel.setOpaque(true); //content panes must be opaque
+        return mainPanel;
+    }
+
+    /** Returns the menu bar. */
+    protected static JMenuBar getMenuBar() {
+        /* glass pane is used for progress bar etc. */
+        final MainMenu menu = new MainMenu();
+        Tools.getGUIData().setMainMenu(menu);
+        return menu.getMenuBar();
+    }
+
+    /** Returns the main glass pane. */
+    protected static ProgressIndicatorPanel getMainGlassPane() {
+        final ProgressIndicatorPanel mainGlassPane =
+                                             new ProgressIndicatorPanel();
+        Tools.getGUIData().setMainGlassPane(mainGlassPane);
+        return mainGlassPane;
+    }
+
+    /** Adds te exit listener and disconnects all hosts prior to exiting. */
     public static class ExitListener extends WindowAdapter {
         /**
          * Called when window is closed.
@@ -212,149 +220,154 @@ public final class DrbdMC extends JPanel {
         }
     }
 
-    /**
-     * The main function for starting the application.
-     */
+    /** Inits the application. */
+    protected static void initApp(final String[] args) {
+        Tools.init();
+        Thread.setDefaultUncaughtExceptionHandler(
+            new Thread.UncaughtExceptionHandler() {
+                public void uncaughtException(final Thread t,
+                                              final Throwable ex) {
+                    Tools.appError("uncaught exception",
+                                   ex.toString(),
+                                   (Exception) ex);
+                }
+            });
+        boolean auto = false;
+        boolean tightvnc = false;
+        boolean ultravnc = false;
+        boolean realvnc = false;
+        boolean vncportoffset = false;
+        boolean opMode = false;
+        float fps = 20.0f;
+        for (final String arg : args) {
+            if (vncportoffset && Tools.isNumber(arg)) {
+                Tools.getConfigData().setVncPortOffset(Integer.parseInt(arg));
+            }
+            if ("--vnc-port-offset".equals(arg)) {
+                vncportoffset = true;
+                continue;
+            } else {
+                vncportoffset = false;
+            }
+
+            if ("--ro".equals(arg)
+                || opMode && "ro".equals(arg)) {
+                Tools.getConfigData().setAccessType(ConfigData.AccessType.RO);
+                Tools.getConfigData().setMaxAccessType(
+                                                  ConfigData.AccessType.RO);
+            } else if ("--op".equals(arg)
+                       || opMode && "op".equals(arg)) {
+                Tools.getConfigData().setAccessType(ConfigData.AccessType.OP);
+                Tools.getConfigData().setMaxAccessType(
+                                          ConfigData.AccessType.OP);
+            } else if ("--admin".equals(arg)
+                       || opMode && "admin".equals(arg)) {
+                Tools.getConfigData().setAccessType(
+                                          ConfigData.AccessType.ADMIN);
+                Tools.getConfigData().setMaxAccessType(
+                                          ConfigData.AccessType.ADMIN);
+            } else if (opMode) {
+                Tools.appWarning("unknown operating mode: " + arg);
+            }
+            if ("--op-mode".equals(arg)
+                || "--operating-mode".equals(arg)) {
+                opMode = true;
+                continue;
+            } else {
+                opMode = false;
+            }
+
+            if (auto) {
+                Tools.parseAutoArgs(arg);
+            } else if ("--keep-helper".equals(arg)) {
+                Tools.debug(null, "--keep-helper option specified");
+                Tools.getConfigData().setKeepHelper(true);
+            } else if ("--version".equals(arg)) {
+                System.out.println("DRBD MANAGEMENT CONSOLE "
+                                   + Tools.getRelease()
+                                   + " by Rasto Levrinc");
+                System.exit(0);
+            } else if ("--help".equals(arg)) {
+                System.out.println("DRBD MANAGEMENT CONSOLE: "
+                                   + Tools.getRelease());
+                System.out.println("--help, print this help.");
+                System.out.println("--keep-helper, do not overwrite "
+                                   + "the drbd-gui-helper program.");
+                System.out.println("--auto for testing");
+                System.out.println("--tightvnc, enable tight vnc viewer");
+                System.out.println("--ultravnc, enable ultra vnc viewer");
+                System.out.println("--realvnc, enable real vnc viewer");
+                System.out.println(
+                           "--vnc-port-offset OFFSET, for port forwarding");
+                System.out.println(
+                           "--staging-pacemaker, enable more installation"
+                           + " options for pacemaker");
+                System.out.println(
+                   "--slow, specify this if you have slow computer. Can be"
+                   + " specified more times");
+                System.out.print(
+                          "--op-mode MODE, operating mode. MODE can be: ");
+                System.out.println("ro - read only");
+                System.out.print(
+                          "                                             ");
+                System.out.println("op - operator");
+                System.out.print(
+                          "                                             ");
+                System.out.println("admin - administrator");
+                System.exit(0);
+            } else if ("--tightvnc".equals(arg)) {
+                tightvnc = true;
+            } else if ("--ultravnc".equals(arg)) {
+                ultravnc = true;
+            } else if ("--realvnc".equals(arg)) {
+                realvnc = true;
+            } else if ("--auto".equals(arg)) {
+                auto = true;
+            } else if ("--staging-drbd".equals(arg)) {
+                Tools.getConfigData().setStagingDrbd(true);
+            } else if ("--staging-pacemaker".equals(arg)) {
+                Tools.getConfigData().setStagingPacemaker(true);
+            } else if ("--slow".equals(arg)) {
+                fps = fps / 2;
+            } else if ("--fast".equals(arg)) {
+                /* undocumented */
+                fps = fps * 2;
+            } else if ("--restore-mouse".equals(arg)) {
+                /* restore mouse if it is stuck in pressed state, during
+                 * robot tests. */
+                RoboTest.restoreMouse();
+            }
+        }
+        Tools.getConfigData().setAnimFPS(fps);
+        if (!tightvnc && !ultravnc && !realvnc) {
+            if (Tools.isLinux()) {
+                tightvnc = true;
+            } else if (Tools.isWindows()) {
+                ultravnc = true;
+            } else {
+                tightvnc = true;
+                ultravnc = true;
+            }
+        }
+        Tools.getConfigData().setTightvnc(tightvnc);
+        Tools.getConfigData().setUltravnc(ultravnc);
+        Tools.getConfigData().setRealvnc(realvnc);
+    }
+
+    /** The main function for starting the application. */
     public static void main(final String[] args) {
         try {
-            Tools.init();
-            Thread.setDefaultUncaughtExceptionHandler(
-                new Thread.UncaughtExceptionHandler() {
-                    public void uncaughtException(final Thread t,
-                                                  final Throwable ex) {
-                        Tools.appError("uncaught exception",
-                                       ex.toString(),
-                                       (Exception) ex);
-                    }
-                });
-            boolean auto = false;
-            boolean tightvnc = false;
-            boolean ultravnc = false;
-            boolean realvnc = false;
-            boolean vncportoffset = false;
-            boolean opMode = false;
-            float fps = 20.0f;
-            for (final String arg : args) {
-                if (vncportoffset && Tools.isNumber(arg)) {
-                    Tools.getConfigData().setVncPortOffset(
-                                                        Integer.parseInt(arg));
-                }
-                if ("--vnc-port-offset".equals(arg)) {
-                    vncportoffset = true;
-                    continue;
-                } else {
-                    vncportoffset = false;
-                }
-
-                if ("--ro".equals(arg)
-                    || opMode && "ro".equals(arg)) {
-                    Tools.getConfigData().setAccessType(
-                                              ConfigData.AccessType.RO);
-                    Tools.getConfigData().setMaxAccessType(
-                                              ConfigData.AccessType.RO);
-                } else if ("--op".equals(arg)
-                           || opMode && "op".equals(arg)) {
-                    Tools.getConfigData().setAccessType(
-                                              ConfigData.AccessType.OP);
-                    Tools.getConfigData().setMaxAccessType(
-                                              ConfigData.AccessType.OP);
-                } else if ("--admin".equals(arg)
-                           || opMode && "admin".equals(arg)) {
-                    Tools.getConfigData().setAccessType(
-                                              ConfigData.AccessType.ADMIN);
-                    Tools.getConfigData().setMaxAccessType(
-                                              ConfigData.AccessType.ADMIN);
-                } else if (opMode) {
-                    Tools.appWarning("unknown operating mode: " + arg);
-                }
-                if ("--op-mode".equals(arg)
-                    || "--operating-mode".equals(arg)) {
-                    opMode = true;
-                    continue;
-                } else {
-                    opMode = false;
-                }
-
-                if (auto) {
-                    Tools.parseAutoArgs(arg);
-                } else if ("--keep-helper".equals(arg)) {
-                    Tools.debug(null, "--keep-helper option specified");
-                    Tools.getConfigData().setKeepHelper(true);
-                } else if ("--version".equals(arg)) {
-                    System.out.println("DRBD MANAGEMENT CONSOLE "
-                                       + Tools.getRelease()
-                                       + " by Rasto Levrinc");
-                    System.exit(0);
-                } else if ("--help".equals(arg)) {
-                    System.out.println("DRBD MANAGEMENT CONSOLE: "
-                                       + Tools.getRelease());
-                    System.out.println("--help, print this help.");
-                    System.out.println("--keep-helper, do not overwrite "
-                                       + "the drbd-gui-helper program.");
-                    System.out.println("--auto for testing");
-                    System.out.println("--tightvnc, enable tight vnc viewer");
-                    System.out.println("--ultravnc, enable ultra vnc viewer");
-                    System.out.println("--realvnc, enable real vnc viewer");
-                    System.out.println(
-                               "--vnc-port-offset OFFSET, for port forwarding");
-                    System.out.println(
-                               "--staging-pacemaker, enable more installation"
-                               + " options for pacemaker");
-                    System.out.println(
-                       "--slow, specify this if you have slow computer. Can be"
-                       + " specified more times");
-                    System.out.print(
-                              "--op-mode MODE, operating mode. MODE can be: ");
-                    System.out.println("ro - read only");
-                    System.out.print(
-                              "                                             ");
-                    System.out.println("op - operator");
-                    System.out.print(
-                              "                                             ");
-                    System.out.println("admin - administrator");
-                    System.exit(0);
-                } else if ("--tightvnc".equals(arg)) {
-                    tightvnc = true;
-                } else if ("--ultravnc".equals(arg)) {
-                    ultravnc = true;
-                } else if ("--realvnc".equals(arg)) {
-                    realvnc = true;
-                } else if ("--auto".equals(arg)) {
-                    auto = true;
-                } else if ("--staging-drbd".equals(arg)) {
-                    Tools.getConfigData().setStagingDrbd(true);
-                } else if ("--staging-pacemaker".equals(arg)) {
-                    Tools.getConfigData().setStagingPacemaker(true);
-                } else if ("--slow".equals(arg)) {
-                    fps = fps / 2;
-                } else if ("--fast".equals(arg)) {
-                    /* undocumented */
-                    fps = fps * 2;
-                } else if ("--restore-mouse".equals(arg)) {
-                    /* restore mouse if it is stuck in pressed state, during
-                     * robot tests. */
-                    RoboTest.restoreMouse();
-                }
-            }
-            Tools.getConfigData().setAnimFPS(fps);
-            if (!tightvnc && !ultravnc && !realvnc) {
-                if (Tools.isLinux()) {
-                    tightvnc = true;
-                } else if (Tools.isWindows()) {
-                    ultravnc = true;
-                } else {
-                    tightvnc = true;
-                    ultravnc = true;
-                }
-            }
-            Tools.getConfigData().setTightvnc(tightvnc);
-            Tools.getConfigData().setUltravnc(ultravnc);
-            Tools.getConfigData().setRealvnc(realvnc);
-            /* Schedule a job for the event-dispatching thread:
-               creating and showing this application's GUI. */
+            initApp(args);
+            final JFrame mainFrame = new JFrame(
+               Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainFrame.addWindowListener(new ExitListener());
+            mainFrame.setContentPane(getMainPanel());
+            mainFrame.setJMenuBar(getMenuBar());
+            mainFrame.setGlassPane(getMainGlassPane());
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    createAndShowGUI();
+                    createAndShowGUI((Container) mainFrame);
                 }
             });
         } catch (Exception e) {

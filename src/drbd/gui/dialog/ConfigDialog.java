@@ -38,7 +38,10 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JApplet;
+import javax.swing.JFrame;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Component;
@@ -508,8 +511,14 @@ public abstract class ConfigDialog {
 
             optionPane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-            dialogPanel = optionPane.createDialog(Tools.getGUIData().getMainFrame(),
-                                                  getDialogTitle());
+            final Container mainFrame = Tools.getGUIData().getMainFrame();
+            if (mainFrame instanceof JApplet) {
+                dialogPanel = optionPane.createDialog((JApplet) mainFrame,
+                                                      getDialogTitle());
+            } else {
+                dialogPanel = optionPane.createDialog((JFrame) mainFrame,
+                                                      getDialogTitle());
+            }
             dialogPanel.setModal(false);
             dialogPanel.setResizable(true);
             dialogPanel.setPreferredSize(new Dimension(dialogWidth(),

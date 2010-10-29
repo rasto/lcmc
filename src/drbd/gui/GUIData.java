@@ -29,6 +29,9 @@ import drbd.utilities.Tools;
 import drbd.utilities.AllHostsUpdatable;
 
 import javax.swing.JFrame;
+import javax.swing.JApplet;
+import javax.swing.JRootPane;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -36,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import java.awt.Component;
+import java.awt.Container;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +58,9 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  */
 public class GUIData  {
     /** Main frame of the whole application. */
-    private JFrame mainFrame;
+    private Container mainFrame;
+    /** Main panel of the whole application. */
+    private JPanel mainPanel;
     /** Split pane where is the terminal panel. */
     private JSplitPane terminalSplitPane;
     /** Clusters panel. */
@@ -89,18 +95,29 @@ public class GUIData  {
     private final List<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
 
-    /**
-     * Sets main frame of this application.
-     */
-    public final void setMainFrame(final JFrame mainFrame) {
+    /** Sets main frame of this application. */
+    public final void setMainFrame(final Container mainFrame) {
         this.mainFrame = mainFrame;
     }
 
-    /**
-     * Gets main frame of this application.
-     */
-    public final JFrame getMainFrame() {
+    /** Sets main panel of this application. */
+    public final void setMainPanel(final JPanel mainPanel) {
+        this.mainPanel = mainPanel;
+    }
+
+    /** Gets main frame of this application. */
+    public final Container getMainFrame() {
         return mainFrame;
+    }
+
+    /** Gets root pane of the main frame of this application. */
+    public final JRootPane getMainFrameRootPane() {
+        if (mainFrame instanceof JFrame) {
+            return ((JFrame) mainFrame).getRootPane();
+        } else if (mainFrame instanceof JApplet) {
+            return ((JApplet) mainFrame).getRootPane();
+        }
+        return null;
     }
 
     /**
@@ -184,7 +201,7 @@ public class GUIData  {
         if (terminalSplitPane.getBottomComponent() == null) {
             return 0;
         } else {
-            return mainFrame.getContentPane().getY()
+            return mainPanel.getY()
                    + terminalSplitPane.getBottomComponent().getY();
         }
     }

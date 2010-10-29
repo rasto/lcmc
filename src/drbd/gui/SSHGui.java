@@ -29,12 +29,14 @@ import javax.swing.JDialog;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JPanel;
+import javax.swing.JApplet;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
-import java.awt.Window;
+import java.awt.Container;
 import java.awt.Frame;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
@@ -54,7 +56,7 @@ import java.util.List;
  */
 public class SSHGui {
     /** Root pane on which the dialogs are comming to. */
-    private final Window rootPane;
+    private final Container rootPane;
     /** Host data object. */
     private final Host host;
     /** Progress bar. */
@@ -65,7 +67,7 @@ public class SSHGui {
     /**
      * Prepares a new <code>SSHGui</code> object.
      */
-    public SSHGui(final Window rootPane,
+    public SSHGui(final Container rootPane,
                   final Host host,
                   final ProgressBar progressBar) {
         this.rootPane = rootPane;
@@ -104,8 +106,11 @@ public class SSHGui {
                                              final String defaultValue,
                                              final boolean isPassword) {
         EnterSomethingDialog esd;
-        if (rootPane.getClass().getName().equals("javax.swing.JDialog")) {
+        if (rootPane instanceof JDialog) {
             esd = new EnterSomethingDialog((JDialog) rootPane, title,
+                    content, underText, defaultValue, isPassword);
+        } else if (rootPane instanceof JApplet) {
+            esd = new EnterSomethingDialog((JApplet) rootPane, title,
                     content, underText, defaultValue, isPassword);
         } else {
             esd = new EnterSomethingDialog((Frame) rootPane, title,
@@ -137,7 +142,7 @@ public class SSHGui {
         /**
          * Prepares a new <code>EnterSomethingDialog</code> object.
          */
-        public EnterSomethingDialog(final Window parent,
+        public EnterSomethingDialog(final Container parent,
                                     final String title,
                                     final String content,
                                     final String underText,
@@ -150,9 +155,7 @@ public class SSHGui {
                  isPasswordA);
         }
 
-        /**
-         * Prepares a new <code>EnterSomethingDialog</code> object.
-         */
+        /** Prepares a new <code>EnterSomethingDialog</code> object. */
         public EnterSomethingDialog(final JDialog parent,
                                     final String title,
                                     final String[] content,
@@ -164,9 +167,7 @@ public class SSHGui {
             setLocationRelativeTo(parent);
         }
 
-        /**
-         * Prepares a new <code>EnterSomethingDialog</code> object.
-         */
+        /** Prepares a new <code>EnterSomethingDialog</code> object. */
         public EnterSomethingDialog(final Frame parent,
                                     final String title,
                                     final String[] content,
@@ -178,9 +179,23 @@ public class SSHGui {
             setLocationRelativeTo(parent);
         }
 
-        /**
-         * Init.
-         */
+        /** Prepares a new <code>EnterSomethingDialog</code> object. */
+        public EnterSomethingDialog(final JApplet parent,
+                                    final String title,
+                                    final String[] content,
+                                    final String underText,
+                                    final String defaultValue,
+                                    final boolean isPasswordA) {
+
+            super((Frame) SwingUtilities.getAncestorOfClass(Frame.class,
+                                                            parent),
+                  title,
+                  true);
+            init(content, underText, defaultValue, isPasswordA);
+            setLocationRelativeTo(parent);
+        }
+
+        /** Init. */
         private void init(final String[] content,
                           final String underText,
                           final String defaultValue,
