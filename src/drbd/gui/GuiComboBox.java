@@ -431,7 +431,7 @@ public class GuiComboBox extends JPanel {
         /* removing select... keyword */
         editor.addFocusListener(new FocusListener() {
             public void focusGained(final FocusEvent e) {
-                Object o = getValue();
+                Object o = ((GuiComboBox) e.getSource()).getValue();
                 if (o != null && !Tools.isStringClass(o)
                     && ((Info) o).getStringValue() == null) {
                     o = null;
@@ -456,8 +456,8 @@ public class GuiComboBox extends JPanel {
             public final void popupMenuWillBecomeVisible(
                                                     final PopupMenuEvent pe) {
                 /* workaround to have items with bigger widths than jcombobox */
-                final JComboBox cb = (JComboBox) pe.getSource();
-                final Object c = cb.getUI().getAccessibleChild(cb, 0);
+                final JComboBox thisCB = (JComboBox) pe.getSource();
+                final Object c = thisCB.getUI().getAccessibleChild(thisCB, 0);
                 if (!(c instanceof JPopupMenu)) {
                     return;
                 }
@@ -465,7 +465,7 @@ public class GuiComboBox extends JPanel {
                             (JScrollPane) ((JPopupMenu) c).getComponent(0);
                 final Dimension size = scrollPane.getPreferredSize();
                 final JComponent view =
-                            (JComponent) scrollPane.getViewport().getView();
+                               (JComponent) scrollPane.getViewport().getView();
                 final int newSize = view.getPreferredSize().width;
                 if (newSize > size.width) {
                     size.width = newSize;

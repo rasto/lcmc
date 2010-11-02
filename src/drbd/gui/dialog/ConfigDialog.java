@@ -100,6 +100,8 @@ public abstract class ConfigDialog {
     private volatile Object optionPaneAnswer;
     /** Whether the skipt button should be enabled. */
     private boolean skipButtonShouldBeEnabled = true;
+    private final String[] buttons = buttons();
+    private final MyButton[] options = new MyButton[buttons.length];
 
     /**
      * Gets dialogPanel.
@@ -443,9 +445,7 @@ public abstract class ConfigDialog {
         /* making non modal dialog */
         dialogGate = new CountDownLatch(1);
         if (dialogPanel == null) {
-            final String[] buttons = buttons();
             final ImageIcon[] icons = getIcons();
-            MyButton[] options = new MyButton[buttons.length];
             MyButton defaultButtonClass = null;
             final List<JComponent> allOptions = new ArrayList<JComponent>();
             if (skipButtonEnabled()) {
@@ -489,25 +489,10 @@ public abstract class ConfigDialog {
             } catch (final java.lang.reflect.InvocationTargetException x) {
                 Tools.printStackTrace();
             }
-            optionPane.addPropertyChangeListener(new PropertyChangeListener() {
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
-                        && !"uninitializedValue".equals(evt.getNewValue())) {
-                        optionPaneAnswer = optionPane.getValue();
-                        dialogGate.countDown();
-                    }
-                }
-            });
-
             optionPane.setPreferredSize(new Dimension(dialogWidth(),
                                                       dialogHeight()));
             optionPane.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
             optionPane.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
-
-            /* add action listeners */
-            for (final MyButton o : options) {
-                o.addActionListener(new OptionPaneActionListener());
-            }
 
             optionPane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
@@ -529,12 +514,36 @@ public abstract class ConfigDialog {
                                                      dialogHeight()));
             /* set location like the previous dialog */
         }
+        /* add action listeners */
+        for (final MyButton o : options) {
+            o.addActionListener(new OptionPaneActionListener());
+        }
+
+        final PropertyChangeListener propertyChangeListener =
+                                           new PropertyChangeListener() {
+            public void propertyChange(final PropertyChangeEvent evt) {
+                if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
+                    && !"uninitializedValue".equals(evt.getNewValue())) {
+                    optionPaneAnswer = optionPane.getValue();
+                    dialogGate.countDown();
+                }
+            }
+        };
+        optionPane.addPropertyChangeListener(propertyChangeListener);
+
         dialogPanel.setVisible(true);
         initDialog();
         try {
             dialogGate.await();
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
+        }
+        optionPane.removePropertyChangeListener(propertyChangeListener);
+        /* remove action listeners */
+        for (final MyButton o : options) {
+            for (final ActionListener als : o.getActionListeners()) {
+                o.removeActionListener(als);
+            }
         }
 
         if (optionPaneAnswer instanceof String) {

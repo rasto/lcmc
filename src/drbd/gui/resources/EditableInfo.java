@@ -55,6 +55,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -926,6 +927,9 @@ public abstract class EditableInfo extends Info {
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
         paramComboBoxClear();
+        for (final ActionListener al : applyButton.getActionListeners()) {
+            applyButton.removeActionListener(al);
+        }
     }
 
     /** Waits till the info panel is done for the first time. */

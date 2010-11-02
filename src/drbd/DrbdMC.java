@@ -222,7 +222,6 @@ public final class DrbdMC extends JPanel {
 
     /** Inits the application. */
     protected static void initApp(final String[] args) {
-        Tools.init();
         Thread.setDefaultUncaughtExceptionHandler(
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
@@ -357,14 +356,15 @@ public final class DrbdMC extends JPanel {
     /** The main function for starting the application. */
     public static void main(final String[] args) {
         try {
-            initApp(args);
+            Tools.init();
             final JFrame mainFrame = new JFrame(
                Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+            mainFrame.setGlassPane(getMainGlassPane());
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mainFrame.addWindowListener(new ExitListener());
             mainFrame.setContentPane(getMainPanel());
             mainFrame.setJMenuBar(getMenuBar());
-            mainFrame.setGlassPane(getMainGlassPane());
+            initApp(args);
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     createAndShowGUI((Container) mainFrame);

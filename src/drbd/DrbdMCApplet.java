@@ -25,6 +25,7 @@
  */
 package drbd;
 
+import drbd.utilities.Tools;
 import javax.swing.JApplet;
 
 
@@ -47,6 +48,7 @@ public final class DrbdMCApplet extends JApplet {
 
     /** Start the applet. */
     public void init() {
+        Tools.init();
         String[] params;
         final String paramsLine = getParameter("params");
         if (paramsLine != null) {

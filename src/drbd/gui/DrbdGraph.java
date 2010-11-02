@@ -258,6 +258,8 @@ public class DrbdGraph extends ResourceGraph {
     public final void removeDrbdResource(final DrbdResourceInfo dri) {
         final Edge e = drbdResourceToEdgeMap.get(dri);
         e.reset();
+        edgeToDrbdResourceMap.remove(e);
+        drbdResourceToEdgeMap.remove(dri);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
