@@ -143,4 +143,23 @@ public class MyMenu extends JMenu implements UpdatableItem {
             });
         }
     }
+
+    /** Cleanup. */
+    public final void cleanup() {
+        /* nothing to cleanup */
+    }
+
+    /** Remove all items. */
+    public final void removeAll() {
+        for (int i = 0; i < getItemCount(); i++) {
+            final javax.swing.JMenuItem item = getItem(i);
+            if (item instanceof MyMenuItem) {
+                ((MyMenuItem) item).cleanup();
+            } else if (item instanceof MyMenu) {
+                ((MyMenu) item).removeAll();
+            }
+        }
+        super.removeAll();
+    }
+
 }

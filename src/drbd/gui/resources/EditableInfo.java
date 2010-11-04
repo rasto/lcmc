@@ -115,9 +115,6 @@ public abstract class EditableInfo extends Info {
     protected abstract Object[] getParamPossibleChoices(String param);
     /** Returns array of all parameters. */
     public abstract String[] getParametersFromXML(); // TODO: no XML
-    /** Map from widget to its label. */
-    private final Map<GuiComboBox, JLabel> labelMap =
-                                        new HashMap<GuiComboBox, JLabel>();
     /** Old apply button, is used for wizards. */
     private MyButton oldApplyButton = null;
     /** Apply button. */ // TODO: private
@@ -334,7 +331,6 @@ public abstract class EditableInfo extends Info {
 
             /* label */
             final JLabel label = new JLabel(getParamShortDesc(param));
-            labelMap.put(paramCb, label);
             final String longDesc = getParamLongDesc(param);
             paramCb.setLabel(label, longDesc);
 
@@ -919,17 +915,15 @@ public abstract class EditableInfo extends Info {
 
     /** Return JLabel object for the combobox. */
     protected final JLabel getLabel(final GuiComboBox cb) {
-        //TODO: labelMap can be removed. cb.getLabel()
-        return labelMap.get(cb);
+        return cb.getLabel();
     }
 
     /** Removes this editable object and clealrs the parameter hashes. */
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
-        paramComboBoxClear();
-        for (final ActionListener al : applyButton.getActionListeners()) {
-            applyButton.removeActionListener(al);
-        }
+        //for (final ActionListener al : applyButton.getActionListeners()) {
+        //    applyButton.removeActionListener(al);
+        //}
     }
 
     /** Waits till the info panel is done for the first time. */

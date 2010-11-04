@@ -696,6 +696,7 @@ public class DrbdInfo extends EditableInfo {
         if (bd1 != null) {
             bd1.setDrbd(true);
             bd1.setDrbdResourceInfo(dri);
+            bd1.cleanup();
             bd1.setInfoPanel(null); /* reload panel */
             bd1.getInfoPanel();
             //bd1.selectMyself();
@@ -703,6 +704,7 @@ public class DrbdInfo extends EditableInfo {
         if (bd2 != null) {
             bd2.setDrbd(true);
             bd2.setDrbdResourceInfo(dri);
+            bd2.cleanup();
             bd2.setInfoPanel(null); /* reload panel */
             bd2.getInfoPanel();
             //bd2.selectMyself();

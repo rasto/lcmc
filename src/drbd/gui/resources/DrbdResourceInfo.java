@@ -962,7 +962,6 @@ public class DrbdResourceInfo extends EditableInfo
         getBrowser().getDrbdGraph().getDrbdInfo().selectMyself();
         getBrowser().getDrbdGraph().updatePopupMenus();
         getBrowser().resetFilesystems();
-        infoPanel = null;
     }
 
     /** Returns string of the drbd resource. */

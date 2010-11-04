@@ -224,9 +224,17 @@ public class Info implements Comparable {
     protected final GuiComboBox paramComboBoxRemove(final String param,
                                                     final String prefix) {
         if (prefix == null) {
-            return paramComboBoxHash.remove(param);
+            if (paramComboBoxHash.containsKey(param)) {
+                paramComboBoxHash.get(param).cleanup();
+                return paramComboBoxHash.remove(param);
+            }
+            return null;
         } else {
-            return paramComboBoxHash.remove(prefix + ":" + param);
+            if (paramComboBoxHash.containsKey(prefix + ":" + param)) {
+                paramComboBoxHash.get(prefix + ":" + param).cleanup();
+                return paramComboBoxHash.remove(prefix + ":" + param);
+            }
+            return null;
         }
     }
 
@@ -234,6 +242,9 @@ public class Info implements Comparable {
      * Clears the whole paramComboBox hash.
      */
     protected final void paramComboBoxClear() {
+        for (final String param : paramComboBoxHash.keySet()) {
+            paramComboBoxHash.get(param).cleanup();
+        }
         paramComboBoxHash.clear();
     }
 
@@ -433,11 +444,44 @@ public class Info implements Comparable {
         this.node = node;
     }
 
+    /** Cleanup */
+    public final void cleanup() {
+        //menu.removeAll();
+        //if (popup != null) {
+        //    popup.removeAll();
+        //}
+        try {
+            mActionMenuListLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        if (actionMenuList != null) {
+            for (final UpdatableItem i : actionMenuList) {
+                i.cleanup();
+            }
+        }
+        mActionMenuListLock.release();
+
+        try {
+            mMenuListLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        if (menuList != null) {
+            for (final UpdatableItem i : menuList) {
+                i.cleanup();
+            }
+        }
+        mMenuListLock.release();
+        paramComboBoxClear();
+    }
+
     /**
      * Removes this object from the tree and highlights and selects parent
      * node.
      */
     public void removeMyself(final boolean testOnly) {
+        cleanup();
         if (node != null) {
             final DefaultMutableTreeNode parent =
                                 (DefaultMutableTreeNode) node.getParent();

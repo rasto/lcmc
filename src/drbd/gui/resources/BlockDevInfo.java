@@ -1018,7 +1018,9 @@ public class BlockDevInfo extends EditableInfo {
             public void action() {
                 final DrbdInfo drbdInfo =
                                     getBrowser().getDrbdGraph().getDrbdInfo();
+                cleanup();
                 setInfoPanel(null);
+                oBdi.cleanup();
                 oBdi.setInfoPanel(null);
                 drbdInfo.addDrbdResource(null,
                                          null,

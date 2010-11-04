@@ -100,8 +100,7 @@ public abstract class ConfigDialog {
     private volatile Object optionPaneAnswer;
     /** Whether the skipt button should be enabled. */
     private boolean skipButtonShouldBeEnabled = true;
-    private final String[] buttons = buttons();
-    private final MyButton[] options = new MyButton[buttons.length];
+    private final MyButton[] options = new MyButton[buttons().length];
 
     /**
      * Gets dialogPanel.
@@ -457,6 +456,7 @@ public abstract class ConfigDialog {
                 skipButton.addItemListener(skipButtonListener());
                 allOptions.add(skipButton);
             }
+            final String[] buttons = buttons();
             /* populate buttonToObjectMap */
             for (int i = 0; i < buttons.length; i++) {
                 options[i] = new MyButton(buttons[i], icons[i]);
@@ -515,20 +515,25 @@ public abstract class ConfigDialog {
             /* set location like the previous dialog */
         }
         /* add action listeners */
+        final Map<MyButton,
+                  OptionPaneActionListener> optionPaneActionListeners =
+                             new HashMap<MyButton, OptionPaneActionListener>();
         for (final MyButton o : options) {
-            o.addActionListener(new OptionPaneActionListener());
+            final OptionPaneActionListener ol = new OptionPaneActionListener();
+            optionPaneActionListeners.put(o, ol);
+            o.addActionListener(ol);
         }
 
         final PropertyChangeListener propertyChangeListener =
-                                           new PropertyChangeListener() {
-            public void propertyChange(final PropertyChangeEvent evt) {
-                if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
-                    && !"uninitializedValue".equals(evt.getNewValue())) {
-                    optionPaneAnswer = optionPane.getValue();
-                    dialogGate.countDown();
+            new PropertyChangeListener() {
+                public void propertyChange(final PropertyChangeEvent evt) {
+                    if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())
+                        && !"uninitializedValue".equals(evt.getNewValue())) {
+                        optionPaneAnswer = optionPane.getValue();
+                        dialogGate.countDown();
+                    }
                 }
-            }
-        };
+            };
         optionPane.addPropertyChangeListener(propertyChangeListener);
 
         dialogPanel.setVisible(true);
@@ -538,19 +543,18 @@ public abstract class ConfigDialog {
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
-        optionPane.removePropertyChangeListener(propertyChangeListener);
-        /* remove action listeners */
-        for (final MyButton o : options) {
-            for (final ActionListener als : o.getActionListeners()) {
-                o.removeActionListener(als);
-            }
-        }
 
         if (optionPaneAnswer instanceof String) {
             setPressedButton((String) optionPaneAnswer);
         } else {
             setPressedButton(cancelButton());
         }
+        optionPane.removePropertyChangeListener(propertyChangeListener);
+        /* remove action listeners */
+        for (final MyButton o : options) {
+            o.removeActionListener(optionPaneActionListeners.get(o));
+        }
+        dialogPanel.dispose();
         return checkAnswer();
     }
 

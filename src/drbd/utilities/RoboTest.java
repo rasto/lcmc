@@ -396,6 +396,19 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
+                    } else if (index == 2) {
+                        /* DRBD */
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startDRBDTest2(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
                     }
                 } else if ("VMs".equals(selected)) {
                     if (index == 1) {
@@ -2162,6 +2175,24 @@ public final class RoboTest {
         leftClick(robot);
         confirmRemove(robot);
         checkDRBDTest(host, "drbd-test1", 2);
+    }
+
+    /** DRBD Test 1. */
+    private static void startDRBDTest2(final Robot robot, final Host host) {
+        slowFactor = 0.2f;
+        host.getSSH().installTestFiles(1);
+        aborted = false;
+        moveTo(robot, 334, 315); /* add drbd resource */
+        rightClick(robot);
+        moveTo(robot, 342, 321);
+        moveTo(robot, 667, 322);
+        leftClick(robot);
+        sleep(20000);
+
+
+        moveTo(robot, 960, 580);
+        leftClick(robot); /* cancel */
+        sleep(20000);
     }
 
     /** VM Test 1. */

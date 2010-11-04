@@ -663,7 +663,10 @@ public class DrbdGraph extends ResourceGraph {
      * resource.
      */
     protected final void oneEdgePressed(final Edge e) {
-        edgeToDrbdResourceMap.get(e).selectMyself();
+        final DrbdResourceInfo dri = edgeToDrbdResourceMap.get(e);
+        if (dri != null) {
+            dri.selectMyself();
+        }
     }
 
     /**
@@ -808,7 +811,9 @@ public class DrbdGraph extends ResourceGraph {
      */
     protected final Paint getEdgePickedPaint(final Edge edge) {
         final DrbdResourceInfo dri = edgeToDrbdResourceMap.get(edge);
-        if (dri.isConnected(isTestOnly()) && !dri.isSplitBrain()) {
+        if (dri != null
+            && dri.isConnected(isTestOnly())
+            && !dri.isSplitBrain()) {
             return super.getEdgePickedPaint(edge);
         } else {
             return Tools.getDefaultColor(

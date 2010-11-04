@@ -40,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.JButton;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Document;
+import javax.swing.text.AbstractDocument;
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -431,7 +432,8 @@ public class GuiComboBox extends JPanel {
         /* removing select... keyword */
         editor.addFocusListener(new FocusListener() {
             public void focusGained(final FocusEvent e) {
-                Object o = ((GuiComboBox) e.getSource()).getValue();
+                //Object o = (GuiComboBox) e.getSource()).getValue();
+                Object o = getValue();
                 if (o != null && !Tools.isStringClass(o)
                     && ((Info) o).getStringValue() == null) {
                     o = null;
@@ -1770,6 +1772,81 @@ public class GuiComboBox extends JPanel {
             return ((JComboBox) component).getItemAt(i);
         } else {
             return component;
+        }
+    }
+
+    /** Cleanup whatever would cause a leak. */
+    public final void cleanup() {
+        JComponent comp;
+        if (fieldButton == null) {
+            comp = component;
+        } else {
+            comp = componentPart;
+        }
+        switch(type) {
+            case TEXTFIELD:
+                final AbstractDocument d = (AbstractDocument) getDocument();
+                for (final DocumentListener dl : d.getDocumentListeners()) {
+                    d.removeDocumentListener(dl);
+                }
+                break;
+            case PASSWDFIELD:
+                final AbstractDocument dp = (AbstractDocument) getDocument();
+                for (final DocumentListener dl : dp.getDocumentListeners()) {
+                    dp.removeDocumentListener(dl);
+                }
+                break;
+            case COMBOBOX:
+                final JComboBox thisCB = ((JComboBox) comp);
+                final AbstractDocument dc = (AbstractDocument) getDocument();
+                for (final DocumentListener dl : dc.getDocumentListeners()) {
+                    dc.removeDocumentListener(dl);
+                }
+                for (final ItemListener il : thisCB.getItemListeners()) {
+                    thisCB.removeItemListener(il);
+                }
+                //final JTextComponent editor =
+                //      (JTextComponent) thisCB.getEditor().getEditorComponent();
+                //for (final FocusListener fl : editor.getFocusListeners()) {
+                //    thisCB.removeFocusListener(fl);
+                //}
+                break;
+            case RADIOGROUP:
+                try {
+                    mComponentsLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                for (final JComponent c : componentsHash.values()) {
+                    for (final ItemListener il : ((JRadioButton) c).getItemListeners()) {
+                        ((JRadioButton) c).removeItemListener(il);
+                    }
+                }
+                mComponentsLock.release();
+                break;
+            case CHECKBOX:
+                for (final ItemListener il :
+                                    ((JCheckBox) comp).getItemListeners()) {
+                    ((JCheckBox) comp).removeItemListener(il);
+                }
+                break;
+            case TEXTFIELDWITHUNIT:
+                final AbstractDocument dtfp =
+                                (AbstractDocument) textFieldPart.getDocument();
+                for (final DocumentListener dl : dtfp.getDocumentListeners()) {
+                    dtfp.removeDocumentListener(dl);
+                }
+                for (final ItemListener il : unitComboBox.getItemListeners()) {
+                    unitComboBox.removeItemListener(il);
+                }
+                //final JTextComponent ueditor =
+                // (JTextComponent) unitComboBox.getEditor().getEditorComponent();
+                //for (final FocusListener fl : ueditor.getFocusListeners()) {
+                //    unitComboBox.removeFocusListener(fl);
+                //}
+                break;
+            default:
+                /* error */
         }
     }
 }
