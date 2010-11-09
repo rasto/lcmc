@@ -351,6 +351,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * Creates tooltip.
      */
     public final JToolTip createToolTip() {
+        if (toolTip != null) {
+            toolTip.setComponent(null);
+        }
         toolTip = super.createToolTip();
         if (toolTipBackground != null) {
             toolTip.setBackground(toolTipBackground);
@@ -416,19 +419,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Clean up. */
     public final void cleanup() {
-        //for (final ItemListener il : getItemListeners()) {
-        //    removeItemListener(il);
-        //}
-        //for (final ActionListener al : getActionListeners()) {
-        //    removeActionListener(al);
-        //}
-        //for (final java.beans.PropertyChangeListener pcl : getPropertyChangeLis
-        //    removePropertyChangeListener(pcl);
-        //}
-        //for (final java.beans.PropertyChangeListener pcl : toolTip.getPropertyC
-        //    toolTip.removePropertyChangeListener(pcl);
-        //}
-        //toolTip = null;
         toolTip.setComponent(null);
      }
 

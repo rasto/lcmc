@@ -367,6 +367,24 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
+                    } else if (index == 7) {
+                        /* pacemaker leak test */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTest7(robot, host);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
+                    } else if (index == 8) {
+                        /* pacemaker leak test */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTest8(robot, host);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
                     } else if (index == 9) {
                         /* all pacemaker tests */
                         int i = 1;
@@ -1507,6 +1525,42 @@ public final class RoboTest {
 
     }
 
+    private static void startTest7(final Robot robot, final Host host) {
+        slowFactor = 0.5f;
+        host.getSSH().installTestFiles(2);
+        aborted = false;
+        final int dummy1X = 235;
+        final int dummy1Y = 255;
+        disableStonith(robot, host);
+        for (int i = 4; i >= 0; i--) {
+            Tools.info("I: " + i);
+            checkTest(host, "test7", 1);
+            /* create 4 dummies */
+            chooseDummy(robot, dummy1X, dummy1Y);
+            checkTest(host, "test7", 2);
+            stopResource(robot, dummy1X, dummy1Y, 0);
+            checkTest(host, "test7", 3);
+            removeResource(robot, dummy1X, dummy1Y, -15);
+        }
+        System.gc();
+    }
+
+    private static void startTest8(final Robot robot, final Host host) {
+        slowFactor = 0.5f;
+        host.getSSH().installTestFiles(2);
+        aborted = false;
+        final int dummy1X = 235;
+        final int dummy1Y = 255;
+        disableStonith(robot, host);
+        for (int i = 4; i >= 0; i--) {
+            Tools.info("I: " + i);
+            checkTest(host, "test7", 1);
+            /* create 4 dummies */
+            chooseDummy(robot, dummy1X, dummy1Y);
+        }
+            //checkTest(host, "test7", 2);
+    }
+
     /** Sets location. */
     private static void setLocation(final Robot robot, final Integer[] events) {
         moveTo(robot, 1041 , 615);
@@ -2000,12 +2054,18 @@ public final class RoboTest {
 
     /** Left press. */
     private static void leftPress(final Robot robot)  {
+        if (aborted) {
+            return;
+        }
         robot.mousePress(InputEvent.BUTTON1_MASK);
         Tools.sleep(300);
     }
 
     /** Left release. */
     private static void leftRelease(final Robot robot)  {
+        if (aborted) {
+            return;
+        }
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
         Tools.sleep(300);
     }

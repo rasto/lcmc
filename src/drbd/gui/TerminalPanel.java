@@ -103,6 +103,8 @@ public class TerminalPanel extends JScrollPane {
     private static final String GOD_OFF = "nogodmode";
     /** Command to turn on the god mode. */
     private static final String GOD_ON  = "godmode";
+    /** Command to run gc. */
+    private static final String RUN_GC  = "rungc";
     /** Command to start frenzy clicking for short period. */
     private static final String CLICKTEST_SHORT = "lclicksh";
     /** Command to start frenzy clicking for longer period. */
@@ -160,6 +162,7 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(CHEAT_LIST, 0);
         CHEATS_MAP.put(GOD_OFF, 0); /* off must be before on */
         CHEATS_MAP.put(GOD_ON, 0);
+        CHEATS_MAP.put(RUN_GC, 0);
         CHEATS_MAP.put(CLICKTEST_SHORT, 0);
         CHEATS_MAP.put(CLICKTEST_LONG, 0);
         CHEATS_MAP.put(CLICKTEST_LAZY_SHORT, 0);
@@ -687,6 +690,9 @@ public class TerminalPanel extends JScrollPane {
                 list.append('\n');
             }
             addCommandOutput(list.toString());
+        } else if (RUN_GC.equals(cheat)) {
+            System.out.println("run gc");
+            System.gc();
         } else if (CLICKTEST_SHORT.equals(cheat)) {
             RoboTest.startClicker(1, false);
         } else if (CLICKTEST_LONG.equals(cheat)) {
