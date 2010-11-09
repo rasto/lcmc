@@ -593,7 +593,7 @@ public class CloneInfo extends ServiceInfo {
                         setEnabled(false);
                     }
                 });
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeAndWait(new Runnable() {
                     public void run() {
                         removeAll();
                     }

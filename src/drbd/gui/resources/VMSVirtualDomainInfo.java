@@ -2169,7 +2169,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final void update() {
-                removeAll();
+                Tools.invokeAndWait(new Runnable() {
+                    public void run() {
+                        removeAll();
+                    }
+                });
                 final Point2D pos = getPos();
                 /* disk */
                 final MyMenuItem newDiskMenuItem = new MyMenuItem(

@@ -1065,7 +1065,11 @@ public class BlockDevInfo extends EditableInfo {
 
             public void update() {
                 super.update();
-                removeAll();
+                Tools.invokeAndWait(new Runnable() {
+                    public void run() {
+                        removeAll();
+                    }
+                });
                 Cluster cluster = getHost().getCluster();
                 Host[] otherHosts = cluster.getHostsArray();
                 for (final Host oHost : otherHosts) {
@@ -1095,7 +1099,11 @@ public class BlockDevInfo extends EditableInfo {
 
                         public final void update() {
                             super.update();
-                            removeAll();
+                            Tools.invokeAndWait(new Runnable() {
+                                public void run() {
+                                    removeAll();
+                                }
+                            });
                             Set<BlockDevInfo> blockDevInfos =
                                         oHost.getBrowser().getBlockDevInfos();
                             List<BlockDevInfo> blockDevInfosS =

@@ -512,7 +512,7 @@ public class GroupInfo extends ServiceInfo {
                         setEnabled(false);
                     }
                 });
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeAndWait(new Runnable() {
                     public void run() {
                         removeAll();
                     }
@@ -621,7 +621,7 @@ public class GroupInfo extends ServiceInfo {
                                 setEnabled(false);
                             }
                         });
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeAndWait(new Runnable() {
                             public void run() {
                                 removeAll();
                             }

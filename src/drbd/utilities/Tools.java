@@ -2314,6 +2314,17 @@ public final class Tools {
         }
     }
 
+    /** Convenience invoke and wait function. */
+    public static void invokeAndWait(final Runnable runnable) {
+        try {
+            SwingUtilities.invokeAndWait(runnable);
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException x) {
+            Tools.printStackTrace();
+        }
+    }
+
     /** Return directory part (to the /) of the filename. */
     public static String getDirectoryPart(final String filename) {
         if (filename == null) {

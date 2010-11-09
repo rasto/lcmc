@@ -1216,7 +1216,7 @@ public class ServicesInfo extends EditableInfo {
                         setEnabled(false);
                     }
                 });
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeAndWait(new Runnable() {
                     public void run() {
                         removeAll();
                     }

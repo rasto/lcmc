@@ -796,7 +796,9 @@ public class DrbdGraph extends ResourceGraph {
      */
     protected final Paint getEdgeDrawPaint(final Edge edge) {
         final DrbdResourceInfo dri = edgeToDrbdResourceMap.get(edge);
-        if (dri.isConnected(isTestOnly()) && !dri.isSplitBrain()) {
+        if (dri != null
+            && dri.isConnected(isTestOnly())
+            && !dri.isSplitBrain()) {
             return super.getEdgeDrawPaint(edge);
         } else {
             return Tools.getDefaultColor(
