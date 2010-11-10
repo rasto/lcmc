@@ -72,6 +72,9 @@ public class MyList extends JList implements ComponentWithTest {
      * Creates tooltip.
      */
     public final JToolTip createToolTip() {
+        if (toolTip != null) {
+            toolTip.setComponent(null);
+        }
         toolTip = super.createToolTip();
         if (toolTipBackground != null) {
             toolTip.setBackground(toolTipBackground);
@@ -131,4 +134,9 @@ public class MyList extends JList implements ComponentWithTest {
         return new Point(event.getX() + 5, /* to not cover the pointer. */
                          event.getY() + 20);
     }
+
+    /** Clean up. */
+    public final void cleanup() {
+        toolTip.setComponent(null);
+     }
 }

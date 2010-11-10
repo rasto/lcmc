@@ -691,8 +691,8 @@ public class TerminalPanel extends JScrollPane {
             }
             addCommandOutput(list.toString());
         } else if (RUN_GC.equals(cheat)) {
-            System.out.println("run gc");
             System.gc();
+            Tools.info("run gc");
         } else if (CLICKTEST_SHORT.equals(cheat)) {
             RoboTest.startClicker(1, false);
         } else if (CLICKTEST_LONG.equals(cheat)) {

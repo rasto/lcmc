@@ -328,8 +328,6 @@ public class HeartbeatGraph extends ResourceGraph {
                 }
             } else {
                 getVertexLocations().put(v, posWithScrollbar(pos));
-                System.out.println("set loc: " + pos);
-                //getLayout().setLocation(v, pos);
             }
 
             getGraph().addVertex(v);

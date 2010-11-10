@@ -4070,6 +4070,7 @@ public class ServiceInfo extends EditableInfo {
         if (!testOnly) {
             setUpdated(true);
             getService().setRemoved(true);
+            cleanup();
         }
         final CloneInfo ci = getCloneInfo();
         if (ci != null) {
@@ -4168,7 +4169,7 @@ public class ServiceInfo extends EditableInfo {
             getBrowser().removeFromServiceInfoHash(this);
             infoPanel = null;
             getService().doneRemoving();
-            getBrowser().reloadAllComboBoxes(this);
+            //getBrowser().reloadAllComboBoxes(this);
         }
     }
 

@@ -1536,10 +1536,13 @@ public final class RoboTest {
             Tools.info("I: " + i);
             checkTest(host, "test7", 1);
             /* create 4 dummies */
+            sleep(5000);
             chooseDummy(robot, dummy1X, dummy1Y);
             checkTest(host, "test7", 2);
+            sleep(5000);
             stopResource(robot, dummy1X, dummy1Y, 0);
             checkTest(host, "test7", 3);
+            sleep(5000);
             removeResource(robot, dummy1X, dummy1Y, -15);
         }
         System.gc();

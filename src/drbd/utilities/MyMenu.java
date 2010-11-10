@@ -24,6 +24,7 @@ package drbd.utilities;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import java.awt.geom.Point2D;
 
@@ -152,7 +153,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
     /** Remove all items. */
     public final void removeAll() {
         for (int i = 0; i < getItemCount(); i++) {
-            final javax.swing.JMenuItem item = getItem(i);
+            final JMenuItem item = getItem(i);
             if (item instanceof MyMenuItem) {
                 ((MyMenuItem) item).cleanup();
             } else if (item instanceof MyMenu) {
@@ -161,5 +162,4 @@ public class MyMenu extends JMenu implements UpdatableItem {
         }
         super.removeAll();
     }
-
 }
