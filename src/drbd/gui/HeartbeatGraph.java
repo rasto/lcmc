@@ -193,7 +193,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (pv == null) {
             return false;
         }
-        if (getGraph().isSuccessor(v, pv) || isAncestor(v, pv, new ArrayList<Vertex>())) {
+        if (getGraph().isSuccessor(pv, v) || isAncestor(v, pv, new ArrayList<Vertex>())) {
             return true;
         }
         return false;

@@ -105,11 +105,6 @@ public class DrbdGraph extends ResourceGraph {
     /** Maximum length of the label in the vertex, after which the string will
      * be cut. */
     private static final int MAX_VERTEX_STRING_LENGTH = 18;
-    /** Maximum length of the label in the edge, after which the string will
-     * be cut. */
-    private static final int MAX_EDGE_STRING_LENGTH = 10;
-    /** String length after the cut. */
-    private static final int EDGE_STRING_LENGTH = 7;
     /** Postion offset of block devices from the host x position. */
     private static final int BD_X_OFFSET = 15;
 
@@ -234,7 +229,7 @@ public class DrbdGraph extends ResourceGraph {
             Point2D pos = null; // getSavedPosition(bdi);
             if (pos == null) {
                 pos = new Point2D.Double(
-                    hostXPos + BD_X_OFFSET + getDefaultVertexWidth(bdv) / 2,
+                    hostXPos + BD_X_OFFSET + VERTEX_SIZE_BD / 2,
                     devYPos);
             }
             getVertexLocations().put(bdv, pos);
@@ -335,8 +330,15 @@ public class DrbdGraph extends ResourceGraph {
 
             final StringBuffer l = new StringBuffer(dri.getName());
             if (l != null) {
-                if (l.length() > MAX_EDGE_STRING_LENGTH) {
-                    l.delete(0, l.length() - EDGE_STRING_LENGTH);
+                final Point2D sp = getVertexLocations().get(source);
+                final Point2D dp = getVertexLocations().get(dest);
+                final int len = (int) Math.sqrt(Math.pow(sp.getX()
+                                                         - dp.getX(), 2)
+                                                + Math.pow(sp.getY()
+                                                           - dp.getY(), 2));
+                final int maxLen = (len - 200) / 7;
+                if (l.length() > maxLen) {
+                    l.delete(0, l.length() - maxLen + 3);
                     l.insert(0, "...");
                 }
                 if (dri.isSyncing()) {

@@ -1532,7 +1532,7 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 255;
         disableStonith(robot, host);
-        for (int i = 4; i >= 0; i--) {
+        for (int i = 40; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(host, "test7", 1);
             /* create 4 dummies */
@@ -1552,14 +1552,19 @@ public final class RoboTest {
         slowFactor = 0.5f;
         host.getSSH().installTestFiles(2);
         aborted = false;
-        final int dummy1X = 235;
-        final int dummy1Y = 255;
+        final int dummy1X = 540;
+        final int dummy1Y = 250;
         disableStonith(robot, host);
-        for (int i = 4; i >= 0; i--) {
+        for (int i = 10; i > 0; i--) {
             Tools.info("I: " + i);
-            checkTest(host, "test7", 1);
-            /* create 4 dummies */
+            //checkTest(host, "test7", 1);
+            sleep(5000);
             chooseDummy(robot, dummy1X, dummy1Y);
+            sleep(5000);
+            moveTo(robot, 550, 250);
+            leftPress(robot); /* move the reosurce */
+            moveTo(robot, 300, 250);
+            leftRelease(robot);
         }
             //checkTest(host, "test7", 2);
     }
