@@ -411,9 +411,13 @@ public abstract class ResourceGraph {
 
 
         layout = new StaticLayout<Vertex, Edge>(graph, vlf) {
+            /* remove the adjust locations part, because scraling is from 0, 0
+            */
             public final void setSize(final Dimension size) {
-                this.size = size;
-                initialize();
+                if (size != null) {
+                    this.size = size;
+                    initialize();
+                }
             }
         };
         vv = new VisualizationViewer<Vertex, Edge>(layout);
@@ -626,6 +630,7 @@ public abstract class ResourceGraph {
             final float x = maxXPos > vvX ? maxXPos : vvX;
             final float y = maxYPos > vvY ? maxYPos : vvY;
             getLayout().setSize(new Dimension((int) x, (int) y));
+            vv.setGraphLayout(getLayout());
         }
         if (changed) {
             somethingChangedReset();
@@ -697,10 +702,22 @@ public abstract class ResourceGraph {
         }
     }
 
-    /**
-     * Returns graph in the scroll pane.
-     */
+    /** Returns position adjusted to scrollbar. */
+    protected Point2D posWithScrollbar(final Point2D oldPos) {
+        final double newX = oldPos.getX()
+                         + scrollPane.getHorizontalScrollBar().getValue();
+        final double newY = oldPos.getY()
+                         + scrollPane.getVerticalScrollBar().getValue();
+        return new Point2D.Double(newX, newY);
+    }
+
+    /** Returns graph in the scroll pane. */
     public final JPanel getGraphPanel() {
+        return scrollPane;
+    }
+
+    /** Returns the scrollpane. */
+    public final GraphZoomScrollPane getScrollPane() {
         return scrollPane;
     }
 
