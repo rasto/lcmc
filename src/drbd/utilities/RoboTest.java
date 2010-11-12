@@ -275,7 +275,7 @@ public final class RoboTest {
     }
 
     /** Automatic tests. */
-    public static void startTest(final int index, final Host host) {
+    public static void startTest(final String index, final Host host) {
         Tools.info("start test " + index + " in 3 seconds");
         final Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -295,7 +295,7 @@ public final class RoboTest {
                 if ("Services".equals(selected)
                     || Tools.getString("ClusterBrowser.ClusterManager").equals(
                                                                    selected)) {
-                    if (index == 1) {
+                    if ("1".equals(index)) {
                         /* pacemaker */
                         int i = 1;
                         while (!aborted) {
@@ -308,7 +308,7 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
-                    } else if (index == 2) {
+                    } else if ("2".equals(index)) {
                         /* resource sets */
                         int i = 1;
                         while (!aborted) {
@@ -321,7 +321,7 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
-                    } else if (index == 3) {
+                    } else if ("3".equals(index)) {
                         /* pacemaker drbd */
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
@@ -331,7 +331,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + " no " + i + ", secs: "
                                    + secs);
-                    } else if (index == 4) {
+                    } else if ("4".equals(index)) {
                         /* placeholders 6 dummies */
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
@@ -341,7 +341,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + " no " + i + ", secs: "
                                    + secs);
-                    } else if (index == 5) {
+                    } else if ("5".equals(index)) {
                         int i = 1;
                         while (true) {
                             /* pacemaker */
@@ -354,7 +354,7 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
-                    } else if (index == 6) {
+                    } else if ("6".equals(index)) {
                         int i = 1;
                         while (true) {
                             /* pacemaker */
@@ -367,7 +367,7 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
-                    } else if (index == 7) {
+                    } else if ("7".equals(index)) {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
@@ -376,7 +376,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
-                    } else if (index == 8) {
+                    } else if ("8".equals(index)) {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
@@ -385,7 +385,25 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
-                    } else if (index == 9) {
+                    } else if ("A".equals(index)) {
+                        /* pacemaker leak test group */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTestA(robot, host);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
+                    } else if ("B".equals(index)) {
+                        /* pacemaker leak test clone */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTestB(robot, host);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
+                    } else if ("9".equals(index)) {
                         /* all pacemaker tests */
                         int i = 1;
                         while (true) {
@@ -401,7 +419,7 @@ public final class RoboTest {
                         }
                     }
                 } else if ("Storage (DRBD)".equals(selected)) {
-                    if (index == 1) {
+                    if ("1".equals(index)) {
                         /* DRBD */
                         int i = 1;
                         while (!aborted) {
@@ -414,7 +432,7 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
-                    } else if (index == 2) {
+                    } else if ("2".equals(index)) {
                         /* DRBD */
                         int i = 1;
                         while (!aborted) {
@@ -429,7 +447,7 @@ public final class RoboTest {
                         }
                     }
                 } else if ("VMs".equals(selected)) {
-                    if (index == 1) {
+                    if ("1".equals(index)) {
                         /* VMs */
                         int i = 1;
                         while (!aborted) {
@@ -480,7 +498,7 @@ public final class RoboTest {
     /** TEST 1. */
     private static void startTest1(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles(1);
+        host.getSSH().installTestFiles();
         aborted = false;
         /* create IPaddr2 with 192.168.100.100 ip */
         final int ipX = 235;
@@ -1118,7 +1136,7 @@ public final class RoboTest {
     /** TEST 2. */
     private static void startTest2(final Robot robot, final Host host) {
         slowFactor = 0.3f;
-        host.getSSH().installTestFiles(2);
+        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1134,10 +1152,10 @@ public final class RoboTest {
         disableStonith(robot, host);
         checkTest(host, "test2", 1);
         /* create 4 dummies */
-        chooseDummy(robot, dummy1X, dummy1Y);
-        chooseDummy(robot, dummy2X, dummy2Y);
-        chooseDummy(robot, dummy3X, dummy3Y);
-        chooseDummy(robot, dummy4X, dummy4Y);
+        chooseDummy(robot, dummy1X, dummy1Y, false);
+        chooseDummy(robot, dummy2X, dummy2Y, false);
+        chooseDummy(robot, dummy3X, dummy3Y, false);
+        chooseDummy(robot, dummy4X, dummy4Y, false);
         checkTest(host, "test2", 2);
 
         /* placeholder */
@@ -1330,7 +1348,7 @@ public final class RoboTest {
     /** TEST 4. */
     private static void startTest4(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles(2);
+        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1359,12 +1377,12 @@ public final class RoboTest {
         disableStonith(robot, host);
         checkTest(host, "test4", 1);
         /* create 6 dummies */
-        chooseDummy(robot, dummy1X, dummy1Y);
-        chooseDummy(robot, dummy2X, dummy2Y);
-        chooseDummy(robot, dummy3X, dummy3Y);
-        chooseDummy(robot, dummy4X, dummy4Y);
-        chooseDummy(robot, dummy5X, dummy5Y);
-        chooseDummy(robot, dummy6X, dummy6Y);
+        chooseDummy(robot, dummy1X, dummy1Y, false);
+        chooseDummy(robot, dummy2X, dummy2Y, false);
+        chooseDummy(robot, dummy3X, dummy3Y, false);
+        chooseDummy(robot, dummy4X, dummy4Y, false);
+        chooseDummy(robot, dummy5X, dummy5Y, false);
+        chooseDummy(robot, dummy6X, dummy6Y, false);
 
         /* 2 placeholders */
         while (true) {
@@ -1406,7 +1424,7 @@ public final class RoboTest {
     /** TEST 5. */
     private static void startTest5(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles(2);
+        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1430,8 +1448,8 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
 
-        chooseDummy(robot, dummy1X, dummy1Y);
-        chooseDummy(robot, dummy2X, dummy2Y);
+        chooseDummy(robot, dummy1X, dummy1Y, false);
+        chooseDummy(robot, dummy2X, dummy2Y, false);
         //checkTest(host, "test5", 2);
 
         addConstraint(robot, dummy2X, dummy2Y, 35, false, -1);
@@ -1490,7 +1508,7 @@ public final class RoboTest {
     /** TEST 6. */
     private static void startTest6(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles(2);
+        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1511,7 +1529,7 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
 
-        chooseDummy(robot, dummy1X, dummy1Y);
+        chooseDummy(robot, dummy1X, dummy1Y, false);
         //checkTest(host, "test5", 2);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
@@ -1527,17 +1545,17 @@ public final class RoboTest {
 
     private static void startTest7(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles(2);
+        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
         disableStonith(robot, host);
-        for (int i = 40; i > 0; i--) {
+        for (int i = 10; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(host, "test7", 1);
-            /* create 4 dummies */
+            /* create dummy */
             sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y);
+            chooseDummy(robot, dummy1X, dummy1Y, false);
             checkTest(host, "test7", 2);
             sleep(5000);
             stopResource(robot, dummy1X, dummy1Y, 0);
@@ -1548,9 +1566,75 @@ public final class RoboTest {
         System.gc();
     }
 
+    private static void startTestA(final Robot robot, final Host host) {
+        slowFactor = 0.5f;
+        host.getSSH().installTestFiles();
+        aborted = false;
+        final int gx = 235;
+        final int gy = 255;
+        disableStonith(robot, host);
+        for (int i = 5; i > 0; i--) {
+            Tools.info("I: " + i);
+
+            checkTest(host, "testA", 1);
+            /* group with dummy resources */
+            moveTo(robot, gx, gy);
+            sleep(1000);
+            rightClick(robot); /* popup */
+            moveTo(robot, gx + 46, gy + 11);
+            sleep(1000);
+            leftClick(robot); /* choose group */
+            sleep(3000);
+            /* create dummy */
+            moveTo(robot, gx + 46, gy + 11);
+            rightClick(robot); /* group popup */
+            sleep(2000 + i * 500);
+            moveTo(robot, gx + 80, gy + 20);
+            moveTo(robot, gx + 84, gy + 22);
+            moveTo(robot, gx + 580, gy + 22);
+            sleep(1000);
+            typeDummy(robot);
+            sleep(i * 300);
+            setTimeouts(robot);
+            moveTo(robot, 809, 192); /* ptest */
+            sleep(6000);
+            leftClick(robot); /* apply */
+            sleep(6000);
+            checkTest(host, "testA", 2);
+            stopResource(robot, gx, gy, 0);
+            sleep(6000);
+            checkTest(host, "testA", 3);
+            removeResource(robot, gx, gy, 0);
+        }
+        System.gc();
+    }
+
+    private static void startTestB(final Robot robot, final Host host) {
+        slowFactor = 0.5f;
+        host.getSSH().installTestFiles();
+        aborted = false;
+        final int dummy1X = 235;
+        final int dummy1Y = 255;
+        disableStonith(robot, host);
+        for (int i = 3; i > 0; i--) {
+            Tools.info("I: " + i);
+            checkTest(host, "testB", 1);
+            /* create dummy */
+            sleep(5000);
+            chooseDummy(robot, dummy1X, dummy1Y, true);
+            checkTest(host, "testB", 2);
+            sleep(5000);
+            stopResource(robot, dummy1X, dummy1Y, 0);
+            checkTest(host, "testB", 3);
+            sleep(5000);
+            removeResource(robot, dummy1X, dummy1Y, -15);
+        }
+        System.gc();
+    }
+
     private static void startTest8(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles(2);
+        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 540;
         final int dummy1Y = 250;
@@ -1559,7 +1643,7 @@ public final class RoboTest {
             Tools.info("I: " + i);
             //checkTest(host, "test7", 1);
             sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y);
+            chooseDummy(robot, dummy1X, dummy1Y, false);
             sleep(5000);
             moveTo(robot, 550, 250);
             leftPress(robot); /* move the reosurce */
@@ -1675,7 +1759,8 @@ public final class RoboTest {
     /** Create dummy resource. */
     private static void chooseDummy(final Robot robot,
                                     final int x,
-                                    final int y) {
+                                    final int y,
+                                    boolean clone) {
         moveTo(robot, x, y);
         sleep(1000);
         rightClick(robot); /* popup */
@@ -1688,6 +1773,8 @@ public final class RoboTest {
         typeDummy(robot);
         sleep(2000);
         setTimeouts(robot);
+        moveTo(robot, 893, 250);
+        leftClick(robot); /* clone */
         moveTo(robot, 809, 192); /* ptest */
         sleep(4000);
         leftClick(robot); /* apply */
@@ -2193,7 +2280,7 @@ public final class RoboTest {
     /** DRBD Test 1. */
     private static void startDRBDTest1(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles(1);
+        host.getSSH().installTestFiles();
         aborted = false;
         moveTo(robot, 334, 315); /* add drbd resource */
         rightClick(robot);
@@ -2248,7 +2335,7 @@ public final class RoboTest {
     /** DRBD Test 1. */
     private static void startDRBDTest2(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles(1);
+        host.getSSH().installTestFiles();
         aborted = false;
         moveTo(robot, 334, 315); /* add drbd resource */
         rightClick(robot);
@@ -2266,7 +2353,7 @@ public final class RoboTest {
     /** VM Test 1. */
     private static void startVMTest1(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles(1);
+        host.getSSH().installTestFiles();
         aborted = false;
         checkVMTest(host, "vm-test1", 1);
 

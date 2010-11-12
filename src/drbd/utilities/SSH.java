@@ -1655,7 +1655,7 @@ public class SSH {
     /**
      * Installs test suite on the remote host.
      */
-    public final void installTestFiles(final int index) {
+    public final void installTestFiles() {
         final String fileName = "drbd-mc-test.tar";
         final Connection conn = connection;
         if (conn == null) {

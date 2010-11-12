@@ -155,6 +155,12 @@ public class TerminalPanel extends JScrollPane {
     private static final String TEST_8 = "starttest8";
     /** Starts test 9. */
     private static final String TEST_9 = "starttest9";
+    /** Starts test A. */
+    private static final String TEST_A = "starttesta";
+    /** Starts test B. */
+    private static final String TEST_B = "starttestb";
+    /** Starts test C. */
+    private static final String TEST_C = "starttestc";
     /** Register mouse movement. */
     private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
@@ -189,6 +195,9 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(TEST_7, 0);
         CHEATS_MAP.put(TEST_8, 0);
         CHEATS_MAP.put(TEST_9, 0);
+        CHEATS_MAP.put(TEST_A, 0);
+        CHEATS_MAP.put(TEST_B, 0);
+        CHEATS_MAP.put(TEST_C, 0);
         CHEATS_MAP.put(REGISTER_MOVEMENT, 0);
     }
 
@@ -739,23 +748,29 @@ public class TerminalPanel extends JScrollPane {
         } else if (DEBUG_DEC.equals(cheat)) {
             Tools.decrementDebugLevel();
         } else if (TEST_1.equals(cheat)) {
-            RoboTest.startTest(1, host);
+            RoboTest.startTest("1", host);
         } else if (TEST_2.equals(cheat)) {
-            RoboTest.startTest(2, host);
+            RoboTest.startTest("2", host);
         } else if (TEST_3.equals(cheat)) {
-            RoboTest.startTest(3, host);
+            RoboTest.startTest("3", host);
         } else if (TEST_4.equals(cheat)) {
-            RoboTest.startTest(4, host);
+            RoboTest.startTest("4", host);
         } else if (TEST_5.equals(cheat)) {
-            RoboTest.startTest(5, host);
+            RoboTest.startTest("5", host);
         } else if (TEST_6.equals(cheat)) {
-            RoboTest.startTest(6, host);
+            RoboTest.startTest("6", host);
         } else if (TEST_7.equals(cheat)) {
-            RoboTest.startTest(7, host);
+            RoboTest.startTest("7", host);
         } else if (TEST_8.equals(cheat)) {
-            RoboTest.startTest(8, host);
+            RoboTest.startTest("8", host);
         } else if (TEST_9.equals(cheat)) {
-            RoboTest.startTest(9, host);
+            RoboTest.startTest("9", host);
+        } else if (TEST_A.equals(cheat)) {
+            RoboTest.startTest("A", host);
+        } else if (TEST_B.equals(cheat)) {
+            RoboTest.startTest("B", host);
+        } else if (TEST_C.equals(cheat)) {
+            RoboTest.startTest("C", host);
         } else if (REGISTER_MOVEMENT.equals(cheat)) {
             RoboTest.registerMovement();
         }

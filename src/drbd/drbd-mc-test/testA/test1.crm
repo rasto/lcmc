@@ -1,0 +1,6 @@
+node host1 
+	attributes standby="off"
+node host2
+property $id="cib-bootstrap-options" 
+	stonith-enabled="false" 
+	no-quorum-policy="ignore"

@@ -735,6 +735,7 @@ public class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             for (final ServiceInfo child : children) {
                 getBrowser().removeFromServiceInfoHash(child);
+                child.cleanup();
                 child.getService().doneRemoving();
             }
         }

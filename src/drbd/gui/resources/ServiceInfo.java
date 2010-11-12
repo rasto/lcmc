@@ -4158,6 +4158,7 @@ public class ServiceInfo extends EditableInfo {
                                                       master,
                                                       testOnly);
                     cleanupResource(dcHost, testOnly);
+                    setUpdated(false); /* must be here, is not a clone anymore*/
                     if (!testOnly && !ret) {
                         Tools.progressIndicatorFailed(dcHost.getName(),
                                                       "removing failed");
@@ -5622,6 +5623,16 @@ public class ServiceInfo extends EditableInfo {
 
         /** Sets whether the info object is being updated. */
         public void setUpdated(final boolean updated) {
+            final GroupInfo gi = groupInfo;
+            if (gi != null) {
+                gi.setUpdated(updated);
+                return;
+            }
+            final CloneInfo ci = cloneInfo;
+            if (ci != null) {
+                ci.setUpdated(updated);
+                return;
+            }
             if (updated && !isUpdated()) {
                 getBrowser().getHeartbeatGraph().startAnimation(this);
             } else if (!updated) {

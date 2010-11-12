@@ -442,6 +442,9 @@ public class CloneInfo extends ServiceInfo {
      */
     public final void cleanupResource(final Host dcHost,
                                       final boolean testOnly) {
+        if (!testOnly) {
+            setUpdated(true);
+        }
         final ServiceInfo cs = containedService;
         if (cs != null) {
             final String hbV = dcHost.getHeartbeatVersion();
@@ -467,6 +470,9 @@ public class CloneInfo extends ServiceInfo {
      * Starts resource in crm.
      */
     public final void startResource(final Host dcHost, final boolean testOnly) {
+        if (!testOnly) {
+            setUpdated(true);
+        }
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
         if (pmV == null
@@ -485,6 +491,9 @@ public class CloneInfo extends ServiceInfo {
      * Stops resource in crm.
      */
     public final void stopResource(final Host dcHost, final boolean testOnly) {
+        if (!testOnly) {
+            setUpdated(true);
+        }
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
         if (pmV == null
@@ -528,6 +537,9 @@ public class CloneInfo extends ServiceInfo {
     public final void setManaged(final boolean isManaged,
                                  final Host dcHost,
                                  final boolean testOnly) {
+        if (!testOnly) {
+            setUpdated(true);
+        }
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
         if (pmV == null
