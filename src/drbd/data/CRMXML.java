@@ -500,6 +500,7 @@ public class CRMXML extends XML {
         addMetaAttribute(pcmkClone, MASTER_MAX_META_ATTR,      null, true);
         addMetaAttribute(pcmkClone, MASTER_NODE_MAX_META_ATTR, null, true);
         addMetaAttribute(pcmkClone, CLONE_MAX_META_ATTR,       null, false);
+        addMetaAttribute(pcmkClone, CLONE_NODE_MAX_META_ATTR,  null, false);
         addMetaAttribute(pcmkClone, NOTIFY_META_ATTR,          null, false);
         addMetaAttribute(pcmkClone, GLOBALLY_UNIQUE_META_ATTR, null, false);
         addMetaAttribute(pcmkClone, ORDERED_META_ATTR,         null, false);
@@ -1568,6 +1569,7 @@ public class CRMXML extends XML {
         rscDefaultsMetaAttrs.put(MASTER_NODE_MAX_META_ATTR, null);
         /* Clone */
         rscDefaultsMetaAttrs.put(CLONE_MAX_META_ATTR,       null);
+        rscDefaultsMetaAttrs.put(CLONE_NODE_MAX_META_ATTR,  null);
         rscDefaultsMetaAttrs.put(NOTIFY_META_ATTR,          null);
         rscDefaultsMetaAttrs.put(GLOBALLY_UNIQUE_META_ATTR, null);
         rscDefaultsMetaAttrs.put(ORDERED_META_ATTR,         null);
