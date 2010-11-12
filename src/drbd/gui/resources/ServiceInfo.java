@@ -3198,6 +3198,12 @@ public class ServiceInfo extends EditableInfo {
                 || (clInfo != null && !clInfo.getService().isNew())) {
                 command = "-U";
             }
+            if (!testOnly) {
+                getService().setNew(false);
+                if (clInfo != null) {
+                    clInfo.getService().setNew(false);
+                }
+            }
             CRM.setParameters(dcHost,
                               command,
                               heartbeatId,
@@ -3219,9 +3225,6 @@ public class ServiceInfo extends EditableInfo {
                               getOperationsRefId(),
                               resourceAgent.isStonith(),
                               testOnly);
-            if (!testOnly) {
-                getService().setNew(false);
-            }
             if (gInfo == null) {
                 String hbId = heartbeatId;
                 if (clInfo != null) {
