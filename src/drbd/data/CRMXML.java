@@ -1619,6 +1619,10 @@ public class CRMXML extends XML {
                     final String type = getAttribute(contentParamNode, "type");
                     String defaultValue = getAttribute(contentParamNode,
                                                                     "default");
+                    if (ra.isIPaddr() && "nic".equals(param)) {
+                        // workaround for default value in IPaddr and IPaddr2
+                        defaultValue = "";
+                    }
                     if ("force_stop".equals(param)
                         && "0".equals(defaultValue)) {
                         // Workaround, default is "0" and should be false
