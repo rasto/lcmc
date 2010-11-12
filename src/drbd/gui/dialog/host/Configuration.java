@@ -53,8 +53,6 @@ public class Configuration extends DialogHost {
     private static final long serialVersionUID = 1L;
     /** Maximum hops. */
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
-    /** Name field. */
-    private GuiComboBox nameField;
     /** Hostname fields. */
     private GuiComboBox[] hostnameField =
                             new GuiComboBox[MAX_HOPS];
@@ -82,9 +80,7 @@ public class Configuration extends DialogHost {
      * Finishes the dialog and stores the values.
      */
     protected final void finishDialog() {
-        final String name = nameField.getStringValue().trim();
         getHost().setHostname(Tools.join(",", hostnames, getHops()));
-        getHost().setName(name);
         final int hops = getHops();
         String[] ipsA = new String[hops];
         for (int i = 0; i < hops; i++) {
@@ -113,14 +109,9 @@ public class Configuration extends DialogHost {
      * Checks the fields and if they are correct the buttons will be enabled.
      */
     protected final void checkFields(final GuiComboBox field) {
-        final String name = nameField.getStringValue().trim();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                boolean isValid = false;
-                if (hostnameOk) {
-                    isValid = (name.length() > 0);
-                }
-                buttonClass(nextButton()).setEnabled(isValid);
+                buttonClass(nextButton()).setEnabled(hostnameOk);
             }
         });
     }
@@ -227,14 +218,6 @@ public class Configuration extends DialogHost {
                 printErrorAndRetry(
                    Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
             }
-            if (hostnameOk) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        nameField.setEnabled(true);
-                    }
-                });
-
-            }
             final String[] items = getHost().getIps(hop);
             if (items != null) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -266,7 +249,6 @@ public class Configuration extends DialogHost {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
-        nameField.setEnabled(false);
         if (getHost().getIp() == null || "".equals(getHost().getIp())) {
             final CheckDNSThread[] checkDNSThread =
                             new CheckDNSThread[MAX_HOPS];
@@ -276,9 +258,19 @@ public class Configuration extends DialogHost {
                                 getHost().getHostnameEntered().split(",")[i];
 
                 hostnameField[i].setEnabled(false);
-                checkDNSThread[i] = new CheckDNSThread(i, hostnameEntered);
-                checkDNSThread[i].setPriority(Thread.MIN_PRIORITY);
-                checkDNSThread[i].start();
+                if (Tools.isIp(hostnameEntered)) {
+                    hostnames[i] = hostnameEntered;
+                    hostnameField[i].setValue(hostnameEntered);
+                    getHost().setIp(hostnameEntered);
+                    getHost().setIps(i, new String[]{hostnameEntered});
+                    ipCombo[i].reloadComboBox(hostnameEntered,
+                                              new String[]{hostnameEntered});
+                    hostnameOk = true;
+                } else {
+                    checkDNSThread[i] = new CheckDNSThread(i, hostnameEntered);
+                    checkDNSThread[i].setPriority(Thread.MIN_PRIORITY);
+                    checkDNSThread[i].start();
+                }
             }
 
 
@@ -286,29 +278,22 @@ public class Configuration extends DialogHost {
                 new Runnable() {
                     public void run() {
                         for (int i = 0; i < getHops(); i++) {
-                            try {
-                                checkDNSThread[i].join();
-                            } catch (java.lang.InterruptedException e) {
-                                Thread.currentThread().interrupt();
+                            if (checkDNSThread[i] != null) {
+                                try {
+                                    checkDNSThread[i].join();
+                                } catch (java.lang.InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                }
                             }
                         }
                         progressBarDone();
                         getHost().setHostname(
                                 Tools.join(",", hostnames, getHops()));
-                        checkFields(nameField);
-                        addCheckField(nameField);
                         String name = getHost().getName();
                         if (name == null || "null".equals(name)) {
                             name = "";
                         }
                         enableComponents();
-                        final String nameValue = name;
-                                nameField.setValueAndWait(nameValue);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                nameField.requestFocus();
-                            }
-                        });
                         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
@@ -321,16 +306,12 @@ public class Configuration extends DialogHost {
                 public void run() {
                     getHost().setHostname(
                                        Tools.join(",", hostnames, getHops()));
-                    checkFields(nameField);
-                    addCheckField(nameField);
                     String name = getHost().getName();
                     if (name == null || "null".equals(name)) {
                         name = "";
                     }
-                    nameField.setValue(name);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            nameField.requestFocus();
                             for (int i = 0; i < getHops(); i++) {
                                 hostnameField[i].setEnabled(false);
                             }
@@ -356,33 +337,6 @@ public class Configuration extends DialogHost {
         final int hops = getHops();
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        /* Name */
-        final JLabel nameLabel = new JLabel(
-                            Tools.getString("Dialog.Host.Configuration.Name"));
-
-        inputPane.add(nameLabel);
-        final String regexp = "^[\\w.-]+$";
-        String name = getHost().getName();
-        if (name == null) {
-            name = "";
-        }
-        nameField = new GuiComboBox(name,
-                                    null, /* items */
-                                    null, /* units */
-                                    null, /* type */
-                                    regexp,
-                                    COMBO_BOX_WIDTH,
-                                    null, /* abbrv */
-                                    new AccessMode(ConfigData.AccessType.RO,
-                                                   false)); /* only adv. mode */
-        inputPane.add(nameField);
-        nameField.setBackground(getHost().getName(),
-                                getHost().getName(),
-                                true);
-        for (int i = 0; i < hops - 1; i++) {
-            inputPane.add(new JLabel(""));
-        }
 
         /* Host/Hosts */
         final JLabel hostnameLabel = new JLabel(
@@ -432,7 +386,7 @@ public class Configuration extends DialogHost {
             ipCombo[i].setEnabled(false);
         }
 
-        SpringUtilities.makeCompactGrid(inputPane, 3, 1 + hops, // rows, cols
+        SpringUtilities.makeCompactGrid(inputPane, 2, 1 + hops, // rows, cols
                                                    0, 0,  // initX, initY
                                                    0, 0); // xPad, yPad
         final JPanel pane = new JPanel(new SpringLayout());
