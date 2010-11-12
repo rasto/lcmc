@@ -153,6 +153,8 @@ public class ConfigData implements Serializable {
     private AccessType accessType = AccessType.ADMIN;
     /** Maximum allowed access type of the application. */
     private AccessType maxAccessType = AccessType.ADMIN;
+    /** Whether the upgrade check is enabled. */
+    private boolean upgradeCheckEnabled = true;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -694,5 +696,16 @@ public class ConfigData implements Serializable {
             }
         }
         return modes.toArray(new String[modes.size()]);
+    }
+
+    /** Sets whether the upgrade check should be enabled. */
+    public final void setUpgradeCheckEnabled(
+                                            final boolean upgradeCheckEnabled) {
+        this.upgradeCheckEnabled = upgradeCheckEnabled;
+    }
+
+    /** Returns whether the upgrade check is enabled. */
+    public final boolean isUpgradeCheckEnabled() {
+        return upgradeCheckEnabled;
     }
 }

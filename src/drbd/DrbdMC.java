@@ -231,6 +231,7 @@ public final class DrbdMC extends JPanel {
                                    (Exception) ex);
                 }
             });
+        boolean upgradeCheck = true;
         boolean auto = false;
         boolean tightvnc = false;
         boolean ultravnc = false;
@@ -293,6 +294,7 @@ public final class DrbdMC extends JPanel {
                 System.out.println("--keep-helper, do not overwrite "
                                    + "the drbd-gui-helper program.");
                 System.out.println("--auto for testing");
+                System.out.println("--no-upgrade-check disable upgrade check");
                 System.out.println("--tightvnc, enable tight vnc viewer");
                 System.out.println("--ultravnc, enable ultra vnc viewer");
                 System.out.println("--realvnc, enable real vnc viewer");
@@ -320,6 +322,8 @@ public final class DrbdMC extends JPanel {
                 ultravnc = true;
             } else if ("--realvnc".equals(arg)) {
                 realvnc = true;
+            } else if ("--no-upgrade-check".equals(arg)) {
+                upgradeCheck = false;
             } else if ("--auto".equals(arg)) {
                 auto = true;
             } else if ("--staging-drbd".equals(arg)) {
@@ -335,6 +339,8 @@ public final class DrbdMC extends JPanel {
                 /* restore mouse if it is stuck in pressed state, during
                  * robot tests. */
                 RoboTest.restoreMouse();
+            } else {
+                Tools.info("unknown option: " + arg);
             }
         }
         Tools.getConfigData().setAnimFPS(fps);
@@ -348,6 +354,7 @@ public final class DrbdMC extends JPanel {
                 ultravnc = true;
             }
         }
+        Tools.getConfigData().setUpgradeCheckEnabled(upgradeCheck);
         Tools.getConfigData().setTightvnc(tightvnc);
         Tools.getConfigData().setUltravnc(ultravnc);
         Tools.getConfigData().setRealvnc(realvnc);
@@ -359,12 +366,12 @@ public final class DrbdMC extends JPanel {
             Tools.init();
             final JFrame mainFrame = new JFrame(
                Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+            initApp(args);
             mainFrame.setGlassPane(getMainGlassPane());
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mainFrame.addWindowListener(new ExitListener());
             mainFrame.setContentPane(getMainPanel());
             mainFrame.setJMenuBar(getMenuBar());
-            initApp(args);
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     createAndShowGUI((Container) mainFrame);

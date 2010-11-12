@@ -98,6 +98,9 @@ public class TextResource extends
         {"MainPanel.UpgradeCheck",
          "checking for available upgrades..."},
 
+        {"MainPanel.UpgradeCheckDisabled",
+         "check for upgrades disabled"},
+
         {"MainPanel.UpgradeCheckFailed",
          "check for upgrade failed"},
 

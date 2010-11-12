@@ -72,7 +72,7 @@ public class ClustersPanel extends JPanel {
     /** Width of the tab border. */
     private static final int TAB_BORDER_WIDTH = 3;
     /** Upgrade check text. */
-    private String upgradeCheck = Tools.getString("MainPanel.UpgradeCheck");
+    private String upgradeCheck;
     /** Upgrade check lock. */
     private final Mutex mUpgradeLock = new Mutex();
     /** Upgrade check text fields. */
@@ -85,8 +85,15 @@ public class ClustersPanel extends JPanel {
     public ClustersPanel() {
         super(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
+        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
+            upgradeCheck = Tools.getString("MainPanel.UpgradeCheck");
+        } else {
+            upgradeCheck = Tools.getString("MainPanel.UpgradeCheckDisabled");
+        }
         newClusterTab = new ClusterTab(null);
-        startUpgradeCheck();
+        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
+            startUpgradeCheck();
+        }
         setBackground(Tools.getDefaultColor("ClustersPanel.Background"));
         showGUI();
     }
