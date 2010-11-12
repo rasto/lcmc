@@ -221,7 +221,7 @@ public final class DrbdMC extends JPanel {
     }
 
     /** Inits the application. */
-    protected static void initApp(final String[] args) {
+    protected static String initApp(final String[] args) {
         Thread.setDefaultUncaughtExceptionHandler(
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
@@ -231,6 +231,7 @@ public final class DrbdMC extends JPanel {
                                    (Exception) ex);
                 }
             });
+        String autoArgs = null;
         boolean upgradeCheck = true;
         boolean auto = false;
         boolean tightvnc = false;
@@ -278,7 +279,7 @@ public final class DrbdMC extends JPanel {
             }
 
             if (auto) {
-                Tools.parseAutoArgs(arg);
+                autoArgs = arg;
             } else if ("--keep-helper".equals(arg)) {
                 Tools.debug(null, "--keep-helper option specified");
                 Tools.getConfigData().setKeepHelper(true);
@@ -358,6 +359,7 @@ public final class DrbdMC extends JPanel {
         Tools.getConfigData().setTightvnc(tightvnc);
         Tools.getConfigData().setUltravnc(ultravnc);
         Tools.getConfigData().setRealvnc(realvnc);
+        return autoArgs;
     }
 
     /** The main function for starting the application. */
@@ -366,17 +368,20 @@ public final class DrbdMC extends JPanel {
             Tools.init();
             final JFrame mainFrame = new JFrame(
                Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
-            initApp(args);
+            final String autoArgs = initApp(args);
             mainFrame.setGlassPane(getMainGlassPane());
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mainFrame.addWindowListener(new ExitListener());
-            mainFrame.setContentPane(getMainPanel());
             mainFrame.setJMenuBar(getMenuBar());
+            mainFrame.setContentPane(getMainPanel());
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     createAndShowGUI((Container) mainFrame);
                 }
             });
+            if (autoArgs != null) {
+                Tools.parseAutoArgs(autoArgs);
+            }
         } catch (Exception e) {
             Tools.appError("Error in the application", "", e);
         }

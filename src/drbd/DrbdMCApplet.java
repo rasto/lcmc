@@ -58,8 +58,8 @@ public final class DrbdMCApplet extends JApplet {
         }
 
         DrbdMC.initApp(params);
-        setContentPane(DrbdMC.getMainPanel());
         setJMenuBar(DrbdMC.getMenuBar());
+        setContentPane(DrbdMC.getMainPanel());
         setGlassPane(DrbdMC.getMainGlassPane());
         DrbdMC.createAndShowGUI(this);
         //TODO: save on quit

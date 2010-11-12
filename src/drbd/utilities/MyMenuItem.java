@@ -203,7 +203,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
-        setFont(new Font(name, style, size));
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setFont(new Font(name, style, size));
+            }
+        });
     }
 
     /**
@@ -214,7 +218,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
-        setFont(new Font(name, style, size));
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setFont(new Font(name, style, size));
+            }
+        });
     }
 
     /**

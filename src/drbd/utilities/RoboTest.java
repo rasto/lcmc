@@ -735,7 +735,7 @@ public final class RoboTest {
         moveTo(robot, 809, 192); /* ptest */
         sleep(4000);
         leftClick(robot); /* apply */
-        sleep(5000);
+        sleep(9000);
         moveTo(robot, 1105, 298);
         leftPress(robot); /* scroll bar back */
         moveTo(robot, 1105, 150);
@@ -1550,7 +1550,7 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 255;
         disableStonith(robot, host);
-        for (int i = 10; i > 0; i--) {
+        for (int i = 30; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(host, "test7", 1);
             /* create dummy */
@@ -1573,7 +1573,7 @@ public final class RoboTest {
         final int gx = 235;
         final int gy = 255;
         disableStonith(robot, host);
-        for (int i = 5; i > 0; i--) {
+        for (int i = 20; i > 0; i--) {
             Tools.info("I: " + i);
 
             checkTest(host, "testA", 1);
@@ -1616,7 +1616,7 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 255;
         disableStonith(robot, host);
-        for (int i = 3; i > 0; i--) {
+        for (int i = 20; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(host, "testB", 1);
             /* create dummy */
@@ -1773,8 +1773,10 @@ public final class RoboTest {
         typeDummy(robot);
         sleep(2000);
         setTimeouts(robot);
-        moveTo(robot, 893, 250);
-        leftClick(robot); /* clone */
+        if (clone) {
+            moveTo(robot, 893, 250);
+            leftClick(robot); /* clone */
+        }
         moveTo(robot, 809, 192); /* ptest */
         sleep(4000);
         leftClick(robot); /* apply */
