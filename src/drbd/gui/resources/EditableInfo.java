@@ -921,8 +921,10 @@ public abstract class EditableInfo extends Info {
     /** Removes this editable object and clealrs the parameter hashes. */
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
-        //for (final ActionListener al : applyButton.getActionListeners()) {
-        //    applyButton.removeActionListener(al);
+        //if (applyButton != null) {
+        //    for (final ActionListener al : applyButton.getActionListeners()) {
+        //        applyButton.removeActionListener(al);
+        //    }
         //}
     }
 

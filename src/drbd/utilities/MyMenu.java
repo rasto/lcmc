@@ -26,6 +26,7 @@ import drbd.data.AccessMode;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import javax.swing.JScrollPane;
 import java.awt.geom.Point2D;
 
 /**
@@ -94,7 +95,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
      * items are to be updated.
      */
     public void update() {
-                processAccessMode();
+        processAccessMode();
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 for (final java.awt.Component m : getMenuComponents()) {
@@ -147,7 +148,13 @@ public class MyMenu extends JMenu implements UpdatableItem {
 
     /** Cleanup. */
     public final void cleanup() {
-        /* nothing to cleanup */
+        for (final java.awt.Component m : getMenuComponents()) {
+            if (m instanceof UpdatableItem) {
+                ((UpdatableItem) m).cleanup();
+            } else if (m instanceof JScrollPane) {
+                ((MyList) ((JScrollPane) m).getViewport().getView()).cleanup();
+            }
+        }
     }
 
     /** Remove all items. */

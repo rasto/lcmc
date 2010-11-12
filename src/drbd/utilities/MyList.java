@@ -137,6 +137,19 @@ public class MyList extends JList implements ComponentWithTest {
 
     /** Clean up. */
     public final void cleanup() {
+        for (int i = 0; i < getModel().getSize(); i++) {
+            final MyMenuItem m = (MyMenuItem) getModel().getElementAt(i);
+            m.cleanup();
+        }
+        for (final java.awt.event.MouseListener ml : getMouseListeners()) {
+            removeMouseListener(ml);
+        }
+        for (final java.awt.event.KeyListener kl : getKeyListeners()) {
+            removeKeyListener(kl);
+        }
+        for (final java.awt.event.MouseMotionListener mml : getMouseMotionListeners()) {
+            removeMouseMotionListener(mml);
+        }
         toolTip.setComponent(null);
      }
 }

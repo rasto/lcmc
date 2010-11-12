@@ -446,7 +446,9 @@ public class Info implements Comparable {
 
     /** Cleanup */
     public final void cleanup() {
-        //menu.removeAll();
+        //if (menu != null) {
+        //    menu.cleanup();
+        //}
         //if (popup != null) {
         //    popup.removeAll();
         //}

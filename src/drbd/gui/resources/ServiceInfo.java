@@ -4832,7 +4832,7 @@ public class ServiceInfo extends EditableInfo {
                         }
                     }
                     if (!colocationOnly && !orderOnly) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeAndWait(new Runnable() {
                             public void run() {
                                 addSeparator();
                             }
@@ -4843,7 +4843,7 @@ public class ServiceInfo extends EditableInfo {
                                 Tools.getString("ClusterBrowser.Hb.ColOnlySubmenu"),
                                 true,
                                 false);
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeAndWait(new Runnable() {
                             public void run() {
                                 add(colOnlyitem);
                             }
@@ -4854,7 +4854,7 @@ public class ServiceInfo extends EditableInfo {
                                 Tools.getString("ClusterBrowser.Hb.OrdOnlySubmenu"),
                                 false,
                                 true);
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeAndWait(new Runnable() {
                             public void run() {
                                 add(ordOnlyItem);
                             }

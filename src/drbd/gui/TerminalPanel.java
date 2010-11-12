@@ -105,6 +105,8 @@ public class TerminalPanel extends JScrollPane {
     private static final String GOD_ON  = "godmode";
     /** Command to run gc. */
     private static final String RUN_GC  = "rungc";
+    /** Allocate 10MB of memory for 1 minute. */
+    private static final String ALLOCATE_10 = "allocate10";
     /** Command to start frenzy clicking for short period. */
     private static final String CLICKTEST_SHORT = "lclicksh";
     /** Command to start frenzy clicking for longer period. */
@@ -163,6 +165,7 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(GOD_OFF, 0); /* off must be before on */
         CHEATS_MAP.put(GOD_ON, 0);
         CHEATS_MAP.put(RUN_GC, 0);
+        CHEATS_MAP.put(ALLOCATE_10, 0);
         CHEATS_MAP.put(CLICKTEST_SHORT, 0);
         CHEATS_MAP.put(CLICKTEST_LONG, 0);
         CHEATS_MAP.put(CLICKTEST_LAZY_SHORT, 0);
@@ -693,6 +696,20 @@ public class TerminalPanel extends JScrollPane {
         } else if (RUN_GC.equals(cheat)) {
             System.gc();
             Tools.info("run gc");
+        } else if (ALLOCATE_10.equals(cheat)) {
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    Tools.info("allocate mem");
+                    Byte[] b = new Byte[1024000];
+                    Tools.info("allocate mem done.");
+
+                    System.gc();
+                    Tools.info("run gc");
+                    Tools.sleep(60000);
+                    Tools.info("free mem.");
+                }
+            });
+            t.start();
         } else if (CLICKTEST_SHORT.equals(cheat)) {
             RoboTest.startClicker(1, false);
         } else if (CLICKTEST_LONG.equals(cheat)) {

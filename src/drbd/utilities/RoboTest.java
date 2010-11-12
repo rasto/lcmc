@@ -1555,7 +1555,7 @@ public final class RoboTest {
         final int dummy1X = 540;
         final int dummy1Y = 250;
         disableStonith(robot, host);
-        for (int i = 10; i > 0; i--) {
+        for (int i = 5; i > 0; i--) {
             Tools.info("I: " + i);
             //checkTest(host, "test7", 1);
             sleep(5000);
