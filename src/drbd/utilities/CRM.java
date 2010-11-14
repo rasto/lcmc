@@ -122,7 +122,7 @@ public final class CRM {
         mPtestLock.release();
         final String command =
                             "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                            + "/usr/sbin/ptest -VVV -S -x $file 2>&1;echo '"
+                            + "/usr/sbin/ptest -VVVV -S -x $file 2>&1;echo '"
                             + PTEST_END_DELIM
                             + "';cat $file 2>/dev/null;"
                             + "mv -f $file{,.last} 2>/dev/null";

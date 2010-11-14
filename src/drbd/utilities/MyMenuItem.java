@@ -99,7 +99,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
-        toolTip.setTipText(text);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                toolTip.setTipText(text);
+            }
+        });
         setNormalFont();
         addActionListener(this);
         try {
@@ -127,7 +131,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                       final AccessMode visibleAccessMode) {
         super(text);
         toolTip = createToolTip();
-        toolTip.setTipText(shortDesc);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                toolTip.setTipText(shortDesc);
+            }
+        });
         setNormalFont();
         this.text1 = text;
         this.icon1 = icon;
@@ -295,7 +303,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeAndWait(new Runnable() {
             public void run() {
                 setEnabled(disableTooltip == null && accessible);
                 setVisible(visiblePredicate()
@@ -304,7 +312,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             }
         });
         if (isVisible()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 public void run() {
                     if (!accessible && enableAccessMode.getAccessType()
                                        != ConfigData.AccessType.NEVER) {
@@ -396,11 +404,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         setToolTipText0(toolTipText);
     }
 
-    /** Sets tooltip and wiggles the mouse to refresh it. */
-    private final void setToolTipText0(final String toolTipText) {
-        toolTip.setTipText(toolTipText);
-        super.setToolTipText(toolTipText);
-        if (toolTip != null && robot != null && toolTip.isShowing()) {
+    private final void moveMouse() {
+        if (robot != null) {
             final GraphicsDevice[] devices =
                     GraphicsEnvironment.getLocalGraphicsEnvironment()
                                        .getScreenDevices();
@@ -422,6 +427,23 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             robot.mouseMove((int) p.getX() + xOffset + 1,
                             (int) p.getY());
             robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
+        }
+    }
+
+    /** Sets tooltip and wiggles the mouse to refresh it. */
+    private final void setToolTipText0(final String toolTipText) {
+        toolTip.setTipText(toolTipText);
+        super.setToolTipText(toolTipText);
+        if (toolTip != null && robot != null && toolTip.isShowing()) {
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
+                    Tools.sleep(1000); /* well, doesn't work all the time */
+                    moveMouse();
+                    Tools.sleep(2000);
+                    moveMouse();
+                }
+            });
+            t.start();
         }
     }
 

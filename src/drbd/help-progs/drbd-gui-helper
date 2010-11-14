@@ -1234,6 +1234,7 @@ sub get_cluster_versions {
 	}
 	my $pm_version = `$libpath/crmd version 2>/dev/null` || "";
 	if ($pm_version) {
+		$pm_version =~ s/.*:\s+//;
 		$pm_version =~ s/\s+.*//;
 		chomp $pm_version;
 		if ($pm_version =~ /^2\.1\./) {
