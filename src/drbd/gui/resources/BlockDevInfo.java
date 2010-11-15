@@ -1201,10 +1201,10 @@ public class BlockDevInfo extends EditableInfo {
         final MyMenuItem connectMenu =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Disconnect"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.Disconnect"),
                            Tools.getString("HostBrowser.Drbd.Connect"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.Connect"),
                            new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1265,13 +1265,14 @@ public class BlockDevInfo extends EditableInfo {
         /* set primary */
         final MyMenuItem setPrimaryItem =
             new MyMenuItem(Tools.getString(
-                              "HostBrowser.Drbd.SetPrimaryOtherSecondary"),
+                                  "HostBrowser.Drbd.SetPrimaryOtherSecondary"),
                            null,
-                           null,
+                           Tools.getString(
+                                  "HostBrowser.Drbd.SetPrimaryOtherSecondary"),
 
                            Tools.getString("HostBrowser.Drbd.SetPrimary"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.SetPrimary"),
                            new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1351,7 +1352,7 @@ public class BlockDevInfo extends EditableInfo {
         final MyMenuItem forcePrimaryItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ForcePrimary"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.ForcePrimary"),
                            new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;

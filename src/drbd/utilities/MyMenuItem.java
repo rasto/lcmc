@@ -130,12 +130,14 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                       final AccessMode enableAccessMode,
                       final AccessMode visibleAccessMode) {
         super(text);
-        toolTip = createToolTip();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                toolTip.setTipText(shortDesc);
-            }
-        });
+        if (shortDesc != null && !"".equals(shortDesc)) {
+            toolTip = createToolTip();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    toolTip.setTipText(shortDesc);
+                }
+            });
+        }
         setNormalFont();
         this.text1 = text;
         this.icon1 = icon;
@@ -275,7 +277,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                     if (icon1 != null) {
                         setIcon(icon1);
                     }
-                    if (shortDesc1 != null
+                    if (toolTip != null
+                        && shortDesc1 != null
                         && !shortDesc1.equals(text1)) {
                         toolTip.setTipText(shortDesc1);
                     }
@@ -288,7 +291,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                     if (icon1 != null) { /* icon1 is here on purpose */
                         setIcon(icon2);
                     }
-                    if (shortDesc2 != null
+                    if (toolTip != null
+                        && shortDesc2 != null
                         && !shortDesc1.equals(text2)) {
                         toolTip.setTipText(shortDesc2);
                     }
@@ -311,7 +315,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                                                         visibleAccessMode));
             }
         });
-        if (isVisible()) {
+        if (toolTip != null && isVisible()) {
             Tools.invokeAndWait(new Runnable() {
                 public void run() {
                     if (!accessible && enableAccessMode.getAccessType()
@@ -400,6 +404,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
     public final void setToolTipText(final String toolTipText) {
+        if (toolTip == null || toolTipText == null) {
+            return;
+        }
         origToolTipText = toolTipText;
         setToolTipText0(toolTipText);
     }
@@ -431,7 +438,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    private final void setToolTipText0(final String toolTipText) {
+    private final void setToolTipText0(String toolTipText) {
+        if (toolTip == null) {
+            return;
+        }
+        if ("".equals(toolTipText)) {
+            toolTipText = "---";
+        }
         toolTip.setTipText(toolTipText);
         super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
@@ -449,7 +462,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Clean up. */
     public final void cleanup() {
-        toolTip.setComponent(null);
+        if (toolTip != null) {
+            toolTip.setComponent(null);
+        }
      }
 
 }

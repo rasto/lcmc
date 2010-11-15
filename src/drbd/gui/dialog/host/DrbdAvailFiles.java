@@ -33,6 +33,9 @@ import drbd.gui.dialog.WizardDialog;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -165,15 +168,24 @@ public class DrbdAvailFiles extends DialogHost {
                       null, /* ProgresBar */
                       new ExecCallback() {
                         public void done(final String ans) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    answerPaneSetText(ans);
+                            final List<String> files = new ArrayList<String>(
+                                                        Arrays.asList(
+                                                         ans.split("\\r?\\n")));
+                            if (files.size() >= 2) {
+                                if (files.size() > 4) {
+                                    /* remove the virtual package. */
+                                    files.remove(0);
                                 }
-                            });
-                            final String[] files = ans.split("\\r?\\n");
-                            if (files.length >= 2) {
+                                final String[] filesA = files.toArray(
+                                                new String[files.size()]);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        answerPaneSetText(Tools.join("\n",
+                                                                     filesA));
+                                    }
+                                });
                                 getHost().setDrbdPackagesToInstall(
-                                                       Tools.shellList(files));
+                                                       Tools.shellList(filesA));
                                 allDone();
                             } else {
                                 SwingUtilities.invokeLater(new Runnable() {

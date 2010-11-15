@@ -1768,6 +1768,9 @@ public abstract class ResourceGraph {
         public Shape transform(final Context<Graph<V, E>, E> context) {
             final Graph<V, E> g = context.graph;
             final E e = context.element;
+            if (!(e instanceof Edge)) {
+                return null;
+            }
 
             final Pair<V> endpoints = g.getEndpoints(e);
             if (endpoints != null) {
