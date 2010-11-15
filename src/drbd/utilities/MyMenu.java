@@ -27,7 +27,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
+import java.awt.Component;
 import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This is a menu object that holds MyMenuItems.
@@ -98,7 +101,15 @@ public class MyMenu extends JMenu implements UpdatableItem {
         processAccessMode();
         final Thread t = new Thread(new Runnable() {
             public void run() {
-                for (final java.awt.Component m : getMenuComponents()) {
+                final List<Component> copy = new ArrayList<Component>();
+                Tools.invokeAndWait(new Runnable() {
+                    public void run() {
+                        for (final Component m : getMenuComponents()) {
+                            copy.add(m);
+                        }
+                    }
+                });
+                for (final Component m : copy) {
                     if (m instanceof UpdatableItem) {
                         ((UpdatableItem) m).update();
                     }
