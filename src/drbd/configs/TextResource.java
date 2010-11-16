@@ -37,7 +37,7 @@ public class TextResource extends
     /** Contents. */
     private static Object[][] contents = {
         {"DrbdMC.Title",
-         "DRBD Management Console (Beta)"},
+         "DRBD Management Console"},
 
         /* Main Menu */
         {"MainMenu.Session",
@@ -832,7 +832,7 @@ public class TextResource extends
          "DRBD is not loaded"},
 
         {"Dialog.About.Title",
-         "DRBD Management Console (Beta). Release: "},
+         "DRBD Management Console. Release: "},
 
         {"Dialog.About.Description",
          "<b>DRBD Management Console by Rasto Levrinc "
