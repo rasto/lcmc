@@ -340,8 +340,6 @@ public final class DrbdMC extends JPanel {
                 /* restore mouse if it is stuck in pressed state, during
                  * robot tests. */
                 RoboTest.restoreMouse();
-            } else {
-                Tools.info("unknown option: " + arg);
             }
         }
         Tools.getConfigData().setAnimFPS(fps);
