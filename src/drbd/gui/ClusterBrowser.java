@@ -1814,6 +1814,9 @@ public class ClusterBrowser extends Browser {
                                             nameToServiceInfoHash.get(name);
             for (final String id : idHash.keySet()) {
                 final ServiceInfo si = idHash.get(id);
+                if (si.getService().isOrphaned()) {
+                    continue;
+                }
                 final GroupInfo gi = si.getGroupInfo();
                 ServiceInfo sigi = si;
                 if (gi != null) {

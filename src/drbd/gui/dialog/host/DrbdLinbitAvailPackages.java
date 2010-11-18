@@ -86,9 +86,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         super(previousDialog, host);
     }
 
-    /**
-     * Checks the available drbd verisions.
-     */
+    /** Checks the available drbd verisions. */
     protected final void availVersions() {
         /* get drbd available versions,
          * they are independent from distribution and kernel version and
@@ -124,9 +122,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         setCommandThread(t);
     }
 
-    /**
-     * Checks the available distributions.
-     */
+    /** Checks the available distributions. */
     protected final void availDistributions() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -166,9 +162,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         setCommandThread(t);
     }
 
-    /**
-     * Checks what are the available kernels for this distribution.
-     */
+    /** Checks what are the available kernels for this distribution. */
     protected final void availKernels() {
         final String distVersion = getHost().getDistVersion();
         if (drbdDistItems == null || !drbdDistItems.contains(distVersion)) {
@@ -216,9 +210,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         setCommandThread(t);
     }
 
-    /**
-     * Checks what are the available architectures for this distribution.
-     */
+    /** Checks what are the available architectures for this distribution. */
     protected final void availArchs() {
         final String kernelVersion = getHost().getKernelVersion();
         final String arch = getHost().getArch();
@@ -253,8 +245,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                         drbdArchCombo.setEnabled(true);
                                     }
                                 });
-                                if (drbdArchItems == null
-                                    || !drbdArchItems.contains(arch)) {
+                                if (drbdArchItems == null) {
                                     allDone(null);
                                 } else {
                                     availVersionsForDist();
@@ -276,9 +267,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         setCommandThread(t);
     }
 
-    /**
-     * Checks what are the avail drbd versions for this distribution.
-     */
+    /** Checks what are the avail drbd versions for this distribution. */
     protected final void availVersionsForDist() {
         final ExecCommandThread t = getHost().execCommandCache(
                           "DrbdAvailVersionsForDist",
@@ -353,18 +342,14 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         addListeners();
     }
 
-    /**
-     * Inits dialog and starts the distribution detection.
-     */
+    /** Inits dialog and starts the distribution detection. */
     protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         availVersions();
     }
 
-    /**
-     * Returns the next dialog which is CheckInstallation.
-     */
+    /** Returns the next dialog which is CheckInstallation. */
     public WizardDialog nextDialog() {
         if (getHost().isDrbdUpgraded()) {
             return new CheckInstallation(this, getHost());
@@ -390,9 +375,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             "Dialog.Host.DrbdLinbitAvailPackages.Description");
     }
 
-    /**
-     * Returns the pane with all combo boxes.
-     */
+    /** Returns the pane with all combo boxes. */
     protected final JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
@@ -442,9 +425,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         return pane;
     }
 
-    /**
-     * Adds listeners to the check boxes.
-     */
+    /** Adds listeners to the check boxes. */
     private void addListeners() {
         /* listeners, that disallow to select anything. */
         /* distribution combo box */
@@ -495,9 +476,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         drbdArchCombo.addListeners(archItemListener, null);
     }
 
-    /**
-     * Returns the input pane with check boxes and other info.
-     */
+    /** Returns the input pane with check boxes and other info. */
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel labelP = new JPanel(new FlowLayout(FlowLayout.LEFT));
