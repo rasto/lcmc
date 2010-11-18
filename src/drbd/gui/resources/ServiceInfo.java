@@ -160,11 +160,11 @@ public class ServiceInfo extends EditableInfo {
     private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
                       Tools.getDefault("HeartbeatGraph.ServiceUnmanagedIcon"));
     /** Started service icon. */
-    private static final ImageIcon SERVICE_STARTED_ICON =
+    protected static final ImageIcon SERVICE_STARTED_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.ServiceStartedIcon"));
     /** Stopped service icon. */
-    private static final ImageIcon SERVICE_STOPPED_ICON =
+    protected static final ImageIcon SERVICE_STOPPED_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.ServiceStoppedIcon"));
     /** Running service icon. */
@@ -1102,7 +1102,7 @@ public class ServiceInfo extends EditableInfo {
      * TODO: broken icon, not managed icon.
      */
     public ImageIcon getMenuIcon(final boolean testOnly) {
-        if (getBrowser().allHostsDown() || isStopped(testOnly)) {
+        if (getBrowser().allHostsDown() || !isRunning(testOnly)) {
             return SERVICE_STOPPED_ICON;
         }
         return SERVICE_STARTED_ICON;

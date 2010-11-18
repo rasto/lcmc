@@ -46,6 +46,7 @@ import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.DefaultListModel;
 import javax.swing.JMenuItem;
@@ -1046,9 +1047,25 @@ public class GroupInfo extends ServiceInfo {
         return super.isStopped(testOnly);
     }
 
-    /**
-     * Returns true if all services in the group are running.
-     */
+    /** Returns true if at least one service in the group are running. */
+    public final boolean isOneRunning(final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
+        if (resources != null) {
+            for (final String hbId : resources) {
+                final ServiceInfo si =
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
+                if (si != null && si.isRunning(testOnly)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** Returns true if all services in the group are running. */
     public final boolean isRunning(final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
@@ -1131,5 +1148,13 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
         }
+    }
+
+    /** Returns the icon for the category. */
+    public ImageIcon getCategoryIcon(final boolean testOnly) {
+        if (getBrowser().allHostsDown() || !isOneRunning(testOnly)) {
+            return ServiceInfo.SERVICE_STOPPED_ICON;
+        }
+        return ServiceInfo.SERVICE_STARTED_ICON;
     }
 }

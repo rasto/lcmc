@@ -43,6 +43,7 @@ import java.util.Locale;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import javax.swing.JComponent;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -676,5 +677,10 @@ public class CloneInfo extends ServiceInfo {
                                                   param,
                                                   getService().isMaster());
         }
+    }
+
+    /** Returns the icon for the category. */
+    public ImageIcon getCategoryIcon(final boolean testOnly) {
+        return getMenuIcon(testOnly);
     }
 }

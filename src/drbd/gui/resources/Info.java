@@ -296,9 +296,7 @@ public class Info implements Comparable {
         return null;
     }
 
-    /**
-     * Returns the icon fot the category.
-     */
+    /** Returns the icon for the category. */
     public ImageIcon getCategoryIcon(final boolean testOnly) {
         return null;
     }
