@@ -649,7 +649,13 @@ public abstract class EditableInfo extends Info {
     /** Checks whether this value matches the regexp of this field. */
     protected final boolean checkRegexp(final String param,
                                         final String newValue) {
-        final String regexp = getParamRegexp(param);
+        String regexp = getParamRegexp(param);
+        if (regexp == null) {
+            final GuiComboBox cb = paramComboBoxGet(param, null);
+            if (cb != null) {
+                regexp = cb.getRegexp();
+            }
+        }
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
             final Matcher m = p.matcher(newValue);

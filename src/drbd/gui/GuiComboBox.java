@@ -166,6 +166,8 @@ public class GuiComboBox extends JPanel {
     private String labelToolTipText = null;
     /** getValue setValue lock. */
     private final Mutex mValueLock = new Mutex();
+    /** Regexp that this field must match. */
+    private final String regexp;
 
     /** Prepares a new <code>GuiComboBox</code> object. */
     public GuiComboBox(final String selectedValue,
@@ -192,7 +194,7 @@ public class GuiComboBox extends JPanel {
                        final Object[] items,
                        final Unit[] units,
                        final Type type,
-                       String regexp,
+                       final String regexp,
                        final int width,
                        final Map<String, String> abbreviations,
                        final AccessMode enableAccessMode,
@@ -203,7 +205,10 @@ public class GuiComboBox extends JPanel {
         this.fieldButton = fieldButton;
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
-            regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
+            this.regexp =
+                    regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
+        } else {
+            this.regexp = regexp;
         }
         if (type == null) {
             if (items == null) {
@@ -1848,5 +1853,10 @@ public class GuiComboBox extends JPanel {
             default:
                 /* error */
         }
+    }
+
+    /** Returns regexp of this field. */
+    public final String getRegexp() {
+        return regexp;
     }
 }
