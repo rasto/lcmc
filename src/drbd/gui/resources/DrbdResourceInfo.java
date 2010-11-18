@@ -551,7 +551,7 @@ public class DrbdResourceInfo extends EditableInfo
                                       null, /* items */
                                       null, /* units */
                                       null, /* type */
-                                      null, /* regexp */
+                                      "^\\S+$", /* regexp */
                                       width,
                                       null, /* abbrv */
                                       new AccessMode(
