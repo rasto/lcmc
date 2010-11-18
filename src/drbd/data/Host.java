@@ -2272,6 +2272,9 @@ public class Host implements Serializable {
 
     /** Sets ssh port. */
     public final void setSSHPort(final String sshPort) {
+        if (sshPort != null && !sshPort.equals(this.sshPort)) {
+            ssh.disconnect();
+        }
         this.sshPort = sshPort;
     }
 
