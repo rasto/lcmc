@@ -142,7 +142,8 @@ public class DrbdGraph extends ResourceGraph {
         return vertexToHostMap.get(v) != getInfo(v);
     }
 
-    /** Adds host with all its block devices to the graph. */
+    /** Adds host with all its block devices to the graph. If it is there
+     * already fix the positions of the block devices. */
     public final void addHost(final HostDrbdInfo hostDrbdInfo) {
         Vertex v = getVertex(hostDrbdInfo);
         if (v == null) {
@@ -157,19 +158,19 @@ public class DrbdGraph extends ResourceGraph {
 
             if (hostPos == null) {
                 hostPos = new Point2D.Double(
-                                hostDefaultXPos + getDefaultVertexWidth(v) / 2,
+                                hostDefaultXPos + VERTEX_SIZE_HOST / 2,
                                 HOST_Y_POS);
                 hostDefaultXPos += HOST_STEP_X;
             }
             final double hostXPos =
-                                hostPos.getX() - getDefaultVertexWidth(v) / 2;
+                                hostPos.getX() - VERTEX_SIZE_HOST / 2;
             getVertexLocations().put(v, hostPos);
             getGraph().addVertex(v);
         }
         /* add block devices vertices */
         final Host host = hostDrbdInfo.getHost();
         final Point2D hostPos = getVertexLocations().get(v);
-        final double hostXPos = hostPos.getX() - getDefaultVertexWidth(v) / 2;
+        final double hostXPos = hostPos.getX() - VERTEX_SIZE_HOST / 2;
         final double hostYPos = hostPos.getY();
         int devYPos = (int) hostYPos + BD_STEP_Y;
         List<Vertex> vertexList = hostBDVerticesMap.get(hostDrbdInfo);
@@ -607,9 +608,12 @@ public class DrbdGraph extends ResourceGraph {
         x = x > MAX_X_POS ? MAX_X_POS : x;
         y = y < MIN_Y_POS ? MIN_Y_POS : y;
         y = y > MAX_Y_POS ? MAX_Y_POS : y;
-        pos.setLocation(x, y);
+        pos.setLocation(x + (getDefaultVertexWidth(v)
+                             - getVertexWidth(v)) / 2,
+                        y);
+        final Point2D loc = new Point2D.Double(x, y);
         getVertexLocations().put(v, pos);
-        getLayout().setLocation(v, pos);
+        getLayout().setLocation(v, loc);
     }
 
     /**
