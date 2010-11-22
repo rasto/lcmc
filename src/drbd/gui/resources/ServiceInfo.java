@@ -495,6 +495,15 @@ public class ServiceInfo extends EditableInfo {
             }
             sameAsMetaAttrsCB.processAccessMode();
         }
+        final boolean ch = changed;
+        final MyButton rb = getRevertButton();
+        if (rb != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setEnabled(ch);
+                }
+            });
+        }
         return changed;
     }
 
@@ -2550,9 +2559,7 @@ public class ServiceInfo extends EditableInfo {
         return savedMetaAttrInfoRef;
     }
 
-    /**
-     * Returns info panel with comboboxes for service parameters.
-     */
+    /** Returns info panel with comboboxes for service parameters. */
     public JComponent getInfoPanel() {
         final CloneInfo ci = getCloneInfo();
         if (ci == null) {
@@ -2638,6 +2645,21 @@ public class ServiceInfo extends EditableInfo {
                             public void run() {
                                 getBrowser().clStatusLock();
                                 apply(getBrowser().getDCHost(), false);
+                                getBrowser().clStatusUnlock();
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            );
+
+            getRevertButton().addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                getBrowser().clStatusLock();
+                                revert();
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -2775,6 +2797,7 @@ public class ServiceInfo extends EditableInfo {
         }
         /* apply button */
         addApplyButton(buttonPanel);
+        addRevertButton(buttonPanel);
         getApplyButton().setEnabled(checkResourceFields(null, params));
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();
@@ -3068,6 +3091,128 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         return pacemakerMetaArgs;
+    }
+
+    /** Returns revert button. */
+    protected void revert() {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        final String[] params = crmXML.getParameters(resourceAgent,
+                                                     getService().isMaster());
+        boolean allSavedMetaAttrsAreDefaultValues = true;
+        if (params != null) {
+            for (String param : params) {
+                if (isMetaAttr(param)) {
+                    final String defaultValue = getParamDefault(param);
+                    final String oldValue = getResource().getValue(param);
+                    if (!Tools.areEqual(defaultValue, oldValue)) {
+                        allSavedMetaAttrsAreDefaultValues = false;
+                    }
+                }
+            }
+        }
+        if (sameAsMetaAttrsCB != null) {
+            if (savedMetaAttrInfoRef == null) {
+                if (!allSavedMetaAttrsAreDefaultValues) {
+                    sameAsMetaAttrsCB.setValue(
+                                META_ATTRS_DEFAULT_VALUES_TEXT);
+                } else {
+                    sameAsMetaAttrsCB.setValue(
+                                 GuiComboBox.NOTHING_SELECTED);
+                }
+            } else {
+                sameAsMetaAttrsCB.setValue(savedMetaAttrInfoRef);
+            }
+        }
+        super.revert();
+        final GroupInfo gInfo = groupInfo;
+        CloneInfo ci;
+        if (gInfo == null) {
+            ci = getCloneInfo();
+        } else {
+            ci = gInfo.getCloneInfo();
+            gInfo.revert();
+        }
+        final CloneInfo clInfo = ci;
+        if (clInfo != null) {
+            clInfo.revert();
+        }
+        if (gInfo != null) {
+            gInfo.revertOperations();
+        }
+        revertOperations();
+
+        if (gInfo == null) {
+            if (clInfo == null) {
+                revertLocations();
+            } else {
+                clInfo.revertLocations();
+            }
+        } else {
+            revertLocations();
+        }
+    }
+
+    /** Revert locations to saved values. */
+    protected void revertLocations() {
+        for (Host host : getBrowser().getClusterHosts()) {
+            final HostInfo hi = host.getBrowser().getHostInfo();
+            final HostLocation savedLocation = savedHostLocations.get(hi);
+            final GuiComboBox cb = scoreComboBoxHash.get(hi);
+
+            String score = null;
+            String op = null;
+            if (savedLocation != null) {
+                score = savedLocation.getScore();
+                op = savedLocation.getOperation();
+            }
+            cb.setValue(score);
+            final JLabel label = cb.getLabel();
+            final String text = getHostLocationLabel(hi.getName(), op);
+            label.setText(text);
+        }
+        /* pingd */
+        final GuiComboBox pcb = pingComboBox;
+        if (pcb != null) {
+            final String spo = savedPingOperation;
+            if (spo == null) {
+                pcb.setValue(GuiComboBox.NOTHING_SELECTED);
+            } else {
+                pcb.setValue(PING_ATTRIBUTES.get(spo));
+            }
+        }
+    }
+
+    /** Revert to saved operation values. */
+    protected final void revertOperations() {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        try {
+            mSavedOperationsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        final ServiceInfo savedOpIdRef = savedOperationIdRef;
+        if (sameAsOperationsCB != null) {
+            sameAsOperationsCB.setValue(savedOpIdRef);
+        }
+        for (final String op : ClusterBrowser.HB_OPERATIONS) {
+            for (final String param : getBrowser().getCRMOperationParams().get(
+                                                                          op)) {
+                final Object value = savedOperation.get(op, param);
+                final GuiComboBox cb =
+                          (GuiComboBox) operationsComboBoxHash.get(op, param);
+                if (cb != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            cb.setEnabled(savedOpIdRef == null);
+                        }
+                    });
+                    if (value != null) {
+                        cb.setValue(value);
+                    }
+                }
+            }
+        }
+        mSavedOperationsLock.release();
     }
 
     /** Applies the changes to the service parameters. */

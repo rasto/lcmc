@@ -1119,6 +1119,9 @@ public class TextResource extends
         {"Browser.ApplyResource",
          "Apply"},
 
+        {"Browser.RevertResource",
+         "Revert"},
+
         {"ClusterBrowser.Host.Disconnected",
          "Disconnected"},
 

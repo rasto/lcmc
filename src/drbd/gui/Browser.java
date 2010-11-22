@@ -68,6 +68,9 @@ public class Browser {
     /** Apply icon. */
     public static final ImageIcon APPLY_ICON =
             Tools.createImageIcon(Tools.getDefault("Browser.ApplyIcon"));
+    /** Revert icon. */
+    public static final ImageIcon REVERT_ICON =
+            Tools.createImageIcon(Tools.getDefault("Browser.RevertIcon"));
     /** Actions memu icon. */
     public static final ImageIcon ACTIONS_ICON =
             Tools.createImageIcon(Tools.getDefault("Browser.ActionsIcon"));

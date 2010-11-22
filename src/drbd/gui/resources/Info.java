@@ -661,7 +661,9 @@ public class Info implements Comparable {
 
     /** Returns the Action menu. */
     public final JMenu getActionsMenu() {
-        return getMenu(Tools.getString("Browser.ActionsMenu"));
+        final JMenu m = getMenu(Tools.getString("Browser.ActionsMenu"));
+        m.setToolTipText(Tools.getString("Browser.ActionsMenu"));
+        return m;
     }
 
     /** Returns the menu with menu item spefified in the createPopup method. */

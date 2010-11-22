@@ -39,6 +39,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
+import javax.swing.Box;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.FlowLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -117,8 +119,10 @@ public abstract class EditableInfo extends Info {
     public abstract String[] getParametersFromXML(); // TODO: no XML
     /** Old apply button, is used for wizards. */
     private MyButton oldApplyButton = null;
-    /** Apply button. */ // TODO: private
+    /** Apply button. */
     private MyButton applyButton;
+    /** Revert button. */
+    private MyButton revertButton;
     /** Is counted down, first time the info panel is initialized. */
     private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
     /** List of advanced panels. */
@@ -150,7 +154,13 @@ public abstract class EditableInfo extends Info {
             applyButton = new MyButton(
                     Tools.getString("Browser.ApplyResource"),
                     Browser.APPLY_ICON);
+            applyButton.setEnabled(false);
             oldApplyButton = applyButton;
+            revertButton = new MyButton("", Browser.REVERT_ICON);
+            revertButton.setEnabled(false);
+            revertButton.setToolTipText(
+                    Tools.getString("Browser.RevertResource"));
+            revertButton.setPreferredSize(new Dimension(40, 50));
         } else {
             applyButton = oldApplyButton;
         }
@@ -164,6 +174,15 @@ public abstract class EditableInfo extends Info {
     protected final void addApplyButton(final JPanel panel) {
         panel.add(applyButton, BorderLayout.WEST);
         Tools.getGUIData().getMainFrameRootPane().setDefaultButton(applyButton);
+    }
+
+    /** Creates revert button and adds it to the panel. */
+    protected final void addRevertButton(final JPanel panel) {
+        final JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        p.setBackground(Browser.STATUS_BACKGROUND);
+        p.add(Box.createRigidArea(new Dimension(5, 0)));
+        p.add(revertButton);
+        panel.add(p, BorderLayout.CENTER);
     }
 
     /** Adds jlabel field with tooltip. */
@@ -981,9 +1000,26 @@ public abstract class EditableInfo extends Info {
         });
     }
 
+    /** Revert valus. */
+    protected void revert() {
+        final String[] params = getParametersFromXML();
+        for (final String param : params) {
+            final String v = getParamSaved(param);
+            final GuiComboBox cb = paramComboBoxGet(param, null);
+            if (cb != null && !Tools.areEqual(cb.getStringValue(), v)) {
+                cb.setValue(v);
+            }
+        }
+    }
+
     /** Returns apply button. */
     public final MyButton getApplyButton() {
         return applyButton;
+    }
+
+    /** Returns revert button. */
+    public final MyButton getRevertButton() {
+        return revertButton;
     }
 
     /** Sets apply button. */
