@@ -587,11 +587,8 @@ public class ServiceInfo extends EditableInfo {
                         /* set default value, because it can change in
                          * rsc_defaults. */
                         getResource().setDefaultValue(param, defaultValue);
-                        if (cb != null) {
+                        if (cb != null && metaAttrInfoRef == null) {
                             cb.setValue(value);
-                            if (haveChanged) {
-                                cb.setEnabled(metaAttrInfoRef == null);
-                            }
                         }
                     }
                 }
@@ -1625,7 +1622,7 @@ public class ServiceInfo extends EditableInfo {
         }
         final String[] params = getParametersFromXML();
         if (params != null) {
-            for (String param : params) {
+            for (final String param : params) {
                 if (!isMetaAttr(param)) {
                     continue;
                 }
@@ -2189,6 +2186,21 @@ public class ServiceInfo extends EditableInfo {
     protected final boolean isEnabled(final String param) {
         if (GUI_ID.equals(param) && !getResource().isNew()) {
             return false;
+        }
+        if (isMetaAttr(param)) {
+            final Info info = (Info) sameAsMetaAttrsCB.getValue();
+            if (info == null) {
+                return true;
+            }
+            boolean nothingSelected = false;
+            if (GuiComboBox.NOTHING_SELECTED.equals(info.toString())) {
+                nothingSelected = true;
+            }
+            boolean sameAs = true;
+            if (META_ATTRS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
+                sameAs = false;
+            }
+            return !sameAs || nothingSelected;
         }
         return true;
     }
@@ -3099,17 +3111,7 @@ public class ServiceInfo extends EditableInfo {
         final String[] params = crmXML.getParameters(resourceAgent,
                                                      getService().isMaster());
         boolean allSavedMetaAttrsAreDefaultValues = true;
-        if (params != null) {
-            for (String param : params) {
-                if (isMetaAttr(param)) {
-                    final String defaultValue = getParamDefault(param);
-                    final String oldValue = getResource().getValue(param);
-                    if (!Tools.areEqual(defaultValue, oldValue)) {
-                        allSavedMetaAttrsAreDefaultValues = false;
-                    }
-                }
-            }
-        }
+        boolean sameAs = false;
         if (sameAsMetaAttrsCB != null) {
             if (savedMetaAttrInfoRef == null) {
                 if (!allSavedMetaAttrsAreDefaultValues) {
@@ -3120,10 +3122,29 @@ public class ServiceInfo extends EditableInfo {
                                  GuiComboBox.NOTHING_SELECTED);
                 }
             } else {
+                sameAs = true;
                 sameAsMetaAttrsCB.setValue(savedMetaAttrInfoRef);
             }
         }
-        super.revert();
+        if (params != null) {
+            for (String param : params) {
+                if (isMetaAttr(param)) {
+                    final String defaultValue = getParamDefault(param);
+                    final String oldValue = getResource().getValue(param);
+                    if (!Tools.areEqual(defaultValue, oldValue)) {
+                        allSavedMetaAttrsAreDefaultValues = false;
+                    }
+                    if (!sameAs || !isMetaAttr(param)) {
+                        final String v = getParamSaved(param);
+                        final GuiComboBox cb = paramComboBoxGet(param, null);
+                        if (cb != null
+                            && !Tools.areEqual(cb.getStringValue(), v)) {
+                            cb.setValue(v);
+                        }
+                    }
+                }
+            }
+        }
         final GroupInfo gInfo = groupInfo;
         CloneInfo ci;
         if (gInfo == null) {
@@ -3191,23 +3212,25 @@ public class ServiceInfo extends EditableInfo {
             Thread.currentThread().interrupt();
         }
         final ServiceInfo savedOpIdRef = savedOperationIdRef;
-        if (sameAsOperationsCB != null) {
+        if (sameAsOperationsCB != null
+            && !Tools.areEqual(savedOpIdRef, sameAsOperationsCB.getValue())) {
             sameAsOperationsCB.setValue(savedOpIdRef);
-        }
-        for (final String op : ClusterBrowser.HB_OPERATIONS) {
-            for (final String param : getBrowser().getCRMOperationParams().get(
-                                                                          op)) {
-                final Object value = savedOperation.get(op, param);
-                final GuiComboBox cb =
-                          (GuiComboBox) operationsComboBoxHash.get(op, param);
-                if (cb != null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            cb.setEnabled(savedOpIdRef == null);
+        } else {
+            for (final String op : ClusterBrowser.HB_OPERATIONS) {
+                for (final String param
+                              : getBrowser().getCRMOperationParams().get(op)) {
+                    final Object value = savedOperation.get(op, param);
+                    final GuiComboBox cb =
+                            (GuiComboBox) operationsComboBoxHash.get(op, param);
+                    if (cb != null) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                cb.setEnabled(savedOpIdRef == null);
+                            }
+                        });
+                        if (value != null) {
+                            cb.setValue(value);
                         }
-                    });
-                    if (value != null) {
-                        cb.setValue(value);
                     }
                 }
             }
