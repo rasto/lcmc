@@ -1147,29 +1147,30 @@ public class GuiComboBox extends JPanel {
                 break;
 
             case TEXTFIELDWITHUNIT:
+                Matcher m = null;
                 if (item != null) {
-                    final Matcher m = unitPattern.matcher((String) item);
-                    String number = "";
-                    String unit = "";
-                    if (m.matches()) {
-                        number = m.group(1);
-                        final String parsedUnit = m.group(2);
-                        if (!"".equals(parsedUnit)) {
-                            unit = parsedUnit;
-                        }
-                    }
-
-                    textFieldPart.setText(number);
-
-                    Object selectedUnitInfo = null;
-                    for (Unit u : units) {
-                        if (u.equals(unit)) {
-                            selectedUnitInfo = u;
-                        }
-                    }
-
-                    unitComboBox.setSelectedItem(selectedUnitInfo);
+                    m = unitPattern.matcher((String) item);
                 }
+                String number = "";
+                String unit = "";
+                if (m != null && m.matches()) {
+                    number = m.group(1);
+                    final String parsedUnit = m.group(2);
+                    if (!"".equals(parsedUnit)) {
+                        unit = parsedUnit;
+                    }
+                }
+
+                textFieldPart.setText(number);
+
+                Object selectedUnitInfo = null;
+                for (Unit u : units) {
+                    if (u.equals(unit)) {
+                        selectedUnitInfo = u;
+                    }
+                }
+
+                unitComboBox.setSelectedItem(selectedUnitInfo);
                 break;
             //case TEXTFIELDWITHBUTTON:
             //    if (item != null) {

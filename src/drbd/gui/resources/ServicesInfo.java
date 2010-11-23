@@ -43,6 +43,7 @@ import drbd.utilities.ButtonCallback;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
+import drbd.utilities.MyButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -244,6 +245,7 @@ public class ServicesInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                 }
             });
@@ -1008,10 +1010,29 @@ public class ServicesInfo extends EditableInfo {
                 }
             }
         );
+        getRevertButton().addActionListener(
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            getBrowser().clStatusLock();
+                            revert();
+                            getBrowser().clStatusUnlock();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        );
 
         /* apply button */
         addApplyButton(buttonPanel);
-        getApplyButton().setEnabled(checkResourceFields(null, params));
+        addRevertButton(buttonPanel);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getApplyButton().setEnabled(checkResourceFields(null, params));
+            }
+        });
 
         mainPanel.add(optionsPanel);
 
@@ -1691,6 +1712,22 @@ public class ServicesInfo extends EditableInfo {
                                            rdi.getParametersFromXML())) {
             changed = true;
         }
+        final MyButton rb = getRevertButton();
+        if (rb != null) {
+            final boolean ch = changed;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setEnabled(ch);
+                }
+            });
+        }
         return changed;
+    }
+
+    /** Revert all values. */
+    protected final void revert() {
+        super.revert();
+        final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
+        rdi.revert();
     }
 }

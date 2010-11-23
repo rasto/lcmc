@@ -1122,6 +1122,9 @@ public class TextResource extends
         {"Browser.RevertResource",
          "Revert"},
 
+        {"Browser.RevertResource.ToolTip",
+         "Revert unapplied changes"},
+
         {"ClusterBrowser.Host.Disconnected",
          "Disconnected"},
 

@@ -29,6 +29,8 @@ import java.awt.RenderingHints;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.geom.Point2D;
 
 import java.awt.geom.Rectangle2D;
@@ -289,5 +291,16 @@ public class MyButton extends JButton implements ComponentWithTest {
      */
     public final void pressButton() {
         fireActionPerformed(new ActionEvent(this, 0, "pressed"));
+    }
+
+    /** Make it a mini button. */
+    public final void miniButton() {
+        final Font font = getFont();
+        final String name = font.getFontName();
+        final int style = font.getStyle();
+        final int size = font.getSize();
+        setFont(new Font(name, style, 9));
+        setMargin(new Insets(2, 2, 2, 2));
+        setIconTextGap(0);
     }
 }

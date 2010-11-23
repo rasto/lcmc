@@ -154,13 +154,17 @@ public abstract class EditableInfo extends Info {
             applyButton = new MyButton(
                     Tools.getString("Browser.ApplyResource"),
                     Browser.APPLY_ICON);
+            applyButton.miniButton();
             applyButton.setEnabled(false);
             oldApplyButton = applyButton;
-            revertButton = new MyButton("", Browser.REVERT_ICON);
+            revertButton = new MyButton(
+                             Tools.getString("Browser.RevertResource"),
+                             Browser.REVERT_ICON);
             revertButton.setEnabled(false);
             revertButton.setToolTipText(
-                    Tools.getString("Browser.RevertResource"));
-            revertButton.setPreferredSize(new Dimension(40, 50));
+                    Tools.getString("Browser.RevertResource.ToolTip"));
+            revertButton.miniButton();
+            revertButton.setPreferredSize(new Dimension(60, 50));
         } else {
             applyButton = oldApplyButton;
         }
@@ -178,9 +182,8 @@ public abstract class EditableInfo extends Info {
 
     /** Creates revert button and adds it to the panel. */
     protected final void addRevertButton(final JPanel panel) {
-        final JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
         p.setBackground(Browser.STATUS_BACKGROUND);
-        p.add(Box.createRigidArea(new Dimension(5, 0)));
         p.add(revertButton);
         panel.add(p, BorderLayout.CENTER);
     }
@@ -383,43 +386,54 @@ public abstract class EditableInfo extends Info {
                     }
                 });
             }
+        }
+        for (final String param : params) {
+            final GuiComboBox paramCb = paramComboBoxGet(param, prefix);
+            GuiComboBox rpcb = null;
+            if ("wizard".equals(prefix)) {
+                rpcb = paramComboBoxGet(param, null);
+            }
             final GuiComboBox realParamCb = rpcb;
-            paramCb.addListeners(new ItemListener() {
-                public void itemStateChanged(final ItemEvent e) {
-                    if (paramCb.isCheckBox()
-                        || e.getStateChange() == ItemEvent.SELECTED) {
-                        checkParameterFields(paramCb,
-                                             realParamCb,
-                                             param,
-                                             params,
-                                             thisApplyButton);
-                    }
-                }
-            },
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    paramCb.addListeners(new ItemListener() {
+                        public void itemStateChanged(final ItemEvent e) {
+                            if (paramCb.isCheckBox()
+                                || e.getStateChange() == ItemEvent.SELECTED) {
+                                checkParameterFields(paramCb,
+                                                     realParamCb,
+                                                     param,
+                                                     params,
+                                                     thisApplyButton);
+                            }
+                        }
+                    },
 
-            new DocumentListener() {
-                public void insertUpdate(final DocumentEvent e) {
-                    checkParameterFields(paramCb,
-                                         realParamCb,
-                                         param,
-                                         params,
-                                         thisApplyButton);
-                }
+                    new DocumentListener() {
+                        public void insertUpdate(final DocumentEvent e) {
+                            checkParameterFields(paramCb,
+                                                 realParamCb,
+                                                 param,
+                                                 params,
+                                                 thisApplyButton);
+                        }
 
-                public void removeUpdate(final DocumentEvent e) {
-                    checkParameterFields(paramCb,
-                                         realParamCb,
-                                         param,
-                                         params,
-                                         thisApplyButton);
-                }
+                        public void removeUpdate(final DocumentEvent e) {
+                            checkParameterFields(paramCb,
+                                                 realParamCb,
+                                                 param,
+                                                 params,
+                                                 thisApplyButton);
+                        }
 
-                public void changedUpdate(final DocumentEvent e) {
-                    checkParameterFields(paramCb,
-                                         realParamCb,
-                                         param,
-                                         params,
-                                         thisApplyButton);
+                        public void changedUpdate(final DocumentEvent e) {
+                            checkParameterFields(paramCb,
+                                                 realParamCb,
+                                                 param,
+                                                 params,
+                                                 thisApplyButton);
+                        }
+                    });
                 }
             });
         }
@@ -787,8 +801,9 @@ public abstract class EditableInfo extends Info {
     public boolean checkResourceFields(final String param,
                                        final String[] params) {
         final boolean cor = checkResourceFieldsCorrect(param, params);
+        final boolean changed = checkResourceFieldsChanged(param, params);
         if (cor) {
-            return checkResourceFieldsChanged(param, params);
+            return changed;
         }
         return cor;
     }
