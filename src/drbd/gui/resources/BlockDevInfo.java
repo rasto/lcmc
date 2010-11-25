@@ -34,6 +34,7 @@ import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
 import drbd.utilities.ButtonCallback;
+import drbd.utilities.MyButton;
 import drbd.gui.GuiComboBox;
 import drbd.data.Host;
 import drbd.data.Subtext;
@@ -783,6 +784,7 @@ public class BlockDevInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                 }
             });
             if (getBlockDevice().getMetaDisk() != null) {
@@ -927,9 +929,27 @@ public class BlockDevInfo extends EditableInfo {
                     thread.start();
                 }
             });
+            getRevertButton().addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                revert();
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            );
             addApplyButton(buttonPanel);
+            addRevertButton(buttonPanel);
 
-            getApplyButton().setEnabled(checkResourceFields(null, params));
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getApplyButton().setEnabled(
+                                          checkResourceFields(null, params));
+                }
+            });
         }
 
         /* info */
@@ -1756,5 +1776,24 @@ public class BlockDevInfo extends EditableInfo {
                 }
             }
         }
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
+        final boolean ch = super.checkResourceFieldsChanged(param, params);
+        final MyButton rb = getRevertButton();
+        if (rb != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setEnabled(ch);
+                }
+            });
+        }
+        return ch;
     }
 }

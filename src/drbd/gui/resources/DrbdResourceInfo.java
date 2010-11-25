@@ -41,6 +41,7 @@ import drbd.utilities.Unit;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.MyButton;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -701,9 +702,9 @@ public class DrbdResourceInfo extends EditableInfo
             };
 
             String regexp = null;
-            if (isInteger(param)) {
-                regexp = "^-?\\d*$";
-            }
+            //if (isInteger(param)) {
+            //    regexp = "^-?\\d*$";
+            //}
             paramCb = new GuiComboBox(selectedValue,
                                       getPossibleChoices(param),
                                       units,
@@ -742,6 +743,7 @@ public class DrbdResourceInfo extends EditableInfo
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                 }
             });
             getBrowser().getDrbdResHash().remove(getName());
@@ -887,8 +889,29 @@ public class DrbdResourceInfo extends EditableInfo
             }
         });
 
+        getRevertButton().addActionListener(
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            getBrowser().clStatusLock();
+                            revert();
+                            getBrowser().clStatusUnlock();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        );
+
+
         addApplyButton(buttonPanel);
-        getApplyButton().setEnabled(checkResourceFields(null, params));
+        addRevertButton(buttonPanel);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getApplyButton().setEnabled(checkResourceFields(null, params));
+            }
+        });
 
         mainPanel.add(optionsPanel);
 
@@ -1488,5 +1511,24 @@ public class DrbdResourceInfo extends EditableInfo
                 }
             }
         }
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
+        final boolean ch = super.checkResourceFieldsChanged(param, params);
+        final MyButton rb = getRevertButton();
+        if (rb != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setEnabled(ch);
+                }
+            });
+        }
+        return ch;
     }
 }
