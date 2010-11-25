@@ -57,6 +57,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
+import drbd.utilities.MyButton;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -381,6 +382,7 @@ public class DrbdInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                 }
             });
@@ -531,10 +533,29 @@ public class DrbdInfo extends EditableInfo {
                 }
             }
         );
+        getRevertButton().addActionListener(
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            getBrowser().clStatusLock();
+                            revert();
+                            getBrowser().clStatusUnlock();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        );
 
         /* apply button */
         addApplyButton(buttonPanel);
-        getApplyButton().setEnabled(checkResourceFields(null, params));
+        addRevertButton(buttonPanel);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getApplyButton().setEnabled(checkResourceFields(null, params));
+            }
+        });
 
         mainPanel.add(optionsPanel);
 
@@ -774,5 +795,24 @@ public class DrbdInfo extends EditableInfo {
     /** Whether the parameter should be enabled only in advanced mode. */
     protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
+        final boolean ch = super.checkResourceFieldsChanged(param, params);
+        final MyButton rb = getRevertButton();
+        if (rb != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setEnabled(ch);
+                }
+            });
+        }
+        return ch;
     }
 }
