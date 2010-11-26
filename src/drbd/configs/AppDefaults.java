@@ -259,6 +259,8 @@ public class AppDefaults extends
         {"ClusterBrowser.ServiceIcon", "Icons/tango/16x16/service1_16x16.png"},
         {"ClusterBrowser.NetworkIcon", "Icons/tango/16x16/netzwk_16x16.png"},
         {"ClusterBrowser.RemoveIcon",  "Icons/tango/32x32/cancel_32x32.png"},
+        {"ClusterBrowser.RemoveIconSmall",
+         "Icons/tango/16x16/cancel_16x16.png"},
 
         {"ClusterBrowser.ClusterIconSmall",
          "Icons/tango/16x16/cluster_16x16.png"},

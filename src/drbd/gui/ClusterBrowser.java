@@ -206,6 +206,10 @@ public class ClusterBrowser extends Browser {
     public static final ImageIcon REMOVE_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.RemoveIcon"));
+    /** Remove icon small. */
+    public static final ImageIcon REMOVE_ICON_SMALL =
+        Tools.createImageIcon(
+                Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
     /** Name of ocf style resource (heartbeat 2). */
     private static final String HB_OCF_CLASS = "ocf";
     /** Name of heartbeat style resource (heartbeat 1). */

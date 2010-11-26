@@ -338,6 +338,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
             }
         });
         final Map<String, String> parameters = getHWParametersAndSave();

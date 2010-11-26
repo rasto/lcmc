@@ -299,7 +299,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         final String name = font.getFontName();
         final int style = font.getStyle();
         final int size = font.getSize();
-        setFont(new Font(name, style, 9));
+        setFont(new Font(name, style, 10));
         setMargin(new Insets(2, 2, 2, 2));
         setIconTextGap(0);
     }

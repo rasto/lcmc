@@ -164,7 +164,7 @@ public abstract class EditableInfo extends Info {
             revertButton.setToolTipText(
                     Tools.getString("Browser.RevertResource.ToolTip"));
             revertButton.miniButton();
-            revertButton.setPreferredSize(new Dimension(60, 50));
+            revertButton.setPreferredSize(new Dimension(65, 50));
         } else {
             applyButton = oldApplyButton;
         }

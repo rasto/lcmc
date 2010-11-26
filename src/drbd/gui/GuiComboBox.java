@@ -19,7 +19,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.gui;
 
 import drbd.utilities.Tools;
@@ -1105,6 +1104,9 @@ public class GuiComboBox extends JPanel {
                         if (it == item
                             || it.toString().equals(item)
                             || it.equals(item)
+                            || ((it instanceof Info)
+                                && Tools.areEqual(((Info) it).getStringValue(),
+                                                  item))
                             || (NOTHING_SELECTED.equals(it) && item == null)) {
                             selectedObject = it;
                             cb.setSelectedItem(it);

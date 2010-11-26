@@ -67,7 +67,7 @@ public class VMSInfo extends CategoryInfo {
     private static final Map<Integer, Integer> DEFAULT_WIDTHS =
                                                 new HashMap<Integer, Integer>();
     static {
-        DEFAULT_WIDTHS.put(4, 65); /* remove button column */
+        DEFAULT_WIDTHS.put(4, 80); /* remove button column */
     }
     /** Creates the new VMSInfo object with name of the category. */
     public VMSInfo(final String name, final Browser browser) {
@@ -119,10 +119,11 @@ public class VMSInfo extends CategoryInfo {
                 final MyButton domainNameLabel = new MyButton(domainName,
                                                               hostIcon);
                 final MyButton removeDomain = new MyButton(
-                                                   null,
-                                                   ClusterBrowser.REMOVE_ICON,
-                                                   "Remove " + domainName
-                                                   + " domain");
+                                               "Remove",
+                                               ClusterBrowser.REMOVE_ICON_SMALL,
+                                               "Remove " + domainName
+                                               + " domain");
+                removeDomain.miniButton();
                 rows.add(new Object[]{domainNameLabel,
                                       vmsvdi.getDefinedOnString(),
                                       vmsvdi.getRunningOnString(),

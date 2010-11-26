@@ -587,6 +587,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
             final String regexp = "[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
+            fileChooserBtn.miniButton();
             final GuiComboBox paramCB = new GuiComboBox(
                                   sourceFile,
                                   getParamPossibleChoices(param),

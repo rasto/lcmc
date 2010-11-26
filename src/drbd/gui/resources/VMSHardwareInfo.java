@@ -48,6 +48,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.SwingUtilities;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -146,15 +147,32 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                     }
                 }
             );
+            getRevertButton().addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                getBrowser().clStatusLock();
+                                revert();
+                                getBrowser().clStatusUnlock();
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            );
         }
         final JPanel extraButtonPanel =
-                           new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                           new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
         extraButtonPanel.setBackground(Browser.STATUS_BACKGROUND);
         buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
+        addRevertButton(extraButtonPanel);
         final MyButton overviewButton = new MyButton("VM Host Overview",
                                                      BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(200, 50));
+        overviewButton.miniButton();
+        overviewButton.setPreferredSize(new Dimension(130, 50));
+        //overviewButton.setPreferredSize(new Dimension(200, 50));
         overviewButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 vmsVirtualDomainInfo.selectMyself();
@@ -183,9 +201,13 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                   ClusterBrowser.SERVICE_LABEL_WIDTH
                                   + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        getApplyButton().setVisible(
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getApplyButton().setVisible(
                             !getVMSVirtualDomainInfo().getResource().isNew());
-        getApplyButton().setEnabled(checkResourceFields(null, params));
+                getApplyButton().setEnabled(checkResourceFields(null, params));
+            }
+        });
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;
@@ -539,5 +561,22 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         }
     }
 
-
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        final boolean ch = super.checkResourceFieldsChanged(param, params);
+        final MyButton rb = getRevertButton();
+        if (rb != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setEnabled(ch);
+                }
+            });
+        }
+        return ch;
+    }
 }

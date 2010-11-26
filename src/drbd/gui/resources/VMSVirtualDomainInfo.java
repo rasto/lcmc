@@ -310,7 +310,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                                new HashMap<Integer, Integer>();
     private static final Map<Integer, Integer> VIDEO_DEFAULT_WIDTHS =
                                                new HashMap<Integer, Integer>();
-    private static final int CONTROL_BUTTON_WIDTH = 65;
+    private static final int CONTROL_BUTTON_WIDTH = 80;
     static {
         /* remove button column */
         HEADER_DEFAULT_WIDTHS.put(4, CONTROL_BUTTON_WIDTH);
@@ -1283,8 +1283,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns button for defined hosts. */
     private MyButton getHostButton(final Host host, final String prefix) {
-        final MyButton hostBtn = new MyButton("", null, "not defined on "
-                                                       + host.getName());
+        final MyButton hostBtn = new MyButton("Start", null, "not defined on "
+                                                             + host.getName());
+        hostBtn.miniButton();
         final MyButton hBtn = hostBtn;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -1317,7 +1318,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 t.start();
             }
         });
-        hostBtn.setPreferredSize(new Dimension(60, 20));
+        hostBtn.setPreferredSize(new Dimension(80, 20));
         hostBtn.setMinimumSize(hostBtn.getPreferredSize());
         if (prefix == null) {
             hostButtons.put(host.getName(), hostBtn);
@@ -1666,15 +1667,31 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     }
                 }
             );
+            getRevertButton().addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Thread thread = new Thread(new Runnable() {
+                            public void run() {
+                                getBrowser().clStatusLock();
+                                revert();
+                                getBrowser().clStatusUnlock();
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            );
         }
         final JPanel extraButtonPanel =
-                           new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                           new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         extraButtonPanel.setBackground(Browser.STATUS_BACKGROUND);
         buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
+        addRevertButton(extraButtonPanel);
         final MyButton overviewButton = new MyButton("VMs Overview",
                                                      BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(200, 50));
+        overviewButton.miniButton();
+        overviewButton.setPreferredSize(new Dimension(130, 50));
         overviewButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 getBrowser().getVMSInfo().selectMyself();
@@ -1745,7 +1762,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                               ClusterBrowser.SERVICE_LABEL_WIDTH
                               + ClusterBrowser.SERVICE_FIELD_WIDTH * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        getApplyButton().setEnabled(checkResourceFields(null, params));
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getApplyButton().setEnabled(checkResourceFields(null, params));
+            }
+        });
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;
@@ -3152,10 +3173,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final MyButton domainNameLabel = new MyButton(domainName, hostIcon);
             domainNameLabel.setOpaque(true);
             final MyButton removeDomain = new MyButton(
-                                               null,
-                                               ClusterBrowser.REMOVE_ICON,
+                                               "Remove",
+                                               ClusterBrowser.REMOVE_ICON_SMALL,
                                                "Remove " + domainName
                                                + " domain");
+            removeDomain.miniButton();
             rows.add(new Object[]{domainNameLabel,
                                   getDefinedOnString(),
                                   getRunningOnString(),
@@ -3184,9 +3206,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                             final Map<String, DiskData> disks,
                                             final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + targetDev);
+        removeBtn.miniButton();
         final DiskData diskData = disks.get(targetDev);
         if (diskData == null) {
             return new Object[]{targetDev,
@@ -3277,9 +3300,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, InterfaceData> interfaces,
                                 final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + mac);
+        removeBtn.miniButton();
         final InterfaceData interfaceData = interfaces.get(mac);
         if (interfaceData == null) {
             return new Object[]{mac, "unknown", removeBtn};
@@ -3321,9 +3345,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, InputDevData> inputDevs,
                                 final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + index);
+        removeBtn.miniButton();
         final InputDevData inputDevData = inputDevs.get(index);
         if (inputDevData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3344,9 +3369,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, GraphicsData> graphicDisplays,
                                 final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + index);
+        removeBtn.miniButton();
         final GraphicsData graphicsData = graphicDisplays.get(index);
         if (graphicsData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3368,9 +3394,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, SoundData> sounds,
                                 final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + index);
+        removeBtn.miniButton();
         final SoundData soundData = sounds.get(index);
         if (soundData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3392,9 +3419,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, SerialData> serials,
                                 final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + index);
+        removeBtn.miniButton();
         final SerialData serialData = serials.get(index);
         if (serialData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3416,9 +3444,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, ParallelData> parallels,
                                 final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + index);
+        removeBtn.miniButton();
         final ParallelData parallelData = parallels.get(index);
         if (parallelData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3440,9 +3469,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VideoData> videos,
                                 final boolean opaque) {
         final MyButton removeBtn = new MyButton(
-                                           null,
-                                           ClusterBrowser.REMOVE_ICON,
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
                                            "Remove " + index);
+        removeBtn.miniButton();
         final VideoData videoData = videos.get(index);
         if (videoData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -4028,7 +4058,17 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 changed = true;
             }
         }
-        return changed || super.checkResourceFieldsChanged(param, params);
+        final boolean ch =  changed
+                            || super.checkResourceFieldsChanged(param, params);
+        final MyButton rb = getRevertButton();
+        if (rb != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    rb.setEnabled(ch);
+                }
+            });
+        }
+        return ch;
     }
 
     /** Returns whether all the parameters are correct. */
@@ -4221,6 +4261,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     hostCB.setTFButtonEnabled(enable && stopped);
+                    hostBtn.setText("Start");
                     hostBtn.setIcon(HostBrowser.HOST_ON_ICON);
                     hostBtn.setToolTipText("Start on " + host.getName());
                 }
@@ -4237,6 +4278,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     hostCB.setTFButtonEnabled(enable);
+                    hostBtn.setText("View");
                     hostBtn.setIcon(VNC_ICON);
                     hostBtn.setToolTipText("Graphical console on "
                                            + host.getName());
@@ -4285,5 +4327,23 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 setButtonToNotDefined(h, wizardHostCB, wizardHostBtn);
             }
         }
+    }
+
+    /** Revert valus. */
+    protected void revert() {
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final GuiComboBox hostCB =
+                                    definedOnHostComboBoxHash.get(h.getName());
+            String savedValue;
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null
+                && vmsxml.getDomainNames().contains(getDomainName())) {
+                savedValue = DEFINED_ON_HOST_TRUE;
+            } else {
+                savedValue = DEFINED_ON_HOST_FALSE;
+            }
+            hostCB.setValue(savedValue);
+        }
+        super.revert();
     }
 }

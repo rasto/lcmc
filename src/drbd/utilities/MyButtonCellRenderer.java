@@ -64,6 +64,9 @@ public class MyButtonCellRenderer extends MyButton
             }
             setText(button.getText());
             setIcon(button.getIcon());
+            setMargin(button.getInsets());
+            setFont(button.getFont());
+            setIconTextGap(button.getIconTextGap());
             getModel().setPressed(button.getModel().isPressed());
             getModel().setArmed(button.getModel().isArmed());
             getModel().setRollover(button.getModel().isRollover());
