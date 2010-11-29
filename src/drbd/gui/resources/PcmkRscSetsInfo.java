@@ -290,8 +290,8 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Check order and colocation constraints. */
-    public final boolean checkResourceFields(final String param,
-                                             final String[] params) {
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
         boolean oneIsNew = false;
         try {
             mConstraintPHLock.acquire();
@@ -306,8 +306,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
             }
         }
         mConstraintPHLock.release();
-        //TODO: have to chech changed and correct separately
-        return super.checkResourceFields(param, params) || oneIsNew;
+        return super.checkResourceFieldsChanged(param, params) || oneIsNew;
     }
 
     /** Return list of popup items. */

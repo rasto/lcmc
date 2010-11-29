@@ -213,7 +213,7 @@ public class VMSSoundInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        checkResourceFields(null, getParametersFromXML());
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /** Returns device parameters. */

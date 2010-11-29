@@ -205,7 +205,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             public void run() {
                 getApplyButton().setVisible(
                             !getVMSVirtualDomainInfo().getResource().isNew());
-                getApplyButton().setEnabled(checkResourceFields(null, params));
+                setApplyButtons(null, params);
             }
         });
         infoPanel = newPanel;
@@ -559,24 +559,5 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             final String name = fc.getSelectedFile().getAbsolutePath();
             paramCB.setValue(name);
         }
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        final boolean ch = super.checkResourceFieldsChanged(param, params);
-        final MyButton rb = getRevertButton();
-        if (rb != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    rb.setEnabled(ch);
-                }
-            });
-        }
-        return ch;
     }
 }

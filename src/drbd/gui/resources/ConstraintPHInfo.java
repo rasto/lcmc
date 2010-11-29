@@ -295,15 +295,6 @@ public class ConstraintPHInfo extends ServiceInfo {
         return true;
     }
 
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
-    public final boolean checkResourceFields(final String param,
-                                             final String[] params) {
-        return true;
-    }
-
     /** Applies changes to the placeholder. */
     public final void apply(final Host dcHost, final boolean testOnly) {
         /* apply is in resource set info object. */

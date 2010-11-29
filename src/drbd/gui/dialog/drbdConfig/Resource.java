@@ -143,9 +143,11 @@ public class Resource extends DrbdConfig {
                   null);
 
         inputPane.add(optionsPanel);
-
-        buttonClass(nextButton()).setEnabled(
-                     getDrbdResourceInfo().checkResourceFields(null, PARAMS));
+        final boolean ch = 
+               getDrbdResourceInfo().checkResourceFieldsChanged(null, PARAMS);
+        final boolean cor = 
+               getDrbdResourceInfo().checkResourceFieldsCorrect(null, PARAMS);
+        buttonClass(nextButton()).setEnabled(ch && cor);
         final JScrollPane sp = new JScrollPane(inputPane);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

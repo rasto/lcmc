@@ -443,7 +443,11 @@ public class GuiComboBox extends JPanel {
                     o = null;
                 }
                 if (o == null) {
-                    editor.setText("");
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            editor.setText("");
+                        }
+                    });
                 }
             }
 
@@ -723,11 +727,13 @@ public class GuiComboBox extends JPanel {
     public final void setEditable() {
         setEditable(editable);
     }
+    int sindex = 0;
 
     /**
      * Sets combo box editable.
      */
     public final void setEditable(final boolean editable) {
+        sindex++;
         this.editable = editable;
         JComponent c;
         if (fieldButton == null) {

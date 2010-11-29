@@ -153,7 +153,6 @@ public class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             storeComboBoxValues(params);
             getBrowser().reload(getNode(), false);
-            checkResourceFields(null, params);
         }
         getBrowser().getHeartbeatGraph().repaint();
     }
@@ -278,7 +277,29 @@ public class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             storeComboBoxValues(params);
             getBrowser().reload(getNode(), false);
-            checkResourceFields(null, params);
+        }
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final List<String> resources = cs.getGroupResources(
+                                                       getHeartbeatId(testOnly),
+                                                       testOnly);
+        if (resources != null) {
+            for (final String hbId : resources) {
+                final ServiceInfo gsi =
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
+                if (gsi.checkResourceFieldsCorrect(null,
+                                                  gsi.getParametersFromXML(),
+                                                  false,
+                                                  false,
+                                                  true)
+                    && gsi.checkResourceFieldsChanged(
+                                                null,
+                                                gsi.getParametersFromXML(),
+                                                false,
+                                                false,
+                                                true)) {
+                    gsi.apply(dcHost, testOnly);
+                }
+            }
         }
         getBrowser().getHeartbeatGraph().repaint();
     }
@@ -1090,15 +1111,89 @@ public class GroupInfo extends ServiceInfo {
      */
     public final boolean checkResourceFieldsChanged(final String param,
                                                     final String[] params) {
-        final DefaultMutableTreeNode n = getNode();
-        if (n == null) {
+        return checkResourceFieldsChanged(param, params, false, false);
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If group does not have any services, its changes
+     * cannot by applied.
+     */
+    public final boolean checkResourceFieldsChanged(
+                                            final String param,
+                                            final String[] params,
+                                            final boolean fromServicesInfo,
+                                            final boolean fromCloneInfo) {
+        final DefaultMutableTreeNode gn = getNode();
+        if (gn == null) {
             return false;
         }
-        final Enumeration e = n.children();
-        if (!e.hasMoreElements()) {
+        final Enumeration se = gn.children();
+        if (!se.hasMoreElements()) {
             return false;
         }
-        return super.checkResourceFieldsChanged(param, params);
+        boolean changed = super.checkResourceFieldsChanged(param,
+                                                           params,
+                                                           fromServicesInfo,
+                                                           fromCloneInfo,
+                                                           true);
+        final Enumeration e = gn.children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode n =
+                                  (DefaultMutableTreeNode) e.nextElement();
+            final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
+            if (gsi.checkResourceFieldsChanged(
+                                           null,
+                                           gsi.getParametersFromXML(),
+                                           fromServicesInfo,
+                                           fromCloneInfo,
+                                           true)) {
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false, false);
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params,
+                                              final boolean fromServicesInfo,
+                                              final boolean fromCloneInfo) {
+        boolean cor = super.checkResourceFieldsCorrect(param,
+                                                       params,
+                                                       fromServicesInfo,
+                                                       fromCloneInfo,
+                                                       true);
+        final Enumeration e = getNode().children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode n =
+                                  (DefaultMutableTreeNode) e.nextElement();
+            final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
+            if (!gsi.checkResourceFieldsCorrect(null,
+                                                gsi.getParametersFromXML(),
+                                                fromServicesInfo,
+                                                fromCloneInfo,
+                                                true)) {
+                cor = false;
+            }
+        }
+        return cor;
     }
 
     /**
@@ -1156,5 +1251,26 @@ public class GroupInfo extends ServiceInfo {
             return ServiceInfo.SERVICE_STOPPED_ICON;
         }
         return ServiceInfo.SERVICE_STARTED_ICON;
+    }
+
+    /** Revert all values. */
+    public final void revert() {
+        super.revert();
+        final Enumeration e = getNode().children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode n =
+                                  (DefaultMutableTreeNode) e.nextElement();
+            final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
+            if (gsi != null) {
+                if (gsi.checkResourceFieldsChanged(
+                                              null,
+                                              gsi.getParametersFromXML(),
+                                              true,
+                                              false,
+                                              false)) {
+                    gsi.revert();
+                }
+            }
+        }
     }
 }

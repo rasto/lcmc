@@ -413,7 +413,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        checkResourceFields(null, params);
+        checkResourceFieldsChanged(null, params);
     }
 
     /** Modify device xml. */
@@ -576,7 +576,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.DISK_TABLE);
-        checkResourceFields(null, getParametersFromXML());
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /** Returns combo box for parameter. */

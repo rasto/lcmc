@@ -287,7 +287,20 @@ public class ServicesInfo extends EditableInfo {
         if (!testOnly) {
             storeComboBoxValues(params);
             rdi.storeComboBoxValues(rdiParams);
-            checkResourceFields(null, params);
+        }
+        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
+            if (si.checkResourceFieldsCorrect(null,
+                                              si.getParametersFromXML(),
+                                              true,
+                                              false,
+                                              false)
+                && si.checkResourceFieldsChanged(null,
+                                                 si.getParametersFromXML(),
+                                                 true,
+                                                 false,
+                                                 false)) {
+                si.apply(dcHost, testOnly);
+            }
         }
     }
 
@@ -960,7 +973,7 @@ public class ServicesInfo extends EditableInfo {
                 startTestLatch.countDown();
             }
         };
-        initApplyButton(buttonCallback);
+        initCommitButton(buttonCallback);
         getBrowser().getRscDefaultsInfo().setApplyButton(getApplyButton());
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -1030,7 +1043,7 @@ public class ServicesInfo extends EditableInfo {
         addRevertButton(buttonPanel);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                getApplyButton().setEnabled(checkResourceFields(null, params));
+                setApplyButtons(null, params);
             }
         });
 
@@ -1687,11 +1700,21 @@ public class ServicesInfo extends EditableInfo {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         boolean ret = true;
         if (!rdi.checkResourceFieldsCorrect(param,
-                                            rdi.getParametersFromXML())) {
+                                            rdi.getParametersFromXML(),
+                                            true)) {
             ret = false;
         }
         if (!super.checkResourceFieldsCorrect(param, params)) {
             ret = false;
+        }
+        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
+            if (!si.checkResourceFieldsCorrect(null,
+                                              si.getParametersFromXML(),
+                                              true,
+                                              false,
+                                              false)) {
+                ret = false;
+            }
         }
         return ret;
     }
@@ -1709,25 +1732,36 @@ public class ServicesInfo extends EditableInfo {
             changed = true;
         }
         if (rdi.checkResourceFieldsChanged(param,
-                                           rdi.getParametersFromXML())) {
+                                           rdi.getParametersFromXML(),
+                                           true)) {
             changed = true;
         }
-        final MyButton rb = getRevertButton();
-        if (rb != null) {
-            final boolean ch = changed;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    rb.setEnabled(ch);
-                }
-            });
+        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
+            if (si.checkResourceFieldsChanged(null,
+                                              si.getParametersFromXML(),
+                                              true,
+                                              false,
+                                              false)) {
+                changed = true;
+            }
         }
         return changed;
     }
 
     /** Revert all values. */
-    protected final void revert() {
+    public final void revert() {
         super.revert();
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         rdi.revert();
+        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
+            if (si.checkResourceFieldsChanged(null,
+                                              si.getParametersFromXML(),
+                                              true,
+                                              false,
+                                              false)) {
+                si.revert();
+            }
+        }
+        //TODO: should remove new resources and constraints
     }
 }

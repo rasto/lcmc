@@ -1521,7 +1521,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 getBrowser().repaintTree();
             }
         });
-        checkResourceFields(null, getParametersFromXML());
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /**
@@ -1764,7 +1764,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         newPanel.add(new JScrollPane(mainPanel));
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                getApplyButton().setEnabled(checkResourceFields(null, params));
+                setApplyButtons(null, params);
             }
         });
         infoPanel = newPanel;
@@ -2990,7 +2990,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                      getDomainName(),
                                      allHWP.get(hi));
                         hi.getResource().setNew(false);
-                        //hi.checkResourceFields(null, hi.getParametersFromXML());
                     }
                     vmsxml.saveAndDefine(domainNode, getDomainName());
                 } else {
@@ -3013,7 +3012,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                          getDomainName(),
                                          allHWP.get(hi));
                             hi.getResource().setNew(false);
-                            hi.checkResourceFields(null,
+                            hi.checkResourceFieldsChanged(
+                                                   null,
                                                    hi.getParametersFromXML());
                         }
                         vmsxml.saveAndDefine(domainNode, getDomainName());
@@ -3051,7 +3051,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             getBrowser().periodicalVMSUpdate(host);
         }
         updateParameters();
-        checkResourceFields(null, params);
+        checkResourceFieldsChanged(null, params);
         getBrowser().reload(getNode(), false);
     }
 
@@ -4060,14 +4060,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         }
         final boolean ch =  changed
                             || super.checkResourceFieldsChanged(param, params);
-        final MyButton rb = getRevertButton();
-        if (rb != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    rb.setEnabled(ch);
-                }
-            });
-        }
         return ch;
     }
 
@@ -4330,7 +4322,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Revert valus. */
-    protected void revert() {
+    public void revert() {
         for (final Host h : getBrowser().getClusterHosts()) {
             final GuiComboBox hostCB =
                                     definedOnHostComboBoxHash.get(h.getName());

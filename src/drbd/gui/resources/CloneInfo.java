@@ -361,22 +361,73 @@ public class CloneInfo extends ServiceInfo {
         containedService.removeMyself(testOnly);
     }
 
-    /**
-     * In clone resource check its conaining service.
-     */
-    public final boolean checkResourceFields(final String param,
-                                             final String[] params) {
+    /** In clone resource check its containing service. */
+    public final boolean checkResourceFieldsCorrect(final String param,
+                                                    final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false);
+    }
+
+    /** In clone resource check its containing service. */
+    public final boolean checkResourceFieldsCorrect(
+                                            final String param,
+                                            final String[] params,
+                                            final boolean fromServicesInfo) {
+        final boolean cor = super.checkResourceFieldsCorrect(param,
+                                                             params,
+                                                             fromServicesInfo,
+                                                             true,
+                                                             false);
         final boolean ccor = containedService.checkResourceFieldsCorrect(
                                   param,
-                                  containedService.getParametersFromXML());
-        final boolean cchanged = containedService.checkResourceFieldsChanged(
-                                  param,
-                                  containedService.getParametersFromXML());
-        final boolean changed = checkResourceFieldsChanged(
-                                                      param,
-                                                      getParametersFromXML());
-        return ccor && (cchanged || changed);
+                                  containedService.getParametersFromXML(),
+                                  fromServicesInfo,
+                                  true,
+                                  false);
+        return cor && ccor;
     }
+
+    /** In clone resource check its containing service. */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
+        return checkResourceFieldsChanged(param, params, false);
+    }
+
+    /** In clone resource check its containing service. */
+    public final boolean checkResourceFieldsChanged(
+                                              final String param,
+                                              final String[] params,
+                                              final boolean fromServicesInfo) {
+        final boolean ch = super.checkResourceFieldsChanged(param,
+                                                            params,
+                                                            fromServicesInfo,
+                                                            true,
+                                                            false);
+
+        final boolean cch = containedService.checkResourceFieldsChanged(
+                                  param,
+                                  containedService.getParametersFromXML(),
+                                  fromServicesInfo,
+                                  true,
+                                  false);
+        return ch || cch;
+    }
+
+    ///**
+    // * In clone resource check its conaining service.
+    // */
+    //public final boolean checkResourceFields(final String param,
+    //                                         final String[] params) {
+    //    final boolean ccor = containedService.checkResourceFieldsCorrect(
+    //                              param,
+    //                              containedService.getParametersFromXML());
+    //    final boolean cchanged = containedService.checkResourceFieldsChanged(
+    //                              param,
+    //                              containedService.getParametersFromXML());
+    //    final boolean changed = checkResourceFieldsChanged(
+    //                                                  param,
+    //                                                  getParametersFromXML());
+    //    return ccor && (cchanged || changed);
+    //}
 
     /**
      * Returns whether service is started.

@@ -302,18 +302,39 @@ public class ServiceInfo extends EditableInfo {
      */
     public boolean checkResourceFieldsCorrect(final String param,
                                               final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false, false, false);
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params,
+                                              final boolean fromServicesInfo,
+                                              final boolean fromCloneInfo,
+                                              final boolean fromGroupInfo) {
         boolean ret = true;
-        if (getService().isOrphaned()) {
-            return false;
+        if (getComboBoxValue(GUI_ID) == null) {
+            return true;
         }
         final CloneInfo ci = getCloneInfo();
-        if (ci != null
-            && !ci.checkResourceFieldsCorrect(
-                                         param,
-                                         ci.getParametersFromXML())) {
-            /* the next super checkResourceFieldsCorrect must be run at
-              least once. */
-            ret = false;
+        if (!fromCloneInfo && ci != null) {
+            return ci.checkResourceFieldsCorrect(param,
+                                                 ci.getParametersFromXML(),
+                                                 fromServicesInfo);
+        }
+        final GroupInfo gi = getGroupInfo();
+        if (!fromGroupInfo && gi != null) {
+            return gi.checkResourceFieldsCorrect(param,
+                                                 gi.getParametersFromXML(),
+                                                 fromServicesInfo,
+                                                 fromCloneInfo);
+        }
+        if (getService().isOrphaned()) {
+            return false;
         }
         if (!super.checkResourceFieldsCorrect(param, params)) {
             return false;
@@ -350,8 +371,41 @@ public class ServiceInfo extends EditableInfo {
      */
     public boolean checkResourceFieldsChanged(final String param,
                                               final String[] params) {
+        return checkResourceFieldsChanged(param, params, false, false, false);
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params,
+                                              final boolean fromServicesInfo,
+                                              final boolean fromCloneInfo,
+                                              final boolean fromGroupInfo) {
+            
+        final String id = getComboBoxValue(GUI_ID);
+        final CloneInfo ci = getCloneInfo();
+        if (!fromCloneInfo && ci != null) {
+            return ci.checkResourceFieldsChanged(param,
+                                                 ci.getParametersFromXML(),
+                                                 fromServicesInfo);
+        }
+        final GroupInfo gi = getGroupInfo();
+        if (!fromGroupInfo && gi != null) {
+            if (!fromGroupInfo && !fromServicesInfo && gi != null) {
+                gi.setApplyButtons(null, gi.getParametersFromXML());
+            }
+            return gi.checkResourceFieldsChanged(param,
+                                                 gi.getParametersFromXML(),
+                                                 fromServicesInfo,
+                                                 fromCloneInfo);
+        }
         if (getService().isNew()) {
             return true;
+        } else if (id == null) {
+            return false;
         }
         boolean changed = false;
         if (super.checkResourceFieldsChanged(param, params)) {
@@ -373,14 +427,6 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         }
-        final CloneInfo ci = getCloneInfo();
-        if (ci != null
-                   && ci.checkResourceFieldsChanged(
-                                           param,
-                                           ci.getParametersFromXML())) {
-            changed = true;
-        }
-        final String id = getComboBoxValue(GUI_ID);
         final String heartbeatId = getService().getHeartbeatId();
         if (ConfigData.PM_GROUP_NAME.equals(getName())) {
             if (heartbeatId == null) {
@@ -495,14 +541,10 @@ public class ServiceInfo extends EditableInfo {
             }
             sameAsMetaAttrsCB.processAccessMode();
         }
-        final boolean ch = changed;
-        final MyButton rb = getRevertButton();
-        if (rb != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    rb.setEnabled(ch);
-                }
-            });
+        //final boolean ch = changed;
+        if (!fromServicesInfo) {
+            final ServicesInfo sis = getBrowser().getServicesInfo();
+            sis.setApplyButtons(null, sis.getParametersFromXML());
         }
         return changed;
     }
@@ -1543,8 +1585,7 @@ public class ServiceInfo extends EditableInfo {
                                 label.setText(onText);
                             }
                             final String[] params = getParametersFromXML();
-                            getApplyButton().setEnabled(
-                                checkResourceFields(CACHED_FIELD, params));
+                            setApplyButtons(CACHED_FIELD, params);
                         }
                     });
                 }
@@ -2045,12 +2086,9 @@ public class ServiceInfo extends EditableInfo {
                                      (Info) sameAsOperationsCB.getValue();
                                 setOperationsSameAs(info);
                                 final String[] params = getParametersFromXML();
-                                final boolean enable =
-                                    checkResourceFields(CACHED_FIELD, params);
-                                SwingUtilities.invokeLater(
-                                new Runnable() {
+                                setApplyButtons(CACHED_FIELD, params);
+                                SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        getApplyButton().setEnabled(enable);
                                         if (info != null) {
                                             sameAsOperationsCB.setToolTipText(
                                                               info.toString());
@@ -2370,13 +2408,11 @@ public class ServiceInfo extends EditableInfo {
                             || e.getStateChange() == ItemEvent.SELECTED) {
                             final Thread thread = new Thread(new Runnable() {
                                 public void run() {
-                                    final boolean enable =
-                                      checkResourceFields(CACHED_FIELD, params);
+                                    setApplyButtons(CACHED_FIELD, params);
                                     SwingUtilities.invokeLater(
                                     new Runnable() {
                                         public void run() {
                                             cb.setEditable();
-                                            getApplyButton().setEnabled(enable);
                                         }
                                     });
                                 }
@@ -2390,14 +2426,7 @@ public class ServiceInfo extends EditableInfo {
                     private void check() {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
-                                final boolean enable =
-                                    checkResourceFields(CACHED_FIELD, params);
-                                SwingUtilities.invokeLater(
-                                new Runnable() {
-                                    public void run() {
-                                        getApplyButton().setEnabled(enable);
-                                    }
-                                });
+                                setApplyButtons(CACHED_FIELD, params);
                             }
                         });
                         thread.start();
@@ -2424,14 +2453,7 @@ public class ServiceInfo extends EditableInfo {
                         || e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
-                                final boolean enable =
-                                  checkResourceFields(CACHED_FIELD, params);
-                                SwingUtilities.invokeLater(
-                                new Runnable() {
-                                    public void run() {
-                                        getApplyButton().setEnabled(enable);
-                                    }
-                                });
+                                setApplyButtons(CACHED_FIELD, params);
                             }
                         });
                         thread.start();
@@ -2443,14 +2465,7 @@ public class ServiceInfo extends EditableInfo {
                 private void check() {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            final boolean enable =
-                                checkResourceFields(CACHED_FIELD, params);
-                            SwingUtilities.invokeLater(
-                            new Runnable() {
-                                public void run() {
-                                    getApplyButton().setEnabled(enable);
-                                }
-                            });
+                            setApplyButtons(CACHED_FIELD, params);
                         }
                     });
                     thread.start();
@@ -2486,14 +2501,7 @@ public class ServiceInfo extends EditableInfo {
                         || e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
                             public void run() {
-                                final boolean enable = checkResourceFields(
-                                                            CACHED_FIELD,
-                                                            params);
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        getApplyButton().setEnabled(enable);
-                                    }
-                                });
+                                setApplyButtons(CACHED_FIELD, params);
                             }
                         });
                         thread.start();
@@ -2505,13 +2513,7 @@ public class ServiceInfo extends EditableInfo {
                 private void check() {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            final boolean enable =
-                                 checkResourceFields(CACHED_FIELD, params);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    getApplyButton().setEnabled(enable);
-                                }
-                            });
+                            setApplyButtons(CACHED_FIELD, params);
                         }
                     });
                     thread.start();
@@ -2567,11 +2569,9 @@ public class ServiceInfo extends EditableInfo {
                                 setMetaAttrsSameAs(info);
                                 final String[] params =
                                                     getParametersFromXML();
-                                final boolean enable =
-                                  checkResourceFields(CACHED_FIELD, params);
+                                setApplyButtons(CACHED_FIELD, params);
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
-                                        getApplyButton().setEnabled(enable);
                                         if (info != null) {
                                             sameAsMetaAttrsCB.setToolTipText(
                                                               info.toString());
@@ -2672,6 +2672,7 @@ public class ServiceInfo extends EditableInfo {
         initApplyButton(buttonCallback);
         if (ci != null) {
             ci.setApplyButton(getApplyButton());
+            ci.setRevertButton(getRevertButton());
         }
         /* add item listeners to the apply button. */
         if (!abExisted) {
@@ -2837,7 +2838,8 @@ public class ServiceInfo extends EditableInfo {
         addRevertButton(buttonPanel);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                getApplyButton().setEnabled(checkResourceFields(null, params));
+                /* invoke later on purpose  */
+                setApplyButtons(null, params);
             }
         });
         mainPanel.add(optionsPanel);
@@ -3135,7 +3137,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Revert all values. */
-    protected final void revert() {
+    public void revert() {
         final CRMXML crmXML = getBrowser().getCRMXML();
         final String[] params = getParametersFromXML();
         boolean allSavedMetaAttrsAreDefaultValues = true;
@@ -3183,7 +3185,7 @@ public class ServiceInfo extends EditableInfo {
             ci = getCloneInfo();
         } else {
             ci = gInfo.getCloneInfo();
-            gInfo.revert();
+            //gInfo.revert();
         }
         final CloneInfo clInfo = ci;
         if (clInfo != null) {
@@ -3631,7 +3633,7 @@ public class ServiceInfo extends EditableInfo {
 
             getBrowser().reload(getNode(), false);
             getBrowser().getHeartbeatGraph().repaint();
-            checkResourceFields(null, params);
+            setApplyButtons(null, params);
         }
         getBrowser().reload(getNode(), false);
     }
@@ -4093,16 +4095,7 @@ public class ServiceInfo extends EditableInfo {
                                                   testOnly);
                 if (!testOnly) {
                     final PcmkRscSetsInfo prsi = cphi.getPcmkRscSetsInfo();
-                    final boolean enabled = prsi.checkResourceFields(null,
-                                                 prsi.getParametersFromXML());
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            final MyButton ab = prsi.getApplyButton();
-                            if (ab != null) {
-                                ab.setEnabled(enabled);
-                            }
-                        }
-                    });
+                    prsi.setApplyButtons(null, prsi.getParametersFromXML());
                 }
             } else {
                 final String parentId = getHeartbeatId(testOnly);

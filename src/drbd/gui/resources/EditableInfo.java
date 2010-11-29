@@ -150,9 +150,22 @@ public abstract class EditableInfo extends Info {
 
     /** Inits apply button. */
     public final void initApplyButton(final ButtonCallback buttonCallback) {
+        initApplyButton(buttonCallback,
+                        Tools.getString("Browser.ApplyResource"));
+    }
+
+    /** Inits commit button. */
+    public final void initCommitButton(final ButtonCallback buttonCallback) {
+        initApplyButton(buttonCallback,
+                        Tools.getString("Browser.CommitResources"));
+    }
+
+    /** Inits apply or commit button button. */
+    public final void initApplyButton(final ButtonCallback buttonCallback,
+                                      final String text) {
         if (oldApplyButton == null) {
             applyButton = new MyButton(
-                    Tools.getString("Browser.ApplyResource"),
+                    text,
                     Browser.APPLY_ICON);
             applyButton.miniButton();
             applyButton.setEnabled(false);
@@ -303,7 +316,7 @@ public abstract class EditableInfo extends Info {
     private void addParams(final JPanel optionsPanel,
                            final String prefix,
                            final String[] params,
-                           final MyButton thisApplyButton,
+                           final MyButton thisApplyButton,//TODO: used for what?
                            final int leftWidth,
                            final int rightWidth,
                            final Map<String, GuiComboBox> sameAsFields) {
@@ -547,6 +560,7 @@ public abstract class EditableInfo extends Info {
                 //    }
                 //});
                 boolean c;
+                boolean ch = false;
                 if (realParamCb != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -555,15 +569,19 @@ public abstract class EditableInfo extends Info {
                         }
                     });
                     Tools.waitForSwing();
-                    c = checkResourceFieldsCorrect(param,
-                                                   params);
+                    c = checkResourceFieldsCorrect(param, params);
                 } else {
-                    c = checkResourceFields(param, params);
+                    ch = checkResourceFieldsChanged(param, params);
+                    c = checkResourceFieldsCorrect(param, params) && ch;
                 }
                 final boolean check = c;
+                final boolean changed = ch;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         thisApplyButton.setEnabled(check);
+                        if (revertButton != null) {
+                            revertButton.setEnabled(changed);
+                        }
                         paramCb.setToolTipText(
                                 getToolTipText(param));
                         if (realParamCb != null) {
@@ -794,19 +812,38 @@ public abstract class EditableInfo extends Info {
 
     }
 
-    /**
-     * Can be called from dialog box, where it does not need to check if
-     * fields have changed.
-     */
-    public boolean checkResourceFields(final String param,
-                                       final String[] params) {
+    /** Enables and disabled apply and revert button. */
+    public final void setApplyButtons(final String param,
+                                      final String[] params) {
+        final boolean ch = checkResourceFieldsChanged(param, params);
         final boolean cor = checkResourceFieldsCorrect(param, params);
-        final boolean changed = checkResourceFieldsChanged(param, params);
-        if (cor) {
-            return changed;
-        }
-        return cor;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                final MyButton ab = getApplyButton();
+                if (ab != null) {
+                    ab.setEnabled(ch && cor);
+                }
+                final MyButton rb = getRevertButton();
+                if (rb != null) {
+                    rb.setEnabled(ch);
+                }
+            }
+        });
     }
+
+    ///**
+    // * Can be called from dialog box, where it does not need to check if
+    // * fields have changed.
+    // */
+    //public boolean checkResourceFields(final String param,
+    //                                   final String[] params) {
+    //    final boolean cor = checkResourceFieldsCorrect(param, params);
+    //    final boolean changed = checkResourceFieldsChanged(param, params);
+    //    if (cor) {
+    //        return changed;
+    //    }
+    //    return cor;
+    //}
 
     /** Checks one parameter. */
     protected final void checkOneParam(final String param) {
@@ -1016,8 +1053,11 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Revert valus. */
-    protected void revert() {
+    public void revert() {
         final String[] params = getParametersFromXML();
+        if (params == null) {
+            return;
+        }
         for (final String param : params) {
             final String v = getParamSaved(param);
             final GuiComboBox cb = paramComboBoxGet(param, null);
@@ -1040,5 +1080,10 @@ public abstract class EditableInfo extends Info {
     /** Sets apply button. */
     public final void setApplyButton(final MyButton applyButton) {
         this.applyButton = applyButton;
+    }
+
+    /** Sets revert button. */
+    public final void setRevertButton(final MyButton revertButton) {
+        this.revertButton = revertButton;
     }
 }

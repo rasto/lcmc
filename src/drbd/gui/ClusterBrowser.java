@@ -2488,47 +2488,46 @@ public class ClusterBrowser extends Browser {
         return (AvailableServicesInfo) availableServicesNode.getUserObject();
     }
 
-    /**
-     * Returns the services info object.
-     */
+    /** Returns the services info object. */
     public final ServicesInfo getServicesInfo() {
         return servicesInfo;
     }
 
-    /**
-     * Returns rsc defaults info object.
-     */
+    /** Returns rsc defaults info object. */
     public final RscDefaultsInfo getRscDefaultsInfo() {
         return rscDefaultsInfo;
     }
 
     /** Checks all fields in the application. */
     public final void checkAccessOfEverything() {
-        servicesInfo.checkResourceFields(null,
+        servicesInfo.checkResourceFieldsChanged(
+                                         null,
                                          servicesInfo.getParametersFromXML());
         servicesInfo.updateAdvancedPanels();
         rscDefaultsInfo.updateAdvancedPanels();
         Tools.getGUIData().updateGlobalItems();
         for (final ServiceInfo si : getExistingServiceList(null)) {
-            si.checkResourceFields(null, si.getParametersFromXML());
+            si.checkResourceFieldsChanged(null, si.getParametersFromXML());
             si.updateAdvancedPanels();
         }
 
-        drbdGraph.getDrbdInfo().checkResourceFields(
+        drbdGraph.getDrbdInfo().checkResourceFieldsChanged(
                                 null,
                                 drbdGraph.getDrbdInfo().getParametersFromXML());
         drbdGraph.getDrbdInfo().updateAdvancedPanels();
         for (final DrbdResourceInfo dri : drbdResHash.values()) {
-            dri.checkResourceFields(null, dri.getParametersFromXML());
+            dri.checkResourceFieldsChanged(null, dri.getParametersFromXML());
             dri.updateAdvancedPanels();
             final BlockDevInfo bdi1 = dri.getFirstBlockDevInfo();
             if (bdi1 != null) {
-                bdi1.checkResourceFields(null, bdi1.getParametersFromXML());
+                bdi1.checkResourceFieldsChanged(null,
+                                                bdi1.getParametersFromXML());
                 bdi1.updateAdvancedPanels();
             }
             final BlockDevInfo bdi2 = dri.getSecondBlockDevInfo();
             if (bdi2 != null) {
-                bdi2.checkResourceFields(null, bdi2.getParametersFromXML());
+                bdi2.checkResourceFieldsChanged(null,
+                                                bdi2.getParametersFromXML());
                 bdi2.updateAdvancedPanels();
             }
         }
@@ -2540,7 +2539,9 @@ public class ClusterBrowser extends Browser {
                                     (DefaultMutableTreeNode) e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
-                vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
+                vmsvdi.checkResourceFieldsChanged(
+                                                null,
+                                                vmsvdi.getParametersFromXML());
                 vmsvdi.updateAdvancedPanels();
                 final Enumeration ce = node.children();
                 while (ce.hasMoreElements()) {
@@ -2548,8 +2549,9 @@ public class ClusterBrowser extends Browser {
                                      (DefaultMutableTreeNode) ce.nextElement();
                     final VMSHardwareInfo vmshi =
                                   (VMSHardwareInfo) cnode.getUserObject();
-                    vmshi.checkResourceFields(null,
-                                              vmshi.getParametersFromXML());
+                    vmshi.checkResourceFieldsChanged(
+                                                null,
+                                                vmshi.getParametersFromXML());
                     vmshi.updateAdvancedPanels();
                 }
             }
@@ -2557,7 +2559,7 @@ public class ClusterBrowser extends Browser {
 
         for (final HbConnectionInfo hbci
                                     : heartbeatGraph.getAllHbConnections()) {
-            hbci.checkResourceFields(null, hbci.getParametersFromXML());
+            hbci.checkResourceFieldsChanged(null, hbci.getParametersFromXML());
             hbci.updateAdvancedPanels();
         }
     }

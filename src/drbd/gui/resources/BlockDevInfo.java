@@ -806,7 +806,7 @@ public class BlockDevInfo extends EditableInfo {
                                         ((BlockDevInfo) o).getBlockDevice();
                 getBlockDevice().setMetaDisk(metaDisk);
             }
-            checkResourceFields(null, params);
+            checkResourceFieldsChanged(null, params);
         }
     }
 
@@ -946,8 +946,7 @@ public class BlockDevInfo extends EditableInfo {
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getApplyButton().setEnabled(
-                                          checkResourceFields(null, params));
+                    setApplyButtons(null, params);
                 }
             });
         }
@@ -1776,24 +1775,5 @@ public class BlockDevInfo extends EditableInfo {
                 }
             }
         }
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params) {
-        final boolean ch = super.checkResourceFieldsChanged(param, params);
-        final MyButton rb = getRevertButton();
-        if (rb != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    rb.setEnabled(ch);
-                }
-            });
-        }
-        return ch;
     }
 }

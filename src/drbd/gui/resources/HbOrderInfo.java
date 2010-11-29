@@ -296,15 +296,6 @@ public class HbOrderInfo extends EditableInfo
         return getBrowser().getCRMXML().isOrderRequired(param);
     }
 
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
-    public final boolean checkResourceFields(final String param,
-                                             final String[] params) {
-        return connectionInfo.checkResourceFields(param, null);
-    }
-
     /** Returns attributes of this colocation. */
     protected final Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
@@ -395,7 +386,7 @@ public class HbOrderInfo extends EditableInfo
             }
             if (!testOnly) {
                 storeComboBoxValues(params);
-                checkResourceFields(null, params);
+                checkResourceFieldsChanged(null, params);
             }
         }
     }
@@ -478,5 +469,52 @@ public class HbOrderInfo extends EditableInfo
     /** Whether the parameter should be enabled only in advanced mode. */
     protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
+    }
+
+    /**
+     * Checks resource fields of all constraints that are in this
+     * connection with this constraint.
+     */
+    public final boolean checkResourceFieldsCorrect(final String param,
+                                                    final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false);
+    }
+
+    /**
+     * Checks resource fields of all constraints that are in this
+     * connection with this constraint.
+     */
+    public final boolean checkResourceFieldsCorrect(final String param,
+                                                    final String[] params,
+                                                    final boolean fromUp) {
+        if (fromUp) {
+            return super.checkResourceFieldsCorrect(param, params);
+        } else {
+            return connectionInfo.checkResourceFieldsCorrect(param, null);
+        }
+                              
+    }
+
+    /**
+     * Checks resource fields of all constraints that are in this
+     * connection with this constraint.
+     */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
+        return checkResourceFieldsChanged(param, params, false);
+    }
+    
+    /**
+     * Checks resource fields of all constraints that are in this
+     * connection with this constraint.
+     */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params,
+                                                    final boolean fromUp) {
+        if (fromUp) {
+            return super.checkResourceFieldsChanged(param, params);
+        } else {
+            return connectionInfo.checkResourceFieldsChanged(param, null);
+        }
     }
 }

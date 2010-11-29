@@ -387,7 +387,7 @@ public class DrbdInfo extends EditableInfo {
                 }
             });
             storeComboBoxValues(params);
-            checkResourceFields(null, params);
+            checkResourceFieldsChanged(null, params);
         }
     }
 
@@ -553,7 +553,7 @@ public class DrbdInfo extends EditableInfo {
         addRevertButton(buttonPanel);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                getApplyButton().setEnabled(checkResourceFields(null, params));
+                setApplyButtons(null, params);
             }
         });
 
@@ -795,24 +795,5 @@ public class DrbdInfo extends EditableInfo {
     /** Whether the parameter should be enabled only in advanced mode. */
     protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params) {
-        final boolean ch = super.checkResourceFieldsChanged(param, params);
-        final MyButton rb = getRevertButton();
-        if (rb != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    rb.setEnabled(ch);
-                }
-            });
-        }
-        return ch;
     }
 }

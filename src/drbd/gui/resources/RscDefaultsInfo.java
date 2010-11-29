@@ -273,12 +273,43 @@ public class RscDefaultsInfo extends EditableInfo {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
 
-    /**
-     * Check the fields.
-     */
-    public final boolean checkResourceFields(final String param,
-                                             final String[] params) {
-        final ServicesInfo ssi = getBrowser().getServicesInfo();
-        return ssi.checkResourceFields(param, ssi.getParametersFromXML());
+    /** Check the fields. */
+    public final boolean checkResourceFieldsChanged(final String param,
+                                                    final String[] params) {
+        return checkResourceFieldsChanged(param, params, false);
+    }
+
+    /** Check the fields. */
+    public final boolean checkResourceFieldsChanged(
+                                            final String param,
+                                            final String[] params,
+                                            final boolean fromServicesInfo) {
+        if (fromServicesInfo) {
+            return super.checkResourceFieldsChanged(param, params);
+        } else {
+            final ServicesInfo ssi = getBrowser().getServicesInfo();
+            return ssi.checkResourceFieldsChanged(param,
+                                                  ssi.getParametersFromXML());
+        }
+    }
+
+    /** Check the fields. */
+    public final boolean checkResourceFieldsCorrect(final String param,
+                                                    final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false);
+    }
+
+    /** Check the fields. */
+    public final boolean checkResourceFieldsCorrect(
+                                            final String param,
+                                            final String[] params,
+                                            final boolean fromServicesInfo) {
+        if (fromServicesInfo) {
+            return super.checkResourceFieldsCorrect(param, params);
+        } else {
+            final ServicesInfo ssi = getBrowser().getServicesInfo();
+            return ssi.checkResourceFieldsCorrect(param,
+                                                  ssi.getParametersFromXML());
+        }
     }
 }

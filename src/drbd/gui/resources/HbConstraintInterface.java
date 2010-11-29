@@ -48,41 +48,32 @@ public interface HbConstraintInterface {
                    final int rightWidth,
                    final Map<String, GuiComboBox> sameAsFields);
     /**
-     * Check fields and return true if all are correct and at least one have
-     * changed.
-     */
-    boolean checkResourceFields(final String param, final String[] params);
-    /**
      * Check which fields are correct and return true if all are.
      */
     boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params);
+                                       final String[] params,
+                                       final boolean fromUp);
     /**
      * Check which fields have changed and sets fancy colors and returns true
      * if at least one field have changed.
      */
     boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params);
-    /**
-     * Applies the changes after apply button was pressed.
-     */
+                                       final String[] params,
+                                       final boolean fromUp);
+    /** Applies the changes after apply button was pressed. */
     void apply(final Host dcHost, final boolean testOnly);
-    /**
-     * Returns data object of this info.
-     */
+    /** Revert all values. */
+    void revert();
+    /** Returns data object of this info. */
     Service getService();
-    /**
-     * Adds field with left and right component to the specified panel.
-     */
+    /** Adds field with left and right component to the specified panel. */
     void addField(final JPanel panel,
                   final JComponent left,
                   final JComponent right,
                   final int leftWidth,
                   final int rightWidth,
                   final int height);
-    /**
-     * Adds label and field to the specified panel.
-     */
+    /** Adds label and field to the specified panel. */
     void addLabelField(final JPanel panel,
                        final String left,
                        final String right,

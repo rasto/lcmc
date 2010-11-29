@@ -303,4 +303,8 @@ public class MyButton extends JButton implements ComponentWithTest {
         setMargin(new Insets(2, 2, 2, 2));
         setIconTextGap(0);
     }
+
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+    }
 }

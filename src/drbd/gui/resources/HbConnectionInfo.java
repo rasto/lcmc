@@ -257,6 +257,7 @@ public class HbConnectionInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                 }
             });
@@ -278,8 +279,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Check order and colocation constraints. */
-    public boolean checkResourceFields(final String param,
-                                       final String[] params) {
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
         boolean correct = true;
         try {
             mConstraintsLock.acquire();
@@ -289,24 +290,39 @@ public class HbConnectionInfo extends EditableInfo {
         for (final HbConstraintInterface c : constraints) {
             final boolean cor = c.checkResourceFieldsCorrect(
                                                   param,
-                                                  c.getParametersFromXML());
+                                                  c.getParametersFromXML(),
+                                                  true);
             if (!cor) {
                 correct = false;
                 break;
             }
         }
+        mConstraintsLock.release();
+        return correct;
+    }
+
+    /** Check order and colocation constraints. */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        boolean correct = true;
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         boolean changed = false;
         for (final HbConstraintInterface c : constraints) {
             final boolean chg = c.checkResourceFieldsChanged(
                                               param,
-                                              c.getParametersFromXML());
+                                              c.getParametersFromXML(),
+                                              true);
             if (chg) {
                 changed = true;
                 break;
             }
         }
         mConstraintsLock.release();
-        return correct && changed;
+        return changed;
     }
 
     /** Returns panal with user visible info. */
@@ -410,9 +426,11 @@ public class HbConnectionInfo extends EditableInfo {
         initApplyButton(buttonCallback);
         for (final String col : colocationIds.keySet()) {
             colocationIds.get(col).setApplyButton(getApplyButton());
+            colocationIds.get(col).setRevertButton(getRevertButton());
         }
         for (final String ord : orderIds.keySet()) {
             orderIds.get(ord).setApplyButton(getApplyButton());
+            orderIds.get(ord).setRevertButton(getRevertButton());
         }
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -474,10 +492,29 @@ public class HbConnectionInfo extends EditableInfo {
                 }
             }
         );
+        getRevertButton().addActionListener(
+            new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            getBrowser().clStatusLock();
+                            revert();
+                            getBrowser().clStatusUnlock();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        );
 
         /* apply button */
         addApplyButton(buttonPanel);
-        getApplyButton().setEnabled(checkResourceFields(null, null));
+        addRevertButton(buttonPanel);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setApplyButtons(null, null);
+            }
+        });
         mainPanel.add(optionsPanel);
 
         final JPanel newPanel = new JPanel();
@@ -779,6 +816,7 @@ public class HbConnectionInfo extends EditableInfo {
                                                serviceInfoChild,
                                                getBrowser());
         oi.setApplyButton(getApplyButton());
+        oi.setRevertButton(getRevertButton());
         orderIds.put(ordId, oi);
         oi.getService().setHeartbeatId(ordId);
         oi.setParameters();
@@ -816,6 +854,7 @@ public class HbConnectionInfo extends EditableInfo {
                                                          serviceInfoWithRsc,
                                                          getBrowser());
         ci.setApplyButton(getApplyButton());
+        ci.setRevertButton(getRevertButton());
         colocationIds.put(colId, ci);
         ci.getService().setHeartbeatId(colId);
         ci.setParameters();
@@ -1064,5 +1103,24 @@ public class HbConnectionInfo extends EditableInfo {
             return hoi.getAttributes();
         }
         return null;
+    }
+
+    /** Revert all values. */
+    public final void revert() {
+        super.revert();
+        final List<HbConstraintInterface> constraintsCopy
+                                    = new ArrayList<HbConstraintInterface>();
+        try {
+            mConstraintsLock.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        for (final HbConstraintInterface c : constraints) {
+            constraintsCopy.add(c);
+        }
+        mConstraintsLock.release();
+        for (final HbConstraintInterface c : constraintsCopy) {
+            c.revert();
+        }
     }
 }

@@ -339,7 +339,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        checkResourceFields(null, params);
+        checkResourceFieldsChanged(null, params);
     }
 
     /** Returns data for the table. */
