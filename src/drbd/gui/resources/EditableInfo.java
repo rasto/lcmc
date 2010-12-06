@@ -552,6 +552,7 @@ public abstract class EditableInfo extends Info {
                                      final String param,
                                      final String[] params,
                                      final MyButton thisApplyButton) {
+        final EditableInfo thisClass = this;
         final Thread thread = new Thread(new Runnable() {
             public void run() {
                 //SwingUtilities.invokeLater(new Runnable() {
@@ -572,13 +573,14 @@ public abstract class EditableInfo extends Info {
                     c = checkResourceFieldsCorrect(param, params);
                 } else {
                     ch = checkResourceFieldsChanged(param, params);
-                    c = checkResourceFieldsCorrect(param, params) && ch;
+                    c = checkResourceFieldsCorrect(param, params);
                 }
                 final boolean check = c;
                 final boolean changed = ch;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        thisApplyButton.setEnabled(check);
+                        thisApplyButton.setEnabled(
+                                  check && (changed || getResource().isNew()));
                         if (revertButton != null) {
                             revertButton.setEnabled(changed);
                         }
@@ -821,7 +823,7 @@ public abstract class EditableInfo extends Info {
             public void run() {
                 final MyButton ab = getApplyButton();
                 if (ab != null) {
-                    ab.setEnabled(ch && cor);
+                    ab.setEnabled((ch || getResource().isNew()) && cor);
                 }
                 final MyButton rb = getRevertButton();
                 if (rb != null) {
@@ -1063,6 +1065,10 @@ public abstract class EditableInfo extends Info {
             final GuiComboBox cb = paramComboBoxGet(param, null);
             if (cb != null && !Tools.areEqual(cb.getStringValue(), v)) {
                 cb.setValue(v);
+                final GuiComboBox wizardCb = paramComboBoxGet(param, "wizard");
+                if (wizardCb != null) {
+                    wizardCb.setValue(v);
+                }
             }
         }
     }

@@ -402,9 +402,7 @@ public class ServiceInfo extends EditableInfo {
                                                  fromServicesInfo,
                                                  fromCloneInfo);
         }
-        if (getService().isNew()) {
-            return true;
-        } else if (id == null) {
+        if (id == null) {
             return false;
         }
         boolean changed = false;
@@ -458,7 +456,7 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             if (heartbeatId == null) {
-                changed = true;
+                //changed = true;
             } else if (heartbeatId.equals(Service.RES_ID_PREFIX
                                           + getService().getName()
                                           + "_" + id)
@@ -3322,6 +3320,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Applies the changes to the service parameters. */
     public void apply(final Host dcHost, final boolean testOnly) {
+        getInfoPanel();
         /* TODO: make progress indicator per resource. */
         if (!testOnly) {
             setUpdated(true);

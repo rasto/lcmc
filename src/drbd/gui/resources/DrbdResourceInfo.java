@@ -215,14 +215,16 @@ public class DrbdResourceInfo extends EditableInfo
                              * to the resource. */
                             if (!value.equals(Tools.getString(
                                                 "ClusterBrowser.None"))) {
-                                final String v =
-                                     getBrowser().getDrbdDevHash().get(
-                                                              value).getName();
-                                sectionConfig.append("\t\t");
-                                sectionConfig.append(param);
-                                sectionConfig.append('\t');
-                                sectionConfig.append(Tools.escapeConfig(v));
-                                sectionConfig.append(";\n");
+                                final DrbdResourceInfo v0 =
+                                     getBrowser().getDrbdDevHash().get(value);
+                                if (v0 != null) {
+                                    final String v = v0.getName();
+                                    sectionConfig.append("\t\t");
+                                    sectionConfig.append(param);
+                                    sectionConfig.append('\t');
+                                    sectionConfig.append(Tools.escapeConfig(v));
+                                    sectionConfig.append(";\n");
+                                }
                             }
                         } else { /* name value parameter */
                             sectionConfig.append("\t\t");
@@ -820,7 +822,6 @@ public class DrbdResourceInfo extends EditableInfo
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
                     getBrowser().clStatusUnlock();
-                    Tools.appError("config failed");
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
                 getApplyButton().setToolTipText(dtd.getToolTip());

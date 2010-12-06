@@ -69,6 +69,7 @@ import java.awt.event.MouseListener;
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.MouseMotionListener;
 import java.util.Comparator;
 import java.util.List;
@@ -727,6 +728,15 @@ public class Info implements Comparable {
                     super.paintComponent(g);
                 }
             };
+
+            final Font font = menu.getFont();
+            final String fname = font.getFontName();
+            final int style = font.getStyle();
+            final int size = font.getSize();
+            menu.setFont(new Font(fname, style, 10));
+            menu.setMargin(new Insets(2, 2, 2, 2));
+            menu.setIconTextGap(0);
+
             final Thread thread = new Thread(new Runnable() {
                 public void run() {
                     menu.setIcon(Browser.ACTIONS_ICON);
