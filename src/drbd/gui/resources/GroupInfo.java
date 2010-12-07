@@ -273,7 +273,13 @@ public class GroupInfo extends ServiceInfo {
                         false, /* stonith */
                         testOnly);
         }
-        setLocations(heartbeatId, dcHost, testOnly);
+        final CloneInfo ci = getCloneInfo();
+        if (ci == null) {
+            setLocations(heartbeatId, dcHost, testOnly);
+        } else {
+            ci.setLocations(heartbeatId, dcHost, testOnly);
+
+        }
         if (!testOnly) {
             storeComboBoxValues(params);
             getBrowser().reload(getNode(), false);
