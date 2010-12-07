@@ -30,6 +30,8 @@ import drbd.utilities.Unit;
 import drbd.data.CRMXML;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
+import drbd.data.AccessMode;
+import drbd.data.resources.Resource;
 import drbd.gui.SpringUtilities;
 
 import javax.swing.JLabel;
@@ -132,6 +134,8 @@ public abstract class EditableInfo extends Info {
                                                       new ArrayList<JPanel>();
     /** More options panel. */
     private final JPanel moreOptionsPanel = new JPanel();
+    /** Whether dialog was started. It disables the apply button. */
+    private boolean dialogStarted = false;
 
     /** How much of the info is used. */
     public int getUsed() {
@@ -579,16 +583,22 @@ public abstract class EditableInfo extends Info {
                 final boolean changed = ch;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        thisApplyButton.setEnabled(
-                                  check && (changed || getResource().isNew()));
+                        if (thisApplyButton == applyButton) {
+                            thisApplyButton.setEnabled(
+                                  !isDialogStarted()
+                                  && check
+                                  && (changed || getResource().isNew()));
+                        } else {
+                            /* wizard button */
+                            thisApplyButton.setEnabled(check);
+                        }
                         if (revertButton != null) {
                             revertButton.setEnabled(changed);
                         }
                         paramCb.setToolTipText(
                                 getToolTipText(param));
                         if (realParamCb != null) {
-                            realParamCb.setToolTipText(
-                                    getToolTipText(param));
+                            realParamCb.setToolTipText(getToolTipText(param));
                         }
                     }
                 });
@@ -822,8 +832,9 @@ public abstract class EditableInfo extends Info {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 final MyButton ab = getApplyButton();
+                final Resource r = getResource();
                 if (ab != null) {
-                    ab.setEnabled((ch || getResource().isNew()) && cor);
+                    ab.setEnabled((ch || (r != null && r.isNew())) && cor);
                 }
                 final MyButton rb = getRevertButton();
                 if (rb != null) {
@@ -960,7 +971,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /**
-     * Returns whether the specified parameter or any of the parameters
+     * Returns whetherrs the specified parameter or any of the parameters
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
@@ -987,6 +998,7 @@ public abstract class EditableInfo extends Info {
                 if (!Tools.areEqual(newValue, oldValue)) {
                     changedValue = true;
                 }
+                cb.processAccessMode();
             }
         }
         return changedValue;
@@ -1061,7 +1073,10 @@ public abstract class EditableInfo extends Info {
             return;
         }
         for (final String param : params) {
-            final String v = getParamSaved(param);
+            String v = getParamSaved(param);
+            if (v == null) {
+                v = getParamDefault(param);
+            }
             final GuiComboBox cb = paramComboBoxGet(param, null);
             if (cb != null && !Tools.areEqual(cb.getStringValue(), v)) {
                 cb.setValue(v);
@@ -1091,5 +1106,15 @@ public abstract class EditableInfo extends Info {
     /** Sets revert button. */
     public final void setRevertButton(final MyButton revertButton) {
         this.revertButton = revertButton;
+    }
+
+    /** Returns if dialog was started. It disables the apply button. */
+    public final boolean isDialogStarted() {
+        return dialogStarted;
+    }
+
+    /** Sets if dialog was started. It disables the apply button. */
+    public void setDialogStarted(final boolean dialogStarted) {
+        this.dialogStarted = dialogStarted;
     }
 }

@@ -387,7 +387,8 @@ public class DrbdInfo extends EditableInfo {
                 }
             });
             storeComboBoxValues(params);
-            checkResourceFieldsChanged(null, params);
+            //checkResourceFieldsChanged(null, params);
+            setAllApplyButtons();
         }
     }
 
@@ -750,6 +751,12 @@ public class DrbdInfo extends EditableInfo {
         dri.getInfoPanel();
         final DrbdResourceInfo driF = dri;
         if (interactive) {
+            if (bd1 != null) {
+                bd1.getBlockDevice().setNew(true);
+            }
+            if (bd2 != null) {
+                bd2.getBlockDevice().setNew(true);
+            }
             final Thread thread = new Thread(new Runnable() {
                 public void run() {
                     //reload(getNode());
@@ -795,5 +802,73 @@ public class DrbdInfo extends EditableInfo {
     /** Whether the parameter should be enabled only in advanced mode. */
     protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        boolean changed = false;
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
+        for (final String res : drbdResHash.keySet()) {
+            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
+            if (drbdRes.checkResourceFieldsChanged(
+                                               param,
+                                               drbdRes.getParametersFromXML(),
+                                               true)) {
+                changed = true;
+            }
+        }
+        return super.checkResourceFieldsChanged(param, params) || changed;
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params,
+                                              final boolean fromDrbdInfo) {
+        boolean correct = true;
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
+        for (final String res : drbdResHash.keySet()) {
+            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
+            if (!drbdRes.checkResourceFieldsCorrect(
+                                               param,
+                                               drbdRes.getParametersFromXML(),
+                                               true)) {
+                correct = false;
+            }
+        }
+        return super.checkResourceFieldsCorrect(param, params) && correct;
+    }
+
+    /** Revert all values. */
+    public final void revert() {
+        super.revert();
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
+        for (final String res : drbdResHash.keySet()) {
+            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
+            drbdRes.revert();
+        }
+    }
+
+    /** Set all apply buttons. */
+    public final void setAllApplyButtons() {
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
+        for (final String res : drbdResHash.keySet()) {
+            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
+            drbdRes.storeComboBoxValues(drbdRes.getParametersFromXML());
+            drbdRes.setAllApplyButtons();
+        }
     }
 }

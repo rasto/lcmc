@@ -328,11 +328,15 @@ public class ServiceInfo extends EditableInfo {
         }
         final GroupInfo gi = getGroupInfo();
         if (!fromGroupInfo && gi != null) {
-            return gi.checkResourceFieldsCorrect(param,
-                                                 gi.getParametersFromXML(),
-                                                 fromServicesInfo,
-                                                 fromCloneInfo);
+            if (!fromServicesInfo) {
+                gi.setApplyButtons(null, gi.getParametersFromXML());
+            }
         }
+        //    return gi.checkResourceFieldsCorrect(param,
+        //                                         gi.getParametersFromXML(),
+        //                                         fromServicesInfo,
+        //                                         fromCloneInfo);
+        //}
         if (getService().isOrphaned()) {
             return false;
         }
@@ -394,13 +398,13 @@ public class ServiceInfo extends EditableInfo {
         }
         final GroupInfo gi = getGroupInfo();
         if (!fromGroupInfo && gi != null) {
-            if (!fromGroupInfo && !fromServicesInfo && gi != null) {
+            if (!fromServicesInfo) {
                 gi.setApplyButtons(null, gi.getParametersFromXML());
             }
-            return gi.checkResourceFieldsChanged(param,
-                                                 gi.getParametersFromXML(),
-                                                 fromServicesInfo,
-                                                 fromCloneInfo);
+            //return gi.checkResourceFieldsChanged(param,
+            //                                     gi.getParametersFromXML(),
+            //                                     fromServicesInfo,
+            //                                     fromCloneInfo);
         }
         if (id == null) {
             return false;
@@ -2667,7 +2671,12 @@ public class ServiceInfo extends EditableInfo {
                 startTestLatch.countDown();
             }
         };
-        initApplyButton(buttonCallback);
+        if (getResourceAgent().isGroup()) {
+            initApplyButton(buttonCallback,
+                            Tools.getString("Browser.ApplyGroup"));
+        } else {
+            initApplyButton(buttonCallback);
+        }
         if (ci != null) {
             ci.setApplyButton(getApplyButton());
             ci.setRevertButton(getRevertButton());

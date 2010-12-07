@@ -1119,8 +1119,14 @@ public class TextResource extends
         {"Browser.ApplyResource",
          "Apply"},
 
+        {"Browser.ApplyGroup",
+         "Apply Grp"},
+
         {"Browser.CommitResources",
-         "Commit"},
+         "Commit All"},
+
+        {"Browser.ApplyDRBDResource",
+         "Apply"},
 
         {"Browser.RevertResource",
          "Revert"},

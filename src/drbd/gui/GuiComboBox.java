@@ -1434,10 +1434,13 @@ public class GuiComboBox extends JPanel {
             if (label != null) {
                 Tools.debug(this, "changed label: " + labelText + " != "
                                    + savedLabel, 1);
+                Tools.debug(this, "changed: " + value + " != "
+                                         + savedValue, 1);
                 /*
                    Tools.printStackTrace("changed: " + value + " != "
                                          + savedValue);
-                */
+                   */
+                
                 label.setForeground(CHANGED_VALUE_COLOR);
             }
         } else if (Tools.areEqual(value, defaultValue)

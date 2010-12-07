@@ -53,6 +53,7 @@ public class AddDrbdConfigDialog {
      */
     public final void showDialogs() {
         DrbdConfig dialog = new Resource(null, dri);
+        dri.setDialogStarted(true);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
@@ -61,12 +62,14 @@ public class AddDrbdConfigDialog {
                 canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 dri.getBrowser().reloadAllComboBoxes(null);
+                dri.setDialogStarted(false);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
+        dri.setDialogStarted(false);
         dri.getBrowser().reloadAllComboBoxes(null);
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();

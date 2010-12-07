@@ -1951,7 +1951,7 @@ public final class Tools {
             if (o2 instanceof Info) {
                 return s1.equals(((Info) o2).getStringValue());
             } else {
-                return s1.equals(o2);
+                return s1.equals(o2) || o1.toString().equals(o2);
             }
         } else if (o2 != null && o2 instanceof Info) {
             final String s2 = ((Info) o2).getStringValue();
@@ -1964,7 +1964,7 @@ public final class Tools {
             if (o1 instanceof Info) {
                 return s2.equals(((Info) o1).getStringValue());
             } else {
-                return s2.equals(o1);
+                return s2.equals(o1) || o2.toString().equals(o1);
             }
         } else if (o1 == null && o2 != null) {
             return o2.toString().equals("");

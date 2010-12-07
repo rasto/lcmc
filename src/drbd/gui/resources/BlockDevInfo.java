@@ -794,6 +794,7 @@ public class BlockDevInfo extends EditableInfo {
             getBrowser().getDrbdVIPortList().remove(
                                getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
 
+            getBlockDevice().setNew(false);
             storeComboBoxValues(params);
 
             getBrowser().getDrbdVIPortList().add(
@@ -806,7 +807,10 @@ public class BlockDevInfo extends EditableInfo {
                                         ((BlockDevInfo) o).getBlockDevice();
                 getBlockDevice().setMetaDisk(metaDisk);
             }
-            checkResourceFieldsChanged(null, params);
+            final DrbdResourceInfo dri = drbdResourceInfo;
+            if (dri != null) {
+                dri.getDrbdInfo().setAllApplyButtons();
+            }
         }
     }
 
@@ -1738,6 +1742,7 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Sets stored parameters. */
     public final void setParameters(final String resName) {
+        getBlockDevice().setNew(false);
         final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
         final String hostName = getHost().getName();
         final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
@@ -1775,5 +1780,68 @@ public class BlockDevInfo extends EditableInfo {
                 }
             }
         }
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        return checkResourceFieldsChanged(param, params, false, false);
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public boolean checkResourceFieldsChanged(
+                                          final String param,
+                                          final String[] params,
+                                          final boolean fromDrbdInfo,
+                                          final boolean fromDrbdResourceInfo) {
+        final DrbdResourceInfo dri = getDrbdResourceInfo();
+        if (dri != null && !fromDrbdResourceInfo) {
+            if (!fromDrbdInfo) {
+                dri.setApplyButtons(null, dri.getParametersFromXML());
+            }
+            //return dri.checkResourceFieldsChanged(param,
+            //                                      dri.getParametersFromXML(),
+            //                                      fromDrbdInfo);
+        }
+        return super.checkResourceFieldsChanged(param, params);
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false, false);
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(
+                                          final String param,
+                                          final String[] params,
+                                          final boolean fromDrbdInfo,
+                                          final boolean fromDrbdResourceInfo) {
+        //final DrbdResourceInfo dri = getDrbdResourceInfo();
+        //if (!fromDrbdResourceInfo && dri != null) {
+        //    return dri.checkResourceFieldsCorrect(param,
+        //                                          dri.getParametersFromXML(),
+        //                                          fromDrbdInfo);
+        //}
+        return super.checkResourceFieldsCorrect(param, params);
     }
 }

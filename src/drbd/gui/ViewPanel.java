@@ -175,8 +175,12 @@ public class ViewPanel extends JPanel {
                     //        && path[1].toString().equals(
                     //              Tools.getString("ClusterBrowser.Drbd")))) {
                         final TreePath tp = new TreePath(path);
-                        tree.expandPath(tp);
-                        tree.setSelectionPath(tp);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                tree.expandPath(tp);
+                                tree.setSelectionPath(tp);
+                            }
+                        });
                     //}
                 }
             }

@@ -762,8 +762,24 @@ public class DrbdResourceInfo extends EditableInfo
             getBrowser().getDrbdDevHash().put(drbdDevStr, this);
             getBrowser().getDrbdGraph().repaint();
             getDrbdResource().setCommited(true);
-            checkResourceFieldsChanged(null, params);
+            getDrbdInfo().setAllApplyButtons();
         }
+    }
+
+    /** Set all apply buttons. */
+    public final void setAllApplyButtons() {
+        final BlockDevInfo bdi1 = blockDevInfo1;
+        if (bdi1 != null) {
+            bdi1.storeComboBoxValues(bdi1.getParametersFromXML());
+            bdi1.setApplyButtons(null, bdi1.getParametersFromXML());
+        }
+
+        final BlockDevInfo bdi2 = blockDevInfo2;
+        if (bdi2 != null) {
+            bdi2.storeComboBoxValues(bdi2.getParametersFromXML());
+            bdi2.setApplyButtons(null, bdi2.getParametersFromXML());
+        }
+        setApplyButtons(null, getParametersFromXML());
     }
 
     /**
@@ -830,7 +846,8 @@ public class DrbdResourceInfo extends EditableInfo
                 startTestLatch.countDown();
             }
         };
-        initApplyButton(buttonCallback);
+        initApplyButton(buttonCallback,
+                        Tools.getString("Browser.ApplyDRBDResource"));
 
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
@@ -1512,5 +1529,128 @@ public class DrbdResourceInfo extends EditableInfo
                 }
             }
         }
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        return checkResourceFieldsChanged(param, params, false);
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params,
+                                              final boolean fromDrbdInfo) {
+        final DrbdInfo di = getDrbdInfo();
+        if (di != null && !fromDrbdInfo) {
+            di.setApplyButtons(null, di.getParametersFromXML());
+            //return di.checkResourceFieldsChanged(param,
+            //                                     di.getParametersFromXML());
+        }
+        boolean changed = false;
+        final BlockDevInfo bdi1 = blockDevInfo1;
+        if (bdi1 != null) {
+            if (bdi1.checkResourceFieldsChanged(param,
+                                               bdi1.getParametersFromXML(),
+                                               fromDrbdInfo,
+                                               true)) {
+                changed = true;
+            }
+        }
+
+        final BlockDevInfo bdi2 = blockDevInfo2;
+        if (bdi2 != null) {
+            if (bdi2.checkResourceFieldsChanged(param,
+                                                bdi2.getParametersFromXML(),
+                                                fromDrbdInfo,
+                                                true)) {
+                changed = true;
+            }
+        }
+        return super.checkResourceFieldsChanged(param, params) || changed;
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false);
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params,
+                                              final boolean fromDrbdInfo) {
+        final DrbdInfo di = getDrbdInfo();
+        //if (!fromDrbdInfo && di != null) {
+        //    di.setApplyButtons(null, di.getParametersFromXML());
+        //    //return di.checkResourceFieldsCorrect(param,
+        //    //                                     di.getParametersFromXML(),
+        //    //                                     fromDrbdInfo);
+        //}
+        boolean correct = true;
+        final BlockDevInfo bdi1 = blockDevInfo1;
+        if (bdi1 != null && !bdi1.getBlockDevice().isNew()) {
+            if (!bdi1.checkResourceFieldsCorrect(param,
+                                                 bdi1.getParametersFromXML(),
+                                                 fromDrbdInfo,
+                                                 true)) {
+                correct = false;
+            }
+        }
+
+        final BlockDevInfo bdi2 = blockDevInfo2;
+        if (bdi2 != null && !bdi2.getBlockDevice().isNew()) {
+            if (!bdi2.checkResourceFieldsCorrect(param,
+                                                 bdi2.getParametersFromXML(),
+                                                 fromDrbdInfo,
+                                                 true)) {
+                correct = false;
+            }
+        }
+        return super.checkResourceFieldsCorrect(param, params) && correct;
+    }
+
+    /** Revert all values. */
+    public final void revert() {
+        super.revert();
+        final BlockDevInfo bdi1 = blockDevInfo1;
+        if (bdi1 != null) {
+            bdi1.revert();
+        }
+        final BlockDevInfo bdi2 = blockDevInfo2;
+        if (bdi2 != null) {
+            bdi2.revert();
+        }
+    }
+
+    /** Sets if dialog was started. It disables the apply button. */
+    public final void setDialogStarted(final boolean dialogStarted) {
+        final BlockDevInfo bdi1 = blockDevInfo1;
+        if (bdi1 != null) {
+            bdi1.setDialogStarted(dialogStarted);
+        }
+        final BlockDevInfo bdi2 = blockDevInfo2;
+        if (bdi2 != null) {
+            bdi2.setDialogStarted(dialogStarted);
+        }
+        super.setDialogStarted(dialogStarted);
     }
 }
