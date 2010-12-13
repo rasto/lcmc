@@ -48,6 +48,7 @@ public class AddVMConfigDialog {
 
     /** Shows step by step dialogs that add and configure new vm domain. */
     public final void showDialogs() {
+        vmsVirtualDomainInfo.setDialogStarted(true);
         VMConfig dialog = new Domain(null, vmsVirtualDomainInfo);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
@@ -57,12 +58,14 @@ public class AddVMConfigDialog {
                 canceled = true;
                 vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
                 vmsVirtualDomainInfo.removeMyself(false);
+                vmsVirtualDomainInfo.setDialogStarted(false);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
+        vmsVirtualDomainInfo.setDialogStarted(false);
         vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();

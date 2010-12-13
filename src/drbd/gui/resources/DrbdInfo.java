@@ -814,13 +814,15 @@ public class DrbdInfo extends EditableInfo {
         boolean changed = false;
         final Map<String, DrbdResourceInfo> drbdResHash =
                                                 getBrowser().getDrbdResHash();
-        for (final String res : drbdResHash.keySet()) {
-            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
-            if (drbdRes.checkResourceFieldsChanged(
+        if (drbdResHash != null) {
+            for (final String res : drbdResHash.keySet()) {
+                final DrbdResourceInfo drbdRes = drbdResHash.get(res);
+                if (drbdRes.checkResourceFieldsChanged(
                                                param,
                                                drbdRes.getParametersFromXML(),
                                                true)) {
-                changed = true;
+                    changed = true;
+                }
             }
         }
         return super.checkResourceFieldsChanged(param, params) || changed;

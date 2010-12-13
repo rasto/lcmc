@@ -560,4 +560,69 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             paramCB.setValue(name);
         }
     }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. Don't check the invisible for the type parameters.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
+        return checkResourceFieldsChanged(param, params, false);
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. Don't check the invisible for the type parameters.
+     */
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params,
+                                              final boolean fromDomain) {
+        final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
+        if (!fromDomain && vdi != null) {
+            vdi.setApplyButtons(null, vdi.getParametersFromXML());
+        }
+        String[] parameters;
+        if (params == null || params.length == 1) {
+            /* just one param */
+            parameters = params;
+        } else {
+            parameters = getRealParametersFromXML();
+        }
+        return super.checkResourceFieldsChanged(param, parameters);
+    }
+
+    /** Returns whether all the parameters are correct. */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
+        return checkResourceFieldsCorrect(param, params, false);
+    }
+
+    /** Returns whether all the parameters are correct. */
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params,
+                                              final boolean fromDomain) {
+        final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
+        if (!fromDomain && vdi != null) {
+            vdi.setApplyButtons(null, vdi.getParametersFromXML());
+        }
+        String[] parameters;
+        if (params == null || params.length == 1) {
+            /* just one param */
+            parameters = params;
+        } else {
+            parameters = getRealParametersFromXML();
+        }
+        return super.checkResourceFieldsCorrect(param, parameters);
+    }
+
+    /** Checks one parameter. */
+    protected final void checkOneParam(final String param) {
+        checkResourceFieldsCorrect(param, new String[]{param}, true);
+    }
+
+    /** Returns parameters. */
+    public String[] getRealParametersFromXML() {
+        return getParametersFromXML();
+    }
+
 }

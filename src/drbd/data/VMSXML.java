@@ -512,15 +512,15 @@ public class VMSXML extends XML {
     }
 
     /** Modify xml of the domain. */
-    public final void modifyDomainXML(final String domainName,
+    public final Node modifyDomainXML(final String domainName,
                                       final Map<String, String> parametersMap) {
         final String configName = namesConfigsMap.get(domainName);
         if (configName == null) {
-            return;
+            return null;
         }
         final Node domainNode = getDomainNode(domainName);
         if (domainNode == null) {
-            return;
+            return null;
         }
         final XPath xpath = XPathFactory.newInstance().newXPath();
         final Map<String, String> paths = new HashMap<String, String>();
@@ -564,9 +564,9 @@ public class VMSXML extends XML {
             }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
-            return;
+            return null;
         }
-        saveAndDefine(domainNode, domainName);
+        return domainNode;
     }
 
     /** Modify xml of some device element. */

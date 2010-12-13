@@ -859,7 +859,7 @@ public abstract class EditableInfo extends Info {
     //}
 
     /** Checks one parameter. */
-    protected final void checkOneParam(final String param) {
+    protected void checkOneParam(final String param) {
         checkResourceFieldsCorrect(param, new String[]{param});
     }
 

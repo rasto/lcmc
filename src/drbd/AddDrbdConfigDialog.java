@@ -52,8 +52,8 @@ public class AddDrbdConfigDialog {
      * Shows step by step dialogs that add and configure new drbd resource.
      */
     public final void showDialogs() {
-        DrbdConfig dialog = new Resource(null, dri);
         dri.setDialogStarted(true);
+        DrbdConfig dialog = new Resource(null, dri);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();

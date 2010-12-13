@@ -72,6 +72,8 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     /** Readonly combo box. */
     private Map<String, GuiComboBox> readonlyCB =
                                             new HashMap<String, GuiComboBox>();
+    /** Previous target bus value. */
+    private String prevTargetBus = null;
     /** Parameters. */
     private static final String[] PARAMETERS = {DiskData.TYPE,
                                                 DiskData.TARGET_BUS_TYPE,
@@ -259,6 +261,15 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         return PARAMETERS;
     }
 
+    /** Returns real parameters. */
+    public String[] getRealParametersFromXML() {
+        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
+            return BLOCK_PARAMETERS;
+        } else {
+            return FILE_PARAMETERS;
+        }
+    }
+
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
         if (DiskData.SOURCE_FILE.equals(param)) {
@@ -343,12 +354,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Returns device parameters. */
     protected final Map<String, String> getHWParametersAndSave() {
-        String[] params;
-        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
-            params = BLOCK_PARAMETERS;
-        } else {
-            params = FILE_PARAMETERS;
-        }
+        final String[] params = getRealParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
         String type = null;
         for (final String param : params) {
@@ -387,12 +393,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             }
         });
         final Map<String, String> parameters = getHWParametersAndSave();
-        String[] params;
-        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
-            params = BLOCK_PARAMETERS;
-        } else {
-            params = FILE_PARAMETERS;
-        }
+        final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -452,7 +453,6 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
-
     /** Returns true if the value of the parameter is ok. */
     protected final boolean checkParam(final String param,
                                        final String newValue) {
@@ -493,10 +493,19 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             } else if (devices.size() > 1) {
                 selected = devices.toArray(new String[devices.size()])[1];
             }
-            for (final String p : targetDeviceCB.keySet()) {
-                targetDeviceCB.get(p).reloadComboBox(
-                            selected,
-                            devices.toArray(new String[devices.size()]));
+            if (prevTargetBus == null
+                || !prevTargetBus.equals(selected)) {
+                final String sel = selected;
+                for (final String p : targetDeviceCB.keySet()) {
+                    //SwingUtilities.invokeLater(new Runnable() {
+                    //    public void run() {
+                            targetDeviceCB.get(p).reloadComboBox(
+                                sel,
+                                devices.toArray(new String[devices.size()]));
+                    //    }
+                    //});
+                }
+                prevTargetBus = selected;
             }
             if (getParamSaved(DiskData.DRIVER_NAME) == null) {
                 if ("ide/cdrom".equals(newValue)) {
@@ -732,19 +741,6 @@ public class VMSDiskInfo extends VMSHardwareInfo {
             }
         });
         return newBtn;
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. Don't check the invisible for the type parameters.
-     */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
-            return super.checkResourceFieldsChanged(param, BLOCK_PARAMETERS);
-        } else {
-            return super.checkResourceFieldsChanged(param, FILE_PARAMETERS);
-        }
     }
 
     /** Returns the regexp of the parameter. */

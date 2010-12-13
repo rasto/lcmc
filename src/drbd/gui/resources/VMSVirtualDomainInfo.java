@@ -2985,11 +2985,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     final Map<VMSHardwareInfo, Map<String, String>> allHWP =
                                                           getAllHWParameters();
                     for (final VMSHardwareInfo hi : allHWP.keySet()) {
-                        hi.modifyXML(vmsxml,
-                                     domainNode,
-                                     getDomainName(),
-                                     allHWP.get(hi));
-                        hi.getResource().setNew(false);
+                        if (hi.checkResourceFieldsChanged(
+                                                null,
+                                                hi.getRealParametersFromXML(),
+                                                true)) {
+                            hi.modifyXML(vmsxml,
+                                         domainNode,
+                                         getDomainName(),
+                                         allHWP.get(hi));
+                            hi.getResource().setNew(false);
+                        }
                     }
                     vmsxml.saveAndDefine(domainNode, getDomainName());
                 } else {
@@ -2998,23 +3003,34 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                         vmsxml = new VMSXML(host);
                         getBrowser().vmsXMLPut(host, vmsxml);
                     }
+                    Node domainNode;
                     if (vmsxml.getDomainNames().contains(getDomainName())) {
-                        vmsxml.modifyDomainXML(getDomainName(), parameters);
-                    } else {
-                        final Node domainNode =
-                                     vmsxml.createDomainXML(getDomainName(),
+                        domainNode = vmsxml.modifyDomainXML(getDomainName(),
                                                             parameters);
-                        final Map<VMSHardwareInfo, Map<String, String>> allHWP =
-                                                          getAllHWParameters();
-                        for (final VMSHardwareInfo hi : allHWP.keySet()) {
-                            hi.modifyXML(vmsxml,
-                                         domainNode,
-                                         getDomainName(),
-                                         allHWP.get(hi));
-                            hi.getResource().setNew(false);
-                            hi.checkResourceFieldsChanged(
-                                                   null,
-                                                   hi.getParametersFromXML());
+                    } else {
+                        domainNode = vmsxml.createDomainXML(getDomainName(),
+                                                            parameters);
+                    }
+                    if (domainNode != null) {
+                        final Enumeration eee = getNode().children();
+                        while (eee.hasMoreElements()) {
+                            final DefaultMutableTreeNode node =
+                                    (DefaultMutableTreeNode) eee.nextElement();
+                            final VMSHardwareInfo vmshi =
+                                       (VMSHardwareInfo) node.getUserObject();
+                            if (vmshi.checkResourceFieldsChanged(
+                                            null,
+                                            vmshi.getRealParametersFromXML(),
+                                            true)) {
+                                vmshi.modifyXML(vmsxml,
+                                                domainNode,
+                                                getDomainName(),
+                                                vmshi.getHWParametersAndSave());
+                                vmshi.getResource().setNew(false);
+                                vmshi.setApplyButtons(
+                                            null,
+                                            vmshi.getRealParametersFromXML());
+                            }
                         }
                         vmsxml.saveAndDefine(domainNode, getDomainName());
                     }
@@ -4058,8 +4074,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 changed = true;
             }
         }
-        final boolean ch =  changed
-                            || super.checkResourceFieldsChanged(param, params);
+        final Enumeration eee = getNode().children();
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                        (DefaultMutableTreeNode) eee.nextElement();
+            final VMSHardwareInfo vmshi =
+                            (VMSHardwareInfo) node.getUserObject();
+            if (vmshi.checkResourceFieldsChanged(
+                                             null,
+                                             vmshi.getRealParametersFromXML(),
+                                             true)) {
+                changed = true;
+            }
+        }
+        final boolean ch = super.checkResourceFieldsChanged(param, params)
+                           || changed;
         return ch;
     }
 
@@ -4095,6 +4124,19 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         if (!cor) {
             for (final String key : definedOnHostComboBoxHash.keySet()) {
                 definedOnHostComboBoxHash.get(key).wrongValue();
+            }
+        }
+        final Enumeration eee = getNode().children();
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                        (DefaultMutableTreeNode) eee.nextElement();
+            final VMSHardwareInfo vmshi =
+                            (VMSHardwareInfo) node.getUserObject();
+            if (!vmshi.checkResourceFieldsCorrect(
+                                              null,
+                                              vmshi.getRealParametersFromXML(),
+                                              true)) {
+                cor = false;
             }
         }
         return super.checkResourceFieldsCorrect(null, params) && cor;
@@ -4335,6 +4377,19 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 savedValue = DEFINED_ON_HOST_FALSE;
             }
             hostCB.setValue(savedValue);
+        }
+        final Enumeration eee = getNode().children();
+        while (eee.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                        (DefaultMutableTreeNode) eee.nextElement();
+            final VMSHardwareInfo vmshi =
+                            (VMSHardwareInfo) node.getUserObject();
+            if (vmshi.checkResourceFieldsChanged(
+                                             null,
+                                             vmshi.getRealParametersFromXML(),
+                                             true)) {
+                vmshi.revert();
+            }
         }
         super.revert();
     }

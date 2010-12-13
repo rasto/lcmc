@@ -1186,17 +1186,20 @@ public class GroupInfo extends ServiceInfo {
                                                        fromServicesInfo,
                                                        fromCloneInfo,
                                                        true);
-        final Enumeration e = getNode().children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                                  (DefaultMutableTreeNode) e.nextElement();
-            final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-            if (!gsi.checkResourceFieldsCorrect(null,
-                                                gsi.getParametersFromXML(),
-                                                fromServicesInfo,
-                                                fromCloneInfo,
-                                                true)) {
-                cor = false;
+        final DefaultMutableTreeNode gn = getNode();
+        if (gn != null) {
+            final Enumeration e = gn.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
+                if (!gsi.checkResourceFieldsCorrect(null,
+                                                    gsi.getParametersFromXML(),
+                                                    fromServicesInfo,
+                                                    fromCloneInfo,
+                                                    true)) {
+                    cor = false;
+                }
             }
         }
         return cor;

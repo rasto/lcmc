@@ -267,12 +267,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns device parameters. */
     protected final Map<String, String> getHWParametersAndSave() {
-        String[] params;
-        if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
-            params = NETWORK_PARAMETERS;
-        } else {
-            params = BRIDGE_PARAMETERS;
-        }
+        final String[] params = getRealParametersFromXML();
 
         final Map<String, String> parameters = new HashMap<String, String>();
         String type = null;
@@ -312,12 +307,7 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         });
 
         final Map<String, String> parameters = getHWParametersAndSave();
-        String[] params;
-        if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
-            params = NETWORK_PARAMETERS;
-        } else {
-            params = BRIDGE_PARAMETERS;
-        }
+        final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -534,16 +524,12 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
         return newBtn;
     }
 
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. Don't check the invisible for the type parameters.
-     */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
+    /** Returns real parameters. */
+    public String[] getRealParametersFromXML() {
         if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
-            return super.checkResourceFieldsChanged(param, NETWORK_PARAMETERS);
+            return NETWORK_PARAMETERS;
         } else {
-            return super.checkResourceFieldsChanged(param, BRIDGE_PARAMETERS);
+            return BRIDGE_PARAMETERS;
         }
     }
 }

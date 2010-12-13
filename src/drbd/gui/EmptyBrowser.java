@@ -29,6 +29,7 @@ import drbd.gui.resources.AllHostsInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -108,18 +109,23 @@ public class EmptyBrowser extends Browser {
      */
     public final void updateHosts(final JTree treeMenu) {
         this.treeMenu = treeMenu;
-        DefaultMutableTreeNode resource;
 
         /* all hosts */
         final Host[] allHosts =
                               Tools.getConfigData().getHosts().getHostsArray();
-        allHostsNode.removeAllChildren();
-        for (Host host : allHosts) {
-            final HostBrowser hostBrowser = host.getBrowser();
-            resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
-            //setNode(resource);
-            allHostsNode.add(resource);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                DefaultMutableTreeNode resource;
+                allHostsNode.removeAllChildren();
+                for (Host host : allHosts) {
+                    final HostBrowser hostBrowser = host.getBrowser();
+                    resource = new DefaultMutableTreeNode(
+                                                    hostBrowser.getHostInfo());
+                    //setNode(resource);
+                    allHostsNode.add(resource);
+                }
+            }
+        });
         reload(allHostsNode, false);
     }
 }

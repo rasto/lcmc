@@ -342,12 +342,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
             }
         });
         final Map<String, String> parameters = getHWParametersAndSave();
-        String[] params = {};
-        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
-            params = VNC_PARAMETERS;
-        } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {
-            params = SDL_PARAMETERS;
-        }
+        final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -553,20 +548,6 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
         return paramCB;
     }
 
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. Don't check the invisible for the type parameters.
-     */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
-            return super.checkResourceFieldsChanged(param, VNC_PARAMETERS);
-        } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {
-            return super.checkResourceFieldsChanged(param, SDL_PARAMETERS);
-        }
-        return false;
-    }
-
     /** Modify device xml. */
     protected final void modifyXML(final VMSXML vmsxml,
                                    final Node node,
@@ -575,5 +556,15 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
         if (vmsxml != null) {
             vmsxml.modifyGraphicsXML(node, domainName, params);
         }
+    }
+
+    /** Returns real parameters. */
+    public String[] getRealParametersFromXML() {
+        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
+            return VNC_PARAMETERS;
+        } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {
+            return SDL_PARAMETERS;
+        }
+        return null;
     }
 }

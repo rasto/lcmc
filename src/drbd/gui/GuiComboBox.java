@@ -486,6 +486,27 @@ public class GuiComboBox extends JPanel {
         });
         return cb;
     }
+    /** Returns true if combo box has changed. */
+    private boolean comboBoxChanged(final String selectedValue,
+                                    final Object[] items) {
+        final JComboBox cb = (JComboBox) component;
+        if (items.length != cb.getItemCount()) {
+            return true;
+        }
+
+        for (int i = 0; i < items.length; i++) {
+            Object item;
+            if (items[i] == null) {
+                item = GuiComboBox.NOTHING_SELECTED;
+            } else {
+                item = items[i];
+            }
+            if (!Tools.areEqual(item, cb.getItemAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /** Reloads combo box with items and selects supplied value. */
     public final void reloadComboBox(final String selectedValue,
@@ -493,25 +514,40 @@ public class GuiComboBox extends JPanel {
         if (type != Type.COMBOBOX) {
             return;
         }
+        final JComboBox cb = (JComboBox) component;
+        final Object selectedItem = cb.getSelectedItem();
+        boolean selectedChanged = false;
+        if (selectedValue == null
+            && (selectedItem != null
+                 && selectedItem != GuiComboBox.NOTHING_SELECTED)) {
+            selectedChanged = true;
+        } else if (!selectedValue.equals(selectedItem)) {
+            selectedChanged = true;
+        }
+        final boolean itemsChanged = comboBoxChanged(selectedValue, items);
+        if (!selectedChanged && !itemsChanged) {
+            return;
+        }
 
         component.setPreferredSize(null);
         /* removing dupicates */
-        final HashSet<String> itemCache = new HashSet<String>();
 
         final List<Object> comboList = new ArrayList<Object>();
         final Object selectedValueInfo = addItems(comboList,
                                                   selectedValue,
                                                   items);
 
-        final JComboBox cb = (JComboBox) component;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                cb.setSelectedIndex(-1);
-                cb.removeAllItems();
-                for (final Object item : comboList) {
-                    if (!itemCache.contains(item.toString())) {
-                        cb.addItem(item);
-                        itemCache.add(item.toString());
+                if (itemsChanged) {
+                    final HashSet<String> itemCache = new HashSet<String>();
+                    cb.setSelectedIndex(-1);
+                    cb.removeAllItems();
+                    for (final Object item : comboList) {
+                        if (!itemCache.contains(item.toString())) {
+                            cb.addItem(item);
+                            itemCache.add(item.toString());
+                        }
                     }
                 }
                 if (selectedValueInfo != null) {
