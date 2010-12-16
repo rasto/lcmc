@@ -814,17 +814,23 @@ public class Info implements Comparable {
         }
 
         if (actionMenuList != null) {
+            final List<UpdatableItem> actionMenuListCopy =
+                                                new ArrayList<UpdatableItem>();
             try {
                 mActionMenuListLock.acquire();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             for (final UpdatableItem i : actionMenuList) {
-                i.setPos(pos);
-                i.update();
+                actionMenuListCopy.add(i);
             }
             final int aSize = actionMenuList.size();
             mActionMenuListLock.release();
+
+            for (final UpdatableItem i : actionMenuListCopy) {
+                i.setPos(pos);
+                i.update();
+            }
             if (aSize > maxMenuList) {
                 maxMenuList = aSize;
                 Tools.debug(this, "action menu list size: " + maxMenuList, 2);
