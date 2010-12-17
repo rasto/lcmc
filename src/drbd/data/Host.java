@@ -194,6 +194,8 @@ public class Host implements Serializable {
     private HostBrowser browser;
     /** A gate that is used to synchronize the loading sequence. */
     private CountDownLatch isLoadingGate;
+    /** A gate that waits for server status. */
+    private final CountDownLatch serverStatusLatch = new CountDownLatch(1);
     /** List of gui elements that are to be enabled if the host is connected.*/
     private final List<JComponent> enableOnConnectList =
                                                    new ArrayList<JComponent>();
@@ -2258,6 +2260,25 @@ public class Host implements Serializable {
      */
     public final void setLoadingError() {
         isLoadingGate.countDown();
+    }
+
+    /** Waits for the server status latch. */
+    public final void waitForServerStatusLatch() {
+        try {
+            serverStatusLatch.await();
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /** The latch is set when the server status is run for the first time. */
+    public final void serverStatusLatchDone() {
+        serverStatusLatch.countDown();
+    }
+
+    /** Returns true if latch is set. */
+    public final boolean isServerStatusLatch() {
+        return serverStatusLatch.getCount() == 1;
     }
 
     /** Returns ssh port. */

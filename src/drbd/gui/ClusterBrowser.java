@@ -72,7 +72,9 @@ import drbd.utilities.ButtonCallback;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -552,7 +554,6 @@ public class ClusterBrowser extends Browser {
             setNode(vmsNode);
             topAdd(vmsNode);
             reload(getTreeTop(), true);
-            reload(servicesNode, true);
         }
     }
 
@@ -688,6 +689,22 @@ public class ClusterBrowser extends Browser {
      * Starts everything.
      */
     private void updateHeartbeatDrbdThread() {
+        final Thread tt = new Thread(new Runnable() {
+            public void run() {
+                final Host[] hosts = cluster.getHostsArray();
+                for (final Host host : hosts) {
+                    host.waitForServerStatusLatch();
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getClusterViewPanel().setDisabledDuringLoad(
+                                                                false);
+                        reload(getServicesNode(), true);
+                    }
+                });
+            }
+        });
+        tt.start();
         final Runnable runnable = new Runnable() {
             public void run() {
                 Host firstHost = null;
@@ -790,45 +807,45 @@ public class ClusterBrowser extends Browser {
         final String hostName = host.getName();
         final CategoryInfo[] infosToUpdate =
                                         new CategoryInfo[]{clusterHostsInfo};
-        boolean firstTime = true;
         long count = 0;
         while (true) {
-            if (firstTime) {
+            if (host.isServerStatusLatch()) {
                 Tools.startProgressIndicator(hostName,
                                              ": updating server info...");
             }
 
             host.setIsLoading();
-            if (firstTime || count % 5 == 0) {
+            if (host.isServerStatusLatch() || count % 5 == 0) {
                 host.getHWInfo(infosToUpdate);
             } else {
                 host.getHWInfoLazy(infosToUpdate);
             }
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
-            if (firstTime) {
+            if (host.isServerStatusLatch()) {
                 Tools.stopProgressIndicator(hostName,
                                              ": updating server info...");
                 Tools.startProgressIndicator(hostName,
                                              ": updating VMs status...");
             }
             periodicalVMSUpdate(host);
-            if (firstTime) {
+            if (host.isServerStatusLatch()) {
                 Tools.stopProgressIndicator(hostName,
                                              ": updating VMs status...");
+
             }
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
-                        drbdGraph.scale();
+                        drbdGraph.scale(); // TODO: ?
                     }
                 });
+            host.serverStatusLatchDone();
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-            firstTime = false;
             count++;
             if (!serverStatus) {
                 break;
@@ -1441,6 +1458,7 @@ public class ClusterBrowser extends Browser {
                                     new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         addVMSNode();
+
         if (vmsNode != null) {
             final Enumeration ee = vmsNode.children();
             while (ee.hasMoreElements()) {
@@ -1519,6 +1537,8 @@ public class ClusterBrowser extends Browser {
         final DrbdXML dxml = drbdXML;
         final String[] drbdResources = dxml.getResources();
         final boolean testOnly = false;
+        final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
+        boolean atLeastOneAdded = false;
         for (int i = 0; i < drbdResources.length; i++) {
             final String resName = drbdResources[i];
             final String drbdDev = dxml.getDrbdDevice(resName);
@@ -1547,29 +1567,6 @@ public class ClusterBrowser extends Browser {
                     }
                 }
                 bdi.setParameters(resName);
-                //bdi.getBlockDevice().setValue(
-                //                      "DrbdNetInterfacePort",
-                //                      dxml.getVirtualInterfacePort(hostName,
-                //                                                   resName));
-                //bdi.getBlockDevice().setValue(
-                //                          "DrbdNetInterface",
-                //                          dxml.getVirtualInterface(hostName,
-                //                                                   resName));
-                //final String drbdMetaDisk = dxml.getMetaDisk(hostName,
-                //                                             resName);
-                //bdi.getBlockDevice().setValue("DrbdMetaDisk", drbdMetaDisk);
-                //bdi.getBlockDevice().setValue(
-                //                            "DrbdMetaDiskIndex",
-                //                            dxml.getMetaDiskIndex(hostName,
-                //                                                  resName));
-                //if (!"internal".equals(drbdMetaDisk)) {
-                //    final BlockDevInfo mdI =
-                //                      drbdGraph.findBlockDevInfo(hostName,
-                //                                                 drbdMetaDisk);
-                //    if (mdI != null) {
-                //        bdi.getBlockDevice().setMetaDisk(mdI.getBlockDevice());
-                //    }
-                //}
                 if (bd1 == null) {
                     bd1 = bdi;
                 } else {
@@ -1578,17 +1575,26 @@ public class ClusterBrowser extends Browser {
             }
             if (bd1 != null
                 && bd2 != null) {
-                final boolean added = drbdGraph.getDrbdInfo().addDrbdResource(
-                                                                     resName,
-                                                                     drbdDev,
-                                                                     bd1,
-                                                                     bd2,
-                                                                     false,
-                                                                     testOnly);
-                if (!added) {
+                final boolean added = drbdInfo.addDrbdResource(resName,
+                                                               drbdDev,
+                                                               bd1,
+                                                               bd2,
+                                                               false,
+                                                               testOnly);
+                if (added) {
+                    atLeastOneAdded = true;
+                } else {
                     bd1.getDrbdResourceInfo().setParameters();
                 }
             }
+        }
+        if (atLeastOneAdded) {
+            drbdInfo.getInfoPanel();
+            Tools.invokeAndWait(new Runnable() {
+                public void run() {
+                    drbdInfo.setAllApplyButtons();
+                }
+            });
         }
     }
 

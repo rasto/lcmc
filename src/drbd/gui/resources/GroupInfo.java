@@ -307,6 +307,9 @@ public class GroupInfo extends ServiceInfo {
                 }
             }
         }
+        if (!testOnly) {
+            setApplyButtons(null, params);
+        }
         getBrowser().getHeartbeatGraph().repaint();
     }
 

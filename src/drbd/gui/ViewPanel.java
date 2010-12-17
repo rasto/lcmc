@@ -69,6 +69,8 @@ public class ViewPanel extends JPanel {
     private static final Dimension MENU_TREE_SIZE = new Dimension(400, 200);
     /** Location of the divider in the split pane. */
     private static final int DIVIDER_LOCATION   = 200;
+    /** Disabled during load. It disables the menu expanding.*/
+    private volatile boolean disabledDuringLoad = true;
 
     /**
      * Prepares a new <code>ViewPanel</code> object.
@@ -148,7 +150,9 @@ public class ViewPanel extends JPanel {
         tree.getModel().addTreeModelListener(
             new TreeModelListener() {
                 public void treeNodesChanged(final TreeModelEvent e) {
-                    setRightComponentInView(tree, viewSP, browser);
+                    if (!disabledDuringLoad) {
+                        setRightComponentInView(tree, viewSP, browser);
+                    }
                 }
 
                 public void treeNodesInserted(final TreeModelEvent e) {
@@ -161,19 +165,13 @@ public class ViewPanel extends JPanel {
 
                 public void treeStructureChanged(final TreeModelEvent e) {
                     final Object[] path = e.getPath();
-                    /* expand the tree if an item was added */
-                    //if ((path.length > 2
-                    //     && path[2].toString().equals(
-                    //             Tools.getString("ClusterBrowser.Services")))
-                    //    || (path.length > 1
-                    //        && path[1].toString().equals(
-                    //             Tools.getString("ClusterBrowser.AllHosts")))
-                    //    || (path.length > 1
-                    //        && path[1].toString().equals(
-                    //                  Tools.getString("ClusterBrowser.VMs")))
-                    //    || (path.length > 1
-                    //        && path[1].toString().equals(
-                    //              Tools.getString("ClusterBrowser.Drbd")))) {
+                    if (!disabledDuringLoad
+                        || (path.length == 2
+                            && path[1].toString().equals(
+                                Tools.getString("ClusterBrowser.AllHosts")))
+                        || (path.length == 3
+                            && path[2].toString().equals(
+                                Tools.getString("ClusterBrowser.Services")))) {
                         final TreePath tp = new TreePath(path);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -181,11 +179,16 @@ public class ViewPanel extends JPanel {
                                 tree.setSelectionPath(tp);
                             }
                         });
-                    //}
+                    }
                 }
             }
         );
         return tree;
+    }
+
+    /** Sets if expanding of paths should be disabled during the initial load.*/
+    public final void setDisabledDuringLoad(final boolean disabledDuringLoad) {
+        this.disabledDuringLoad = disabledDuringLoad;
     }
 
     /**

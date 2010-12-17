@@ -584,16 +584,9 @@ public class DrbdXML extends XML {
     /**
      * Parses the global node in the drbd config.
      */
-    private void parseConfigGlobalNode(final Node globalNode) {
-        Map<String, String> nameValueMap =
-                                optionsMap.get("global");
-        if (nameValueMap == null) {
-            nameValueMap = new HashMap<String, String>();
-        }
+    private void parseConfigGlobalNode(final Node globalNode,
+                                       final Map<String, String> nameValueMap) {
         final NodeList options = globalNode.getChildNodes();
-        nameValueMap.put("usage-count", "yes");
-        nameValueMap.put("disable-ip-verification",
-                         Tools.getString("Boolean.False"));
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             final String nodeName = option.getNodeName();
@@ -606,7 +599,7 @@ public class DrbdXML extends XML {
             } else if ("disable-ip-verification".equals(nodeName)) {
                 nameValueMap.put(nodeName, Tools.getString("Boolean.True"));
             } else if ("usage-count".equals(nodeName)) {
-                /* does not come from drbdadm (<=8.3.7) */
+                /* does not come from drbdadm */
                 /* TODO: "count" is guessed. */
                 final String usageCount = getAttribute(option, "count");
                 if (usageCount != null) {
@@ -614,7 +607,6 @@ public class DrbdXML extends XML {
                 }
             }
         }
-        optionsMap.put("global", nameValueMap);
     }
 
 
@@ -695,6 +687,8 @@ public class DrbdXML extends XML {
                 }
                 final NodeList optionInfos = optionNode.getChildNodes();
                 paramDefaultMap.put("usage-count", "");
+                paramDefaultMap.put("disable-ip-verification",
+                                    Tools.getString("Boolean.False"));
                 for (int j = 0; j < optionInfos.getLength(); j++) {
                     final Node optionInfo = optionInfos.item(j);
                     final String tag = optionInfo.getNodeName();
@@ -975,12 +969,20 @@ public class DrbdXML extends XML {
         configFile = getAttribute(configNode, "file");
 
         final NodeList resources = configNode.getChildNodes();
+        Map<String, String> globalNameValueMap = optionsMap.get("global");
+        if (globalNameValueMap == null) {
+            globalNameValueMap = new HashMap<String, String>();
+            optionsMap.put("global", globalNameValueMap);
+        }
+        globalNameValueMap.put("usage-count", "yes");
+        globalNameValueMap.put("disable-ip-verification",
+                               Tools.getString("Boolean.False"));
 
         for (int i = 0; i < resources.getLength(); i++) {
             final Node resourceNode = resources.item(i);
             /* <global> */
             if (resourceNode.getNodeName().equals("global")) {
-                parseConfigGlobalNode(resourceNode);
+                parseConfigGlobalNode(resourceNode, globalNameValueMap);
             }
             /* <common> */
             if (resourceNode.getNodeName().equals("common")) {

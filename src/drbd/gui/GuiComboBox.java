@@ -521,7 +521,8 @@ public class GuiComboBox extends JPanel {
             && (selectedItem != null
                  && selectedItem != GuiComboBox.NOTHING_SELECTED)) {
             selectedChanged = true;
-        } else if (!selectedValue.equals(selectedItem)) {
+        } else if (selectedValue != null
+                   && !selectedValue.equals(selectedItem)) {
             selectedChanged = true;
         }
         final boolean itemsChanged = comboBoxChanged(selectedValue, items);

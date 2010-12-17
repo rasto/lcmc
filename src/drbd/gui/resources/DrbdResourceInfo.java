@@ -177,8 +177,7 @@ public class DrbdResourceInfo extends EditableInfo
      * from the 'after' parameter.
      * TODO: move this out of gui
      */
-    private String drbdSectionsConfig()
-                                    throws Exceptions.DrbdConfigException {
+    private String drbdSectionsConfig() throws Exceptions.DrbdConfigException {
         final StringBuffer config = new StringBuffer("");
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String[] sections = dxml.getSections();
@@ -932,11 +931,11 @@ public class DrbdResourceInfo extends EditableInfo
 
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setApplyButtons(null, params);
-            }
-        });
+        //SwingUtilities.invokeLater(new Runnable() {
+        //    public void run() {
+        //        setApplyButtons(null, params);
+        //    }
+        //});
 
         mainPanel.add(optionsPanel);
 

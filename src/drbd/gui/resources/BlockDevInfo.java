@@ -438,28 +438,32 @@ public class BlockDevInfo extends EditableInfo {
             ret = false;
         } else if (DRBD_MD_PARAM.equals(param)) {
             if (infoPanel != null) {
-                final boolean internal = "internal".equals(value);
-                final GuiComboBox ind = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
-                                                         null);
-                final GuiComboBox indW = paramComboBoxGet(DRBD_MD_INDEX_PARAM,
-                                                          "wizard");
-                if (internal) {
-                    ind.setValue(DRBD_MD_TYPE_FLEXIBLE);
-                    if (indW != null) {
-                        indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
+                if (!getHost().isServerStatusLatch()) {
+                    final boolean internal = "internal".equals(value);
+                    final GuiComboBox ind = paramComboBoxGet(
+                                                           DRBD_MD_INDEX_PARAM,
+                                                           null);
+                    final GuiComboBox indW = paramComboBoxGet(
+                                                           DRBD_MD_INDEX_PARAM,
+                                                           "wizard");
+                    if (internal) {
+                        ind.setValue(DRBD_MD_TYPE_FLEXIBLE);
+                        if (indW != null) {
+                            indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
+                        }
                     }
-                }
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        ind.setEnabled(!internal);
-                    }
-                });
-                if (indW != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            indW.setEnabled(!internal);
+                            ind.setEnabled(!internal);
                         }
                     });
+                    if (indW != null) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                indW.setEnabled(!internal);
+                            }
+                        });
+                    }
                 }
             }
         } else if (DRBD_NI_PORT_PARAM.equals(param)) {
@@ -947,12 +951,6 @@ public class BlockDevInfo extends EditableInfo {
             );
             addApplyButton(buttonPanel);
             addRevertButton(buttonPanel);
-
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    setApplyButtons(null, params);
-                }
-            });
         }
 
         /* info */

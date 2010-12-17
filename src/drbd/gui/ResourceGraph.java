@@ -856,6 +856,7 @@ public abstract class ResourceGraph {
             vertexToMenus.remove(v);
         }
         for (final Edge e : graph.getEdges()) {
+            //TODO: need to lock edges
             edgeToMenus.remove(e);
             updatePopupEdge(e);
         }

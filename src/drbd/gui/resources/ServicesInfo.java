@@ -302,6 +302,9 @@ public class ServicesInfo extends EditableInfo {
                 si.apply(dcHost, testOnly);
             }
         }
+        if (!testOnly) {
+            setApplyButtons(null, params);
+        }
     }
 
     /**
@@ -542,22 +545,24 @@ public class ServicesInfo extends EditableInfo {
                 }
             }
             final DefaultMutableTreeNode n = newSi.getNode();
-            final int i = n.getParent().getIndex(n);
-            if (i > pos) {
-                final int p = pos;
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        final DefaultMutableTreeNode parent =
+            if (n != null) {
+                final int i = n.getParent().getIndex(n);
+                if (i > pos) {
+                    final int p = pos;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            final DefaultMutableTreeNode parent =
                                         (DefaultMutableTreeNode) n.getParent();
-                        if (parent != null) {
-                            parent.remove(n);
-                            parent.insert(n, p);
-                            getBrowser().reload(parent, false);
+                            if (parent != null) {
+                                parent.remove(n);
+                                parent.insert(n, p);
+                                getBrowser().reload(parent, false);
+                            }
                         }
-                    }
-                });
+                    });
+                }
+                pos++;
             }
-            pos++;
         }
 
         for (final ServiceInfo newSi : setParametersHash.keySet()) {

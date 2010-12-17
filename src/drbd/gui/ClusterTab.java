@@ -50,7 +50,9 @@ public class ClusterTab extends JPanel {
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
         this.cluster = cluster;
         if (cluster == null) {
-            add(new EmptyViewPanel());
+            final EmptyViewPanel p = new EmptyViewPanel();
+            p.setDisabledDuringLoad(false);
+            add(p);
         }
     }
 

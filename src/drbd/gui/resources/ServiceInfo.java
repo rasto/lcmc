@@ -350,11 +350,14 @@ public class ServiceInfo extends EditableInfo {
                 /* at least one "eq" */
                 final GuiComboBox cb = scoreComboBoxHash.get(hi);
                 if (cb != null) {
-                    final String op = getOpFromLabel(hi.getName(),
-                                                     cb.getLabel().getText());
-                    if (cb.getValue() == null || "eq".equals(op)) {
-                        on = true;
-                        break;
+                    final JLabel label = cb.getLabel();
+                    if (label != null) {
+                        final String op = getOpFromLabel(hi.getName(),
+                                                         label.getText());
+                        if (cb.getValue() == null || "eq".equals(op)) {
+                            on = true;
+                            break;
+                        }
                     }
                 }
             }

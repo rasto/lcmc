@@ -92,6 +92,10 @@ public class DrbdInfo extends EditableInfo {
             if (value == null) {
                 value = "";
             }
+            if ("".equals(value) && "usage-count".equals(param)) {
+                value = "yes"; /* we don't get this parameter from
+                                  the dump. */
+            }
             final String oldValue = getParamSaved(param);
             final GuiComboBox cb = paramComboBoxGet(param, null);
             if (!Tools.areEqual(value, oldValue)) {
@@ -550,11 +554,11 @@ public class DrbdInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setApplyButtons(null, params);
-            }
-        });
+        //SwingUtilities.invokeLater(new Runnable() {
+        //    public void run() {
+        //        setApplyButtons(null, params);
+        //    }
+        //});
 
         mainPanel.add(optionsPanel);
 
