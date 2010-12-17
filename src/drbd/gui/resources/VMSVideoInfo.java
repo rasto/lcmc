@@ -325,6 +325,7 @@ public class VMSVideoInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.VIDEO_TABLE);
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /** Returns string representation. */

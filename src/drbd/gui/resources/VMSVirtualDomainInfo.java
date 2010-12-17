@@ -2985,16 +2985,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     final Map<VMSHardwareInfo, Map<String, String>> allHWP =
                                                           getAllHWParameters();
                     for (final VMSHardwareInfo hi : allHWP.keySet()) {
-                        if (hi.checkResourceFieldsChanged(
-                                                null,
-                                                hi.getRealParametersFromXML(),
-                                                true)) {
-                            hi.modifyXML(vmsxml,
-                                         domainNode,
-                                         getDomainName(),
-                                         allHWP.get(hi));
-                            hi.getResource().setNew(false);
-                        }
+                        hi.modifyXML(vmsxml,
+                                     domainNode,
+                                     getDomainName(),
+                                     allHWP.get(hi));
+                        hi.getResource().setNew(false);
                     }
                     vmsxml.saveAndDefine(domainNode, getDomainName());
                 } else {

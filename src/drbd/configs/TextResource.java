@@ -1123,7 +1123,7 @@ public class TextResource extends
          "Apply Grp"},
 
         {"Browser.CommitResources",
-         "Commit All"},
+         "Apply All"},
 
         {"Browser.ApplyDRBDResource",
          "Apply"},

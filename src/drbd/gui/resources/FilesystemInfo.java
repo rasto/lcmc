@@ -215,21 +215,6 @@ class FilesystemInfo extends ServiceInfo {
             },
             null);
     }
-    ///** Sets service parameters with values from resourceNode hash. */
-    //public void setParameters(final Map<String, String> resourceNode) {
-    //    super.setParameters(resourceNode);
-    //    //final DrbdResourceInfo dri = getBrowser().getDrbdDevHash().get(
-    //    //                                 getParamSaved(FS_RES_PARAM_DEV));
-    //    //if (dri != null) {
-    //    //    dri.setUsedByCRM(true);
-    //    //    final Thread t = new Thread(new Runnable() {
-    //    //        public void run() {
-    //    //            dri.updateMenus(null);
-    //    //        }
-    //    //    });
-    //    //    t.start();
-    //    //}
-    //}
 
     /** Returns editable element for the parameter. */
     protected GuiComboBox getParamComboBox(final String param,
@@ -240,6 +225,7 @@ class FilesystemInfo extends ServiceInfo {
             final DrbdResourceInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
+            getBrowser().putDrbdDevHash();
             String selectedValue = null;
             if (selectedInfo == null) {
                 selectedValue = getParamSaved(FS_RES_PARAM_DEV);
@@ -341,6 +327,7 @@ class FilesystemInfo extends ServiceInfo {
         final StringBuffer s = new StringBuffer(getName());
         final DrbdResourceInfo dri = getBrowser().getDrbdResHash().get(
                                              getParamSaved(FS_RES_PARAM_DEV));
+        getBrowser().putDrbdResHash();
         if (dri == null) {
             id = getParamSaved(FS_RES_PARAM_DEV);
         } else {
@@ -364,6 +351,7 @@ class FilesystemInfo extends ServiceInfo {
         final DrbdResourceInfo oldDri =
                     getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
+        getBrowser().putDrbdDevHash();
         super.removeMyselfNoConfirm(dcHost, testOnly);
         if (oldDri != null && !testOnly) {
             oldDri.setUsedByCRM(null);
@@ -389,6 +377,7 @@ class FilesystemInfo extends ServiceInfo {
         final DrbdResourceInfo oldDri =
                     getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
+        getBrowser().putDrbdDevHash();
         if (oldDri != null) {
             // TODO: disabled because it does not work well at the moment.
             return;
@@ -396,6 +385,7 @@ class FilesystemInfo extends ServiceInfo {
         final DrbdResourceInfo newDri =
                     getBrowser().getDrbdDevHash().get(
                                         getComboBoxValue(FS_RES_PARAM_DEV));
+        getBrowser().putDrbdDevHash();
         if (newDri == null || newDri.equals(oldDri)) {
             return;
         }
@@ -479,6 +469,7 @@ class FilesystemInfo extends ServiceInfo {
         final DrbdResourceInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
+        getBrowser().putDrbdDevHash();
         String selectedValue = null;
         if (selectedInfo == null) {
             selectedValue = getParamSaved(FS_RES_PARAM_DEV);

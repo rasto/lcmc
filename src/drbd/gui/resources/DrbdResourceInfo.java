@@ -217,6 +217,7 @@ public class DrbdResourceInfo extends EditableInfo
                                                 "ClusterBrowser.None"))) {
                                 final DrbdResourceInfo v0 =
                                      getBrowser().getDrbdDevHash().get(value);
+                                getBrowser().putDrbdDevHash();
                                 if (v0 != null) {
                                     final String v = v0.getName();
                                     sectionConfig.append("\t\t");
@@ -573,11 +574,13 @@ public class DrbdResourceInfo extends EditableInfo
                 while (i < 11) {
                     final String drbdDevStr = "/dev/drbd"
                                               + Integer.toString(index);
-                    if (!getBrowser().getDrbdDevHash().containsKey(
-                                                                 drbdDevStr)) {
+                    final Map<String, DrbdResourceInfo> drbdDevHash =
+                                                  getBrowser().getDrbdDevHash();
+                    if (!drbdDevHash.containsKey(drbdDevStr)) {
                         drbdDevices.add(drbdDevStr);
                         i++;
                     }
+                    getBrowser().putDrbdDevHash();
                     index++;
                 }
                 paramCb = new GuiComboBox(defaultItem,
@@ -622,23 +625,22 @@ public class DrbdResourceInfo extends EditableInfo
                                         "-1",
                                         getBrowser());
             l.add(di);
+            final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
             if (defaultItem == null || "-1".equals(defaultItem)) {
                 defaultItem = Tools.getString("ClusterBrowser.None");
             } else if (defaultItem != null) {
-                final DrbdResourceInfo dri =
-                                getBrowser().getDrbdResHash().get(defaultItem);
+                final DrbdResourceInfo dri = drbdResHash.get(defaultItem);
                 if (dri != null) {
                     defaultItem = dri.getDevice();
                 }
             }
 
-            for (final String drbdRes
-                                    : getBrowser().getDrbdResHash().keySet()) {
-                final DrbdResourceInfo r =
-                                    getBrowser().getDrbdResHash().get(drbdRes);
+            for (final String drbdRes : drbdResHash.keySet()) {
+                final DrbdResourceInfo r = drbdResHash.get(drbdRes);
                 DrbdResourceInfo odri = r;
                 boolean cyclicRef = false;
-                while ((odri = getBrowser().getDrbdResHash().get(
+                while ((odri = drbdResHash.get(
                        odri.getParamSaved(DRBD_RES_PARAM_AFTER))) != null) {
                     if (odri == this) {
                         cyclicRef = true;
@@ -648,6 +650,7 @@ public class DrbdResourceInfo extends EditableInfo
                     l.add(r);
                 }
             }
+            getBrowser().putDrbdResHash();
             paramCb = new GuiComboBox(defaultItem,
                                       l.toArray(new Info[l.size()]),
                                       null, /* units */
@@ -749,7 +752,9 @@ public class DrbdResourceInfo extends EditableInfo
                 }
             });
             getBrowser().getDrbdResHash().remove(getName());
+            getBrowser().putDrbdResHash();
             getBrowser().getDrbdDevHash().remove(getDevice());
+            getBrowser().putDrbdDevHash();
             storeComboBoxValues(params);
 
             final String name = getParamSaved(DRBD_RES_PARAM_NAME);
@@ -759,7 +764,9 @@ public class DrbdResourceInfo extends EditableInfo
             getDrbdResource().setDevice(drbdDevStr);
 
             getBrowser().getDrbdResHash().put(name, this);
+            getBrowser().putDrbdResHash();
             getBrowser().getDrbdDevHash().put(drbdDevStr, this);
+            getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
             getDrbdResource().setCommited(true);
             getDrbdInfo().setAllApplyButtons();
@@ -964,7 +971,9 @@ public class DrbdResourceInfo extends EditableInfo
 
     public final void removeFromHashes() {
         getBrowser().getDrbdResHash().remove(getName());
+        getBrowser().putDrbdResHash();
         getBrowser().getDrbdDevHash().remove(getDevice());
+        getBrowser().putDrbdDevHash();
         blockDevInfo1.removeFromDrbd();
         blockDevInfo2.removeFromDrbd();
     }
@@ -981,12 +990,15 @@ public class DrbdResourceInfo extends EditableInfo
             DRBD.down(host, getName(), testOnly);
         }
         super.removeMyself(testOnly);
-        final DrbdResourceInfo dri = getBrowser().getDrbdResHash().get(
-                                                                    getName());
-        getBrowser().getDrbdResHash().remove(getName());
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
+        final DrbdResourceInfo dri = drbdResHash.get(getName());
+        drbdResHash.remove(getName());
+        getBrowser().putDrbdResHash();
         dri.setName(null);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
         getBrowser().getDrbdDevHash().remove(getDevice());
+        getBrowser().putDrbdDevHash();
         blockDevInfo1.removeFromDrbd();
         blockDevInfo2.removeFromDrbd();
         blockDevInfo1.removeMyself(testOnly);

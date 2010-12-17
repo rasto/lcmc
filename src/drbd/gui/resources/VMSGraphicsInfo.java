@@ -466,6 +466,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
                                         getParamSaved(GraphicsData.DISPLAY)));
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.GRAPHICS_TABLE);
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /** Returns string representation. */
@@ -565,6 +566,6 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
         } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {
             return SDL_PARAMETERS;
         }
-        return null;
+        return PARAMETERS;
     }
 }

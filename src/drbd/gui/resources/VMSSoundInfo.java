@@ -302,6 +302,7 @@ public class VMSSoundInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.SOUND_TABLE);
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /** Returns string representation. */

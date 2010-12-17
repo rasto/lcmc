@@ -141,10 +141,14 @@ public class ClusterBrowser extends Browser {
                                                 String.CASE_INSENSITIVE_ORDER);
     /** Name to service hash lock. */
     private final Mutex mNameToServiceLock = new Mutex();
-    /** drbd resource name string to drbd resource info hash. */
+    /** DRBD resource hash lock. */
+    private final Mutex mDrbdResHashLock = new Mutex();
+    /** DRBD resource name string to drbd resource info hash. */
     private final Map<String, DrbdResourceInfo> drbdResHash =
                                 new HashMap<String, DrbdResourceInfo>();
-    /** drbd resource device string to drbd resource info hash. */
+    /** DRBD device hash lock. */
+    private final Mutex mDrbdDevHashLock = new Mutex();
+    /** DRBD resource device string to drbd resource info hash. */
     private final Map<String, DrbdResourceInfo> drbdDevHash =
                                 new HashMap<String, DrbdResourceInfo>();
     /** Heartbeat id to service lock. */
@@ -1522,6 +1526,7 @@ public class ClusterBrowser extends Browser {
                                                 dxml.getHostDiskMap(resName);
             BlockDevInfo bd1 = null;
             BlockDevInfo bd2 = null;
+                                    
             for (String hostName : hostDiskMap.keySet()) {
                 if (!cluster.contains(hostName)) {
                     continue;
@@ -1530,10 +1535,12 @@ public class ClusterBrowser extends Browser {
                 final BlockDevInfo bdi = drbdGraph.findBlockDevInfo(hostName,
                                                                     disk);
                 if (bdi == null) {
-                    if (drbdDevHash.containsKey(disk)) {
+                    if (getDrbdDevHash().containsKey(disk)) {
                         /* TODO: ignoring stacked device */
+                        putDrbdDevHash();
                         continue;
                     } else {
+                        putDrbdDevHash();
                         Tools.appWarning("could not find disk: " + disk
                                          + " on host: " + hostName);
                         continue;
@@ -2396,19 +2403,45 @@ public class ClusterBrowser extends Browser {
     }
 
     /**
-     * Returns a hash from drbd device to drbd resource info.
-     */
+     * Returns a hash from drbd device to drbd resource info. putDrbdDevHash
+     * must follow after you're done. */
     public final Map<String, DrbdResourceInfo> getDrbdDevHash() {
-        //TODO: lock
+        try {
+            mDrbdDevHashLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         return drbdDevHash;
     }
 
+    /** Unlock drbd dev hash. */
+    public final void putDrbdDevHash() {
+        mDrbdDevHashLock.release();
+    }
     /**
      * Returns a hash from resource name to drbd resource info hash.
+     * Get locks the hash and put unlocks it
      */
     public final Map<String, DrbdResourceInfo> getDrbdResHash() {
-        //TODO: lock
+        try {
+            mDrbdResHashLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         return drbdResHash;
+    }
+
+    /** Done using drbdResHash. */
+    public final void putDrbdResHash() {
+        mDrbdResHashLock.release();
+    }
+
+    /** Returns (shallow) copy of all drbdresource info objects. */
+    public final List<DrbdResourceInfo> getDrbdResHashValues() {
+        final List<DrbdResourceInfo> values =
+                   new ArrayList<DrbdResourceInfo>(getDrbdResHash().values());
+        putDrbdResHash();
+        return values;
     }
 
     /** Reloads all combo boxes that need to be reloaded. */
@@ -2515,7 +2548,7 @@ public class ClusterBrowser extends Browser {
                                 null,
                                 drbdGraph.getDrbdInfo().getParametersFromXML());
         drbdGraph.getDrbdInfo().updateAdvancedPanels();
-        for (final DrbdResourceInfo dri : drbdResHash.values()) {
+        for (final DrbdResourceInfo dri : getDrbdResHashValues()) {
             dri.checkResourceFieldsChanged(null, dri.getParametersFromXML());
             dri.updateAdvancedPanels();
             final BlockDevInfo bdi1 = dri.getFirstBlockDevInfo();

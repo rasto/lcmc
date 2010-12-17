@@ -184,14 +184,12 @@ public class DrbdInfo extends EditableInfo {
         final Host[] hosts = getBrowser().getCluster().getHostsArray();
         for (Host host : hosts) {
             final StringBuffer resConfig = new StringBuffer("");
-            final Map<String, DrbdResourceInfo> drbdResHash =
-                                                getBrowser().getDrbdResHash();
-            for (final String res : drbdResHash.keySet()) {
-                final DrbdResourceInfo drbdRes = drbdResHash.get(res);
-                if (drbdRes.resourceInHost(host)) {
+            for (final DrbdResourceInfo dri
+                                       : getBrowser().getDrbdResHashValues()) {
+                if (dri.resourceInHost(host)) {
                     resConfig.append('\n');
                     try {
-                        resConfig.append(drbdRes.drbdResourceConfig());
+                        resConfig.append(dri.drbdResourceConfig());
                     } catch (Exceptions.DrbdConfigException dce) {
                         throw dce;
                     }
@@ -626,6 +624,7 @@ public class DrbdInfo extends EditableInfo {
                 }
             }
         }
+        getBrowser().putDrbdResHash();
         return index + 1;
     }
 
@@ -652,8 +651,10 @@ public class DrbdInfo extends EditableInfo {
                                          final boolean interactive,
                                          final boolean testOnly) {
         if (getBrowser().getDrbdResHash().containsKey(name)) {
+            getBrowser().putDrbdResHash();
             return false;
         }
+        getBrowser().putDrbdResHash();
         DrbdResourceInfo dri;
         if (bd1 == null || bd2 == null) {
             return false;
@@ -665,10 +666,13 @@ public class DrbdInfo extends EditableInfo {
             drbdDevStr = "/dev/drbd" + Integer.toString(index);
 
             /* search for next available drbd device */
-            while (getBrowser().getDrbdDevHash().containsKey(drbdDevStr)) {
+            final Map<String, DrbdResourceInfo> drbdDevHash =
+                                                 getBrowser().getDrbdDevHash();
+            while (drbdDevHash.containsKey(drbdDevStr)) {
                 index++;
                 drbdDevStr = "/dev/drbd" + Integer.toString(index);
             }
+            getBrowser().putDrbdDevHash();
             dri = new DrbdResourceInfo(name,
                                        drbdDevStr,
                                        bd1,
@@ -713,7 +717,9 @@ public class DrbdInfo extends EditableInfo {
                                         DrbdResourceInfo.DRBD_RES_PARAM_DEV,
                                         drbdDevStr);
         getBrowser().getDrbdResHash().put(name, dri);
+        getBrowser().putDrbdResHash();
         getBrowser().getDrbdDevHash().put(drbdDevStr, dri);
+        getBrowser().putDrbdDevHash();
 
         if (bd1 != null) {
             bd1.setDrbd(true);
@@ -812,17 +818,11 @@ public class DrbdInfo extends EditableInfo {
     public boolean checkResourceFieldsChanged(final String param,
                                               final String[] params) {
         boolean changed = false;
-        final Map<String, DrbdResourceInfo> drbdResHash =
-                                                getBrowser().getDrbdResHash();
-        if (drbdResHash != null) {
-            for (final String res : drbdResHash.keySet()) {
-                final DrbdResourceInfo drbdRes = drbdResHash.get(res);
-                if (drbdRes.checkResourceFieldsChanged(
-                                               param,
-                                               drbdRes.getParametersFromXML(),
+        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+            if (dri.checkResourceFieldsChanged(param,
+                                               dri.getParametersFromXML(),
                                                true)) {
-                    changed = true;
-                }
+                changed = true;
             }
         }
         return super.checkResourceFieldsChanged(param, params) || changed;
@@ -838,14 +838,10 @@ public class DrbdInfo extends EditableInfo {
                                               final String[] params,
                                               final boolean fromDrbdInfo) {
         boolean correct = true;
-        final Map<String, DrbdResourceInfo> drbdResHash =
-                                                getBrowser().getDrbdResHash();
-        for (final String res : drbdResHash.keySet()) {
-            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
-            if (!drbdRes.checkResourceFieldsCorrect(
-                                               param,
-                                               drbdRes.getParametersFromXML(),
-                                               true)) {
+        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+            if (!dri.checkResourceFieldsCorrect(param,
+                                                dri.getParametersFromXML(),
+                                                true)) {
                 correct = false;
             }
         }
@@ -855,22 +851,16 @@ public class DrbdInfo extends EditableInfo {
     /** Revert all values. */
     public final void revert() {
         super.revert();
-        final Map<String, DrbdResourceInfo> drbdResHash =
-                                                getBrowser().getDrbdResHash();
-        for (final String res : drbdResHash.keySet()) {
-            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
-            drbdRes.revert();
+        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+            dri.revert();
         }
     }
 
     /** Set all apply buttons. */
     public final void setAllApplyButtons() {
-        final Map<String, DrbdResourceInfo> drbdResHash =
-                                                getBrowser().getDrbdResHash();
-        for (final String res : drbdResHash.keySet()) {
-            final DrbdResourceInfo drbdRes = drbdResHash.get(res);
-            drbdRes.storeComboBoxValues(drbdRes.getParametersFromXML());
-            drbdRes.setAllApplyButtons();
+        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+            dri.storeComboBoxValues(dri.getParametersFromXML());
+            dri.setAllApplyButtons();
         }
     }
 }

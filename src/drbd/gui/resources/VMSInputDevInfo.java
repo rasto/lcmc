@@ -310,6 +310,7 @@ public class VMSInputDevInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.INPUTDEVS_TABLE);
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /** Returns string representation. */

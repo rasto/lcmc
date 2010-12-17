@@ -93,6 +93,7 @@ class DrbddiskInfo extends ServiceInfo {
         super.removeMyselfNoConfirm(dcHost, testOnly);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
+        getBrowser().putDrbdResHash();
         if (dri != null) {
             dri.setUsedByCRM(null);
         }
@@ -103,6 +104,7 @@ class DrbddiskInfo extends ServiceInfo {
         super.setParameters(resourceNode);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
+        getBrowser().putDrbdResHash();
         if (dri != null) {
             if (isManaged(false) && !getService().isOrphaned()) {
                 dri.setUsedByCRM(this);

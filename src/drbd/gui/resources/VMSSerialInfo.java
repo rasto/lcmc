@@ -96,6 +96,7 @@ public class VMSSerialInfo extends VMSParallelSerialInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.SERIAL_TABLE);
+        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /** Returns string representation. */
