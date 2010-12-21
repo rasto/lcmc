@@ -165,11 +165,15 @@ public class DrbdGraph extends ResourceGraph {
             final double hostXPos =
                                 hostPos.getX() - VERTEX_SIZE_HOST / 2;
             getVertexLocations().put(v, hostPos);
+            putVertexLocations();
+            lockGraph();
             getGraph().addVertex(v);
+            unlockGraph();
         }
         /* add block devices vertices */
         final Host host = hostDrbdInfo.getHost();
         final Point2D hostPos = getVertexLocations().get(v);
+        putVertexLocations();
         final double hostXPos = hostPos.getX() - VERTEX_SIZE_HOST / 2;
         final double hostYPos = hostPos.getY();
         int devYPos = (int) hostYPos + BD_STEP_Y;
@@ -196,7 +200,9 @@ public class DrbdGraph extends ResourceGraph {
                     }
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
+                            lockGraph();
                             getGraph().removeVertex(bdv);
+                            unlockGraph();
                         }
                     });
                     removeInfo(bdv);
@@ -234,10 +240,13 @@ public class DrbdGraph extends ResourceGraph {
                     devYPos);
             }
             getVertexLocations().put(bdv, pos);
+            putVertexLocations();
             getLayout().setLocation(bdv, pos);
             devYPos += BD_STEP_Y;
             if (bdv != null) {
+                lockGraph();
                 getGraph().addVertex(bdv);
+                unlockGraph();
             }
         }
     }
@@ -259,8 +268,11 @@ public class DrbdGraph extends ResourceGraph {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
+                    lockGraph();
                     getGraph().removeEdge(e);
+                    unlockGraph();
                 } catch (final Exception ignore) {
+                    unlockGraph();
                     /* ignore */
                 }
             }
@@ -331,8 +343,10 @@ public class DrbdGraph extends ResourceGraph {
 
             final StringBuffer l = new StringBuffer(dri.getName());
             if (l != null) {
-                final Point2D sp = getVertexLocations().get(source);
-                final Point2D dp = getVertexLocations().get(dest);
+                final Map<Vertex, Point2D> vl = getVertexLocations();
+                final Point2D sp = vl.get(source);
+                final Point2D dp = vl.get(dest);
+                putVertexLocations();
                 final int len = (int) Math.sqrt(Math.pow(sp.getX()
                                                          - dp.getX(), 2)
                                                 + Math.pow(sp.getY()
@@ -481,12 +495,15 @@ public class DrbdGraph extends ResourceGraph {
         if (bdi1 != null && bdi2 != null) {
             final Vertex v1 = bdiToVertexMap.get(bdi1);
             final Vertex v2 = bdiToVertexMap.get(bdi2);
+            lockGraph();
             if (getGraph().findEdge(v1, v2) != null
                 || getGraph().findEdge(v2, v1) != null) {
+                unlockGraph();
                 return;
             }
             final Edge e = new Edge(v1, v2);
             getGraph().addEdge(e, v1, v2);
+            unlockGraph();
             edgeToDrbdResourceMap.put(e, dri);
             drbdResourceToEdgeMap.put(dri, e);
         }
@@ -546,22 +563,27 @@ public class DrbdGraph extends ResourceGraph {
     //    final HostDrbdInfo hi = vertexToHostMap.get(vertex);
     //    final PickedState ps = getVisualizationViewer().getPickedState();
     //    final Point2D hl = getVertexLocations().getLocation(getVertex(hi));
+    //    putVertexLocations();
     //    final double x = hl.getX() + BD_X_OFFSET;
     //    for (final Vertex v : hostBDVerticesMap.get(hi)) {
     //        if (!v.equals(vertex) && !ps.isPicked(v)) {
     //            final Point2D l = getVertexLocations().getLocation(v);
+    //            putVertexLocations();
     //            final double y = l.getY();
     //            if (oldY >= 0) {
     //                if (y >= oldY && y <= newY) {
     //                    l.setLocation(x, y - BD_STEP_Y);
     //                    getVertexLocations().setLocation(v, l);
+    //                    putVertexLocations();
     //                } else if (y <= oldY && y >= newY) {
     //                    l.setLocation(x, y + BD_STEP_Y);
     //                    getVertexLocations().setLocation(v, l);
+    //                    putVertexLocations();
     //                }
     //            } else {
     //                l.setLocation(x, y);
     //                getVertexLocations().setLocation(v, l);
+    //                putVertexLocations();
     //            }
     //        }
     //    }
@@ -613,6 +635,7 @@ public class DrbdGraph extends ResourceGraph {
                         y);
         final Point2D loc = new Point2D.Double(x, y);
         getVertexLocations().put(v, pos);
+        putVertexLocations();
         getLayout().setLocation(v, loc);
     }
 
@@ -925,6 +948,7 @@ public class DrbdGraph extends ResourceGraph {
         } else {
             boolean pickedResource = false;
             if (tOnly) {
+                lockGraph();
                 for (final Edge e : getGraph().getInEdges(v)) {
                     if (isPicked(e)) {
                         pickedResource = true;
@@ -939,6 +963,7 @@ public class DrbdGraph extends ResourceGraph {
                         }
                     }
                 }
+                unlockGraph();
             }
             if (pickedResource) {
                 g2d.setColor(Color.RED);

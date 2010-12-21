@@ -506,7 +506,6 @@ public class ClusterBrowser extends Browser {
      * Returns whether there is at least one drbddisk resource.
      */
     public final boolean atLeastOneDrbddisk() {
-        /* TODO: need to lock it. */
         try {
             mHeartbeatIdToService.acquire();
         } catch (InterruptedException ie) {

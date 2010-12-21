@@ -153,7 +153,7 @@ public class HeartbeatGraph extends ResourceGraph {
 
     /**
      * Returns true if vertex v is one of the ancestors or the same as
-     * vertex p.
+     * vertex p. The vertex and edge lists must be locked when called.
      */
     private boolean isAncestor(final Vertex v,
                                final Vertex p,
@@ -193,9 +193,13 @@ public class HeartbeatGraph extends ResourceGraph {
         if (pv == null) {
             return false;
         }
-        if (getGraph().isSuccessor(pv, v) || isAncestor(v, pv, new ArrayList<Vertex>())) {
+        lockGraph();
+        if (getGraph().isSuccessor(pv, v)
+            || isAncestor(v, pv, new ArrayList<Vertex>())) {
+            unlockGraph();
             return true;
         }
+        unlockGraph();
         return false;
     }
 
@@ -206,10 +210,12 @@ public class HeartbeatGraph extends ResourceGraph {
         final List<String> parentsHbIds = new ArrayList<String>();
         final Vertex v = getVertex(si);
         if (v != null) {
+            lockGraph();
             for (final Vertex pV : getGraph().getPredecessors(v)) {
                 final ServiceInfo psi = (ServiceInfo) getInfo(pV);
                 parentsHbIds.add(psi.getService().getHeartbeatId());
             }
+            unlockGraph();
         }
 
         return parentsHbIds.toArray(new String [parentsHbIds.size()]);
@@ -220,10 +226,12 @@ public class HeartbeatGraph extends ResourceGraph {
         final List<ServiceInfo> parents = new ArrayList<ServiceInfo>();
         final Vertex v = getVertex(si);
         if (v != null) {
+            lockGraph();
             for (final Vertex pV :getGraph().getPredecessors(v)) {
                 final ServiceInfo psi = (ServiceInfo) getInfo(pV);
                 parents.add(psi);
             }
+            unlockGraph();
         }
         return parents;
     }
@@ -233,10 +241,12 @@ public class HeartbeatGraph extends ResourceGraph {
         final List<ServiceInfo> children = new ArrayList<ServiceInfo>();
         final Vertex v = getVertex(si);
         if (v != null) {
+            lockGraph();
             for (final Vertex pV :getGraph().getSuccessors(v)) {
                 final ServiceInfo psi = (ServiceInfo) getInfo(pV);
                 children.add(psi);
             }
+            unlockGraph();
         }
         return children;
     }
@@ -256,6 +266,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final List<HbConnectionInfo> infos = new ArrayList<HbConnectionInfo>();
         final Vertex v = getVertex(si);
         if (v != null) {
+            lockGraph();
             for (final Vertex pV : getGraph().getPredecessors(v)) {
                 Edge edge = getGraph().findEdge(pV, v);
 
@@ -276,6 +287,7 @@ public class HeartbeatGraph extends ResourceGraph {
                     infos.add(edgeToHbconnectionMap.get(edge));
                 }
             }
+            unlockGraph();
         }
         return infos.toArray(new HbConnectionInfo[infos.size()]);
     }
@@ -323,14 +335,19 @@ public class HeartbeatGraph extends ResourceGraph {
                                             v,
                                             new Point2D.Float(BD_X_POS,
                                                               maxYPos + 40));
+                    putVertexLocations();
                 } else {
                     getVertexLocations().put(v, newPos);
+                    putVertexLocations();
                 }
             } else {
                 getVertexLocations().put(v, posWithScrollbar(pos));
+                putVertexLocations();
             }
 
+            lockGraph();
             getGraph().addVertex(v);
+            unlockGraph();
             somethingChanged();
             putInfoToVertex(serviceInfo, v);
             putVertexToInfo(v, (Info) serviceInfo);
@@ -396,24 +413,30 @@ public class HeartbeatGraph extends ResourceGraph {
         }
         Edge edge = null;
         try {
+            lockGraph();
             edge = getGraph().findEdge(vP, v);
 
             if (edge == null) {
                 edge = getGraph().findEdge(v, vP);
+                unlockGraph();
                 if (edge != null) {
                     edge.reverse();
                 }
             } else {
+                unlockGraph();
                 edge.reset();
             }
         } catch (final Exception e) {
+            unlockGraph();
             /* ignore */
         }
         HbConnectionInfo hbci;
         if (edge == null) {
             hbci = getClusterBrowser().getNewHbConnectionInfo();
             edge = new Edge(vP, v);
+            lockGraph();
             getGraph().addEdge(edge, vP, v);
+            unlockGraph();
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         } else {
@@ -453,10 +476,12 @@ public class HeartbeatGraph extends ResourceGraph {
             return false;
         }
 
+        lockGraph();
         Edge edge = getGraph().findEdge(vP, v);
         if (edge == null) {
             edge = getGraph().findEdge(v, vP);
         }
+        unlockGraph();
         if (edge != null) {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
             if (edgeIsColocationList.contains(edge)) {
@@ -475,10 +500,12 @@ public class HeartbeatGraph extends ResourceGraph {
             return false;
         }
 
+        lockGraph();
         Edge edge = getGraph().findEdge(vP, v);
         if (edge == null) {
             edge = getGraph().findEdge(v, vP);
         }
+        unlockGraph();
         if (edge != null) {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
             if (edgeIsOrderList.contains(edge)) {
@@ -530,10 +557,12 @@ public class HeartbeatGraph extends ResourceGraph {
         }
         Edge edge = null;
         try {
+            lockGraph();
             edge = getGraph().findEdge(vWithRsc, vRsc);
             if (edge == null) {
                 edge = getGraph().findEdge(vRsc, vWithRsc);
             }
+            unlockGraph();
         } catch (final Exception e) {
             /* ignore */
         }
@@ -541,7 +570,9 @@ public class HeartbeatGraph extends ResourceGraph {
         if (edge == null) {
             hbci = getClusterBrowser().getNewHbConnectionInfo();
             edge = new Edge(vWithRsc, vRsc);
+            lockGraph();
             getGraph().addEdge(edge, vWithRsc, vRsc);
+            unlockGraph();
             edgeToHbconnectionMap.put(edge, hbci);
             hbconnectionToEdgeMap.put(hbci, edge);
         } else {
@@ -558,6 +589,7 @@ public class HeartbeatGraph extends ResourceGraph {
 
     /** Removes items from order list. */
     public final void clearOrderList() {
+        lockGraph();
         for (final Edge edge : getGraph().getEdges()) {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
             if (hbci != null && !hbci.isNew()) {
@@ -565,10 +597,12 @@ public class HeartbeatGraph extends ResourceGraph {
                 edgeIsOrderList.remove(edge);
             }
         }
+        unlockGraph();
     }
 
     /** Removes items from colocation list. */
     public final void clearColocationList() {
+        lockGraph();
         for (final Edge edge : getGraph().getEdges()) {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
             if (hbci != null && !hbci.isNew()) {
@@ -576,6 +610,7 @@ public class HeartbeatGraph extends ResourceGraph {
                 edgeIsColocationList.remove(edge);
             }
         }
+        unlockGraph();
     }
 
     /**
@@ -749,6 +784,7 @@ public class HeartbeatGraph extends ResourceGraph {
         y = y > MAX_Y_POS ? MAX_Y_POS : y;
         pos.setLocation(x, y);
         getVertexLocations().put(v, pos);
+        putVertexLocations();
         getLayout().setLocation(v, pos);
     }
 
@@ -1056,11 +1092,13 @@ public class HeartbeatGraph extends ResourceGraph {
      * colocation nor order constraints.
      */
     public final void killRemovedEdges() {
+        lockGraph();
         final List<Edge> edges =
                             new ArrayList<Edge>(getGraph().getEdges().size());
         for (final Edge e : getGraph().getEdges()) {
             edges.add(e);
         }
+        unlockGraph();
 
         final boolean tOnly = isTestOnly();
         for (int i = 0; i < edges.size(); i++) {
@@ -1101,8 +1139,11 @@ public class HeartbeatGraph extends ResourceGraph {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     try {
+                        lockGraph();
                         getGraph().removeEdge(e);
+                        unlockGraph();
                     } catch (final Exception ignore) {
+                        unlockGraph();
                         /* ignore */
                     }
                 }
@@ -1126,23 +1167,33 @@ public class HeartbeatGraph extends ResourceGraph {
     public final void killRemovedVertices() {
         /* Make copy first. */
         final List<Vertex> vertices = new ArrayList<Vertex>();
+        lockGraph();
         for (final Vertex vo : getGraph().getVertices()) {
             vertices.add(vo);
         }
+        unlockGraph();
         for (final Vertex v : vertices) {
             if (vertexToHostMap.containsKey(v)) {
                 continue;
-            } else if (!getGraph().getInEdges(v).isEmpty()
+            }
+            lockGraph();
+            if (!getGraph().getInEdges(v).isEmpty()
                 || !getGraph().getOutEdges(v).isEmpty()) {
+                unlockGraph();
                 continue;
-            } else if (vertexToConstraintPHMap.containsKey(v)) {
+            }
+            unlockGraph();
+            if (vertexToConstraintPHMap.containsKey(v)) {
                 final ConstraintPHInfo cphi = (ConstraintPHInfo) getInfo(v);
                 if (!vertexIsPresentList.contains(v)) {
                     cphi.setUpdated(false);
                     if (!getClusterBrowser().clStatusFailed()
                         && cphi.getService().isRemoved()) {
                         getVertexLocations().put(v, null);
+                        putVertexLocations();
+                        lockGraph();
                         getGraph().removeVertex(v);
+                        unlockGraph();
                         removeInfo(v);
                         removeVertex(cphi);
                         cphi.removeInfo();
@@ -1164,7 +1215,10 @@ public class HeartbeatGraph extends ResourceGraph {
 
                         si.setUpdated(false);
                         getVertexLocations().put(v, null);
+                        putVertexLocations();
+                        lockGraph();
                         getGraph().removeVertex(v);
+                        unlockGraph();
                         removeInfo(v);
                         removeVertex(si);
                         si.removeInfo();
@@ -1185,6 +1239,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final Vertex v = getVertex(i);
         /* remove edges */
 
+        lockGraph();
         for (final Edge e : getGraph().getInEdges(v)) {
             edgeIsOrderList.remove(e);
             edgeIsColocationList.remove(e);
@@ -1194,6 +1249,7 @@ public class HeartbeatGraph extends ResourceGraph {
             edgeIsOrderList.remove(e);
             edgeIsColocationList.remove(e);
         }
+        unlockGraph();
 
         /* remove vertex */
         vertexIsPresentList.remove(v);
@@ -1270,11 +1326,13 @@ public class HeartbeatGraph extends ResourceGraph {
 
     /** Reloads popup menus for all services. */
     public final void reloadServiceMenus() {
+        lockGraph();
         for (final Vertex v : getGraph().getVertices()) {
             final JMenu existingServiceMenuItem =
                                 vertexToAddExistingServiceMap.get(v);
             reloadAddExistingServicePopup(existingServiceMenuItem, v);
         }
+        unlockGraph();
     }
 
     /**
@@ -1480,7 +1538,9 @@ public class HeartbeatGraph extends ResourceGraph {
         if (v == null) {
             /* add host vertex */
             v = new Vertex();
+            lockGraph();
             getGraph().addVertex(v);
+            unlockGraph();
             somethingChanged();
             putInfoToVertex(hostInfo, v);
             vertexToHostMap.put(v, hostInfo);
@@ -1492,7 +1552,7 @@ public class HeartbeatGraph extends ResourceGraph {
                 hostDefaultXPos += HOST_STEP_X;
             }
             getVertexLocations().put(v, hostPos);
-            // TODO: vertexLocations needs locking
+            putVertexLocations();
         }
     }
 
@@ -1694,14 +1754,19 @@ public class HeartbeatGraph extends ResourceGraph {
                                         v,
                                         new Point2D.Float(BD_X_POS,
                                                           maxYPos + 40));
+                putVertexLocations();
             } else {
                 getVertexLocations().put(v, newPos);
+                putVertexLocations();
             }
         } else {
             getVertexLocations().put(v, pos);
+            putVertexLocations();
         }
 
+        lockGraph();
         getGraph().addVertex(v);
+        unlockGraph();
         putInfoToVertex(rsoi, v);
         putVertexToInfo(v, (Info) rsoi);
         constraintPHToVertexMap.put(rsoi, v);

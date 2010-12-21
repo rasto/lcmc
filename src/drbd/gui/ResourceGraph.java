@@ -126,6 +126,8 @@ public abstract class ResourceGraph {
                                 new LinkedHashMap<Edge, List<MyMenuItem>>();
     /** Empty shape for arrows. (to not show an arrow). */
     private final Area emptyShape = new Area();
+    /** Graph lock. */
+    private final Mutex mGraphLock = new Mutex();
     /** The graph object. */
     private Graph<Vertex, Edge> graph;
     /** Visualization viewer object. */
@@ -134,6 +136,8 @@ public abstract class ResourceGraph {
     private StaticLayout<Vertex, Edge> layout;
     /** The graph's scroll pane. */
     private GraphZoomScrollPane scrollPane;
+    /** The vertex locations lock. */
+    private final Mutex mVertexLocationsLock = new Mutex();
     /** The vertex locations object. */
     private Map<Vertex, Point2D> vertexLocations =
                                                 new HashMap<Vertex, Point2D>();
@@ -407,7 +411,8 @@ public abstract class ResourceGraph {
         this.graph = graph;
 
         final Transformer<Vertex, Point2D> vlf =
-                              TransformerUtils.mapTransformer(vertexLocations);
+                      TransformerUtils.mapTransformer(getVertexLocations());
+        putVertexLocations();
 
 
         layout = new StaticLayout<Vertex, Edge>(graph, vlf) {
@@ -510,10 +515,24 @@ public abstract class ResourceGraph {
         return graph;
     }
 
-    /** Returns the vertex locations function. */
+    /** Returns the vertex locations function and locks them. Must be followed
+        by putVertexLocations. */
     protected final Map<Vertex, Point2D> getVertexLocations() {
+        try {
+            mVertexLocationsLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         return vertexLocations;
     }
+
+    /** Puts vertex locations. */
+    protected final void putVertexLocations() {
+        mVertexLocationsLock.release();
+    }
+
+
+    /**
 
     /** Returns the layout object. */
     protected final StaticLayout<Vertex, Edge> getLayout() {
@@ -593,8 +612,7 @@ public abstract class ResourceGraph {
         Float maxYPos = new Float(0);
         Float maxXPos = new Float(0);
 
-        // TODO: have to lock vertex locations
-        for (final Vertex v : vertexLocations.keySet()) {
+        for (final Vertex v : getVertexLocations().keySet()) {
             final Point2D loc = layout.transform(v);
             if (loc != null) {
                 final Float pX = new Float(loc.getX());
@@ -608,6 +626,7 @@ public abstract class ResourceGraph {
                 }
             }
         }
+        putVertexLocations();
         maxXPos += 80;
         maxYPos += 32;
         return new Point2D.Float(maxXPos, maxYPos);
@@ -684,10 +703,16 @@ public abstract class ResourceGraph {
         /** Sets direction of the edge. */
         public void setDirection(final Vertex from, final Vertex to) {
             if (mFrom != from || mTo != to) {
+                try {
+                    mGraphLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 getGraph().removeEdge(this);
                 mFrom = from;
                 mTo   = to;
                 getGraph().addEdge(this, mFrom, mTo);
+                mGraphLock.release();
             }
         }
 
@@ -852,14 +877,19 @@ public abstract class ResourceGraph {
 
     /** Updates all popup menus. */
     public final void updatePopupMenus() {
+        try {
+            mGraphLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         for (final Vertex v : graph.getVertices()) {
             vertexToMenus.remove(v);
         }
         for (final Edge e : graph.getEdges()) {
-            //TODO: need to lock edges
             edgeToMenus.remove(e);
             updatePopupEdge(e);
         }
+        mGraphLock.release();
     }
 
     /** Updates edge popup. */
@@ -976,7 +1006,13 @@ public abstract class ResourceGraph {
 
     /** Removes info from the graph. */
     protected void removeInfo(final Info i) {
+        try {
+            mGraphLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         graph.removeVertex(getVertex(i));
+        mGraphLock.release();
     }
 
     /** Picks and highlights vertex with Info i in the graph. */
@@ -1553,12 +1589,18 @@ public abstract class ResourceGraph {
                                              final boolean testOnly);
     /** Returns positions of the vertices (by value). */
     public final void getPositions(final Map<String, Point2D> positions) {
+        try {
+            mGraphLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         for (final Vertex v : graph.getVertices()) {
             final Info info = getInfo(v);
             final Point2D p = new Point2D.Double();
             final Point2D loc = layout.transform(v);
             if (loc == null) {
                 positions.clear();
+                mGraphLock.release();
                 return;
             }
             p.setLocation(loc);
@@ -1573,6 +1615,7 @@ public abstract class ResourceGraph {
                 }
             }
         }
+        mGraphLock.release();
     }
 
     /** Returns id that is used for saving of the vertex positions to a file. */
@@ -1671,7 +1714,13 @@ public abstract class ResourceGraph {
         }
         try {
             if (testEdge != null) {
+                try {
+                    mGraphLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 getGraph().removeEdge(testEdge);
+                mGraphLock.release();
                 testEdge = null;
             }
         } catch (final Exception ignore) {
@@ -1693,8 +1742,15 @@ public abstract class ResourceGraph {
         }
         if (testEdge != null) {
             try {
+                try {
+                    mGraphLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 getGraph().removeEdge(testEdge);
+                mGraphLock.release();
             } catch (final Exception e) {
+                mGraphLock.release();
                 /* ignore */
             }
         }
@@ -1704,9 +1760,16 @@ public abstract class ResourceGraph {
         }
         try {
             final Edge edge = new Edge(vP, v);
+            try {
+                mGraphLock.acquire();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             getGraph().addEdge(edge, vP, v);
+            mGraphLock.release();
             testEdge = edge;
         } catch (final Exception e) {
+            mGraphLock.release();
             /* ignore */
         }
         mTestEdgeLock.release();
@@ -1788,5 +1851,19 @@ public abstract class ResourceGraph {
                 return instance;
             }
         }
+    }
+
+    /** Locking graph's vertex and edge lists. */
+    protected final void lockGraph() {
+        try {
+            mGraphLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /** Unlocking graph's vertex and edge lists. */
+    protected final void unlockGraph() {
+        mGraphLock.release();
     }
 }

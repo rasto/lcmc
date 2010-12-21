@@ -395,6 +395,8 @@ public class SSH {
         private boolean outputVisible;
         /** Whether the command should be visible in the terminal area. */
         private final boolean commandVisible;
+        /** Session lock. */
+        private final Mutex mSessionLock = new Mutex();
         /** Execution session object. */
         private Session sess = null;
         /** Timeout for ssh command. */
@@ -430,7 +432,13 @@ public class SSH {
                 return new SSHOutput("", 0);
             }
             try {
+                try {
+                    mSessionLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 final Session thisSession = sess;
+                mSessionLock.release();
                 if (thisSession == null) {
                     return new SSHOutput("", 130);
                 }
@@ -583,9 +591,14 @@ public class SSH {
          */
         public final void cancel() {
             cancelIt = true;
-            //TODO need lock for session
+            try {
+                mSessionLock.acquire();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
             final Session thisSession = sess;
             sess = null;
+            mSessionLock.release();
             if (thisSession != null) {
                 thisSession.close();
             }
@@ -674,7 +687,14 @@ public class SSH {
                 try {
                     /* it may hang here if we lost connection, so it will be
                      * interrupted after a timeout. */
-                    sess = conn.openSession();
+                    final Session newSession = conn.openSession();
+                    try {
+                        mSessionLock.acquire();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                    sess = newSession;
+                    mSessionLock.release();
                     if (cancelTimeout[0]) {
                         throw new java.io.IOException("open session failed");
                     }

@@ -121,6 +121,8 @@ public class ServiceInfo extends EditableInfo {
     private GuiComboBox sameAsOperationsCB = null;
     /** Saved operations lock. */
     private final Mutex mSavedOperationsLock = new Mutex();
+    /** Operations combo box hash lock. */
+    private final Mutex mOperationsComboBoxHashLock = new Mutex();
     /** A map from operation to its combo box. */
     private final MultiKeyMap operationsComboBoxHash = new MultiKeyMap();
     /** Cache for the info panel. */
@@ -815,9 +817,15 @@ public class ServiceInfo extends EditableInfo {
                     if (!value.equals(savedOperation.get(op, param))) {
                         savedOperation.put(op, param, value);
                         if (infoPanelOk) {
+                            try {
+                                mOperationsComboBoxHashLock.acquire();
+                            } catch (InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                            }
                             final GuiComboBox cb =
                                (GuiComboBox) operationsComboBoxHash.get(op,
                                                                         param);
+                            mOperationsComboBoxHashLock.release();
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     cb.setEnabled(operationIdRef == null);
@@ -1285,8 +1293,14 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = "";
                 }
+                try {
+                    mOperationsComboBoxHashLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 final GuiComboBox cb =
                         (GuiComboBox) operationsComboBoxHash.get(op, param);
+                mOperationsComboBoxHashLock.release();
                 if (cb == null) {
                     mSavedOperationsLock.release();
                     continue;
@@ -1737,7 +1751,6 @@ public class ServiceInfo extends EditableInfo {
      */
     private boolean isOperationReferenced() {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        //TODO: need to lock services
         getBrowser().mHeartbeatIdToServiceLock();
         final Map<String, ServiceInfo> services =
                                     getBrowser().getHeartbeatIdToServiceInfo();
@@ -1917,8 +1930,14 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = "";
                 }
+                try {
+                    mOperationsComboBoxHashLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 final GuiComboBox cb =
                           (GuiComboBox) operationsComboBoxHash.get(op, param);
+                mOperationsComboBoxHashLock.release();
                 final Object oldValue = cb.getValue();
                 cb.setEnabled(!sameAs || nothingSelected);
                 if (!nothingSelected) {
@@ -1950,8 +1969,13 @@ public class ServiceInfo extends EditableInfo {
                                  final int leftWidth,
                                  final int rightWidth) {
         int rows = 0;
-        // TODO: need lock operationsComboBoxHash
+        try {
+            mOperationsComboBoxHashLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         operationsComboBoxHash.clear();
+        mOperationsComboBoxHashLock.release();
 
         final JPanel sectionPanel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
@@ -2046,7 +2070,13 @@ public class ServiceInfo extends EditableInfo {
                                                    false));
                 cb.setEnabled(savedOpIdRef == null);
 
+                try {
+                    mOperationsComboBoxHashLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 operationsComboBoxHash.put(op, param, cb);
+                mOperationsComboBoxHashLock.release();
                 rows++;
                 final JLabel cbLabel = new JLabel(Tools.ucfirst(op)
                                                   + " / "
@@ -2496,8 +2526,14 @@ public class ServiceInfo extends EditableInfo {
         if (dv == null) {
             return;
         }
+        try {
+            mOperationsComboBoxHashLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
         final GuiComboBox cb =
                     (GuiComboBox) operationsComboBoxHash.get(op, param);
+        mOperationsComboBoxHashLock.release();
         final String[] params = getParametersFromXML();
         cb.addListeners(
             new ItemListener() {
@@ -3009,8 +3045,14 @@ public class ServiceInfo extends EditableInfo {
                             || ClusterBrowser.HB_OP_PROMOTE.equals(op))) {
                         continue;
                     }
+                    try {
+                        mOperationsComboBoxHashLock.acquire();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                     final GuiComboBox cb =
                         (GuiComboBox) operationsComboBoxHash.get(op, param);
+                    mOperationsComboBoxHashLock.release();
                     String value;
                     if (cb != null) {
                         value = cb.getStringValue();
@@ -3266,8 +3308,14 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = "";
                 }
+                try {
+                    mOperationsComboBoxHashLock.acquire();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 final GuiComboBox cb =
                           (GuiComboBox) operationsComboBoxHash.get(op, param);
+                mOperationsComboBoxHashLock.release();
                 String value = cb.getStringValue();
                 if (value == null || "".equals(value)) {
                     value = getOpDefaultsDefault(param);
@@ -3312,8 +3360,14 @@ public class ServiceInfo extends EditableInfo {
                 for (final String param
                               : getBrowser().getCRMOperationParams().get(op)) {
                     final Object value = savedOperation.get(op, param);
+                    try {
+                        mOperationsComboBoxHashLock.acquire();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                     final GuiComboBox cb =
                             (GuiComboBox) operationsComboBoxHash.get(op, param);
+                    mOperationsComboBoxHashLock.release();
                     if (cb != null) {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
