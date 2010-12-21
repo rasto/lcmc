@@ -49,12 +49,12 @@ public class DistResource_suse_SLES11 extends
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "clusterlabs repo: 1.0.x/1.2.x" },
+         "opensuse SLE 11 SP1 repo: 1.1.x/1.2.x" },
         {"PmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
-         + " http://www.clusterlabs.org/rpm/opensuse-11.1/clusterlabs.repo && "
-         + "zypper -n --no-gpg-check install pacemaker corosync"
-         + " && /sbin/chkconfig --add corosync"
+         + " http://download.opensuse.org/repositories/network:/ha-clustering/SLE_11_SP1/network:ha-clustering.repo "
+         + " && zypper -n --no-gpg-check install pacemaker corosync"
+         + " && /sbin/chkconfig --add openais"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"},
@@ -66,6 +66,18 @@ public class DistResource_suse_SLES11 extends
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
          + " && chkconfig --add openais"},
+
+        /* Corosync/Openais/Pacemaker clusterlabs */
+        {"PmInst.install.text.3",
+         "clusterlabs repo: 1.0.x/1.2.x" },
+        {"PmInst.install.3",
+         "wget -N -nd -P /etc/zypp/repos.d/"
+         + " http://www.clusterlabs.org/rpm/opensuse-11.1/clusterlabs.repo && "
+         + "zypper -n --no-gpg-check install pacemaker corosync"
+         + " && /sbin/chkconfig --add corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ];then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"},
 
         /* Heartbeat/Pacemaker Clusterlabs */
         {"HbPmInst.install.text.1",

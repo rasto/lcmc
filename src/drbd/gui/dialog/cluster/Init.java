@@ -396,9 +396,11 @@ public class Init extends DialogCluster {
             final JLabel pmStartedInfo = pmStartedInfos.get(i);
             final MyButton csAisStartButton = pmStartButtons.get(i);
             String is = "Corosync";
-            if (!h.isCorosync() && h.getOpenaisVersion() != null) {
+            if ((!h.isCorosync() || h.isOpenaisWrapper())
+                && h.getOpenaisVersion() != null) {
                 is = "OpenAIS";
             }
+            System.out.println("is: " + is);
             final String initScript = is;
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {
@@ -670,11 +672,13 @@ public class Init extends DialogCluster {
                                         e.getActionCommand())) {
                                         Heartbeat.addHeartbeatToRc(host);
                                     } else if (host.isCorosync()
+                                               && !host.isOpenaisWrapper()
                                                && HB_BUTTON_SWITCH.equals(
                                                        e.getActionCommand())) {
                                         Heartbeat.switchFromCorosyncToHeartbeat(
                                                                           host);
-                                    } else if (!host.isCorosync()
+                                    } else if ((!host.isCorosync()
+                                                || host.isOpenaisWrapper())
                                                && HB_BUTTON_SWITCH.equals(
                                                        e.getActionCommand())) {
                                         Heartbeat.switchFromOpenaisToHeartbeat(
@@ -724,27 +728,31 @@ public class Init extends DialogCluster {
                                     if (Tools.getString(
                                    "Dialog.Cluster.Init.CsAisButtonRc").equals(
                                         e.getActionCommand())) {
-                                        if (host.isCorosync()) {
+                                        if (host.isCorosync()
+                                            && !host.isOpenaisWrapper()) {
                                             Corosync.addCorosyncToRc(host);
                                         } else {
                                             Openais.addOpenaisToRc(host);
                                         }
                                     } else if (CS_AIS_BUTTON_SWITCH.equals(
                                                     e.getActionCommand())) {
-                                        if (host.isCorosync()) {
+                                        if (host.isCorosync()
+                                            && !host.isOpenaisWrapper()) {
                                             Corosync.switchToCorosync(host);
                                         } else {
                                             Openais.switchToOpenais(host);
                                         }
                                     } else {
                                         if (host.isCsAisRc()) {
-                                            if (host.isCorosync()) {
+                                            if (host.isCorosync()
+                                                && !host.isOpenaisWrapper()) {
                                                 Corosync.startCorosync(host);
                                             } else {
                                                 Openais.startOpenais(host);
                                             }
                                         } else {
-                                            if (host.isCorosync()) {
+                                            if (host.isCorosync()
+                                                && !host.isOpenaisWrapper()) {
                                                 Corosync.startCorosyncRc(host);
                                             } else {
                                                 Openais.startOpenaisRc(host);

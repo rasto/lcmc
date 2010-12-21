@@ -1275,16 +1275,22 @@ sub get_cluster_versions {
 	}
 	my $ais_version = "";
 	if (-e $ais_prog) {
-		$ais_version =
-		`grep -a -o 'subrev [0-9]* version [0-9.]*' /usr/sbin/aisexec|sed 's/.* //'`;
-		chomp $ais_version;
+		if (!(system("/usr/bin/file $ais_prog 2>/dev/null"
+			     ."|grep 'shell script' > /dev/null") >> 8)) {
+			$ais_version = "wrapper";
+		}
+		if (!$ais_version) {
+			$ais_version =
+				`grep -a -o 'subrev [0-9]* version [0-9.]*' /usr/sbin/aisexec|sed 's/.* //'`;
+			chomp $ais_version;
+		}
 		if (!$ais_version) {
 			$ais_version = "ok";
 		}
 	}
 	my $hb_isrc_cmd = is_script_rc("heartbeat");
 	my $cs_ais_isrc_cmd;
-	if ($cs_version) {
+	if ($cs_version && "wrapper" ne $ais_version) {
 		$cs_ais_isrc_cmd = is_script_rc($cs_script);
 	} else {
 		$cs_ais_isrc_cmd = is_script_rc($ais_script);
@@ -1296,7 +1302,7 @@ sub get_cluster_versions {
 
 	my $hb_running_cmd = "$libpath/heartbeat -s";
 	my $cs_ais_running_cmd;
-	if ($cs_version) {
+	if ($cs_version && "wrapper" ne $ais_version) {
 		$cs_ais_running_cmd = is_running($cs_script, $cs_prog);
 	} else {
 		$cs_ais_running_cmd = is_running($ais_script, $ais_prog);

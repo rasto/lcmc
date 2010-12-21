@@ -2184,12 +2184,16 @@ public class Host implements Serializable {
         return corosyncVersion;
     }
 
-    /**
-     * Returns whether corosync is installed.
-     */
+    /** Returns whether corosync is installed. */
     public final boolean isCorosync() {
         return corosyncVersion != null;
     }
+
+    /** Returns whether openais is a wrapper. */
+    public final boolean isOpenaisWrapper() {
+        return "wrapper".equals(openaisVersion);
+    }
+
 
     /**
      * Returns the openais version.

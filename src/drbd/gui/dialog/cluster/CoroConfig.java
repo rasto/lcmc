@@ -189,7 +189,8 @@ public class CoroConfig extends DialogCluster {
                                     Openais.createAISConfig(hosts, config);
                                 }
                                 boolean configOk = updateOldAisConfig();
-                                if (hosts[0].isCorosync()) {
+                                if (hosts[0].isCorosync()
+                                    && !hosts[0].isOpenaisWrapper()) {
                                     Corosync.reloadCorosyncs(hosts);
                                 } else {
                                     Openais.reloadOpenaises(hosts);
