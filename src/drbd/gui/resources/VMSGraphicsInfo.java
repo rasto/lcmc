@@ -50,17 +50,18 @@ import org.w3c.dom.Node;
  */
 public class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Combo box that can be made invisible. */
-    private GuiComboBox portCB = null;
+    private Map<String, GuiComboBox> portCB =  new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private GuiComboBox listenCB = null;
+    private Map<String, GuiComboBox> listenCB = new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private GuiComboBox passwdCB = null;
+    private Map<String, GuiComboBox> passwdCB = new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private GuiComboBox keymapCB = null;
+    private Map<String, GuiComboBox> keymapCB =  new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private GuiComboBox displayCB = null;
+    private Map<String, GuiComboBox> displayCB =  new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private GuiComboBox xauthCB = null;
+    private Map<String, GuiComboBox> xauthCB =  new HashMap<String, GuiComboBox>();
+
     /** Parameters. AUTOPORT is generated */
     private static final String[] PARAMETERS = {GraphicsData.TYPE,
                                                 GraphicsData.PORT,
@@ -311,8 +312,11 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
         }
         for (final String param : params) {
             final String value = getComboBoxValue(param);
-            if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
+            if (getResource().isNew()
+                || !Tools.areEqual(getParamSaved(param), value)) {
+                if (!Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, value);
+                }
                 if (vnc) {
                     if (GraphicsData.PORT.equals(param) && "-1".equals(value)) {
                         parameters.put(GraphicsData.AUTOPORT, "yes");
@@ -413,12 +417,24 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
             final boolean sdl = "sdl".equals(newValue);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    listenCB.setVisible(vnc);
-                    passwdCB.setVisible(vnc);
-                    keymapCB.setVisible(vnc);
-                    portCB.setVisible(vnc);
-                    displayCB.setVisible(sdl);
-                    xauthCB.setVisible(sdl);
+                    for (final String p : listenCB.keySet()) {
+                        listenCB.get(p).setVisible(vnc);
+                    }
+                    for (final String p : passwdCB.keySet()) {
+                        passwdCB.get(p).setVisible(vnc);
+                    }
+                    for (final String p : keymapCB.keySet()) {
+                        keymapCB.get(p).setVisible(vnc);
+                    }
+                    for (final String p : portCB.keySet()) {
+                        portCB.get(p).setVisible(vnc);
+                    }
+                    for (final String p : displayCB.keySet()) {
+                        displayCB.get(p).setVisible(sdl);
+                    }
+                    for (final String p : xauthCB.keySet()) {
+                        xauthCB.get(p).setVisible(sdl);
+                    }
                 }
             });
         }
@@ -472,8 +488,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Returns string representation. */
     public final String toString() {
         final StringBuffer s = new StringBuffer(30);
-        final String type = getParamSaved(GraphicsData.TYPE);
-        if (type == null) {
+        if (getName() == null) {
             s.append("new graphics device...");
         } else {
             s.append(getName());
@@ -534,17 +549,41 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
         final GuiComboBox paramCB =
                                  super.getParamComboBox(param, prefix, width);
         if (GraphicsData.PORT.equals(param)) {
-            portCB = paramCB;
+            if (prefix == null) {
+                portCB.put("", paramCB);
+            } else {
+                portCB.put(prefix, paramCB);
+            }
         } else if (GraphicsData.LISTEN.equals(param)) {
-            listenCB = paramCB;
+            if (prefix == null) {
+                listenCB.put("", paramCB);
+            } else {
+                listenCB.put(prefix, paramCB);
+            }
         } else if (GraphicsData.PASSWD.equals(param)) {
-            passwdCB = paramCB;
+            if (prefix == null) {
+                passwdCB.put("", paramCB);
+            } else {
+                passwdCB.put(prefix, paramCB);
+            }
         } else if (GraphicsData.KEYMAP.equals(param)) {
-            keymapCB = paramCB;
+            if (prefix == null) {
+                keymapCB.put("", paramCB);
+            } else {
+                keymapCB.put(prefix, paramCB);
+            }
         } else if (GraphicsData.DISPLAY.equals(param)) {
-            displayCB = paramCB;
+            if (prefix == null) {
+                displayCB.put("", paramCB);
+            } else {
+                displayCB.put(prefix, paramCB);
+            }
         } else if (GraphicsData.XAUTH.equals(param)) {
-            xauthCB = paramCB;
+            if (prefix == null) {
+                xauthCB.put("", paramCB);
+            } else {
+                xauthCB.put(prefix, paramCB);
+            }
         }
         return paramCB;
     }

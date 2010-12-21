@@ -389,8 +389,11 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
-            if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
+            if (getResource().isNew()
+                || !Tools.areEqual(getParamSaved(param), value)) {
+                if (!Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, value);
+                }
                 getResource().setValue(param, value);
             }
         }
@@ -578,7 +581,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                               final String[] params,
                                               final boolean fromDomain) {
         final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
-        if (!fromDomain && vdi != null) {
+        if (!fromDomain && vdi != null && params.length != 1) {
             vdi.setApplyButtons(null, vdi.getParametersFromXML());
         }
         String[] parameters;
@@ -602,7 +605,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                               final String[] params,
                                               final boolean fromDomain) {
         final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
-        if (!fromDomain && vdi != null) {
+        if (!fromDomain && vdi != null && params.length != 1) {
             vdi.setApplyButtons(null, vdi.getParametersFromXML());
         }
         String[] parameters;
@@ -625,4 +628,13 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         return getParametersFromXML();
     }
 
+    /** Saves all preferred values. */
+    public final void savePreferredValues() {
+        for (final String param : getParametersFromXML()) { 
+            final String pv = getParamPreferred(param);
+            if (pv != null) {
+                getResource().setValue(param, pv);
+            }
+        }
+    }
 }

@@ -53,7 +53,9 @@ public class Storage extends VMConfig {
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
-                                            DiskData.SOURCE_DEVICE};
+                                            DiskData.SOURCE_DEVICE,
+                                            DiskData.DRIVER_NAME,
+                                            DiskData.DRIVER_TYPE};
     /** VMS disk info object. */
     private VMSDiskInfo vmsdi = null;
     /** Next dialog object. */
@@ -120,6 +122,18 @@ public class Storage extends VMConfig {
             vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
         }
         vmsdi.waitForInfoPanel();
+        vmsdi.savePreferredValues();
+        vmsdi.getResource().setValue(DiskData.TYPE, "file");
+        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE Disk");
+        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hda");
+        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
+        vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "qemu");
+        vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
+                                     "/var/lib/libvirt/images/"
+                                     +
+                                     getVMSVirtualDomainInfo().getComboBoxValue(
+                                                         VMSXML.VM_PARAM_NAME)
+                                     + ".img");
         vmsdi.addWizardParams(
                       optionsPanel,
                       PARAMS,
@@ -127,15 +141,15 @@ public class Storage extends VMConfig {
                       Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
-        vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
-        vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
-                                                                "IDE Disk");
-        vmsdi.paramComboBoxGet(DiskData.SOURCE_FILE, "wizard").setValue(
-                                     "/var/lib/libvirt/images/"
-                                     +
-                                     getVMSVirtualDomainInfo().getComboBoxValue(
-                                                         VMSXML.VM_PARAM_NAME)
-                                     + ".img");
+        //vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
+        //vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
+        //                                                        "IDE Disk");
+        //vmsdi.paramComboBoxGet(DiskData.SOURCE_FILE, "wizard").setValue(
+        //                             "/var/lib/libvirt/images/"
+        //                             +
+        //                             getVMSVirtualDomainInfo().getComboBoxValue(
+        //                                                 VMSXML.VM_PARAM_NAME)
+        //                             + ".img");
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));

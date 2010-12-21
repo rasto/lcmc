@@ -1486,7 +1486,6 @@ public class ClusterBrowser extends Browser {
             mUpdateVMSlock.release();
             return;
         }
-
         for (final String domainName : domainNames) {
             final Enumeration e = vmsNode.children();
             int i = 0;

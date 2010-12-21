@@ -513,6 +513,13 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             } else if (diskNames.contains(vmsdi.getName())) {
                 /* keeping */
                 diskNames.remove(vmsdi.getName());
+                try {
+                    mDiskToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                diskToInfo.put(vmsdi.getName(), vmsdi);
+                mDiskToInfoLock.release();
                 vmsdi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
@@ -1521,7 +1528,6 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 getBrowser().repaintTree();
             }
         });
-        checkResourceFieldsChanged(null, getParametersFromXML());
     }
 
     /**
@@ -2966,7 +2972,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         setName(getComboBoxValue(VMSXML.VM_PARAM_NAME));
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
-            if (!Tools.areEqual(getParamSaved(param), value)) {
+            if (getResource().isNew()
+                || !Tools.areEqual(getParamSaved(param), value)) {
                 parameters.put(param, value);
                 getResource().setValue(param, value);
             }
@@ -3062,8 +3069,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             getBrowser().periodicalVMSUpdate(host);
         }
         updateParameters();
-        checkResourceFieldsChanged(null, params);
         getBrowser().reload(getNode(), false);
+        if (!testOnly) {
+            setApplyButtons(null, getParametersFromXML());
+        }
     }
 
     /** Returns parameters of all devices. */
@@ -4060,7 +4069,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 definedOnHostComboBoxHash.get(host.getName()).getStringValue();
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
             if ((vmsxml == null
-                 || !vmsxml.getDomainNames().contains(getDomainName()))
+                 || (!getResource().isNew()
+                     && !vmsxml.getDomainNames().contains(getDomainName())))
                 && DEFINED_ON_HOST_TRUE.equals(value)) {
                 changed = true;
             } else if (vmsxml != null
@@ -4365,8 +4375,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                     definedOnHostComboBoxHash.get(h.getName());
             String savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null
-                && vmsxml.getDomainNames().contains(getDomainName())) {
+            if (getResource().isNew()
+                || (vmsxml != null
+                    && vmsxml.getDomainNames().contains(getDomainName()))) {
                 savedValue = DEFINED_ON_HOST_TRUE;
             } else {
                 savedValue = DEFINED_ON_HOST_FALSE;
@@ -4387,5 +4398,12 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         super.revert();
+    }
+
+    /** Saves all preferred values. */
+    public final void savePreferredValues() {
+        for (final String pv : PREFERRED_MAP.keySet()) {
+            getResource().setValue(pv, PREFERRED_MAP.get(pv));
+        }
     }
 }

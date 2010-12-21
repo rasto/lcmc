@@ -120,6 +120,10 @@ public class Network extends VMConfig {
             vmsii = getVMSVirtualDomainInfo().addInterfacePanel();
             vmsii.waitForInfoPanel();
         }
+        vmsii.savePreferredValues();
+        vmsii.getResource().setValue(InterfaceData.TYPE, "network");
+        vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, "default");
+        vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, "");
         vmsii.addWizardParams(
                       optionsPanel,
                       PARAMS,
@@ -127,10 +131,10 @@ public class Network extends VMConfig {
                       Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
-        vmsii.paramComboBoxGet(InterfaceData.TYPE,
-                               "wizard").setValue("network");
-        vmsii.paramComboBoxGet(InterfaceData.SOURCE_NETWORK,
-                               "wizard").setValue("default");
+        //vmsii.paramComboBoxGet(InterfaceData.TYPE,
+        //                       "wizard").setValue("network");
+        //vmsii.paramComboBoxGet(InterfaceData.SOURCE_NETWORK,
+        //                       "wizard").setValue("default");
         vmsii.paramComboBoxGet(InterfaceData.MODEL_TYPE, "wizard").setValue("");
 
         panel.add(optionsPanel);

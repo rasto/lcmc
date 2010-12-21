@@ -276,8 +276,11 @@ public class VMSInterfaceInfo extends VMSHardwareInfo {
             if (InterfaceData.TYPE.equals(param)) {
                 type = value;
             }
-            if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
+            if (getResource().isNew()
+                || !Tools.areEqual(getParamSaved(param), value)) {
+                if (!Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, value);
+                }
                 getResource().setValue(param, value);
             }
         }

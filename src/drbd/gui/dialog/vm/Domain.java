@@ -118,6 +118,8 @@ public class Domain extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         vdi.waitForInfoPanel();
+        vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, "CD-ROM");
+        vdi.savePreferredValues();
         vdi.addWizardParams(
                           optionsPanel,
                           PARAMS,
@@ -125,7 +127,7 @@ public class Domain extends VMConfig {
                           Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                           Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                           null);
-        vdi.paramComboBoxGet(VMSXML.VM_PARAM_BOOT, "wizard").setValue("CD-ROM");
+        //vdi.paramComboBoxGet(VMSXML.VM_PARAM_BOOT, "wizard").setValue("CD-ROM");
 
         panel.add(optionsPanel);
 

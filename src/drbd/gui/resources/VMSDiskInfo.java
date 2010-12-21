@@ -154,7 +154,7 @@ public class VMSDiskInfo extends VMSHardwareInfo {
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                               new HashMap<String, Object[]>();
     /** Default location for libvirt images. */
-    private static final String LIBVIRT_IMAGE_LOCATION =
+    public static final String LIBVIRT_IMAGE_LOCATION =
                                              "/var/lib/libvirt/images/";
     /** Pattern that parses stat output. */
     private static final Pattern STAT_PATTERN = Pattern.compile(
@@ -372,8 +372,11 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                     Tools.appWarning("cannot parse: " + param + " = " + value);
                 }
                 getResource().setValue(param, value);
-            } else if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
+            } else if (getResource().isNew()
+                       || !Tools.areEqual(getParamSaved(param), value)) {
+                if (!Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, value);
+                }
                 getResource().setValue(param, value);
             }
         }
@@ -516,7 +519,9 @@ public class VMSDiskInfo extends VMSHardwareInfo {
                         if (getResource().isNew()) {
                             driverTypeCB.get(p).setValue("raw");
                         } else {
-                            driverTypeCB.get(p).setValue(null);
+                            if (driverTypeCB.get(p).getValue() != null) {
+                                driverTypeCB.get(p).setValue(null);
+                            }
                         }
                     }
                 } else if ("virtio/disk".equals(newValue)) {
@@ -585,7 +590,8 @@ public class VMSDiskInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.DISK_TABLE);
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        //checkResourceFieldsChanged(null, getParametersFromXML());
+        setApplyButtons(null, getRealParametersFromXML());
     }
 
     /** Returns combo box for parameter. */

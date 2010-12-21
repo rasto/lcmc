@@ -122,6 +122,9 @@ public class Display extends VMConfig {
             vmsgi = getVMSVirtualDomainInfo().addGraphicsPanel();
             vmsgi.waitForInfoPanel();
         }
+        vmsgi.savePreferredValues();
+        vmsgi.getResource().setValue(GraphicsData.TYPE, "vnc");
+        vmsgi.getResource().setValue(GraphicsData.PORT, "auto");
         vmsgi.addWizardParams(
                       optionsPanel,
                       PARAMS,
@@ -129,7 +132,7 @@ public class Display extends VMConfig {
                       Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
-        vmsgi.paramComboBoxGet(GraphicsData.TYPE, "wizard").setValue("vnc");
+        //vmsgi.paramComboBoxGet(GraphicsData.TYPE, "wizard").setValue("vnc");
 
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);

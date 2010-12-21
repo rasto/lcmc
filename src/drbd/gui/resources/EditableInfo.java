@@ -398,8 +398,12 @@ public abstract class EditableInfo extends Info {
                 final GuiComboBox rpcb0 = rpcb;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        final Object value = paramCb.getStringValue();
-                        rpcb0.setValueAndWait(value);
+                        if (paramCb.getValue() == null) {
+                            rpcb0.setValueAndWait(null);
+                        } else {
+                            final Object value = paramCb.getStringValue();
+                            rpcb0.setValueAndWait(value);
+                        }
                     }
                 });
             }

@@ -400,7 +400,6 @@ public class Init extends DialogCluster {
                 && h.getOpenaisVersion() != null) {
                 is = "OpenAIS";
             }
-            System.out.println("is: " + is);
             final String initScript = is;
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {

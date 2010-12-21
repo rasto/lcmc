@@ -53,7 +53,8 @@ public class InstallationDisk extends VMConfig {
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
                                             DiskData.SOURCE_DEVICE,
-                                            DiskData.DRIVER_TYPE};
+                                            DiskData.DRIVER_TYPE,
+                                            DiskData.READONLY};
     /** VMS disk info object. */
     private VMSDiskInfo vmsdi = null;
     /** Next dialog object. */
@@ -120,6 +121,14 @@ public class InstallationDisk extends VMConfig {
             vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
             vmsdi.waitForInfoPanel();
         }
+        vmsdi.savePreferredValues();
+        vmsdi.getResource().setValue(DiskData.TYPE, "file");
+        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE CDROM");
+        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hdc");
+        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
+        vmsdi.getResource().setValue(DiskData.READONLY, "True");
+        vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
+                                     VMSDiskInfo.LIBVIRT_IMAGE_LOCATION);
         vmsdi.addWizardParams(
                           optionsPanel,
                           PARAMS,
@@ -127,9 +136,10 @@ public class InstallationDisk extends VMConfig {
                           Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                           Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                           null);
-        vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
-        vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
-                                                                  "IDE CDROM");
+        vmsdi.setApplyButtons(null, vmsdi.getParametersFromXML());
+        //vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
+        //vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
+        //                                                          "IDE CDROM");
         panel.add(optionsPanel);
 
         final JScrollPane sp = new JScrollPane(panel);
