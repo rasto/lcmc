@@ -706,7 +706,7 @@ public class HbConfig extends DialogCluster {
         config.append("warntime 20\n");
         config.append("deadtime 30\n");
         config.append("initdead 30\n\n");
-        config.append("crm yes\nnode");
+        config.append("crm respawn\nnode");
         final Host[] hosts = getCluster().getHostsArray();
         for (Host host : hosts) {
             config.append(' ');
