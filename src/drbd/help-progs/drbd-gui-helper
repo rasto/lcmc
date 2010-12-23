@@ -32,6 +32,7 @@ use Socket;
 
 $ENV{LANG}="C";
 $ENV{LANGUAGE}="C";
+$ENV{LC_CTYPE}="C";
 for (keys %ENV) {
 	$ENV{$_} = "C" if /^LC_/;
 }
@@ -63,6 +64,8 @@ if ($option eq "all") {
 	get_net_info();
 	print "disk-info\n";
 	get_disk_info();
+	print "vg-info\n";
+	get_vg_info();
 	print "filesystems-info\n";
 	get_filesystems_info();
 	print "crypto-info\n";
@@ -83,6 +86,8 @@ if ($option eq "all") {
 	sleep 1;
 	print "disk-info\n";
 	get_disk_info();
+	print "vg-info\n";
+	get_vg_info();
 	sleep 1;
 	print "filesystems-info\n";
 	get_filesystems_info();
@@ -98,6 +103,8 @@ if ($option eq "all") {
 	get_net_info();
 } elsif ($option eq "get-disk-info") {
 	get_disk_info();
+} elsif ($option eq "get-vg-info") {
+	get_vg_info();
 } elsif ($option eq "get-filesystems-info") {
 	get_filesystems_info();
 } elsif ($option eq "get-crypto-info") {
@@ -257,7 +264,7 @@ sub get_mount {
 				}
 			}
 			print_debug("mount: $dev, $mountpoint, $filesystem");
-			$dev_to_mount{$dev} = "$mountpoint $filesystem";
+			$dev_to_mount{$dev} = "$mountpoint fs:$filesystem";
 		}
 	}
 	return \%dev_to_mount;
@@ -332,6 +339,7 @@ sub get_lvm {
 	}
 
 	my %major_minor_to_dev;
+	my %major_minor_to_group;
 	my %devs_with_lvm;
 	my %lvm_devs;
 
@@ -340,6 +348,7 @@ sub get_lvm {
 		my ($major, $minor, $group, $name) = split;
 		print_debug("get_lvm: ($major, $minor, $group, $name, $group_to_pv{$group})");
 		$major_minor_to_dev{"$major:$minor"} = "$group/$name";
+		$major_minor_to_group{"$major:$minor"} = $group;
 		$devs_with_lvm{$group_to_pv{$group}}++;
 		$lvm_devs{"$group/$name"}++;
 
@@ -347,7 +356,8 @@ sub get_lvm {
 	return (\%group_to_pv,
 		\%major_minor_to_dev,
 		\%devs_with_lvm,
-		\%lvm_devs);
+		\%lvm_devs,
+		\%major_minor_to_group);
 }
 
 # this is used if the devices is dm but not lvm
@@ -417,7 +427,8 @@ sub get_disk_info {
 	my ($group_to_pv,
 	    $lvm_major_minor_to_dev,
 	    $devs_with_lvm,
-	    $lvm_devs) = get_lvm();
+	    $lvm_devs,
+	    $lvm_major_minor_to_group) = get_lvm();
 	my $dm_major_minor_to_dev = get_device_mapper_hash();
 	my $drbd_devs = get_drbd_devs();
 	my $dev_to_mount = get_mount($lvm_devs, $drbd_devs);
@@ -446,12 +457,14 @@ sub get_disk_info {
 		my ($major, $minor, $blocks, $name) = split;
 		next if $$devs_with_lvm{$name} || $$devs_in_raid{$name};
 		my $device;
+		my $lvm_group;
 		if ($major == $device_mapper_major) {
 			if ($$lvm_major_minor_to_dev{"$major:$minor"}) {
 				$device = "/dev/".$$lvm_major_minor_to_dev{"$major:$minor"};
 				my $dev = $$lvm_major_minor_to_dev{"$major:$minor"};
 				$dev = $name if !$dev;
 				$device = "/dev/".$dev;
+				$lvm_group = $$lvm_major_minor_to_group{"$major:$minor"};
 			} elsif ($$dm_major_minor_to_dev{"$major:$minor"}) {
 				$device =
 				     $$dm_major_minor_to_dev{"$major:$minor"};
@@ -482,10 +495,11 @@ sub get_disk_info {
 		my $readlink = `readlink -f $device`;
 		chomp $readlink;
 		my $dev_sec = $by_uuids{$readlink} || $readlink || $device;
-		my $info = "$device $dev_sec $blocks";
-		$info.= " ".$$dev_to_mount{$device} if $$dev_to_mount{$device};
-		$info.= " swap swap" if $$dev_to_swap{$device};
-		$info.= " ".$$dev_to_used{$device} if defined $$dev_to_used{$device};
+		my $info = "$device rl:$dev_sec size:$blocks";
+		$info.= " mp:".$$dev_to_mount{$device} if $$dev_to_mount{$device};
+		$info.= " fs:swap mp:swap" if $$dev_to_swap{$device};
+		$info.= " used:".$$dev_to_used{$device} if defined $$dev_to_used{$device};
+		$info.= " vg:".$lvm_group if defined $lvm_group;
 		$info.= "\n";
 		push @info, $info;
 	}
@@ -497,6 +511,19 @@ sub get_disk_info {
 				||
 	   (($a->[1] =~ /(\d+$)/)[0] || 0) <=> (($b->[1]  =~ /(\d+$)/)[0] || 0) 
 	  } map { [$_, /([^\/]+?) /] } @info;
+}
+
+# returns volume group info
+sub get_vg_info {
+	my $path = "/usr/sbin/";
+	if (-e "/sbin/pvdisplay") {
+		$path = "/sbin";
+	}
+	for (`$path/vgdisplay -C --noheadings --units b -o name,free 2>/dev/null`) {
+		my ($name, $free) = split;
+		$free =~ s/B$//;
+		print "$name $free\n";
+	}
 }
 
 # get_filesystems_info

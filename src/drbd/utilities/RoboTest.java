@@ -546,10 +546,9 @@ public final class RoboTest {
         leftPress(robot); /* scroll bar */
         moveTo(robot, 1105, 510);
         leftRelease(robot);
-
         moveTo(robot, 1076, 420);
         leftClick(robot);
-        moveTo(robot, 1037, 490);
+        moveTo(robot, 1037, 487);
         leftClick(robot); /* no ping */
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
@@ -1057,17 +1056,17 @@ public final class RoboTest {
         stopEverything(robot); /* to be sure */
         sleep(5000);
         checkTest(host, "test1", 29);
-        if (maybe()) {
-            removeEverything(robot);
-        } else {
+        if (true) {
             removeResource(robot, ipX, ipY, -15);
 	    sleep(5000);
             removeGroup(robot, gx, gy, 0);
 	    sleep(5000);
             removeGroup(robot, statefulX, statefulY, -15);
+        } else {
+            removeEverything(robot);
         }
         if (!aborted) {
-            Tools.sleep(10000);
+            Tools.sleep(240000);
         }
         checkTest(host, "test1", 1);
     }
@@ -1320,7 +1319,7 @@ public final class RoboTest {
         stopEverything(robot);
         sleep(10000);
         checkTest(host, "test2", 12.5);
-        if (maybe()) {
+        if (true) {
             /* remove placeholder */
             moveTo(robot, phX , phY);
             rightClick(robot);
@@ -1341,6 +1340,9 @@ public final class RoboTest {
             sleep(5000);
         } else {
             removeEverything(robot);
+        }
+        if (!aborted) {
+            Tools.sleep(240000);
         }
         checkTest(host, "test2", 16);
     }
@@ -2147,6 +2149,7 @@ public final class RoboTest {
         robot.mousePress(InputEvent.BUTTON1_MASK);
         Tools.sleep(300);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
+        Tools.sleep(300);
     }
 
     /** Left press. */

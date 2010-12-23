@@ -233,6 +233,7 @@ public final class DrbdMC extends JPanel {
             });
         String autoArgs = null;
         boolean upgradeCheck = true;
+        boolean pluginCheck = true;
         boolean auto = false;
         boolean tightvnc = false;
         boolean ultravnc = false;
@@ -296,6 +297,7 @@ public final class DrbdMC extends JPanel {
                                    + "the drbd-gui-helper program.");
                 System.out.println("--auto for testing");
                 System.out.println("--no-upgrade-check disable upgrade check");
+                System.out.println("--no-plugin-check disable plugin check");
                 System.out.println("--tightvnc, enable tight vnc viewer");
                 System.out.println("--ultravnc, enable ultra vnc viewer");
                 System.out.println("--realvnc, enable real vnc viewer");
@@ -325,6 +327,8 @@ public final class DrbdMC extends JPanel {
                 realvnc = true;
             } else if ("--no-upgrade-check".equals(arg)) {
                 upgradeCheck = false;
+            } else if ("--no-plugin-check".equals(arg)) {
+                pluginCheck = false;
             } else if ("--auto".equals(arg)) {
                 auto = true;
             } else if ("--staging-drbd".equals(arg)) {
@@ -354,6 +358,7 @@ public final class DrbdMC extends JPanel {
             }
         }
         Tools.getConfigData().setUpgradeCheckEnabled(upgradeCheck);
+        Tools.getConfigData().setPluginsEnabled(pluginCheck);
         Tools.getConfigData().setTightvnc(tightvnc);
         Tools.getConfigData().setUltravnc(ultravnc);
         Tools.getConfigData().setRealvnc(realvnc);

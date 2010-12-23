@@ -25,13 +25,14 @@ import drbd.data.ConfigData;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.Clusters;
+import drbd.data.DrbdGuiXML;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.ServiceInfo;
 import drbd.gui.ClusterBrowser;
-import drbd.data.DrbdGuiXML;
 import drbd.gui.GUIData;
 import drbd.gui.dialog.ConfirmDialog;
+import drbd.utilities.UpdatableItem;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -101,6 +102,13 @@ import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.lang.reflect.Modifier;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+
 /**
  * This class provides tools, that are not classified.
  *
@@ -164,6 +172,9 @@ public final class Tools {
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
     /** Random number generator. */
     private static final Random RANDOM = new Random();
+    /** Hash mit classes from plugin. */
+    private static final Map<String, RemotePlugin> pluginObjects =
+                                           new HashMap<String, RemotePlugin>();
     /**
      * Private constructor.
      */
@@ -537,6 +548,19 @@ public final class Tools {
             appWarningHash.add(msg);
             if (appWarning) {
                 System.out.println("APPWARNING: " + msg);
+            } else {
+                debug("APPWARNING: " + msg, 2);
+            }
+        }
+    }
+
+    /** Warning with exception error message. */
+    public static void appWarning(final String msg, final Exception e) {
+        if (!appWarningHash.contains(msg)) {
+            appWarningHash.add(msg);
+            if (appWarning) {
+                System.out.println("APPWARNING: " + msg + ": "
+                                   + e.getMessage());
             } else {
                 debug("APPWARNING: " + msg, 2);
             }
@@ -1106,7 +1130,7 @@ public final class Tools {
             return resourceSD.getStringArray(service);
         } catch (Exception e) {
             Tools.appWarning("cannot get service definition for service: "
-                             + service);
+                             + service, e);
             return new String[]{};
         }
     }
@@ -1719,9 +1743,7 @@ public final class Tools {
         sleep((int) ms);
     }
 
-    /**
-     * Returns the latest version of this application.
-     */
+    /** Returns the latest version of this application. */
     public static String getLatestVersion() {
         String version = null;
         final Pattern vp = Pattern.compile(
@@ -2335,5 +2357,122 @@ public final class Tools {
             return filename;
         }
         return filename.substring(0, i + 1);
+    }
+
+    /** Returns list of plugins. */
+    private static List<String> getPluginList() {
+        final Pattern p = Pattern.compile(
+                ".*<img src=\"/icons/folder.gif\" alt=\"\\[DIR\\]\">"
+                + "</td><td><a href=\".*?/\">(.*?)/</a>.*");
+        final List<String> pluginList = new ArrayList<String>();
+        try {
+            final String url = "http://oss.linbit.com/drbd-mc/drbd-mc-plugins/?drbd-mc-plugin-check-"
+                               + getRelease();
+            final BufferedReader reader = new BufferedReader(
+                             new InputStreamReader(new URL(url).openStream()));
+            do {
+                final String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                final Matcher m = p.matcher(line);
+                if (m.matches()) {
+                    final String pluginName = m.group(1);
+                    pluginList.add(pluginName);
+                }
+            } while (true);
+        } catch (MalformedURLException mue) {
+            return pluginList;
+        } catch (IOException ioe) {
+            return pluginList;
+        }
+        return pluginList;
+    }
+
+    /** Loads one plugin. */
+    private static Class loadPlugin(final String pluginName) {
+        final String user = getConfigData().getPluginUser();
+        final String passwd = getConfigData().getPluginPassword();
+
+        if (user != null && passwd != null) {
+            Authenticator.setDefault(new java.net.Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(user,
+                                                      passwd.toCharArray());
+                }
+            });
+        }
+        URLClassLoader loader;
+        final String[] dirs = pluginName.split(":");
+        final String url = "http://rasto:rasto@oss.linbit.com/drbd-mc/drbd-mc-plugins/"
+                           + pluginName + "/"
+                           + getRelease() + "/";
+        try {
+            loader = new URLClassLoader(new URL[] {
+                new URL(url)
+            });
+        } catch (java.net.MalformedURLException e) {
+            Tools.appWarning("could not get: " + url, e);
+            return null;
+        }
+        Class c = null;
+        final String className = "plugins." + dirs[dirs.length - 1];
+        try {
+            c = loader.loadClass(className);
+        } catch (java.lang.ClassNotFoundException e) {
+            Tools.debug("could not load " + url + " " + className, 1);
+            return null;
+        }
+        return c;
+    }
+
+    /** Load all plugins */
+    public static void loadPlugins() {
+        final List<String> pluginList = getPluginList();
+        getGUIData().getMainMenu().reloadPluginsMenu(pluginList);
+        for (final String pluginName : pluginList) {
+            final Class c = loadPlugin(pluginName);
+            if (c == null) {
+                continue;
+            }
+            RemotePlugin remotePlugin = null;
+            try {
+                remotePlugin = (RemotePlugin) c.newInstance();
+            } catch (java.lang.InstantiationException e) {
+                Tools.appWarning("could not instantiate plugin: " + pluginName,
+                                 e);
+                continue;
+            } catch (java.lang.IllegalAccessException e) {
+                Tools.appWarning("could not access plugin: " + pluginName, e);
+                continue;
+            }
+            remotePlugin.init();
+            pluginObjects.put(pluginName, remotePlugin);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getGUIData().getMainMenu().enablePluginMenu(pluginName,
+                                                                c != null);
+                    if (c != null) {
+                        Tools.info(pluginName + " was enabled");
+                    }
+                }
+            });
+        }
+    }
+
+    /** Show plugin description. */
+    public static void showPluginDescription(final String pluginName) {
+        final RemotePlugin remotePlugin = pluginObjects.get(pluginName);
+        if (remotePlugin != null) {
+            remotePlugin.showDescription();
+        }
+    }
+
+    /** Adds menu items from plugins. */
+    public static void addPluginMenuItems(final Info info,
+                                          final List<UpdatableItem> items) {
+        for (final String pluginName : pluginObjects.keySet()) {
+            pluginObjects.get(pluginName).addPluginMenuItems(info, items);
+        }
     }
 }

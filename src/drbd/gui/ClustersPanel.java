@@ -94,6 +94,9 @@ public class ClustersPanel extends JPanel {
         if (Tools.getConfigData().isUpgradeCheckEnabled()) {
             startUpgradeCheck();
         }
+        if (Tools.getConfigData().arePluginsEnabled()) {
+            loadPlugins();
+        }
         setBackground(Tools.getDefaultColor("ClustersPanel.Background"));
         showGUI();
     }
@@ -294,9 +297,7 @@ public class ClustersPanel extends JPanel {
         }
     }
 
-    /**
-     * Starts upgrade check.
-     */
+    /** Starts upgrade check. */
     private void startUpgradeCheck() {
         final Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -330,6 +331,16 @@ public class ClustersPanel extends JPanel {
                         }
                     }
                 });
+            }
+        });
+        thread.start();
+    }
+
+    /** Load plugins. */
+    private void loadPlugins() {
+        final Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Tools.loadPlugins();
             }
         });
         thread.start();

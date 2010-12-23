@@ -25,6 +25,7 @@ package drbd.gui;
 import drbd.utilities.Tools;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
+import drbd.gui.dialog.PluginLogin;
 import drbd.AddHostDialog;
 import drbd.AddClusterDialog;
 
@@ -42,6 +43,7 @@ import java.awt.event.KeyEvent;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -62,9 +64,14 @@ public class MainMenu extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
     /** Menu bar. */
     private final JMenuBar menuBar;
+    /** Plugins submenu. */
+    private final JMenu pluginsMenu;
     /** Look and feel map. */
     private static final Map<String, String> LOOK_AND_FEEL_MAP =
                                                 new HashMap<String, String>();
+    /** Map from plugin name to it's menu item. */
+    private final Map<String, JMenuItem> pluginHash =
+                                               new HashMap<String, JMenuItem>();
     /**
      * because glassPane does not capture key events in my version of java,
      * the menu must turned off explicitly. */
@@ -154,6 +161,11 @@ public class MainMenu extends JPanel implements ActionListener {
 
         menuBar.add(submenu);
 
+        /* plugins */
+        pluginsMenu = addMenu(Tools.getString("MainMenu.Plugins"),
+                              KeyEvent.VK_P);
+        menuBar.add(pluginsMenu);
+
         /* settings */
         submenu = addMenu(Tools.getString("MainMenu.Settings"), 0);
         Tools.getGUIData().addToVisibleInAccessType(submenu,
@@ -223,9 +235,7 @@ public class MainMenu extends JPanel implements ActionListener {
         };
     }
 
-    /**
-     * Add new host action listener.
-     */
+    /** Add new host action listener. */
     private ActionListener newHostActionListener() {
         return new ActionListener() {
              public void actionPerformed(final ActionEvent e) {
@@ -236,6 +246,41 @@ public class MainMenu extends JPanel implements ActionListener {
                      public void run() {
                          final AddHostDialog h = new AddHostDialog();
                          h.showDialogs();
+                     }
+                 });
+                 t.start();
+             }
+        };
+    }
+
+    /** Add new plugin action listener. */
+    private ActionListener newPluginActionListener(final String pluginName) {
+        return new ActionListener() {
+             public void actionPerformed(final ActionEvent e) {
+                 if (turnOff) {
+                     return;
+                 }
+                 final Thread t = new Thread(new Runnable() {
+                     public void run() {
+                         Tools.showPluginDescription(pluginName);
+                     }
+                 });
+                 t.start();
+             }
+        };
+    }
+
+    /** Add new register plugins action listener. */
+    private ActionListener newRegisterPluginsActionListener() {
+        return new ActionListener() {
+             public void actionPerformed(final ActionEvent e) {
+                 if (turnOff) {
+                     return;
+                 }
+                 final Thread t = new Thread(new Runnable() {
+                     public void run() {
+                         final PluginLogin pl = new PluginLogin(null);
+                         pl.showDialog();
                      }
                  });
                  t.start();
@@ -501,5 +546,54 @@ public class MainMenu extends JPanel implements ActionListener {
         }
         parentMenu.add(item);
         return item;
+    }
+
+    /** Reloads plugin menu. */
+    public final void reloadPluginsMenu(final List<String> pluginList) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                pluginsMenu.removeAll();
+                final JMenuItem hostItem =
+                        addMenuItem(Tools.getString("MainMenu.RegisterPlugins"),
+                                    pluginsMenu,
+                                    KeyEvent.VK_R,
+                                    0,
+                                    newRegisterPluginsActionListener(),
+                                    null);
+                for (final String pluginName : pluginList) {
+                    String newName = pluginName;
+                    final String[] dirs = newName.split(":");
+                    JMenu submenu = pluginsMenu;
+                    if (dirs.length > 1) {
+                        for (int i = 0; i < dirs.length - 1; i++) {
+                            final JMenu m =
+                                    addMenu(dirs[i].replaceAll("_", " "), 0);
+                            submenu.add(m);
+                            submenu = m;
+                        }
+                        newName = dirs[dirs.length - 1];
+                    }
+                    final JMenuItem pluginItem = addMenuItem(
+                                           "About "
+                                           + newName.replaceAll("_", " " ),
+                                           submenu,
+                                           0,
+                                           0,
+                                           newPluginActionListener(pluginName),
+                                           null);
+                    pluginHash.put(pluginName, pluginItem);
+                    pluginItem.setEnabled(false);
+                }
+            }
+        });
+    }
+
+    /** Enable plugin menu item. */
+    public final void enablePluginMenu(final String pluginName,
+                                       final boolean enable) {
+        final JMenuItem item = pluginHash.get(pluginName);
+        if (item != null) {
+            item.setEnabled(enable);
+        }
     }
 }

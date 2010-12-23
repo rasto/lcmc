@@ -25,6 +25,8 @@ import java.io.Serializable;
 import java.io.IOException;
 import java.io.File;
 import drbd.utilities.Tools;
+import drbd.gui.resources.BlockDevInfo;
+import drbd.gui.ClusterBrowser;
 import ch.ethz.ssh2.KnownHosts;
 import org.apache.commons.collections.map.MultiKeyMap;
 import java.util.List;
@@ -93,6 +95,17 @@ public class ConfigData implements Serializable {
     private String savedDownloadPassword = "";
     /** If set to true user and password will be saved. */
     private boolean loginSave = true;
+
+    /** Default user for plugin login. */
+    private String pluginUser = null;
+    /** Default password for plugin login. */
+    private String pluginPassword = null;
+    /** User for plugin login. */
+    private String savedPluginUser = "";
+    /** Password for plugin login. */
+    private String savedPluginPassword = "";
+    /** If set to true user and password will be saved. */
+    private boolean pluginLoginSave = true;
     /** Whether it is an advanced mode. */
     private boolean advancedMode = false;
     /** Default save file. */
@@ -155,6 +168,8 @@ public class ConfigData implements Serializable {
     private AccessType maxAccessType = AccessType.ADMIN;
     /** Whether the upgrade check is enabled. */
     private boolean upgradeCheckEnabled = true;
+    /** Whether the plugins are enabled. */
+    private boolean pluginsEnabled = true;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -217,9 +232,7 @@ public class ConfigData implements Serializable {
         return downloadUser;
     }
 
-    /**
-     * Gets password for download area.
-     */
+    /** Gets password for download area. */
     public final String getDownloadPassword() {
         if (savedDownloadPassword != null
             && !savedDownloadPassword.equals("")) {
@@ -236,9 +249,7 @@ public class ConfigData implements Serializable {
         return loginSave;
     }
 
-    /**
-     * Sets user and password for download area.
-     */
+    /** Sets user and password for download area. */
     public final void setDownloadLogin(final String downloadUser,
                                        final String downloadPassword,
                                        final boolean loginSave) {
@@ -252,6 +263,48 @@ public class ConfigData implements Serializable {
             savedDownloadUser = "";
             savedDownloadPassword = "";
         }
+    }
+
+    /** Gets user for plugin area. */
+    public final String getPluginUser() {
+        if (savedPluginUser != null && !savedPluginUser.equals("")) {
+            pluginUser = savedPluginUser;
+            savedPluginUser = "";
+        }
+        return pluginUser;
+    }
+
+    /** Gets password for plugin area. */
+    public final String getPluginPassword() {
+        if (savedPluginPassword != null
+            && !savedPluginPassword.equals("")) {
+            pluginPassword = savedPluginPassword;
+            savedPluginPassword = "";
+        }
+        return pluginPassword;
+    }
+
+    /** Sets user and password for plugin area. */
+    public final void setPluginLogin(final String pluginUser,
+                                     final String pluginPassword,
+                                     final boolean pluginLoginSave) {
+        this.pluginUser = pluginUser;
+        this.pluginPassword = pluginPassword;
+        this.loginSave = loginSave;
+        if (loginSave) {
+            savedPluginUser = pluginUser;
+            savedPluginPassword = pluginPassword;
+        } else {
+            savedPluginUser = "";
+            savedPluginPassword = "";
+        }
+    }
+
+    /**
+     * Returns whether the user and password for plugin area, shuld be saved.
+     */
+    public final boolean getPluginLoginSave() {
+        return pluginLoginSave;
     }
 
     /**
@@ -707,5 +760,15 @@ public class ConfigData implements Serializable {
     /** Returns whether the upgrade check is enabled. */
     public final boolean isUpgradeCheckEnabled() {
         return upgradeCheckEnabled;
+    }
+
+    /** Returns whether the plugins are enabled. */
+    public final boolean arePluginsEnabled() {
+        return pluginsEnabled;
+    }
+
+    /** Sets whether the plugins should be enabled. */
+    public final void setPluginsEnabled(final boolean pluginsEnabled) {
+        this.pluginsEnabled = pluginsEnabled;
     }
 }

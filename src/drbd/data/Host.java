@@ -216,6 +216,10 @@ public class Host implements Serializable {
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
+    /** Volume group information on this host. */
+    public Map<String, Double> volumeGroups =
+                                        new LinkedHashMap<String, Double>();
+    
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1913,6 +1917,8 @@ public class Host implements Serializable {
                                      new LinkedHashMap<String, BlockDevice>();
         final Map<String, NetInterface> newNetInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
+        final Map<String, Double> newVolumeGroups =
+                                         new LinkedHashMap<String, Double>();
         final Pattern bdP = Pattern.compile("(\\D+)\\d+");
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
@@ -1922,6 +1928,7 @@ public class Host implements Serializable {
             }
             if ("net-info".equals(line)
                 || "disk-info".equals(line)
+                || "vg-info".equals(line)
                 || "filesystems-info".equals(line)
                 || "crypto-info".equals(line)
                 || "qemu-keymaps-info".equals(line)
@@ -1954,6 +1961,13 @@ public class Host implements Serializable {
                         newBlockDevices.remove(m.group(1));
                     }
                 }
+            } else if ("vg-info".equals(type)) {
+                final String[] vgi = line.split("\\s+");
+                if (vgi.length == 2) {
+                    newVolumeGroups.put(vgi[0], Double.parseDouble(vgi[1]));
+                } else {
+                    Tools.appWarning("could not parse volume info: " + line);
+                }
             } else if ("filesystems-info".equals(type)) {
                 addFileSystem(line);
             } else if ("crypto-info".equals(type)) {
@@ -1973,6 +1987,7 @@ public class Host implements Serializable {
         setDistInfo(versionLines.toArray(new String[versionLines.size()]));
         blockDevices = newBlockDevices;
         netInterfaces = newNetInterfaces;
+        volumeGroups = newVolumeGroups;
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
                                        getFileSystems());

@@ -1842,4 +1842,9 @@ public class BlockDevInfo extends EditableInfo {
         //}
         return super.checkResourceFieldsCorrect(param, params);
     }
+
+    /** Returns whether this block device is LVM. */
+    public final boolean isLVM() {
+        return getBlockDevice().getLVMGroup() != null;
+    }
 }

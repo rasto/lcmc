@@ -32,6 +32,7 @@ import drbd.utilities.UpdatableItem;
 import drbd.utilities.MyCellRenderer;
 import drbd.utilities.MyButtonCellRenderer;
 import drbd.utilities.MyButton;
+import drbd.utilities.MyMenuItem;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -592,6 +593,7 @@ public class Info implements Comparable {
         if (popup == null) {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
+                Tools.addPluginMenuItems(this, items);
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
@@ -631,6 +633,7 @@ public class Info implements Comparable {
         if (popup == null) {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
+                Tools.addPluginMenuItems(this, items);
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
@@ -662,13 +665,18 @@ public class Info implements Comparable {
 
     /** Returns the Action menu. */
     public final JMenu getActionsMenu() {
-        final JMenu m = getMenu(Tools.getString("Browser.ActionsMenu"));
+        final JMenu m = getNewMenu(Tools.getString("Browser.ActionsMenu"));
         m.setToolTipText(Tools.getString("Browser.ActionsMenu"));
         return m;
     }
 
+    /** Returns menu object. */
+    public final JMenu getMenu() {
+        return menu;
+    }
+
     /** Returns the menu with menu item spefified in the createPopup method. */
-    public final JMenu getMenu(final String name) {
+    public final JMenu getNewMenu(final String name) {
         if (menu == null) {
             menu = new JMenu(name) {
                 /** Serial version uid. */
@@ -736,12 +744,13 @@ public class Info implements Comparable {
             menu.setFont(new Font(fname, style, 10));
             menu.setMargin(new Insets(2, 2, 2, 2));
             menu.setIconTextGap(0);
-
+            final Info thisObject = this;
             final Thread thread = new Thread(new Runnable() {
                 public void run() {
                     menu.setIcon(Browser.ACTIONS_ICON);
                     menu.setBackground(Browser.STATUS_BACKGROUND);
                     final List<UpdatableItem> items = createPopup();
+                    Tools.addPluginMenuItems(thisObject, items);
                     try {
                         mActionMenuListLock.acquire();
                     } catch (InterruptedException e) {
@@ -801,12 +810,14 @@ public class Info implements Comparable {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            for (final UpdatableItem i : menuList) {
+            final List<UpdatableItem> menuListCopy =
+                                        new ArrayList<UpdatableItem>(menuList);
+            mMenuListLock.release();
+            for (final UpdatableItem i : menuListCopy) {
                 i.setPos(pos);
                 i.update();
             }
-            final int size = menuList.size();
-            mMenuListLock.release();
+            final int size = menuListCopy.size();
             if (size > maxMenuList) {
                 maxMenuList = size;
                 Tools.debug(this, "menu list size: " + maxMenuList, 2);
@@ -1282,5 +1293,58 @@ public class Info implements Comparable {
             return ((MyButton) object).getText();
         }
         return object.toString();
+    }
+
+    /** Adds plugin menu item. */
+    public final void addPluginMenuItem(final MyMenuItem pluginItem) {
+        /* check if it is already there */
+        try {
+            mMenuListLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        //for (final UpdatableItem menuItem : menuList) {
+        //    if (menuItem.toString().equals(pluginItem.toString())) {
+        //        mMenuListLock.release();
+        //        return;
+        //    }
+        //}
+        menuList.add(pluginItem);
+        mMenuListLock.release();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                menu.add(pluginItem);
+            }
+        });
+    }
+
+    /** Adds plugin action menu item. */
+    public final void addPluginActionMenuItem(final MyMenuItem pluginItem) {
+        /* check if it is already there */
+        try {
+            mActionMenuListLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        if (actionMenuList == null) {
+            mActionMenuListLock.release();
+            return;
+        }
+        //for (final UpdatableItem actionMenuItem : actionMenuList) {
+        //    if (actionMenuItem.toString().equals(pluginItem.toString())) {
+        //        mActionMenuListLock.release();
+        //        return;
+        //    }
+        //}
+        actionMenuList.add(pluginItem);
+        mActionMenuListLock.release();
+        final JPopupMenu pm = popup;
+        if (pm != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    pm.add(pluginItem);
+                }
+            });
+        }
     }
 }

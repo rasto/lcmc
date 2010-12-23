@@ -22,6 +22,7 @@
 
 package drbd.gui;
 
+import drbd.gui.resources.BlockDevInfo;
 import drbd.data.Cluster;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
@@ -522,4 +523,16 @@ public class GUIData  {
                                                                 required) >= 0);
     }
 
+    /** Returns all block devices from all clusters. */
+    public final List<BlockDevInfo> getAllBlockDevices() {
+        final List<BlockDevInfo> bdis = new ArrayList<BlockDevInfo>();
+        for (final Cluster cluster
+                        : Tools.getConfigData().getClusters().getClusterSet()) {
+            final ClusterBrowser cb = cluster.getBrowser();
+            if (cb != null) {
+                bdis.addAll(cluster.getBrowser().getAllBlockDevices());
+            }
+        }
+        return bdis;
+    }
 }

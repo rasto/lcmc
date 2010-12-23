@@ -77,6 +77,10 @@ public class DrbdGuiXML extends XML {
     private static final String DOWNLOAD_USER_ATTR = "dwuser";
     /** Download user password. */
     private static final String DOWNLOAD_PASSWD_ATTR = "dwpasswd";
+    /** Plugin user. */
+    private static final String PLUGIN_USER_ATTR = "plguser";
+    /** Plugin password. */
+    private static final String PLUGIN_PASSWD_ATTR = "plgpasswd";
 
     /**
      * Saves data about clusters and hosts to the supplied output stream.
@@ -103,6 +107,15 @@ public class DrbdGuiXML extends XML {
             if (downloadUser != null && downloadPasswd != null) {
                 root.setAttribute(DOWNLOAD_USER_ATTR, downloadUser);
                 root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
+            }
+        }
+        if (Tools.getConfigData().getPluginLoginSave()) {
+            final String pluginUser = Tools.getConfigData().getPluginUser();
+            final String pluginPasswd =
+                                Tools.getConfigData().getPluginPassword();
+            if (pluginUser != null && pluginPasswd != null) {
+                root.setAttribute(PLUGIN_USER_ATTR, pluginUser);
+                root.setAttribute(PLUGIN_PASSWD_ATTR, pluginPasswd);
             }
         }
         final Element hosts = (Element) root.appendChild(
@@ -227,6 +240,7 @@ public class DrbdGuiXML extends XML {
         final Map<String, List<Host>> hostMap =
                                        new LinkedHashMap<String, List<Host>>();
         if (rootNode != null) {
+            /* download area */
             final String downloadUser = getAttribute(rootNode,
                                                      DOWNLOAD_USER_ATTR);
             final String downloadPasswd = getAttribute(rootNode,
@@ -235,6 +249,16 @@ public class DrbdGuiXML extends XML {
                 Tools.getConfigData().setDownloadLogin(downloadUser,
                                                        downloadPasswd,
                                                        true);
+            }
+            /* plugins */
+            final String pluginUser = getAttribute(rootNode,
+                                                   PLUGIN_USER_ATTR);
+            final String pluginPasswd = getAttribute(rootNode,
+                                                     PLUGIN_PASSWD_ATTR);
+            if (pluginUser != null && pluginPasswd != null) {
+                Tools.getConfigData().setPluginLogin(pluginUser,
+                                                     pluginPasswd,
+                                                     true);
             }
             /* hosts */
             final Node hostsNode = getChildNode(rootNode, "hosts");

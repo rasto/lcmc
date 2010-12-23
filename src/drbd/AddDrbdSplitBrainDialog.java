@@ -37,7 +37,6 @@ import drbd.gui.resources.DrbdResourceInfo;
  * @version $Id$
  */
 public class AddDrbdSplitBrainDialog {
-
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */

@@ -75,6 +75,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.JMenu;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -2618,5 +2619,15 @@ public class ClusterBrowser extends Browser {
             }
         }
         return false;
+    }
+
+    
+    /** Returns all block devices from this clusters. */
+    public final List<BlockDevInfo> getAllBlockDevices() {
+        final List<BlockDevInfo> bdis = new ArrayList<BlockDevInfo>();
+        for (final Host host : cluster.getHostsArray()) {
+            bdis.addAll(host.getBrowser().getBlockDevInfos());
+        }
+        return bdis;
     }
 }

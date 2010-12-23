@@ -25,6 +25,10 @@ package drbd.data.resources;
 import drbd.utilities.Tools;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * This class holds data of one block device.
@@ -61,15 +65,17 @@ public class BlockDevice extends Resource {
     /** The connection state. */
     private String connectionState = null;
     /** The node state. */
-    private String nodeState       = null;
+    private String nodeState = null;
     /** The disk state. */
-    private String diskState       = null;
+    private String diskState = null;
     /** The sync progress in percent as String. */
-    private String syncedProgress  = null;
+    private String syncedProgress = null;
     /** Drbd flags. */
-    private String drbdFlags       = null;
+    private String drbdFlags = null;
     /** How much of the file system is used in percents. */
-    private int used            = -1;
+    private int used = -1;
+    /** LVM group. */
+    private String lvmGroup = null;
 
     ///**
     // * Creates a new <code>BlockDevice</code> object.
@@ -100,22 +106,30 @@ public class BlockDevice extends Resource {
      * Updates the block device.
      */
     public final void update(final String line) {
+        final Pattern p = Pattern.compile("([^:]+):(.*)");
         final String[] cols = line.split(" ");
         if (cols.length < 2) {
             Tools.appWarning("cannot parse line: " + line);
         } else {
             final String device = cols[0];
-            this.readlink = cols[1];
             setName(device);
-            this.blockSize = cols[2];
-            this.mountedOn = null;
-            this.fsType    = null;
-            if (cols.length > 4) {
-                this.mountedOn = cols[3];
-                this.fsType    = cols[4];
+            final Map<String, String> tokens = new HashMap<String, String>();
+            for (int i = 1; i < cols.length; i++) {
+                final Matcher m = p.matcher(cols[i]);
+                if (m.matches()) {
+                    tokens.put(m.group(1), m.group(2));
+                } else {
+                    Tools.appWarning("could not parse: " + line);
+                }
             }
-            if (cols.length > 5) {
-                this.used = Integer.parseInt(cols[5]);
+            this.readlink  = tokens.get("rl");
+            this.blockSize = tokens.get("size");
+            this.mountedOn = tokens.get("mp");
+            this.fsType    = tokens.get("fs");
+            this.lvmGroup = tokens.get("vg");
+            final String usedStr = tokens.get("used");
+            if (usedStr != null) {
+                this.used      = Integer.parseInt(usedStr);
             }
         }
     }
@@ -639,10 +653,13 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Returns absolute path obtained with readlink.
-     */
+    /** Returns absolute path obtained with readlink. */
     public final String getReadlink() {
         return readlink;
+    }
+
+    /** Returns lvm group or null. */
+    public final String getLVMGroup() {
+        return lvmGroup; 
     }
 }
