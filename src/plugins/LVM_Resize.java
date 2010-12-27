@@ -27,17 +27,26 @@ import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
+import drbd.utilities.MyButton;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
+import drbd.gui.dialog.WizardDialog;
+import drbd.gui.GuiComboBox;
 
 import java.util.List;
+import java.awt.BorderLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JMenu;
+import javax.swing.JLabel;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 /**
  * This class implements LVM resize plugin.
  *
@@ -47,6 +56,7 @@ import javax.swing.JMenu;
 public class LVM_Resize implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    private static final String LVM_RESIZE_MENU_ITEM = "LVM Resize";
 
     /** Private. */
     public LVM_Resize() {
@@ -84,9 +94,9 @@ public class LVM_Resize implements RemotePlugin {
     private MyMenuItem resizeLVMItem(final BlockDevInfo bdi) {
         /* attach / detach */
         final MyMenuItem resizeMenu =
-            new MyMenuItem("LVM resize",
+            new MyMenuItem(LVM_RESIZE_MENU_ITEM,
                            null,
-                           "LVM resize",
+                           LVM_RESIZE_MENU_ITEM,
                            new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, true)) {
                 private static final long serialVersionUID = 1L;
@@ -104,7 +114,8 @@ public class LVM_Resize implements RemotePlugin {
                 }
 
                 public void action() {
-                    System.out.println("resize");
+                    final LVMResizeDialog lvmrd = new LVMResizeDialog(bdi);
+                    lvmrd.showDialog();
                 }
             };
         return resizeMenu;
@@ -135,5 +146,103 @@ public class LVM_Resize implements RemotePlugin {
             }
         };
         description.showDialog();
+    }
+
+    /** LVM Resize dialog. */
+    private class LVMResizeDialog extends WizardDialog {
+        /** Block device info object. */
+        final BlockDevInfo blockDevInfo;
+        private final MyButton resizeButton = new MyButton("Resize");
+        /** Create new LVMResizeDialog object. */
+        public LVMResizeDialog(final BlockDevInfo blockDevInfo) {
+            super(null);
+            this.blockDevInfo = blockDevInfo;
+        }
+
+        /** Finishes the dialog and sets the information. */
+        protected final void finishDialog() {
+        }
+
+        /** Returns the next dialog. */
+        public WizardDialog nextDialog() {
+            return null;
+        }
+
+        /** Returns the title of the dialog. */
+        protected final String getDialogTitle() {
+            return "LVM Resize";
+        }
+
+        /** Returns the description of the dialog. */
+        protected final String getDescription() {
+            return "Here you can resize the LVM volume.";
+        }
+
+        /** Inits the dialog. */
+        protected final void initDialog() {
+            super.initDialog();
+            enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
+            enableComponents();
+            //SwingUtilities.invokeLater(new Runnable() {
+            //    public void run() {
+            //        pluginUserField.requestFocus();
+            //    }
+            //});
+        }
+
+        /** Returns the input pane. */
+        protected final JComponent getInputPane() {
+            resizeButton.setEnabled(false);
+            final JPanel pane = new JPanel(new SpringLayout());
+            final JPanel inputPane = new JPanel(new SpringLayout());
+
+            /* size */
+            final JLabel sizeLabel = new JLabel("Size");
+
+            final GuiComboBox sizeCB = new GuiComboBox("",
+                                           null,
+                                           null, /* units */
+                                           GuiComboBox.Type.COMBOBOX,
+                                           null, /* regexp */
+                                           250,
+                                           null, /* abbrv */
+                                           new AccessMode(ConfigData.AccessType.OP,
+                                                          false)); /* only adv. */
+            inputPane.add(sizeLabel);
+            inputPane.add(sizeCB);
+            sizeCB.addListeners(
+                new  ItemListener() {
+                    public void itemStateChanged(final ItemEvent e) {
+                        if (e.getStateChange() == ItemEvent.SELECTED) {
+                            final Thread thread = new Thread(new Runnable() {
+                                public void run() {
+                                }
+                            });
+                            thread.start();
+                        }
+                    }
+                },
+                null);
+
+            resizeButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    //resize();
+                }
+            });
+            inputPane.add(resizeButton);
+
+            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
+                                                       1, 1,  // initX, initY
+                                                       1, 1); // xPad, yPad
+
+            pane.add(inputPane);
+            pane.add(getProgressBarPane(null));
+            pane.add(getAnswerPane(""));
+            SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
+                                                  0, 0,  // initX, initY
+                                                  0, 0); // xPad, yPad
+
+            return pane;
+        }
     }
 }

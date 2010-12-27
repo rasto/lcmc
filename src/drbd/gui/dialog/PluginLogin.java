@@ -62,9 +62,7 @@ public class PluginLogin extends WizardDialog {
         super(previousDialog);
     }
 
-    /**
-     * Finishes the dialog and sets the information.
-     */
+    /** Finishes the dialog and sets the information. */
     protected final void finishDialog() {
         Tools.getConfigData().setPluginLogin(
                                 pluginUserField.getStringValue().trim(),
@@ -73,9 +71,7 @@ public class PluginLogin extends WizardDialog {
         Tools.loadPlugins();
     }
 
-    /**
-     * Returns the next dialog.
-     */
+    /** Returns the next dialog. */
     public WizardDialog nextDialog() {
         return null;
     }
@@ -96,9 +92,7 @@ public class PluginLogin extends WizardDialog {
         });
     }
 
-    /**
-     * Check all fields if they are correct.
-     */
+    /** Check all fields if they are correct. */
     protected final void checkFields(final GuiComboBox field) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -127,9 +121,7 @@ public class PluginLogin extends WizardDialog {
         return Tools.getString("Dialog.PluginLogin.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
+    /** Inits the dialog. */
     protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
@@ -219,5 +211,4 @@ public class PluginLogin extends WizardDialog {
         p.add(inputPane, BorderLayout.SOUTH);
         return p;
     }
-
 }
