@@ -776,7 +776,7 @@ public class Info implements Comparable {
                                 }
                             }
                         });
-                    updateMenus(null);
+                    //updateMenus(null);
                 }
             });
             thread.start();
