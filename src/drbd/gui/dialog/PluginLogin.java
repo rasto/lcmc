@@ -25,7 +25,6 @@ import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
-import drbd.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;

@@ -72,10 +72,7 @@ import drbd.utilities.ButtonCallback;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.JMenu;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;

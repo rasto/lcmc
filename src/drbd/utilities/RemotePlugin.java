@@ -27,7 +27,8 @@ import drbd.gui.resources.Info;
 import java.util.List;
 
 /**
- * Interface for remote plugins.
+ * Interface for remote plugins. IMPORTANT: Remote plugins can't have
+ * anonymous inner classes. 
  */
 public interface RemotePlugin {
     /** Init plugin. */

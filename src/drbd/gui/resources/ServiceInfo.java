@@ -45,7 +45,6 @@ import drbd.utilities.ButtonCallback;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
 import drbd.gui.SpringUtilities;
-import drbd.utilities.MyButton;
 import drbd.gui.dialog.pacemaker.ServiceLogs;
 
 import java.awt.Color;

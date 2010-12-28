@@ -30,7 +30,6 @@ import drbd.utilities.Unit;
 import drbd.data.CRMXML;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
-import drbd.data.AccessMode;
 import drbd.data.resources.Resource;
 import drbd.gui.SpringUtilities;
 
@@ -41,7 +40,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
-import javax.swing.Box;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -58,7 +56,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;

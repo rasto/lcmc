@@ -43,7 +43,6 @@ import drbd.utilities.ButtonCallback;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
-import drbd.utilities.MyButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

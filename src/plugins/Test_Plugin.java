@@ -58,27 +58,34 @@ public class Test_Plugin implements RemotePlugin {
 
     /** Shows dialog with description. */
     public final void showDescription() {
-        final ConfigDialog description = new ConfigDialog() {
-            /** Serial version UID. */
-            private static final long serialVersionUID = 1L;
-
-            protected final void initDialog() {
-                super.initDialog();
-                enableComponents();
-            }
-
-            protected final String getDialogTitle() {
-                return "Test Plugin " + Tools.getRelease();
-            }
-
-            protected final String getDescription() {
-                return "This is a test plugin to test plugin interface";
-            }
-
-            protected final JComponent getInputPane() {
-                return null;
-            }
-        };
+        final Description description = new Description();
         description.showDialog();
+    }
+
+    /** Description dialog. */
+    private class Description extends ConfigDialog {
+        /** Serial version UID. */
+        private static final long serialVersionUID = 2L;
+
+        public Description() {
+            super();
+        }
+
+        protected final void initDialog() {
+            super.initDialog();
+            enableComponents();
+        }
+
+        protected final String getDialogTitle() {
+            return "Test Plugin " + Tools.getRelease();
+        }
+
+        protected final String getDescription() {
+            return "This is a test plugin to test plugin interface";
+        }
+
+        protected final JComponent getInputPane() {
+            return null;
+        }
     }
 }

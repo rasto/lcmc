@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JMenu;
 import javax.swing.JLabel;
+import javax.swing.ImageIcon;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
@@ -64,7 +65,6 @@ public class LVM_Resize implements RemotePlugin {
 
     /** Inits the plugin. */
     public final void init() {
-        System.out.println("lvm resize init");
         for (final BlockDevInfo bdi
                         : Tools.getGUIData().getAllBlockDevices()) {
             registerInfo(bdi);
@@ -75,7 +75,6 @@ public class LVM_Resize implements RemotePlugin {
         if (info instanceof BlockDevInfo) {
             final JMenu menu = info.getMenu();
             if (menu != null) {
-                System.out.println("register plugin: " + info.toString());
                 info.addPluginMenuItem(resizeLVMItem((BlockDevInfo) info));
                 info.addPluginActionMenuItem(resizeLVMItem(
                                                      (BlockDevInfo) info));
@@ -93,59 +92,80 @@ public class LVM_Resize implements RemotePlugin {
 
     private MyMenuItem resizeLVMItem(final BlockDevInfo bdi) {
         /* attach / detach */
-        final MyMenuItem resizeMenu =
-            new MyMenuItem(LVM_RESIZE_MENU_ITEM,
+        final ResizeItem resizeMenu =
+            new ResizeItem(LVM_RESIZE_MENU_ITEM,
                            null,
                            LVM_RESIZE_MENU_ITEM,
                            new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, true)) {
-                private static final long serialVersionUID = 1L;
-
-                public boolean predicate() {
-                    return true;
-                }
-
-                public boolean visiblePredicate() {
-                    return bdi.isLVM();
-                }
-
-                public String enablePredicate() {
-                    return null;
-                }
-
-                public void action() {
-                    final LVMResizeDialog lvmrd = new LVMResizeDialog(bdi);
-                    lvmrd.showDialog();
-                }
-            };
+                           new AccessMode(ConfigData.AccessType.OP, true),
+                           bdi);
         return resizeMenu;
+    }
+
+    /** Resize menu item. (can't use anonymous classes). */
+    private class ResizeItem extends MyMenuItem {
+        private static final long serialVersionUID = 1L;
+        private final BlockDevInfo bdi;
+
+        public ResizeItem(final String text,
+                          final ImageIcon icon,
+                          final String shortDesc,
+                          final AccessMode enableAccessMode,
+                          final AccessMode visibleAccessMode,
+                          final BlockDevInfo bdi) {
+            super(text, icon, shortDesc, enableAccessMode, visibleAccessMode);
+            this.bdi = bdi;
+        }
+        public boolean predicate() {
+            return true;
+        }
+
+        public boolean visiblePredicate() {
+            return bdi.isLVM();
+        }
+
+        public String enablePredicate() {
+            return null;
+        }
+
+        public void action() {
+            final LVMResizeDialog lvmrd = new LVMResizeDialog(bdi);
+            lvmrd.showDialog();
+        }
     }
 
     /** Shows dialog with description. */
     public final void showDescription() {
-        final ConfigDialog description = new ConfigDialog() {
-            /** Serial version UID. */
-            private static final long serialVersionUID = 1L;
-
-            protected final void initDialog() {
-                super.initDialog();
-                enableComponents();
-            }
-
-            protected final String getDialogTitle() {
-                return "LVM Resize " + Tools.getRelease();
-            }
-
-            protected final String getDescription() {
-                return "You can now use LVM Resize menu item in the "
-                       + "\"Storage (DRBD)\" view.";
-            }
-
-            protected final JComponent getInputPane() {
-                return null;
-            }
-        };
+        final Description description = new Description();
         description.showDialog();
+    }
+
+    /** Description dialog. */
+    private class Description extends ConfigDialog {
+        /** Serial version UID. */
+        private static final long serialVersionUID = 1L;
+
+        public Description() {
+            super();
+        }
+
+        protected final void initDialog() {
+            super.initDialog();
+            enableComponents();
+        }
+
+        protected final String getDialogTitle() {
+            return "LVM Resize " + Tools.getRelease();
+        }
+
+        protected final String getDescription() {
+            return "You can now use LVM Resize menu item in the "
+                   + "\"Storage (DRBD)\" view.";
+        }
+
+        protected final JComponent getInputPane() {
+            return null;
+        }
     }
 
     /** LVM Resize dialog. */
@@ -181,7 +201,8 @@ public class LVM_Resize implements RemotePlugin {
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
-            enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
+            enableComponentsLater(
+                              new JComponent[]{buttonClass(finishButton())});
             enableComponents();
             //SwingUtilities.invokeLater(new Runnable() {
             //    public void run() {
@@ -199,36 +220,20 @@ public class LVM_Resize implements RemotePlugin {
             /* size */
             final JLabel sizeLabel = new JLabel("Size");
 
-            final GuiComboBox sizeCB = new GuiComboBox("",
-                                           null,
-                                           null, /* units */
-                                           GuiComboBox.Type.COMBOBOX,
-                                           null, /* regexp */
-                                           250,
-                                           null, /* abbrv */
-                                           new AccessMode(ConfigData.AccessType.OP,
-                                                          false)); /* only adv. */
+            final GuiComboBox sizeCB = new GuiComboBox(
+                                       "",
+                                       null,
+                                       null, /* units */
+                                       GuiComboBox.Type.COMBOBOX,
+                                       null, /* regexp */
+                                       250,
+                                       null, /* abbrv */
+                                       new AccessMode(ConfigData.AccessType.OP,
+                                                      false)); /* only adv. */
             inputPane.add(sizeLabel);
             inputPane.add(sizeCB);
-            sizeCB.addListeners(
-                new  ItemListener() {
-                    public void itemStateChanged(final ItemEvent e) {
-                        if (e.getStateChange() == ItemEvent.SELECTED) {
-                            final Thread thread = new Thread(new Runnable() {
-                                public void run() {
-                                }
-                            });
-                            thread.start();
-                        }
-                    }
-                },
-                null);
-
-            resizeButton.addActionListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    //resize();
-                }
-            });
+            sizeCB.addListeners(new SizeItemListener(), null);
+            resizeButton.addActionListener(new ResizeActionListener());
             inputPane.add(resizeButton);
 
             SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
@@ -243,6 +248,27 @@ public class LVM_Resize implements RemotePlugin {
                                                   0, 0); // xPad, yPad
 
             return pane;
+        }
+
+        /** Size combo box item listener. */
+        private class SizeItemListener implements ItemListener {
+            public SizeItemListener() {
+                super();
+            }
+            public void itemStateChanged(final ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                }
+            }
+        }
+
+        /** Resize action listener. */
+        private class ResizeActionListener implements ActionListener {
+            public ResizeActionListener() {
+                super();
+            }
+            public void actionPerformed(final ActionEvent e) {
+                //resize(blockDevInfo);
+            }
         }
     }
 }

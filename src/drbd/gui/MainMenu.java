@@ -43,7 +43,7 @@ import java.awt.event.KeyEvent;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -549,7 +549,7 @@ public class MainMenu extends JPanel implements ActionListener {
     }
 
     /** Reloads plugin menu. */
-    public final void reloadPluginsMenu(final List<String> pluginList) {
+    public final void reloadPluginsMenu(final Set<String> pluginList) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 pluginsMenu.removeAll();

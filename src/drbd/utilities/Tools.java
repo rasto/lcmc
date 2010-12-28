@@ -32,7 +32,6 @@ import drbd.gui.resources.ServiceInfo;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GUIData;
 import drbd.gui.dialog.ConfirmDialog;
-import drbd.utilities.UpdatableItem;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -49,6 +48,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileNotFoundException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -102,10 +105,7 @@ import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
 
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.net.URLClassLoader;
-import java.lang.reflect.Modifier;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
@@ -175,6 +175,12 @@ public final class Tools {
     /** Hash mit classes from plugin. */
     private static final Map<String, RemotePlugin> pluginObjects =
                                            new HashMap<String, RemotePlugin>();
+    /** Local plugin directory. */
+    private static final String PLUGIN_DIR = System.getProperty("user.home")
+                                             + "/.drbd-mc/plugins/";
+    /** Remote plugin location. */
+    private static final String PLUGIN_LOCATION =
+                                     "oss.linbit.com/drbd-mc/drbd-mc-plugins/";
     /**
      * Private constructor.
      */
@@ -2360,14 +2366,14 @@ public final class Tools {
     }
 
     /** Returns list of plugins. */
-    private static List<String> getPluginList() {
+    private static Set<String> getPluginList() {
         final Pattern p = Pattern.compile(
                 ".*<img src=\"/icons/folder.gif\" alt=\"\\[DIR\\]\">"
                 + "</td><td><a href=\".*?/\">(.*?)/</a>.*");
-        final List<String> pluginList = new ArrayList<String>();
+        final Set<String> pluginList = new LinkedHashSet<String>();
         try {
-            final String url = "http://oss.linbit.com/drbd-mc/drbd-mc-plugins/?drbd-mc-plugin-check-"
-                               + getRelease();
+            final String url = "http://" + PLUGIN_LOCATION
+                               + "/?drbd-mc-plugin-check-" + getRelease();
             final BufferedReader reader = new BufferedReader(
                              new InputStreamReader(new URL(url).openStream()));
             do {
@@ -2382,39 +2388,44 @@ public final class Tools {
                 }
             } while (true);
         } catch (MalformedURLException mue) {
-            return pluginList;
         } catch (IOException ioe) {
-            return pluginList;
+        }
+        final File dir = new File(PLUGIN_DIR);
+        final String[] l = dir.list();
+        if (dir != null && l != null) {
+            for (final String fn : l) {
+                pluginList.add(fn);
+            }
         }
         return pluginList;
     }
 
     /** Loads one plugin. */
-    private static Class loadPlugin(final String pluginName) {
+    private static Class loadPlugin(final String pluginName,
+                                    final String url) {
         final String user = getConfigData().getPluginUser();
         final String passwd = getConfigData().getPluginPassword();
 
         if (user != null && passwd != null) {
             Authenticator.setDefault(new java.net.Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
+                protected PasswordAuthentication
+                                            getPasswordAuthentication() {
                     return new PasswordAuthentication(user,
-                                                      passwd.toCharArray());
+                                                   passwd.toCharArray());
                 }
             });
         }
         URLClassLoader loader;
         final String[] dirs = pluginName.split(":");
-        final String url = "http://rasto:rasto@oss.linbit.com/drbd-mc/drbd-mc-plugins/"
-                           + pluginName + "/"
-                           + getRelease() + "/";
         try {
             loader = new URLClassLoader(new URL[] {
-                new URL(url)
+                new URL(url + pluginName + "/" + getRelease() + "/")
             });
         } catch (java.net.MalformedURLException e) {
             Tools.appWarning("could not get: " + url, e);
             return null;
         }
+
         Class c = null;
         final String className = "plugins." + dirs[dirs.length - 1];
         try {
@@ -2426,18 +2437,61 @@ public final class Tools {
         return c;
     }
 
+    /** Saves the class. */
+    private static void savePluginClass(final String pluginName,
+                                        final Class c) {
+        for (final Class sc : c.getDeclaredClasses()) {
+            savePluginClass(pluginName, sc);
+        }
+        try {
+            final String className = c.getName();
+            final String classAsPath = className.replace('.', '/') + ".class";
+            final String dirToCreate = PLUGIN_DIR
+                                       + pluginName
+                                       + "/"
+                                       + getRelease()
+                                       + "/";
+            (new File(dirToCreate + "plugins/")).mkdirs();
+            final FileOutputStream fileOut = new FileOutputStream(
+                                                                dirToCreate
+                                                                + classAsPath);
+            final InputStream stream =
+                           c.getClassLoader().getResourceAsStream(classAsPath);
+
+            final byte[] buff = new byte[512];
+            while (stream.available() > 0) {
+                final int l = stream.read(buff);
+                fileOut.write(buff, 0, l);
+            }
+            fileOut.close();
+        } catch(FileNotFoundException e) {
+            Tools.appWarning("plugin not found", e);
+            return;
+        } catch (IOException e) {
+            Tools.appWarning("could not save plugin", e);
+            return;
+        }
+    }
+
     /** Load all plugins */
     public static void loadPlugins() {
-        final List<String> pluginList = getPluginList();
+        final Set<String> pluginList = getPluginList();
         getGUIData().getMainMenu().reloadPluginsMenu(pluginList);
         for (final String pluginName : pluginList) {
-            final Class c = loadPlugin(pluginName);
+            Class c = loadPlugin(pluginName, "http://" + PLUGIN_LOCATION);
             if (c == null) {
-                continue;
+                c = loadPlugin(pluginName, "file://" + PLUGIN_DIR);
+                if (c == null) {
+                    continue;
+                }
+            } else {
+                savePluginClass(pluginName, c);
+                /* cache it. */
             }
+            final Class pluginClass = c;
             RemotePlugin remotePlugin = null;
             try {
-                remotePlugin = (RemotePlugin) c.newInstance();
+                remotePlugin = (RemotePlugin) pluginClass.newInstance();
             } catch (java.lang.InstantiationException e) {
                 Tools.appWarning("could not instantiate plugin: " + pluginName,
                                  e);
@@ -2450,9 +2504,10 @@ public final class Tools {
             pluginObjects.put(pluginName, remotePlugin);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getGUIData().getMainMenu().enablePluginMenu(pluginName,
-                                                                c != null);
-                    if (c != null) {
+                    getGUIData().getMainMenu().enablePluginMenu(
+                                                        pluginName,
+                                                        pluginClass != null);
+                    if (pluginClass != null) {
                         Tools.info(pluginName + " was enabled");
                     }
                 }
