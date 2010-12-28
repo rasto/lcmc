@@ -217,8 +217,7 @@ public class Host implements Serializable {
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
     /** Volume group information on this host. */
-    public Map<String, Double> volumeGroups =
-                                        new LinkedHashMap<String, Double>();
+    public Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
     
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
@@ -1917,8 +1916,8 @@ public class Host implements Serializable {
                                      new LinkedHashMap<String, BlockDevice>();
         final Map<String, NetInterface> newNetInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
-        final Map<String, Double> newVolumeGroups =
-                                         new LinkedHashMap<String, Double>();
+        final Map<String, Long> newVolumeGroups =
+                                         new LinkedHashMap<String, Long>();
         final Pattern bdP = Pattern.compile("(\\D+)\\d+");
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
@@ -1964,7 +1963,7 @@ public class Host implements Serializable {
             } else if ("vg-info".equals(type)) {
                 final String[] vgi = line.split("\\s+");
                 if (vgi.length == 2) {
-                    newVolumeGroups.put(vgi[0], Double.parseDouble(vgi[1]));
+                    newVolumeGroups.put(vgi[0], Long.parseLong(vgi[1]));
                 } else {
                     Tools.appWarning("could not parse volume info: " + line);
                 }
@@ -2531,5 +2530,10 @@ public class Host implements Serializable {
         } catch (java.lang.NumberFormatException e) {
             /* ignore it */
         }
+    }
+
+    /** Returns how much is free space in a volume group. */
+    public final Long getFreeInVolumeGroup(final String volumeGroup) {
+        return volumeGroups.get(volumeGroup);
     }
 }

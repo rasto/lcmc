@@ -217,7 +217,7 @@ public class DrbdXML extends XML {
                     if (m2.matches()) {
                         parseSection(section, xml.toString(), host, hosts);
                         section = null;
-                        xml.delete(0, xml.length() - 1);
+                        xml.delete(0, xml.length());
                     }
                 }
             }

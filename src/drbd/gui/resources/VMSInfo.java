@@ -193,8 +193,8 @@ public class VMSInfo extends CategoryInfo {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
                 public int compare(final Object s1, final Object s2) {
-                    final int i1 = Tools.convertToKilobytes((String) s1);
-                    final int i2 = Tools.convertToKilobytes((String) s2);
+                    final long i1 = Tools.convertToKilobytes((String) s1);
+                    final long i2 = Tools.convertToKilobytes((String) s2);
                     if (i1 < i2) {
                         return -1;
                     } else if (i1 > i2) {

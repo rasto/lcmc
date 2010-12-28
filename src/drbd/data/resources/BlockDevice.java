@@ -75,7 +75,7 @@ public class BlockDevice extends Resource {
     /** How much of the file system is used in percents. */
     private int used = -1;
     /** LVM group. */
-    private String lvmGroup = null;
+    private String volumeGroup = null;
 
     ///**
     // * Creates a new <code>BlockDevice</code> object.
@@ -126,7 +126,7 @@ public class BlockDevice extends Resource {
             this.blockSize = tokens.get("size");
             this.mountedOn = tokens.get("mp");
             this.fsType    = tokens.get("fs");
-            this.lvmGroup = tokens.get("vg");
+            this.volumeGroup = tokens.get("vg");
             final String usedStr = tokens.get("used");
             if (usedStr != null) {
                 this.used      = Integer.parseInt(usedStr);
@@ -659,7 +659,7 @@ public class BlockDevice extends Resource {
     }
 
     /** Returns lvm group or null. */
-    public final String getLVMGroup() {
-        return lvmGroup; 
+    public final String getVolumeGroup() {
+        return volumeGroup; 
     }
 }

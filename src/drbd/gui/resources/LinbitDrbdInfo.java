@@ -115,12 +115,12 @@ class LinbitDrbdInfo extends ServiceInfo {
             } else {
                 dri.setUsedByCRM(null);
             }
-            final Thread t = new Thread(new Runnable() {
-                public void run() {
-                    dri.updateMenus(null);
-                }
-            });
-            t.start();
+            //final Thread t = new Thread(new Runnable() {
+            //    public void run() {
+            //        dri.updateMenus(null);
+            //    }
+            //});
+            //t.start();
         }
     }
 }

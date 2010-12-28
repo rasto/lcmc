@@ -457,6 +457,8 @@ public class TextResource extends
 
         {"Dialog.PluginLogin.Save",
          "Save"},
+        {"Dialog.PluginLogin.FinishButton",
+         "Register"},
 
         {"Dialog.Host.DrbdAvailFiles.Title",
          "Available DRBD Packages"},
@@ -1909,6 +1911,9 @@ public class TextResource extends
          "Getting DRBD parameters..."},
         {"Error.Title",
          "Error"},
+
+        {"LVM.ExecutingCommand",
+         "Executing LVM command..."},
 
         {"VIRSH.ExecutingCommand",
          "Executing virsh command..."},

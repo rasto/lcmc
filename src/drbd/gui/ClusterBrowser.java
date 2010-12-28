@@ -1216,8 +1216,8 @@ public class ClusterBrowser extends Browser {
                             final String status =
                                               clusterStatusOutput.substring(i);
                             clusterStatusOutput.delete(
-                                             0,
-                                             clusterStatusOutput.length() - 1);
+                                                 0,
+                                                 clusterStatusOutput.length());
                             if (CLUSTER_STATUS_ERROR.equals(status)) {
                                 final boolean oldStatus = host.isClStatus();
                                 clusterStatus.setOnlineNode(host.getName(),
@@ -2626,5 +2626,11 @@ public class ClusterBrowser extends Browser {
             bdis.addAll(host.getBrowser().getBlockDevInfos());
         }
         return bdis;
+    }
+
+    /** Updates host hardware info immediatly. */
+    public final void updateHWInfo(final Host host) {
+        host.setIsLoading();
+        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo});
     }
 }

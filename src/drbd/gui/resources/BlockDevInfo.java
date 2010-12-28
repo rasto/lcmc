@@ -33,6 +33,7 @@ import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
+import drbd.utilities.LVM;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.MyButton;
 import drbd.gui.GuiComboBox;
@@ -166,6 +167,9 @@ public class BlockDevInfo extends EditableInfo {
      * to this block device.
      */
     public final BlockDevInfo getOtherBlockDevInfo() {
+        if (drbdResourceInfo == null) {
+            return null;
+        }
         return drbdResourceInfo.getOtherBlockDevInfo(this);
     }
 
@@ -730,6 +734,12 @@ public class BlockDevInfo extends EditableInfo {
                             testOnly);
     }
 
+    public final boolean lvmResize(final String size,
+                                final boolean testOnly) {
+        final String device = getBlockDevice().getName();
+        return LVM.resize(getHost(), device, size, testOnly);
+    }
+
     public final void forcePrimary(final boolean testOnly) {
         DRBD.forcePrimary(getHost(), drbdResourceInfo.getName(), testOnly);
     }
@@ -750,8 +760,8 @@ public class BlockDevInfo extends EditableInfo {
     }
 
 
-    public final void resizeDrbd(final boolean testOnly) {
-        DRBD.resize(getHost(), drbdResourceInfo.getName(), testOnly);
+    public final boolean resizeDrbd(final boolean testOnly) {
+        return DRBD.resize(getHost(), drbdResourceInfo.getName(), testOnly);
     }
 
     public final JPanel getGraphicalView() {
@@ -1845,6 +1855,12 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Returns whether this block device is LVM. */
     public final boolean isLVM() {
-        return getBlockDevice().getLVMGroup() != null;
+        return getBlockDevice().getVolumeGroup() != null;
+    }
+
+    /** Returns how much is free space in a volume group. */
+    public final Long getFreeInVolumeGroup() {
+        return getHost().getFreeInVolumeGroup(
+                                           getBlockDevice().getVolumeGroup());
     }
 }

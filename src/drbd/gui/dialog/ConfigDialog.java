@@ -85,6 +85,8 @@ public abstract class ConfigDialog {
     /** Map from the button name to its object. */
     private final Map<String, MyButton> buttonToObjectMap =
                                             new HashMap<String, MyButton>();
+    /** Text in answer pane. */
+    private final StringBuffer answerPaneText = new StringBuffer(100);
     /** Answer pane. The pane were texts can be easily written. */
     private JEditorPane answerPane = null;
     /** Components that were disabled and can be enabled later. */
@@ -170,7 +172,12 @@ public abstract class ConfigDialog {
     public final void answerPaneSetText(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                answerPane.setText(text);
+                final int l = answerPaneText.length();
+                if (l > 1) {
+                    answerPaneText.delete(0, l);
+                }
+                answerPaneText.append(text);
+                answerPane.setText(answerPaneText.toString());
             }
         });
     }
@@ -179,7 +186,13 @@ public abstract class ConfigDialog {
      * Appends text to the answer pane.
      */
     public final void answerPaneAddText(final String text) {
-        answerPaneSetText(answerPane.getText() + "\n" + text);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                answerPaneText.append('\n');
+                answerPaneText.append(text);
+                answerPaneSetText(answerPaneText.toString());
+            }
+        });
     }
 
 
@@ -191,7 +204,12 @@ public abstract class ConfigDialog {
             public void run() {
                 answerPane.setForeground(
                        Tools.getDefaultColor("ConfigDialog.AnswerPane.Error"));
-                answerPane.setText(text);
+                final int l = answerPaneText.length();
+                if (l > 1) {
+                    answerPaneText.delete(0, l);
+                }
+                answerPaneText.append(text);
+                answerPane.setText(answerPaneText.toString());
             }
         });
     }
@@ -200,7 +218,13 @@ public abstract class ConfigDialog {
      * Appends the error text to the answer pane.
      */
     public final void answerPaneAddTextError(final String text) {
-        answerPaneSetTextError(answerPane.getText() + "\n" + text);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                answerPaneText.append('\n');
+                answerPaneText.append(text);
+                answerPaneSetTextError(answerPaneText.toString());
+            }
+        });
     }
 
     /**
@@ -296,7 +320,7 @@ public abstract class ConfigDialog {
     /**
      * Returns localized string of Cancel button.
      */
-    public final String cancelButton() {
+    public String cancelButton() {
         return buttonString("Cancel");
     }
 

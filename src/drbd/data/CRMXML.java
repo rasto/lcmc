@@ -599,7 +599,7 @@ public class CRMXML extends XML {
                                   xml.toString(),
                                   masterSlave);
                     serviceName = null;
-                    xml.delete(0, xml.length() - 1);
+                    xml.delete(0, xml.length());
                 }
             }
         }

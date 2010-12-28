@@ -1349,11 +1349,9 @@ public class GuiComboBox extends JPanel {
         }
     }
 
-    /**
-     * Adds item listener to the component.
-     */
+    /** Adds item listener to the component. */
     public final void addListeners(final ItemListener il,
-                             final DocumentListener dl) {
+                                   final DocumentListener dl) {
         JComponent comp;
         if (fieldButton == null) {
             comp = component;

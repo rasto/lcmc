@@ -371,5 +371,7 @@ public class DistResource extends
 
         {"Host.getConnectionStatus",
          ":"},
+
+        {"LVM.resize",        "lvresize -L@SIZE@ @DEVICE@"},
     };
 }

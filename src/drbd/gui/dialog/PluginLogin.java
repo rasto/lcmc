@@ -120,6 +120,11 @@ public class PluginLogin extends WizardDialog {
         return Tools.getString("Dialog.PluginLogin.Description");
     }
 
+    /** Returns localized string of Finish button. */
+    public final String finishButton() {
+        return Tools.getString("Dialog.PluginLogin.FinishButton");
+    }
+
     /** Inits the dialog. */
     protected final void initDialog() {
         super.initDialog();

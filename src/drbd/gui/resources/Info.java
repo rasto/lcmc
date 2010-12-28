@@ -1303,12 +1303,12 @@ public class Info implements Comparable {
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-        //for (final UpdatableItem menuItem : menuList) {
-        //    if (menuItem.toString().equals(pluginItem.toString())) {
-        //        mMenuListLock.release();
-        //        return;
-        //    }
-        //}
+        for (final UpdatableItem menuItem : menuList) {
+            if (menuItem.toString().equals(pluginItem.toString())) {
+                mMenuListLock.release();
+                return;
+            }
+        }
         menuList.add(pluginItem);
         mMenuListLock.release();
         SwingUtilities.invokeLater(new Runnable() {
@@ -1330,12 +1330,12 @@ public class Info implements Comparable {
             mActionMenuListLock.release();
             return;
         }
-        //for (final UpdatableItem actionMenuItem : actionMenuList) {
-        //    if (actionMenuItem.toString().equals(pluginItem.toString())) {
-        //        mActionMenuListLock.release();
-        //        return;
-        //    }
-        //}
+        for (final UpdatableItem actionMenuItem : actionMenuList) {
+            if (actionMenuItem.toString().equals(pluginItem.toString())) {
+                mActionMenuListLock.release();
+                return;
+            }
+        }
         actionMenuList.add(pluginItem);
         mActionMenuListLock.release();
         final JPopupMenu pm = popup;

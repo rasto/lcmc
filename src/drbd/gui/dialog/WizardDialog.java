@@ -102,24 +102,18 @@ public abstract class WizardDialog extends ConfigDialog {
     //    return Tools.getString("Dialog.Dialog." + b);
     //}
 
-    /**
-     * Returns localized string of Next button.
-     */
-    public final String nextButton() {
+    /** Returns localized string of Next button. */
+    public String nextButton() {
         return buttonString("Next");
     }
 
-    /**
-     * Returns localized string of Back button.
-     */
+    /** Returns localized string of Back button. */
     public final String backButton() {
         return buttonString("Back");
     }
 
-    /**
-     * Returns localized string of Finish button.
-     */
-    public final String finishButton() {
+    /** Returns localized string of Finish button. */
+    public String finishButton() {
         return buttonString("Finish");
     }
 

@@ -2883,21 +2883,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             return false;
         }
         if (VMSXML.VM_PARAM_MEMORY.equals(param)) {
-            final int mem = Tools.convertToKilobytes(newValue);
+            final long mem = Tools.convertToKilobytes(newValue);
             if (mem < 4096) {
                 return false;
             }
-            final int curMem = Tools.convertToKilobytes(
+            final long curMem = Tools.convertToKilobytes(
                         getComboBoxValue(VMSXML.VM_PARAM_CURRENTMEMORY));
             if (mem < curMem) {
                 return false;
             }
         } else if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)) {
-            final int curMem = Tools.convertToKilobytes(newValue);
+            final long curMem = Tools.convertToKilobytes(newValue);
             if (curMem < 4096) {
                 return false;
             }
-            final int mem = Tools.convertToKilobytes(
+            final long mem = Tools.convertToKilobytes(
                              getComboBoxValue(VMSXML.VM_PARAM_MEMORY));
             if (mem < curMem) {
                 paramComboBoxGet(VMSXML.VM_PARAM_MEMORY, null).setValue(

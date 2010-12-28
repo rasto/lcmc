@@ -437,15 +437,15 @@ public class VMSXML extends XML {
         /* memory */
         final Node memoryNode = (Element) root.appendChild(
                                                   doc.createElement("memory"));
-        final int mem = Tools.convertToKilobytes(
+        final long mem = Tools.convertToKilobytes(
                                            parametersMap.get(VM_PARAM_MEMORY));
-        memoryNode.appendChild(doc.createTextNode(Integer.toString(mem)));
+        memoryNode.appendChild(doc.createTextNode(Long.toString(mem)));
         /* current memory */
         final Node curMemoryNode = (Element) root.appendChild(
                                            doc.createElement("currentMemory"));
-        final int curMem = Tools.convertToKilobytes(
+        final long curMem = Tools.convertToKilobytes(
                                     parametersMap.get(VM_PARAM_CURRENTMEMORY));
-        curMemoryNode.appendChild(doc.createTextNode(Integer.toString(curMem)));
+        curMemoryNode.appendChild(doc.createTextNode(Long.toString(curMem)));
         /* vcpu */
         final String vcpu = parametersMap.get(VM_PARAM_VCPU);
         if (vcpu != null) {
@@ -550,7 +550,7 @@ public class VMSXML extends XML {
                     String value = parametersMap.get(param);
                     if (VM_PARAM_MEMORY.equals(param)
                         || VM_PARAM_CURRENTMEMORY.equals(param)) {
-                        value = Integer.toString(
+                        value = Long.toString(
                                             Tools.convertToKilobytes(value));
                     }
                     if (VM_PARAM_BOOT.equals(param)) {

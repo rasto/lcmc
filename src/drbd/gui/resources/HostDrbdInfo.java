@@ -294,6 +294,7 @@ public class HostDrbdInfo extends Info {
 
                 public final void action() {
                     DRBD.load(getHost(), testOnly);
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
                 }
             };
         items.add(loadItem);
