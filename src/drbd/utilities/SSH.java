@@ -96,6 +96,8 @@ public class SSH {
     /** Default timeout for SSH commands. */
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
                                Tools.getDefaultInt("SSH.Command.Timeout.Long");
+    /** Whether the sudo should be executed with password. */
+    private boolean sudoWithPwd = true;
 
     /**
      * Reconnect.
@@ -449,10 +451,13 @@ public class SSH {
                                   + host.getName()
                                   + ": "
                                   + host.getSudoCommand(
-                                               host.getHoppedCommand(command)),
+                                               host.getHoppedCommand(command),
+                                               sudoWithPwd),
                                   2);
                 thisSession.execCommand(host.getSudoCommand(
-                                            host.getHoppedCommand(command)));
+                                              host.getHoppedCommand(command),
+                                              sudoWithPwd));
+                sudoWithPwd = false;
 
                 final InputStream stdout = thisSession.getStdout();
                 final InputStream stderr = thisSession.getStderr();
@@ -1218,6 +1223,7 @@ public class SSH {
                 callback.done(1);
             }
             host.setSudoPassword("");
+            sudoWithPwd = true;
             final MyConnection conn = new MyConnection(hostname,
                                                        host.getSSHPortInt());
             disconnectForGood = false;

@@ -1423,20 +1423,25 @@ public class Host implements Serializable {
     }
 
     /** Returns sudo prefix. */
-    public final String getSudoPrefix() {
+    public final String getSudoPrefix(final boolean sudoWithPwd) {
         if (useSudo != null && useSudo) {
-            return "echo \""
-                   + escapeQuotes(sudoPassword, 1)
-                   + "\"|sudo -S -p '' ";
+            if (sudoWithPwd) {
+                return "echo \""
+                       + escapeQuotes(sudoPassword, 1)
+                       + "\"|sudo -S -p '' ";
+            } else {
+                return "sudo ";
+            }
         } else {
             return "";
         }
     }
     /** Returns command exclosed in sh -c "". */
-    public final String getSudoCommand(final String command) {
+    public final String getSudoCommand(final String command,
+                                       final boolean sudoWithPwd) {
         if (useSudo != null && useSudo) {
             return "trap - SIGPIPE;"
-                   + getSudoPrefix()
+                   + getSudoPrefix(sudoWithPwd)
                    + "bash -c \"trap - SIGPIPE; { "
                    + escapeQuotes(command, 1) + "; } 2>&1\" 2>/dev/null";
         } else {
@@ -1675,6 +1680,10 @@ public class Host implements Serializable {
                     new ConnectionCallback() {
                         public void done(final int flag) {
                             setConnected();
+                            getSSH().execCommandAndWait(":", /* activate sudo */
+                                    false,
+                                    false,
+                                    10000);
                             getSSH().installGuiHelper();
                             getAllInfo();
                             SwingUtilities.invokeLater(new Runnable() {
