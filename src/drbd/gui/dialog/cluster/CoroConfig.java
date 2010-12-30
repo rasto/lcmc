@@ -227,16 +227,17 @@ public class CoroConfig extends DialogCluster {
         return Tools.getString("Dialog.Cluster.CoroConfig.Title");
     }
 
-    /**
-     * Returns description of this dialog.
-     */
+    /** Returns description of this dialog. */
     protected final String getDescription() {
         return Tools.getString("Dialog.Cluster.CoroConfig.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
+    /** Returns localized string of Next button. */
+    public final String nextButton() {
+        return Tools.getString("Dialog.Cluster.CoroConfig.NextButton");
+    }
+
+    /** Inits the dialog. */
     protected final void initDialog() {
         super.initDialog();
         configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));

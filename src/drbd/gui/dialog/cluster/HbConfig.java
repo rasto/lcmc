@@ -233,16 +233,17 @@ public class HbConfig extends DialogCluster {
         return Tools.getString("Dialog.Cluster.HbConfig.Title");
     }
 
-    /**
-     * Returns description of this dialog.
-     */
+    /** Returns description of this dialog. */
     protected final String getDescription() {
         return Tools.getString("Dialog.Cluster.HbConfig.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
+    /** Returns localized string of Next button. */
+    public final String nextButton() {
+        return Tools.getString("Dialog.Cluster.HbConfig.NextButton");
+    }
+
+    /** Inits the dialog. */
     protected final void initDialog() {
         super.initDialog();
         configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));

@@ -610,7 +610,7 @@ public class TextResource extends
          "No Match"},
 
         {"Dialog.ConfigDialog.SkipButton",
-         "Skip"},
+         "Skip this dialog"},
 
         {"Dialog.ConnectDialog.Title",
          "SSH Connection"},
@@ -665,6 +665,8 @@ public class TextResource extends
          + "hand on every host in the cluster. You have to press the "
          + "\"Create Config\" button to save the new configuration on all "
          + "hosts. "},
+
+        {"Dialog.Cluster.CoroConfig.NextButton", "Next / Keep Config"},
 
         {"Dialog.Cluster.CoroConfig.CreateAisConfig",
          "Create/Overwrite Config"},
@@ -729,6 +731,8 @@ public class TextResource extends
          + "hosts. By the way it is OK to have ucast address to the node's "
          + "own interface, it will be ignored, at the same time it allows to "
          + "have the same config file on all hosts."},
+
+        {"Dialog.Cluster.HbConfig.NextButton", "Next / Keep Config"},
 
         {"Dialog.Cluster.HbConfig.CreateHbConfig",
          "Create/Overwrite HB Config"},
