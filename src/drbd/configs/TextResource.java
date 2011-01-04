@@ -199,11 +199,12 @@ public class TextResource extends
          + "Host can be entered either as hostname or IP address. Enter a "
          + "hostname only if it is resolvable by DNS. Username will be used "
          + "for SSH connections and command executions. Normally it should "
-         + "be the <b>root</b> user. It is recommended not to change it."
+         + "be the <b>root</b> user or user with sudo access. "
          + "<br><br>You may enter more hosts delimited with \",\", if the "
          + "server is reachable not directly but via several <b>hops</b>. "
          + "If this is the case you have to enter the same number of "
-         + "usernames and hostnames/IPs as they are hops."},
+         + "usernames and hostnames/IPs as they are hops."
+         + "<br><br>If you use <b>sudo</b>, requiretty option can't be used."},
 
         {"Dialog.Host.NewHost.EnterHost",
          "Host:"},

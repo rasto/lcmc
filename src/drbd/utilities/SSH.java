@@ -446,7 +446,7 @@ public class SSH {
                 }
                 /* requestPTY mixes stdout and strerr together, but it works
                    better at the moment. */
-                thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
+                //thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "

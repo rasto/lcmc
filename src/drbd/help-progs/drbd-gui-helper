@@ -1501,12 +1501,13 @@ sub gui_test {
 		    =~ s/((\d+) Nodes configured)\./$1, $2 expected votes/;
 		$status =~ s/!ONLINE!/Online: [ @o_nodes ]\n/;
 	} else {
-		my $crm_show = "TERM=dumb /usr/sbin/crm configure show"
-			       ."|grep -v 'expected-quorum-votes=\"2\"'"
-			       ."|grep -v 'unknown-expected-votes'"
-			       ."|grep -v 'dc-version=\"'"
-			       ."|grep -v 'cluster-infrastructure=\"'"
-			       ."|grep -v 'last-lrm-refresh='";
+		my $crm_show = 
+			"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm configure show"
+			."|grep -v 'expected-quorum-votes=\"2\"'"
+			."|grep -v 'unknown-expected-votes'"
+			."|grep -v 'dc-version=\"'"
+			."|grep -v 'cluster-infrastructure=\"'"
+			."|grep -v 'last-lrm-refresh='";
 		$cib = `$crm_show`;
 		my $ret = $?;
 		if ($ret != 0) {
@@ -1527,7 +1528,8 @@ sub gui_test {
 		# sort node lines
 		$cib =~
 	  	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
-		$crm_status = "TERM=dumb /usr/sbin/crm status|sed 1,5d";
+		$crm_status =
+			"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,5d";
 		$status = `$crm_status`;
 		$ret = $?;
 		if ($ret != 0) {
