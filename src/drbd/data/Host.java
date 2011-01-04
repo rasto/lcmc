@@ -1964,9 +1964,12 @@ public class Host implements Serializable {
                         blockDevice.update(line);
                     }
                     newBlockDevices.put(name, blockDevice);
-                    final Matcher m = bdP.matcher(name);
-                    if (m.matches()) {
-                        newBlockDevices.remove(m.group(1));
+                    if (blockDevice.getVolumeGroup() == null
+                        && name.length() > 5 && name.indexOf('/', 5) < 0) {
+                        final Matcher m = bdP.matcher(name);
+                        if (m.matches()) {
+                            newBlockDevices.remove(m.group(1));
+                        }
                     }
                 }
             } else if ("vg-info".equals(type)) {
