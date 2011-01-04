@@ -445,7 +445,10 @@ public class SSH {
                     return new SSHOutput("", 130);
                 }
                 /* requestPTY mixes stdout and strerr together, but it works
-                   better at the moment. */
+                   better at the moment.
+                   With pty, the sudo wouldn't work, because we don't want
+                   to enter sudo password by every command.
+                   (It would be exposed) */
                 //thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
                 Tools.debug(this, "exec command: "
                                   + host.getName()

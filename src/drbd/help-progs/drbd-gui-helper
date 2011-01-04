@@ -22,7 +22,7 @@
 
 use strict;
 use warnings;
-$! = 1;
+$| = 1;
 
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use POSIX qw(:errno_h); # EAGAIN
