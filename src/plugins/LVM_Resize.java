@@ -270,6 +270,13 @@ public class LVM_Resize implements RemotePlugin {
                     sizeCB.setEnabled(false);
                     resizeButton.setEnabled(false);
                     return false;
+                } else if (!oBDI.getBlockDevice().isPrimary()
+                           && !blockDevInfo.getBlockDevice().isPrimary()) {
+                    printErrorAndRetry(
+                       "Not resizing. Must be primary at least on one node.");
+                    sizeCB.setEnabled(false);
+                    resizeButton.setEnabled(false);
+                    return false;
                 }
             }
             return true;
