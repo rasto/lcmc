@@ -745,7 +745,6 @@ public class GroupInfo extends ServiceInfo {
                 getBrowser().getHeartbeatGraph().killRemovedVertices();
             }
         } else {
-            super.removeMyselfNoConfirm(dcHost, testOnly);
             String cloneId = null;
             boolean master = false;
             final CloneInfo ci = getCloneInfo();
@@ -753,6 +752,7 @@ public class GroupInfo extends ServiceInfo {
                 cloneId = ci.getHeartbeatId(testOnly);
                 master = ci.getService().isMaster();
             }
+            super.removeMyselfNoConfirm(dcHost, testOnly);
             CRM.removeResource(dcHost,
                                null,
                                getHeartbeatId(testOnly),
