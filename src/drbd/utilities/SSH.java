@@ -1670,10 +1670,7 @@ public class SSH {
             final String fileName = "/help-progs/drbd-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
-                scp(file,
-                    "@GUI-HELPER@",
-                    "0700",
-                    false);
+                scp(file, "@GUI-HELPER@", "0700", false, null);
             }
         }
     }
@@ -1721,8 +1718,9 @@ public class SSH {
                                    final String fileName,
                                    final String dir,
                                    final String mode,
-                                   final boolean makeBackup) {
-        scp(config, dir + fileName, mode, makeBackup);
+                                   final boolean makeBackup,
+                                   final String preCommand) {
+        scp(config, dir + fileName, mode, makeBackup, preCommand);
     }
 
     /**
@@ -1736,8 +1734,13 @@ public class SSH {
     public final void scp(final String fileContent,
                           final String remoteFilename,
                           final String mode,
-                          final boolean makeBackup) {
+                          final boolean makeBackup,
+                          final String preCommand) {
         final StringBuffer commands = new StringBuffer(40);
+        if (preCommand != null) {
+            commands.append(preCommand);
+            commands.append(';');
+        }
         if (makeBackup) {
             commands.append("cp ");
             commands.append(remoteFilename);

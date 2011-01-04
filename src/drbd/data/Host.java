@@ -2165,7 +2165,8 @@ public class Host implements Serializable {
                               "drbdgui.cf",
                               "/var/lib/heartbeat/",
                               "0600",
-                              false);
+                              false,
+                              null);
     }
 
     /**

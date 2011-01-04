@@ -380,7 +380,7 @@ public class VMSXML extends XML {
             return;
         }
         if (xml != null) {
-            host.getSSH().scp(xml, configName, "0600", true);
+            host.getSSH().scp(xml, configName, "0600", true, null);
         }
     }
 

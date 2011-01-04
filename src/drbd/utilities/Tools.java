@@ -1490,7 +1490,12 @@ public final class Tools {
                                               final String mode,
                                               final boolean makeBackup) {
         for (Host host : hosts) {
-            host.getSSH().createConfig(config, fileName, dir, mode, makeBackup);
+            host.getSSH().createConfig(config,
+                                       fileName,
+                                       dir,
+                                       mode,
+                                       makeBackup,
+                                       null);
         }
     }
 

@@ -202,21 +202,25 @@ public class DrbdInfo extends EditableInfo {
             String dir;
             String configName;
             boolean makeBackup;
+            String preCommand;
             if (testOnly) {
                 dir = "/var/lib/drbd/";
                 configName = "drbd.conf-drbd-mc-test";
                 makeBackup = false;
+                preCommand = null;
             } else {
                 dir = "/etc/";
                 configName = "drbd.conf";
                 makeBackup = true;
+                preCommand = "mv /etc/drbd.d{,.bak.`date +'%s'`}";
             }
             host.getSSH().createConfig(config.toString()
                                        + resConfig.toString(),
                                        configName,
                                        dir,
                                        "0600",
-                                       makeBackup);
+                                       makeBackup,
+                                       preCommand);
         }
     }
 
