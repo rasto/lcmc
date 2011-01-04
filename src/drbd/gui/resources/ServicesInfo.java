@@ -979,6 +979,7 @@ public class ServicesInfo extends EditableInfo {
         };
         initCommitButton(buttonCallback);
         getBrowser().getRscDefaultsInfo().setApplyButton(getApplyButton());
+        getBrowser().getRscDefaultsInfo().setRevertButton(getRevertButton());
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
