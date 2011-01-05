@@ -86,6 +86,8 @@ public class DistResource_fedora extends
          + "@GUI-HELPER@ get-lsb-resources"},
 
         /* Corosync/Pacemaker native */
+        {"PmInst.install.text.1",
+         "the Fedora way: 1.1.x/1.3.x"},
         {"PmInst.install.1",
          "yum -y install pacemaker corosync"
          + "&& if ( rpm -qa|grep drbd ); then"
