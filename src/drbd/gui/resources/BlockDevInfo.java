@@ -631,10 +631,11 @@ public class BlockDevInfo extends EditableInfo {
     }
 
     protected final boolean checkParamCache(final String param) {
-        if (paramCorrectValueMap.get(param) == null) {
+        final Boolean cv = paramCorrectValueMap.get(param);
+        if (cv == null) {
             return false;
         }
-        return paramCorrectValueMap.get(param).booleanValue();
+        return cv.booleanValue();
     }
 
     protected final Object[] getNetInterfaces(final Info defaultValue,
