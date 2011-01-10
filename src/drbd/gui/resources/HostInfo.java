@@ -328,7 +328,6 @@ public class HostInfo extends Info {
                 }
 
                 public final void action() {
-                    final Host thisDCHost = cb.getDCHost();
                     for (final ServiceInfo si
                             : cb.getExistingServiceList(null)) {
                         if (!si.isConstraintPH()) {
@@ -337,7 +336,7 @@ public class HostInfo extends Info {
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
                                                         getHost().getName())) {
-                                si.migrateFromResource(thisDCHost, false);
+                                si.migrateFromResource(host, false);
                             }
                         }
                     }

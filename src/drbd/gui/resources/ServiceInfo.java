@@ -4312,12 +4312,12 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Migrates resource in heartbeat from current location. */
-    public void migrateFromResource(final Host dcHost,
+    public void migrateFromResource(final Host host,
                                     final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
         }
-        CRM.migrateFromResource(dcHost,
+        CRM.migrateFromResource(host,
                                 getHeartbeatId(testOnly),
                                 testOnly);
     }
