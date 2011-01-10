@@ -122,6 +122,9 @@ public class GroupInfo extends ServiceInfo {
         for (final String resId : newOrder) {
             final ServiceInfo gsi =
                                getBrowser().getServiceInfoFromCRMId(resId);
+            if (gsi == null)  {
+                continue;
+            }
             pacemakerResAttrs.put(resId,
                                   gsi.getPacemakerResAttrs(testOnly));
             pacemakerResArgs.put(resId, gsi.getPacemakerResArgs());
@@ -292,11 +295,14 @@ public class GroupInfo extends ServiceInfo {
             for (final String hbId : resources) {
                 final ServiceInfo gsi =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
-                if (gsi.checkResourceFieldsCorrect(null,
-                                                  gsi.getParametersFromXML(),
-                                                  false,
-                                                  false,
-                                                  true)
+
+                if (gsi != null
+                    && gsi.checkResourceFieldsCorrect(
+                                                    null,
+                                                    gsi.getParametersFromXML(),
+                                                    false,
+                                                    false,
+                                                    true)
                     && gsi.checkResourceFieldsChanged(
                                                 null,
                                                 gsi.getParametersFromXML(),
@@ -475,9 +481,12 @@ public class GroupInfo extends ServiceInfo {
                                                       testOnly);
         if (resources != null) {
             for (final String hbId : resources) {
-                getBrowser().getServiceInfoFromCRMId(hbId).cleanupResource(
-                                                                   dcHost,
-                                                                   testOnly);
+
+                final ServiceInfo gsi =
+                                getBrowser().getServiceInfoFromCRMId(hbId);
+                if (gsi != null) {
+                    gsi.cleanupResource(dcHost, testOnly);
+                }
             }
         }
     }
@@ -619,6 +628,9 @@ public class GroupInfo extends ServiceInfo {
             for (final String hbId : resources) {
                 final ServiceInfo gsi =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
+                if (gsi == null) {
+                    continue;
+                }
                 final MyMenu groupServicesMenu = new MyMenu(
                             gsi.toString(),
                             new AccessMode(ConfigData.AccessType.RO, false),
@@ -823,8 +835,9 @@ public class GroupInfo extends ServiceInfo {
                                                      testOnly);
         if (resources != null) {
             for (final String hbId : resources) {
-                if (getBrowser().getServiceInfoFromCRMId(hbId).isOneFailed(
-                                                                  testOnly)) {
+                final ServiceInfo gsi =
+                                   getBrowser().getServiceInfoFromCRMId(hbId);
+                if (gsi != null && gsi.isOneFailed(testOnly)) {
                     return true;
                 }
             }
@@ -840,8 +853,9 @@ public class GroupInfo extends ServiceInfo {
                                                      testOnly);
         if (resources != null) {
             for (final String hbId : resources) {
-                if (getBrowser().getServiceInfoFromCRMId(
-                                           hbId).isOneFailedCount(testOnly)) {
+                final ServiceInfo gsi =
+                                    getBrowser().getServiceInfoFromCRMId(hbId);
+                if (gsi != null && gsi.isOneFailedCount(testOnly)) {
                     return true;
                 }
             }
@@ -888,6 +902,9 @@ public class GroupInfo extends ServiceInfo {
             for (final String resId : resources) {
                 final ServiceInfo si =
                                    getBrowser().getServiceInfoFromCRMId(resId);
+                if (si == null) {
+                    continue;
+                }
                 final Subtext[] subtexts =
                                      si.getSubtextsForGraph(testOnly);
                 Subtext sSubtext = null;
@@ -1221,7 +1238,9 @@ public class GroupInfo extends ServiceInfo {
             for (final String hbId : resources) {
                 final ServiceInfo si =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
-                si.updateMenus(pos);
+                if (si != null) {
+                    si.updateMenus(pos);
+                }
             }
         }
     }

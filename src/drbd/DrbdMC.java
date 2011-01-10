@@ -81,47 +81,6 @@ public final class DrbdMC extends JPanel {
                         new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                         new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                         new ColorUIResource(0xFFFFFF)});
-        try {
-            /* Metal */
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            MetalLookAndFeel.setCurrentTheme(
-                new OceanTheme() {
-                    /** e.g. arrows on split pane... */
-                    protected ColorUIResource getPrimary1() {
-                        return new ColorUIResource(
-                                            ClusterBrowser.STATUS_BACKGROUND);
-                    }
-
-                    /** unknown to me */
-                    protected ColorUIResource getPrimary2() {
-                        return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                    /** unknown to me */
-                    protected ColorUIResource getPrimary3() {
-                        return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                    /** Button and other borders. */
-                    protected ColorUIResource getSecondary1() {
-                        return new ColorUIResource(
-                                  drbd.configs.AppDefaults.LINBIT_DARK_ORANGE);
-                    }
-                    protected ColorUIResource getSecondary2() {
-                        return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                    /** Split pane divider. Line in the main menu. */
-                    protected ColorUIResource getSecondary3() {
-                        return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                }
-            );
-
-        } catch (final Exception e) {
-            /* ignore it then */
-        }
         ToolTipManager.sharedInstance().setInitialDelay(
                                                     TOOLTIP_INITIAL_DELAY);
         ToolTipManager.sharedInstance().setDismissDelay(
@@ -222,6 +181,46 @@ public final class DrbdMC extends JPanel {
 
     /** Inits the application. */
     protected static String initApp(final String[] args) {
+        try {
+            /* Metal */
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            MetalLookAndFeel.setCurrentTheme(
+                new OceanTheme() {
+                    /** e.g. arrows on split pane... */
+                    protected ColorUIResource getPrimary1() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.STATUS_BACKGROUND);
+                    }
+
+                    /** unknown to me */
+                    protected ColorUIResource getPrimary2() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                    /** unknown to me */
+                    protected ColorUIResource getPrimary3() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                    /** Button and other borders. */
+                    protected ColorUIResource getSecondary1() {
+                        return new ColorUIResource(
+                                  drbd.configs.AppDefaults.LINBIT_DARK_ORANGE);
+                    }
+                    protected ColorUIResource getSecondary2() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                    /** Split pane divider. Line in the main menu. */
+                    protected ColorUIResource getSecondary3() {
+                        return new ColorUIResource(
+                                            ClusterBrowser.PANEL_BACKGROUND);
+                    }
+                }
+            );
+        } catch (final Exception e) {
+            /* ignore it then */
+        }
         Thread.setDefaultUncaughtExceptionHandler(
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
