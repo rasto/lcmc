@@ -223,7 +223,6 @@ public class AppDefaults extends
         {"Dialog.Cluster.HbConfig.DopdUncheckedIcon", "Icons/Unchecked.gif"},
         {"Dialog.Cluster.CoroConfig.DefaultMCastAddress", "226.94.1.1"},
         {"Dialog.Cluster.CoroConfig.DefaultMCastPort",    "5405"},
-        {"Browser.ResourceIcon", "Icons/16X16/crab.png"},
         {"Browser.CategoryIcon", "Icons/tango/16x16/folder_16x16.png"},
         {"Browser.ApplyIcon",    "Icons/tango/16x16/ok_16x16.png"},
         {"Browser.ApplyIconLarge", "Icons/tango/32x32/ok_32x32.png"},
@@ -318,10 +317,6 @@ public class AppDefaults extends
 
         {"ProgressIndicatorPanel.CancelIcon",
                                         "Icons/tango/32x32/cancel_32x32.png"},
-        {"ProgressIndicatorPanel.InitIcon1",  "Icons/32X32/starfish.png"},
-        {"ProgressIndicatorPanel.InitIcon2",  "Icons/32X32/shark.png"},
-        {"ProgressIndicatorPanel.InitIcon3",  "Icons/32X32/crab.png"},
-        {"ProgressIndicatorPanel.InitIcon4",  "Icons/32X32/server.png"},
         {"ProgressBar.CancelIcon", "Icons/tango/16x16/cancel_16x16.png"},
 
         {"Dialog.Dialog.BackIcon",     "Icons/tango/16x16/back2_16x16.png"},
@@ -340,13 +335,13 @@ public class AppDefaults extends
 
         {"Dialog.Host.CheckInstallation.CheckingIcon",
          "Icons/32X32/dialog-information.png"},
-
+        
         {"Dialog.Host.CheckInstallation.NotInstalledIcon",
          "Icons/32X32/software-update-urgent.png"},
-
+        
         {"Dialog.Host.CheckInstallation.InstalledIcon",
          "Icons/32X32/weather-clear.png"},
-
+        
         {"Dialog.Host.CheckInstallation.UpgrAvailIcon",
          "Icons/32X32/software-update-available.png"},
 
