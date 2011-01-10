@@ -967,13 +967,14 @@ sub get_stonith_devices {
 		my $dir = "$libdir/$subtype/";
 		for (`find $dir -perm -a=x -type f -printf "%f\n"`) {
 			chomp;
+			my $path = "PATH=\$PATH:/usr/share/cluster-glue";
 			print get_ocf_like_stonith_devices(
-			     "PATH=$PATH:/usr/share/cluster-glue $subtype/$_",
+			     "$subtype/$_",
 			     $dir,
-			     scalar `$dir/$_ getinfo-devid`,
-			     scalar `$dir/$_ getinfo-devdescr`
-			     .`$dir/$_ getinfo-devurl`,
-			     scalar `$dir/$_ getinfo-xml`);
+			     scalar `$path $dir/$_ getinfo-devid`,
+			     scalar `$path $dir/$_ getinfo-devdescr`
+			     	   .`$path $dir/$_ getinfo-devurl`,
+			     scalar `$path $dir/$_ getinfo-xml`);
 		}
 	}
 
