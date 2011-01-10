@@ -1073,7 +1073,7 @@ public class SSH {
                  * TODO: do this also for other OSes, when I find out the
                  * known_hosts locations.
                  */
-                if (Tools.isLinux()) {
+                if (!Tools.isWindows()) {
                     try {
                         KnownHosts.addHostkeyToFile(
                               new File(
