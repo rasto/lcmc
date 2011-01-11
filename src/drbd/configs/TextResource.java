@@ -203,8 +203,7 @@ public class TextResource extends
          + "<br><br>You may enter more hosts delimited with \",\", if the "
          + "server is reachable not directly but via several <b>hops</b>. "
          + "If this is the case you have to enter the same number of "
-         + "usernames and hostnames/IPs as they are hops."
-         + "<br><br>If you use <b>sudo</b>, requiretty option can't be used."},
+         + "usernames and hostnames/IPs as they are hops."},
 
         {"Dialog.Host.NewHost.EnterHost",
          "Host:"},

@@ -1423,14 +1423,13 @@ public class Host implements Serializable {
     }
 
     /** Returns sudo prefix. */
-    public final String getSudoPrefix(final boolean sudoWithPwd) {
+    public final String getSudoPrefix(final boolean sudoTest) {
         if (useSudo != null && useSudo) {
-            if (sudoWithPwd) {
-                return "echo \""
-                       + escapeQuotes(sudoPassword, 1)
-                       + "\"|sudo -S -p '' ";
+            if (sudoTest) {
+                return "sudo -n ";
             } else {
-                return "sudo ";
+                return "sudo -p '"
+                       + SSH.SUDO_PROMPT + "' ";
             }
         } else {
             return "";
@@ -1438,10 +1437,10 @@ public class Host implements Serializable {
     }
     /** Returns command exclosed in sh -c "". */
     public final String getSudoCommand(final String command,
-                                       final boolean sudoWithPwd) {
+                                       final boolean sudoTest) {
         if (useSudo != null && useSudo) {
             return "trap - SIGPIPE;"
-                   + getSudoPrefix(sudoWithPwd)
+                   + getSudoPrefix(sudoTest)
                    + "bash -c \"trap - SIGPIPE; { "
                    + escapeQuotes(command, 1) + "; } 2>&1\" 2>/dev/null";
         } else {

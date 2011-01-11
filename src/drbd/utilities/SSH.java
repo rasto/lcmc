@@ -19,7 +19,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package drbd.utilities;
 
 import drbd.data.Host;
@@ -96,8 +95,8 @@ public class SSH {
     /** Default timeout for SSH commands. */
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
                                Tools.getDefaultInt("SSH.Command.Timeout.Long");
-    /** Whether the sudo should be executed with password. */
-    private boolean sudoWithPwd = true;
+    /** Sudo prompt. */
+    public static final String SUDO_PROMPT = "drbd mc sudo pwd";
 
     /**
      * Reconnect.
@@ -449,23 +448,25 @@ public class SSH {
                    With pty, the sudo wouldn't work, because we don't want
                    to enter sudo password by every command.
                    (It would be exposed) */
-                //thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
+                thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "
                                   + host.getSudoCommand(
                                                host.getHoppedCommand(command),
-                                               sudoWithPwd),
+                                               true),
                                   2);
+                boolean checkCommand = false;
                 thisSession.execCommand(host.getSudoCommand(
-                                              host.getHoppedCommand(command),
-                                              sudoWithPwd));
-                sudoWithPwd = false;
+                                          host.getHoppedCommand(command),
+                                          false));
 
                 final InputStream stdout = thisSession.getStdout();
+                final java.io.OutputStream stdin = thisSession.getStdin();
                 final InputStream stderr = thisSession.getStderr();
                 //byte[] buff = new byte[8192];
                 final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
+                String sudoPwd = host.getSudoPassword();
                 while (true) {
                     if ((stdout.available() == 0)
                         && (stderr.available() == 0)) {
@@ -537,6 +538,16 @@ public class SSH {
                                 host.getTerminalPanel().addContent(buffString);
                             }
                         }
+                    }
+                    final int index = output.indexOf(SUDO_PROMPT);
+                    if (index >= 0) {
+                        if (sudoPwd == null) {
+                            enterSudoPassword();
+                        }
+                        final String pwd = host.getSudoPassword() + "\n";
+                        output.delete(index, index + SUDO_PROMPT.length() + 1);
+                        stdin.write(pwd.getBytes());
+                        sudoPwd = null;
                     }
 
                     /* stderr */
@@ -1226,7 +1237,6 @@ public class SSH {
                 callback.done(1);
             }
             host.setSudoPassword("");
-            sudoWithPwd = true;
             final MyConnection conn = new MyConnection(hostname,
                                                        host.getSSHPortInt());
             disconnectForGood = false;
@@ -1583,50 +1593,6 @@ public class SSH {
                     }
                     connectionThread = null;
                     mConnectionThreadLock.release();
-                    if (host.isUseSudo() != null && host.isUseSudo()) {
-                        lastError = "";
-                        while (true) {
-                            final String lastSudoPwd = host.getSudoPassword();
-                            if (lastSudoPwd != null
-                                && !"".equals(lastSudoPwd)) {
-                                final SSHOutput ret =
-                                    execCommandAndWait(
-                                                 "true",
-                                                 true,
-                                                 false,
-                                                 10000);
-                                final int ec = ret.getExitCode();
-                                if (ec == 0) {
-                                    break;
-                                }
-                                host.setSudoPassword(null);
-                            }
-                            final String sudoPwd = sshGui.enterSomethingDialog(
-                                    "Sudo Authentication",
-                                    new String[] {lastError,
-                                                  "<html>"
-                                                  + host.getName()
-                                                  + Tools.getString(
-                                                      "SSH.Enter.sudoPassword")
-                                                  + "</html>"},
-                                    null,
-                                    null,
-                                    true);
-                            host.setSudoPassword(sudoPwd);
-                            if (sudoPwd == null) {
-                                try {
-                                    mConnectionLock.acquire();
-                                } catch (InterruptedException e) {
-                                    Thread.currentThread().interrupt();
-                                }
-                                connection = null;
-                                mConnectionLock.release();
-                                host.setConnected();
-                                break;
-                            }
-                            lastError = "wrong password";
-                        }
-                    }
                     host.setConnected();
                     if (callback != null) {
                         callback.done(0);
@@ -1656,6 +1622,36 @@ public class SSH {
                 try {
                     mConnectionLock.acquire();
                 } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                connection = null;
+                mConnectionLock.release();
+                host.setConnected();
+            }
+        }
+    }
+
+    /** Enter sudo password. */
+    public final void enterSudoPassword() {
+        if (host.isUseSudo() != null && host.isUseSudo()) {
+            String lastError = "";
+            final String lastSudoPwd = host.getSudoPassword();
+            final String sudoPwd = sshGui.enterSomethingDialog(
+                    "Sudo Authentication",
+                    new String[] {lastError,
+                                  "<html>"
+                                  + host.getName()
+                                  + Tools.getString(
+                                      "SSH.Enter.sudoPassword")
+                                  + "</html>"},
+                    null,
+                    null,
+                    true);
+            host.setSudoPassword(sudoPwd);
+            if (sudoPwd == null) {
+                try {
+                    mConnectionLock.acquire();
+                } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
                 connection = null;
