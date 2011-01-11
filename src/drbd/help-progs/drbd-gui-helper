@@ -1081,7 +1081,7 @@ sub get_drbd_xml {
 	my %missing; # handlers and startup don't come from drbdsetup xml, so
 		     # we parse them out of the man page.
 	my @missing;
-	my $manpage = `zcat /usr/share/man/man5/drbd.conf.5.gz || cat /usr/share/man/man5/drbd.conf.5`;
+	my $manpage = `zcat /usr/share/man/man5/drbd.conf.5.gz || cat /usr/share/man/man5/drbd.conf.5 || bzcat /usr/share/man/man5/drbd.conf.5.bz2`;
 	#my $from = "on-io-error";
 	my $from = "";
 
