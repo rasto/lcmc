@@ -213,6 +213,8 @@ public class Host implements Serializable {
     private int index = 0;
     /** Whether the last connection check was positive. */
     private volatile boolean lastConnected = false;
+    /** Whether corosync or heartbeat is running. */
+    private Boolean corosyncHeartbeatRunning = null;
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
@@ -2124,6 +2126,13 @@ public class Host implements Serializable {
                 drbdModuleVersion = null;
             }
         }
+        if ((heartbeatRunning == null || !"on".equals(heartbeatRunning))
+            && (csAisRunning == null || !"on".equals(csAisRunning))) {
+            setClStatus(false);
+            corosyncHeartbeatRunning = false;
+        } else {
+            corosyncHeartbeatRunning = true;
+        }
     }
 
     /**
@@ -2547,5 +2556,16 @@ public class Host implements Serializable {
     /** Returns how much is free space in a volume group. */
     public final Long getFreeInVolumeGroup(final String volumeGroup) {
         return volumeGroups.get(volumeGroup);
+    }
+    
+    /** Returns if corosync or heartbeat is running, null for unknown. */
+    public final Boolean getCorosyncHeartbeatRunning() {
+        return corosyncHeartbeatRunning;
+    }
+
+    /** Sets corosyncHeartbeatRunning. */
+    public final void setCorosyncHeartbeatRunning(
+                                      final Boolean corosyncHeartbeatRunning) {
+        this.corosyncHeartbeatRunning = corosyncHeartbeatRunning;
     }
 }

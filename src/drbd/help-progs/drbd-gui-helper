@@ -760,10 +760,24 @@ sub get_cluster_events {
 
 		my $cibevent = 0;
 		my $prev_byte = "";
+		my $testcount = 10; # check every 10 seconds
 		while (1) {
 			my $len = sysread($CB, $byte, 1);
 			if ($! == EAGAIN || $len != 1) {
 				sleep 1;
+				if ($testcount > 0) {
+					$testcount--;
+				} else {
+					socket(my $TESTCB,
+					       PF_UNIX,
+					       SOCK_STREAM,
+					       0);
+					connect($TESTCB,
+						sockaddr_un($cb_socket_name))
+					    or return "ERROR: Can't connect to "
+						      ."$cb_socket_name: $!";
+					$testcount = 10;
+				}
 				if ($cibevent > 0) {
 					my $info = get_cluster_info();
 					print "---start---\n";

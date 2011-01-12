@@ -78,6 +78,12 @@ public class HostInfo extends Info {
     /** Offline subtext. */
     private static final Subtext OFFLINE_SUBTEXT =
                                       new Subtext("offline", null, Color.BLUE);
+    /** Stopped subtext. */
+    private static final Subtext STOPPED_SUBTEXT =
+                                      new Subtext("stopped", null, Color.RED);
+    /** Unknown subtext. */
+    private static final Subtext UNKNOWN_SUBTEXT =
+                                      new Subtext("unknown...", null, Color.BLUE);
     /** Online subtext. */
     private static final Subtext ONLINE_SUBTEXT =
                                        new Subtext("online", null, Color.BLUE);
@@ -527,7 +533,18 @@ public class HostInfo extends Info {
                 return ONLINE_SUBTEXT;
             }
         } else if (getHost().isConnected()) {
-            return OFFLINE_SUBTEXT;
+            final Boolean running = getHost().getCorosyncHeartbeatRunning();
+            if (running == null) {
+                return UNKNOWN_SUBTEXT;
+            } else if (!running) {
+                return STOPPED_SUBTEXT;
+            }
+            final ClusterStatus cs = getClusterStatus();
+            if (cs != null && "no".equals(cs.isOnlineNode(host.getName()))) {
+                return OFFLINE_SUBTEXT;
+            } else {
+                return UNKNOWN_SUBTEXT;
+            }
         }
         return null;
     }
