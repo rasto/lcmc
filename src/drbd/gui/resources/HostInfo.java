@@ -336,7 +336,7 @@ public class HostInfo extends Info {
                 public final void action() {
                     for (final ServiceInfo si
                             : cb.getExistingServiceList(null)) {
-                        if (!si.isConstraintPH()) {
+                        if (!si.isConstraintPH() && si.getGroupInfo() == null) {
                             final List<String> runningOnNodes =
                                                    si.getRunningOnNodes(false);
                             if (runningOnNodes != null
@@ -354,7 +354,7 @@ public class HostInfo extends Info {
                 public void action(final Host host) {
                     for (final ServiceInfo si
                             : cb.getExistingServiceList(null)) {
-                        if (!si.isConstraintPH()) {
+                        if (!si.isConstraintPH() && si.getGroupInfo() == null) {
                             final List<String> runningOnNodes =
                                                    si.getRunningOnNodes(false);
                             if (runningOnNodes != null
