@@ -95,7 +95,6 @@ public class ClusterHosts extends DialogCluster {
             }
         }
         Tools.getGUIData().refreshClustersPanel();
-        checkBoxToHost.clear();
     }
 
     /**

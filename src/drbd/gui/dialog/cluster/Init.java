@@ -195,6 +195,7 @@ public class Init extends DialogCluster {
         lastPmRc      = null;
         lastHbStarted  = null;
         lastHbRc       = null;
+        checkClusterStopped = false;
         checkClusterThread = new Thread(
             new Runnable() {
                 public void run() {
@@ -574,7 +575,6 @@ public class Init extends DialogCluster {
                 Thread.currentThread().interrupt();
             }
         }
-        checkClusterStopped = false;
         drbdLoadedInfos = new ArrayList<JLabel>();
         drbdLoadButtons = new ArrayList<MyButton>();
 
