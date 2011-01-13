@@ -183,7 +183,7 @@ public class PluginLogin extends WizardDialog {
                                   pluginPassword,
                                   null, /* items */
                                   null, /* units */
-                                  null, /* type */
+                                  GuiComboBox.Type.PASSWDFIELD, /* type */
                                   null, /* regexp */
                                   CHECKBOX_WIDTH,
                                   null, /* abbrv */
