@@ -237,7 +237,9 @@ public class DistResource extends
         {"Corosync.startCorosync",   "/etc/init.d/corosync start"},
         {"Corosync.stopCorosync",   "/etc/init.d/corosync start"},
         {"Corosync.reloadCorosync",  "/etc/init.d/corosync force-reload"},
-        {"Heartbeat.reloadHeartbeat", "/etc/init.d/heartbeat reload"},
+        {"Heartbeat.reloadHeartbeat",
+         "if ! /etc/init.d/heartbeat status >/dev/null 2>&1; then"
+         + " /etc/init.d/heartbeat start; fi"},
 
         {"Heartbeat.getHbConfig",    "cat /etc/ha.d/ha.cf"},
 
