@@ -307,10 +307,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
+        final boolean visible = visiblePredicate();
         Tools.invokeAndWait(new Runnable() {
             public void run() {
                 setEnabled(disableTooltip == null && accessible);
-                setVisible(visiblePredicate()
+                setVisible(visible
                            && Tools.getConfigData().isAccessible(
                                                         visibleAccessMode));
             }
