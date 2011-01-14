@@ -2085,23 +2085,23 @@ public final class Tools {
     /** Converts value in kilobytes. */
     public static String convertKilobytes(final String kb) {
         if (isNumber(kb)) {
-            final double k = Integer.parseInt(kb);
-            if (k / 1024 != (int) (k / 1024)) {
+            final double k = Long.parseLong(kb);
+            if (k / 1024 != (long) (k / 1024)) {
                 return kb + "K";
             }
             final double m = k / 1024;
-            if (m / 1024 != (int) (m / 1024)) {
-                return Integer.toString((int) m) + "M";
+            if (m / 1024 != (long) (m / 1024)) {
+                return Long.toString((long) m) + "M";
             }
             final double g = m / 1024;
-            if (g / 1024 != (int) (g / 1024)) {
-                return Integer.toString((int) g) + "G";
+            if (g / 1024 != (long) (g / 1024)) {
+                return Long.toString((long) g) + "G";
             }
             final double t = g / 1024;
-            if (t / 1024 != (int) (t / 1024)) {
-                return Integer.toString((int) t) + "T";
+            if (t / 1024 != (long) (t / 1024)) {
+                return Long.toString((long) t) + "T";
             }
-            return Integer.toString((int) g) + "G";
+            return Long.toString((long) g) + "G";
         }
         return kb;
     }
@@ -2110,7 +2110,7 @@ public final class Tools {
     public static long convertToKilobytes(final String value) {
         final Object[] v = Tools.extractUnit(value);
         if (v.length == 2 && Tools.isNumber((String) v[0])) {
-            int num = Integer.parseInt((String) v[0]);
+            long num = Long.parseLong((String) v[0]);
             final String unit = (String) v[1];
             if ("T".equals(unit)) {
                 num = num * 1024 * 1024 * 1024;

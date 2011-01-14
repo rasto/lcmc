@@ -70,7 +70,10 @@ public class LVM_Resize implements RemotePlugin {
     private static final String DESCRIPTION =
                    "Resize the LVM volume. You can make it bigger, but not "
                    + " smaller for now. If this volume is replicated by"
-                   + " DRBD, volumes on both nodes will be resized.";
+                   + " DRBD, volumes on both nodes will be resized and"
+                   + " drbdadm resize will be called. If you have something"
+                   + " like filesystem on the DRBD, you have to resize the"
+                   + " filesystem yourself.";
 
     /** Private. */
     public LVM_Resize() {
@@ -339,7 +342,8 @@ public class LVM_Resize implements RemotePlugin {
             final JPanel pane = new JPanel(new SpringLayout());
             final JPanel inputPane = new JPanel(new SpringLayout());
             /* old size */
-            final JLabel oldSizeLabel = new JLabel("Size");
+            final JLabel oldSizeLabel = new JLabel("Current Size");
+            oldSizeLabel.setEnabled(false);
 
             final String oldBlockSize =
                                 blockDevInfo.getBlockDevice().getBlockSize();
@@ -379,6 +383,7 @@ public class LVM_Resize implements RemotePlugin {
             inputPane.add(resizeButton);
             /* max size */
             final JLabel maxSizeLabel = new JLabel("Max Size");
+            maxSizeLabel.setEnabled(false);
             maxSizeCB = new GuiComboBox(Tools.convertKilobytes(maxBlockSize),
                                         null,
                                         getUnits(),
