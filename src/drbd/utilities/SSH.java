@@ -96,7 +96,7 @@ public class SSH {
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
                                Tools.getDefaultInt("SSH.Command.Timeout.Long");
     /** Sudo prompt. */
-    public static final String SUDO_PROMPT = "drbd mc sudo pwd";
+    public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
 
     /**
      * Reconnect.
@@ -467,6 +467,7 @@ public class SSH {
                 //byte[] buff = new byte[8192];
                 final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
                 String sudoPwd = host.getSudoPassword();
+                boolean skipNextLine = false;
                 while (true) {
                     if ((stdout.available() == 0)
                         && (stderr.available() == 0)) {
@@ -545,9 +546,17 @@ public class SSH {
                             enterSudoPassword();
                         }
                         final String pwd = host.getSudoPassword() + "\n";
-                        output.delete(index, index + SUDO_PROMPT.length() + 1);
-                        stdin.write(pwd.getBytes());
                         sudoPwd = null;
+                        stdin.write(pwd.getBytes());
+                        skipNextLine = true;
+                        continue;
+                    } else {
+                        if (skipNextLine) {
+                            /* this is the "enter" after pwd */
+                            skipNextLine = false;
+                            continue;
+                        }
+                        skipNextLine = false;
                     }
 
                     /* stderr */
