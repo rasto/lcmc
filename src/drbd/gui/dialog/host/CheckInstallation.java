@@ -300,7 +300,7 @@ public class CheckInstallation extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              public void done(final String ans) {
-                                 Tools.debug(this, "ans: " + ans);
+                                 Tools.debug(this, "ans: " + ans, 2);
                                  checkAisHbPm(ans);
                              }
                              public void doneError(final String ans,
