@@ -180,6 +180,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Map to host buttons, to start and view virtual hosts. */
     private final Map<String, MyButton> hostButtons =
                                                new HashMap<String, MyButton>();
+    /** Whether it is used by CRM. */
+    private boolean usedByCRM = false;
     /** Map from target string in the table to vms interface info object. */
     private volatile Map<String, VMSVideoInfo> videoKeyToInfo =
                                        new HashMap<String, VMSVideoInfo>();
@@ -288,6 +290,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 Tools.getString("VMSVirtualDomainInfo.Section.Features");
     private static final String VIRTUAL_SYSTEM_OPTIONS =
                 Tools.getString("VMSVirtualDomainInfo.Section.Options");
+    /** String that is displayed as a tool tip for not applied domain. */
+    public static final String NOT_APPLIED = "not applied yet";
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NO_VM_STATUS_STRING =
                                                 "VM status is not available";
@@ -323,6 +327,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         PARALLEL_DEFAULT_WIDTHS.put(1, CONTROL_BUTTON_WIDTH);
         VIDEO_DEFAULT_WIDTHS.put(1, CONTROL_BUTTON_WIDTH);
     }
+    /** String that is displayed as a tool tip if a menu item is used by CRM. */
+    public static final String IS_USED_BY_CRM_STRING =
+                                               "it is used by cluster manager";
     /** New vm domain button. */
     private JComponent newVMButton = null;
     /** New disk button. */
@@ -2334,7 +2341,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             Tools.getString("VMSVirtualDomainInfo.StartOn")
                             + host.getName(),
                             HostBrowser.HOST_ON_ICON_LARGE,
-                            null,
+                            Tools.getString("VMSVirtualDomainInfo.StartOn")
+                            + host.getName(),
                             new AccessMode(ConfigData.AccessType.OP, false),
                             new AccessMode(ConfigData.AccessType.OP, false)) {
 
@@ -2348,6 +2356,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final String enablePredicate() {
+                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                    return IS_USED_BY_CRM_STRING;
+                }
                 return null;
             }
 
@@ -2371,7 +2382,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             Tools.getString("VMSVirtualDomainInfo.ShutdownOn")
                             + host.getName(),
                             SHUTDOWN_ICON,
-                            null,
+                            Tools.getString("VMSVirtualDomainInfo.ShutdownOn")
+                            + host.getName(),
                             new AccessMode(ConfigData.AccessType.OP, false),
                             new AccessMode(ConfigData.AccessType.OP, false)) {
 
@@ -2385,6 +2397,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final String enablePredicate() {
+                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                    return IS_USED_BY_CRM_STRING;
+                }
                 return null;
             }
 
@@ -2408,7 +2423,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             Tools.getString("VMSVirtualDomainInfo.RebootOn")
                             + host.getName(),
                             REBOOT_ICON,
-                            null,
+                            Tools.getString("VMSVirtualDomainInfo.RebootOn")
+                            + host.getName(),
                             new AccessMode(ConfigData.AccessType.OP, false),
                             new AccessMode(ConfigData.AccessType.OP, false)) {
 
@@ -2422,6 +2438,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             public final String enablePredicate() {
+                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                    return IS_USED_BY_CRM_STRING;
+                }
                 return null;
             }
 
@@ -2445,7 +2464,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
                             RESUME_ICON,
-                            null,
+                            Tools.getString("VMSVirtualDomainInfo.ResumeOn")
+                            + host.getName(),
                             new AccessMode(ConfigData.AccessType.OP, false),
                             new AccessMode(ConfigData.AccessType.OP, false)) {
 
@@ -2460,7 +2480,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
             public final String enablePredicate() {
                 if (getResource().isNew()) {
-                    return "not applied yet";
+                    return NOT_APPLIED;
                 }
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 if (vmsxml == null) {
@@ -2495,7 +2515,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             Tools.getString("VMSVirtualDomainInfo.DestroyOn")
                             + host.getName(),
                             DESTROY_ICON,
-                            null,
+                            Tools.getString("VMSVirtualDomainInfo.DestroyOn")
+                            + host.getName(),
                             new AccessMode(ConfigData.AccessType.OP, false),
                             new AccessMode(ConfigData.AccessType.OP, false)) {
 
@@ -2503,8 +2524,11 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
 
             public final String enablePredicate() {
+                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                    return IS_USED_BY_CRM_STRING;
+                }
                 if (getResource().isNew()) {
-                    return "not applied yet";
+                    return NOT_APPLIED;
                 }
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 if (vmsxml == null
@@ -2535,7 +2559,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             Tools.getString("VMSVirtualDomainInfo.SuspendOn")
                             + host.getName(),
                             PAUSE_ICON,
-                            null,
+                            Tools.getString("VMSVirtualDomainInfo.SuspendOn")
+                            + host.getName(),
                             new AccessMode(ConfigData.AccessType.OP, false),
                             new AccessMode(ConfigData.AccessType.OP, false)) {
 
@@ -2543,7 +2568,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
             public final String enablePredicate() {
                 if (getResource().isNew()) {
-                    return "not applied yet";
+                    return NOT_APPLIED;
                 }
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 if (vmsxml == null
@@ -2579,7 +2604,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
                             RESUME_ICON,
-                            null,
+                            Tools.getString("VMSVirtualDomainInfo.ResumeOn")
+                            + host.getName(),
                             new AccessMode(ConfigData.AccessType.OP, false),
                             new AccessMode(ConfigData.AccessType.OP, false)) {
 
@@ -2587,7 +2613,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
             public final String enablePredicate() {
                 if (getResource().isNew()) {
-                    return "not applied yet";
+                    return NOT_APPLIED;
                 }
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 if (vmsxml == null
@@ -2675,10 +2701,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         final MyMenuItem removeMenuItem = new MyMenuItem(
                        Tools.getString("VMSVirtualDomainInfo.RemoveDomain"),
                        ClusterBrowser.REMOVE_ICON,
-                       null,
+                       Tools.getString("VMSVirtualDomainInfo.RemoveDomain"),
                        Tools.getString("VMSVirtualDomainInfo.CancelDomain"),
                        ClusterBrowser.REMOVE_ICON,
-                       null,
+                       Tools.getString("VMSVirtualDomainInfo.CancelDomain"),
                        new AccessMode(ConfigData.AccessType.ADMIN, false),
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                             private static final long serialVersionUID = 1L;
@@ -2686,6 +2712,10 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                 return !getResource().isNew();
                             }
                             public String enablePredicate() {
+                                if (!Tools.getConfigData().isAdvancedMode()
+                                    && isUsedByCRM()) {
+                                    return IS_USED_BY_CRM_STRING;
+                                }
                                 for (final Host host
                                            : getBrowser().getClusterHosts()) {
                                     final VMSXML vmsxml =
@@ -2737,7 +2767,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final MyMenuItem tightvncViewerMenu = new MyMenuItem(
                             getVNCMenuString("TIGHT", host),
                             VNC_ICON,
-                            null,
+                            getVNCMenuString("TIGHT", host),
                             new AccessMode(ConfigData.AccessType.RO, false),
                             new AccessMode(ConfigData.AccessType.RO, false)) {
 
@@ -2745,7 +2775,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
                 public final String enablePredicate() {
                     if (getResource().isNew()) {
-                        return "not applied yet";
+                        return NOT_APPLIED;
                     }
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     if (vmsxml == null) {
@@ -2778,7 +2808,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final MyMenuItem ultravncViewerMenu = new MyMenuItem(
                             getVNCMenuString("ULTRA", host),
                             VNC_ICON,
-                            null,
+                            getVNCMenuString("ULTRA", host),
                             new AccessMode(ConfigData.AccessType.RO, false),
                             new AccessMode(ConfigData.AccessType.RO, false)) {
 
@@ -2786,7 +2816,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
                 public final String enablePredicate() {
                     if (getResource().isNew()) {
-                        return "not applied yet";
+                        return NOT_APPLIED;
                     }
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     if (vmsxml == null) {
@@ -2819,7 +2849,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             final MyMenuItem realvncViewerMenu = new MyMenuItem(
                             getVNCMenuString("REAL", host),
                             VNC_ICON,
-                            null,
+                            getVNCMenuString("REAL", host),
                             new AccessMode(ConfigData.AccessType.RO, false),
                             new AccessMode(ConfigData.AccessType.RO, false)) {
 
@@ -2827,7 +2857,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
                 public final String enablePredicate() {
                     if (getResource().isNew()) {
-                        return "not applied yet";
+                        return NOT_APPLIED;
                     }
                     final VMSXML vmsxml = getBrowser().getVMSXML(host);
                     if (vmsxml == null) {
@@ -4405,5 +4435,15 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         for (final String pv : PREFERRED_MAP.keySet()) {
             getResource().setValue(pv, PREFERRED_MAP.get(pv));
         }
+    }
+
+    /** Returns whether it is used by CRM. */
+    public final boolean isUsedByCRM() {
+        return usedByCRM;
+    }
+
+    /** Sets whether it is used by CRM. */
+    public final void setUsedByCRM(final boolean usedByCRM) {
+        this.usedByCRM = usedByCRM;
     }
 }

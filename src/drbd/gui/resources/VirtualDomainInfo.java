@@ -108,17 +108,22 @@ class VirtualDomainInfo extends ServiceInfo {
     /**
      * Connects with VMSVirtualDomainInfo object.
      */
-    public final void connectWithVMS() {
+    public final VMSVirtualDomainInfo connectWithVMS() {
         final String config = getParamSaved("config");
+        VMSVirtualDomainInfo newVMSVDI = null;
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 final String name = vxml.getNameFromConfig(config);
-                vmsVirtualDomainInfo = getBrowser().findVMSVirtualDomainInfo(
-                                                                         name);
-                break;
+                newVMSVDI = getBrowser().findVMSVirtualDomainInfo(name);
+                if (newVMSVDI != null) {
+                    newVMSVDI.setUsedByCRM(true);
+                    break;
+                }
             }
         }
+        vmsVirtualDomainInfo = newVMSVDI;
+        return newVMSVDI;
     }
 
     /**

@@ -6172,8 +6172,9 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Connects with VMSVirtualDomainInfo object. */
-    public void connectWithVMS() {
+    public VMSVirtualDomainInfo connectWithVMS() {
         /* for VirtualDomainInfo */
+        return null;
     }
 
     /** Whether this class is a constraint placeholder. */

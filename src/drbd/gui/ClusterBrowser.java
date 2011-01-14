@@ -1455,6 +1455,8 @@ public class ClusterBrowser extends Browser {
                                     new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
         addVMSNode();
+        final List<VMSVirtualDomainInfo> currentVMSVDIs =
+                                        new ArrayList<VMSVirtualDomainInfo>();
 
         if (vmsNode != null) {
             final Enumeration ee = vmsNode.children();
@@ -1465,6 +1467,7 @@ public class ClusterBrowser extends Browser {
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 if (domainNames.contains(vmsvdi.toString())) {
                     /* keeping */
+                    currentVMSVDIs.add(vmsvdi);
                     domainNames.remove(vmsvdi.toString());
                     vmsvdi.updateParameters(); /* update old */
                 } else {
@@ -1500,6 +1503,7 @@ public class ClusterBrowser extends Browser {
             /* add new vms nodes */
             final VMSVirtualDomainInfo vmsvdi =
                                    new VMSVirtualDomainInfo(domainName, this);
+            currentVMSVDIs.add(vmsvdi);
             resource = new DefaultMutableTreeNode(vmsvdi);
             setNode(resource);
             vmsvdi.updateParameters();
@@ -1508,9 +1512,16 @@ public class ClusterBrowser extends Browser {
         }
         if (nodeChanged) {
             reload(vmsNode, false);
-            for (final ServiceInfo si : getExistingServiceList(null)) {
-                si.connectWithVMS();
+        }
+        for (final ServiceInfo si : getExistingServiceList(null)) {
+            final VMSVirtualDomainInfo vmsvdi = si.connectWithVMS();
+            if (vmsvdi != null) {
+                /* keep the not connected ones.*/
+                currentVMSVDIs.remove(vmsvdi);
             }
+        }
+        for (final VMSVirtualDomainInfo vmsvdi : currentVMSVDIs) {
+            vmsvdi.setUsedByCRM(false);
         }
         final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
         if (vmsi != null) {
