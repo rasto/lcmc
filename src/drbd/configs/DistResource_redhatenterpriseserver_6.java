@@ -78,5 +78,31 @@ public class DistResource_redhatenterpriseserver_6 extends
          "echo '/etc/init.d/openais start'|at now"},
         {"Openais.reloadOpenais.i686",
          "echo '/etc/init.d/openais reload'|at now"},
+
+        /* Drbd install method 2 */
+        {"DrbdInst.install.text.2",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.2",
+         "source"},
+
+        {"DrbdInst.install.2",
+         "/bin/mkdir -p /tmp/drbdinst && "
+         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
+         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         + "cd /tmp/drbdinst && "
+         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
+         + "cd drbd-@VERSION@ && "
+         + "/usr/bin/yum -y install kernel`uname -r|"
+          + " grep -o '5PAE\\|5xen\\|5debug'"
+          + "|tr 5 -`-devel-`uname -r|sed 's/\\(PAE\\|xen\\|debug\\)$//'` && "
+         + "/usr/bin/yum -y install make glibc flex gcc && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
+         //+ "/sbin/chkconfig --add drbd && "
+         + "/bin/rm -rf /tmp/drbdinst"},
     };
 }
