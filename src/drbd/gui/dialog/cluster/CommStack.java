@@ -202,13 +202,13 @@ public class CommStack extends DialogCluster {
                 && host.getOpenaisVersion() == null) {
                 aisImpossible = true;
             }
-            if (host.isCsAisRc()) {
+            if (host.isCsRc() || host.isAisRc()) {
                 aisIsRc++;
             }
             if (host.isHeartbeatRc()) {
                 hbIsRc++;
             }
-            if (host.isCsAisRunning()) {
+            if (host.isCsRunning() || host.isAisRunning()) {
                 aisIsRunning++;
             }
             if (host.isHeartbeatRunning()) {

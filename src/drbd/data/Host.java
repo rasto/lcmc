@@ -153,20 +153,28 @@ public class Host implements Serializable {
     private String pacemakerVersion = null;
     /** Openais version. */
     private String openaisVersion = null;
-    /** Is "on" if corosync/openais is in rc. */
-    private String csAisIsRc = null;
-    /** Is "on" if corosync/openais is running. */
-    private String csAisRunning = null;
+    /** Is "on" if corosync is in rc. */
+    private boolean csIsRc = false;
+    /** Is "on" if openais is in rc. */
+    private boolean aisIsRc = false;
+    /** Is "on" if corosync has an init script. */
+    private boolean csInit = false;
+    /** Is "on" if openais has an init script. */
+    private boolean aisInit = false;
+    /** Is "on" if corosync is running. */
+    private boolean csRunning = false;
+    /** Is "on" if openais is running. */
+    private boolean aisRunning = false;
     /** Is "on" if corosync/openais config exists. */
-    private String csAisConf = null;
+    private boolean csAisConf = false;
     /** Is "on" if heartbeat is in rc. */
-    private String heartbeatIsRc = null;
+    private boolean heartbeatIsRc = false;
     /** Is "on" if heartbeat is running. */
-    private String heartbeatRunning = null;
+    private boolean heartbeatRunning = false;
     /** Is "on" if heartbeat config exists. */
-    private String heartbeatConf = null;
+    private boolean heartbeatConf = false;
     /** Is "on" if drbd module is loaded. */
-    private String drbdLoaded = null;
+    private boolean drbdLoaded = false;
     /** Corosync version. */
     private String corosyncVersion = null;
     /** Heartbeat version. */
@@ -2058,23 +2066,47 @@ public class Host implements Serializable {
             } else {
                 openaisVersion = null;
             }
-        } else if ("cs-ais-rc".equals(tokens[0])) {
+        } else if ("ais-rc".equals(tokens[0])) {
             if (tokens.length == 2) {
-                csAisIsRc = tokens[1].trim();
+                aisIsRc = "on".equals(tokens[1].trim());
             } else {
-                csAisIsRc = null;
+                aisIsRc = false;
+            }
+        } else if ("cs-rc".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                csIsRc = "on".equals(tokens[1].trim());
+            } else {
+                csIsRc = false;
             }
         } else if ("cs-ais-conf".equals(tokens[0])) {
             if (tokens.length == 2) {
-                csAisConf = tokens[1].trim();
+                csAisConf = "on".equals(tokens[1].trim());
             } else {
-                csAisConf = null;
+                csAisConf = false;
             }
-        } else if ("cs-ais-running".equals(tokens[0])) {
+        } else if ("cs-running".equals(tokens[0])) {
             if (tokens.length == 2) {
-                csAisRunning = tokens[1].trim();
+                csRunning = "on".equals(tokens[1].trim());
             } else {
-                csAisRunning = null;
+                csRunning = false;
+            }
+        } else if ("ais-running".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                aisRunning = "on".equals(tokens[1].trim());
+            } else {
+                aisRunning = false;
+            }
+        } else if ("cs-init".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                csInit = "on".equals(tokens[1].trim());
+            } else {
+                csInit = false;
+            }
+        } else if ("ais-init".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                aisInit = "on".equals(tokens[1].trim());
+            } else {
+                aisInit = false;
             }
         } else if ("hb".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -2084,27 +2116,27 @@ public class Host implements Serializable {
             }
         } else if ("hb-rc".equals(tokens[0])) {
             if (tokens.length == 2) {
-                heartbeatIsRc = tokens[1].trim();
+                heartbeatIsRc = "on".equals(tokens[1].trim());
             } else {
-                heartbeatIsRc = null;
+                heartbeatIsRc = false;
             }
         } else if ("hb-conf".equals(tokens[0])) {
             if (tokens.length == 2) {
-                heartbeatConf = tokens[1].trim();
+                heartbeatConf = "on".equals(tokens[1].trim());
             } else {
-                heartbeatConf = null;
+                heartbeatConf = false;
             }
         } else if ("hb-running".equals(tokens[0])) {
             if (tokens.length == 2) {
-                heartbeatRunning = tokens[1].trim();
+                heartbeatRunning = "on".equals(tokens[1].trim());
             } else {
-                heartbeatRunning = null;
+                heartbeatRunning = false;
             }
         } else if ("drbd-loaded".equals(tokens[0])) {
             if (tokens.length == 2) {
-                drbdLoaded = tokens[1].trim();
+                drbdLoaded = "on".equals(tokens[1].trim());
             } else {
-                drbdLoaded = null;
+                drbdLoaded = false;
             }
         } else if ("hn".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -2126,8 +2158,7 @@ public class Host implements Serializable {
                 drbdModuleVersion = null;
             }
         }
-        if ((heartbeatRunning == null || !"on".equals(heartbeatRunning))
-            && (csAisRunning == null || !"on".equals(csAisRunning))) {
+        if (!heartbeatRunning && !csRunning && !aisRunning) {
             setClStatus(false);
             corosyncHeartbeatRunning = false;
         } else {
@@ -2400,53 +2431,60 @@ public class Host implements Serializable {
         return drbdInstallMethod;
     }
 
-    /**
-     * Returns whether Corosync/Openais is rc script.
-     */
-    public final boolean isCsAisRc() {
-       return csAisIsRc != null && csAisIsRc.equals("on");
+    /** Returns whether Corosync is rc script. */
+    public final boolean isCsRc() {
+       return csIsRc;
     }
 
-    /**
-     * Returns whether Corosync/Openais is running script.
-     */
-    public final boolean isCsAisRunning() {
-       return csAisRunning != null && csAisRunning.equals("on");
+    /** Returns whether Openais is rc script. */
+    public final boolean isAisRc() {
+       return aisIsRc;
     }
 
-    /**
-     * Returns whether Corosync/Openais config exists.
-     */
+    /** Returns whether Corosync has an init script. */
+    public final boolean isCsInit() {
+       return csInit;
+    }
+
+    /** Returns whether Openais has an init script. */
+    public final boolean isAisInit() {
+       return aisInit;
+    }
+
+
+    /** Returns whether Corosync is running script. */
+    public final boolean isCsRunning() {
+       return csRunning;
+    }
+
+    /** Returns whether Openais is running script. */
+    public final boolean isAisRunning() {
+       return aisRunning;
+    }
+
+    /** Returns whether Corosync/Openais config exists. */
     public final boolean isCsAisConf() {
-       return csAisConf != null && csAisConf.equals("on");
+       return csAisConf;
     }
 
-    /**
-     * Returns whether Heartbeat is rc script.
-     */
+    /** Returns whether Heartbeat is rc script. */
     public final boolean isHeartbeatRc() {
-       return heartbeatIsRc != null && heartbeatIsRc.equals("on");
+       return heartbeatIsRc;
     }
 
-    /**
-     * Returns whether Heartbeat is running script.
-     */
+    /** Returns whether Heartbeat is running script. */
     public final boolean isHeartbeatRunning() {
-       return heartbeatRunning != null && heartbeatRunning.equals("on");
+       return heartbeatRunning;
     }
 
-    /**
-     * Returns whether Heartbeat config exists.
-     */
+    /** Returns whether Heartbeat config exists. */
     public final boolean isHeartbeatConf() {
-       return heartbeatConf != null && heartbeatConf.equals("on");
+       return heartbeatConf;
     }
 
-    /**
-     * Returns whether drbd module is loaded.
-     */
+    /** Returns whether drbd module is loaded. */
     public final boolean isDrbdLoaded() {
-       return drbdLoaded != null && drbdLoaded.equals("on");
+       return drbdLoaded;
     }
 
     /**

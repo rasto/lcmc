@@ -25,6 +25,7 @@ package drbd.gui.dialog.cluster;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
 import drbd.utilities.Heartbeat;
@@ -36,6 +37,7 @@ import drbd.utilities.SSH;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.ExecCallback;
 import drbd.gui.ProgressBar;
+import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -52,6 +54,7 @@ import java.awt.Color;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
+import javax.swing.BoxLayout;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
@@ -114,6 +117,24 @@ public class Init extends DialogCluster {
     /** Switch to Corosync/OpenAIS button text. */
     private static final String CS_AIS_BUTTON_SWITCH =
                        Tools.getString("Dialog.Cluster.Init.CsAisButtonSwitch");
+    /** Corosync init script. */
+    private static final String COROSYNC_INIT_SCRIPT =
+                                                 "use /etc/init.d/corosync";
+    /** Openais init script. */
+    private static final String OPENAIS_INIT_SCRIPT = "/etc/init.d/openais";
+    /** Whether to use openais init script instead of corosync. It applies only
+     * if both of them are present. */
+    final GuiComboBox useOpenaisButton =
+            new GuiComboBox(null,
+                            new String[]{COROSYNC_INIT_SCRIPT,
+                                         OPENAIS_INIT_SCRIPT},
+                            null,
+                            GuiComboBox.Type.RADIOGROUP,
+                            null,
+                            0,
+                            null,
+                            new AccessMode(ConfigData.AccessType.ADMIN,
+                                           false));
 
     /**
      * Prepares a new <code>Init</code> object.
@@ -277,6 +298,8 @@ public class Init extends DialogCluster {
             lastHbConf = new Boolean[hosts.length];
             lastHbInstalled = new Boolean[hosts.length];
         }
+        boolean needOpenaisButton = false;
+
         for (final Host h : hosts) {
             boolean drbdFailed = false;
             boolean csAisFailed = false;
@@ -324,8 +347,9 @@ public class Init extends DialogCluster {
 
             final boolean csAisIsInstalled = h.getOpenaisVersion() != null
                                              || h.getCorosyncVersion() != null;
-            final boolean csAisRunning     = h.isCsAisRunning();
-            final boolean csAisIsRc        = h.isCsAisRc();
+            final boolean csAisRunning     = h.isCsRunning()
+                                             || h.isAisRunning();
+            final boolean csAisIsRc        = h.isCsRc() || h.isAisRc();
             final boolean csAisIsConf      = h.isCsAisConf();
 
             final boolean heartbeatIsInstalled =
@@ -333,6 +357,9 @@ public class Init extends DialogCluster {
             final boolean heartbeatIsRunning   = h.isHeartbeatRunning();
             final boolean heartbeatIsRc      = h.isHeartbeatRc();
             final boolean heartbeatIsConf      = h.isHeartbeatConf();
+            if (!csAisRunning && h.isCsInit() && h.isAisInit()) {
+                needOpenaisButton = true;
+            }
 
             boolean hbChanged = false;
             boolean csAisChanged = false;
@@ -397,7 +424,7 @@ public class Init extends DialogCluster {
             final JLabel pmStartedInfo = pmStartedInfos.get(i);
             final MyButton csAisStartButton = pmStartButtons.get(i);
             String is = "Corosync";
-            if ((!h.isCorosync() || h.isOpenaisWrapper())
+            if (!useCorosync(h)
                 && h.getOpenaisVersion() != null) {
                 is = "OpenAIS";
             }
@@ -532,6 +559,12 @@ public class Init extends DialogCluster {
             }
             i++;
         }
+        final boolean nob = needOpenaisButton;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                useOpenaisButton.setEnabled(nob);
+            }
+        });
 
         if (oneChanged || !periodic) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -589,6 +622,8 @@ public class Init extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         /* DRBD */
         int i = 0;
+        boolean oneStartedAsOpenais = false;
+        boolean noCorosync = false;
         for (final Host host : hosts) {
             final int index = i;
 
@@ -642,7 +677,10 @@ public class Init extends DialogCluster {
             hbStartedInfos.add(new JLabel(
                         Tools.getString("Dialog.Cluster.Init.CheckingHb")));
             MyButton button;
-            if (host.isCsAisRunning() || host.isCsAisRc()) {
+            if (host.isCsRunning()
+                || host.isAisRunning()
+                || host.isCsRc()
+                || host.isAisRc()) {
                 button = new MyButton(HB_BUTTON_SWITCH);
             } else {
                 button = new MyButton(
@@ -670,14 +708,12 @@ public class Init extends DialogCluster {
                                       "Dialog.Cluster.Init.HbButtonRc").equals(
                                         e.getActionCommand())) {
                                         Heartbeat.addHeartbeatToRc(host);
-                                    } else if (host.isCorosync()
-                                               && !host.isOpenaisWrapper()
+                                    } else if (useCorosync(host)
                                                && HB_BUTTON_SWITCH.equals(
                                                        e.getActionCommand())) {
                                         Heartbeat.switchFromCorosyncToHeartbeat(
                                                                           host);
-                                    } else if ((!host.isCorosync()
-                                                || host.isOpenaisWrapper())
+                                    } else if (!useCorosync(host)
                                                && HB_BUTTON_SWITCH.equals(
                                                        e.getActionCommand())) {
                                         Heartbeat.switchFromOpenaisToHeartbeat(
@@ -727,31 +763,27 @@ public class Init extends DialogCluster {
                                     if (Tools.getString(
                                    "Dialog.Cluster.Init.CsAisButtonRc").equals(
                                         e.getActionCommand())) {
-                                        if (host.isCorosync()
-                                            && !host.isOpenaisWrapper()) {
+                                        if (useCorosync(host)) {
                                             Corosync.addCorosyncToRc(host);
                                         } else {
                                             Openais.addOpenaisToRc(host);
                                         }
                                     } else if (CS_AIS_BUTTON_SWITCH.equals(
                                                     e.getActionCommand())) {
-                                        if (host.isCorosync()
-                                            && !host.isOpenaisWrapper()) {
+                                        if (useCorosync(host)) {
                                             Corosync.switchToCorosync(host);
                                         } else {
                                             Openais.switchToOpenais(host);
                                         }
                                     } else {
-                                        if (host.isCsAisRc()) {
-                                            if (host.isCorosync()
-                                                && !host.isOpenaisWrapper()) {
+                                        if (host.isCsRc() || host.isAisRc()) {
+                                            if (useCorosync(host)) {
                                                 Corosync.startCorosync(host);
                                             } else {
                                                 Openais.startOpenais(host);
                                             }
                                         } else {
-                                            if (host.isCorosync()
-                                                && !host.isOpenaisWrapper()) {
+                                            if (useCorosync(host)) {
                                                 Corosync.startCorosyncRc(host);
                                             } else {
                                                 Openais.startOpenaisRc(host);
@@ -765,6 +797,13 @@ public class Init extends DialogCluster {
                         thread.start();
                     }
                 });
+            if (host.isCsRunning() && host.isAisRunning()) {
+                /* started with openais init script. */
+                oneStartedAsOpenais = true;
+            }
+            if (!host.isCsInit()) {
+                noCorosync = true;
+            }
 
             pane.add(pmStartedInfos.get(i));
             pane.add(pmStartButtons.get(i));
@@ -774,7 +813,20 @@ public class Init extends DialogCluster {
                                                   1, 0); //xPad, yPad
             mainPanel.add(pane);
         }
-        return new JScrollPane(mainPanel);
+        final JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        final JScrollPane s = new JScrollPane(mainPanel);
+        if (oneStartedAsOpenais || noCorosync) {
+            useOpenaisButton.setValue(OPENAIS_INIT_SCRIPT);
+        } else {
+            useOpenaisButton.setValue(COROSYNC_INIT_SCRIPT);
+        }
+        useOpenaisButton.setEnabled(false);
+        useOpenaisButton.setBackgroundColor(Color.WHITE);
+        useOpenaisButton.setMaximumSize(useOpenaisButton.getMinimumSize());
+        p.add(useOpenaisButton);
+        p.add(s);
+        return p;
     }
 
     /**
@@ -782,5 +834,21 @@ public class Init extends DialogCluster {
      */
     protected final boolean skipButtonEnabled() {
         return true;
+    }
+
+    /** Whether to use corosync or openais init script. */
+    private boolean useCorosync(final Host host) {
+        if (!host.isCorosync() || !host.isCsInit()) {
+            return false;
+        }
+        if (host.isCsInit()
+            && COROSYNC_INIT_SCRIPT.equals(
+                                          useOpenaisButton.getStringValue())) {
+            return true;
+        }
+        if (!host.isAisInit()) {
+            return true;
+        }
+        return false;
     }
 }

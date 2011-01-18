@@ -533,15 +533,16 @@ public class HostBrowser extends Browser {
                 tt.append(" \n");
                 tt.append(corOrAis);
                 tt.append(" (");
-                if (host.isCsAisRunning()) {
+                if (host.isCsRunning()
+                    || host.isAisRunning()) {
                     tt.append("running");
-                    if (!host.isCsAisRc()) {
+                    if (!host.isCsRc() && !host.isAisRc()) {
                         tt.append("/no rc.d");
                     }
                 } else {
                     tt.append("not running");
                 }
-                if (host.isCsAisRc()) {
+                if (host.isCsRc() || host.isAisRc()) {
                     tt.append("/rc.d");
                 }
                 tt.append(')');

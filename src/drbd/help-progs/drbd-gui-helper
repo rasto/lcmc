@@ -1229,6 +1229,13 @@ sub get_drbd_xml {
 }
 
 #
+# Returns whether it is an init script.
+sub is_init {
+	my $script = shift;
+	return `if [ -e /etc/init.d/$script ]; then echo on; fi` || "";
+}
+
+#
 # Returns a portable command that determines if the init script is in rc?.d
 # directories.
 sub is_script_rc {
@@ -1332,28 +1339,31 @@ sub get_cluster_versions {
 			$ais_version = "ok";
 		}
 	}
+	my $cs_init = is_init($cs_script);
+	chomp $cs_init;
+	my $ais_init = is_init($ais_script);
+	chomp $ais_init;
 	my $hb_isrc_cmd = is_script_rc("heartbeat");
-	my $cs_ais_isrc_cmd;
-	if ($cs_version && "wrapper" ne $ais_version) {
-		$cs_ais_isrc_cmd = is_script_rc($cs_script);
-	} else {
-		$cs_ais_isrc_cmd = is_script_rc($ais_script);
-	}
+	my $cs_isrc_cmd = is_script_rc($cs_script);
+	my $ais_isrc_cmd = is_script_rc($ais_script);
 	my $hb_isrc = `$hb_isrc_cmd` || "off";
-	my $cs_ais_isrc = `$cs_ais_isrc_cmd` || "off";
+	my $cs_isrc = `$cs_isrc_cmd` || "off";
+	my $ais_isrc = `$ais_isrc_cmd` || "off";
 	chomp $hb_isrc;
-	chomp $cs_ais_isrc;
+	chomp $cs_isrc;
+	chomp $ais_isrc;
 
 	my $hb_running_cmd = "$libpath/heartbeat -s";
-	my $cs_ais_running_cmd;
-	if ($cs_version && "wrapper" ne $ais_version) {
-		$cs_ais_running_cmd = is_running($cs_script, $cs_prog);
-	} else {
-		$cs_ais_running_cmd = is_running($ais_script, $ais_prog);
+	my $ais_running = "";
+	if (!$cs_version || "wrapper" eq $ais_version) {
+		my $ais_running_cmd = is_running($ais_script, $ais_prog);
+		$ais_running =
+			system("$ais_running_cmd 2>/dev/null") >> 8 || "on";
 	}
+	my $cs_running_cmd = is_running($cs_script, $cs_prog);
+	my $cs_running =
+		system("$cs_running_cmd 2>/dev/null") >> 8 || "on";
 	my $hb_running = system("$hb_running_cmd 2>/dev/null") >> 8 || "on";
-	my $cs_ais_running = system("$cs_ais_running_cmd 2>/dev/null") >> 8
-								|| "on";
 	my $drbd_loaded = system("/sbin/lsmod |grep '\\<drbd\\>'") >> 8 || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf 2>/dev/null") >> 8 || "on";
 	my $cs_ais_conf;
@@ -1366,7 +1376,8 @@ sub get_cluster_versions {
 		   system("ls /etc/ais/openais.conf 2>/dev/null") >> 8 || "on";
 	}
 	chomp $hb_running;
-	chomp $cs_ais_running;
+	chomp $ais_running;
+	chomp $cs_running;
 	# drbd version
 	my ($drbd_version) =
 			`echo|/sbin/drbdadm help 2>/dev/null`=~ /Version:\s+(\S+)/;
@@ -1379,9 +1390,13 @@ sub get_cluster_versions {
 	       ."cs:$cs_version\n"
 	       ."ais:$ais_version\n"
 	       ."hb-rc:$hb_isrc\n"
-	       ."cs-ais-rc:$cs_ais_isrc\n"
+	       ."ais-rc:$ais_isrc\n"
+	       ."cs-rc:$cs_isrc\n"
 	       ."hb-running:$hb_running\n"
-	       ."cs-ais-running:$cs_ais_running\n"
+	       ."cs-running:$cs_running\n"
+	       ."ais-running:$ais_running\n"
+	       ."cs-init:$cs_init\n"
+	       ."ais-init:$ais_init\n"
 	       ."hb-conf:$hb_conf\n"
 	       ."cs-ais-conf:$cs_ais_conf\n"
 	       ."drbd:$drbd_version\n"
