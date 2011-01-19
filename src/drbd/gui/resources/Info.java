@@ -763,19 +763,6 @@ public class Info implements Comparable {
                             menu.add((JMenuItem) u);
                         }
                     }
-                    //menu.addItemListener(
-                    //    new ItemListener() {
-                    //        public void itemStateChanged(final ItemEvent e) {
-                    //            if (e.getStateChange() == ItemEvent.SELECTED) {
-                    //                final Thread t = new Thread(new Runnable() {
-                    //                    public void run() {
-                    //                        updateMenus(null);
-                    //                    }
-                    //                });
-                    //                t.start();
-                    //            }
-                    //        }
-                    //    });
                     updateMenus(null);
                 }
             });

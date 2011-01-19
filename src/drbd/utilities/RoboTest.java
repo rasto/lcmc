@@ -59,10 +59,27 @@ public final class RoboTest {
         if (MouseInfo.getPointerInfo() == null) {
             return false;
         }
-        final Point2D p = MouseInfo.getPointerInfo().getLocation();
+        final Point2D loc =
+                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+        Point2D p = MouseInfo.getPointerInfo().getLocation();
+        double x = p.getX() - loc.getX();
+        if (x > 1536 || x < -512) {
+            int i = 0;
+            while (x > 1536 || x < -512) {
+                if (i % 5 == 0) {
+                    Tools.info("sleep: " + x);
+                }
+                Tools.sleep(1000);
+                p = MouseInfo.getPointerInfo().getLocation();
+                x = p.getX() - loc.getX();
+                i++;
+            }
+            prevP = p;
+            return false;
+        }
         if (prevP != null
-            && (Math.abs(p.getX() - prevP.getX()) > 200
-                || Math.abs(p.getY() - prevP.getY()) > 200)) {
+            && (Math.abs(p.getX() - prevP.getX()) > 400
+                || Math.abs(p.getY() - prevP.getY()) > 400)) {
             prevP = null;
             Tools.info("test aborted");
             aborted = true;
@@ -276,6 +293,7 @@ public final class RoboTest {
 
     /** Automatic tests. */
     public static void startTest(final String index, final Host host) {
+        aborted = false;
         Tools.info("start test " + index + " in 3 seconds");
         final Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -712,10 +730,10 @@ public final class RoboTest {
         leftRelease(robot);
 
         sleep(1000);
-        moveTo(robot, 1078 , 484);
+        moveTo(robot, 1078, 484);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078 , 535);
+        moveTo(robot, 1078, 535);
         sleep(1000);
         leftClick(robot); /* choose another dummy */
         sleep(1000);
@@ -901,6 +919,22 @@ public final class RoboTest {
         stopResource(robot, ipX, ipY, 0);
         sleep(5000);
         checkTest(host, "test1", 11.4);
+        resetStartStopResource(robot, ipX, ipY);
+        sleep(5000);
+        checkTest(host, "test1", 11.5);
+
+        moveTo(robot, ipX + 20, ipY + 10);
+        leftClick(robot); /* choose ip */
+        stopResource(robot, 1020, 180, 10); /* actions menu stop */
+        sleep(5000);
+        checkTest(host, "test1", 11.501);
+
+        moveTo(robot, ipX + 20, ipY + 10);
+        leftClick(robot); /* choose ip */
+        startResource(robot, 1020, 180, 20); /* actions menu start */
+        sleep(5000);
+        checkTest(host, "test1", 11.502);
+
         resetStartStopResource(robot, ipX, ipY);
         sleep(5000);
         checkTest(host, "test1", 11.5);
@@ -1744,6 +1778,9 @@ public final class RoboTest {
 
     /** Sleep for x milliseconds * slowFactor + some random time. */
     private static void sleep(final int x) {
+        if (abortWithMouseMovement()) {
+            return;
+        }
         if (!aborted) {
             Tools.sleep((int) (x * slowFactor));
             Tools.sleep((int) (x * slowFactor * Math.random()));
@@ -1836,8 +1873,6 @@ public final class RoboTest {
                                      final int y,
                                      final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        sleep(2000);
-        rightClick(robot); /* popup */
         sleep(2000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 130 + yFactor);
@@ -2263,7 +2298,7 @@ public final class RoboTest {
                     final Point2D newPos = new Point2D.Double(
                                                       pos.getX() - loc.getX(),
                                                       pos.getY() - loc.getY());
-                    Tools.sleep(200);
+                    Tools.sleep(2000);
                     if (newPos.equals(prevP) && !prevPrevP.equals(prevP)) {
                         Tools.info("moveTo(robot, "
                                     + (int) newPos.getX()
