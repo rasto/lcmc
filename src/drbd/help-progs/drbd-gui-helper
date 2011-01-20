@@ -130,7 +130,9 @@ if ($option eq "all") {
 } elsif ($option eq "get-cluster-events") {
 	my $ret = get_cluster_events();
 	if ($ret) {
-		print $ret;
+		print "---start---\n";
+		print "$ret\n";
+		print "---done---\n";
 		exit 1;
 	}
 } elsif ($option eq "get-cluster-metadata") {
@@ -763,6 +765,7 @@ sub get_cluster_events {
 		my $cibevent = 0;
 		my $prev_byte = "";
 		my $testcount = 10; # check every 10 seconds
+		my $ctime = "";
 		while (1) {
 			my $len = sysread($CB, $byte, 1);
 			if ($! == EAGAIN || $len != 1) {
@@ -770,6 +773,13 @@ sub get_cluster_events {
 				if ($testcount > 0) {
 					$testcount--;
 				} else {
+					my $new_ctime = `/usr/bin/stat -c "%y" "$cb_socket_name"`;
+					# pcmk could be restarted, and it
+					# would hang
+					if ($ctime && $ctime ne $new_ctime) {
+						return "ERROR: pcmk restart";
+					}
+					$ctime = $new_ctime;
 					socket(my $TESTCB,
 					       PF_UNIX,
 					       SOCK_STREAM,
@@ -1339,6 +1349,8 @@ sub get_cluster_versions {
 			$ais_version = "ok";
 		}
 	}
+	my $hb_init = is_init("heartbeat");
+	chomp $hb_init;
 	my $cs_init = is_init($cs_script);
 	chomp $cs_init;
 	my $ais_init = is_init($ais_script);
@@ -1395,6 +1407,7 @@ sub get_cluster_versions {
 	       ."hb-running:$hb_running\n"
 	       ."cs-running:$cs_running\n"
 	       ."ais-running:$ais_running\n"
+	       ."hb-init:$hb_init\n"
 	       ."cs-init:$cs_init\n"
 	       ."ais-init:$ais_init\n"
 	       ."hb-conf:$hb_conf\n"

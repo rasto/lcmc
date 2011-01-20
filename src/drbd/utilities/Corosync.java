@@ -85,6 +85,16 @@ public final class Corosync {
     }
 
     /**
+     * Stops corosync on host.
+     * /etc/init.d/corosync stop
+     */
+    public static void stopCorosync(final Host host) {
+        final String command = host.getDistCommand("Corosync.stopCorosync",
+                                                   (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
+    /**
      * Starts Corosync on host and adds it to the rc.
      */
     public static void startCorosyncRc(final Host host) {

@@ -34,6 +34,7 @@ import drbd.gui.SSHGui;
 import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.resources.CategoryInfo;
+import drbd.gui.ResourceGraph;
 import drbd.data.resources.NetInterface;
 import drbd.data.resources.BlockDevice;
 import java.awt.geom.Point2D;
@@ -153,10 +154,16 @@ public class Host implements Serializable {
     private String pacemakerVersion = null;
     /** Openais version. */
     private String openaisVersion = null;
+    /** Whether the comm layer is stopping. */
+    private boolean commLayerStopping = false;
+    /** Whether the comm layer is starting. */
+    private boolean commLayerStarting = false;
     /** Is "on" if corosync is in rc. */
     private boolean csIsRc = false;
     /** Is "on" if openais is in rc. */
     private boolean aisIsRc = false;
+    /** Is "on" if heartbeat has an init script. */
+    private boolean heartbeatInit = false;
     /** Is "on" if corosync has an init script. */
     private boolean csInit = false;
     /** Is "on" if openais has an init script. */
@@ -1746,7 +1753,8 @@ public class Host implements Serializable {
     }
 
     /** Gets and stores hardware info about the host. */
-    public final void getHWInfo(final CategoryInfo[] infosToUpdate) {
+    public final void getHWInfo(final CategoryInfo[] infosToUpdate,
+                                final ResourceGraph[] graphs) {
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
                              public void done(final String ans) {
@@ -1756,6 +1764,11 @@ public class Host implements Serializable {
                                     for (final CategoryInfo ci
                                                         : infosToUpdate) {
                                         ci.updateTable(CategoryInfo.MAIN_TABLE);
+                                    }
+                                    for (final ResourceGraph g : graphs) {
+                                        if (g != null) {
+                                            g.repaint();
+                                        }
                                     }
                                  }
                                  setLoadingDone();
@@ -1776,8 +1789,10 @@ public class Host implements Serializable {
         }
     }
 
-    /** Gets and stores hardware info about the host. */
-    public final void getHWInfoLazy(final CategoryInfo[] infosToUpdate) {
+    /** Gets and stores hardware info about the host. Return true if something
+     * has changed. */
+    public final void getHWInfoLazy(final CategoryInfo[] infosToUpdate,
+                                    final ResourceGraph[] graphs) {
         final Thread t = execCommand("GetHostHWInfoLazy",
                          new ExecCallback() {
                              public void done(final String ans) {
@@ -1787,6 +1802,11 @@ public class Host implements Serializable {
                                     for (final CategoryInfo ci
                                                         : infosToUpdate) {
                                         ci.updateTable(CategoryInfo.MAIN_TABLE);
+                                    }
+                                    for (final ResourceGraph g : graphs) {
+                                        if (g != null) {
+                                            g.repaint();
+                                        }
                                     }
                                  }
                                  setLoadingDone();
@@ -2093,8 +2113,15 @@ public class Host implements Serializable {
         } else if ("ais-running".equals(tokens[0])) {
             if (tokens.length == 2) {
                 aisRunning = "on".equals(tokens[1].trim());
+                commLayerStarting = false;
             } else {
                 aisRunning = false;
+            }
+        } else if ("heartbeat-init".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                heartbeatInit = "on".equals(tokens[1].trim());
+            } else {
+                heartbeatInit = false;
             }
         } else if ("cs-init".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -2159,10 +2186,19 @@ public class Host implements Serializable {
             }
         }
         if (!heartbeatRunning && !csRunning && !aisRunning) {
-            setClStatus(false);
             corosyncHeartbeatRunning = false;
         } else {
             corosyncHeartbeatRunning = true;
+        }
+        if (commLayerStarting
+            && (csRunning || aisRunning || heartbeatRunning)) {
+            commLayerStarting = false;
+        }
+        if (commLayerStopping
+            && !csRunning
+            && !aisRunning
+            && !heartbeatRunning) {
+            commLayerStopping = false;
         }
     }
 
@@ -2441,6 +2477,11 @@ public class Host implements Serializable {
        return aisIsRc;
     }
 
+    /** Returns whether Heartbeat has an init script. */
+    public final boolean isHeartbeatInit() {
+       return heartbeatInit;
+    }
+
     /** Returns whether Corosync has an init script. */
     public final boolean isCsInit() {
        return csInit;
@@ -2605,5 +2646,25 @@ public class Host implements Serializable {
     public final void setCorosyncHeartbeatRunning(
                                       final Boolean corosyncHeartbeatRunning) {
         this.corosyncHeartbeatRunning = corosyncHeartbeatRunning;
+    }
+
+    /** Returns true if comm layer is stopping. */
+    public final boolean isCommLayerStopping() {
+        return commLayerStopping;
+    }
+
+    /** Sets whether the comm layer is stopping. */
+    public final void setCommLayerStopping(final boolean commLayerStopping) {
+        this.commLayerStopping = commLayerStopping;
+    }
+
+    /** Returns true if comm layer is starting. */
+    public final boolean isCommLayerStarting() {
+        return commLayerStarting;
+    }
+
+    /** Sets whether the comm layer is starting. */
+    public final void setCommLayerStarting(final boolean commLayerStarting) {
+        this.commLayerStarting = commLayerStarting;
     }
 }

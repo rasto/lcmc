@@ -73,6 +73,16 @@ public final class Heartbeat {
     }
 
     /**
+     * Stops heartbeat on host.
+     * /etc/init.d/heartbeat stop
+     */
+    public static void stopHeartbeat(final Host host) {
+        final String command = host.getDistCommand("Heartbeat.stopHeartbeat",
+                                                   (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
+    /**
      * Starts heartbeat on host and adds it to the rc.
      */
     public static void startHeartbeatRc(final Host host) {
@@ -120,16 +130,6 @@ public final class Heartbeat {
      */
     public static void reloadHeartbeat(final Host host) {
         final String command = host.getDistCommand("Heartbeat.reloadHeartbeat",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
-    }
-
-    /**
-     * Stops heartbeat on host.
-     * /etc/init.d/heartbeat stop
-     */
-    public static void stopHeartbeat(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.stopHeartbeat",
                                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }

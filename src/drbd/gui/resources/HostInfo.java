@@ -41,6 +41,9 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.CRM;
 import drbd.utilities.SSH;
+import drbd.utilities.Corosync;
+import drbd.utilities.Openais;
+import drbd.utilities.Heartbeat;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -75,6 +78,14 @@ public class HostInfo extends Info {
     private static final ImageIcon HOST_STANDBY_OFF_ICON =
              Tools.createImageIcon(
                         Tools.getDefault("HeartbeatGraph.HostStandbyOffIcon"));
+    /** Stop comm layer icon. */
+    private static final ImageIcon HOST_STOP_COMM_LAYER_ICON =
+             Tools.createImageIcon(
+                     Tools.getDefault("HeartbeatGraph.HostStopCommLayerIcon"));
+    /** Start comm layer icon. */
+    private static final ImageIcon HOST_START_COMM_LAYER_ICON =
+             Tools.createImageIcon(
+                    Tools.getDefault("HeartbeatGraph.HostStartCommLayerIcon"));
     /** Offline subtext. */
     private static final Subtext OFFLINE_SUBTEXT =
                                       new Subtext("offline", null, Color.BLUE);
@@ -90,6 +101,12 @@ public class HostInfo extends Info {
     /** Standby subtext. */
     private static final Subtext STANDBY_SUBTEXT =
                                        new Subtext("STANDBY", null, Color.RED);
+    /** Stopping subtext. */
+    private static final Subtext STOPPING_SUBTEXT =
+                                   new Subtext("stopping...", null, Color.RED);
+    /** Starting subtext. */
+    private static final Subtext STARTING_SUBTEXT =
+                                  new Subtext("starting...", null, Color.BLUE);
     /** String that is displayed as a tool tip for disabled menu item. */
     private static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
@@ -370,6 +387,223 @@ public class HostInfo extends Info {
                                  allMigrateFromItemCallback);
         }
         items.add(allMigrateFromItem);
+        /* Stop corosync/openais. */
+        final MyMenuItem stopCorosyncItem =
+            new MyMenuItem(Tools.getString("HostInfo.StopCorosync"),
+                           HOST_STOP_COMM_LAYER_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                           Tools.getString("HostInfo.StopOpenais"),
+                           HOST_STOP_COMM_LAYER_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                           new AccessMode(ConfigData.AccessType.ADMIN, true),
+                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public final boolean predicate() {
+                    /* when both are running it's openais. */
+                    return getHost().isCsRunning() && !getHost().isAisRunning();
+                }
+
+                public final boolean visiblePredicate() {
+                    return getHost().isCsRunning()
+                           || getHost().isAisRunning();
+                }
+
+                public final void action() {
+                    if (Tools.confirmDialog(
+                         Tools.getString("HostInfo.confirmCorosyncStop.Title"),
+                         Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
+                         Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
+                         Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
+                        getHost().setCommLayerStopping(true);
+                        Corosync.stopCorosync(getHost());
+                        getBrowser().getClusterBrowser().updateHWInfo(host);
+                    }
+                }
+            };
+        if (cb != null) {
+            final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
+                            cb.new ClMenuItemCallback(stopCorosyncItem, host) {
+                public void action(final Host host) {
+                    if (!isStandby(false)) {
+                        CRM.standByOn(host, true);
+                    }
+                }
+            };
+            addMouseOverListener(stopCorosyncItem,
+                                 stopCorosyncItemCallback);
+        }
+        items.add(stopCorosyncItem);
+        /* Stop heartbeat. */
+        final MyMenuItem stopHeartbeatItem =
+            new MyMenuItem(Tools.getString("HostInfo.StopHeartbeat"),
+                           HOST_STOP_COMM_LAYER_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                           new AccessMode(ConfigData.AccessType.ADMIN, true),
+                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public final boolean visiblePredicate() {
+                    return getHost().isHeartbeatRunning();
+                }
+
+                public final void action() {
+                    if (Tools.confirmDialog(
+                         Tools.getString("HostInfo.confirmHeartbeatStop.Title"),
+                         Tools.getString("HostInfo.confirmHeartbeatStop.Desc"),
+                         Tools.getString("HostInfo.confirmHeartbeatStop.Yes"),
+                         Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
+                        getHost().setCommLayerStopping(true);
+                        Heartbeat.stopHeartbeat(getHost());
+                        getBrowser().getClusterBrowser().updateHWInfo(host);
+                    }
+                }
+            };
+        if (cb != null) {
+            final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
+                            cb.new ClMenuItemCallback(stopHeartbeatItem, host) {
+                public void action(final Host host) {
+                    if (!isStandby(false)) {
+                        CRM.standByOn(host, true);
+                    }
+                }
+            };
+            addMouseOverListener(stopHeartbeatItem,
+                                 stopHeartbeatItemCallback);
+        }
+        items.add(stopHeartbeatItem);
+        /* Start corosync. */
+        final MyMenuItem startCorosyncItem =
+            new MyMenuItem(Tools.getString("HostInfo.StartCorosync"),
+                           HOST_START_COMM_LAYER_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public final boolean visiblePredicate() {
+                    final Host h = getHost();
+                    return h.isCorosync()
+                           && h.isCsInit()
+                           && h.isCsAisConf()
+                           && !h.isCsRunning()
+                           && !h.isAisRunning()
+                           && !h.isHeartbeatRunning()
+                           && !h.isHeartbeatRc();
+                }
+
+                public final String enablePredicate() {
+                    final Host h = getHost();
+                    if (h.isAisRc() && !h.isCsRc()) {
+                        return "Openais is in rc.d";
+                    }
+                    return null;
+                }
+
+                public final void action() {
+                    getHost().setCommLayerStarting(true);
+                    Corosync.startCorosync(getHost());
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            };
+        if (cb != null) {
+            final ClusterBrowser.ClMenuItemCallback startCorosyncItemCallback =
+                            cb.new ClMenuItemCallback(startCorosyncItem, host) {
+                public void action(final Host host) {
+                    //TODO
+                }
+            };
+            addMouseOverListener(startCorosyncItem,
+                                 startCorosyncItemCallback);
+        }
+        items.add(startCorosyncItem);
+        /* Start openais. */
+        final MyMenuItem startOpenaisItem =
+            new MyMenuItem(Tools.getString("HostInfo.StartOpenais"),
+                           HOST_START_COMM_LAYER_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public final boolean visiblePredicate() {
+                    final Host h = getHost();
+                    return h.isAisInit()
+                           && h.isCsAisConf()
+                           && !h.isCsRunning()
+                           && !h.isAisRunning()
+                           && !h.isHeartbeatRunning()
+                           && !h.isHeartbeatRc();
+                }
+
+                public final String enablePredicate() {
+                    final Host h = getHost();
+                    if (h.isCsRc() && !h.isAisRc()) {
+                        return "Corosync is in rc.d";
+                    }
+                    return null;
+                }
+
+                public final void action() {
+                    getHost().setCommLayerStarting(true);
+                    Openais.startOpenais(getHost());
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            };
+        if (cb != null) {
+            final ClusterBrowser.ClMenuItemCallback startOpenaisItemCallback =
+                            cb.new ClMenuItemCallback(startOpenaisItem, host) {
+                public void action(final Host host) {
+                    //TODO
+                }
+            };
+            addMouseOverListener(startOpenaisItem,
+                                 startOpenaisItemCallback);
+        }
+        items.add(startOpenaisItem);
+        /* Start heartbeat. */
+        final MyMenuItem startHeartbeatItem =
+            new MyMenuItem(Tools.getString("HostInfo.StartHeartbeat"),
+                           HOST_START_COMM_LAYER_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public final boolean visiblePredicate() {
+                    final Host h = getHost();
+                    return h.isHeartbeatInit()
+                           && h.isHeartbeatConf()
+                           && !h.isCsRunning()
+                           && !h.isAisRunning()
+                           && !h.isHeartbeatRunning()
+                           && !h.isAisRc()
+                           && !h.isCsRc();
+                }
+
+                public final void action() {
+                    getHost().setCommLayerStarting(true);
+                    Heartbeat.startHeartbeat(getHost());
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            };
+        if (cb != null) {
+            final ClusterBrowser.ClMenuItemCallback startHeartbeatItemCallback =
+                          cb.new ClMenuItemCallback(startHeartbeatItem, host) {
+                public void action(final Host host) {
+                    //TODO
+                }
+            };
+            addMouseOverListener(startHeartbeatItem,
+                                 startHeartbeatItemCallback);
+        }
+        items.add(startHeartbeatItem);
         /* change host color */
         final MyMenuItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
@@ -526,6 +760,11 @@ public class HostInfo extends Info {
 
     /** Returns text that appears in the corner of the graph. */
     public final Subtext getRightCornerTextForGraph(final boolean testOnly) {
+        if (getHost().isCommLayerStopping()) {
+            return STOPPING_SUBTEXT;
+        } else if (getHost().isCommLayerStarting()) {
+            return STARTING_SUBTEXT;
+        }
         if (getHost().isClStatus()) {
             if (isStandby(testOnly)) {
                 return STANDBY_SUBTEXT;

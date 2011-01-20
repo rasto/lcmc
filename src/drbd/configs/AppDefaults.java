@@ -251,6 +251,10 @@ public class AppDefaults extends
 
         {"HeartbeatGraph.ServiceNotRunningIcon",
                                         "Icons/tango/32x32/service_32x32.png"},
+        {"HeartbeatGraph.HostStopCommLayerIcon",
+                                       "Icons/tango/32x32/shutdown_32x32.png"},
+        {"HeartbeatGraph.HostStartCommLayerIcon",
+         "Icons/tango/32x32/resume_32x32.png"},
         {"ClusterBrowser.ServiceStartedIcon",
                                 "Icons/tango/16x16/service_active_16x16.png"},
         {"ClusterBrowser.ServiceStoppedIcon",

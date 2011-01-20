@@ -812,10 +812,14 @@ public class ClusterBrowser extends Browser {
             }
 
             host.setIsLoading();
+            boolean changed = false;
             if (host.isServerStatusLatch() || count % 5 == 0) {
-                host.getHWInfo(infosToUpdate);
+                host.getHWInfo(infosToUpdate,
+                               new ResourceGraph[]{drbdGraph, heartbeatGraph});
             } else {
-                host.getHWInfoLazy(infosToUpdate);
+                host.getHWInfoLazy(infosToUpdate,
+                                   new ResourceGraph[]{drbdGraph,
+                                                       heartbeatGraph});
             }
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             updateDrbdResources();
@@ -1227,9 +1231,6 @@ public class ClusterBrowser extends Browser {
                                    heartbeatGraph.repaint();
                                 }
                             } else {
-                                final String online =
-                                    clusterStatus.isOnlineNode(host.getName());
-                                setClStatus(host, "yes".equals(online));
                                 if (clusterStatus.parseStatus(status)) {
                                     Tools.debug(this,
                                                 "update cluster status: "
@@ -1247,12 +1248,19 @@ public class ClusterBrowser extends Browser {
                                     clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
                                 }
+                                final String online =
+                                    clusterStatus.isOnlineNode(host.getName());
+                                if ("yes".equals(online)) {
+                                    setClStatus(host, true);
+                                    setClStatus();
+                                } else {
+                                    setClStatus(host, false);
+                                }
                             }
                         }
                         firstTime.countDown();
                     }
                 }
-                setClStatus();
             }
         }
         clStatusUnlock();
@@ -1678,7 +1686,13 @@ public class ClusterBrowser extends Browser {
         int lastHostIndex = -1;
         int i = 0;
         for (Host host : getClusterHosts()) {
-            if (host.getName().equals(dc) && host.isClStatus()) {
+            if (host.getName().equals(dc)
+                && host.isClStatus()
+                && !host.isCommLayerStarting()
+                && !host.isCommLayerStopping()
+                && (host.isHeartbeatRunning()
+                    || host.isCsRunning()
+                    || host.isAisRunning())) {
                 dcHost = host;
                 break;
             }
@@ -1696,7 +1710,10 @@ public class ClusterBrowser extends Browser {
                 if (ix > hosts.size() - 1) {
                     ix = 0;
                 }
-                if (hosts.get(ix).isConnected()) {
+                if (hosts.get(ix).isConnected()
+                    && (hosts.get(ix).isHeartbeatRunning()
+                        || hosts.get(ix).isCsRunning()
+                        || hosts.get(ix).isAisRunning())) {
                     lastDcHost = hosts.get(ix);
                     break;
                 }
@@ -2642,6 +2659,7 @@ public class ClusterBrowser extends Browser {
     /** Updates host hardware info immediatly. */
     public final void updateHWInfo(final Host host) {
         host.setIsLoading();
-        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo});
+        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
+                       new ResourceGraph[]{drbdGraph, heartbeatGraph});
     }
 }

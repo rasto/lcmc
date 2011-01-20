@@ -235,7 +235,7 @@ public class DistResource extends
         {"Openais.stopOpenais",   "/etc/init.d/openais stop"},
         {"Openais.reloadOpenais",  "/etc/init.d/openais reload"},
         {"Corosync.startCorosync",   "/etc/init.d/corosync start"},
-        {"Corosync.stopCorosync",   "/etc/init.d/corosync start"},
+        {"Corosync.stopCorosync",   "/etc/init.d/corosync stop"},
         {"Corosync.reloadCorosync",  "/etc/init.d/corosync force-reload"},
         {"Heartbeat.reloadHeartbeat",
          "if ! /etc/init.d/heartbeat status >/dev/null 2>&1; then"

@@ -85,6 +85,16 @@ public final class Openais {
     }
 
     /**
+     * Stops openais on host.
+     * /etc/init.d/openais stop
+     */
+    public static void stopOpenais(final Host host) {
+        final String command = host.getDistCommand("Openais.stopOpenais",
+                                                   (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
+    /**
      * Starts openais on host and adds it to the rc.
      */
     public static void startOpenaisRc(final Host host) {

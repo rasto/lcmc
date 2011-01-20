@@ -1551,11 +1551,11 @@ public class TextResource extends
          "Filesystem + drbddisk (obsolete)"},
 
         {"ClusterBrowser.StartingPtest",
-         "<html><b>What happens when you apply it:</b><br>"
+         "<html><b>Look what happens when you apply it:</b><br>"
          + "Starting policy engine test...</html>"},
 
         {"ClusterBrowser.StartingDRBDtest",
-         "<html><b>What happens when you apply it:</b><br>"
+         "<html><b>Look what happens when you apply it:</b><br>"
          + "Starting drbdadm --dry-run test...</html>"},
 
         {"ClusterBrowser.OperationsSameAs",
@@ -1568,10 +1568,10 @@ public class TextResource extends
           "Add constraint placeholder to create a resource set."},
 
         {"PtestData.ToolTip",
-         "What happens when you apply it:"},
+         "Look what happens when you apply it:"},
 
         {"DRBDtestData.ToolTip",
-         "What happens when you apply it:"},
+         "Look what happens when you apply it:"},
 
         {"HostBrowser.HostWizard",
          "Host Wizard"},
@@ -1684,6 +1684,48 @@ public class TextResource extends
 
         {"HostInfo.CRM.AllMigrateFrom",
          "Migrate All Resources Away"},
+
+        {"HostInfo.StopCorosync",
+         "Stop Corosync"},
+
+        {"HostInfo.StopOpenais",
+         "Stop Openais"},
+
+        {"HostInfo.StopHeartbeat",
+         "Stop Heartbeat"},
+
+        {"HostInfo.StartCorosync",
+         "Start Corosync"},
+
+        {"HostInfo.StartOpenais",
+         "Start Openais"},
+
+        {"HostInfo.StartHeartbeat",
+         "Start Heartbeat"},
+
+        {"HostInfo.confirmCorosyncStop.Title",
+         "Stop Corosync"},
+
+        {"HostInfo.confirmCorosyncStop.Desc",
+         "Are you sure you want to stop the corosync?"},
+
+        {"HostInfo.confirmCorosyncStop.Yes",
+         "Stop"},
+
+        {"HostInfo.confirmCorosyncStop.No",
+         "Cancel"},
+
+        {"HostInfo.confirmHeartbeatStop.Title",
+         "Stop Heartbeat"},
+
+        {"HostInfo.confirmHeartbeatStop.Desc",
+         "Are you sure you want to stop the Heartbeat?"},
+
+        {"HostInfo.confirmHeartbeatStop.Yes",
+         "Stop"},
+
+        {"HostInfo.confirmHeartbeatStop.No",
+         "Cancel"},
 
         {"HostBrowser.CRM.StandByOn",
          "Go Into Standby"},
