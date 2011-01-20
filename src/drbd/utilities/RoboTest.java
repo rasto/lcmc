@@ -421,6 +421,15 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
+                    } else if ("C".equals(index)) {
+                        /* pacemaker master/slave test */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTestC(robot, host);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
                     } else if ("9".equals(index)) {
                         /* all pacemaker tests */
                         int i = 1;
@@ -990,11 +999,11 @@ public final class RoboTest {
         /** Add m/s Stateful resource */
         moveTo(robot, statefulX, statefulY);
         rightClick(robot); /* popup */
-        moveTo(robot, 637, 263);
-        moveTo(robot, 637, 283);
-        moveTo(robot, 912, 282);
-        moveTo(robot, 932, 325);
-        moveTo(robot, 1165, 325);
+        moveTo(robot, statefulX + 137, statefulY + 8);
+        moveTo(robot, statefulX + 137, statefulY + 28);
+        moveTo(robot, statefulX + 412, statefulY + 27);
+        moveTo(robot, statefulX + 432, statefulY + 70);
+        moveTo(robot, statefulX + 665, statefulY + 70);
         sleep(1000);
 
         press(robot, KeyEvent.VK_S);
@@ -1666,6 +1675,51 @@ public final class RoboTest {
             removeResource(robot, dummy1X, dummy1Y, -15);
         }
         System.gc();
+    }
+
+    private static void startTestC(final Robot robot, final Host host) {
+        slowFactor = 0.5f;
+        host.getSSH().installTestFiles();
+        final int statefulX = 500;
+        final int statefulY = 255;
+        disableStonith(robot, host);
+        for (int i = 20; i > 0; i--) {
+            Tools.info("I: " + i);
+            checkTest(host, "testC", 1);
+            /** Add m/s Stateful resource */
+            moveTo(robot, statefulX, statefulY);
+            rightClick(robot); /* popup */
+            moveTo(robot, statefulX + 137, statefulY + 8);
+            moveTo(robot, statefulX + 137, statefulY + 28);
+            moveTo(robot, statefulX + 412, statefulY + 27);
+            moveTo(robot, statefulX + 432, statefulY + 70);
+            moveTo(robot, statefulX + 665, statefulY + 70);
+            sleep(1000);
+
+            press(robot, KeyEvent.VK_S);
+            sleep(200);
+            press(robot, KeyEvent.VK_T);
+            sleep(200);
+            press(robot, KeyEvent.VK_A);
+            sleep(200);
+            press(robot, KeyEvent.VK_T);
+            sleep(200);
+            press(robot, KeyEvent.VK_E);
+            sleep(200);
+            press(robot, KeyEvent.VK_F);
+            sleep(200);
+            press(robot, KeyEvent.VK_ENTER); /* choose Stateful */
+            sleep(1000);
+
+            moveTo(robot, 812, 179);
+            sleep(1000);
+            leftClick(robot); /* apply */
+            sleep(4000);
+            stopResource(robot, statefulX, statefulY, 0);
+            checkTest(host, "testC", 2);
+            sleep(5000);
+            removeResource(robot, statefulX, statefulY, -20);
+        }
     }
 
     private static void startTest8(final Robot robot, final Host host) {
