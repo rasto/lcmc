@@ -1209,6 +1209,9 @@ public class GroupInfo extends ServiceInfo {
         final DefaultMutableTreeNode gn = getNode();
         if (gn != null) {
             final Enumeration e = gn.children();
+            if (!e.hasMoreElements()) {
+                return false;
+            }
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode n =
                                       (DefaultMutableTreeNode) e.nextElement();

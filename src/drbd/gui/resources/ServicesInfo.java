@@ -380,7 +380,6 @@ public class ServicesInfo extends EditableInfo {
                 hg.repaint();
             }
         }
-        hg.setVertexIsPresent(newCi);
         return newCi;
     }
 
@@ -429,6 +428,7 @@ public class ServicesInfo extends EditableInfo {
                                final String grpOrCloneId,
                                final GroupInfo newGi,
                                final CloneInfo newCi,
+                               final List<ServiceInfo> serviceIsPresent,
                                final List<ServiceInfo> groupServiceIsPresent,
                                final boolean testOnly) {
         final Map<ServiceInfo, Map<String, String>> setParametersHash =
@@ -459,6 +459,7 @@ public class ServicesInfo extends EditableInfo {
                                   hbId,
                                   gi,
                                   null,
+                                  serviceIsPresent,
                                   groupServiceIsPresent,
                                   testOnly);
                 newSi = (ServiceInfo) gi;
@@ -538,7 +539,7 @@ public class ServicesInfo extends EditableInfo {
                     setParametersHash.put(newSi, resourceNode);
                 }
                 newSi.getService().setNew(false);
-                hg.setVertexIsPresent(newSi);
+                serviceIsPresent.add(newSi);
                 if (newGi != null || newCi != null) {
                     groupServiceIsPresent.add(newSi);
                 }
@@ -584,16 +585,16 @@ public class ServicesInfo extends EditableInfo {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final Set<String> allGroupsAndClones = clStatus.getAllGroups();
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
-        hg.clearVertexIsPresentList();
         final List<ServiceInfo> groupServiceIsPresent =
                                                   new ArrayList<ServiceInfo>();
-        groupServiceIsPresent.clear();
+        final List<ServiceInfo> serviceIsPresent = new ArrayList<ServiceInfo>();
         for (final String groupOrClone : allGroupsAndClones) {
             CloneInfo newCi = null;
             GroupInfo newGi = null;
             if (clStatus.isClone(groupOrClone)) {
                 /* clone */
                 newCi = setCreateCloneInfo(groupOrClone, testOnly);
+                serviceIsPresent.add(newCi);
             } else if (!"none".equals(groupOrClone)) {
                 /* group */
                 final GroupInfo gi =
@@ -605,12 +606,13 @@ public class ServicesInfo extends EditableInfo {
                     continue;
                 }
                 newGi = setCreateGroupInfo(groupOrClone, newCi, testOnly);
-                hg.setVertexIsPresent(newGi);
+                serviceIsPresent.add(newGi);
             }
             setGroupResources(allGroupsAndClones,
                               groupOrClone,
                               newGi,
                               newCi,
+                              serviceIsPresent,
                               groupServiceIsPresent,
                               testOnly);
         }
@@ -721,7 +723,7 @@ public class ServicesInfo extends EditableInfo {
                                            so that ids are correct. */
                     rdataToCphi.put(rdata, cphi);
                 }
-                hg.setVertexIsPresent(cphi);
+                serviceIsPresent.add(cphi);
 
                 final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
                 final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
@@ -840,10 +842,14 @@ public class ServicesInfo extends EditableInfo {
                         /* remove the group service from the menu that does
                          * not exist anymore. */
                         s.removeInfo();
+                    } else if (!testOnly) {
+                        s.updateMenus(null);
                     }
                 }
             }
+            g.updateMenus(null);
         }
+        hg.setServiceIsPresentList(serviceIsPresent);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 hg.killRemovedEdges();

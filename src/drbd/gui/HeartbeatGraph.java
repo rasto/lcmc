@@ -73,8 +73,10 @@ public class HeartbeatGraph extends ResourceGraph {
     private final List<Edge> edgeIsOrderList = new ArrayList<Edge>();
     /** List with edges that are colocation constraints. */
     private final List<Edge> edgeIsColocationList = new ArrayList<Edge>();
+    /** Vertex is present lock. */
+    private final Mutex mVertexIsPresentListLock = new Mutex();
     /** List with vertices that are present. */
-    private final List<Vertex> vertexIsPresentList = new ArrayList<Vertex>();
+    private List<Vertex> vertexIsPresentList = new ArrayList<Vertex>();
     /** Map from vertex to 'Add service' menu. */
     private final Map<Vertex, JMenu> vertexToAddServiceMap =
                                                 new HashMap<Vertex, JMenu>();
@@ -304,6 +306,7 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void exchangeObjectInTheVertex(final ServiceInfo newSI,
                                                 final ServiceInfo oldSI) {
+        Tools.printStackTrace("exchange");
         final Vertex v = getVertex(oldSI);
         removeVertex(oldSI);
         putInfoToVertex(newSI, v);
@@ -614,13 +617,6 @@ public class HeartbeatGraph extends ResourceGraph {
     }
 
     /**
-     * Removes all elements in vertexIsPresentList.
-     */
-    public final void clearVertexIsPresentList() {
-        vertexIsPresentList.clear();
-    }
-
-    /**
      * Returns label for service vertex.
      */
     protected final String getMainText(final Vertex v,
@@ -635,9 +631,11 @@ public class HeartbeatGraph extends ResourceGraph {
             if (si == null) {
                 return "";
             }
+            final List<Vertex> vipl = getVertexIsPresentList();
+            putVertexIsPresentList();
             if (si.getService().isRemoved()) {
                 str = Tools.getString("HeartbeatGraph.Removing");
-            } else if (vertexIsPresentList.contains(v)) {
+            } else if (vipl.contains(v)) {
                 str = si.getMainTextForGraph();
             } else {
                 if (si.getService().isNew()) {
@@ -898,6 +896,8 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
+        final List<Vertex> vipl = getVertexIsPresentList();
+        putVertexIsPresentList();
         if (getClusterBrowser().allHostsDown()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
         } else if (si.getService().isOrphaned()) {
@@ -908,7 +908,7 @@ public class HeartbeatGraph extends ResourceGraph {
             return ClusterBrowser.FILL_PAINT_STOPPED;
         } else if (getClusterBrowser().clStatusFailed()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
-        } else if (vertexIsPresentList.contains(v) || tOnly) {
+        } else if (vipl.contains(v) || tOnly) {
             final List<Color> colors = si.getHostColors(tOnly);
             if (colors.size() >= 1) {
                 return colors.get(0);
@@ -1183,9 +1183,11 @@ public class HeartbeatGraph extends ResourceGraph {
                 continue;
             }
             unlockGraph();
+            final List<Vertex> vipl = getVertexIsPresentList();
+            putVertexIsPresentList();
             if (vertexToConstraintPHMap.containsKey(v)) {
                 final ConstraintPHInfo cphi = (ConstraintPHInfo) getInfo(v);
-                if (!vertexIsPresentList.contains(v)) {
+                if (!vipl.contains(v)) {
                     cphi.setUpdated(false);
                     if (!getClusterBrowser().clStatusFailed()
                         && cphi.getService().isRemoved()) {
@@ -1207,7 +1209,7 @@ public class HeartbeatGraph extends ResourceGraph {
                 }
                 cphi.resetRscSetConnectionData();
             } else {
-                if (!vertexIsPresentList.contains(v)) {
+                if (!vipl.contains(v)) {
                     final ServiceInfo si = (ServiceInfo) getInfo(v);
                     if (si != null
                         && !si.getService().isNew()
@@ -1228,6 +1230,8 @@ public class HeartbeatGraph extends ResourceGraph {
                         vertexToAddExistingServiceMap.remove(v);
                         //TODO: positions are still there
                         somethingChanged();
+                        Tools.printStackTrace("remove vertex: "
+                                              + si.toString());
                     }
                 }
             }
@@ -1252,21 +1256,60 @@ public class HeartbeatGraph extends ResourceGraph {
         unlockGraph();
 
         /* remove vertex */
-        vertexIsPresentList.remove(v);
+        getVertexIsPresentList().remove(v);
+        putVertexIsPresentList();
         ((ServiceInfo) i).getService().setNew(false);
         resetSavedPosition(i);
     }
 
-    /** Set vertex as present. */
-    public final void setVertexIsPresent(final ServiceInfo si) {
-        final Vertex v = getVertex(si);
-        if (v == null) {
-            //Tools.Toolsrror("no vertex associated with service info");
-            /* group vertices */
-            return;
+    /**
+     * Returns vertex location list, it acquires mVertexIsPresentListLock and
+     * must be followed by putVertexIsPresentList. */
+    public final List<Vertex> getVertexIsPresentList() {
+        try {
+            mVertexIsPresentListLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
         }
-        vertexIsPresentList.add(v);
+        return vertexIsPresentList;
     }
+
+    /** Releases mVertexIsPresentListLock. */
+    public final void putVertexIsPresentList() {
+        mVertexIsPresentListLock.release();
+    }
+
+    /** Set vertex-is-present list. */
+    public final void setServiceIsPresentList(final List<ServiceInfo> sis) {
+        final List<Vertex> vipl = new ArrayList<Vertex>();
+        for (final ServiceInfo si : sis) {
+            final Vertex v = getVertex(si);
+            if (v == null) {
+                /* e.g. group vertices */
+                continue;
+            }
+            vipl.add(v);
+        }
+        try {
+            mVertexIsPresentListLock.acquire();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        vertexIsPresentList = vipl;
+        mVertexIsPresentListLock.release();
+    }
+
+    ///** Set vertex as present. */
+    //public final void setVertexIsPresent(final ServiceInfo si) {
+    //    final Vertex v = getVertex(si);
+    //    if (v == null) {
+    //        //Tools.Toolsrror("no vertex associated with service info");
+    //        /* group vertices */
+    //        return;
+    //    }
+    //    getVertexIsPresentList().add(v);
+    //    putVertexIsPresentList();
+    //}
 
     /** Returns an icon for the vertex. */
     protected final List<ImageIcon> getIconsForVertex(final Vertex v,

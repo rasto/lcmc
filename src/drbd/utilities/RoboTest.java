@@ -63,9 +63,9 @@ public final class RoboTest {
                        Tools.getGUIData().getMainFrame().getLocationOnScreen();
         Point2D p = MouseInfo.getPointerInfo().getLocation();
         double x = p.getX() - loc.getX();
-        if (x > 1536 || x < -512) {
+        if (x > 1536 || x < -100) {
             int i = 0;
-            while (x > 1536 || x < -512) {
+            while (x > 1536 || x < -100) {
                 if (i % 5 == 0) {
                     Tools.info("sleep: " + x);
                 }
@@ -691,7 +691,7 @@ public final class RoboTest {
         leftClick(robot); /*  apply */
         for (int i = 0; i < 2; i++) {
             /* another group resource */
-            sleep(3000);
+            sleep(20000);
             moveTo(robot, gx + 46, gy + 11);
             rightClick(robot); /* group popup */
             sleep(2000 + i * 500);
@@ -1715,7 +1715,7 @@ public final class RoboTest {
             sleep(1000);
             leftClick(robot); /* apply */
             sleep(4000);
-            stopResource(robot, statefulX, statefulY, 0);
+            stopResource(robot, statefulX, statefulY, -10);
             checkTest(host, "testC", 2);
             sleep(5000);
             removeResource(robot, statefulX, statefulY, -20);

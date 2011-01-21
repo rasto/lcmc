@@ -850,7 +850,6 @@ public class ServiceInfo extends EditableInfo {
         } else {
             getService().setOrphaned(false);
         }
-        updateMenus(null);
     }
 
     /** Returns the main text that appears in the graph. */
