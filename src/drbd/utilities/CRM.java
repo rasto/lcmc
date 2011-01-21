@@ -617,13 +617,16 @@ public final class CRM {
                                          final String score,
                                          final String scoreAttribute,
                                          final String op,
+                                         final String role,
                                          final String locationId) {
         final StringBuffer xml = new StringBuffer(360);
         xml.append("'<rsc_location id=\"");
         xml.append(locationId);
         xml.append("\" rsc=\"");
         xml.append(resId);
-        if (op == null || ("eq".equals(op) && !"pingd".equals(attribute))) {
+        if (op == null || ("eq".equals(op)
+                           && !"pingd".equals(attribute)
+                           && role == null)) {
             /* eq */
             if (onHost != null) {
                 xml.append("\" node=\"");
@@ -642,6 +645,11 @@ public final class CRM {
             if (score != null) {
                 xml.append(" score=\"");
                 xml.append(score);
+                xml.append('"');
+            }
+            if (role != null) {
+                xml.append(" role=\"");
+                xml.append(role);
                 xml.append('"');
             }
             if (scoreAttribute != null) {
@@ -678,12 +686,20 @@ public final class CRM {
         if (locationId == null) {
             locationId = "loc_" + resId + "_" + onHost;
             command = "-C";
+        } else if ("migration".equals(locationId)) {
+            locationId = "cli-standby-" + resId;
+            command = "-C";
+        } else if ("remigration".equals(locationId)) {
+            locationId = "cli-standby-" + resId;
+            command = "-U";
         }
         String score = null;
         String op = null;
+        String role = null;
         if (hostLocation != null) {
             score = hostLocation.getScore();
             op = hostLocation.getOperation();
+            role = hostLocation.getRole();
         }
         final String xml = getLocationXML(resId,
                                           onHost,
@@ -691,6 +707,7 @@ public final class CRM {
                                           score,
                                           null,
                                           op,
+                                          role,
                                           locationId);
         final SSH.SSHOutput ret = execCommand(
                                     host,
@@ -733,6 +750,7 @@ public final class CRM {
                                           score,
                                           scoreAttribute,
                                           op,
+                                          null, /* role */
                                           locationId);
         final SSH.SSHOutput ret = execCommand(
                                     host,
@@ -750,6 +768,7 @@ public final class CRM {
                                          final String resId,
                                          final boolean testOnly) {
         final String xml = getLocationXML(resId,
+                                          null,
                                           null,
                                           null,
                                           null,

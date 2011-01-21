@@ -181,7 +181,7 @@ public class ServiceInfo extends EditableInfo {
     /** Stop service icon. */
     public static final ImageIcon STOP_ICON  = SERVICE_NOT_RUNNING_ICON;
     /** Migrate icon. */
-    private static final ImageIcon MIGRATE_ICON = Tools.createImageIcon(
+    protected static final ImageIcon MIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.MigrateIcon"));
     /** Unmigrate icon. */
     public static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
@@ -1258,7 +1258,8 @@ public class ServiceInfo extends EditableInfo {
             if (score == null || "".equals(score)) {
                 savedHostLocations.remove(hi);
             } else {
-                savedHostLocations.put(hi, new HostLocation(score, op, null));
+                savedHostLocations.put(hi,
+                                       new HostLocation(score, op, null, null));
             }
         }
         /* ping */
@@ -2956,7 +2957,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final String onHost = hi.getName();
             final String op = getOpFromLabel(onHost, cb.getLabel().getText());
-            final HostLocation hostLoc = new HostLocation(hs, op, null);
+            final HostLocation hostLoc = new HostLocation(hs, op, null, null);
             if (!hostLoc.equals(hlSaved)) {
                 String locationId = cs.getLocationId(getHeartbeatId(testOnly),
                                                      onHost,
@@ -4312,12 +4313,14 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Migrates resource in heartbeat from current location. */
-    public void migrateFromResource(final Host host,
+    public void migrateFromResource(final Host dcHost,
+                                    final String fromHost,
                                     final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
         }
-        CRM.migrateFromResource(host,
+        /* don't need fromHost, but m/s resources need it. */
+        CRM.migrateFromResource(dcHost,
                                 getHeartbeatId(testOnly),
                                 testOnly);
     }
@@ -5666,15 +5669,20 @@ public class ServiceInfo extends EditableInfo {
                         final List<String> runningOnNodes =
                                                getRunningOnNodes(testOnly);
                         if (runningOnNodes == null
-                            || runningOnNodes.size() != 1) {
-                            return "must run on exactly 1 node";
+                            || runningOnNodes.size() < 1) {
+                            return "must run";
                         }
-                        final String runningOnNode =
-                                runningOnNodes.get(0).toLowerCase(Locale.US);
+                        boolean runningOnNode = false;
+                        for (final String ron : runningOnNodes) {
+                            if (hostName.toLowerCase(Locale.US).equals(
+                                               ron.toLowerCase(Locale.US))) {
+                                runningOnNode = true;
+                                break;
+                            }
+                        }
                         if (!getBrowser().clStatusFailed()
                                && getService().isAvailable()
-                               && hostName.toLowerCase(Locale.US).equals(
-                                                                 runningOnNode)
+                               && runningOnNode
                                && host.isClStatus()) {
                             return null;
                         } else {
@@ -5685,13 +5693,14 @@ public class ServiceInfo extends EditableInfo {
                     public void action() {
                         hidePopup();
                         migrateFromResource(getBrowser().getDCHost(),
+                                            hostName,
                                             testOnly);
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
                getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
                 public void action(final Host dcHost) {
-                    migrateFromResource(dcHost, true); /* testOnly */
+                    migrateFromResource(dcHost, hostName, true); /* testOnly */
                 }
             };
             addMouseOverListener(migrateFromMenuItem, migrateItemCallback);

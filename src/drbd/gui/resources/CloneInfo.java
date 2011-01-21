@@ -30,10 +30,12 @@ import drbd.data.ClusterStatus;
 import drbd.data.CRMXML;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
+import drbd.data.HostLocation;
 import drbd.utilities.CRM;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.MyMenu;
+import drbd.utilities.MyMenuItem;
 
 import java.util.List;
 import java.util.Map;
@@ -538,10 +540,101 @@ public class CloneInfo extends ServiceInfo {
             }
         }
     }
+    /** Adds migrate and unmigrate menu items. */
+    protected void addMigrateMenuItems(final List<UpdatableItem> items) {
+        super.addMigrateMenuItems(items);
+        if (!getService().isMaster()) {
+            return;
+        }
+        final boolean testOnly = false;
+        final ServiceInfo thisClass = this;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final String hostName = host.getName();
+            final MyMenuItem migrateFromMenuItem =
+               new MyMenuItem(Tools.getString(
+                                   "ClusterBrowser.Hb.MigrateFromResource")
+                                   + " " + hostName + " (stop)",
+                              MIGRATE_ICON,
+                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-    /**
-     * Stops resource in crm.
-     */
+                              Tools.getString(
+                                   "ClusterBrowser.Hb.MigrateFromResource")
+                                   + " " + hostName + " (stop) (offline)",
+                              MIGRATE_ICON,
+                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+
+                    public boolean predicate() {
+                        return host.isClStatus();
+                    }
+
+                    public boolean visiblePredicate() {
+                        return !host.isClStatus()
+                               || enablePredicate() == null;
+                    }
+
+                    public String enablePredicate() {
+                        final List<String> runningOnNodes =
+                                               getRunningOnNodes(testOnly);
+                        if (runningOnNodes == null
+                            || runningOnNodes.size() < 1) {
+                            return "must run";
+                        }
+                        boolean runningOnNode = false;
+                        for (final String ron : runningOnNodes) {
+                            if (hostName.toLowerCase(Locale.US).equals(
+                                               ron.toLowerCase(Locale.US))) {
+                                runningOnNode = true;
+                                break;
+                            }
+                        }
+                        if (!getBrowser().clStatusFailed()
+                               && getService().isAvailable()
+                               && runningOnNode
+                               && host.isClStatus()) {
+                            return null;
+                        } else {
+                            return ""; /* is not visible anyway */
+                        }
+                    }
+
+                    public void action() {
+                        hidePopup();
+                        if (getService().isMaster()) {
+                            /* without role=master */
+                            superMigrateFromResource(getBrowser().getDCHost(),
+                                                      hostName,
+                                                      testOnly);
+                        } else {
+                            migrateFromResource(getBrowser().getDCHost(),
+                                                hostName,
+                                                testOnly);
+                        }
+                    }
+                };
+            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
+               getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
+                public void action(final Host dcHost) {
+                    if (getService().isMaster()) {
+                        /* without role=master */
+                        superMigrateFromResource(dcHost,
+                                                 hostName,
+                                                 true); /* testOnly */
+                    } else {
+                        migrateFromResource(dcHost,
+                                            hostName,
+                                            true); /* testOnly */
+                    }
+                }
+            };
+            addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
+            items.add(migrateFromMenuItem);
+        }
+    }
+
+    /** Stops resource in crm. */
     public final void stopResource(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
@@ -560,32 +653,40 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    ///**
-    // * Migrates resource in heartbeat from current location.
-    // */
-    //public final void migrateResource(final String onHost,
-    //                                  final Host dcHost,
-    //                                  final boolean testOnly) {
-    //    final ServiceInfo cs = containedService;
-    //    if (cs != null) {
-    //        cs.migrateResource(onHost, dcHost, testOnly);
-    //    }
-    //}
+    /** Workaround to call method from super. */
+    private final void superMigrateFromResource(final Host dcHost,
+                                                final String fromHost,
+                                                final boolean testOnly) {
+        super.migrateFromResource(dcHost, fromHost, testOnly);
+    }
+    /** Migrates resource in heartbeat from current location. */
+    public final void migrateFromResource(final Host dcHost,
+                                          final String fromHost,
+                                          final boolean testOnly) {
+        String role = null;
+        if (getService().isMaster()) {
+            role = "Master";
+        }
+        final HostLocation hostLoc =
+                                new HostLocation(CRMXML.MINUS_INFINITY_STRING,
+                                                 "eq",
+                                                 null,
+                                                 role);
+        String action;
+        if (getMigratedFrom(testOnly) == null) {
+            action = "migration";
+        } else {
+            action = "remigration";
+        }
+        CRM.setLocation(dcHost,
+                        getHeartbeatId(testOnly),
+                        fromHost,
+                        hostLoc,
+                        action,
+                        testOnly);
+    }
 
-    ///**
-    // * Removes constraints created by resource migrate command.
-    // */
-    //public final void unmigrateResource(final Host dcHost,
-    //                                    final boolean testOnly) {
-    //    final ServiceInfo cs = containedService;
-    //    if (cs != null) {
-    //        cs.unmigrateResource(dcHost, testOnly);
-    //    }
-    //}
-
-    /**
-     * Sets whether the service is managed.
-     */
+    /** Sets whether the service is managed. */
     public final void setManaged(final boolean isManaged,
                                  final Host dcHost,
                                  final boolean testOnly) {
@@ -606,16 +707,12 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Adds "migrate from" and "force migrate" menuitems to the submenu.
-     */
+    /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
     protected void addMoreMigrateMenuItems(final MyMenu submenu) {
         /* no migrate / unmigrate menu advanced items for clones. */
     }
 
-    /**
-     * Returns items for the clone popup.
-     */
+    /** Returns items for the clone popup. */
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = super.createPopup();
         final ServiceInfo cs = containedService;

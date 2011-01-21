@@ -2995,6 +2995,7 @@ public class CRMXML extends XML {
                     final String rsc   = getAttribute(constraintNode, "rsc");
                     final String score = getAttribute(constraintNode,
                                                       SCORE_STRING);
+                    final String role = null; // TODO
 
                     List<String> locs = locationsIdMap.get(rsc);
                     if (locs == null) {
@@ -3014,7 +3015,10 @@ public class CRMXML extends XML {
                     }
                     if (score != null) {
                         hostScoreMap.put(node.toLowerCase(Locale.US),
-                                         new HostLocation(score, "eq", null));
+                                         new HostLocation(score,
+                                                          "eq",
+                                                          null,
+                                                          role));
                     }
                     locs.add(locId);
                     final Node ruleNode = getChildNode(constraintNode,
@@ -3044,7 +3048,8 @@ public class CRMXML extends XML {
                                 hostScoreMap.put(value.toLowerCase(Locale.US),
                                                  new HostLocation(score2,
                                                                   op,
-                                                                  null));
+                                                                  null,
+                                                                  role));
                                 resHostToLocIdMap.put(
                                                   rsc,
                                                   value.toLowerCase(Locale.US),
@@ -3055,7 +3060,8 @@ public class CRMXML extends XML {
                                 pingLocationMap.put(rsc,
                                                     new HostLocation(score2,
                                                                      op,
-                                                                     value));
+                                                                     value,
+                                                                     null));
                                 resPingToLocIdMap.put(rsc, locId);
                             } else {
                                 Tools.appWarning(

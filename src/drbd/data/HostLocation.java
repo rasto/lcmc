@@ -38,16 +38,20 @@ public class HostLocation {
     private final String op;
     /** Value. */
     private final String value;
+    /** Role. */
+    private final String role;
 
     /**
      * Prepares a new <code>AisCastAddress</code> object.
      */
     public HostLocation(final String score,
                         final String op,
-                        final String value) {
+                        final String value,
+                        final String role) {
         this.score = score;
-        this.op    = op;
+        this.op = op;
         this.value = value;
+        this.role = role;
     }
 
     /** Returns score. */
@@ -65,13 +69,19 @@ public class HostLocation {
         return value;
     }
 
+    /** Returns role. */
+    public final String getRole() {
+        return role;
+    }
+
     /**
      * Return whether the two objects are equal.
      */
     public final boolean equals(final Object other) {
         if (other == null) {
             return (score == null || "".equals(score))
-                   && (op == null || "".equals(op));
+                   && (op == null || "".equals(op))
+                   && (role == null || "".equals(role));
         }
         final HostLocation otherHL = (HostLocation) other;
         if (score == null) {
@@ -80,6 +90,15 @@ public class HostLocation {
             }
         } else {
             if (!score.equals(otherHL.getScore())) {
+                return false;
+            }
+        }
+        if (role == null) {
+            if (otherHL.getRole() != null && !"".equals(otherHL.getRole())) {
+                return false;
+            }
+        } else {
+            if (!role.equals(otherHL.getRole())) {
                 return false;
             }
         }

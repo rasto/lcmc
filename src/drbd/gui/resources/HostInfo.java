@@ -353,13 +353,18 @@ public class HostInfo extends Info {
                 public final void action() {
                     for (final ServiceInfo si
                             : cb.getExistingServiceList(null)) {
-                        if (!si.isConstraintPH() && si.getGroupInfo() == null) {
+                        if (!si.isConstraintPH() &&
+                            si.getGroupInfo() == null
+                            && si.getCloneInfo() == null) {
                             final List<String> runningOnNodes =
                                                    si.getRunningOnNodes(false);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
                                                         getHost().getName())) {
-                                si.migrateFromResource(host, false);
+                                final Host dcHost = getHost();
+                                si.migrateFromResource(dcHost,
+                                                       getHost().getName(),
+                                                       false);
                             }
                         }
                     }
@@ -368,7 +373,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
                     cb.new ClMenuItemCallback(allMigrateFromItem, host) {
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     for (final ServiceInfo si
                             : cb.getExistingServiceList(null)) {
                         if (!si.isConstraintPH() && si.getGroupInfo() == null) {
@@ -376,8 +381,10 @@ public class HostInfo extends Info {
                                                    si.getRunningOnNodes(false);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
-                                                        getHost().getName())) {
-                                si.migrateFromResource(host, true);
+                                                        host.getName())) {
+                                si.migrateFromResource(dcHost,
+                                                       host.getName(),
+                                                       true);
                             }
                         }
                     }
