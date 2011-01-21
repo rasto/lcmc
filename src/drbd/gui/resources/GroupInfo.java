@@ -95,7 +95,11 @@ public class GroupInfo extends ServiceInfo {
                 continue;
             }
             if (!"".equals(value)) {
-                groupMetaArgs.put(param, value);
+                if (CRMXML.GROUP_ORDERED_META_ATTR.equals(param)) {
+                    groupMetaArgs.put("ordered", value);
+                } else {
+                    groupMetaArgs.put(param, value);
+                }
             }
         }
         final Map<String, Map<String, String>> pacemakerResAttrs =
@@ -250,7 +254,11 @@ public class GroupInfo extends ServiceInfo {
                     continue;
                 }
                 if (!"".equals(value)) {
-                    groupMetaArgs.put(param, value);
+                    if (CRMXML.GROUP_ORDERED_META_ATTR.equals(param)) {
+                        groupMetaArgs.put("ordered", value);
+                    } else {
+                        groupMetaArgs.put(param, value);
+                    }
                 }
             }
             CRM.setParameters(

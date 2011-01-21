@@ -306,7 +306,6 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     public final void exchangeObjectInTheVertex(final ServiceInfo newSI,
                                                 final ServiceInfo oldSI) {
-        Tools.printStackTrace("exchange");
         final Vertex v = getVertex(oldSI);
         removeVertex(oldSI);
         putInfoToVertex(newSI, v);
@@ -1230,8 +1229,6 @@ public class HeartbeatGraph extends ResourceGraph {
                         vertexToAddExistingServiceMap.remove(v);
                         //TODO: positions are still there
                         somethingChanged();
-                        Tools.printStackTrace("remove vertex: "
-                                              + si.toString());
                     }
                 }
             }

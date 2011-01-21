@@ -287,6 +287,11 @@ public class CRMXML extends XML {
     private static final String ORDERED_META_ATTR = "ordered";
     /** Name of the interleave clone meta attribute. */
     private static final String INTERLEAVE_META_ATTR = "interleave";
+    /** Name of the ordered group meta attribute. It has different default than
+     * clone "ordered". */
+    public static final String GROUP_ORDERED_META_ATTR = "group-ordered";
+    /** Name of the collocated group meta attribute. */
+    private static final String GROUP_COLLOCATED_META_ATTR = "collocated";
 
     /** Section for meta attributes in rsc_defaults. */
     private static final Map<String, String> M_A_SECTION =
@@ -471,6 +476,19 @@ public class CRMXML extends XML {
         M_A_SECTION.put(INTERLEAVE_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(INTERLEAVE_META_ATTR,
                                          ConfigData.AccessType.GOD);
+        /* Group collocated */
+        M_A_SHORT_DESC.put(GROUP_COLLOCATED_META_ATTR, "Collocated");
+        M_A_DEFAULT.put(GROUP_COLLOCATED_META_ATTR, PCMK_TRUE);
+        M_A_POSSIBLE_CHOICES.put(GROUP_COLLOCATED_META_ATTR,
+                                 PCMK_BOOLEAN_VALUES);
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GROUP_COLLOCATED_META_ATTR,
+                                         ConfigData.AccessType.ADMIN);
+        /* group ordered */
+        M_A_SHORT_DESC.put(GROUP_ORDERED_META_ATTR, "Ordered");
+        M_A_DEFAULT.put(GROUP_ORDERED_META_ATTR, PCMK_TRUE);
+        M_A_POSSIBLE_CHOICES.put(GROUP_ORDERED_META_ATTR, PCMK_BOOLEAN_VALUES);
+        M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GROUP_ORDERED_META_ATTR,
+                                         ConfigData.AccessType.ADMIN);
     }
     /**
      * Prepares a new <code>CRMXML</code> object.
@@ -506,6 +524,8 @@ public class CRMXML extends XML {
         addMetaAttribute(pcmkClone, ORDERED_META_ATTR,         null, false);
         addMetaAttribute(pcmkClone, INTERLEAVE_META_ATTR,      null, false);
 
+        addMetaAttribute(hbGroup, GROUP_ORDERED_META_ATTR, null, false);
+        addMetaAttribute(hbGroup, GROUP_COLLOCATED_META_ATTR, null, false);
         /* groups */
         final Map<String, String> metaAttrParams = getMetaAttrParameters();
         for (final String metaAttr : metaAttrParams.keySet()) {
@@ -2221,10 +2241,13 @@ public class CRMXML extends XML {
                     final Node maNode = nvpairsMA.item(l);
                     if (maNode.getNodeName().equals("nvpair")) {
                         final String nvpairId = getAttribute(maNode, "id");
-                        final String name = getAttribute(maNode, "name");
+                        String name = getAttribute(maNode, "name");
                         String value = getAttribute(maNode, "value");
                         if (TARGET_ROLE_META_ATTR.equals(name)) {
                             value = value.toLowerCase(Locale.US);
+                        }
+                        if ("ordered".equals(name)) {
+                            name = GROUP_ORDERED_META_ATTR;
                         }
                         params.put(name, value);
                         nvpairIds.put(name, nvpairId);

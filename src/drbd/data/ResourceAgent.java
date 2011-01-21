@@ -68,10 +68,10 @@ public class ResourceAgent {
     private final Set<String> paramIsMetaAttr = new HashSet<String>();
     /** Map from parameter to its long description. */
     private final Map<String, String> paramLongDesc =
-                                                  new HashMap<String, String>();
+                                                 new HashMap<String, String>();
     /** Map from parameter to its short description. */
     private final Map<String, String> paramShortDesc =
-                                                  new HashMap<String, String>();
+                                                 new HashMap<String, String>();
     /** Map from parameter to its type. */
     private final Map<String, String> paramType = new HashMap<String, String>();
     /** Map from parameter to its default value. */
@@ -82,10 +82,10 @@ public class ResourceAgent {
                                                  new HashMap<String, String>();
     /** Map from parameter to an array of its possible choices. */
     private final Map<String, String[]> paramPossibleChoices =
-                                                new HashMap<String, String[]>();
+                                               new HashMap<String, String[]>();
     /** Map from m/s parameter to an array of its possible choices. */
     private final Map<String, String[]> paramPossibleChoicesMS =
-                                                new HashMap<String, String[]>();
+                                               new HashMap<String, String[]>();
     /** Name of the hb service in the pull down menus. */
     private final String menuName;
     /** Map that holds default values for operations. The keys are the name and
