@@ -73,6 +73,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -122,6 +123,8 @@ public class ClusterBrowser extends Browser {
     private DefaultMutableTreeNode commonBlockDevicesNode;
     /** Menu's available heartbeat services node. */
     private DefaultMutableTreeNode availableServicesNode;
+    /** Heartbeat node. */
+    private DefaultMutableTreeNode heartbeatNode;
     /** Menu's heartbeat services node. */
     private DefaultMutableTreeNode servicesNode;
     /** Menu's drbd node. */
@@ -554,9 +557,7 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Initializes cluster resources for cluster view.
-     */
+    /** Initializes cluster resources for cluster view. */
     public final void initClusterBrowser() {
         /* all hosts */
         allHostsNode = new DefaultMutableTreeNode(
@@ -590,8 +591,7 @@ public class ClusterBrowser extends Browser {
         final CRMInfo crmInfo = new CRMInfo(
                               Tools.getString("ClusterBrowser.ClusterManager"),
                               this);
-        final DefaultMutableTreeNode heartbeatNode =
-                                        new DefaultMutableTreeNode(crmInfo);
+        heartbeatNode = new DefaultMutableTreeNode(crmInfo);
         setNode(heartbeatNode);
         topAdd(heartbeatNode);
 
@@ -619,6 +619,8 @@ public class ClusterBrowser extends Browser {
         servicesNode = new DefaultMutableTreeNode(servicesInfo);
         setNode(servicesNode);
         heartbeatNode.add(servicesNode);
+        addVMSNode();
+        selectPath(new Object[]{getTreeTop(), heartbeatNode});
     }
 
     /**
@@ -1462,7 +1464,6 @@ public class ClusterBrowser extends Browser {
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
         boolean nodeChanged = false;
-        addVMSNode();
         final List<VMSVirtualDomainInfo> currentVMSVDIs =
                                         new ArrayList<VMSVirtualDomainInfo>();
 
@@ -1683,9 +1684,12 @@ public class ClusterBrowser extends Browser {
         Host dcHost = null;
         final String dc = clusterStatus.getDC();
         final List<Host> hosts = new ArrayList<Host>();
-        int lastHostIndex = -1;
+        int lastHostIndex = 0;
         int i = 0;
         for (Host host : getClusterHosts()) {
+            if (host == lastDcHost) {
+                lastHostIndex = i;
+            }
             if (host.getName().equals(dc)
                 && host.isClStatus()
                 && !host.isCommLayerStarting()
@@ -1698,9 +1702,6 @@ public class ClusterBrowser extends Browser {
             }
             hosts.add(host);
 
-            if (host == lastDcHost) {
-                lastHostIndex = i;
-            }
             i++;
         }
         if (dcHost == null) {
@@ -1720,6 +1721,9 @@ public class ClusterBrowser extends Browser {
             } while (ix != lastHostIndex);
             dcHost = lastDcHost;
             realDcHost = null;
+            if (dcHost == null) {
+                dcHost = hosts.get(0);
+            }
         } else {
             realDcHost = dcHost;
         }
@@ -1758,7 +1762,8 @@ public class ClusterBrowser extends Browser {
      */
     public final void selectServices() {
         // this fires treeStructureChanged in ViewPanel.
-        nodeChanged(servicesNode);
+        //nodeChanged(servicesNode);
+        selectPath(new Object[]{getTreeTop(), heartbeatNode, servicesNode});
     }
 
     /** Returns ServiceInfo object from crm id. */

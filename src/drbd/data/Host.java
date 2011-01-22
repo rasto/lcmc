@@ -2117,7 +2117,7 @@ public class Host implements Serializable {
             } else {
                 aisRunning = false;
             }
-        } else if ("heartbeat-init".equals(tokens[0])) {
+        } else if ("hb-init".equals(tokens[0])) {
             if (tokens.length == 2) {
                 heartbeatInit = "on".equals(tokens[1].trim());
             } else {

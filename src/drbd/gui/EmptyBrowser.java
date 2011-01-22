@@ -127,6 +127,7 @@ public class EmptyBrowser extends Browser {
             }
         });
         reload(allHostsNode, false);
+        selectPath(new Object[]{getTreeTop(), allHostsNode});
     }
 }
 

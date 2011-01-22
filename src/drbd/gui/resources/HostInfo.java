@@ -94,7 +94,7 @@ public class HostInfo extends Info {
                                       new Subtext("stopped", null, Color.RED);
     /** Unknown subtext. */
     private static final Subtext UNKNOWN_SUBTEXT =
-                                      new Subtext("unknown...", null, Color.BLUE);
+                                      new Subtext("wait...", null, Color.BLUE);
     /** Online subtext. */
     private static final Subtext ONLINE_SUBTEXT =
                                        new Subtext("online", null, Color.BLUE);
@@ -589,9 +589,9 @@ public class HostInfo extends Info {
                            && h.isHeartbeatConf()
                            && !h.isCsRunning()
                            && !h.isAisRunning()
-                           && !h.isHeartbeatRunning()
-                           && !h.isAisRc()
-                           && !h.isCsRc();
+                           && !h.isHeartbeatRunning();
+                           //&& !h.isAisRc()
+                           //&& !h.isCsRc(); TODO should check /etc/defaults/
                 }
 
                 public final void action() {

@@ -306,4 +306,15 @@ public class Browser {
     public final void drbdtestLockRelease() {
         mDRBDtestLock.release();
     }
+
+    /** Selects specified path. */
+    protected void selectPath(final Object[] path) {
+        final TreePath tp = new TreePath(path);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getTree().expandPath(tp);
+                getTree().setSelectionPath(tp);
+            }
+        });
+    }
 }
