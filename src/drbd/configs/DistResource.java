@@ -233,14 +233,17 @@ public class DistResource extends
         {"Heartbeat.stopHeartbeat",  "/etc/init.d/heartbeat stop"},
         {"Openais.startOpenais",   "/etc/init.d/openais start"},
         {"Openais.stopOpenais",   "/etc/init.d/openais stop"},
-        {"Openais.reloadOpenais",  "/etc/init.d/openais reload"},
+        {"Openais.reloadOpenais",
+         "if ! /etc/init.d/openais status >/dev/null 2>&1; then"
+         + " /etc/init.d/openais start; fi"},
         {"Corosync.startCorosync",   "/etc/init.d/corosync start"},
         {"Corosync.stopCorosync",   "/etc/init.d/corosync stop"},
-        {"Corosync.reloadCorosync",  "/etc/init.d/corosync force-reload"},
+        {"Corosync.reloadCorosync",
+         "if ! /etc/init.d/corosync status >/dev/null 2>&1; then"
+         + " /etc/init.d/corosync start; fi"},
         {"Heartbeat.reloadHeartbeat",
          "if ! /etc/init.d/heartbeat status >/dev/null 2>&1; then"
          + " /etc/init.d/heartbeat start; fi"},
-
         {"Heartbeat.getHbConfig",    "cat /etc/ha.d/ha.cf"},
 
         {"Heartbeat.dopdWorkaround",

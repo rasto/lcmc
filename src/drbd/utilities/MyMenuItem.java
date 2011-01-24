@@ -308,7 +308,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
         final boolean visible = visiblePredicate();
-        Tools.invokeAndWait(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setEnabled(disableTooltip == null && accessible);
                 setVisible(visible
@@ -317,7 +317,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             }
         });
         if (toolTip != null && isVisible()) {
-            Tools.invokeAndWait(new Runnable() {
+            SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (!accessible && enableAccessMode.getAccessType()
                                        != ConfigData.AccessType.NEVER) {

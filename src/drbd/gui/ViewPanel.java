@@ -180,6 +180,11 @@ public class ViewPanel extends JPanel {
         return tree;
     }
 
+    /** Returns whether expanding of paths is disabled during the initial load.
+     */
+    public final boolean isDisabledDuringLoad() {
+        return disabledDuringLoad;
+    }
     /** Sets if expanding of paths should be disabled during the initial load.*/
     public final void setDisabledDuringLoad(final boolean disabledDuringLoad) {
         this.disabledDuringLoad = disabledDuringLoad;
@@ -203,9 +208,11 @@ public class ViewPanel extends JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     final JComponent p = browser.getInfoPanel(nodeInfo);
-                    final int loc = viewSP.getDividerLocation();
-                    viewSP.setRightComponent(p);
-                    viewSP.setDividerLocation(loc);
+                    if (!disabledDuringLoad) {
+                        final int loc = viewSP.getDividerLocation();
+                        viewSP.setRightComponent(p);
+                        viewSP.setDividerLocation(loc);
+                    }
                 }
             });
         }
@@ -220,7 +227,7 @@ public class ViewPanel extends JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     final JComponent p = browser.getInfoPanel(nodeInfo);
-                    if (p != null) {
+                    if (!disabledDuringLoad && p != null) {
                         final int loc = viewSP.getDividerLocation();
                         viewSP.setRightComponent(p);
                         viewSP.setDividerLocation(loc);

@@ -328,13 +328,14 @@ public class Info implements Comparable {
      * Updates the info text.
      */
     public void updateInfo() {
-        if (resourceInfoArea != null) {
+        final JEditorPane ria = resourceInfoArea;
+        if (ria != null) {
             final String newInfo = getInfo();
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        resourceInfoArea.setText(newInfo);
+                        ria.setText(newInfo);
                     }
                 });
             }

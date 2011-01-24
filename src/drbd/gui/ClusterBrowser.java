@@ -698,7 +698,7 @@ public class ClusterBrowser extends Browser {
                     public void run() {
                         getClusterViewPanel().setDisabledDuringLoad(
                                                                 false);
-                        reload(getServicesNode(), true);
+                        selectServices();
                     }
                 });
             }
@@ -1287,7 +1287,6 @@ public class ClusterBrowser extends Browser {
                      Tools.progressIndicatorFailed(clusterName,
                                                    "Cluster status failed");
                 } else {
-                    selectServices();
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                            heartbeatGraph.scale();
@@ -1763,6 +1762,9 @@ public class ClusterBrowser extends Browser {
     public final void selectServices() {
         // this fires treeStructureChanged in ViewPanel.
         //nodeChanged(servicesNode);
+        if (getClusterViewPanel().isDisabledDuringLoad()) {
+            return;
+        }
         selectPath(new Object[]{getTreeTop(), heartbeatNode, servicesNode});
     }
 

@@ -1656,9 +1656,17 @@ public class HeartbeatGraph extends ResourceGraph {
      */
     protected final int getUsed(final Vertex v) {
         if (vertexToHostMap.containsKey(v)) {
-            return ((HostInfo) getInfo(v)).getUsed();
+            final HostInfo hi = (HostInfo) getInfo(v);
+            if (hi == null) {
+                return 0;
+            }
+            return hi.getUsed();
         }
-        return ((ServiceInfo) getInfo(v)).getUsed();
+        final ServiceInfo si = (ServiceInfo) getInfo(v);
+        if (si == null) {
+            return 0;
+        }
+        return si.getUsed();
     }
 
     /**
