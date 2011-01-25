@@ -52,6 +52,8 @@ import java.awt.FlowLayout;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -80,6 +82,83 @@ import java.awt.Component;
 public class HbConfig extends DialogCluster {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Keepalive combobox. */
+    private static final String KEEPALIVE = "keepalive";
+    private static final String WARNTIME = "warntime";
+    private static final String DEADTIME = "deadtime"; 
+    private static final String INITDEAD = "initdead";
+    private static final String CRM = "crm";
+    private static final String COMPRESSION = "compression";
+    private static final String LOGFACILITY = "logfacility";
+    private static final String USE_LOGD = "use_logd";
+    private static final String AUTOJOIN = "autojoin";
+    private static final String[] OPTIONS = {KEEPALIVE,
+                                             WARNTIME,
+                                             DEADTIME,
+                                             INITDEAD,
+                                             CRM,
+                                             COMPRESSION,
+                                             LOGFACILITY,
+                                             USE_LOGD,
+                                             AUTOJOIN};
+    /** Option types. */
+    private static final Map<String, GuiComboBox.Type> OPTION_TYPES =
+                                       new HashMap<String, GuiComboBox.Type>();
+    /** Option regexps. */
+    private static final Map<String, String> OPTION_REGEXPS =
+                                                 new HashMap<String, String>();
+    /** Option values. */
+    private static final Map<String, String[]> OPTION_VALUES =
+                                               new HashMap<String, String[]>();
+    /** Default values. */
+    private static final Map<String, String> OPTION_DEFAULTS =
+                                                 new HashMap<String, String>();
+    /** Option sizes. */
+    private static final Map<String, Integer> OPTION_SIZES =
+                                                new HashMap<String, Integer>();
+    static {
+        //OPTION_TYPES.put(CRM, GuiComboBox.Type.COMBOBOX);
+        OPTION_REGEXPS.put(KEEPALIVE, "^\\d*$");
+        OPTION_REGEXPS.put(WARNTIME, "^\\d*$");
+        OPTION_REGEXPS.put(DEADTIME, "^\\d*$");
+        OPTION_REGEXPS.put(INITDEAD, "^\\d*$");
+        OPTION_REGEXPS.put(CRM, "^(\\w*)$");
+
+        OPTION_REGEXPS.put(COMPRESSION, "^(\\w*)$");
+        OPTION_REGEXPS.put(LOGFACILITY, "^(\\w*)$");
+        OPTION_REGEXPS.put(USE_LOGD, "^(\\w*)$");
+        OPTION_REGEXPS.put(AUTOJOIN, "^(\\w*)$");
+        /* choices */
+        OPTION_VALUES.put(CRM, new String[]{"respawn", "on", "off"});
+        OPTION_VALUES.put(COMPRESSION, new String[]{"", "zlib", "bz2"});
+        OPTION_VALUES.put(LOGFACILITY, new String[]{"local0",
+                                                    "local1",
+                                                    "local2",
+                                                    "local3",
+                                                    "local4",
+                                                    "local5",
+                                                    "local6",
+                                                    "local7",
+                                                    "none"});
+        OPTION_VALUES.put(USE_LOGD, new String[]{"", "on", "off"});
+        OPTION_VALUES.put(AUTOJOIN, new String[]{"", "none", "any", "other"});
+        /* defaults */
+        OPTION_DEFAULTS.put(KEEPALIVE, "2");
+        OPTION_DEFAULTS.put(WARNTIME, "20");
+        OPTION_DEFAULTS.put(DEADTIME, "30");
+        OPTION_DEFAULTS.put(INITDEAD, "30");
+        OPTION_DEFAULTS.put(CRM, "respawn");
+        /* sizes */
+        OPTION_SIZES.put(CRM, 100);
+        OPTION_SIZES.put(COMPRESSION, 80);
+        OPTION_SIZES.put(LOGFACILITY, 80);
+        OPTION_SIZES.put(USE_LOGD, 50);
+        OPTION_SIZES.put(AUTOJOIN, 80);
+    }
+    /** Option checkboxes. */
+    private final Map<String, GuiComboBox> optionsCB =
+                                            new HashMap<String, GuiComboBox>();
+
     /** Checkbox for dopd. */
     private JCheckBox dopdCB  = null;
     /** Checkbox for mgmtd. */
@@ -176,7 +255,9 @@ public class HbConfig extends DialogCluster {
                                     }
                                 });
                                 disableComponents();
-                                StringBuffer config = hbConfigHead(false);
+                                final StringBuffer config = hbConfigHead(false);
+                                config.append(hbConfigOptions());
+                                config.append(hbConfigNodes());
                                 config.append('\n');
                                 config.append(hbConfigAddr());
                                 config.append(hbConfigDopd(
@@ -278,16 +359,32 @@ public class HbConfig extends DialogCluster {
      */
     private void setNewConfig(final String oldConfig) {
         final String[] config = oldConfig.split(NEWLINE);
-        final Pattern bcastP  = Pattern.compile("(bcast) (\\w+)");
-        final Pattern mcastP  = Pattern.compile("(mcast) (\\w+) (.*)");
-        final Pattern serialP = Pattern.compile("(serial) (.*)");
-        final Pattern ucastP  = Pattern.compile("(ucast) (\\w+) (.*)");
+        final Pattern bcastP     = Pattern.compile("(bcast) (\\w+)");
+        final Pattern mcastP     = Pattern.compile("(mcast) (\\w+) (.*)");
+        final Pattern serialP    = Pattern.compile("(serial) (.*)");
+        final Pattern ucastP     = Pattern.compile("(ucast) (\\w+) (.*)");
+        final Map<String, Pattern> optionPatterns =
+                                               new HashMap<String, Pattern>();
+        for (final String option : OPTIONS) {
+            optionPatterns.put(option,
+                               Pattern.compile("^\\s*"
+                                               + option
+                                               + "\\s+("
+                                               + OPTION_REGEXPS.get(option)
+                                               + ")"));
+        }
+        final Pattern dopdP =
+                         Pattern.compile("^\\s*respawn hacluster .*\\/dopd$");
+        final Pattern mgmtdP =
+                          Pattern.compile("^\\s*respawn root .*\\/mgmtd -v$");
         castAddresses.clear();
         for (String line : config) {
             final Matcher bcastM  = bcastP.matcher(line);
             final Matcher mcastM  = mcastP.matcher(line);
             final Matcher ucastM  = ucastP.matcher(line);
             final Matcher serialM = serialP.matcher(line);
+            final Matcher dopdM = dopdP.matcher(line);
+            final Matcher mgmtdM = mgmtdP.matcher(line);
             String type       = typeCB.getStringValue();
             String iface      = "";
             String addr       = "";
@@ -306,7 +403,20 @@ public class HbConfig extends DialogCluster {
                 type  = ucastM.group(1);
                 iface = ucastM.group(2);
                 addr  = ucastM.group(3);
+            } else if (dopdM.matches()) {
+                dopdCB.setSelected(true);
+                continue;
+            } else if (mgmtdM.matches()) {
+                mgmtdCB.setSelected(true);
+                continue;
             } else {
+                for (final String option : OPTIONS) {
+                    final Matcher m = optionPatterns.get(option).matcher(line);
+                    if (m.matches()) {
+                        optionsCB.get(option).setValue(m.group(1));
+                        continue;
+                    }
+                }
                 continue;
             }
             if (!"".equals(type)) {
@@ -518,6 +628,12 @@ public class HbConfig extends DialogCluster {
                 for (String line : head) {
                     configPanel.add(new JLabel(line));
                 }
+                /* timeouts */
+                for (final String option : OPTIONS) {
+                    configPanel.add(getComponentPanel(option,
+                                                      optionsCB.get(option)));
+                }
+                configPanel.add(new JLabel(hbConfigNodes()));
                 configPanel.add(new JLabel(" "));
                 if (castAddresses.size() < 2) {
                     JLabel l;
@@ -692,9 +808,7 @@ public class HbConfig extends DialogCluster {
         });
     }
 
-    /**
-     * Returns the head of the hb config.
-     */
+    /** Returns the head of the hb config. */
     private StringBuffer hbConfigHead(final boolean fake) {
         final StringBuffer config = new StringBuffer(130);
         if (fake) {
@@ -702,20 +816,37 @@ public class HbConfig extends DialogCluster {
         } else {
             config.append("## generated by drbd-gui ");
         }
+        return config;
+    }
+
+    /** Returns timeouts. */
+    private StringBuffer hbConfigOptions() {
+        final StringBuffer config = new StringBuffer(130);
         config.append(Tools.getRelease());
-        config.append("\n\nkeepalive 2\n");
-        config.append("warntime 20\n");
-        config.append("deadtime 30\n");
-        config.append("initdead 30\n\n");
-        config.append("crm respawn\nnode");
+        config.append("\n\n");
+        for (final String option : OPTIONS) {
+            final String value = optionsCB.get(option).getStringValue();
+            if (value != null && !"".equals(value)) {
+                config.append(option);
+                config.append(' ');
+                config.append(optionsCB.get(option).getStringValue());
+                config.append('\n');
+            }
+        }
+        config.append("\n");
+        return config;
+    }
+
+    /** Returns nodes. */
+    private String hbConfigNodes() {
+        final StringBuffer config = new StringBuffer(130);
+        config.append("node");
         final Host[] hosts = getCluster().getHostsArray();
         for (Host host : hosts) {
             config.append(' ');
             config.append(host.getHostname());
         }
-
-        config.append("\nlogfacility local0\n");
-        return config;
+        return config.toString();
     }
 
     /**
@@ -797,6 +928,7 @@ public class HbConfig extends DialogCluster {
      * Returns panel where user can edit the config.
      */
     protected final JComponent getInputPane() {
+        optionsCB.clear();
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         final Host[] hosts = getCluster().getHostsArray();
@@ -1034,8 +1166,8 @@ public class HbConfig extends DialogCluster {
                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
                                    );
-        configScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE,
-                                                      150));
+        //configScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE,
+        //                                              150));
         configScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE,
                                                         150));
         statusPanel = new JPanel();
@@ -1097,6 +1229,29 @@ public class HbConfig extends DialogCluster {
         mcast.add(addButton);
         mcast.setMaximumSize(mcast.getPreferredSize());
         mcast.setAlignmentX(Component.LEFT_ALIGNMENT);
+        for (final String option : OPTIONS) {
+            int size;
+            if (OPTION_SIZES.containsKey(option)) {
+                size = OPTION_SIZES.get(option);
+            } else {
+                size = 40;
+            }
+            final GuiComboBox cb = new GuiComboBox(
+                                      OPTION_DEFAULTS.get(option),
+                                      OPTION_VALUES.get(option),
+                                      null, /* units */
+                                      OPTION_TYPES.get(option),
+                                      "^" + OPTION_REGEXPS.get(option) + "$",
+                                      size,
+                                      null,
+                                        new AccessMode(
+                                               ConfigData.AccessType.ADMIN,
+                                               false));
+            optionsCB.put(option, cb);
+            cb.setAlwaysEditable(true);
+            cb.addListeners(null, getDocumentListener());
+        }
+
         /* dopd */
         dopdCB = new JCheckBox(
                     Tools.getString("Dialog.Cluster.HbConfig.UseDopdCheckBox"),
@@ -1145,6 +1300,59 @@ public class HbConfig extends DialogCluster {
      * Enable skip button.
      */
     protected final boolean skipButtonEnabled() {
+        return true;
+    }
+
+    /** Returns document listener for textfields. */
+    private final DocumentListener getDocumentListener() {
+        return new DocumentListener() {
+            private void check() {
+                final Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        for (final String option : OPTIONS) {
+                            final GuiComboBox cb = optionsCB.get(option);
+                            if (cb != null) {
+                                if (!checkRegexp(cb.getRegexp(),
+                                                 cb.getStringValue())) {
+                                    cb.wrongValue();
+                                } else {
+                                    cb.setBackground(null, null, true);
+                                }
+                            }
+                        }
+                        Tools.getGUIData().setAccessible(
+                                                makeConfigButton,
+                                                ConfigData.AccessType.ADMIN);
+                    }
+                });
+                t.start();
+            }
+
+            public void insertUpdate(final DocumentEvent e) {
+                check();
+            }
+
+            public void removeUpdate(final DocumentEvent e) {
+                check();
+            }
+
+            public void changedUpdate(final DocumentEvent e) {
+                check();
+            }
+        };
+    }
+
+    /** Checks regexp. */
+    private final boolean checkRegexp(final String regexp,
+                                      final String value) {
+        if (regexp != null) {
+            final Pattern p = Pattern.compile(regexp);
+            final Matcher m = p.matcher(value);
+            if (m.matches()) {
+                return true;
+            }
+            return false;
+        }
         return true;
     }
 }
