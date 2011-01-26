@@ -297,6 +297,9 @@ public class DrbdGraph extends ResourceGraph {
             }
         } else {
             final HostDrbdInfo hi = vertexToHostMap.get(v);
+            if (hi == null) {
+                return null;
+            }
             if (hi.getHost().isDrbdStatus()
                 && hi.getHost().isDrbdLoaded()) {
                 icons.add(HostBrowser.HOST_ON_ICON_LARGE);
@@ -392,7 +395,10 @@ public class DrbdGraph extends ResourceGraph {
                 return bdi.getIconTextForGraph(testOnly);
             }
         } else {
-            vertexToHostMap.get(v).getIconTextForDrbdGraph(testOnly);
+            final HostDrbdInfo hi = vertexToHostMap.get(v);
+            if (hi != null) {
+                return hi.getIconTextForDrbdGraph(testOnly);
+            }
         }
         return null;
     }
@@ -407,8 +413,10 @@ public class DrbdGraph extends ResourceGraph {
 
             }
         } else {
-            return vertexToHostMap.get(v).getRightCornerTextForDrbdGraph(
-                                                                      testOnly);
+            final HostDrbdInfo hi = vertexToHostMap.get(v);
+            if (hi != null) {
+                return hi.getRightCornerTextForDrbdGraph(testOnly);
+            }
         }
         return null;
     }
@@ -437,7 +445,10 @@ public class DrbdGraph extends ResourceGraph {
                                 textColor)};
             }
         } else {
-            return vertexToHostMap.get(v).getSubtextsForDrbdGraph(testOnly);
+            final HostDrbdInfo hi = vertexToHostMap.get(v);
+            if (hi != null) {
+                return hi.getSubtextsForDrbdGraph(testOnly);
+            }
         }
         return null;
     }
@@ -484,7 +495,11 @@ public class DrbdGraph extends ResourceGraph {
         } else {
             /* host */
             final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
-            return hi.getPopup();
+            if (hi == null) {
+                return null;
+            } else {
+                return hi.getPopup();
+            }
         }
     }
 
@@ -603,6 +618,9 @@ public class DrbdGraph extends ResourceGraph {
     private void pickHost(final Vertex v) {
         pickVertex(v);
         final HostDrbdInfo hi = vertexToHostMap.get(v);
+        if (hi == null) {
+            return;
+        }
         Tools.getGUIData().setTerminalPanel(hi.getHost().getTerminalPanel());
     }
 
@@ -616,6 +634,9 @@ public class DrbdGraph extends ResourceGraph {
         } else {
             pickHost(v);
             final HostDrbdInfo hi = vertexToHostMap.get(v);
+            if (hi == null) {
+                return;
+            }
             getClusterBrowser().setRightComponentInView(hi);
         }
     }
@@ -718,9 +739,9 @@ public class DrbdGraph extends ResourceGraph {
         if (v.equals(hostVertex)) {
             /* host */
             return hi.getHost().getDrbdColors()[0];
-        } else if (hi.getHost() == null
-                   || (!hi.getHost().isDrbdStatus()
-                       && hi.getHost().isDrbdLoaded())) {
+        } else if (hi != null && (hi.getHost() == null
+                                  || (!hi.getHost().isDrbdStatus()
+                                      && hi.getHost().isDrbdLoaded()))) {
             return Tools.getDefaultColor("DrbdGraph.FillPaintUnknown");
         } else {
             if (!isVertexDrbd(v)) {
@@ -859,7 +880,9 @@ public class DrbdGraph extends ResourceGraph {
         String hiId = "";
         if (v != null) {
             final HostDrbdInfo hi = vertexToHostMap.get(v);
-            hiId = hi.getId();
+            if (hi != null) {
+                hiId = hi.getId();
+            }
         }
         return "dr=" + hiId + i.getId();
     }
@@ -893,7 +916,11 @@ public class DrbdGraph extends ResourceGraph {
             return bdi.getUsed();
         }
         final HostDrbdInfo hi = vertexToHostMap.get(v);
-        return hi.getUsed();
+        if (hi == null) {
+            return 0;
+        } else {
+            return hi.getUsed();
+        }
     }
 
     /** This method draws how much of the vertex is used for something. */
@@ -921,13 +948,15 @@ public class DrbdGraph extends ResourceGraph {
             }
         } else {
             final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
-            drawInsideVertex(g2d,
-                             v,
-                             hi.getHost().getDrbdColors(),
-                             x,
-                             y,
-                             height,
-                             width);
+            if (hi != null) {
+                drawInsideVertex(g2d,
+                                 v,
+                                 hi.getHost().getDrbdColors(),
+                                 x,
+                                 y,
+                                 height,
+                                 width);
+            }
         }
         final boolean tOnly = isTestOnly();
         if (used > 0) {
