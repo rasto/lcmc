@@ -1184,7 +1184,7 @@ public class ClusterBrowser extends Browser {
         final boolean oldStatus = host.isClStatus();
         host.setClStatus(status);
         if (oldStatus != status) {
-            selectServices();
+            nodeChanged(servicesNode);
         }
     }
 
