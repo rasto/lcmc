@@ -85,12 +85,45 @@ public final class Corosync {
     }
 
     /**
+     * Starts corosync with pacemaker on host.
+     * /etc/init.d/corosync start && /etc/init.d/pacemaker start
+     */
+    public static void startCorosyncWithPcmk(final Host host) {
+        final String command = host.getDistCommand(
+                                              "Corosync.startCorosyncWithPcmk",
+                                              (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
+
+    /**
+     * Starts pacemaker on host.
+     * /etc/init.d/pacemaker start
+     */
+    public static void startPacemaker(final Host host) {
+        final String command = host.getDistCommand("Corosync.startPcmk",
+                                                   (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
+    /**
      * Stops corosync on host.
      * /etc/init.d/corosync stop
      */
     public static void stopCorosync(final Host host) {
         final String command = host.getDistCommand("Corosync.stopCorosync",
                                                    (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
+    /**
+     * Stops corosync with pacemaker on host.
+     * /etc/init.d/corosync stop && /etc/init.d/pacemaker stop
+     */
+    public static void stopCorosyncWithPcmk(final Host host) {
+        final String command = host.getDistCommand(
+                                              "Corosync.stopCorosyncWithPcmk",
+                                              (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
 

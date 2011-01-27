@@ -3108,9 +3108,11 @@ public class CRMXML extends XML {
                     final String ha = getAttribute(nodeStateNode, "ha");
                     final String join = getAttribute(nodeStateNode, "join");
                     final String inCCM = getAttribute(nodeStateNode, "in_ccm");
+                    final String crmd = getAttribute(nodeStateNode, "crmd");
                     if ("active".equals(ha)
                         && "member".equals(join)
-                        && "true".equals(inCCM)) {
+                        && "true".equals(inCCM)
+                        && !"offline".equals(crmd)) {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "yes");
                     } else {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "no");

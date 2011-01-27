@@ -1697,6 +1697,9 @@ public class TextResource extends
         {"HostInfo.StartCorosync",
          "Start Corosync"},
 
+        {"HostInfo.StartPacemaker",
+         "Start Pacemakerd"},
+
         {"HostInfo.StartOpenais",
          "Start Openais"},
 

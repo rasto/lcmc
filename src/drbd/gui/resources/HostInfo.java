@@ -424,8 +424,16 @@ public class HostInfo extends Info {
                          Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
                          Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
                          Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
-                        getHost().setCommLayerStopping(true);
-                        Corosync.stopCorosync(getHost());
+                        final Host host = getHost();
+                        host.setCommLayerStopping(true);
+                        if (host.getPcmkServiceVersion() > 0
+                            && host.isPcmkInit()
+                            && host.isPcmkRunning()) {
+                            Corosync.stopCorosyncWithPcmk(host);
+                        } else {
+                            Corosync.stopCorosync(host);
+                        }
+
                         getBrowser().getClusterBrowser().updateHWInfo(host);
                     }
                 }
@@ -513,7 +521,11 @@ public class HostInfo extends Info {
 
                 public final void action() {
                     getHost().setCommLayerStarting(true);
-                    Corosync.startCorosync(getHost());
+                    if (getHost().isPcmkRc()) {
+                        Corosync.startCorosyncWithPcmk(getHost());
+                    } else {
+                        Corosync.startCorosync(getHost());
+                    }
                     getBrowser().getClusterBrowser().updateHWInfo(host);
                 }
             };
@@ -611,6 +623,46 @@ public class HostInfo extends Info {
                                  startHeartbeatItemCallback);
         }
         items.add(startHeartbeatItem);
+
+        /* Start pacemaker. */
+        final MyMenuItem startPcmkItem =
+            new MyMenuItem(Tools.getString("HostInfo.StartPacemaker"),
+                           HOST_START_COMM_LAYER_ICON,
+                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
+
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                private static final long serialVersionUID = 1L;
+
+                public final boolean visiblePredicate() {
+                    final Host h = getHost();
+                    return h.getPcmkServiceVersion() > 0
+                           && !h.isPcmkRunning()
+                           && (h.isCsRunning()
+                               || h.isAisRunning())
+                           && !h.isHeartbeatRunning();
+                }
+
+                public final String enablePredicate() {
+                    return null;
+                }
+
+                public final void action() {
+                    Corosync.startPacemaker(getHost());
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            };
+        if (cb != null) {
+            final ClusterBrowser.ClMenuItemCallback startPcmkItemCallback =
+                         cb.new ClMenuItemCallback(startPcmkItem, host) {
+                public void action(final Host host) {
+                    //TODO
+                }
+            };
+            addMouseOverListener(startPcmkItem,
+                                 startPcmkItemCallback);
+        }
+        items.add(startPcmkItem);
         /* change host color */
         final MyMenuItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),

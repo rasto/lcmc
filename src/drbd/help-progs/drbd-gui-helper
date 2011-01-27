@@ -1349,21 +1349,28 @@ sub get_cluster_versions {
 			$ais_version = "ok";
 		}
 	}
+	my $pcmk_prog = "/usr/sbin/pacemakerd";
+	my $pcmk_script = "pacemaker";
 	my $hb_init = is_init("heartbeat");
 	chomp $hb_init;
 	my $cs_init = is_init($cs_script);
 	chomp $cs_init;
 	my $ais_init = is_init($ais_script);
 	chomp $ais_init;
+	my $pcmk_init = is_init($pcmk_script);
+	chomp $pcmk_init;
 	my $hb_isrc_cmd = is_script_rc("heartbeat");
 	my $cs_isrc_cmd = is_script_rc($cs_script);
 	my $ais_isrc_cmd = is_script_rc($ais_script);
+	my $pcmk_isrc_cmd = is_script_rc($pcmk_script);
 	my $hb_isrc = `$hb_isrc_cmd` || "off";
 	my $cs_isrc = `$cs_isrc_cmd` || "off";
 	my $ais_isrc = `$ais_isrc_cmd` || "off";
+	my $pcmk_isrc = `$pcmk_isrc_cmd` || "off";
 	chomp $hb_isrc;
 	chomp $cs_isrc;
 	chomp $ais_isrc;
+	chomp $pcmk_isrc;
 
 	my $hb_running_cmd = "$libpath/heartbeat -s";
 	my $ais_running = "";
@@ -1373,9 +1380,10 @@ sub get_cluster_versions {
 			system("$ais_running_cmd 2>/dev/null") >> 8 || "on";
 	}
 	my $cs_running_cmd = is_running($cs_script, $cs_prog);
-	my $cs_running =
-		system("$cs_running_cmd 2>/dev/null") >> 8 || "on";
+	my $cs_running = system("$cs_running_cmd 2>/dev/null") >> 8 || "on";
 	my $hb_running = system("$hb_running_cmd 2>/dev/null") >> 8 || "on";
+	my $pcmk_running_cmd = is_running($pcmk_script, $pcmk_prog);
+	my $pcmk_running = system("$pcmk_running_cmd 2>/dev/null") >> 8 || "on";
 	my $drbd_loaded = system("/sbin/lsmod |grep '\\<drbd\\>'") >> 8 || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf 2>/dev/null") >> 8 || "on";
 	my $cs_ais_conf;
@@ -1390,6 +1398,9 @@ sub get_cluster_versions {
 	chomp $hb_running;
 	chomp $ais_running;
 	chomp $cs_running;
+	chomp $pcmk_running;
+	my $service=`/usr/sbin/corosync-objctl service 2>/dev/null`;
+	my ($pcmk_svc_ver) = $service =~ /^service.ver=(\d*)/;
 	# drbd version
 	my ($drbd_version) =
 			`echo|/sbin/drbdadm help 2>/dev/null`=~ /Version:\s+(\S+)/;
@@ -1404,12 +1415,16 @@ sub get_cluster_versions {
 	       ."hb-rc:$hb_isrc\n"
 	       ."ais-rc:$ais_isrc\n"
 	       ."cs-rc:$cs_isrc\n"
+	       ."pcmk-rc:$pcmk_isrc\n"
 	       ."hb-running:$hb_running\n"
 	       ."cs-running:$cs_running\n"
 	       ."ais-running:$ais_running\n"
+	       ."pcmk-running:$pcmk_running\n"
 	       ."hb-init:$hb_init\n"
 	       ."cs-init:$cs_init\n"
 	       ."ais-init:$ais_init\n"
+	       ."pcmk-init:$pcmk_init\n"
+	       ."pcmk-svc-ver:$pcmk_svc_ver\n"
 	       ."hb-conf:$hb_conf\n"
 	       ."cs-ais-conf:$cs_ais_conf\n"
 	       ."drbd:$drbd_version\n"
@@ -1812,3 +1827,4 @@ sub gui_drbd_test {
 		exit 2;
 	}
 }
+

@@ -180,6 +180,14 @@ public class Host implements Serializable {
     private boolean heartbeatRunning = false;
     /** Is "on" if heartbeat config exists. */
     private boolean heartbeatConf = false;
+    /** Is "on" if pacemaker is in rc. */
+    private boolean pcmkIsRc = false;
+    /** Is "on" if pacemaker is running. */
+    private boolean pcmkRunning = false;
+    /** Is "on" if pacemaker has an init script. */
+    private boolean pcmkInit = false;
+    /** Pacemaker service version. From version 1, use pacamker init script. */
+    public int pcmkServiceVersion = 0;
     /** Is "on" if drbd module is loaded. */
     private boolean drbdLoaded = false;
     /** Corosync version. */
@@ -235,7 +243,6 @@ public class Host implements Serializable {
                                                    "not connected to the host";
     /** Volume group information on this host. */
     public Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
-    
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -2117,12 +2124,6 @@ public class Host implements Serializable {
             } else {
                 aisRunning = false;
             }
-        } else if ("hb-init".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                heartbeatInit = "on".equals(tokens[1].trim());
-            } else {
-                heartbeatInit = false;
-            }
         } else if ("cs-init".equals(tokens[0])) {
             if (tokens.length == 2) {
                 csInit = "on".equals(tokens[1].trim());
@@ -2141,6 +2142,12 @@ public class Host implements Serializable {
             } else {
                 heartbeatVersion = null;
             }
+        } else if ("hb-init".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                heartbeatInit = "on".equals(tokens[1].trim());
+            } else {
+                heartbeatInit = false;
+            }
         } else if ("hb-rc".equals(tokens[0])) {
             if (tokens.length == 2) {
                 heartbeatIsRc = "on".equals(tokens[1].trim());
@@ -2158,6 +2165,32 @@ public class Host implements Serializable {
                 heartbeatRunning = "on".equals(tokens[1].trim());
             } else {
                 heartbeatRunning = false;
+            }
+        } else if ("pcmk-rc".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                pcmkIsRc = "on".equals(tokens[1].trim());
+            } else {
+                pcmkIsRc = false;
+            }
+        } else if ("pcmk-running".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                pcmkRunning = "on".equals(tokens[1].trim());
+            } else {
+                pcmkRunning = false;
+            }
+        } else if ("pcmk-init".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                pcmkInit = "on".equals(tokens[1].trim());
+            } else {
+                pcmkInit = false;
+            }
+        } else if ("pcmk-svc-ver".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                try {
+                    pcmkServiceVersion = Integer.parseInt(tokens[1].trim());
+                } catch (java.lang.NumberFormatException e) {
+                    pcmkServiceVersion = 0;
+                }
             }
         } else if ("drbd-loaded".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -2477,6 +2510,11 @@ public class Host implements Serializable {
        return aisIsRc;
     }
 
+    /** Returns whether Pacemaker is rc script. */
+    public final boolean isPcmkRc() {
+       return pcmkIsRc;
+    }
+
     /** Returns whether Heartbeat has an init script. */
     public final boolean isHeartbeatInit() {
        return heartbeatInit;
@@ -2492,10 +2530,20 @@ public class Host implements Serializable {
        return aisInit;
     }
 
+    /** Returns whether Pacemaker has an init script. */
+    public final boolean isPcmkInit() {
+       return pcmkInit;
+    }
+
 
     /** Returns whether Corosync is running script. */
     public final boolean isCsRunning() {
        return csRunning;
+    }
+
+    /** Returns whether Pacemakerd is running. */
+    public final boolean isPcmkRunning() {
+       return pcmkRunning;
     }
 
     /** Returns whether Openais is running script. */
@@ -2666,5 +2714,10 @@ public class Host implements Serializable {
     /** Sets whether the comm layer is starting. */
     public final void setCommLayerStarting(final boolean commLayerStarting) {
         this.commLayerStarting = commLayerStarting;
+    }
+    
+    /** Returns pcmkServiceVersion. */
+    public final int getPcmkServiceVersion() {
+        return pcmkServiceVersion;
     }
 }
