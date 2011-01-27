@@ -283,23 +283,35 @@ public class CoroConfig extends DialogCluster {
         final Pattern totemP = Pattern.compile("\\s*totem\\s*\\{\\s*");
         final Pattern interfaceP =
                             Pattern.compile("\\s*interface\\s+\\{\\s*");
+        final Pattern serviceP = Pattern.compile("\\s*service\\s*\\{\\s*");
         final Pattern endParenthesesP = Pattern.compile("^\\s*}\\s*");
         final Pattern pattern =
                             Pattern.compile("\\s*(\\S+):\\s*(\\S+)\\s*");
         aisCastAddresses.clear();
         boolean inTotem = false;
         boolean inInterface = false;
+        boolean inService = false;
         String mcastaddr = null;
         String mcastport = null;
         String bindnetaddr = null;
+        String useMgmtdString = null;
         for (String line : config) {
             final Matcher totemM = totemP.matcher(line);
-            if (!inTotem && totemM.matches()) {
+            final Matcher serviceM = serviceP.matcher(line);
+            if (!inService && serviceM.matches()) {
+                inService = true;
+            } else if (!inTotem && totemM.matches()) {
                 inTotem = true;
             } else if (inTotem && !inInterface) {
                 final Matcher interfaceM = interfaceP.matcher(line);
                 if (interfaceM.matches()) {
                     inInterface = true;
+                } else {
+                    final Matcher endParenthesesM =
+                                            endParenthesesP.matcher(line);
+                    if (endParenthesesM.matches()) {
+                        inTotem = false;
+                    }
                 }
             } else if (inInterface) {
                 final Matcher endParenthesesM =
@@ -324,6 +336,22 @@ public class CoroConfig extends DialogCluster {
                             mcastport = value;
                         } else if ("bindnetaddr".equals(name)) {
                             bindnetaddr = value;
+                        }
+                    }
+                }
+            } else if (inService) {
+                final Matcher endParenthesesM =
+                                            endParenthesesP.matcher(line);
+                if (endParenthesesM.matches()) {
+                    inService = false;
+                    mgmtdCB.setSelected("yes".equals(useMgmtdString));
+                } else {
+                    final Matcher lineM = pattern.matcher(line);
+                    if (lineM.matches()) {
+                        final String name  = lineM.group(1);
+                        final String value = lineM.group(2);
+                        if ("use_mgmtd".equals(name)) {
+                            useMgmtdString = value;
                         }
                     }
                 }
@@ -470,7 +498,7 @@ public class CoroConfig extends DialogCluster {
             if (noConfigs) {
                 updateConfigPanelEditable(false);
             } else {
-                setNewConfig(configs[0]);
+                //setNewConfig(configs[0]);
                 updateConfigPanelExisting();
             }
         }
@@ -976,8 +1004,6 @@ public class CoroConfig extends DialogCluster {
                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
                                    );
-        configScrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE,
-                                                      150));
         configScrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE,
                                                         150));
         statusPanel = new JPanel();

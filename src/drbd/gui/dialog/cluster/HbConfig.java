@@ -109,9 +109,6 @@ public class HbConfig extends DialogCluster {
     /** Option regexps. */
     private static final Map<String, String> OPTION_REGEXPS =
                                                  new HashMap<String, String>();
-    /** Option values. */
-    private static final Map<String, String[]> OPTION_VALUES =
-                                               new HashMap<String, String[]>();
     /** Default values. */
     private static final Map<String, String> OPTION_DEFAULTS =
                                                  new HashMap<String, String>();
@@ -131,20 +128,6 @@ public class HbConfig extends DialogCluster {
         OPTION_REGEXPS.put(USE_LOGD, "\\w*");
         OPTION_REGEXPS.put(AUTOJOIN, "\\w*");
         OPTION_REGEXPS.put(NODE, ".*?");
-        /* choices */
-        OPTION_VALUES.put(CRM, new String[]{"respawn", "on", "off"});
-        OPTION_VALUES.put(COMPRESSION, new String[]{"", "zlib", "bz2"});
-        OPTION_VALUES.put(LOGFACILITY, new String[]{"local0",
-                                                    "local1",
-                                                    "local2",
-                                                    "local3",
-                                                    "local4",
-                                                    "local5",
-                                                    "local6",
-                                                    "local7",
-                                                    "none"});
-        OPTION_VALUES.put(USE_LOGD, new String[]{"", "on", "off"});
-        OPTION_VALUES.put(AUTOJOIN, new String[]{"", "any", "other", "none"});
         /* defaults */
         OPTION_DEFAULTS.put(KEEPALIVE, "2");
         OPTION_DEFAULTS.put(WARNTIME, "20");
@@ -159,6 +142,9 @@ public class HbConfig extends DialogCluster {
         OPTION_SIZES.put(AUTOJOIN, 80);
         OPTION_SIZES.put(NODE, 300);
     }
+    /** Option values. */
+    private final Map<String, String[]> optionValues =
+                                               new HashMap<String, String[]>();
     /** Option checkboxes. */
     private final Map<String, GuiComboBox> optionsCB =
                                             new HashMap<String, GuiComboBox>();
@@ -253,7 +239,21 @@ public class HbConfig extends DialogCluster {
             first = false;
             config.append(host.getHostname());
         }
-        OPTION_VALUES.put(NODE, new String[]{config.toString(), ""});
+        /* choices */
+        optionValues.put(NODE, new String[]{config.toString(), ""});
+        optionValues.put(CRM, new String[]{"respawn", "on", "off"});
+        optionValues.put(COMPRESSION, new String[]{"", "zlib", "bz2"});
+        optionValues.put(LOGFACILITY, new String[]{"local0",
+                                                   "local1",
+                                                   "local2",
+                                                   "local3",
+                                                   "local4",
+                                                   "local5",
+                                                   "local6",
+                                                   "local7",
+                                                   "none"});
+        optionValues.put(USE_LOGD, new String[]{"", "on", "off"});
+        optionValues.put(AUTOJOIN, new String[]{"", "any", "other", "none"});
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(
                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
@@ -1245,7 +1245,7 @@ public class HbConfig extends DialogCluster {
             }
             final GuiComboBox cb = new GuiComboBox(
                                       OPTION_DEFAULTS.get(option),
-                                      OPTION_VALUES.get(option),
+                                      optionValues.get(option),
                                       null, /* units */
                                       OPTION_TYPES.get(option),
                                       "^" + OPTION_REGEXPS.get(option)
