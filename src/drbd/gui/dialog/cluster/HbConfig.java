@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;
@@ -222,6 +223,7 @@ public class HbConfig extends DialogCluster {
     private volatile JScrollPane configScrollPane = null;
     /** Whether the config pane was already moved to the position. */
     private volatile boolean alreadyMoved = false;
+    private final CountDownLatch fieldCheckLatch = new CountDownLatch(1);
 
     /**
      * Prepares a new <code>HbConfig</code> object.
@@ -257,6 +259,7 @@ public class HbConfig extends DialogCluster {
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(
                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+        makeConfigButton.setEnabled(false);
         makeConfigButton.addActionListener(
             new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -447,6 +450,11 @@ public class HbConfig extends DialogCluster {
                 optionsCB.get(option).setValue("");
             }
         }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                fieldCheckLatch.countDown();
+            }
+        });
     }
 
     /**
@@ -587,9 +595,7 @@ public class HbConfig extends DialogCluster {
         return configOk;
     }
 
-    /**
-     * Shows all ha.cf config files.
-     */
+    /** Shows all ha.cf config files. */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
         SwingUtilities.invokeLater(new Runnable() {
@@ -636,6 +642,9 @@ public class HbConfig extends DialogCluster {
      * Updates the config panel.
      */
     private void updateConfigPanelEditable(final boolean configChanged) {
+        if (fieldCheckLatch.getCount() > 0) {
+            return;
+        }
         this.configChanged = configChanged;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -1315,6 +1324,9 @@ public class HbConfig extends DialogCluster {
     private final DocumentListener getDocumentListener() {
         return new DocumentListener() {
             private void check() {
+                if (fieldCheckLatch.getCount() > 0) {
+                    return;
+                }
                 final Thread t = new Thread(new Runnable() {
                     public void run() {
                         for (final String option : OPTIONS) {
