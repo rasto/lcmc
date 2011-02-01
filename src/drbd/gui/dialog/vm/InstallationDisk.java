@@ -68,6 +68,9 @@ public class InstallationDisk extends VMConfig {
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
+        if (skipButtonEnabled()) {
+            vmsdi.removeMyself(true);
+        }
         if (nextDialogObject == null) {
             nextDialogObject = new Storage(this, getVMSVirtualDomainInfo());
         }
@@ -137,9 +140,6 @@ public class InstallationDisk extends VMConfig {
                           Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                           null);
         vmsdi.setApplyButtons(null, vmsdi.getParametersFromXML());
-        //vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
-        //vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
-        //                                                          "IDE CDROM");
         panel.add(optionsPanel);
 
         final JScrollPane sp = new JScrollPane(panel);
@@ -147,5 +147,10 @@ public class InstallationDisk extends VMConfig {
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
         inputPane = sp;
         return sp;
+    }
+
+    /** Enable skip button. */
+    protected final boolean skipButtonEnabled() {
+        return true;
     }
 }

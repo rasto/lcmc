@@ -187,15 +187,17 @@ public class HeartbeatGraph extends ResourceGraph {
         if (si.equals(parent)) {
             return true;
         }
+        lockGraph();
         final Vertex v = getVertex(si);
         if (v == null) {
+            unlockGraph();
             return false;
         }
         final Vertex pv = getVertex(parent);
         if (pv == null) {
+            unlockGraph();
             return false;
         }
-        lockGraph();
         if (getGraph().isSuccessor(pv, v)
             || isAncestor(v, pv, new ArrayList<Vertex>())) {
             unlockGraph();

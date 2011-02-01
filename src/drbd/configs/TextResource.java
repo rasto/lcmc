@@ -666,7 +666,7 @@ public class TextResource extends
          + "\"Create Config\" button to save the new configuration on all "
          + "hosts. "},
 
-        {"Dialog.Cluster.CoroConfig.NextButton", "Next / Keep Config"},
+        {"Dialog.Cluster.CoroConfig.NextButton", "Next / Keep Old Config"},
 
         {"Dialog.Cluster.CoroConfig.CreateAisConfig",
          "Create/Overwrite Config"},
@@ -732,7 +732,7 @@ public class TextResource extends
          + "own interface, it will be ignored, at the same time it allows to "
          + "have the same config file on all hosts."},
 
-        {"Dialog.Cluster.HbConfig.NextButton", "Next / Keep Config"},
+        {"Dialog.Cluster.HbConfig.NextButton", "Next / Keep Old Config"},
 
         {"Dialog.Cluster.HbConfig.CreateHbConfig",
          "Create/Overwrite HB Config"},
@@ -1985,6 +1985,9 @@ public class TextResource extends
         {"VMSVirtualDomainInfo.Short.Name",
          "Domain name"},
 
+        {"VMSVirtualDomainInfo.Short.Type",
+         "Type"},
+
         {"VMSVirtualDomainInfo.Short.Vcpu",
          "Number of CPUs"},
 
@@ -1996,6 +1999,9 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.Short.Os.Boot",
          "Boot Device"},
+
+        {"VMSVirtualDomainInfo.Short.Os.Loader",
+         "Loader"},
 
         {"VMSVirtualDomainInfo.Short.Autostart",
          "Autostart"},

@@ -127,7 +127,12 @@ public class Storage extends VMConfig {
         vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE Disk");
         vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hda");
         vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
-        vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "qemu");
+        if ("xen".equals(getVMSVirtualDomainInfo().paramComboBoxGet(
+                            VMSXML.VM_PARAM_TYPE, null).getStringValue())) {
+            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "file");
+        } else {
+            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "qemu");
+        }
         vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
                                      "/var/lib/libvirt/images/"
                                      +

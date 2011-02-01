@@ -1400,7 +1400,10 @@ sub get_cluster_versions {
 	chomp $cs_running;
 	chomp $pcmk_running;
 	my $service=`/usr/sbin/corosync-objctl service 2>/dev/null`;
-	my ($pcmk_svc_ver) = $service =~ /^service.ver=(\d*)/;
+	my $pcmk_svc_ver = "0";
+	if ($service) {
+		($pcmk_svc_ver) = $service =~ /^service.ver=(\d*)/;
+	}
 	# drbd version
 	my ($drbd_version) =
 			`echo|/sbin/drbdadm help 2>/dev/null`=~ /Version:\s+(\S+)/;
@@ -1464,13 +1467,13 @@ sub get_vm_networks {
 sub get_vm_info {
 	my $networks = get_vm_networks();
 	my %autostart;
-	for (`ls /etc/libvirt/qemu/autostart/*.xml 2>/dev/null`) {
+	for (`ls /etc/libvirt/qemu/autostart/*.xml 2>/dev/null; ls /etc/xen/auto/ 2>/dev/null`) {
 		my ($name) = /([^\/]+).xml/;
 		next if !$name;
 		$autostart{$name}++;
 	}
 	my $out = "";
-	for (`ls /etc/libvirt/qemu/*.xml 2>/dev/null`) {
+	for (`ls /etc/libvirt/qemu/*.xml 2>/dev/null; ls /etc/xen/vm/*.xml 2>/dev/null`) {
 		my ($name) = /([^\/]+).xml/;
 		next if !$name;
 		chomp;

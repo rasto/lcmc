@@ -50,11 +50,11 @@ public class Domain extends VMConfig {
     private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {VMSXML.VM_PARAM_NAME,
+                                            VMSXML.VM_PARAM_TYPE,
                                             VMSXML.VM_PARAM_VCPU,
                                             VMSXML.VM_PARAM_CURRENTMEMORY,
                                             VMSXML.VM_PARAM_BOOT,
-                                            VMSXML.VM_PARAM_ARCH,
-                                            VMSXML.VM_PARAM_EMULATOR};
+                                            VMSXML.VM_PARAM_ARCH};
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 

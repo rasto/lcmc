@@ -263,9 +263,7 @@ public class CommStack extends DialogCluster {
         return panel;
     }
 
-    /**
-     * Enable skip button.
-     */
+    /** Enable skip button. */
     protected final boolean skipButtonEnabled() {
         return true;
     }

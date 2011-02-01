@@ -81,7 +81,7 @@ public class VMSXML extends XML {
     /** Map from network names to configs. */
     private final Map<String, String> netNamesConfigsMap =
                                             new HashMap<String, String>();
-    /** Map from names to vcpus. */
+    /** Map from parameters to values. */
     private final MultiKeyMap parameterValues = new MultiKeyMap();
     /** Hash of domains and their remote ports. */
     private final Map<String, Integer> remotePorts =
@@ -135,6 +135,8 @@ public class VMSXML extends XML {
     public static final String VM_PARAM_DEFINED = "defined";
     /** VM field: status. */
     public static final String VM_PARAM_STATUS = "status";
+    /** VM field: type. */
+    public static final String VM_PARAM_TYPE = "type";
     /** VM field: vcpu. */
     public static final String VM_PARAM_VCPU = "vcpu";
     /** VM field: currentMemory. */
@@ -143,6 +145,8 @@ public class VMSXML extends XML {
     public static final String VM_PARAM_MEMORY = "memory";
     /** VM field: os-boot. */
     public static final String VM_PARAM_BOOT = "boot";
+    /** VM field: loader. */
+    public static final String VM_PARAM_LOADER = "loader";
     /** VM field: autostart. */
     public static final String VM_PARAM_AUTOSTART = "autostart";
     /** VM field: arch. */
@@ -414,7 +418,11 @@ public class VMSXML extends XML {
         //  </os>
         //</domain>
 
-        final String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
+        final String type = parametersMap.get(VM_PARAM_TYPE);/* kvm/xen */
+        String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
+        if ("xen".equals(type)) {
+            configName = "/etc/xen/vm/" + domainName + ".xml";
+        }
         namesConfigsMap.put(domainName, configName);
         /* build xml */
         final String encoding = "UTF-8";
@@ -429,8 +437,9 @@ public class VMSXML extends XML {
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(
                                                   doc.createElement("domain"));
+        /* type */
+        root.setAttribute("type", type);/* kvm/xen */
         /* name */
-        root.setAttribute("type", "kvm");
         final Node nameNode = (Element) root.appendChild(
                                                     doc.createElement("name"));
         nameNode.appendChild(doc.createTextNode(domainName));
@@ -464,6 +473,10 @@ public class VMSXML extends XML {
         typeNode.appendChild(doc.createTextNode("hvm"));
         final Element bootNode = (Element) osNode.appendChild(
                                                   doc.createElement("boot"));
+        final Node loaderNode = (Element) osNode.appendChild(
+                                                  doc.createElement("loader"));
+        loaderNode.appendChild(doc.createTextNode(
+                                          parametersMap.get(VM_PARAM_LOADER)));
         bootNode.setAttribute("dev", parametersMap.get(VM_PARAM_BOOT));
 
         /* features */
@@ -513,29 +526,30 @@ public class VMSXML extends XML {
 
     /** Modify xml of the domain. */
     public final Node modifyDomainXML(final String domainName,
-                                      final Map<String, String> parametersMap) {
-        final String configName = namesConfigsMap.get(domainName);
-        if (configName == null) {
-            return null;
-        }
-        final Node domainNode = getDomainNode(domainName);
-        if (domainNode == null) {
-            return null;
-        }
-        final XPath xpath = XPathFactory.newInstance().newXPath();
-        final Map<String, String> paths = new HashMap<String, String>();
-        paths.put(VM_PARAM_MEMORY, "memory");
-        paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
-        paths.put(VM_PARAM_VCPU, "vcpu");
-        paths.put(VM_PARAM_BOOT, "os/boot");
-        paths.put(VM_PARAM_ARCH, "os/type");
-        //paths.put(VM_PARAM_ACPI, "features/acpi");
-        //paths.put(VM_PARAM_APIC, "features/apic");
-        //paths.put(VM_PARAM_PAE, "features/ape");
-        paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
-        paths.put(VM_PARAM_ON_CRASH, "on_crash");
-        paths.put(VM_PARAM_EMULATOR, "devices/emulator");
-        try {
+                                          final Map<String, String> parametersMap) {
+            final String configName = namesConfigsMap.get(domainName);
+            if (configName == null) {
+                return null;
+            }
+            final Node domainNode = getDomainNode(domainName);
+            if (domainNode == null) {
+                return null;
+            }
+            final XPath xpath = XPathFactory.newInstance().newXPath();
+            final Map<String, String> paths = new HashMap<String, String>();
+            paths.put(VM_PARAM_MEMORY, "memory");
+            paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
+            paths.put(VM_PARAM_VCPU, "vcpu");
+            paths.put(VM_PARAM_BOOT, "os/boot");
+            paths.put(VM_PARAM_ARCH, "os/type");
+            paths.put(VM_PARAM_LOADER, "os/loader");
+            //paths.put(VM_PARAM_ACPI, "features/acpi");
+            //paths.put(VM_PARAM_APIC, "features/apic");
+            //paths.put(VM_PARAM_PAE, "features/ape");
+            paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
+            paths.put(VM_PARAM_ON_CRASH, "on_crash");
+            paths.put(VM_PARAM_EMULATOR, "devices/emulator");
+            try {
             for (final String param : parametersMap.keySet()) {
                 final String path = paths.get(param);
                 if (path == null) {
@@ -1011,6 +1025,7 @@ public class VMSXML extends XML {
         if (domainNode == null) {
             return;
         }
+        final String domainType = getAttribute(domainNode, "type");
         final NodeList options = domainNode.getChildNodes();
         boolean tabletOk = false;
         String name = null;
@@ -1022,6 +1037,7 @@ public class VMSXML extends XML {
                     domainNames.add(name);
                 }
                 parameterValues.put(name, VM_PARAM_NAME, name);
+                parameterValues.put(name, VM_PARAM_TYPE, domainType);
                 if (!name.equals(nameInFilename)) {
                     Tools.appWarning("unexpected name: " + name
                                      + " != " + nameInFilename);
@@ -1049,6 +1065,10 @@ public class VMSXML extends XML {
                         parameterValues.put(name,
                                             VM_PARAM_ARCH,
                                             getAttribute(osOption, "arch"));
+                    } else {
+                        parameterValues.put(name,
+                                            osOption.getNodeName(),
+                                            getText(osOption));
                     }
                 }
             } else if ("features".equals(option.getNodeName())) {

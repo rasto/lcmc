@@ -190,18 +190,20 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                                VMSXML.VM_PARAM_NAME,
+                                               VMSXML.VM_PARAM_TYPE,
+                                               VMSXML.VM_PARAM_EMULATOR,
                                                VMSXML.VM_PARAM_VCPU,
                                                VMSXML.VM_PARAM_CURRENTMEMORY,
                                                VMSXML.VM_PARAM_MEMORY,
                                                VMSXML.VM_PARAM_BOOT,
+                                               VMSXML.VM_PARAM_LOADER,
                                                VMSXML.VM_PARAM_AUTOSTART,
                                                VMSXML.VM_PARAM_ARCH,
                                                VMSXML.VM_PARAM_ACPI,
                                                VMSXML.VM_PARAM_APIC,
                                                VMSXML.VM_PARAM_PAE,
                                                VMSXML.VM_PARAM_ON_REBOOT,
-                                               VMSXML.VM_PARAM_ON_CRASH,
-                                               VMSXML.VM_PARAM_EMULATOR};
+                                               VMSXML.VM_PARAM_ON_CRASH};
     /** Advanced parameters. */
     private static final Set<String> IS_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{
@@ -209,8 +211,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                                VMSXML.VM_PARAM_APIC,
                                                VMSXML.VM_PARAM_PAE,
                                                VMSXML.VM_PARAM_ON_REBOOT,
-                                               VMSXML.VM_PARAM_ON_CRASH,
-                                               VMSXML.VM_PARAM_EMULATOR}));
+                                               VMSXML.VM_PARAM_ON_CRASH}));
     /** Map of sections to which every param belongs. */
     private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
@@ -353,16 +354,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                           new HashMap<String, GuiComboBox>();
     static {
         SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_TYPE,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_EMULATOR,      VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMSXML.VM_PARAM_ARCH,     VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_ARCH,          VIRTUAL_SYSTEM_STRING);
 
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_REBOOT,     VIRTUAL_SYSTEM_OPTIONS);
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_CRASH,      VIRTUAL_SYSTEM_OPTIONS);
-        SECTION_MAP.put(VMSXML.VM_PARAM_EMULATOR,      VIRTUAL_SYSTEM_OPTIONS);
 
         SECTION_MAP.put(VMSXML.VM_PARAM_ACPI, VIRTUAL_SYSTEM_FEATURES);
         SECTION_MAP.put(VMSXML.VM_PARAM_APIC, VIRTUAL_SYSTEM_FEATURES);
@@ -372,6 +375,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_NAME,
                    Tools.getString("VMSVirtualDomainInfo.Short.Name"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_TYPE,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Type"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_VCPU,
                    Tools.getString("VMSVirtualDomainInfo.Short.Vcpu"));
@@ -384,6 +390,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_BOOT,
                    Tools.getString("VMSVirtualDomainInfo.Short.Os.Boot"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_LOADER,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Os.Loader"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_AUTOSTART,
                    Tools.getString("VMSVirtualDomainInfo.Short.Autostart"));
@@ -428,8 +437,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_CRASH, "restart");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, "/usr/bin/kvm");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, "False");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT,   "hd");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU,      "1");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "hd");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_TYPE, "kvm");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, "1");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_ACPI, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_APIC, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_PAE, "False");
@@ -450,10 +460,14 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                       new StringInfo("Floppy",
                                                      "fd",
                                                      null)});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_LOADER,
+                            new String[]{"", "/usr/lib/xen/boot/hvmloader"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_AUTOSTART,
                             new String[]{"True", "False"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE,
+                            new String[]{"kvm", "xen"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ARCH,
-                            new String[]{"x86_64", "i686"});
+                            new String[]{"x86_64", "i686", ""});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_REBOOT,
                             new String[]{"restart"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_CRASH,
@@ -462,6 +476,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             new StringInfo[]{
                                        new StringInfo("kvm",
                                                       "/usr/bin/kvm",
+                                                      null),
+                                       new StringInfo("xen",
+                                                      "/usr/lib/xen/bin/qemu-dm",
                                                       null),
                                        new StringInfo("qemu",
                                                       "/usr/bin/qemu",
@@ -2933,6 +2950,20 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 paramComboBoxGet(VMSXML.VM_PARAM_MEMORY, null).setValue(
                                                                      newValue);
             }
+        } else if (VMSXML.VM_PARAM_TYPE.equals(param)) {
+            final GuiComboBox emCB = paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR,
+                                                      null);
+            if (getResource().isNew()
+                && !Tools.areEqual(emCB.getStringValue(), newValue)) {
+                paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR, null).setValue(
+                                                                     newValue);
+                if (Tools.areEqual("xen", newValue)) {
+                    paramComboBoxGet(VMSXML.VM_PARAM_LOADER, null).setValue(
+                                                "/usr/lib/xen/boot/hvmloader");
+                } else {
+                    paramComboBoxGet(VMSXML.VM_PARAM_LOADER, null).setValue("");
+                }
+            }
         }
         return true;
     }
@@ -2954,7 +2985,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns true if the specified parameter is required. */
     protected final boolean isRequired(final String param) {
-        return true;
+        return false;
     }
 
     /** Returns true if the specified parameter is integer. */
