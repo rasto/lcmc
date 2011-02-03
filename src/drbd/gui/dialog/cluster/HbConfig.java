@@ -223,7 +223,7 @@ public class HbConfig extends DialogCluster {
     private volatile JScrollPane configScrollPane = null;
     /** Whether the config pane was already moved to the position. */
     private volatile boolean alreadyMoved = false;
-    private final CountDownLatch fieldCheckLatch = new CountDownLatch(1);
+    private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
 
     /**
      * Prepares a new <code>HbConfig</code> object.
@@ -266,6 +266,7 @@ public class HbConfig extends DialogCluster {
                     final Thread thread = new Thread(
                         new Runnable() {
                             public void run() {
+                                fieldCheckLatch = new CountDownLatch(1);
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         makeConfigButton.setEnabled(false);
@@ -450,11 +451,6 @@ public class HbConfig extends DialogCluster {
                 optionsCB.get(option).setValue("");
             }
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fieldCheckLatch.countDown();
-            }
-        });
     }
 
     /**
@@ -586,12 +582,16 @@ public class HbConfig extends DialogCluster {
                 }
             });
             if (noConfigs) {
-                //setNewConfig(null);
                 updateConfigPanelEditable(false);
             } else {
                 updateConfigPanelExisting();
             }
         }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                fieldCheckLatch.countDown();
+            }
+        });
         return configOk;
     }
 
@@ -642,7 +642,7 @@ public class HbConfig extends DialogCluster {
      * Updates the config panel.
      */
     private void updateConfigPanelEditable(final boolean configChanged) {
-        if (fieldCheckLatch.getCount() > 0) {
+        if (configChanged && fieldCheckLatch.getCount() > 0) {
             return;
         }
         this.configChanged = configChanged;
@@ -746,6 +746,7 @@ public class HbConfig extends DialogCluster {
                     if (castAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
+                        System.out.println("set accessible 2");
                         Tools.getGUIData().setAccessible(
                                             makeConfigButton,
                                             ConfigData.AccessType.ADMIN);
@@ -1340,6 +1341,7 @@ public class HbConfig extends DialogCluster {
                                 }
                             }
                         }
+                        System.out.println("set accessible");
                         Tools.getGUIData().setAccessible(
                                                 makeConfigButton,
                                                 ConfigData.AccessType.ADMIN);
