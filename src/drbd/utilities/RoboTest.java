@@ -1715,7 +1715,7 @@ public final class RoboTest {
             sleep(1000);
             leftClick(robot); /* apply */
             sleep(4000);
-            stopResource(robot, statefulX, statefulY, -10);
+            stopResource(robot, statefulX, statefulY, -20);
             checkTest(host, "testC", 2);
             sleep(5000);
             removeResource(robot, statefulX, statefulY, -20);

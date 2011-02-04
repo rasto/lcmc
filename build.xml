@@ -175,6 +175,34 @@
 			</classpath>
 		</java>
 	</target>
+
+	<target name="lowmem40" depends="jar">
+		<java fork="true"
+		      classname="${main-class}">
+		      	<arg value="--auto"/>
+			<arg value="${auto}"/> <!--  ant -Dauto=... -->
+			<jvmarg value="-Xmx40m"/>
+			<jvmarg value="-Xdebug"/>
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
+			<classpath>
+				<path location="${jar.dir}/${ant.project.name}.jar"/>
+			</classpath>
+		</java>
+	</target>
+
+	<target name="lowmem150" depends="jar">
+		<java fork="true"
+		      classname="${main-class}">
+		      	<arg value="--auto"/>
+			<arg value="${auto}"/> <!--  ant -Dauto=... -->
+			<jvmarg value="-Xmx150m"/>
+			<jvmarg value="-Xdebug"/>
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
+			<classpath>
+				<path location="${jar.dir}/${ant.project.name}.jar"/>
+			</classpath>
+		</java>
+	</target>
 	
 	<target name="clean-build" depends="clean,jar"/>
 	
