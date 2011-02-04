@@ -136,7 +136,7 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         smallButtonPanel.setBackground(STATUS_BACKGROUND);
         smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel,
                                    BoxLayout.Y_AXIS));
-        final MyButton newButton = new MyButton("I am new here");
+        final MyButton newButton = new MyButton(HELP_BUTTON_STRING);
         smallButtonPanel.add(newButton);
         buttonPanel.add(smallButtonPanel);
         newButton.addActionListener(new ActionListener() {

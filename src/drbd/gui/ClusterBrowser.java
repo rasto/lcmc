@@ -810,7 +810,7 @@ public class ClusterBrowser extends Browser {
         while (true) {
             if (host.isServerStatusLatch()) {
                 Tools.startProgressIndicator(hostName,
-                                             ": updating server info...");
+                                             Tools.getString("ClusterBrowser.UpdatingServerInfo"));
             }
 
             host.setIsLoading();
@@ -827,14 +827,14 @@ public class ClusterBrowser extends Browser {
             updateDrbdResources();
             if (host.isServerStatusLatch()) {
                 Tools.stopProgressIndicator(hostName,
-                                             ": updating server info...");
+                                             Tools.getString("ClusterBrowser.UpdatingServerInfo"));
                 Tools.startProgressIndicator(hostName,
-                                             ": updating VMs status...");
+                                             Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
             }
             periodicalVMSUpdate(host);
             if (host.isServerStatusLatch()) {
                 Tools.stopProgressIndicator(hostName,
-                                             ": updating VMs status...");
+                                             Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
 
             }
             SwingUtilities.invokeLater(
@@ -967,7 +967,8 @@ public class ClusterBrowser extends Browser {
         host.setDrbdStatus(false);
         final String hostName = host.getName();
         /* now what we do if the status finished for the first time. */
-        Tools.startProgressIndicator(hostName, ": updating drbd status...");
+        Tools.startProgressIndicator(hostName,
+                                     Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
         final Thread thread = new Thread(new Runnable() {
             public void run() {
                 try {
@@ -982,7 +983,7 @@ public class ClusterBrowser extends Browser {
                     }
                 });
                 Tools.stopProgressIndicator(hostName,
-                                            ": updating drbd status...");
+                                            Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
             }
         });
         thread.start();

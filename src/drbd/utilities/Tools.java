@@ -1002,8 +1002,7 @@ public final class Tools {
         synchronized (Tools.class) {
             if (resource == null) {
                 /* set locale */
-                final Locale currentLocale = new Locale(localeLang,
-                                                        localeCountry);
+                final Locale currentLocale = Locale.getDefault();
                 resource =
                     ResourceBundle.getBundle("drbd.configs.TextResource",
                                              currentLocale);

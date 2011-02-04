@@ -260,7 +260,7 @@ public class PtestData {
             }
         }
         if (!isToolTip) {
-            sb.append("no actions");
+            sb.append(Tools.getString("PtestData.NoToolTip"));
         }
         sb.append("</html>");
         this.toolTip = sb.toString();

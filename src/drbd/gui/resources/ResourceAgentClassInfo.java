@@ -112,7 +112,8 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        final MyButton overviewButton = new MyButton("Classes Overview",
+        final MyButton overviewButton = new MyButton(
+                                                     Tools.getString("ClusterBrowser.ClassesOverviewButton"),
                                                      BACK_ICON);
         overviewButton.setPreferredSize(new Dimension(180, 50));
         overviewButton.addActionListener(new ActionListener() {

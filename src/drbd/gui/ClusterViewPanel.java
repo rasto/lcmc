@@ -117,7 +117,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         /* Operating mode */
         final JPanel opModePanel = new JPanel();
         opModePanel.setBackground(STATUS_BACKGROUND);
-        final TitledBorder vmBorder = Tools.getBorder("Operating Mode");
+        final TitledBorder vmBorder = Tools.getBorder(
+                          Tools.getString("ClusterViewPanel.OperatingMode"));
         opModePanel.setBorder(vmBorder);
         final String[] modes = Tools.getConfigData().getOperatingModes();
         final JComboBox opModeCB = new JComboBox(modes);

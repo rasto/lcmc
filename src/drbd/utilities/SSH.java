@@ -1491,13 +1491,15 @@ public class SSH {
                              * "keyboard-interactive" method and notify the
                              * user.
                              */
-                            lastError = "Keyboard-interactive does not work.";
+                            lastError = Tools.getString(
+                                        "SSH.KeyboardInteractive.DoesNotWork");
 
                             /* do not try this again */
                             enableKeyboardInteractive = false;
                         } else {
                             /* try again, if possible */
-                            lastError = "Keyboard-interactive auth failed.";
+                            lastError = Tools.getString(
+                                        "SSH.KeyboardInteractive.Failed");
                         }
                         continue;
                     }
@@ -1508,7 +1510,8 @@ public class SSH {
                             ans = lastPassword;
                         } else {
                             ans = sshGui.enterSomethingDialog(
-                                    "Password Authentication",
+                                    Tools.getString(
+                                                 "SSH.PasswordAuthentication"),
                                     new String[] {lastError,
                                                   "<html>"
                                                   + host.getUserAtHost()
@@ -1544,7 +1547,8 @@ public class SSH {
                         }
 
                         /* try again, if possible */
-                        lastError = "Password authentication failed.";
+                        lastError = Tools.getString(
+                                        "SSH.Password.Authentication.Failed");
                         passwdTry--;
                         if (passwdTry <= 0) {
                             enablePublicKey = true;
@@ -1650,7 +1654,7 @@ public class SSH {
             String lastError = "";
             final String lastSudoPwd = host.getSudoPassword();
             final String sudoPwd = sshGui.enterSomethingDialog(
-                    "Sudo Authentication",
+                     Tools.getString("SSH.SudoAuthentication"),
                     new String[] {lastError,
                                   "<html>"
                                   + host.getName()

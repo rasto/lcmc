@@ -348,7 +348,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns tool tip for the placeholder. */
     public final String getToolTipText(final boolean testOnly) {
-        return "Resource set placeholder";
+        return Tools.getString("ConstraintPHInfo.ToolTip");
     }
 
     /** Return list of popup items. */
@@ -358,7 +358,7 @@ public class ConstraintPHInfo extends ServiceInfo {
         addDependencyMenuItems(items, true, testOnly);
         /* remove the placeholder and all constraints associated with it. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
-                    "Remove",
+                    Tools.getString("ConstraintPHInfo.Remove"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
                     new AccessMode(ConfigData.AccessType.ADMIN, false),

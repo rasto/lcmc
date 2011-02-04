@@ -96,7 +96,7 @@ public class DRBDtestData {
             }
         }
         if (!isToolTip) {
-            sb.append("no actions");
+            sb.append(Tools.getString("DRBDtestData.NoToolTip"));
         }
         sb.append("</html>");
         this.toolTip = sb.toString();

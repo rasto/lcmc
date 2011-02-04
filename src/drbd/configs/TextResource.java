@@ -165,6 +165,9 @@ public class TextResource extends
         {"ClusterViewPanel.ClusterWizard",
          "Cluster Wizard"},
 
+        {"ClusterViewPanel.OperatingMode",
+         "Operating Mode"},
+
         /* Progress bar */
         {"ProgressBar.Cancel",
          "Cancel"},
@@ -1034,6 +1037,9 @@ public class TextResource extends
         {"Dialog.ClusterLogs.Title",
          "Log Viewer"},
 
+        {"Dialog.Logs.RefreshButton",
+         "Refresh"},
+
         {"AppError.Title",
          "Application Error"},
 
@@ -1264,6 +1270,15 @@ public class TextResource extends
 
         {"ClusterBrowser.CreateDir.No",
          "Don't Create"},
+
+        {"ClusterBrowser.UpdatingServerInfo",
+         ": updating server info..."},
+
+        {"ClusterBrowser.UpdatingVMsStatus",
+         ": updating VMs status..."},
+
+        {"ClusterBrowser.UpdatingDrbdStatus",
+         ": updating drbd status..."},
 
         /* Cluster Resource View */
         {"ClusterBrowser.AllHosts",
@@ -1561,6 +1576,15 @@ public class TextResource extends
         {"ClusterBrowser.OperationsSameAs",
          "Same As"},
 
+        {"ClusterBrowser.AddServiceToCluster",
+         "Add Service To Cluster"},
+
+        {"ClusterBrowser.RAsOverviewButton",
+         "RAs Overview"},
+
+        {"ClusterBrowser.ClassesOverviewButton",
+         "Classes Overview"},
+
         {"ServicesInfo.AddConstraintPlaceholder",
           "Add Constraint Placeholder"},
 
@@ -1570,8 +1594,14 @@ public class TextResource extends
         {"PtestData.ToolTip",
          "Look what happens when you apply it:"},
 
+        {"PtestData.NoToolTip",
+         "no actions"},
+
         {"DRBDtestData.ToolTip",
          "Look what happens when you apply it:"},
+
+        {"DRBDtestData.NoToolTip",
+         "no actions"},
 
         {"HostBrowser.HostWizard",
          "Host Wizard"},
@@ -1899,8 +1929,23 @@ public class TextResource extends
         {"SSH.Publickey.Authentication.Failed",
          "Authentication failed."},
 
+        {"SSH.KeyboardInteractive.DoesNotWork",
+         "Keyboard-interactive does not work."},
+
+        {"SSH.KeyboardInteractive.Failed",
+         "Keyboard-interactive auth failed."},
+
+        {"SSH.Password.Authentication.Failed",
+         "Password authentication failed."},
+
         {"SSH.RSA.DSA.Authentication",
          "RSA/DSA Authentication"},
+
+        {"SSH.PasswordAuthentication",
+         "Password Authentication"},
+
+        {"SSH.SudoAuthentication",
+         "Sudo Authentication"},
 
         {"Boolean.True",
          "True"},
@@ -2096,6 +2141,12 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.confirmRemove.No",
          "Cancel"},
+
+        {"ConstraintPHInfo.ToolTip",
+         "Resource set placeholder"},
+
+        {"ConstraintPHInfo.Remove",
+         "Remove"},
 
         {"ConstraintPHInfo.confirmRemove.Title",
          "Remove Constraint Placeholder"},

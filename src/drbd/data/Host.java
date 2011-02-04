@@ -1692,7 +1692,8 @@ public class Host implements Serializable {
     public final void connect(SSHGui sshGui) {
         if (!isConnected()) {
             final String hostName = getName();
-            Tools.startProgressIndicator(hostName, "Connecting...");
+            Tools.startProgressIndicator(hostName, 
+                                         Tools.getString("Dialog.Host.SSH.Connecting"));
             if (sshGui == null) {
                 sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
                                     this,
@@ -1712,8 +1713,8 @@ public class Host implements Serializable {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     Tools.stopProgressIndicator(
-                                                          hostName,
-                                                          "Connecting...");
+                                                hostName,
+                                                Tools.getString("Dialog.Host.SSH.Connecting"));
                                 }
                             });
                         }
@@ -1726,7 +1727,8 @@ public class Host implements Serializable {
                                 public void run() {
                                     Tools.stopProgressIndicator(
                                                 hostName,
-                                                "Connecting..."); }
+                                                Tools.getString("Dialog.Host.SSH.Connecting"));
+                                }
                             });
                         }
                     });

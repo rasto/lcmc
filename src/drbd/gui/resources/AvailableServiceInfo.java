@@ -129,7 +129,8 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        final MyButton overviewButton = new MyButton("RAs Overview",
+        final MyButton overviewButton = new MyButton(
+                                                     Tools.getString("ClusterBrowser.RAsOverviewButton"),
                                                      BACK_ICON);
         overviewButton.setPreferredSize(new Dimension(180, 50));
         overviewButton.addActionListener(new ActionListener() {
@@ -160,7 +161,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final MyMenuItem addServiceMenu = new MyMenuItem(
-                            "Add Service To Cluster",
+                            Tools.getString("ClusterBrowser.AddServiceToCluster"),
                             null,
                             null,
                             new AccessMode(ConfigData.AccessType.ADMIN, false),

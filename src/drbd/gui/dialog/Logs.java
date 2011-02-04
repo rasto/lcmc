@@ -75,7 +75,7 @@ public class Logs extends ConfigDialog {
     private final Map<String, JCheckBox> checkBoxMap =
                                             new HashMap<String, JCheckBox>();
     /** Refresh button. */
-    private final MyButton refreshBtn = new MyButton("Refresh");
+    private final MyButton refreshBtn = new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
     /** Refresh lock. */
     private final Mutex mRefreshLock = new Mutex();
 
