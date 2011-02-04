@@ -222,7 +222,7 @@ public class Cluster {
      */
     public final boolean contains(final String hostName) {
         for (final Host host : hosts) {
-            if (hostName.equals(host.getName())) {
+            if (hostName != null && hostName.equals(host.getName())) {
                 return true;
             }
         }
