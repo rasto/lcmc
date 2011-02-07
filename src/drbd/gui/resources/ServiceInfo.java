@@ -5919,13 +5919,22 @@ public class ServiceInfo extends EditableInfo {
         final StringBuffer sb = new StringBuffer(200);
         sb.append("<b>");
         sb.append(toString());
+        String textOn;
+        String textNotOn;
+        if (getResourceAgent().isFilesystem()) {
+            textOn = "mounted on";
+            textNotOn = "not mounted";
+        } else {
+            textOn = "running on";
+            textNotOn = "not running";
+        }
         if (isFailed(testOnly)) {
             sb.append("</b> <b>Failed</b>");
         } else if (isStopped(testOnly)
                    || nodeString == null) {
-            sb.append("</b> not running");
+            sb.append("</b> " + textNotOn);
         } else {
-            sb.append("</b> running on: ");
+            sb.append("</b> " + textOn + ": ");
             sb.append(nodeString);
         }
         if (!isManaged(testOnly)) {
@@ -5980,16 +5989,25 @@ public class ServiceInfo extends EditableInfo {
     public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         Color color = null;
         final List<Subtext> texts = new ArrayList<Subtext>();
+        String textOn;
+        String textNotOn;
+        if (getResourceAgent().isFilesystem()) {
+            textOn = "mounted on";
+            textNotOn = "not mounted";
+        } else {
+            textOn = "running on";
+            textNotOn = "not running";
+        }
         if (getService().isOrphaned()) {
             texts.add(new Subtext("...",
                                   null,
                                   Color.BLACK));
         } else if (getResource().isNew()) {
-            texts.add(new Subtext("not running (new)",
+            texts.add(new Subtext(textNotOn + " (new)",
                                   ClusterBrowser.FILL_PAINT_STOPPED,
                                   Color.BLACK));
         } else if (isFailed(testOnly)) {
-            texts.add(new Subtext("not running",
+            texts.add(new Subtext(textNotOn,
                                   null,
                                   Color.BLACK));
         } else if (isStopped(testOnly)) {
@@ -6018,13 +6036,13 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             if (runningOnNodeString != null) {
-                texts.add(new Subtext("running on: " + runningOnNodeString
+                texts.add(new Subtext(textOn + ": " + runningOnNodeString
                                       + getPingCountString(runningOnNodeString,
                                                            testOnly),
                                       color,
                                       textColor));
             } else {
-                texts.add(new Subtext("not running",
+                texts.add(new Subtext(textNotOn,
                                       ClusterBrowser.FILL_PAINT_STOPPED,
                                       textColor));
             }
