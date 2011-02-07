@@ -203,6 +203,20 @@
 			</classpath>
 		</java>
 	</target>
+
+	<target name="lowmem100" depends="jar">
+		<java fork="true"
+		      classname="${main-class}">
+		      	<arg value="--auto"/>
+			<arg value="${auto}"/> <!--  ant -Dauto=... -->
+			<jvmarg value="-Xmx100m"/>
+			<jvmarg value="-Xdebug"/>
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
+			<classpath>
+				<path location="${jar.dir}/${ant.project.name}.jar"/>
+			</classpath>
+		</java>
+	</target>
 	
 	<target name="clean-build" depends="clean,jar"/>
 	

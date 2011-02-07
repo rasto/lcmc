@@ -70,8 +70,10 @@ public final class RoboTest {
                     Tools.info("sleep: " + x);
                 }
                 Tools.sleep(1000);
-                p = MouseInfo.getPointerInfo().getLocation();
-                x = p.getX() - loc.getX();
+                if (MouseInfo.getPointerInfo() != null) {
+                    p = MouseInfo.getPointerInfo().getLocation();
+                    x = p.getX() - loc.getX();
+                }
                 i++;
             }
             prevP = p;

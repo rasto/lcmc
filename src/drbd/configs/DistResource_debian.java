@@ -169,7 +169,7 @@ public class DistResource_debian extends
          + " stop 05 0 1 6 . "
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
-         + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
+         + " http://hg.clusterlabs.org/pacemaker/1.1/archive/tip.tar.bz2"
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp pacemaker.tar.bz2"
          + " && cd `ls -dr Pacemaker-1-*`"
@@ -221,7 +221,7 @@ public class DistResource_debian extends
          + " -o 'DPkg::Options::force=--force-confnew'"
          + " bzip2 automake libtool make pkg-config libglib2.0-dev libxml2-dev"
          + " libbz2-dev uuid-dev libsnmp-dev subversion libxslt1-dev psmisc"
-         + " libltdl3-dev libnss3-dev groff"
+         + " libltdl3-dev libnss3-dev groff xsltproc"
          + " && /bin/mkdir -p /tmp/pminst "
          /* cluster glue */
          + " && /usr/bin/wget -N -O /tmp/pminst/cluster-glue.tar.bz2"
@@ -257,7 +257,7 @@ public class DistResource_debian extends
          + " true)"
          /* Pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
-         + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
+         + " http://hg.clusterlabs.org/pacemaker/1.1/archive/tip.tar.bz2"
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp pacemaker.tar.bz2"
          + " && cd `ls -dr Pacemaker-1-*`"

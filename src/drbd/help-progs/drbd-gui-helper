@@ -835,7 +835,7 @@ sub get_resource_status {
 		my $on;
 		my $res;
 		if ($line =~
-		    /Leave\s+resource\s+(\S+)\s+\((.*?)\)/) {
+		    /Leave\s+(?:resource\s+)?(\S+)\s+\((.*?)\)/) {
 		  	# managed: Started, Master, Slave, Stopped
 			$res = $1;
 			my $state = $2;

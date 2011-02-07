@@ -188,7 +188,7 @@ public class DistResource_ubuntu extends
          + " stop 05 0 1 6 . "
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
-         + " http://hg.clusterlabs.org/pacemaker/stable-1.0/archive/tip.tar.bz2"
+         + " http://hg.clusterlabs.org/pacemaker/1.1/archive/tip.tar.bz2"
          + " && cd /tmp/pminst"
          + " && /bin/tar xfjp pacemaker.tar.bz2"
          + " && cd `ls -dr Pacemaker-1-*`"
