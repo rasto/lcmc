@@ -1780,7 +1780,8 @@ public class SSH {
                             commands.toString()
                             + "echo \""
                             + host.escapeQuotes(fileContent, 1)
-                            + "\">" + remoteFilename
+                            + "\">" + remoteFilename + ".new && "
+                            + "mv " + remoteFilename + ".new " + remoteFilename
                             + modeString,
                             new ExecCallback() {
                                 public void done(final String ans) {
