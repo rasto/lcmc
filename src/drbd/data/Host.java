@@ -1505,7 +1505,11 @@ public class Host implements Serializable {
         for (int i = 1; i < hops; i++) {
             s.append("ssh -q -A -tt -o 'StrictHostKeyChecking no' "
                      + "-o 'ForwardAgent yes' -l ");
-            s.append(usernames[i]);
+            if (i < usernames.length) {
+                s.append(usernames[i]);
+            } else {
+                s.append("root");
+            }
             s.append(' ');
             s.append(ips[i]);
             s.append(' ');
