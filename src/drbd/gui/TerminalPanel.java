@@ -362,42 +362,34 @@ public class TerminalPanel extends JScrollPane {
         final int end = terminalArea.getDocument().getLength();
         pos = end + pos - maxPos;
         maxPos = end;
-        final byte[] bytes = text.getBytes();
+        final char[] chars = text.toCharArray();
         StringBuffer colorString = new StringBuffer(10);
         boolean inside = false;
-        for (int i = 0; i < bytes.length; i++) {
-            final byte b = bytes[i];
+        for (int i = 0; i < chars.length; i++) {
+            final char c = chars[i];
+            final String s = Character.toString(c);
             boolean printit = true;
-            if (b == 8) { /* one position to the left */
+            if (c == 8) { /* one position to the left */
                 printit = false;
                 pos--;
-            } else if (i < bytes.length - 1
-                       && b == 13 && bytes[i + 1] == 10) { /* new line */
+            } else if (i < chars.length - 1
+                       && c == 13 && chars[i + 1] == 10) { /* new line */
                 prevLine = maxPos + 2;
                 pos = maxPos;
-            } else if (b == 13) { /* beginning of the same line */
+            } else if (c == 13) { /* beginning of the same line */
                 pos = prevLine;
                 printit = false;
-            } else if (b == 27) {
+            } else if (c == 27) {
                 /* funny colors, e.g. in sles */
                 inside = true;
                 printit = false;
                 colorString = new StringBuffer(10);
             }
-            String c = "";
-            try {
-                c = new String(bytes, i, 1, "UTF-8");
-            } catch (java.io.UnsupportedEncodingException e) {
-                Tools.appError(
-                        "TerminalPanel UnsupportedEncodingException UTF-8",
-                        "",
-                        e);
-            }
             if (inside) {
-                if ((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')) {
+                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
                     /* we are done */
                     inside = false;
-                    if (b == 'm') {
+                    if (c == 'm') {
                         Color newColor =
                                      getColorFromString(colorString.toString());
 
@@ -406,7 +398,7 @@ public class TerminalPanel extends JScrollPane {
                         }
                         StyleConstants.setForeground(colorAS, newColor);
                         colorString = new StringBuffer(10);
-                    } else if (b == 'G') {
+                    } else if (c == 'G') {
                         final int g = getCharCount(colorString.toString());
                         pos = prevLine + g;
                         while (pos > maxPos) {
@@ -422,7 +414,7 @@ public class TerminalPanel extends JScrollPane {
                         }
                     }
                 } else if (printit) {
-                    colorString.append(c);
+                    colorString.append(s);
                 }
                 printit = false;
             }
@@ -439,7 +431,7 @@ public class TerminalPanel extends JScrollPane {
                 }
                 try {
                     doc.insertString(pos,
-                                     c,
+                                     s,
                                      colorAS);
                 } catch (javax.swing.text.BadLocationException e1) {
                     Tools.appError("TerminalPanel pos: " + pos,
