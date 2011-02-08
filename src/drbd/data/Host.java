@@ -2280,6 +2280,7 @@ public class Host implements Serializable {
                               "/var/lib/heartbeat/",
                               "0600",
                               false,
+                              null,
                               null);
     }
 

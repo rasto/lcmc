@@ -1686,7 +1686,7 @@ public class SSH {
             final String fileName = "/help-progs/drbd-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
-                scp(file, "@GUI-HELPER@", "0700", false, null);
+                scp(file, "@GUI-HELPER@", "0700", false, null, null);
             }
         }
     }
@@ -1735,8 +1735,9 @@ public class SSH {
                                    final String dir,
                                    final String mode,
                                    final boolean makeBackup,
-                                   final String preCommand) {
-        scp(config, dir + fileName, mode, makeBackup, preCommand);
+                                   final String preCommand,
+                                   final String postCommand) {
+        scp(config, dir + fileName, mode, makeBackup, preCommand, postCommand);
     }
 
     /**
@@ -1751,7 +1752,8 @@ public class SSH {
                           final String remoteFilename,
                           final String mode,
                           final boolean makeBackup,
-                          final String preCommand) {
+                          final String preCommand,
+                          final String postCommand) {
         final StringBuffer commands = new StringBuffer(40);
         if (preCommand != null) {
             commands.append(preCommand);
@@ -1760,7 +1762,7 @@ public class SSH {
         if (makeBackup) {
             commands.append("cp ");
             commands.append(remoteFilename);
-            commands.append("{,.`date +'%s'`};");
+            commands.append("{,.bak};");
         }
         final int index = remoteFilename.lastIndexOf('/');
         if (index > 0) {
@@ -1772,9 +1774,27 @@ public class SSH {
         if  (!isConnected()) {
             return;
         }
-        String modeString = null;
+        String modeString = "";
         if (mode != null) {
             modeString = ";chmod " + mode + " " + remoteFilename;
+        }
+        String postCommandString = "";
+        if (postCommand != null) {
+            postCommandString = ";" + postCommand;
+        }
+        final StringBuffer backupString = new StringBuffer("");
+        if (makeBackup) {
+            backupString.append(";if ! diff ");
+            backupString.append(remoteFilename);
+            backupString.append("{,.bak}>/dev/null; then ");
+            backupString.append("cp ");
+            backupString.append(remoteFilename);
+            backupString.append("{.bak,.`date +'%s'`};");
+            backupString.append(" else ");
+            backupString.append("rm ");
+            backupString.append(remoteFilename);
+            backupString.append(".bak;");
+            backupString.append(" fi");
         }
         final Thread t = execCommand(
                             commands.toString()
@@ -1782,7 +1802,9 @@ public class SSH {
                             + host.escapeQuotes(fileContent, 1)
                             + "\">" + remoteFilename + ".new && "
                             + "mv " + remoteFilename + ".new " + remoteFilename
-                            + modeString,
+                            + modeString
+                            + postCommandString
+                            + backupString.toString(),
                             new ExecCallback() {
                                 public void done(final String ans) {
                                     /* ok */

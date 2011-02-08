@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
+import java.util.Collection;
 import java.util.TreeSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -1232,6 +1233,12 @@ public final class Tools {
         return ret.toString();
     }
 
+    /** Joins String list into one string with specified delimiter. */
+    public static String join(final String delim,
+                              final Collection<String> strings) {
+        return join(delim, strings.toArray(new String[strings.size()]));
+    }
+
     /**
      * Joins String array into one string with specified delimiter.
      *
@@ -1494,6 +1501,7 @@ public final class Tools {
                                        dir,
                                        mode,
                                        makeBackup,
+                                       null,
                                        null);
         }
     }

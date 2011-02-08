@@ -1741,9 +1741,24 @@ sub gui_drbd_test {
 	}
 	close CONF;
 	if (!$conf) {
-		print "no /etc.drbd.conf";
+		print "no /etc/drbd.conf";
 		exit 3;
 	}
+
+ 	if ($conf =~ m!^include "drbd\.d/\*\.res"!m) {
+ 		if (opendir my $dir, "/etc/drbd.d/") {
+ 			for my $file (sort grep { /^[^.]/ } readdir $dir) {
+ 				$conf .= "--- $file ---\n";
+ 				open my $fh, "/etc/drbd.d/$file" or die $!;
+ 				{
+ 					local $/;
+ 					$conf .= <$fh>;
+ 				}
+ 				$conf .= "--- $file ---\n";
+ 			}
+ 		}
+ 	}
+
 
 	if (!open PROC, "/proc/drbd") {
 		return;
