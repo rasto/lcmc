@@ -1483,7 +1483,7 @@ public class Host implements Serializable {
         final String[] usernames = username.split(",");
         final String[] ips = ip.split(",");
         final StringBuffer s = new StringBuffer(200);
-        s.append("LC_ALL=C ");
+        s.append("export LC_ALL=C;");
         if (hops > 1) {
             String sshAgentPid = "";
             String sshAgentSock = "";
