@@ -1483,6 +1483,7 @@ public class Host implements Serializable {
         final String[] usernames = username.split(",");
         final String[] ips = ip.split(",");
         final StringBuffer s = new StringBuffer(200);
+        s.append("LC_ALL=C ");
         if (hops > 1) {
             String sshAgentPid = "";
             String sshAgentSock = "";
@@ -1500,7 +1501,6 @@ public class Host implements Serializable {
             s.append(sshAgentPid);
             s.append(" SSH_AUTH_SOCK=");
             s.append(sshAgentSock);
-            s.append(' ');
         }
         for (int i = 1; i < hops; i++) {
             s.append("ssh -q -A -tt -o 'StrictHostKeyChecking no' "
