@@ -5272,7 +5272,7 @@ public class ServiceInfo extends EditableInfo {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     } else if (isStarted(testOnly)) {
-                        return "it is already started";
+                        return Tools.getString("ServiceInfo.AlreadyStarted");
                     } else {
                         return getService().isAvailableWithText();
                     }
@@ -5308,7 +5308,7 @@ public class ServiceInfo extends EditableInfo {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     } else if (isStopped(testOnly)) {
-                        return "it is already stopped";
+                        return Tools.getString("ServiceInfo.AlreadyStopped");
                     } else {
                         return getService().isAvailableWithText();
                     }
@@ -5784,7 +5784,8 @@ public class ServiceInfo extends EditableInfo {
                                                getRunningOnNodes(testOnly);
                         if (runningOnNodes == null
                             || runningOnNodes.isEmpty()) {
-                            return "it is not running anywhere";
+                            return Tools.getString(
+                                            "ServiceInfo.NotRunningAnywhere");
                         }
                         final String runningOnNode =
                                 runningOnNodes.get(0).toLowerCase(Locale.US);
@@ -5800,7 +5801,8 @@ public class ServiceInfo extends EditableInfo {
                         }
                         if (hostName.toLowerCase(Locale.US).equals(
                                                              runningOnNode)) {
-                            return "already running on this node";
+                            return Tools.getString(
+                                           "ServiceInfo.AlreadyRunningOnNode");
                         } else {
                             return null;
                         }
@@ -5860,7 +5862,8 @@ public class ServiceInfo extends EditableInfo {
                                                getRunningOnNodes(testOnly);
                         if (runningOnNodes == null
                             || runningOnNodes.isEmpty()) {
-                            return "it is not running anywhere";
+                            return Tools.getString(
+                                            "ServiceInfo.NotRunningAnywhere");
                         }
                         final String runningOnNode =
                                 runningOnNodes.get(0).toLowerCase(Locale.US);
@@ -5922,11 +5925,12 @@ public class ServiceInfo extends EditableInfo {
         String textOn;
         String textNotOn;
         if (getResourceAgent().isFilesystem()) {
-            textOn = "mounted on";
-            textNotOn = "not mounted";
+            textOn = Tools.getString("ServiceInfo.Filesystem.MoutedOn");
+            textNotOn = Tools.getString("ServiceInfo.Filesystem.NotMounted");
         } else {
-            textOn = "running on";
-            textNotOn = "not running";
+
+            textOn = Tools.getString("ServiceInfo.Filesystem.RunningOn");
+            textNotOn = Tools.getString("ServiceInfo.Filesystem.NotRunning");
         }
         if (isFailed(testOnly)) {
             sb.append("</b> <b>Failed</b>");
@@ -5992,11 +5996,12 @@ public class ServiceInfo extends EditableInfo {
         String textOn;
         String textNotOn;
         if (getResourceAgent().isFilesystem()) {
-            textOn = "mounted on";
-            textNotOn = "not mounted";
+            textOn = Tools.getString("ServiceInfo.Filesystem.MoutedOn");
+            textNotOn = Tools.getString("ServiceInfo.Filesystem.NotMounted");
         } else {
-            textOn = "running on";
-            textNotOn = "not running";
+
+            textOn = Tools.getString("ServiceInfo.Filesystem.RunningOn");
+            textNotOn = Tools.getString("ServiceInfo.Filesystem.NotRunning");
         }
         if (getService().isOrphaned()) {
             texts.add(new Subtext("...",

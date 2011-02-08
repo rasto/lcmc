@@ -2230,6 +2230,30 @@ public class TextResource extends
          + "Set location according the connectivity. You have<br>"
          + "to set a ping/pingd resource, for this to work.</html>"},
 
+        {"ServiceInfo.Filesystem.RunningOn",
+         "running on"},
+
+        {"ServiceInfo.Filesystem.NotRunning",
+         "not running"},
+
+        {"ServiceInfo.Filesystem.MoutedOn",
+         "mounted on"},
+
+        {"ServiceInfo.Filesystem.NotMounted",
+         "not mounted"},
+
+        {"ServiceInfo.NotRunningAnywhere",
+         "it is not running anywhere"},
+
+        {"ServiceInfo.AlreadyRunningOnNode",
+         "already running on this node"},
+
+        {"ServiceInfo.AlreadyStarted",
+         "it is already started"},
+
+        {"ServiceInfo.AlreadyStopped",
+         "it is already stopped"},
+
         {"EmptyViewPanel.HelpText",
 "<h3>Welcome to the DRBD Management Console</h3>"
 + "by Rasto Levrinc."
