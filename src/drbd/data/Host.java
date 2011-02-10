@@ -1501,6 +1501,7 @@ public class Host implements Serializable {
             s.append(sshAgentPid);
             s.append(" SSH_AUTH_SOCK=");
             s.append(sshAgentSock);
+            s.append(' ');
         }
         for (int i = 1; i < hops; i++) {
             s.append("ssh -q -A -tt -o 'StrictHostKeyChecking no' "
