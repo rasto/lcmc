@@ -168,6 +168,8 @@ public class ConfigData implements Serializable {
     private boolean upgradeCheckEnabled = true;
     /** Whether the plugins are enabled. */
     private boolean pluginsEnabled = true;
+    /** Whether big drbd.conf and not drbd.d/ should be used. */
+    private boolean bigDRBDConf = false;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -768,5 +770,15 @@ public class ConfigData implements Serializable {
     /** Sets whether the plugins should be enabled. */
     public final void setPluginsEnabled(final boolean pluginsEnabled) {
         this.pluginsEnabled = pluginsEnabled;
+    }
+
+    /** Returns whether big drbd.conf and not drbd.d/ should be used. */
+    public final boolean getBigDRBDConf() {
+        return bigDRBDConf;
+    }
+
+    /** Sets whether big drbd.conf and not drbd.d/ should be used. */
+    public final void setBigDRBDConf(final boolean bigDRBDConf) {
+        this.bigDRBDConf = bigDRBDConf;
     }
 }

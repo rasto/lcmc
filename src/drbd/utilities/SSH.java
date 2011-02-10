@@ -1787,7 +1787,7 @@ public class SSH {
             backupString.append(";if ! diff ");
             backupString.append(remoteFilename);
             backupString.append("{,.bak}>/dev/null; then ");
-            backupString.append("cp ");
+            backupString.append("mv ");
             backupString.append(remoteFilename);
             backupString.append("{.bak,.`date +'%s'`};");
             backupString.append(" else ");

@@ -239,6 +239,7 @@ public final class DrbdMC extends JPanel {
         boolean realvnc = false;
         boolean vncportoffset = false;
         boolean opMode = false;
+        boolean bigDRBDConf = false;
         float fps = 20.0f;
         for (final String arg : args) {
             if (vncportoffset && Tools.isNumber(arg)) {
@@ -308,6 +309,9 @@ public final class DrbdMC extends JPanel {
                 System.out.println(
                    "--slow, specify this if you have slow computer. Can be"
                    + " specified more times");
+                System.out.println("--big-drbd-conf, create one big"
+                                 + " drbd.conf, instead of many files in\n"
+                                 + "                 drbd.d/ directory.");
                 System.out.print(
                           "--op-mode MODE, operating mode. MODE can be: ");
                 System.out.println("ro - read only");
@@ -339,6 +343,8 @@ public final class DrbdMC extends JPanel {
             } else if ("--fast".equals(arg)) {
                 /* undocumented */
                 fps = fps * 2;
+            } else if ("--big-drbd-conf".equals(arg)) {
+                bigDRBDConf = true;
             } else if ("--restore-mouse".equals(arg)) {
                 /* restore mouse if it is stuck in pressed state, during
                  * robot tests. */
@@ -361,6 +367,7 @@ public final class DrbdMC extends JPanel {
         Tools.getConfigData().setTightvnc(tightvnc);
         Tools.getConfigData().setUltravnc(ultravnc);
         Tools.getConfigData().setRealvnc(realvnc);
+        Tools.getConfigData().setBigDRBDConf(bigDRBDConf);
         return autoArgs;
     }
 
