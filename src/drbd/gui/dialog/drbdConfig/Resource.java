@@ -23,6 +23,7 @@
 package drbd.gui.dialog.drbdConfig;
 
 import drbd.utilities.Tools;
+import drbd.gui.resources.DrbdInfo;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.dialog.WizardDialog;
 
@@ -32,6 +33,8 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.awt.Component;
 import java.awt.Dimension;
 
@@ -46,14 +49,32 @@ import java.awt.Dimension;
 public class Resource extends DrbdConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Wfc timeout option string. */
+    private static final String WFC_TIMEOUT_PARAM = "wfc-timeout";
+    /** Degr wfc timeout option string. */
+    private static final String DEGR_WFC_TIMEOUT_PARAM = "degr-wfc-timeout";
+
+    /** cram-hmac-alg option string. */
+    private static final String CRAM_HMAC_ALG = "cram-hmac-alg";
+    /** shared-secret option string. */
+    private static final String SHARED_SECRET = "shared-secret";
+    /** on-io-error option string. */
+    private static final String ON_IO_ERROR = "on-io-error";
+    /** Common configuration options. */
+    private static final String[] COMMON_PARAMS = {CRAM_HMAC_ALG,
+                                                   SHARED_SECRET,
+                                                   WFC_TIMEOUT_PARAM,
+                                                   DEGR_WFC_TIMEOUT_PARAM,
+                                                   ON_IO_ERROR};
     /** Configuration options of the drbd resource. */
     private static final String[] PARAMS = {"name",
                                             "device",
                                             "protocol",
-                                            "cram-hmac-alg",
-                                            "shared-secret",
-                                            "degr-wfc-timeout",
-                                            "on-io-error"};
+                                            CRAM_HMAC_ALG,
+                                            SHARED_SECRET,
+                                            WFC_TIMEOUT_PARAM,
+                                            DEGR_WFC_TIMEOUT_PARAM,
+                                            ON_IO_ERROR};
     /** Length of the secret string. */
     private static final int SECRET_STRING_LENGTH = 32;
 
@@ -76,11 +97,17 @@ public class Resource extends DrbdConfig {
      * Applies the changes and returns next dialog (BlockDev).
      */
     public final WizardDialog nextDialog() {
+        final DrbdResourceInfo dri = getDrbdResourceInfo();
+        final DrbdInfo drbdInfo = dri.getDrbdInfo();
+        if (drbdInfo.getDrbdResources().size() <= 1) {
+            for (final String commonP : COMMON_PARAMS) {
+                final String value = dri.getComboBoxValue(commonP);
+                drbdInfo.getResource().setValue(commonP, value);
+            }
+        }
         Tools.waitForSwing();
-        getDrbdResourceInfo().apply(false);
-        return new BlockDev(this,
-                            getDrbdResourceInfo(),
-                            getDrbdResourceInfo().getFirstBlockDevInfo());
+        drbdInfo.apply(false);
+        return new BlockDev(this, dri, dri.getFirstBlockDevInfo());
     }
 
     /**
@@ -119,7 +146,9 @@ public class Resource extends DrbdConfig {
      * Returns input pane where user can configure a drbd resource.
      */
     protected final JComponent getInputPane() {
-        getDrbdResourceInfo().waitForInfoPanel();
+        final DrbdResourceInfo dri = getDrbdResourceInfo();
+        final DrbdInfo drbdInfo = dri.getDrbdInfo();
+        dri.waitForInfoPanel();
         Tools.waitForSwing();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
@@ -127,14 +156,50 @@ public class Resource extends DrbdConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        /* common options */
+        final Map<String, String> commonPreferredValue =
+                                                new HashMap<String, String>();
+        commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, "0");
+        commonPreferredValue.put(CRAM_HMAC_ALG, "sha1");
+        commonPreferredValue.put(SHARED_SECRET, getRandomSecret());
+        commonPreferredValue.put(ON_IO_ERROR, "detach");
+        if (drbdInfo.getDrbdResources().size() <= 1) {
+            for (final String commonP : COMMON_PARAMS) {
+                /* for the first resource set common options. */
+                final String commonValue =
+                                      drbdInfo.getResource().getValue(commonP);
+                if (commonPreferredValue.containsKey(commonP)) {
+                    final String defaultValue =
+                               drbdInfo.getParamDefault(commonP);
+                    if ((defaultValue == null && "".equals(commonValue))
+                        || (defaultValue != null
+                            && defaultValue.equals(commonValue))) {
+                        drbdInfo.paramComboBoxGet(commonP, null).setValue(
+                                            commonPreferredValue.get(commonP));
+                        dri.getResource().setValue(
+                                            commonP,
+                                            commonPreferredValue.get(commonP));
+                    } else {
+                        dri.getResource().setValue(commonP, commonValue);
+                    }
+                }
+            }
+        } else {
+            /* resource options, if not defined in common section. */
+            for (final String commonP : COMMON_PARAMS) {
+                final String commonValue =
+                                      drbdInfo.getResource().getValue(commonP);
+                if ("".equals(commonValue)
+                    && commonPreferredValue.containsKey(commonP)) {
+                    dri.getResource().setValue(
+                                            commonP,
+                                            commonPreferredValue.get(commonP));
+                }
+            }
+        }
 
-        getDrbdResourceInfo().getResource().setValue("cram-hmac-alg", "sha1");
-        getDrbdResourceInfo().getResource().setValue("shared-secret",
-                                                     getRandomSecret());
-        getDrbdResourceInfo().getResource().setValue("on-io-error", "detach");
-        getDrbdResourceInfo().getResource().setValue("degr-wfc-timeout", "0");
 
-        getDrbdResourceInfo().addWizardParams(
+        dri.addWizardParams(
                   optionsPanel,
                   PARAMS,
                   buttonClass(nextButton()),
@@ -143,10 +208,8 @@ public class Resource extends DrbdConfig {
                   null);
 
         inputPane.add(optionsPanel);
-        final boolean ch = 
-               getDrbdResourceInfo().checkResourceFieldsChanged(null, PARAMS);
-        final boolean cor = 
-               getDrbdResourceInfo().checkResourceFieldsCorrect(null, PARAMS);
+        final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
+        final boolean cor = dri.checkResourceFieldsCorrect(null, PARAMS);
         buttonClass(nextButton()).setEnabled(ch && cor);
         final JScrollPane sp = new JScrollPane(inputPane);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));

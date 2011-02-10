@@ -11,6 +11,7 @@ global {
 
 common {
 	startup {
+		wfc-timeout	3;
 		degr-wfc-timeout	0;
 	}
 
@@ -27,7 +28,15 @@ common {
 --- global_common.conf ---
 --- r0.res ---
 resource r0 {
-	protocol	C;
+	protocol	B;
+
+	handlers {
+		fence-peer	"/usr/lib/heartbeat/drbd-peer-outdater -t 5";
+	}
+
+	startup {
+		wfc-timeout	9;
+	}
 
 	on host1 {
 		device	/dev/drbd0;
@@ -44,3 +53,22 @@ resource r0 {
 	}
 }
 --- r0.res ---
+--- r1.res ---
+resource r1 {
+	protocol	C;
+
+	on host1 {
+		device	/dev/drbd1;
+		disk	DISK;
+		address	IP:7789;
+		flexible-meta-disk	internal;
+	}
+
+	on host2 {
+		device	/dev/drbd1;
+		disk	DISK;
+		address	IP:7789;
+		flexible-meta-disk	internal;
+	}
+}
+--- r1.res ---

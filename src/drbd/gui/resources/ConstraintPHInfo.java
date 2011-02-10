@@ -240,7 +240,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     /**
      * Returns default for this parameter.
      */
-    protected final String getParamDefault(final String param) {
+    public final String getParamDefault(final String param) {
         return "default";
     }
 

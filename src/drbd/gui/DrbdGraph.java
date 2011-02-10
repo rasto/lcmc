@@ -826,6 +826,9 @@ public class DrbdGraph extends ResourceGraph {
     protected final boolean showEdgeArrow(final Edge edge) {
         final BlockDevInfo sourceBDI = (BlockDevInfo) getInfo(edge.getSource());
         final BlockDevInfo destBDI = (BlockDevInfo) getInfo(edge.getDest());
+        if (sourceBDI == null || destBDI == null) {
+            return false;
+        }
         final BlockDevice sourceBD = sourceBDI.getBlockDevice();
         final BlockDevice destBD = destBDI.getBlockDevice();
         final boolean tOnly = isTestOnly();

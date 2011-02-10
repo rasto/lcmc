@@ -44,3 +44,22 @@ resource r0 {
 	}
 }
 --- r0.res ---
+--- r1.res ---
+resource r1 {
+	protocol	C;
+
+	on host1 {
+		device	/dev/drbd1;
+		disk	DISK;
+		address	IP:7789;
+		flexible-meta-disk	internal;
+	}
+
+	on host2 {
+		device	/dev/drbd1;
+		disk	DISK;
+		address	IP:7789;
+		flexible-meta-disk	internal;
+	}
+}
+--- r1.res ---

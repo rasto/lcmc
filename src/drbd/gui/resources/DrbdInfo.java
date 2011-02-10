@@ -30,7 +30,6 @@ import drbd.data.Host;
 import drbd.data.DrbdXML;
 import drbd.data.resources.Resource;
 import drbd.data.DRBDtestData;
-import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
@@ -40,18 +39,16 @@ import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Iterator;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -59,22 +56,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
-import drbd.utilities.MyButton;
 
 /**
  * This class provides drbd info. For one it shows the editable global
  * drbd config, but if a drbd block device is selected it forwards to the
  * block device info, which is defined in HostBrowser.java.
  */
-public class DrbdInfo extends EditableInfo {
+public class DrbdInfo extends DrbdGuiInfo {
     /** Selected block device. */
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
 
-    /**
-     * Prepares a new <code>DrbdInfo</code> object.
-     */
+    /** Prepares a new <code>DrbdInfo</code> object. */
     public DrbdInfo(final String name, final Browser browser) {
         super(name, browser);
         setResource(new Resource(name));
@@ -85,14 +79,22 @@ public class DrbdInfo extends EditableInfo {
     public final void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         for (final String param : getParametersFromXML()) {
+            final String section = dxml.getSection(param);
             String value;
-            value = dxml.getGlobalConfigValue(param);
             final String defaultValue = getParamDefault(param);
-            if (value == null) {
-                value = defaultValue;
-            }
-            if (value == null) {
-                value = "";
+            if (DrbdXML.GLOBAL_SECTION.equals(section)) {
+                value = dxml.getGlobalConfigValue(param);
+                if (value == null) {
+                    value = defaultValue;
+                }
+                if (value == null) {
+                    value = "";
+                }
+            } else {
+                value = dxml.getCommonConfigValue(section, param);
+                if ("".equals(value)) {
+                    value = defaultValue;
+                }
             }
             if ("".equals(value) && "usage-count".equals(param)) {
                 value = "yes"; /* we don't get this parameter from
@@ -109,23 +111,7 @@ public class DrbdInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
-        return (ClusterBrowser) super.getBrowser();
-    }
-
-    /**
-     * Returns menu drbd icon.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return null;
-    }
-
-    /**
-     * Sets selected block device.
-     */
+    /** Sets selected block device. */
     public final void setSelectedNode(final BlockDevInfo bdi) {
         this.selectedBD = bdi;
     }
@@ -134,9 +120,9 @@ public class DrbdInfo extends EditableInfo {
      * Gets combo box for paremeter in te global config. usage-count is
      * disabled.
      */
-    protected final GuiComboBox getParamComboBox(final String param,
-                                                 final String prefix,
-                                                 final int width) {
+    @Override protected final GuiComboBox getParamComboBox(final String param,
+                                                           final String prefix,
+                                                           final int width) {
         final GuiComboBox cb = super.getParamComboBox(param, prefix, width);
         if ("usage-count".equals(param)) {
             cb.setEnabled(false);
@@ -144,9 +130,7 @@ public class DrbdInfo extends EditableInfo {
         return cb;
     }
 
-    /**
-     * Creates drbd config.
-     */
+    /** Creates drbd config. */
     public final void createDrbdConfig(final boolean testOnly)
                throws Exceptions.DrbdConfigException {
         final StringBuffer globalConfig = new StringBuffer(160);
@@ -154,7 +138,8 @@ public class DrbdInfo extends EditableInfo {
 
         final StringBuffer global = new StringBuffer(80);
         final DrbdXML dxml = getBrowser().getDrbdXML();
-        final String[] params = dxml.getGlobalParams();
+        /* global options */
+        final String[] params = dxml.getSectionParams(DrbdXML.GLOBAL_SECTION);
         global.append("global {\n");
         for (String param : params) {
             String value = getComboBoxValue(param);
@@ -185,6 +170,15 @@ public class DrbdInfo extends EditableInfo {
         if (global.length() > 0) {
             globalConfig.append(global);
         }
+
+        /* common section */
+        final String common = drbdSectionsConfig();
+        String commonSectionConfig = "";
+        if (!"".equals(common)) {
+            commonSectionConfig = "\ncommon {\n" + common + "}";
+        }
+
+        /* resources */
         final Host[] hosts = getBrowser().getCluster().getHostsArray();
         for (Host host : hosts) {
             final Map<String, String> resConfigs =
@@ -224,8 +218,10 @@ public class DrbdInfo extends EditableInfo {
                 }
             }
             if (bigDRBDConf) {
+                /* one big drbd.conf */
                 host.getSSH().createConfig(globalConfig.toString()
-                                           + "\n"
+                                           + commonSectionConfig
+                                           + "\n\n"
                                            + Tools.join("\n",
                                                         resConfigs.values()),
                                            configName,
@@ -236,7 +232,8 @@ public class DrbdInfo extends EditableInfo {
                                            null);
             } else {
                 /* global */
-                host.getSSH().createConfig(globalConfig.toString(),
+                host.getSSH().createConfig(globalConfig.toString()
+                                           + commonSectionConfig,
                                            "global_common.conf",
                                            dir + "drbd.d.temp/",
                                            "0600",
@@ -289,10 +286,8 @@ public class DrbdInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Returns lsit of all parameters as an array.
-     */
-    public final String[] getParametersFromXML() {
+    /** Returns lsit of all parameters as an array. */
+    @Override public final String[] getParametersFromXML() {
         final DrbdXML drbdXML = getBrowser().getDrbdXML();
         if (drbdXML == null) {
             return null;
@@ -301,164 +296,30 @@ public class DrbdInfo extends EditableInfo {
     }
 
     /**
-     * Checks parameter's new value if it is correct.
-     */
-    protected final boolean checkParam(final String param,
-                                       final String newValue) {
-        return getBrowser().getDrbdXML().checkParam(param, newValue);
-    }
-
-    /**
-     * Returns default value of the parameter.
-     */
-    protected final String getParamDefault(final String param) {
-        return getBrowser().getDrbdXML().getParamDefault(param);
-    }
-
-    /** Returns the regexp of the parameter. */
-    protected String getParamRegexp(final String param) {
-        return null;
-    }
-
-    /**
-     * Returns the preferred value of the parameter.
-     */
-    protected final String getParamPreferred(final String param) {
-        return getBrowser().getDrbdXML().getParamPreferred(param);
-    }
-
-    /**
-     * Possible choices for pulldown menus, or null if it is not a pull
-     * down menu.
-     */
-    protected final Object[] getParamPossibleChoices(final String param) {
-        return getBrowser().getDrbdXML().getPossibleChoices(param);
-    }
-
-    /**
-     * Returns paramter short description, for user visible text.
-     */
-    protected final String getParamShortDesc(final String param) {
-        return getBrowser().getDrbdXML().getParamShortDesc(param);
-    }
-
-    /**
-     * Returns parameter long description, for tool tips.
-     */
-    protected final String getParamLongDesc(final String param) {
-        return getBrowser().getDrbdXML().getParamLongDesc(param);
-    }
-
-    /**
      * Returns section to which this parameter belongs.
      * This is used for grouping in the info panel.
      */
-    protected final String getSection(final String param) {
-        return getBrowser().getDrbdXML().getSection(param);
-    }
-
-    /**
-     * Returns whether the parameter is required.
-     */
-    protected final boolean isRequired(final String param) {
-        return getBrowser().getDrbdXML().isRequired(param);
-    }
-
-    /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
-        if (!Tools.areEqual(getParamDefault(param),
-                            getParamSaved(param))) {
-            /* it changed, show it */
-            return false;
+    @Override protected final String getSection(final String param) {
+        final String section = getBrowser().getDrbdXML().getSection(param);
+        if (DrbdXML.GLOBAL_SECTION.equals(section)) {
+            return section;
+        } else {
+            return Tools.getString("DrbdInfo.CommonSection") + section;
         }
-        return getBrowser().getDrbdXML().isAdvanced(param);
     }
 
-    /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
-        return getBrowser().getDrbdXML().getAccessType(param);
-    }
-
-    /** Whether the parameter should be enabled. */
-    protected final boolean isEnabled(final String param) {
-        return true;
-    }
-
-    /** Returns whether the parameter is of the integer type. */
-    protected final boolean isInteger(final String param) {
-        return getBrowser().getDrbdXML().isInteger(param);
-    }
-
-    /** Returns whether the parameter is of the label type. */
-    protected final boolean isLabel(final String param) {
-        return getBrowser().getDrbdXML().isLabel(param);
-    }
-
-    /**
-     * Returns whether the parameter is of the time type.
-     */
-    protected final boolean isTimeType(final String param) {
-        /* not required */
-        return false;
-    }
-
-    /**
-     * Returns true if unit has prefix.
-     */
-    protected final boolean hasUnitPrefix(final String param) {
-        return getBrowser().getDrbdXML().hasUnitPrefix(param);
-    }
-
-    /**
-     * Returns long name of the unit, for user visible uses.
-     */
-    protected final String getUnitLong(final String param) {
-        return getBrowser().getDrbdXML().getUnitLong(param);
-    }
-
-    /**
-     * Returns the default unit of the parameter.
-     */
-    protected final String getDefaultUnit(final String param) {
-        return getBrowser().getDrbdXML().getDefaultUnit(param);
-    }
-
-    /**
-     * Returns whether the parameter is check box.
-     */
-    protected final boolean isCheckBox(final String param) {
-        final String type = getBrowser().getDrbdXML().getParamType(param);
-        if (type == null) {
-            return false;
-        }
-        if (ClusterBrowser.DRBD_RES_BOOL_TYPE_NAME.equals(type)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns parameter type, boolean etc.
-     */
-    protected final String getParamType(final String param) {
-        return getBrowser().getDrbdXML().getParamType(param);
-    }
-
-    /**
-     * Applies changes made in the info panel by user.
-     */
+    /** Applies changes made in the info panel by user. */
     public final void apply(final boolean testOnly) {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                 }
             });
             storeComboBoxValues(params);
-            //checkResourceFieldsChanged(null, params);
             setAllApplyButtons();
         }
     }
@@ -467,7 +328,7 @@ public class DrbdInfo extends EditableInfo {
      * Returns info panel for drbd. If a block device was selected, its
      * info panel is shown.
      */
-    public final JComponent getInfoPanel() {
+    @Override public final JComponent getInfoPanel() {
         if (selectedBD != null) { /* block device is not in drbd */
             return selectedBD.getInfoPanel();
         }
@@ -482,10 +343,8 @@ public class DrbdInfo extends EditableInfo {
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
 
-            /**
-             * Whether the whole thing should be enabled.
-             */
-            public final boolean isEnabled() {
+            /** Whether the whole thing should be enabled. */
+            @Override public final boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
                 if (dcHost == null) {
                     return false;
@@ -500,7 +359,7 @@ public class DrbdInfo extends EditableInfo {
                 return true;
             }
 
-            public final void mouseOut() {
+            @Override public final void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -509,7 +368,7 @@ public class DrbdInfo extends EditableInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            public final void mouseOver() {
+            @Override public final void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -528,7 +387,6 @@ public class DrbdInfo extends EditableInfo {
                                                                startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
-                apply(true);
                 final Map<Host,String> testOutput =
                                          new LinkedHashMap<Host, String>();
                 try {
@@ -582,11 +440,16 @@ public class DrbdInfo extends EditableInfo {
 
         getApplyButton().addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
+                            Tools.invokeAndWait(new Runnable() {
+                                @Override public void run() {
+                                    getApplyButton().setEnabled(false);
+                                    getRevertButton().setEnabled(false);
+                                }
+                            });
                             getBrowser().clStatusLock();
-                            apply(false);
                             try {
                                 createDrbdConfig(false);
                                 for (final Host h
@@ -598,6 +461,7 @@ public class DrbdInfo extends EditableInfo {
                                 getBrowser().clStatusUnlock();
                                 Tools.appError("config failed");
                             }
+                            apply(false);
                             getBrowser().clStatusUnlock();
                         }
                     });
@@ -607,9 +471,9 @@ public class DrbdInfo extends EditableInfo {
         );
         getRevertButton().addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             getBrowser().clStatusLock();
                             revert();
                             getBrowser().clStatusUnlock();
@@ -623,11 +487,6 @@ public class DrbdInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        //SwingUtilities.invokeLater(new Runnable() {
-        //    public void run() {
-        //        setApplyButtons(null, params);
-        //    }
-        //});
 
         mainPanel.add(optionsPanel);
 
@@ -647,14 +506,12 @@ public class DrbdInfo extends EditableInfo {
      * Clears info panel cache.
      * TODO: should select something.
      */
-    public final boolean selectAutomaticallyInTreeMenu() {
+    @Override public final boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
-    /**
-     * Returns drbd graph in a panel.
-     */
-    public final JPanel getGraphicalView() {
+    /** Returns drbd graph in a panel. */
+    @Override public final JPanel getGraphicalView() {
         if (selectedBD != null) {
             getBrowser().getDrbdGraph().pickBlockDevice(selectedBD);
         }
@@ -666,7 +523,7 @@ public class DrbdInfo extends EditableInfo {
      * because block devices don't have here their own node, but
      * views change depending on selectedNode variable.
      */
-    public final void selectMyself() {
+    @Override public final void selectMyself() {
         if (selectedBD == null || !selectedBD.getBlockDevice().isDrbd()) {
             getBrowser().reload(getNode(), true);
             getBrowser().nodeChanged(getNode());
@@ -676,9 +533,7 @@ public class DrbdInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Returns new drbd resource index, the one that is not used .
-     */
+    /** Returns new drbd resource index, the one that is not used . */
     private int getNewDrbdResourceIndex() {
         final Iterator<String> it =
                          getBrowser().getDrbdResHash().keySet().iterator();
@@ -800,7 +655,6 @@ public class DrbdInfo extends EditableInfo {
             bd1.cleanup();
             bd1.setInfoPanel(null); /* reload panel */
             bd1.getInfoPanel();
-            //bd1.selectMyself();
         }
         if (bd2 != null) {
             bd2.setDrbd(true);
@@ -808,7 +662,6 @@ public class DrbdInfo extends EditableInfo {
             bd2.cleanup();
             bd2.setInfoPanel(null); /* reload panel */
             bd2.getInfoPanel();
-            //bd2.selectMyself();
         }
 
         final DefaultMutableTreeNode drbdResourceNode =
@@ -837,8 +690,7 @@ public class DrbdInfo extends EditableInfo {
                 bd2.getBlockDevice().setNew(true);
             }
             final Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    //reload(getNode());
+                @Override public void run() {
                     getBrowser().reload(drbdResourceNode, true);
                     AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(driF);
                     adrd.showDialogs();
@@ -878,20 +730,15 @@ public class DrbdInfo extends EditableInfo {
         return true;
     }
 
-    /** Whether the parameter should be enabled only in advanced mode. */
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return false;
-    }
-
     /**
      * Returns whether the specified parameter or any of the parameters
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    public boolean checkResourceFieldsChanged(final String param,
+    @Override public boolean checkResourceFieldsChanged(final String param,
                                               final String[] params) {
         boolean changed = false;
-        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+        for (final DrbdResourceInfo dri : getDrbdResources()) {
             if (dri.checkResourceFieldsChanged(param,
                                                dri.getParametersFromXML(),
                                                true)) {
@@ -911,7 +758,7 @@ public class DrbdInfo extends EditableInfo {
                                               final String[] params,
                                               final boolean fromDrbdInfo) {
         boolean correct = true;
-        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+        for (final DrbdResourceInfo dri : getDrbdResources()) {
             if (!dri.checkResourceFieldsCorrect(param,
                                                 dri.getParametersFromXML(),
                                                 true)) {
@@ -922,18 +769,33 @@ public class DrbdInfo extends EditableInfo {
     }
 
     /** Revert all values. */
-    public final void revert() {
+    @Override public final void revert() {
         super.revert();
-        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+        for (final DrbdResourceInfo dri : getDrbdResources()) {
             dri.revert();
         }
     }
 
     /** Set all apply buttons. */
     public final void setAllApplyButtons() {
-        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+        for (final DrbdResourceInfo dri : getDrbdResources()) {
             dri.storeComboBoxValues(dri.getParametersFromXML());
             dri.setAllApplyButtons();
         }
+    }
+
+    /** Returns all drbd resources in this cluster. */
+    public final Set<DrbdResourceInfo> getDrbdResources() {
+        final Set<DrbdResourceInfo> resources =
+                                        new LinkedHashSet<DrbdResourceInfo>();
+        final Host[] hosts = getBrowser().getCluster().getHostsArray();
+        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+            for (final Host host : hosts) {
+                if (dri.resourceInHost(host)) {
+                    resources.add(dri);
+                }
+            }
+        }
+        return resources;
     }
 }

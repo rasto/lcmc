@@ -99,8 +99,9 @@ public class DrbdXML extends XML {
     private final Map<String, List<Object>> paramItemsMap =
                                     new LinkedHashMap<String, List<Object>>();
     /** List of all parameters. */
-    private final List<String> parametersList =
-                                                new ArrayList<String>();
+    private final List<String> parametersList = new ArrayList<String>();
+    /** List of all gloval parameters. */
+    private final List<String> globalParametersList = new ArrayList<String>();
     /** List of all required parameters. */
     private final List<String> requiredParametersList =
                                                     new ArrayList<String>();
@@ -136,6 +137,8 @@ public class DrbdXML extends XML {
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
+    /** Global section. */
+    public static final String GLOBAL_SECTION = "global";
     /** DRBD protocol C, that is a default. */
     private static final String PROTOCOL_C = "C / Synchronous";
     /** DRBD communication protocols. */
@@ -158,6 +161,7 @@ public class DrbdXML extends XML {
         NOT_ADVANCED_PARAMS.add("rate");
         NOT_ADVANCED_PARAMS.add("fence-peer");
         NOT_ADVANCED_PARAMS.add("wfc-timeout");
+        NOT_ADVANCED_PARAMS.add("degr-wfc-timeout");
         NOT_ADVANCED_PARAMS.add("become-primary-on");
         NOT_ADVANCED_PARAMS.add("timeout");
         NOT_ADVANCED_PARAMS.add("allow-two-primaries");
@@ -542,11 +546,8 @@ public class DrbdXML extends XML {
      * Returns parameters for the global section.
      */
     public final String[] getGlobalParams() {
-        final List<String> params = sectionParamsMap.get("global");
-        if (params == null) {
-            return new String[0];
-        }
-        return params.toArray(new String[params.size()]);
+        return globalParametersList.toArray(
+                                     new String[globalParametersList.size()]);
     }
 
     /**
@@ -721,9 +722,14 @@ public class DrbdXML extends XML {
                     }
                 }
                 paramTypeMap.put(name, type);
-                if (!"global".equals(section)
+                if (!GLOBAL_SECTION.equals(section)
                     && !parametersList.contains(name)) {
                     parametersList.add(name);
+                }
+                if (!"resource".equals(section)
+                    && !globalParametersList.contains(name)
+                    && !("syncer".equals(section) && "after".equals(name))) {
+                    globalParametersList.add(name);
                 }
 
                 paramSectionMap.put(name, section);
@@ -969,10 +975,10 @@ public class DrbdXML extends XML {
         configFile = getAttribute(configNode, "file");
 
         final NodeList resources = configNode.getChildNodes();
-        Map<String, String> globalNameValueMap = optionsMap.get("global");
+        Map<String, String> globalNameValueMap = optionsMap.get(GLOBAL_SECTION);
         if (globalNameValueMap == null) {
             globalNameValueMap = new HashMap<String, String>();
-            optionsMap.put("global", globalNameValueMap);
+            optionsMap.put(GLOBAL_SECTION, globalNameValueMap);
         }
         globalNameValueMap.put("usage-count", "yes");
         globalNameValueMap.put("disable-ip-verification",
@@ -981,7 +987,7 @@ public class DrbdXML extends XML {
         for (int i = 0; i < resources.getLength(); i++) {
             final Node resourceNode = resources.item(i);
             /* <global> */
-            if (resourceNode.getNodeName().equals("global")) {
+            if (resourceNode.getNodeName().equals(GLOBAL_SECTION)) {
                 parseConfigGlobalNode(resourceNode, globalNameValueMap);
             }
             /* <common> */
@@ -1003,7 +1009,7 @@ public class DrbdXML extends XML {
      * Returns value from drbd global config identified by option name.
      */
     public final String getGlobalConfigValue(final String optionName) {
-        final Map<String, String> option = optionsMap.get("global");
+        final Map<String, String> option = optionsMap.get(GLOBAL_SECTION);
         String value = null;
         if (option != null) {
             value = option.get(optionName);
@@ -1033,6 +1039,23 @@ public class DrbdXML extends XML {
             if (option != null) {
                 value = option.get(optionName);
             }
+        }
+
+        if (value == null) {
+            return "";
+        }
+        return value;
+    }
+
+    /** Returns config value from the common section. */
+    public final String getCommonConfigValue(final String section,
+                                             final String optionName) {
+
+        String value = null;
+        final Map<String, String> option =
+                                optionsMap.get("Section.Common." + section);
+        if (option != null) {
+            value = option.get(optionName);
         }
 
         if (value == null) {

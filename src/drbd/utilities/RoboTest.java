@@ -487,6 +487,19 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
+                    } else if ("4".equals(index)) {
+                        /* DRBD old style config */
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startDRBDTest4(robot, host);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
                     }
                 } else if ("VMs".equals(selected)) {
                     if ("1".equals(index)) {
@@ -2461,6 +2474,7 @@ public final class RoboTest {
 
     /** DRBD Test 3. */
     private static void startDRBDTest3(final Robot robot, final Host host) {
+        /* works only with --big-drbd-conf option */
         slowFactor = 0.2f;
         host.getSSH().installTestFiles();
         aborted = false;
@@ -2504,14 +2518,176 @@ public final class RoboTest {
         leftClick(robot); /* finish */
         sleep(10000);
 
-        checkDRBDTest(host, "drbd-test1", 1);
+        checkDRBDTest(host, "drbd-test3", 1);
 
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot); /* finish */
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, "drbd-test1", 2);
+        checkDRBDTest(host, "drbd-test3", 2);
+    }
+
+    /** DRBD Test 4. */
+    private static void startDRBDTest4(final Robot robot, final Host host) {
+        /* Two drbds. */
+        slowFactor = 0.2f;
+        host.getSSH().installTestFiles();
+        aborted = false;
+        int offset = 0;
+        for (int i = 0; i < 2; i++) {
+            moveTo(robot, 334, 315 + offset); /* add drbd resource */
+            rightClick(robot);
+            moveTo(robot, 342, 321 + offset);
+            moveTo(robot, 667, 322 + offset);
+            leftClick(robot);
+            sleep(20000);
+
+
+            moveTo(robot, 720, 580);
+            leftClick(robot); /* next */
+            sleep(20000);
+
+            moveTo(robot, 751, 412); /* interface */
+            leftClick(robot);
+            moveTo(robot, 716, 451);
+            leftClick(robot);
+            sleep(1000);
+
+            moveTo(robot, 720, 580);
+            leftClick(robot); /* next */
+            sleep(20000);
+
+            moveTo(robot, 751, 412); /* interface again */
+            leftClick(robot);
+            moveTo(robot, 716, 451);
+            leftClick(robot);
+            sleep(1000);
+
+            moveTo(robot, 720, 580);
+            leftClick(robot); /* next */
+            sleep(20000);
+
+            moveTo(robot, 720, 580); /* meta-data */
+            leftClick(robot); /* next */
+            sleep(20000);
+            moveTo(robot, 820, 580); /* fs */
+            leftClick(robot); /* finish */
+            sleep(10000);
+            if (offset == 0) {
+                checkDRBDTest(host, "drbd-test4", 1);
+            }
+            offset += 40;
+        }
+        checkDRBDTest(host, "drbd-test4", 2);
+
+        moveTo(robot, 480, 250); /* select r0 */
+        leftClick(robot);
+        moveTo(robot, 1073, 317); /* select protocol */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 1070, 350); /* protocol b */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 1075, 372); /* select fence peer */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 1075, 410); /* select dopd */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 970, 420); /* wfc timeout */
+        leftClick(robot);
+        press(robot, KeyEvent.VK_9);
+        sleep(2000);
+
+        moveTo(robot, 814, 189);
+        sleep(6000); /* test */
+        leftClick(robot); /* apply */
+        checkDRBDTest(host, "drbd-test4", 2.1); /* 2.1 */
+
+
+        /* common */
+        moveTo(robot, 500, 390); /* select background */
+        leftClick(robot);
+
+        moveTo(robot, 970, 380); /* wfc timeout */
+        leftClick(robot);
+        press(robot, KeyEvent.VK_3);
+        sleep(2000);
+        moveTo(robot, 814, 189);
+        sleep(6000); /* test */
+        leftClick(robot); /* apply */
+        checkDRBDTest(host, "drbd-test4", 2.11); /* 2.11 */
+        moveTo(robot, 970, 380); /* wfc timeout */
+        sleep(6000);
+        leftClick(robot);
+        press(robot, KeyEvent.VK_BACK_SPACE);
+        press(robot, KeyEvent.VK_0);
+        sleep(2000);
+        moveTo(robot, 814, 189);
+        sleep(6000); /* test */
+        leftClick(robot); /* apply */
+
+        /* resource */
+        moveTo(robot, 480, 250); /* select r0 */
+        leftClick(robot);
+
+        moveTo(robot, 1073, 317); /* select protocol */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 1070, 372); /* protocol c */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 1075, 372); /* select fence peer */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 1075, 390); /* deselect dopd */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 970, 420); /* wfc timeout */
+        leftClick(robot);
+        press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(2000);
+        press(robot, KeyEvent.VK_5);
+        sleep(2000);
+
+        moveTo(robot, 814, 189);
+        sleep(6000); /* test */
+        leftClick(robot); /* apply */
+        checkDRBDTest(host, "drbd-test4", 2.2); /* 2.2 */
+
+        moveTo(robot, 970, 420); /* wfc timeout */
+        leftClick(robot);
+        press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(2000);
+        press(robot, KeyEvent.VK_0);
+        sleep(2000);
+
+        moveTo(robot, 814, 189);
+        sleep(6000); /* test */
+        leftClick(robot); /* apply */
+        checkDRBDTest(host, "drbd-test4", 2.3); /* 2.3 */
+
+        moveTo(robot, 480, 250); /* rsc popup */
+        rightClick(robot); 
+        moveTo(robot, 555, 340); /* remove */
+        leftClick(robot);
+        confirmRemove(robot);
+        checkDRBDTest(host, "drbd-test4", 3);
+        moveTo(robot, 480, 250); /* rsc popup */
+        rightClick(robot); 
+        moveTo(robot, 555, 340); /* remove */
+        leftClick(robot);
+        confirmRemove(robot);
+        checkDRBDTest(host, "drbd-test4", 4);
     }
 
     /** VM Test 1. */

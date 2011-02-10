@@ -2170,7 +2170,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns default value for specified parameter. */
-    protected String getParamDefault(final String param) {
+    public String getParamDefault(final String param) {
         if (isMetaAttr(param)) {
             final String paramDefault = getBrowser().getRscDefaultsInfo()
                                                  .getResource().getValue(param);

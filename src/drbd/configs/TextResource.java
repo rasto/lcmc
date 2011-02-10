@@ -2281,5 +2281,7 @@ public class TextResource extends
 + "<p>Thanks.</p>"
         },
 
+        {"DrbdInfo.CommonSection",
+         "common "},
     };
 }

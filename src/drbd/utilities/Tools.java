@@ -1219,10 +1219,10 @@ public final class Tools {
      */
     public static String join(final String delim, final String[] strings) {
         if (strings == null || strings.length == 0) {
-            return null;
+            return "";
         }
         if (strings.length == 1 && strings[0] == null) {
-            return null;
+            return "";
         }
         final StringBuffer ret = new StringBuffer("");
         for (int i = 0; i < strings.length - 1; i++) {
