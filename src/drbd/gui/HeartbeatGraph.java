@@ -59,6 +59,7 @@ import javax.swing.JMenu;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import edu.uci.ics.jung.visualization.Layer;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
@@ -231,7 +232,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final Vertex v = getVertex(si);
         if (v != null) {
             lockGraph();
-            for (final Vertex pV :getGraph().getPredecessors(v)) {
+            for (final Vertex pV : getGraph().getPredecessors(v)) {
                 final ServiceInfo psi = (ServiceInfo) getInfo(pV);
                 parents.add(psi);
             }
@@ -246,7 +247,7 @@ public class HeartbeatGraph extends ResourceGraph {
         final Vertex v = getVertex(si);
         if (v != null) {
             lockGraph();
-            for (final Vertex pV :getGraph().getSuccessors(v)) {
+            for (final Vertex pV : getGraph().getSuccessors(v)) {
                 final ServiceInfo psi = (ServiceInfo) getInfo(pV);
                 children.add(psi);
             }
@@ -300,6 +301,10 @@ public class HeartbeatGraph extends ResourceGraph {
      * Returns id that is used for saving of the vertex positions to a file.
      */
     protected final String getId(final Info i) {
+        final String id = i.getId();
+        if (id == null) {
+            return null;
+        }
         return "hb=" + i.getId();
     }
 
@@ -333,19 +338,22 @@ public class HeartbeatGraph extends ResourceGraph {
             if (pos == null) {
                 final Point2D newPos = getSavedPosition(serviceInfo);
                 if (newPos == null) {
-                    final Point2D.Float max = getFilledGraphSize();
+                    final Point2D max = getLastPosition();
                     final float maxYPos = (float) max.getY();
-                    getVertexLocations().put(
-                                            v,
-                                            new Point2D.Float(BD_X_POS,
-                                                              maxYPos + 40));
+                    getVertexLocations().put(v,
+                                             new Point2D.Float(BD_X_POS,
+                                                               maxYPos + 40));
                     putVertexLocations();
                 } else {
                     getVertexLocations().put(v, newPos);
                     putVertexLocations();
                 }
             } else {
-                getVertexLocations().put(v, posWithScrollbar(pos));
+                final Point2D p = getVisualizationViewer()
+                                    .getRenderContext()
+                                        .getMultiLayerTransformer()
+                                            .inverseTransform(Layer.VIEW, pos);
+                getVertexLocations().put(v, posWithScrollbar(p));
                 putVertexLocations();
             }
 
@@ -1798,7 +1806,7 @@ public class HeartbeatGraph extends ResourceGraph {
         if (pos == null) {
             final Point2D newPos = getSavedPosition(rsoi);
             if (newPos == null) {
-                final Point2D.Float max = getFilledGraphSize();
+                final Point2D max = getLastPosition();
                 final float maxYPos = (float) max.getY();
                 getVertexLocations().put(
                                         v,

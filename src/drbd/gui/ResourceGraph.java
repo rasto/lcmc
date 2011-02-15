@@ -66,6 +66,8 @@ import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.GradientPaint;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -82,6 +84,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.JScrollBar;
 
 import java.awt.geom.Area;
 
@@ -139,7 +142,7 @@ public abstract class ResourceGraph {
     /** The vertex locations lock. */
     private final Mutex mVertexLocationsLock = new Mutex();
     /** The vertex locations object. */
-    private Map<Vertex, Point2D> vertexLocations =
+    private final Map<Vertex, Point2D> vertexLocations =
                                                 new HashMap<Vertex, Point2D>();
     /** The scaler. */
     private ViewScalingControl myScaler;
@@ -186,6 +189,12 @@ public abstract class ResourceGraph {
     private static Line2D instance = new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
     /** Singleton instance of dotted line edge shape. */
     private static Path2D hollowInstance = new Path2D.Float();
+    /** Edge draw paint. */
+    private static Paint EDGE_DRAW_PAINT =
+                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint");
+    /** Edge picked paint. */
+    private static Paint EDGE_PICKED_PAINT =
+                (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
     static {
         final float d = 0.05f;
         for (float i = 0; i < 1.0f; i += d) {
@@ -194,6 +203,8 @@ public abstract class ResourceGraph {
         }
         hollowInstance.lineTo(1.0f, 0.0f);
     }
+    /** How much was it scaled so far. */
+    private double scaledSoFar = 1.0;
 
     /** Prepares a new <code>ResourceGraph</code> object. */
     public ResourceGraph(final ClusterBrowser clusterBrowser) {
@@ -451,50 +462,40 @@ public abstract class ResourceGraph {
         vv.getRenderContext().setEdgeShapeTransformer(
                                                   new MyLine<Vertex, Edge>());
         vv.getRenderContext().setEdgeDrawPaintTransformer(
-                new MyPickableEdgePaintFunction<Edge>(
-                  vv.getPickedEdgeState(),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint"),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint")
-                  ));
+                new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
+                                                      EDGE_DRAW_PAINT,
+                                                      EDGE_PICKED_PAINT));
         vv.getRenderContext().setEdgeFillPaintTransformer(
-                new MyPickableEdgePaintFunction<Edge>(
-                  vv.getPickedEdgeState(),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint"),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint")
-                  ));
+                new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
+                                                      EDGE_DRAW_PAINT,
+                                                      EDGE_PICKED_PAINT));
         vv.getRenderContext().setArrowDrawPaintTransformer(
-                new MyPickableEdgePaintFunction<Edge>(
-                  vv.getPickedEdgeState(),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint"),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint")
-                  ));
+                new MyPickableEdgePaintFunction<Edge>(vv.getPickedEdgeState(),
+                                                      EDGE_DRAW_PAINT,
+                                                      EDGE_PICKED_PAINT));
         vv.getRenderContext().setArrowFillPaintTransformer(
                 new MyPickableArrowEdgePaintFunction<Edge>(
-                  vv.getPickedEdgeState(),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint"),
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint")
-                  ));
+                                                      vv.getPickedEdgeState(),
+                                                      EDGE_DRAW_PAINT,
+                                                      EDGE_PICKED_PAINT));
 
         /* scaling */
         /* overwriting scaler so that zooming starts from point (0, 0) */
-        myScaler = new ViewScalingControl() {
-            public void scale(final VisualizationServer thisVV,
-                              final float amount,
-                              final Point2D from) {
-                super.scale(thisVV, amount, new Point2D.Double(0, 0));
-            }
-        };
+        myScaler = getScalingControl();
 
         /* picking and popups */
         /* overwriting loadPlugins method only to set scaler */
         final DefaultModalGraphMouse graphMouse =
             new DefaultModalGraphMouse() {
-            protected void loadPlugins() {
-                super.loadPlugins();
-                ((ScalingGraphMousePlugin) scalingPlugin).setScaler(myScaler);
-                remove(animatedPickingPlugin);
-                animatedPickingPlugin = null;
-            }
+                protected void loadPlugins() {
+                    super.loadPlugins();
+                    ((ScalingGraphMousePlugin) scalingPlugin).setScaler(
+                                                                    myScaler);
+                    ((ScalingGraphMousePlugin) scalingPlugin).setModifiers(
+                                                        MouseEvent.CTRL_MASK);
+                    remove(animatedPickingPlugin);
+                    animatedPickingPlugin = null;
+                }
         };
         vv.setGraphMouse(graphMouse);
         graphMouse.add(new MyPopupGraphMousePlugin<Vertex, Edge>());
@@ -503,6 +504,20 @@ public abstract class ResourceGraph {
         graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
         layout.initialize();
         scrollPane = new GraphZoomScrollPane(vv);
+        final JScrollBar vScrollBar = scrollPane.getVerticalScrollBar();
+        vv.addMouseWheelListener(
+            new MouseWheelListener() {
+                public void mouseWheelMoved(final MouseWheelEvent e) {
+                    if ((e.getModifiers() & MouseWheelEvent.CTRL_MASK) == 0) {
+                        final int amount = e.getWheelRotation();
+                        vScrollBar.setValue(vScrollBar.getValue()
+                                            + amount * 10);
+                        e.consume();
+                        vv.repaint();
+
+                    }
+                }
+            });
     }
 
     /** Repaints the graph. */
@@ -607,37 +622,37 @@ public abstract class ResourceGraph {
         edgeToPopupMap.put(e, p);
     }
 
-    /** Returns the minimal size of the graph that has all vertices in it. */
-    protected final Point2D.Float getFilledGraphSize() {
-        Float maxYPos = new Float(0);
-        Float maxXPos = new Float(0);
+    ///** Returns the minimal size of the graph that has all vertices in it. */
+    //protected final Point2D.Float getFilledGraphSize() {
+    //    Float maxYPos = new Float(0);
+    //    Float maxXPos = new Float(0);
 
-        for (final Vertex v : getVertexLocations().keySet()) {
-            final Point2D loc = layout.transform(v);
-            if (loc != null) {
-                final Float pX = new Float(loc.getX());
-                final Float pY = new Float(loc.getY());
+    //    for (final Vertex v : getVertexLocations().keySet()) {
+    //        final Point2D loc = layout.transform(v);
+    //        if (loc != null) {
+    //            final Float pX = new Float(loc.getX());
+    //            final Float pY = new Float(loc.getY());
 
-                if (pX > maxXPos) {
-                    maxXPos = pX;
-                }
-                if (pY > maxYPos) {
-                    maxYPos = pY;
-                }
-            }
-        }
-        putVertexLocations();
-        maxXPos += 80;
-        maxYPos += 32;
-        return new Point2D.Float(maxXPos, maxYPos);
-    }
+    //            if (pX > maxXPos) {
+    //                maxXPos = pX;
+    //            }
+    //            if (pY > maxYPos) {
+    //                maxYPos = pY;
+    //            }
+    //        }
+    //    }
+    //    putVertexLocations();
+    //    maxXPos += 80;
+    //    maxYPos += 32;
+    //    return new Point2D.Float(maxXPos, maxYPos);
+    //}
 
     /**
      * Scales the graph, so that all vertices can be seen. The graph can
      * get smaller but not bigger.
      */
     public void scale() {
-        Point2D max = getFilledGraphSize();
+        final Point2D max = getLastPosition();
         final float maxXPos = (float) max.getX();
         final float maxYPos = (float) max.getY();
         if (maxXPos <= 0 || maxYPos <= 0) {
@@ -829,8 +844,8 @@ public abstract class ResourceGraph {
     private final class MyVertexShapeSize<V, E>
                                     extends AbstractVertexShapeTransformer<V>
                                     implements Transformer<V, Shape>  {
-        private Transformer<Vertex, Point2D> vlf;
-        private Graph<V, E> graph;
+        private final Transformer<Vertex, Point2D> vlf;
+        private final Graph<V, E> graph;
 
         public MyVertexShapeSize(final Graph<V, E> graphIn,
                                  final Transformer<Vertex, Point2D> vlfIn) {
@@ -1153,7 +1168,7 @@ public abstract class ResourceGraph {
     class MyPickableVertexPaintFunction<V>
                                     extends PickableVertexPaintTransformer<V> {
         /** Whether it is the draw paint. */
-        private boolean draw;
+        private final boolean draw;
 
         /** Creates new <code>MyPickableVertexPaintFunction</code> object. */
         MyPickableVertexPaintFunction(final PickedInfo<V> pi,
@@ -1206,12 +1221,12 @@ public abstract class ResourceGraph {
 
     /** Retuns border paint color for edge e. */
     protected Paint getEdgeDrawPaint(final Edge e) {
-        return Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint");
+        return EDGE_DRAW_PAINT;
     }
 
     /** Retuns fill paint color for edge e. */
     protected Paint getEdgePickedPaint(final Edge e) {
-        return Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
+        return EDGE_PICKED_PAINT;
     }
 
     /** This class defines paints for the edges. */
@@ -1599,9 +1614,7 @@ public abstract class ResourceGraph {
             final Point2D p = new Point2D.Double();
             final Point2D loc = layout.transform(v);
             if (loc == null) {
-                positions.clear();
-                mGraphLock.release();
-                return;
+                continue;
             }
             p.setLocation(loc);
             p.setLocation(p.getX() + (getDefaultVertexWidth(v)
@@ -1623,6 +1636,9 @@ public abstract class ResourceGraph {
 
     /** Returns saved position for the specified resource. */
     public final Point2D getSavedPosition(final Info info) {
+        if (info == null) {
+            return null;
+        }
         final Host[] hosts = clusterBrowser.getClusterHosts();
         Point2D p = null;
         for (final Host host : hosts) {
@@ -1838,7 +1854,7 @@ public abstract class ResourceGraph {
 
             final Pair<V> endpoints = g.getEndpoints(e);
             if (endpoints != null) {
-                boolean isLoop = endpoints.getFirst().equals(
+                final boolean isLoop = endpoints.getFirst().equals(
                                                         endpoints.getSecond());
                 if (isLoop) {
                     Tools.appWarning("an ilegal loop");
@@ -1865,5 +1881,105 @@ public abstract class ResourceGraph {
     /** Unlocking graph's vertex and edge lists. */
     protected final void unlockGraph() {
         mGraphLock.release();
+    }
+
+    /** Scale function. */
+    protected final ViewScalingControl getScalingControl() {
+        return new ViewScalingControl() {
+            public void superScale(final VisualizationServer thisVV,
+                                   final float amount,
+                                   final Point2D from) {
+                super.scale(thisVV, amount, from);
+            }
+
+            public void scale(final VisualizationServer thisVV,
+                              final float amount,
+                              final Point2D from) {
+                final JScrollBar sbV = getScrollPane().getVerticalScrollBar();
+                final JScrollBar sbH = getScrollPane().getHorizontalScrollBar();
+                final Point2D last = posWithScrollbar(getLastPosition());
+                final double fromX =
+                        from.getX() < last.getX() ? from.getX() : last.getX();
+                final double fromY =
+                        from.getY() < last.getY() ? from.getY() : last.getY();
+                final double width =
+                                 getVisualizationViewer().getSize().getWidth();
+                final double height =
+                                 getVisualizationViewer().getSize().getHeight();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        final Point2D prevPoint =
+                            getVisualizationViewer()
+                                .getRenderContext()
+                                    .getMultiLayerTransformer()
+                                        .inverseTransform(Layer.VIEW, from);
+                        final double scaledSoFar = getScaledSoFar();
+                        float am = amount;
+                        if (am < 1) {
+                            if (scaledSoFar < 0.3) {
+                                am = 1;
+                            } else {
+                                superScale(thisVV,
+                                           1 / am,
+                                           new Point2D.Double(0, 0));
+                            }
+                        } else if (am > 1) {
+                            if (scaledSoFar > 5) {
+                                am = 1;
+                            } else {
+                                superScale(thisVV,
+                                           1 / am,
+                                           new Point2D.Double(0, 0));
+                            }
+                        }
+                        setScaledSoFar(scaledSoFar * am);
+                        final Point2D p2 =
+                            getVisualizationViewer()
+                                .getRenderContext()
+                                    .getMultiLayerTransformer()
+                                        .inverseTransform(Layer.VIEW, from);
+                        final int valueY = (int) (sbV.getValue()
+                                                  + prevPoint.getY()
+                                                  - p2.getY());
+                        sbV.setValue(valueY);
+                        sbV.repaint();
+                        final int valueX = (int) (sbH.getValue()
+                                                  + prevPoint.getX()
+                                                  - p2.getX());
+                        sbH.setValue(valueX);
+                        sbH.repaint();
+
+                        thisVV.repaint();
+                    }
+                });
+            }
+        };
+    }
+
+    /** Returns scaledSoFar. */
+    protected final double getScaledSoFar() {
+        return scaledSoFar;
+    }
+
+    /** Sets scaledSoFar. */
+    protected final void setScaledSoFar(final double scaledSoFar) {
+        this.scaledSoFar = scaledSoFar;
+    }
+
+    protected final Point2D getLastPosition() {
+        double lastX = 0;
+        double lastY = 0;
+        final Map<Vertex, Point2D> vl = getVertexLocations();
+        for (final Vertex v : vl.keySet()) {
+            final Point2D last = vl.get(v);
+            if (last.getX() > lastX) {
+                lastX = last.getX();
+            }
+            if (last.getY() > lastY) {
+                lastY = last.getY();
+            }
+        }
+        putVertexLocations();
+        return new Point2D.Double(lastX, lastY + 40);
     }
 }

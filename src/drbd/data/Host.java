@@ -2246,10 +2246,7 @@ public class Host implements Serializable {
      * Returns the graph position of id.
      */
     public final Point2D getGraphPosition(final String id) {
-        if (servicePositions.containsKey(id)) {
-            return servicePositions.get(id);
-        }
-        return null;
+        return servicePositions.get(id);
     }
 
     /**
