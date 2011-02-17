@@ -117,7 +117,7 @@ public class Connect extends DialogCluster {
      * Connects all cluster hosts.
      */
     protected final void connectHosts() {
-        getCluster().connect(getDialogPanel());
+        getCluster().connect(getDialogPanel(), true, 1);
         for (final Host host : getCluster().getHosts()) {
             host.waitOnLoading();
         }

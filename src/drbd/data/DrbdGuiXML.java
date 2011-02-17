@@ -206,7 +206,11 @@ public class DrbdGuiXML extends XML {
                     continue;
                 }
                 Tools.getGUIData().addClusterTab(cluster);
-                cluster.connect(null);
+                final boolean ok = cluster.connect(null, true, 1);
+                if (!ok) {
+                    Tools.getGUIData().getClustersPanel().removeTab(cluster);
+                    continue;
+                }
                 final Runnable runnable = new Runnable() {
                     public void run() {
                         for (final Host host : cluster.getHosts()) {
@@ -274,9 +278,8 @@ public class DrbdGuiXML extends XML {
                             final String sshPort =
                                                 getAttribute(hostNode,
                                                              HOST_SSHPORT_ATTR);
-                            final String color =
-                                                getAttribute(hostNode,
-                                                             HOST_COLOR_ATTR);
+                            final String color = getAttribute(hostNode,
+                                                              HOST_COLOR_ATTR);
                             final String useSudo =
                                                 getAttribute(hostNode,
                                                              HOST_USESUDO_ATTR);

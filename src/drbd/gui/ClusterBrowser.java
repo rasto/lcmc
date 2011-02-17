@@ -176,9 +176,9 @@ public class ClusterBrowser extends Browser {
     /** Object that has drbd test data. */
     private DRBDtestData drbdtestData;
     /** Whether drbd status was canceled by user. */
-    private boolean drbdStatusCanceled = true;
+    private boolean drbdStatusCanceled = false;
     /** Whether hb status was canceled by user. */
-    private boolean clStatusCanceled = true;
+    private boolean clStatusCanceled = false;
     /** Global hb status lock. */
     private final Mutex mClStatusLock = new Mutex();
     /** Ptest lock. */
@@ -712,6 +712,7 @@ public class ClusterBrowser extends Browser {
                     final HostBrowser hostBrowser = host.getBrowser();
                     drbdGraph.addHost(hostBrowser.getHostDrbdInfo());
                 }
+                int notConnectedCount = 0;
                 do { /* wait here until a host is connected. */
                     boolean notConnected = true;
                     for (final Host host : hosts) {
@@ -722,18 +723,29 @@ public class ClusterBrowser extends Browser {
                             break;
                         }
                     }
-                    if (!notConnected) {
+                    if (notConnected) {
+                        notConnectedCount++;
+                    } else {
                         firstHost = getFirstHost();
                     }
                     if (firstHost == null) {
                         try {
-                            Thread.sleep(2000);
+                            Thread.sleep(60000);
                         } catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }
-                        cluster.connect(null);
+                        final boolean ok =
+                                 cluster.connect(null,
+                                                 notConnectedCount < 1,
+                                                 notConnectedCount + 1);
+                        if (!ok) {
+                            break;
+                        }
                     }
                 } while (firstHost == null);
+                if (firstHost == null) {
+                    return;
+                }
 
                 crmXML = new CRMXML(firstHost);
                 clusterStatus = new ClusterStatus(firstHost, crmXML);
@@ -988,8 +1000,8 @@ public class ClusterBrowser extends Browser {
         });
         thread.start();
 
+        drbdStatusCanceled = false;
         while (true) {
-            drbdStatusCanceled = false;
             host.execDrbdStatusCommand(
                   new ExecCallback() {
                        public void done(final String ans) {
@@ -1298,6 +1310,7 @@ public class ClusterBrowser extends Browser {
             }
         });
         thread.start();
+        clStatusCanceled = false;
         while (true) {
             final Host host = getDCHost();
             if (host == null) {
@@ -1309,7 +1322,7 @@ public class ClusterBrowser extends Browser {
                 continue;
             }
             final String hostName = host.getName();
-            clStatusCanceled = false;
+            //clStatusCanceled = false;
             host.execClStatusCommand(
                  new ExecCallback() {
                      public void done(final String ans) {
@@ -1682,7 +1695,11 @@ public class ClusterBrowser extends Browser {
      */
     public final Host getDCHost() {
         Host dcHost = null;
-        final String dc = clusterStatus.getDC();
+        String dc = null;
+        final ClusterStatus cl = clusterStatus;
+        if (cl != null) {
+            dc = cl.getDC();
+        }
         final List<Host> hosts = new ArrayList<Host>();
         int lastHostIndex = 0;
         int i = 0;

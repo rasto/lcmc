@@ -816,11 +816,11 @@ public final class Tools {
      */
     public static void stopClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
+            cluster.removeCluster();
             for (final Host host : cluster.getHosts()) {
                 // TODO: can be run concurrently.
                 host.disconnect();
             }
-            cluster.removeCluster();
             getGUIData().getClustersPanel().removeTab(cluster);
         }
     }

@@ -1641,8 +1641,8 @@ public class Host implements Serializable {
      *          callback class that implements ConnectionCallback interface
      */
     public final void connect(final SSHGui sshGui,
-                        final ProgressBar progressBar,
-                        final ConnectionCallback callback) {
+                              final ProgressBar progressBar,
+                              final ConnectionCallback callback) {
         Tools.debug(this, "host connect: " + sshGui, 1);
         ssh.connect(sshGui, progressBar, callback, this);
     }
@@ -1694,11 +1694,17 @@ public class Host implements Serializable {
     /**
      * Make an ssh connection to the host.
      */
-    public final void connect(SSHGui sshGui) {
+    public final void connect(SSHGui sshGui,
+                              final boolean progressIndicator,
+                              final int index) {
         if (!isConnected()) {
             final String hostName = getName();
-            Tools.startProgressIndicator(hostName, 
-                                         Tools.getString("Dialog.Host.SSH.Connecting"));
+            if (progressIndicator) {
+                Tools.startProgressIndicator(
+                                hostName, 
+                                Tools.getString("Dialog.Host.SSH.Connecting")
+                                + " (" + index + ")");
+            }
             if (sshGui == null) {
                 sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
                                     this,
@@ -1715,26 +1721,32 @@ public class Host implements Serializable {
                                     10000);
                             getSSH().installGuiHelper();
                             getAllInfo();
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    Tools.stopProgressIndicator(
-                                                hostName,
-                                                Tools.getString("Dialog.Host.SSH.Connecting"));
-                                }
-                            });
+                            if (progressIndicator) {
+                                Tools.stopProgressIndicator(
+                                  hostName,
+                                  Tools.getString("Dialog.Host.SSH.Connecting")
+                                  + " (" + index + ")");
+                            }
                         }
 
                         public void doneError(
                                         final String errorText) {
                             setLoadingError();
                             setConnected();
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    Tools.stopProgressIndicator(
-                                                hostName,
-                                                Tools.getString("Dialog.Host.SSH.Connecting"));
-                                }
-                            });
+                            if (progressIndicator) {
+                                Tools.stopProgressIndicator(
+                                  hostName,
+                                  Tools.getString("Dialog.Host.SSH.Connecting")
+                                  + " (" + index + ")");
+                                Tools.progressIndicatorFailed(
+                                  hostName,
+                                  Tools.getString("Dialog.Host.SSH.Connecting")
+                                  + " (" + index + ")");
+                                Tools.stopProgressIndicator(
+                                  hostName,
+                                  Tools.getString("Dialog.Host.SSH.Connecting")
+                                  + " (" + index + ")");
+                            }
                         }
                     });
         }

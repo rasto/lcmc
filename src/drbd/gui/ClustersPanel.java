@@ -197,6 +197,7 @@ public class ClustersPanel extends JPanel {
      */
     public final void removeTab() {
         final ClusterTab selected = getClusterTab();
+        selected.getCluster().setClusterTab(null);
         int index = tabbedPane.getSelectedIndex() - 1;
         if (index < 0) {
             index = 0;

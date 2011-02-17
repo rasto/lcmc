@@ -336,20 +336,29 @@ public class AllHostsInfo extends Info {
         allLoadButtons.put(cluster, loadClusterBtn);
         loadClusterBtn.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                loadClusterBtn.setEnabled(false);
                 final Thread t = new Thread(new Runnable() {
                     public void run() {
+                        Tools.invokeAndWait(new Runnable() {
+                            public void run() {
+                                loadClusterBtn.setEnabled(false);
+                            }
+                        });
                         List<Cluster> selectedClusters =
                                                  new ArrayList<Cluster>();
                         selectedClusters.add(cluster);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                clusterBackgrounds.get(cluster)
-                                               .setBackground(Color.GREEN);
-                                markCB.setSelected(false);
-                            }
-                        });
                         Tools.startClusters(selectedClusters);
+
+                        if (cluster.getClusterTab() == null) {
+                            loadClusterBtn.setEnabled(true);
+                        } else {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    clusterBackgrounds.get(cluster)
+                                                   .setBackground(Color.GREEN);
+                                    markCB.setSelected(false);
+                                }
+                            });
+                        }
                     }
                 });
                 t.start();
@@ -445,7 +454,7 @@ public class AllHostsInfo extends Info {
      * Stops marked clusters.
      */
     private void unloadMarkedClusters(final Set<Cluster> clusters) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeAndWait(new Runnable() {
             public void run() {
                 unloadMarkedClustersBtn.setEnabled(false);
             }

@@ -327,7 +327,6 @@ public class SSH {
             Thread.currentThread().interrupt();
         }
         if (connection != null) {
-            Tools.printStackTrace("force reconnect");
             connection = null;
             mConnectionLock.release();
             Tools.debug(this, "force reconnecting: " + host.getName(), 0);
@@ -610,7 +609,6 @@ public class SSH {
                 sess = null;
             } catch (IOException e) {
                 exitCode = ERROR_EXIT_CODE;
-                //e.printStackTrace();
             }
             if (exitCode == 0) {
                 commandCache.put(command, res.toString());
@@ -1392,6 +1390,7 @@ public class SSH {
                                         true);
                                 if (key == null) {
                                     cancelIt = true;
+                                    disconnectForGood = true;
                                     break;
                                 }
                                 if ("".equals(key)) {
@@ -1878,5 +1877,10 @@ public class SSH {
             return exitCode;
         }
 
+    }
+
+    /** Returns whether connection was canceled. */
+    public final boolean isConnectionCanceled() {
+        return disconnectForGood;
     }
 }

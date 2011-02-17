@@ -318,10 +318,10 @@ public class Cluster {
         return null;
     }
 
-    /**
-     * Connect all hosts in the cluster.
-     */
-    public final void connect(final Window rootPane) {
+    /** Connect all hosts in the cluster. Returns false, if it was canceled. */
+    public final boolean connect(final Window rootPane,
+                                 final boolean progressIndicator,
+                                 final int index) {
         boolean first = true;
         String dsaKey = null;
         String rsaKey = null;
@@ -336,14 +336,19 @@ public class Cluster {
                 host.getSSH().setPasswords(dsaKey, rsaKey, pwd);
             }
             if (rootPane == null) {
-                host.connect(null);
+                host.connect(null, progressIndicator, index);
             } else {
-                host.connect(new SSHGui(rootPane, host, null));
+                host.connect(new SSHGui(rootPane, host, null),
+                             progressIndicator,
+                             index);
             }
+            host.getSSH().waitForConnection();
             if (first) {
                 /* wait till it's connected and try the others with the
                  * same password/key. */
-                host.getSSH().waitForConnection();
+                if (host.getSSH().isConnectionCanceled()) {
+                    return false;
+                }
                 if (host.isConnected()) {
                     dsaKey = host.getSSH().getLastDSAKey();
                     rsaKey = host.getSSH().getLastRSAKey();
@@ -352,5 +357,6 @@ public class Cluster {
             }
             first = false;
         }
+        return true;
     }
 }
