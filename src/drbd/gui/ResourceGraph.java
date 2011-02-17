@@ -511,7 +511,7 @@ public abstract class ResourceGraph {
                     if ((e.getModifiers() & MouseWheelEvent.CTRL_MASK) == 0) {
                         final int amount = e.getWheelRotation();
                         vScrollBar.setValue(vScrollBar.getValue()
-                                            + amount * 10);
+                                            + amount * 20);
                         e.consume();
                         vv.repaint();
 

@@ -746,7 +746,6 @@ public class HbConfig extends DialogCluster {
                     if (castAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        System.out.println("set accessible 2");
                         Tools.getGUIData().setAccessible(
                                             makeConfigButton,
                                             ConfigData.AccessType.ADMIN);
@@ -1341,7 +1340,6 @@ public class HbConfig extends DialogCluster {
                                 }
                             }
                         }
-                        System.out.println("set accessible");
                         Tools.getGUIData().setAccessible(
                                                 makeConfigButton,
                                                 ConfigData.AccessType.ADMIN);
