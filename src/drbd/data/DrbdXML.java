@@ -1035,13 +1035,6 @@ public class DrbdXML extends XML {
         }
 
         if (value == null) {
-            option = optionsMap.get("Section.Common." + section);
-            if (option != null) {
-                value = option.get(optionName);
-            }
-        }
-
-        if (value == null) {
             return "";
         }
         return value;

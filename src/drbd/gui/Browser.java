@@ -118,7 +118,10 @@ public class Browser {
      * Repaints the menu tree.
      */
     public final void repaintTree() {
-        tree.repaint();
+        final JTree t = tree;
+        if (t != null) {
+            t.repaint();
+        }
     }
 
     /**
@@ -138,7 +141,9 @@ public class Browser {
                 if (t != null) {
                     path = t.getSelectionPath();
                 }
-                treeModel.reload(node);
+                if (node != null) {
+                    treeModel.reload(node);
+                }
                 if (!select && t != null && path != null) {
                     /* if don't want to select, we reselect the old path. */
                     t.setSelectionPath(path);

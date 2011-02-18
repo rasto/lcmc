@@ -192,14 +192,17 @@ public class ViewPanel extends JPanel {
 
     /**
      * Sets the right component in the view.
-     * TODO: there is something wrong in these functions
      */
     private void setRightComponentInView(final JTree tree,
                                          final JSplitPane viewSP,
                                          final Browser browser) {
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                           tree.getLastSelectedPathComponent();
+                                           tree.getLastSelectedPathComponent();
         if (node == null) {
+            return;
+        }
+        if (node.getParent() == null) {
+            /* it's not shown. */
             return;
         }
 

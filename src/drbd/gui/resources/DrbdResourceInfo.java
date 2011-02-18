@@ -362,7 +362,6 @@ public class DrbdResourceInfo extends DrbdGuiInfo
             }
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
-
         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
             // TODO: has to be reloaded
             final List<Info> l = new ArrayList<Info>();
@@ -521,7 +520,8 @@ public class DrbdResourceInfo extends DrbdGuiInfo
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
-                    getBrowser().clStatusUnlock();
+                    getBrowser().drbdtestLockRelease();
+                    return;
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
                 getApplyButton().setToolTipText(dtd.getToolTip());
@@ -579,18 +579,19 @@ public class DrbdResourceInfo extends DrbdGuiInfo
                                 getRevertButton().setEnabled(false);
                             }
                         });
-                        getBrowser().clStatusLock();
+                        getBrowser().drbdStatusLock();
                         try {
                             getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getCluster().getHostsArray()) {
                                 DRBD.adjust(h, "all", false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
-                            getBrowser().clStatusUnlock();
+                            getBrowser().drbdStatusUnlock();
                             Tools.appError("config failed");
+                            return;
                         }
                         apply(false);
-                        getBrowser().clStatusUnlock();
+                        getBrowser().drbdStatusUnlock();
                     }
                 });
                 thread.start();
@@ -602,9 +603,9 @@ public class DrbdResourceInfo extends DrbdGuiInfo
                 @Override public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
                         @Override public void run() {
-                            getBrowser().clStatusLock();
+                            getBrowser().drbdStatusLock();
                             revert();
-                            getBrowser().clStatusUnlock();
+                            getBrowser().drbdStatusUnlock();
                         }
                     });
                     thread.start();
@@ -1187,10 +1188,10 @@ public class DrbdResourceInfo extends DrbdGuiInfo
                 }
                 String value = dxml.getConfigValue(resName, section, param);
                 final String defaultValue = getParamDefault(param);
+                final String oldValue = getParamSaved(param);
                 if ("".equals(value)) {
                     value = defaultValue;
                 }
-                final String oldValue = getParamSaved(param);
                 final GuiComboBox cb = paramComboBoxGet(param, null);
                 if (!Tools.areEqual(value, oldValue)) {
                     getResource().setValue(param, value);

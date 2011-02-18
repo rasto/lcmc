@@ -932,7 +932,13 @@ public class BlockDevInfo extends EditableInfo {
                 public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            apply(false);
+                            Tools.invokeAndWait(new Runnable() {
+                                @Override public void run() {
+                                    getApplyButton().setEnabled(false);
+                                    getRevertButton().setEnabled(false);
+                                }
+                            });
+                            getBrowser().getClusterBrowser().drbdStatusLock();
                             try {
                                 drbdResourceInfo.getDrbdInfo()
                                               .createDrbdConfig(false);
@@ -941,8 +947,14 @@ public class BlockDevInfo extends EditableInfo {
                                     DRBD.adjust(h, "all", false);
                                 }
                             } catch (Exceptions.DrbdConfigException e) {
+                                getBrowser()
+                                        .getClusterBrowser()
+                                                .drbdStatusUnlock();
                                 Tools.appError("config failed");
+                                return;
                             }
+                            apply(false);
+                            getBrowser().getClusterBrowser().drbdStatusUnlock();
                         }
                     });
                     thread.start();

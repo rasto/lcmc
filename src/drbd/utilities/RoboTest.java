@@ -2601,6 +2601,8 @@ public final class RoboTest {
 
         moveTo(robot, 970, 420); /* wfc timeout */
         leftClick(robot);
+        press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
         press(robot, KeyEvent.VK_9);
         sleep(2000);
 
@@ -2616,6 +2618,8 @@ public final class RoboTest {
 
         moveTo(robot, 970, 380); /* wfc timeout */
         leftClick(robot);
+        press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
         press(robot, KeyEvent.VK_3);
         sleep(2000);
         moveTo(robot, 814, 189);
@@ -2626,6 +2630,7 @@ public final class RoboTest {
         sleep(6000);
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
         press(robot, KeyEvent.VK_0);
         sleep(2000);
         moveTo(robot, 814, 189);
@@ -2655,7 +2660,7 @@ public final class RoboTest {
         moveTo(robot, 970, 420); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
-        sleep(2000);
+        sleep(1000);
         press(robot, KeyEvent.VK_5);
         sleep(2000);
 
@@ -2667,7 +2672,7 @@ public final class RoboTest {
         moveTo(robot, 970, 420); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
-        sleep(2000);
+        sleep(1000);
         press(robot, KeyEvent.VK_0);
         sleep(2000);
 

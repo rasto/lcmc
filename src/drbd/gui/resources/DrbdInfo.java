@@ -312,7 +312,7 @@ public class DrbdInfo extends DrbdGuiInfo {
     public final void apply(final boolean testOnly) {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
@@ -320,7 +320,14 @@ public class DrbdInfo extends DrbdGuiInfo {
                 }
             });
             storeComboBoxValues(params);
-            setAllApplyButtons();
+            for (final DrbdResourceInfo dri : getDrbdResources()) {
+                dri.setParameters();
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    setAllApplyButtons();
+                }
+            });
         }
     }
 
@@ -397,8 +404,9 @@ public class DrbdInfo extends DrbdGuiInfo {
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
-                    getBrowser().clStatusUnlock();
+                    getBrowser().drbdtestLockRelease();
                     Tools.appError("config failed");
+                    return;
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
                 getApplyButton().setToolTipText(dtd.getToolTip());
@@ -449,7 +457,7 @@ public class DrbdInfo extends DrbdGuiInfo {
                                     getRevertButton().setEnabled(false);
                                 }
                             });
-                            getBrowser().clStatusLock();
+                            getBrowser().drbdStatusLock();
                             try {
                                 createDrbdConfig(false);
                                 for (final Host h
@@ -458,11 +466,12 @@ public class DrbdInfo extends DrbdGuiInfo {
                                 }
                             } catch (
                                 final Exceptions.DrbdConfigException dce) {
-                                getBrowser().clStatusUnlock();
+                                getBrowser().drbdStatusUnlock();
                                 Tools.appError("config failed");
+                                return;
                             }
                             apply(false);
-                            getBrowser().clStatusUnlock();
+                            getBrowser().drbdStatusUnlock();
                         }
                     });
                     thread.start();
@@ -474,9 +483,9 @@ public class DrbdInfo extends DrbdGuiInfo {
                 @Override public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
                         @Override public void run() {
-                            getBrowser().clStatusLock();
+                            getBrowser().drbdStatusLock();
                             revert();
-                            getBrowser().clStatusUnlock();
+                            getBrowser().drbdStatusUnlock();
                         }
                     });
                     thread.start();
@@ -736,7 +745,7 @@ public class DrbdInfo extends DrbdGuiInfo {
      * otherwise all parameters will be checked.
      */
     @Override public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
+                                                        final String[] params) {
         boolean changed = false;
         for (final DrbdResourceInfo dri : getDrbdResources()) {
             if (dri.checkResourceFieldsChanged(param,
