@@ -2583,6 +2583,8 @@ public final class RoboTest {
 
         moveTo(robot, 480, 250); /* select r0 */
         leftClick(robot);
+        sleep(2000);
+        leftClick(robot);
         moveTo(robot, 1073, 317); /* select protocol */
         leftClick(robot);
         sleep(2000);
@@ -2615,6 +2617,8 @@ public final class RoboTest {
         /* common */
         moveTo(robot, 500, 390); /* select background */
         leftClick(robot);
+        sleep(2000);
+        leftClick(robot);
 
         moveTo(robot, 970, 380); /* wfc timeout */
         leftClick(robot);
@@ -2639,6 +2643,8 @@ public final class RoboTest {
 
         /* resource */
         moveTo(robot, 480, 250); /* select r0 */
+        leftClick(robot);
+        sleep(2000);
         leftClick(robot);
 
         moveTo(robot, 1073, 317); /* select protocol */

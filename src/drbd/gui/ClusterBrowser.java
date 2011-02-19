@@ -732,7 +732,7 @@ public class ClusterBrowser extends Browser {
                     }
                     if (firstHost == null) {
                         try {
-                            Thread.sleep(60000);
+                            Thread.sleep(30000);
                         } catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }

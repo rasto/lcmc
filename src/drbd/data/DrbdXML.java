@@ -417,7 +417,6 @@ public class DrbdXML extends XML {
         } else {
             correctValue = true;
         }
-        paramCorrectValueMap.remove(param);
         paramCorrectValueMap.put(param, correctValue);
         return correctValue;
     }
