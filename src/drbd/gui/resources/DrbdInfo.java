@@ -198,7 +198,9 @@ public class DrbdInfo extends DrbdGuiInfo {
             String configName;
             boolean makeBackup;
             String preCommand;
-            boolean bigDRBDConf = Tools.getConfigData().getBigDRBDConf();
+            final String drbdV = host.getDrbdVersion();
+            boolean bigDRBDConf = Tools.getConfigData().getBigDRBDConf()
+                                  || Tools.compareVersions(drbdV, "8.3.0") < 0;
             if (testOnly) {
                 dir = "/var/lib/drbd/";
                 configName = "drbd.conf-drbd-mc-test";
