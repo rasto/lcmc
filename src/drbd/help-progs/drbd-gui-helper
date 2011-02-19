@@ -1251,7 +1251,7 @@ sub is_init {
 sub is_script_rc {
 	my $script = shift;
 	return 
-	  "(/usr/sbin/update-rc.d -n $script defaults 1|grep 'already '"
+	  "(/usr/sbin/update-rc.d -n -f $script remove 2>&1|grep '/rc[0-9]\.d'"
          ." || /sbin/chkconfig --list $script 2>/dev/null"
          ."|grep ':on') 2>/dev/null"
          ."|sed s/.*/on/|uniq";
