@@ -445,7 +445,7 @@ public class CloneInfo extends ServiceInfo {
         } else {
             final ServiceInfo cs = containedService;
             if (cs != null) {
-                return cs.isStarted(testOnly);
+                return cs.isStarted(testOnly) && super.isStarted(testOnly);
             }
             return false;
         }
@@ -465,7 +465,7 @@ public class CloneInfo extends ServiceInfo {
         } else {
             final ServiceInfo cs = containedService;
             if (cs != null) {
-                return cs.isStopped(testOnly);
+                return cs.isStopped(testOnly) || super.isStopped(testOnly);
             }
             return false;
         }
