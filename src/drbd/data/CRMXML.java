@@ -544,14 +544,14 @@ public class CRMXML extends XML {
                                           (ConvertCmdCallback) null);
         }
 
-        if (command == null
+        if ((command == null || "".equals(command))
             && pcmkV == null
             && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
                                           (ConvertCmdCallback) null);
         }
 
-        if (command == null) {
+        if (command == null || "".equals(command)) {
             command = host.getDistCommand("Heartbeat.getOCFParameters",
                                           (ConvertCmdCallback) null);
         }
