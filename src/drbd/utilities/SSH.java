@@ -1761,7 +1761,7 @@ public class SSH {
         if (makeBackup) {
             commands.append("cp ");
             commands.append(remoteFilename);
-            commands.append("{,.bak};");
+            commands.append("{,.bak} 2>/dev/null;");
         }
         final int index = remoteFilename.lastIndexOf('/');
         if (index > 0) {
@@ -1785,14 +1785,14 @@ public class SSH {
         if (makeBackup) {
             backupString.append(";if ! diff ");
             backupString.append(remoteFilename);
-            backupString.append("{,.bak}>/dev/null; then ");
+            backupString.append("{,.bak}>/dev/null 2>&1; then ");
             backupString.append("mv ");
             backupString.append(remoteFilename);
-            backupString.append("{.bak,.`date +'%s'`};");
+            backupString.append("{.bak,.`date +'%s'`} 2>/dev/null;");
             backupString.append(" else ");
             backupString.append("rm ");
             backupString.append(remoteFilename);
-            backupString.append(".bak;");
+            backupString.append(".bak 2>/dev/null;");
             backupString.append(" fi");
         }
         final Thread t = execCommand(
