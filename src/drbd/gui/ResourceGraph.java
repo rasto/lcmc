@@ -319,8 +319,8 @@ public abstract class ResourceGraph {
                             testOnlyFlag = !testOnlyFlag;
                             final boolean testOnlyFlagLast = testOnlyFlag;
                             mTestOnlyFlag.release();
-                                    Tools.setMenuOpaque(component,
-                                                        !testOnlyFlag);
+                            Tools.setMenuOpaque(component,
+                                                false);
                             repaint();
                             int sleep = 300;
                             if (testOnlyFlag) {
@@ -1972,11 +1972,13 @@ public abstract class ResourceGraph {
         final Map<Vertex, Point2D> vl = getVertexLocations();
         for (final Vertex v : vl.keySet()) {
             final Point2D last = vl.get(v);
-            if (last.getX() > lastX) {
-                lastX = last.getX();
-            }
-            if (last.getY() > lastY) {
-                lastY = last.getY();
+            if (last != null) {
+                if (last.getX() > lastX) {
+                    lastX = last.getX();
+                }
+                if (last.getY() > lastY) {
+                    lastY = last.getY();
+                }
             }
         }
         putVertexLocations();
