@@ -68,7 +68,7 @@ public class InstallationDisk extends VMConfig {
 
     /** Next dialog. */
     public final WizardDialog nextDialog() {
-        if (skipButtonEnabled()) {
+        if (skipButtonIsSelected()) {
             vmsdi.removeMyself(true);
         }
         if (nextDialogObject == null) {
