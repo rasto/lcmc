@@ -52,7 +52,7 @@ public class DistResource_suse_SLES11 extends
          "opensuse SLE 11 SP1 repo: 1.1.x/1.2.x" },
         {"PmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
-         + " http://download.opensuse.org/repositories/network:/ha-clustering/SLE_11_SP1/network:ha-clustering.repo "
+         + " http://download.opensuse.org/repositories/network:/ha-clustering/SLE_11/network:ha-clustering.repo "
          + " && zypper -n --no-gpg-check install pacemaker corosync"
          + " && /sbin/chkconfig --add openais"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
