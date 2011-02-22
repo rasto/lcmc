@@ -1783,6 +1783,8 @@ sub gui_drbd_test {
 	$conf =~ s/^(\s+shared-secret\s+)[^;]+/$1SECRET/m;
 	$conf =~ s/^(\s+disk\s+)[^;{]+(\s*;\s*)$/$1DISK$2/mg;
 	$conf =~ s/^(\s+address\s+)[^:]+/$1IP/mg;
+	my $libdir = get_hb_lib_path();
+	$conf =~ s/$libdir/LIBDIR/g;
 
 	my $testfile = "/tmp/drbd-mc-test/$testname/drbd.conf$index";
 	my $test = "";

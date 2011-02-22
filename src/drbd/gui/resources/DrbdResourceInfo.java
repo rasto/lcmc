@@ -661,6 +661,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * infos without confirmation dialog.
      */
     public final void removeMyselfNoConfirm(final boolean testOnly) {
+        getBrowser().drbdStatusLock();
         getBrowser().getDrbdXML().removeResource(getName());
         getBrowser().getDrbdGraph().removeDrbdResource(this);
         final Host[] hosts = getCluster().getHostsArray();
@@ -687,12 +688,15 @@ public class DrbdResourceInfo extends DrbdGuiInfo
             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
                                                                      testOnly);
         } catch (Exceptions.DrbdConfigException dce) {
+            getBrowser().drbdStatusUnlock();
             Tools.appError("config failed", dce);
+            return;
         }
         getBrowser().getDrbdGraph().getDrbdInfo().setSelectedNode(null);
         getBrowser().getDrbdGraph().getDrbdInfo().selectMyself();
         getBrowser().getDrbdGraph().updatePopupMenus();
         getBrowser().resetFilesystems();
+        getBrowser().drbdStatusUnlock();
     }
 
     /** Returns string of the drbd resource. */

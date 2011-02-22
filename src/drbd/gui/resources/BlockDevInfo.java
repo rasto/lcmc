@@ -1764,7 +1764,11 @@ public class BlockDevInfo extends EditableInfo {
     /** Sets stored parameters. */
     public final void setParameters(final String resName) {
         getBlockDevice().setNew(false);
-        final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
+        final ClusterBrowser clusterBrowser = getBrowser().getClusterBrowser();
+        if (clusterBrowser == null) {
+            return;
+        }
+        final DrbdXML dxml = clusterBrowser.getDrbdXML();
         final String hostName = getHost().getName();
         final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
         String value = null;

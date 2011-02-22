@@ -103,10 +103,12 @@ public class Resource extends DrbdConfig {
             for (final String commonP : COMMON_PARAMS) {
                 final String value = dri.getComboBoxValue(commonP);
                 drbdInfo.getResource().setValue(commonP, value);
+                drbdInfo.paramComboBoxGet(commonP, null).setValue(value);
             }
         }
         Tools.waitForSwing();
         drbdInfo.apply(false);
+        dri.apply(false);
         return new BlockDev(this, dri, dri.getFirstBlockDevInfo());
     }
 
