@@ -46,6 +46,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 
 import java.awt.BorderLayout;
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
@@ -71,6 +72,8 @@ public class ViewPanel extends JPanel {
     private static final int DIVIDER_LOCATION   = 200;
     /** Disabled during load. It disables the menu expanding.*/
     private volatile boolean disabledDuringLoad = true;
+    /** Update VMS lock. */
+    private final Mutex mSetPanelLock = new Mutex();
 
     /**
      * Prepares a new <code>ViewPanel</code> object.
@@ -151,7 +154,12 @@ public class ViewPanel extends JPanel {
             new TreeModelListener() {
                 public void treeNodesChanged(final TreeModelEvent e) {
                     if (!disabledDuringLoad) {
-                        setRightComponentInView(tree, viewSP, browser);
+                        final Object[] selected = e.getChildren();
+                        if (selected != null && selected.length > 0) {
+                            Object o = ((DefaultMutableTreeNode) selected[0])
+                                            .getUserObject();
+                            setRightComponentInView(browser, (Info) o);
+                        }
                     }
                 }
 
@@ -196,18 +204,29 @@ public class ViewPanel extends JPanel {
     private void setRightComponentInView(final JTree tree,
                                          final JSplitPane viewSP,
                                          final Browser browser) {
+        try {
+            if (!mSetPanelLock.attempt(0)) {
+                return;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                                            tree.getLastSelectedPathComponent();
         if (node == null) {
+            mSetPanelLock.release();
             return;
         }
         if (node.getParent() == null) {
             /* it's not shown. */
+            mSetPanelLock.release();
             return;
         }
 
         final Object nodeInfo = node.getUserObject();
-        if (nodeInfo != null) {
+        if (nodeInfo == null) {
+            mSetPanelLock.release();
+        } else {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     final JComponent p = browser.getInfoPanel(nodeInfo);
@@ -216,6 +235,7 @@ public class ViewPanel extends JPanel {
                         viewSP.setRightComponent(p);
                         viewSP.setDividerLocation(loc);
                     }
+                    mSetPanelLock.release();
                 }
             });
         }
@@ -227,6 +247,13 @@ public class ViewPanel extends JPanel {
     public final void setRightComponentInView(final Browser browser,
                                               final Info nodeInfo) {
         if (viewSP != null) {
+            try {
+                if (!mSetPanelLock.attempt(0)) {
+                    return;
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     final JComponent p = browser.getInfoPanel(nodeInfo);
@@ -235,6 +262,7 @@ public class ViewPanel extends JPanel {
                         viewSP.setRightComponent(p);
                         viewSP.setDividerLocation(loc);
                     }
+                    mSetPanelLock.release();
                 }
             });
         }
