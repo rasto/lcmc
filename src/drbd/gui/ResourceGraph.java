@@ -491,8 +491,6 @@ public abstract class ResourceGraph {
                     super.loadPlugins();
                     ((ScalingGraphMousePlugin) scalingPlugin).setScaler(
                                                                     myScaler);
-                    ((ScalingGraphMousePlugin) scalingPlugin).setModifiers(
-                                                        MouseEvent.CTRL_MASK);
                     remove(animatedPickingPlugin);
                     animatedPickingPlugin = null;
                 }
@@ -508,7 +506,7 @@ public abstract class ResourceGraph {
         vv.addMouseWheelListener(
             new MouseWheelListener() {
                 public void mouseWheelMoved(final MouseWheelEvent e) {
-                    if ((e.getModifiers() & MouseWheelEvent.CTRL_MASK) == 0) {
+                    if ((e.getModifiers() & MouseWheelEvent.CTRL_MASK) > 0) {
                         final int amount = e.getWheelRotation();
                         vScrollBar.setValue(vScrollBar.getValue()
                                             + amount * 20);
