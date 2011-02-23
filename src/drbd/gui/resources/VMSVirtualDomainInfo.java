@@ -66,6 +66,7 @@ import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -189,29 +190,47 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
-                                               VMSXML.VM_PARAM_NAME,
-                                               VMSXML.VM_PARAM_TYPE,
-                                               VMSXML.VM_PARAM_EMULATOR,
-                                               VMSXML.VM_PARAM_VCPU,
-                                               VMSXML.VM_PARAM_CURRENTMEMORY,
-                                               VMSXML.VM_PARAM_MEMORY,
-                                               VMSXML.VM_PARAM_BOOT,
-                                               VMSXML.VM_PARAM_LOADER,
-                                               VMSXML.VM_PARAM_AUTOSTART,
-                                               VMSXML.VM_PARAM_ARCH,
-                                               VMSXML.VM_PARAM_ACPI,
-                                               VMSXML.VM_PARAM_APIC,
-                                               VMSXML.VM_PARAM_PAE,
-                                               VMSXML.VM_PARAM_ON_REBOOT,
-                                               VMSXML.VM_PARAM_ON_CRASH};
+                                    VMSXML.VM_PARAM_NAME,
+                                    VMSXML.VM_PARAM_TYPE,
+                                    VMSXML.VM_PARAM_EMULATOR,
+                                    VMSXML.VM_PARAM_VCPU,
+                                    VMSXML.VM_PARAM_CURRENTMEMORY,
+                                    VMSXML.VM_PARAM_MEMORY,
+                                    VMSXML.VM_PARAM_BOOT,
+                                    VMSXML.VM_PARAM_LOADER,
+                                    VMSXML.VM_PARAM_AUTOSTART,
+                                    VMSXML.VM_PARAM_ARCH,
+                                    VMSXML.VM_PARAM_ACPI,
+                                    VMSXML.VM_PARAM_APIC,
+                                    VMSXML.VM_PARAM_PAE,
+                                    VMSXML.VM_PARAM_HAP,
+                                    VMSXML.VM_PARAM_CPU_MATCH,
+                                    VMSXML.VM_PARAM_CPUMATCH_MODEL,
+                                    VMSXML.VM_PARAM_CPUMATCH_VENDOR,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                                    VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                                    VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+                                    VMSXML.VM_PARAM_ON_REBOOT,
+                                    VMSXML.VM_PARAM_ON_CRASH};
     /** Advanced parameters. */
     private static final Set<String> IS_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{
-                                               VMSXML.VM_PARAM_ACPI,
-                                               VMSXML.VM_PARAM_APIC,
-                                               VMSXML.VM_PARAM_PAE,
-                                               VMSXML.VM_PARAM_ON_REBOOT,
-                                               VMSXML.VM_PARAM_ON_CRASH}));
+                                    VMSXML.VM_PARAM_ACPI,
+                                    VMSXML.VM_PARAM_APIC,
+                                    VMSXML.VM_PARAM_PAE,
+                                    VMSXML.VM_PARAM_HAP,
+                                    VMSXML.VM_PARAM_CPU_MATCH,
+                                    VMSXML.VM_PARAM_CPUMATCH_MODEL,
+                                    VMSXML.VM_PARAM_CPUMATCH_VENDOR,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                                    VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                                    VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+                                    VMSXML.VM_PARAM_ON_REBOOT,
+                                    VMSXML.VM_PARAM_ON_CRASH}));
     /** Map of sections to which every param belongs. */
     private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
@@ -230,6 +249,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     /** Possible values for some fields. */
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                           new HashMap<String, Object[]>();
+    /** Whether parameter is an integer. */
+    private static final List<String> IS_INTEGER = new ArrayList<String>();
     /** Returns whether this parameter has a unit prefix. */
     private static final Map<String, Boolean> HAS_UNIT_PREFIX =
                                                new HashMap<String, Boolean>();
@@ -291,6 +312,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 Tools.getString("VMSVirtualDomainInfo.Section.Features");
     private static final String VIRTUAL_SYSTEM_OPTIONS =
                 Tools.getString("VMSVirtualDomainInfo.Section.Options");
+    private static final String CPU_MATCH_OPTIONS =
+                Tools.getString("VMSVirtualDomainInfo.Section.CPUMatch");
     /** String that is displayed as a tool tip for not applied domain. */
     public static final String NOT_APPLIED = "not applied yet";
     /** String that is displayed as a tool tip for disabled menu item. */
@@ -370,7 +393,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_ACPI, VIRTUAL_SYSTEM_FEATURES);
         SECTION_MAP.put(VMSXML.VM_PARAM_APIC, VIRTUAL_SYSTEM_FEATURES);
         SECTION_MAP.put(VMSXML.VM_PARAM_PAE, VIRTUAL_SYSTEM_FEATURES);
+        SECTION_MAP.put(VMSXML.VM_PARAM_HAP, VIRTUAL_SYSTEM_FEATURES);
 
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPU_MATCH, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_MODEL, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_VENDOR, CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                        CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                        CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                        CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                        CPU_MATCH_OPTIONS);
+        SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+                        CPU_MATCH_OPTIONS);
 
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_NAME,
@@ -409,6 +446,38 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                    VMSXML.VM_PARAM_PAE,
                    Tools.getString("VMSVirtualDomainInfo.Short.Pae"));
         SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_HAP,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Hap"));
+
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPU_MATCH,
+            Tools.getString("VMSVirtualDomainInfo.Short.CPU.Match"));
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPUMATCH_MODEL,
+            Tools.getString("VMSVirtualDomainInfo.Short.CPUMatch.Model"));
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPUMATCH_VENDOR,
+            Tools.getString("VMSVirtualDomainInfo.Short.CPUMatch.Vendor"));
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+            Tools.getString(
+                       "VMSVirtualDomainInfo.Short.CPUMatch.TopologySockets"));
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+            Tools.getString(
+                        "VMSVirtualDomainInfo.Short.CPUMatch.TopologyCores"));
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+            Tools.getString(
+                       "VMSVirtualDomainInfo.Short.CPUMatch.TopologyThreads"));
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+            Tools.getString("VMSVirtualDomainInfo.Short.CPUMatch.Policy"));
+        SHORTNAME_MAP.put(
+            VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+            Tools.getString("VMSVirtualDomainInfo.Short.CPUMatch.Features"));
+
+        SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_ON_REBOOT,
                    Tools.getString("VMSVirtualDomainInfo.Short.OnReboot"));
         SHORTNAME_MAP.put(
@@ -426,6 +495,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         FIELD_TYPES.put(VMSXML.VM_PARAM_APIC, GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(VMSXML.VM_PARAM_ACPI, GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(VMSXML.VM_PARAM_PAE, GuiComboBox.Type.CHECKBOX);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_HAP, GuiComboBox.Type.CHECKBOX);
 
         PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, "512M");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, "512M");
@@ -443,6 +513,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_ACPI, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_APIC, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_PAE, "False");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_HAP, "False");
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_MEMORY, true);
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_CURRENTMEMORY, true);
         // TODO: no virsh command for os-boot
@@ -483,6 +554,27 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                        new StringInfo("qemu",
                                                       "/usr/bin/qemu",
                                                    null)});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPU_MATCH,
+                            new String[]{"", "exact", "minimum", "strict"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                            new String[]{"", "1", "2"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                            new String[]{"", "1", "2"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                            new String[]{"", "1", "2"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                            new String[]{"",
+                                         "force",
+                                         "require",
+                                         "optional",
+                                         "disable",
+                                         "forbid"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+                            new String[]{"", "aes", "aes apic"});
+        IS_INTEGER.add(VMSXML.VM_PARAM_VCPU);
+        IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
+        IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
+        IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS);
 
     }
     /** Creates the VMSVirtualDomainInfo object. */
@@ -2975,6 +3067,21 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns possible choices for drop down lists. */
     protected final Object[] getParamPossibleChoices(final String param) {
+        if (VMSXML.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
+            final Set<String> models = new LinkedHashSet<String>();
+            models.add("");
+            for (final Host host : getBrowser().getClusterHosts()) {
+                models.addAll(host.getCPUMapModels());
+            }
+            return models.toArray(new String[models.size()]);
+        } else if (VMSXML.VM_PARAM_CPUMATCH_VENDOR.equals(param)) {
+            final Set<String> vendors = new LinkedHashSet<String>();
+            vendors.add("");
+            for (final Host host : getBrowser().getClusterHosts()) {
+                vendors.addAll(host.getCPUMapVendors());
+            }
+            return vendors.toArray(new String[vendors.size()]);
+        }
         return POSSIBLE_VALUES.get(param);
     }
 
@@ -2990,7 +3097,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns true if the specified parameter is integer. */
     protected final boolean isInteger(final String param) {
-        return VMSXML.VM_PARAM_VCPU.equals(param);
+        return IS_INTEGER.contains(param);
     }
 
     /** Returns true if the specified parameter is a label. */
@@ -3033,11 +3140,8 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         setName(getComboBoxValue(VMSXML.VM_PARAM_NAME));
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
-            if (getResource().isNew()
-                || !Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
-                getResource().setValue(param, value);
-            }
+            parameters.put(param, value);
+            getResource().setValue(param, value);
         }
         final List<Host> definedOnHosts = new ArrayList<Host>();
         for (final Host host : getBrowser().getClusterHosts()) {

@@ -2027,6 +2027,9 @@ public class TextResource extends
         {"VMSVirtualDomainInfo.Section.Features",
          "Features"},
 
+        {"VMSVirtualDomainInfo.Section.CPUMatch",
+         "CPU Match"},
+
         {"VMSVirtualDomainInfo.Short.Name",
          "Domain name"},
 
@@ -2062,6 +2065,33 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.Short.Pae",
          "PAE"},
+
+        {"VMSVirtualDomainInfo.Short.Hap",
+         "HAP"},
+
+        {"VMSVirtualDomainInfo.Short.CPU.Match",
+         "Match"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Model",
+         "Model"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Vendor",
+         "Vendor"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologySockets",
+         "Topology Sockets"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyCores",
+         "Topology Cores"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyThreads",
+         "Topology Threads"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Policy",
+         "Policy"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Features",
+         "Features"},
 
         {"VMSVirtualDomainInfo.Short.OnReboot",
          "On Reboot"},

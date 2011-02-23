@@ -157,6 +157,24 @@ public class VMSXML extends XML {
     public static final String VM_PARAM_APIC = "apic";
     /** VM field: pae. */
     public static final String VM_PARAM_PAE = "pae";
+    /** VM field: hap. */
+    public static final String VM_PARAM_HAP = "hap";
+    /** VM field: cpu match. */
+    public static final String VM_PARAM_CPU_MATCH = "match";
+    /** VM field: cpu model. */
+    public static final String VM_PARAM_CPUMATCH_MODEL = "model";
+    /** VM field: cpu vendor. */
+    public static final String VM_PARAM_CPUMATCH_VENDOR = "vendor";
+    /** VM field: cpu topology sockets. */
+    public static final String VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS = "sockets";
+    /** VM field: cpu topology cores. */
+    public static final String VM_PARAM_CPUMATCH_TOPOLOGY_CORES = "cores";
+    /** VM field: cpu topology threads. */
+    public static final String VM_PARAM_CPUMATCH_TOPOLOGY_THREADS = "threads";
+    /** VM field: cpu feature policy. */
+    public static final String VM_PARAM_CPUMATCH_FEATURE_POLICY = "policy";
+    /** VM field: cpu features. A space seperated list. */
+    public static final String VM_PARAM_CPUMATCH_FEATURES = "features";
     /** VM field: on reboot. */
     public static final String VM_PARAM_ON_REBOOT = "on_reboot";
     /** VM field: on crash. */
@@ -407,6 +425,91 @@ public class VMSXML extends XML {
         }
     }
 
+    /* Add CPU match node. */
+    private void addCPUMatchNode(final Document doc,
+                                 final Node root,
+                                 final Map<String, String> parametersMap) {
+        final String cpuMatch = parametersMap.get(VM_PARAM_CPU_MATCH);
+        if (!"".equals(cpuMatch)) {
+            final Element cpuMatchNode = (Element) root.appendChild(
+                                               doc.createElement("cpu"));
+            cpuMatchNode.setAttribute("match", cpuMatch);
+            final String model = parametersMap.get(VM_PARAM_CPUMATCH_MODEL);
+            if (!"".equals(model)) {
+                final Node modelNode = (Element) cpuMatchNode.appendChild(
+                                                  doc.createElement("model"));
+                modelNode.appendChild(doc.createTextNode(model));
+            }
+            final String vendor = parametersMap.get(VM_PARAM_CPUMATCH_VENDOR);
+            if (!"".equals(vendor)) {
+                final Node vendorNode = (Element) cpuMatchNode.appendChild(
+                                                  doc.createElement("vendor"));
+                vendorNode.appendChild(doc.createTextNode(vendor));
+            }
+            final String sockets = parametersMap.get(
+                                           VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
+            final String cores = parametersMap.get(
+                                           VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
+            final String threads = parametersMap.get(
+                                           VM_PARAM_CPUMATCH_TOPOLOGY_THREADS);
+            final boolean isSockets = !"".equals(sockets);
+            final boolean isCores =   !"".equals(cores);
+            final boolean isThreads = !"".equals(threads);
+            if (isSockets || isCores || isThreads) {
+                final Element topologyNode = (Element) cpuMatchNode.appendChild(
+                                              doc.createElement("topology"));
+                if (isSockets) {
+                    topologyNode.setAttribute("sockets", sockets);
+                }
+                if (isCores) {
+                    topologyNode.setAttribute("cores", cores);
+                }
+                if (isThreads) {
+                    topologyNode.setAttribute("threads", threads);
+                }
+            }
+            final String policy = parametersMap.get(
+                                           VM_PARAM_CPUMATCH_FEATURE_POLICY);
+            final String features = parametersMap.get(
+                                           VM_PARAM_CPUMATCH_FEATURES);
+            if (!"".equals(policy) && !"".equals(features)) {
+                for (final String feature : features.split("\\s+")) {
+                    final Element featureNode =
+                                      (Element) cpuMatchNode.appendChild(
+                                                 doc.createElement("feature"));
+                    featureNode.setAttribute("policy", policy);
+                    featureNode.setAttribute("name", feature);
+                }
+            }
+        }
+    }
+
+    /* Add features. */
+    private void addFeatures(final Document doc,
+                             final Node root,
+                             final Map<String, String> parametersMap) {
+        final boolean acpi = "True".equals(parametersMap.get(VM_PARAM_ACPI));
+        final boolean apic = "True".equals(parametersMap.get(VM_PARAM_APIC));
+        final boolean pae = "True".equals(parametersMap.get(VM_PARAM_PAE));
+        final boolean hap = "True".equals(parametersMap.get(VM_PARAM_HAP));
+        if (acpi || apic || pae || hap) {
+            final Element featuresNode = (Element) root.appendChild(
+                                                doc.createElement("features"));
+            if (acpi) {
+                featuresNode.appendChild(doc.createElement("acpi"));
+            }
+            if (apic) {
+                featuresNode.appendChild(doc.createElement("apic"));
+            }
+            if (pae) {
+                featuresNode.appendChild(doc.createElement("pae"));
+            }
+            if (hap) {
+                featuresNode.appendChild(doc.createElement("hap"));
+            }
+        }
+    }
+
     /** Creates XML for new domain. */
     public final Node createDomainXML(final String domainName,
                                       final Map<String, String> parametersMap) {
@@ -480,22 +583,10 @@ public class VMSXML extends XML {
         bootNode.setAttribute("dev", parametersMap.get(VM_PARAM_BOOT));
 
         /* features */
-        final boolean acpi = "True".equals(parametersMap.get(VM_PARAM_ACPI));
-        final boolean apic = "True".equals(parametersMap.get(VM_PARAM_APIC));
-        final boolean pae = "True".equals(parametersMap.get(VM_PARAM_PAE));
-        if (acpi || apic || pae) {
-            final Element featuresNode = (Element) root.appendChild(
-                                                doc.createElement("features"));
-            if (acpi) {
-                featuresNode.appendChild(doc.createElement("acpi"));
-            }
-            if (apic) {
-                featuresNode.appendChild(doc.createElement("apic"));
-            }
-            if (pae) {
-                featuresNode.appendChild(doc.createElement("pae"));
-            }
-        }
+        addFeatures(doc, root, parametersMap);
+
+        /* cpu match */
+        addCPUMatchNode(doc, root, parametersMap);
 
         /* on_ */
         final String onReboot = parametersMap.get(VM_PARAM_ON_REBOOT);
@@ -526,56 +617,80 @@ public class VMSXML extends XML {
 
     /** Modify xml of the domain. */
     public final Node modifyDomainXML(final String domainName,
-                                          final Map<String, String> parametersMap) {
-            final String configName = namesConfigsMap.get(domainName);
-            if (configName == null) {
-                return null;
-            }
-            final Node domainNode = getDomainNode(domainName);
-            if (domainNode == null) {
-                return null;
-            }
-            final XPath xpath = XPathFactory.newInstance().newXPath();
-            final Map<String, String> paths = new HashMap<String, String>();
-            paths.put(VM_PARAM_MEMORY, "memory");
-            paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
-            paths.put(VM_PARAM_VCPU, "vcpu");
-            paths.put(VM_PARAM_BOOT, "os/boot");
-            paths.put(VM_PARAM_ARCH, "os/type");
-            paths.put(VM_PARAM_LOADER, "os/loader");
-            //paths.put(VM_PARAM_ACPI, "features/acpi");
-            //paths.put(VM_PARAM_APIC, "features/apic");
-            //paths.put(VM_PARAM_PAE, "features/ape");
-            paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
-            paths.put(VM_PARAM_ON_CRASH, "on_crash");
-            paths.put(VM_PARAM_EMULATOR, "devices/emulator");
-            try {
+                                      final Map<String, String> parametersMap) {
+        final String configName = namesConfigsMap.get(domainName);
+        if (configName == null) {
+            return null;
+        }
+        final Node domainNode = getDomainNode(domainName);
+        if (domainNode == null) {
+            return null;
+        }
+        final XPath xpath = XPathFactory.newInstance().newXPath();
+        final Map<String, String> paths = new HashMap<String, String>();
+        paths.put(VM_PARAM_MEMORY, "memory");
+        paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
+        paths.put(VM_PARAM_VCPU, "vcpu");
+        paths.put(VM_PARAM_BOOT, "os/boot");
+        paths.put(VM_PARAM_ARCH, "os/type");
+        paths.put(VM_PARAM_LOADER, "os/loader");
+        paths.put(VM_PARAM_CPU_MATCH, "cpu");
+        paths.put(VM_PARAM_ACPI, "features");
+        paths.put(VM_PARAM_APIC, "features");
+        paths.put(VM_PARAM_PAE, "features");
+        paths.put(VM_PARAM_HAP, "features");
+        paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
+        paths.put(VM_PARAM_ON_CRASH, "on_crash");
+        paths.put(VM_PARAM_EMULATOR, "devices/emulator");
+        try {
             for (final String param : parametersMap.keySet()) {
                 final String path = paths.get(param);
                 if (path == null) {
                     continue;
                 }
                 final NodeList nodes = (NodeList) xpath.evaluate(
-                                                       path,
-                                                       domainNode,
-                                                       XPathConstants.NODESET);
-                if (nodes.getLength() > 0) {
-                    final Element node = (Element) nodes.item(0);
-                    String value = parametersMap.get(param);
-                    if (VM_PARAM_MEMORY.equals(param)
-                        || VM_PARAM_CURRENTMEMORY.equals(param)) {
-                        value = Long.toString(
-                                            Tools.convertToKilobytes(value));
-                    }
-                    if (VM_PARAM_BOOT.equals(param)) {
-                        node.setAttribute("dev", value);
-                    } else if (VM_PARAM_ARCH.equals(param)) {
-                        node.setAttribute("arch", value);
+                                                   path,
+                                                   domainNode,
+                                                   XPathConstants.NODESET);
+                final Element node = (Element) nodes.item(0);
+                if (node == null) {
+                    continue;
+                }
+                String value = parametersMap.get(param);
+                if (VM_PARAM_MEMORY.equals(param)
+                    || VM_PARAM_CURRENTMEMORY.equals(param)) {
+                    value = Long.toString(
+                                        Tools.convertToKilobytes(value));
+                }
+                if (VM_PARAM_CPU_MATCH.equals(param)
+                    || VM_PARAM_ACPI.equals(param)
+                    || VM_PARAM_APIC.equals(param)
+                    || VM_PARAM_PAE.equals(param)
+                    || VM_PARAM_HAP.equals(param)) {
+                    domainNode.removeChild(node);
+                } else if (VM_PARAM_BOOT.equals(param)) {
+                    node.setAttribute("dev", value);
+                } else if (VM_PARAM_ARCH.equals(param)) {
+                    node.setAttribute("arch", value);
+                } else if (VM_PARAM_CPU_MATCH.equals(param)) {
+                    if ("".equals(value)) {
+                        node.getParentNode().removeChild(node);
                     } else {
-                        getChildNode(node, "#text").setNodeValue(value);
+                        node.setAttribute("match", value);
                     }
+                } else if (VM_PARAM_CPUMATCH_TOPOLOGY_THREADS.equals(
+                                                                  param)) {
+                    node.setAttribute("threads", value);
+                } else {
+                    getChildNode(node, "#text").setNodeValue(value);
                 }
             }
+            addCPUMatchNode(domainNode.getOwnerDocument(),
+                            domainNode,
+                            parametersMap);
+            addFeatures(domainNode.getOwnerDocument(),
+                        domainNode,
+                        parametersMap);
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
             return null;
@@ -1081,6 +1196,58 @@ public class VMSXML extends XML {
                         parameterValues.put(name, VM_PARAM_APIC, "True");
                     } else if (VM_PARAM_PAE.equals(ftrOption.getNodeName())) {
                         parameterValues.put(name, VM_PARAM_PAE, "True");
+                    } else if (VM_PARAM_HAP.equals(ftrOption.getNodeName())) {
+                        parameterValues.put(name, VM_PARAM_HAP, "True");
+                    }
+                }
+            } else if ("cpu".equals(option.getNodeName())) {
+                final String match = getAttribute(option, "match");
+                if (!"".equals(match)) {
+                    parameterValues.put(name, VM_PARAM_CPU_MATCH, match);
+                    final NodeList cpuMatchOptions = option.getChildNodes();
+                    String policy = "";
+                    final List<String> features = new ArrayList<String>();
+                    for (int j = 0; j < cpuMatchOptions.getLength(); j++) {
+                        final Node cpuMatchOption = cpuMatchOptions.item(j);
+                        final String op = cpuMatchOption.getNodeName();
+                        if ("topology".equals(op)) {
+                            parameterValues.put(
+                                    name,
+                                    VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                                    getAttribute(
+                                          cpuMatchOption,
+                                          VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS));
+                            parameterValues.put(
+                                    name,
+                                    VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                                    getAttribute(
+                                          cpuMatchOption,
+                                          VM_PARAM_CPUMATCH_TOPOLOGY_CORES));
+                            parameterValues.put(
+                                    name,
+                                    VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                                    getAttribute(
+                                          cpuMatchOption,
+                                          VM_PARAM_CPUMATCH_TOPOLOGY_THREADS));
+                        } else if ("feature".equals(op)) {
+                            /* asuming the same policy for all */
+                            policy = getAttribute(
+                                          cpuMatchOption,
+                                          VM_PARAM_CPUMATCH_FEATURE_POLICY);
+                            features.add(getAttribute(cpuMatchOption, "name"));
+                        } else {
+                            parameterValues.put(name,
+                                                op,
+                                                getText(cpuMatchOption));
+                        }
+                    }
+                    if (!"".equals(policy) && features.size() > 0) {
+                        parameterValues.put(name,
+                                            VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                                            policy);
+                        parameterValues.put(name,
+                                            VM_PARAM_CPUMATCH_FEATURES,
+                                            Tools.join(" ", features));
                     }
                 }
             } else if (VM_PARAM_ON_REBOOT.equals(option.getNodeName())) {

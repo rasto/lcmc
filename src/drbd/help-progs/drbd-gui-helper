@@ -51,6 +51,7 @@ if ($option eq "all") {
 	get_crypto_info();
 	print "qemu-keymaps-info\n";
 	get_qemu_keymaps_info();
+	get_cpu_map_info();
 	print "mount-points-info\n";
 	get_mount_points_info();
 	print "gui-info\n";
@@ -72,6 +73,7 @@ if ($option eq "all") {
 	get_crypto_info();
 	print "qemu-keymaps-info\n";
 	get_qemu_keymaps_info();
+	get_cpu_map_info();
 	print "mount-points-info\n";
 	get_mount_points_info();
 	#print "gui-info\n";
@@ -111,6 +113,8 @@ if ($option eq "all") {
 	get_crypto_info();
 } elsif ($option eq "get-qemu-keymaps-info") {
 	get_qemu_keymaps_info();
+} elsif ($option eq "get-cpu-map-info") {
+	get_cpu_map_info();
 } elsif ($option eq "get-gui-info") {
 	get_gui_info();
 } elsif ($option eq "get-mount-point-info") {
@@ -586,6 +590,27 @@ sub get_qemu_keymaps_info {
 	my %module_exists;
 	for (`ls /usr/share/qemu/keymaps/ 2>&1`) {
 		print;
+	}
+}
+
+sub get_cpu_map_info {
+	my @models;
+	my %vendors;
+	if (open my $cpu_map_fh, "/usr/share/libvirt/cpu_map.xml") {
+		while (<$cpu_map_fh>) {
+			my ($model) = /<model\s+name=\'(.*)'>/;
+			push @models, $model if $model;
+			my ($vendor) = /<vendor>(.*)</;
+			$vendors{$vendor} = 1 if $vendor;
+		}
+	}
+	print "cpu-map-model-info\n";
+	for (@models) {
+		print "$_\n";
+	}
+	print "cpu-map-vendor-info\n";
+	for (sort keys %vendors) {
+		print "$_\n";
 	}
 }
 

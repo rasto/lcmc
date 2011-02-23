@@ -128,6 +128,10 @@ public class Host implements Serializable {
     private final Set<String> cryptoModules = new TreeSet<String>();
     /** Available qemu keymaps. */
     private final Set<String> qemuKeymaps = new TreeSet<String>();
+    /** Available libvirt cpu models. */
+    private final Set<String> cpuMapModels = new TreeSet<String>();
+    /** Available libvirt cpu vendors. */
+    private final Set<String> cpuMapVendors = new TreeSet<String>();
     /** Mount points that exist in /mnt dir. */
     private final Set<String> mountPoints = new TreeSet<String>();
     /** List of block devices of this host. */
@@ -621,6 +625,26 @@ public class Host implements Serializable {
     /** Adds qemu keymap to the list of qemu keymaps. */
     public final void addQemuKeymap(final String qemuKeymap) {
         qemuKeymaps.add(qemuKeymap);
+    }
+
+    /** Returns available libvirt's cpu map models. */
+    public final Set<String> getCPUMapModels() {
+        return cpuMapModels;
+    }
+
+    /** Adds libvirt's cpu map models to the list. */
+    public final void addCPUMapModel(final String cpuMapModel) {
+        cpuMapModels.add(cpuMapModel);
+    }
+
+    /** Returns available libvirt's cpu map vendors. */
+    public final Set<String> getCPUMapVendors() {
+        return cpuMapVendors;
+    }
+
+    /** Adds libvirt's cpu map vendors to the list. */
+    public final void addCPUMapVendor(final String cpuMapVendor) {
+        cpuMapVendors.add(cpuMapVendor);
     }
 
     /**
@@ -1995,6 +2019,8 @@ public class Host implements Serializable {
                 || "filesystems-info".equals(line)
                 || "crypto-info".equals(line)
                 || "qemu-keymaps-info".equals(line)
+                || "cpu-map-model-info".equals(line)
+                || "cpu-map-vendor-info".equals(line)
                 || "mount-points-info".equals(line)
                 || "gui-info".equals(line)
                 || "installation-info".equals(line)
@@ -2040,6 +2066,10 @@ public class Host implements Serializable {
                 addCryptoModule(line);
             } else if ("qemu-keymaps-info".equals(type)) {
                 addQemuKeymap(line);
+            } else if ("cpu-map-model-info".equals(type)) {
+                addCPUMapModel(line);
+            } else if ("cpu-map-vendor-info".equals(type)) {
+                addCPUMapVendor(line);
             } else if ("mount-points-info".equals(type)) {
                 addMountPoint(line);
             } else if ("gui-info".equals(type)) {
