@@ -175,6 +175,8 @@ public class VMSXML extends XML {
     public static final String VM_PARAM_CPUMATCH_FEATURE_POLICY = "policy";
     /** VM field: cpu features. A space seperated list. */
     public static final String VM_PARAM_CPUMATCH_FEATURES = "features";
+    /** VM field: on poweroff. */
+    public static final String VM_PARAM_ON_POWEROFF = "on_poweroff";
     /** VM field: on reboot. */
     public static final String VM_PARAM_ON_REBOOT = "on_reboot";
     /** VM field: on crash. */
@@ -589,6 +591,13 @@ public class VMSXML extends XML {
         addCPUMatchNode(doc, root, parametersMap);
 
         /* on_ */
+        final String onPoweroff = parametersMap.get(VM_PARAM_ON_POWEROFF);
+        if (onPoweroff != null) {
+            final Element onPoweroffNode = (Element) root.appendChild(
+                                              doc.createElement("on_poweroff"));
+            onPoweroffNode.appendChild(doc.createTextNode(onPoweroff));
+
+        }
         final String onReboot = parametersMap.get(VM_PARAM_ON_REBOOT);
         if (onReboot != null) {
             final Element onRebootNode = (Element) root.appendChild(
@@ -639,6 +648,7 @@ public class VMSXML extends XML {
         paths.put(VM_PARAM_APIC, "features");
         paths.put(VM_PARAM_PAE, "features");
         paths.put(VM_PARAM_HAP, "features");
+        paths.put(VM_PARAM_ON_POWEROFF, "on_poweroff");
         paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
         paths.put(VM_PARAM_ON_CRASH, "on_crash");
         paths.put(VM_PARAM_EMULATOR, "devices/emulator");
@@ -1050,9 +1060,10 @@ public class VMSXML extends XML {
             final Node node = vms.item(i);
             if ("net".equals(node.getNodeName())) {
                 updateNetworks(node);
-            }
-            if ("vm".equals(node.getNodeName())) {
+            } else if ("vm".equals(node.getNodeName())) {
                 updateVM(node);
+            } else if ("version".equals(node.getNodeName())) {
+                host.setLibvirtVersion(getText(node));
             }
         }
         return true;
@@ -1250,6 +1261,8 @@ public class VMSXML extends XML {
                                             Tools.join(" ", features));
                     }
                 }
+            } else if (VM_PARAM_ON_POWEROFF.equals(option.getNodeName())) {
+                parameterValues.put(name, VM_PARAM_ON_POWEROFF, getText(option));
             } else if (VM_PARAM_ON_REBOOT.equals(option.getNodeName())) {
                 parameterValues.put(name, VM_PARAM_ON_REBOOT, getText(option));
             } else if (VM_PARAM_ON_CRASH.equals(option.getNodeName())) {

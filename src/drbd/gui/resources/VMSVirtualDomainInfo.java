@@ -212,6 +212,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                                     VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
                                     VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+                                    VMSXML.VM_PARAM_ON_POWEROFF,
                                     VMSXML.VM_PARAM_ON_REBOOT,
                                     VMSXML.VM_PARAM_ON_CRASH};
     /** Advanced parameters. */
@@ -229,6 +230,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                                     VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
                                     VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+                                    VMSXML.VM_PARAM_ON_POWEROFF,
                                     VMSXML.VM_PARAM_ON_REBOOT,
                                     VMSXML.VM_PARAM_ON_CRASH}));
     /** Map of sections to which every param belongs. */
@@ -251,6 +253,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                                           new HashMap<String, Object[]>();
     /** Whether parameter is an integer. */
     private static final List<String> IS_INTEGER = new ArrayList<String>();
+    /** Required version for a parameter. */
+    private static final Map<String, String> REQUIRED_VERSION =
+                                                new HashMap<String, String>();
     /** Returns whether this parameter has a unit prefix. */
     private static final Map<String, Boolean> HAS_UNIT_PREFIX =
                                                new HashMap<String, Boolean>();
@@ -387,6 +392,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_ARCH,          VIRTUAL_SYSTEM_STRING);
 
+        SECTION_MAP.put(VMSXML.VM_PARAM_ON_POWEROFF,   VIRTUAL_SYSTEM_OPTIONS);
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_REBOOT,     VIRTUAL_SYSTEM_OPTIONS);
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_CRASH,      VIRTUAL_SYSTEM_OPTIONS);
 
@@ -478,6 +484,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
             Tools.getString("VMSVirtualDomainInfo.Short.CPUMatch.Features"));
 
         SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_ON_POWEROFF,
+                   Tools.getString("VMSVirtualDomainInfo.Short.OnPoweroff"));
+        SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_ON_REBOOT,
                    Tools.getString("VMSVirtualDomainInfo.Short.OnReboot"));
         SHORTNAME_MAP.put(
@@ -503,6 +512,7 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ACPI, "True");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_APIC, "True");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_PAE, "True");
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_POWEROFF, "destroy");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_REBOOT, "restart");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_CRASH, "restart");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, "/usr/bin/kvm");
@@ -539,10 +549,23 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                             new String[]{"kvm", "xen"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ARCH,
                             new String[]{"x86_64", "i686", ""});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_POWEROFF,
+                            new String[]{"destroy",
+                                         "restart",
+                                         "preserve",
+                                         "rename-restart"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_REBOOT,
-                            new String[]{"restart"});
+                            new String[]{"restart",
+                                         "destroy",
+                                         "preserve",
+                                         "rename-restart"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_CRASH,
-                            new String[]{"restart", "destroy"});
+                            new String[]{"restart",
+                                         "destroy",
+                                         "preserve",
+                                         "rename-restart",
+                                         "coredump-destroy", /* since 0.8.4 */
+                                         "coredump-restart"}); /* since 0.8.4*/
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_EMULATOR,
                             new StringInfo[]{
                                        new StringInfo("kvm",
@@ -575,7 +598,18 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
         IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
         IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS);
-
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPU_MATCH, "0.7.5");
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_MODEL, "0.7.5");
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_VENDOR, "0.8.3");
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                             "0.7.5");
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, "0.7.5");
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                             "0.7.5");
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                             "0.7.5");
+        REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES,
+                             "0.7.5");
     }
     /** Creates the VMSVirtualDomainInfo object. */
     public VMSVirtualDomainInfo(final String name,
@@ -3056,6 +3090,22 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                     paramComboBoxGet(VMSXML.VM_PARAM_LOADER, null).setValue("");
                 }
             }
+        } else if (VMSXML.VM_PARAM_CPU_MATCH.equals(param)) {
+            final boolean match = !"".equals(newValue);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    for (final String p : new String[]{
+                                    VMSXML.VM_PARAM_CPUMATCH_MODEL,
+                                    VMSXML.VM_PARAM_CPUMATCH_VENDOR,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
+                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
+                                    VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
+                                    VMSXML.VM_PARAM_CPUMATCH_FEATURES}) {
+                        paramComboBoxGet(p, null).setVisible(match);
+                    }
+                }
+            });
         }
         return true;
     }
@@ -4189,11 +4239,22 @@ public class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Whether the parameter should be enabled. */
-    protected final boolean isEnabled(final String param) {
+    protected final String isEnabled(final String param) {
+
+        final String libvirtVersion =
+                            getBrowser().getCluster().getMinLibvirtVersion();
         if (!getResource().isNew() && VMSXML.VM_PARAM_NAME.equals(param)) {
-            return false;
+            return "";
         }
-        return true;
+        if (REQUIRED_VERSION.containsKey(param)) {
+            final String rv = REQUIRED_VERSION.get(param);
+            if (Tools.compareVersions(rv, libvirtVersion) > 0) {
+                return Tools.getString(
+                                "VMSVirtualDomainInfo.AvailableInVersion")
+                                    .replace("@VERSION@", rv);
+            }
+        }
+        return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */

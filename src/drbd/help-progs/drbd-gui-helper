@@ -1497,7 +1497,11 @@ sub get_vm_info {
 		next if !$name;
 		$autostart{$name}++;
 	}
-	my $out = "";
+	my $libvirt_version = "";
+	if (`/usr/bin/virsh version 2>/dev/null` =~ /libvir\s+([0-9\.]+)/) {
+		$libvirt_version = $1;
+	}
+	my $out = "<version>$libvirt_version</version>\n";
 	for (`ls /etc/libvirt/qemu/*.xml 2>/dev/null; ls /etc/xen/vm/*.xml 2>/dev/null`) {
 		my ($name) = /([^\/]+).xml/;
 		next if !$name;
@@ -1539,11 +1543,11 @@ sub get_vm_info {
 		}
 		$out.= "</vm>\n";
 	}
+	if ($networks) {
+		$out .= $networks;
+	}
 	my $md5 = md5_hex($out);
 	print "<vms md5=\"$md5\">\n";
-	if ($networks) {
-		print $networks;
-	}
 	print $out;
 	print "</vms>\n";
 }
