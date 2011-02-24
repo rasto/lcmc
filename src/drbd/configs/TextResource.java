@@ -2093,6 +2093,9 @@ public class TextResource extends
         {"VMSVirtualDomainInfo.Short.CPUMatch.Features",
          "Features"},
 
+        {"VMSVirtualDomainInfo.Short.OnPoweroff",
+         "On Poweroff"},
+
         {"VMSVirtualDomainInfo.Short.OnReboot",
          "On Reboot"},
 
@@ -2171,6 +2174,9 @@ public class TextResource extends
 
         {"VMSVirtualDomainInfo.confirmRemove.No",
          "Cancel"},
+
+        {"VMSVirtualDomainInfo.AvailableInVersion",
+         "Available in libvirt version @VERSION@"},
 
         {"ConstraintPHInfo.ToolTip",
          "Resource set placeholder"},

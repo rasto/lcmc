@@ -2281,14 +2281,14 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Whether the parameter should be enabled. */
-    protected final boolean isEnabled(final String param) {
+    protected final String isEnabled(final String param) {
         if (GUI_ID.equals(param) && !getResource().isNew()) {
-            return false;
+            return "";
         }
         if (isMetaAttr(param)) {
             final Info info = (Info) sameAsMetaAttrsCB.getValue();
             if (info == null) {
-                return true;
+                return null;
             }
             boolean nothingSelected = false;
             if (GuiComboBox.NOTHING_SELECTED.equals(info.toString())) {
@@ -2298,9 +2298,13 @@ public class ServiceInfo extends EditableInfo {
             if (META_ATTRS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
                 sameAs = false;
             }
-            return !sameAs || nothingSelected;
+            if (!sameAs || nothingSelected) {
+                return null;
+            } else {
+                return "";
+            }
         }
-        return true;
+        return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */

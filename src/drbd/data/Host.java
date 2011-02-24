@@ -242,6 +242,8 @@ public class Host implements Serializable {
     private volatile boolean lastConnected = false;
     /** Whether corosync or heartbeat is running. */
     private Boolean corosyncHeartbeatRunning = null;
+    /** Libvirt version. */
+    private String libvirtVersion = null;
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
@@ -2766,5 +2768,15 @@ public class Host implements Serializable {
     /** Returns pcmkServiceVersion. */
     public final int getPcmkServiceVersion() {
         return pcmkServiceVersion;
+    }
+
+    /** Sets libvirt version. */
+    public final void setLibvirtVersion(final String libvirtVersion) {
+        this.libvirtVersion = libvirtVersion;
+    }
+
+    /** Returns libvirt version. */
+    public final String getLibvirtVersion() {
+        return libvirtVersion;
     }
 }

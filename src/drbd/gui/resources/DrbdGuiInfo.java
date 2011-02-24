@@ -86,8 +86,8 @@ public abstract class DrbdGuiInfo extends EditableInfo {
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected boolean isEnabled(final String param) {
-        return true;
+    @Override protected String isEnabled(final String param) {
+        return null;
     }
 
 

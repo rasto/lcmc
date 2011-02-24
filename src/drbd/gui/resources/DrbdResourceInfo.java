@@ -277,13 +277,13 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected final boolean isEnabled(final String param) {
+    @Override protected final String isEnabled(final String param) {
         if (getDrbdResource().isCommited()
             && (DRBD_RES_PARAM_NAME.equals(param)
                 || DRBD_RES_PARAM_DEV.equals(param))) {
-            return false;
+            return "";
         }
-        return true;
+        return null;
     }
 
     /** Returns the widget that is used to edit this parameter. */

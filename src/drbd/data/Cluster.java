@@ -359,4 +359,25 @@ public class Cluster {
         }
         return true;
     }
+
+    /**
+     * Get the smallest libvirt version. Returns null, if it is not installed
+     * anywhere.
+     */
+    public final String getMinLibvirtVersion() {
+        String minVersion = null;
+        for (final Host host : hosts) {
+            final String version = host.getLibvirtVersion();
+            if (version == null) {
+                /* not installed */
+                continue;
+            }
+            if (minVersion == null) {
+                minVersion = version;
+            } else if (Tools.compareVersions(version, minVersion) < 0) {
+                minVersion = version;
+            }
+        }
+        return minVersion;
+    }
 }

@@ -167,6 +167,8 @@ public class GuiComboBox extends JPanel {
     private final Mutex mValueLock = new Mutex();
     /** Regexp that this field must match. */
     private final String regexp;
+    /** Reason why it is disabled. */
+    private String disabledReason = null;
 
     /** Prepares a new <code>GuiComboBox</code> object. */
     public GuiComboBox(final String selectedValue,
@@ -703,6 +705,10 @@ public class GuiComboBox extends JPanel {
     /** Sets the tooltip text. */
     public final void setToolTipText(String text) {
         toolTipText = text;
+        final String disabledReason0 = disabledReason;
+        if (disabledReason0 != null) {
+            text = text + "<br>" + disabledReason0;
+        }
         if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
             final boolean accessible =
                      Tools.getConfigData().isAccessible(enableAccessMode);
@@ -728,17 +734,29 @@ public class GuiComboBox extends JPanel {
     /** Sets label tooltip text. */
     public final void setLabelToolTipText(String text) {
         labelToolTipText = text;
+        String disabledTooltip = null;
         if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
             final boolean accessible =
                      Tools.getConfigData().isAccessible(enableAccessMode);
             if (!accessible) {
-                if (text.length() > 6
-                    && "<html>".equals(text.substring(0, 6))) {
-                    text = "<html>" + getDisabledTooltip() + "<br>" + "<br>"
-                           + text.substring(6);
-                } else {
-                    text = Tools.html(text + "<br>" + getDisabledTooltip());
-                }
+                disabledTooltip = getDisabledTooltip();
+            }
+        }
+        final String disabledReason0 = disabledReason;
+        if (disabledReason0 != null || disabledTooltip != null) {
+            final StringBuffer tt = new StringBuffer(40);
+            if (disabledReason0 != null) {
+                tt.append(disabledReason0);
+                tt.append("<br>");
+            }
+            if (disabledTooltip != null) {
+                tt.append(disabledTooltip);
+            }
+            if (text.length() > 6 && "<html>".equals(text.substring(0, 6))) {
+                text = "<html>" + tt.toString() + "<br>" + "<br>"
+                       + text.substring(6);
+            } else {
+                text = Tools.html(text + "<br>" + tt.toString());
             }
         }
         label.setToolTipText(text);
@@ -752,10 +770,20 @@ public class GuiComboBox extends JPanel {
         if (enableAccessMode.isAdvancedMode()) {
             advanced = "Advanced ";
         }
-        return "editable in \""
-               + advanced
-               + ConfigData.OP_MODES_MAP.get(enableAccessMode.getAccessType())
-               + "\" mode";
+        final StringBuffer sb = new StringBuffer(100);
+        sb.append("editable in \"");
+        sb.append(advanced);
+        sb.append(
+                ConfigData.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
+        sb.append("\" mode");
+
+        if (disabledReason != null) {
+            /* yet another reason */
+            sb.append(' ');
+            sb.append(disabledReason);
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -1905,5 +1933,10 @@ public class GuiComboBox extends JPanel {
     /** Returns regexp of this field. */
     public final String getRegexp() {
         return regexp;
+    }
+
+    /** Sets reason why it is disabled. */
+    public final void setDisabledReason(final String disabledReason) {
+        this.disabledReason = disabledReason;
     }
 }

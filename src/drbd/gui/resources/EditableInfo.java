@@ -77,8 +77,9 @@ public abstract class EditableInfo extends Info {
     protected abstract boolean isRequired(String param);
     /** Returns whether this parameter is advanced. */
     protected abstract boolean isAdvanced(String param);
-    /** Returns whether this parameter should be enabled. */
-    protected abstract boolean isEnabled(String param);
+    /** Returns null this parameter should be enabled. Otherwise return
+        a reason that appears in the tooltip. */
+    protected abstract String isEnabled(String param);
     /** Returns access type of this parameter. */
     protected abstract ConfigData.AccessType getAccessType(String param);
     /** Returns whether this parameter is enabled in advanced mode. */
@@ -901,9 +902,10 @@ public abstract class EditableInfo extends Info {
                     || !paramCorrectValueMap.containsKey(param)) {
                     final GuiComboBox wizardCb =
                                     paramComboBoxGet(otherParam, "wizard");
-                    final boolean enable = isEnabled(otherParam);
+                    final String enable = isEnabled(otherParam);
                     if (wizardCb != null) {
-                        wizardCb.setEnabled(enable);
+                        wizardCb.setDisabledReason(enable);
+                        wizardCb.setEnabled(enable == null);
                         final Object wo = wizardCb.getValue();
                         if (Tools.isStringClass(wo)) {
                             newValue = wizardCb.getStringValue();
@@ -915,7 +917,8 @@ public abstract class EditableInfo extends Info {
                             newValue = ((Info) wo).getStringValue();
                         }
                     }
-                    cb.setEnabled(enable);
+                    cb.setDisabledReason(enable);
+                    cb.setEnabled(enable == null);
                     final boolean check = checkParam(otherParam, newValue)
                                           && checkRegexp(otherParam, newValue);
                     if (check) {

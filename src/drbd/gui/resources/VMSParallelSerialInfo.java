@@ -355,14 +355,14 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter should be enabled. */
-    protected final boolean isEnabled(final String param) {
+    protected final String isEnabled(final String param) {
         if (ParallelSerialData.TARGET_PORT.equals(param)) {
-            return false;
+            return "";
         } else if (!getResource().isNew()
                    && ParallelSerialData.TYPE.equals(param)) {
-            return false;
+            return "";
         }
-        return true;
+        return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */

@@ -246,8 +246,8 @@ public class VMSSoundInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter should be enabled. */
-    protected final boolean isEnabled(final String param) {
-        return true;
+    protected final String isEnabled(final String param) {
+        return null;
     }
 
     /** Whether the parameter should be enabled. */
