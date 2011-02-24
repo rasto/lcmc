@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
@@ -107,6 +108,8 @@ public class CibQuery {
                                     new HashMap<String, Map<String, String>>();
     /** If node is online. */
     private Map<String, String> nodeOnline = new HashMap<String, String>();
+    /** If node is pending. */
+    private Set<String> nodePending = new HashSet<String>();
     /** Group to resources map. */
     private Map<String, List<String>> groupsToResources =
                                            new HashMap<String, List<String>>();
@@ -486,18 +489,24 @@ public class CibQuery {
         return resOpIds;
     }
 
-    /**
-     * Sets map with nodes and if they ore online.
-     */
+    /** Sets map with nodes and if they ore online. */
     public final void setNodeOnline(final Map<String, String> nodeOnline) {
         this.nodeOnline = nodeOnline;
     }
 
-    /**
-     * Gets map whith nodes and if they are online.
-     */
+    /** Gets map whith nodes and if they are online. */
     public final Map<String, String> getNodeOnline() {
         return nodeOnline;
+    }
+
+    /** Sets map with nodes that are pending. */
+    public final void setNodePending(final Set<String> nodePending) {
+        this.nodePending = nodePending;
+    }
+
+    /** Gets map whith nodes that are pending. */
+    public final Set<String> getNodePending() {
+        return nodePending;
     }
 
     /**

@@ -89,6 +89,9 @@ public class HostInfo extends Info {
     /** Offline subtext. */
     private static final Subtext OFFLINE_SUBTEXT =
                                       new Subtext("offline", null, Color.BLUE);
+    /** Pending subtext. */
+    private static final Subtext PENDING_SUBTEXT =
+                                      new Subtext("pending", null, Color.BLUE);
     /** Stopped subtext. */
     private static final Subtext STOPPED_SUBTEXT =
                                       new Subtext("stopped", null, Color.RED);
@@ -838,7 +841,10 @@ public class HostInfo extends Info {
                 return STOPPED_SUBTEXT;
             }
             final ClusterStatus cs = getClusterStatus();
-            if (cs != null && "no".equals(cs.isOnlineNode(host.getName()))) {
+            if (cs != null && cs.isPendingNode(host.getName())) {
+                return PENDING_SUBTEXT;
+            } else if (cs != null
+                       && "no".equals(cs.isOnlineNode(host.getName()))) {
                 return OFFLINE_SUBTEXT;
             } else {
                 return UNKNOWN_SUBTEXT;

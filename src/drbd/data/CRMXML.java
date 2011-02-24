@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import java.util.regex.Pattern;
@@ -3098,6 +3099,7 @@ public class CRMXML extends XML {
 
         /* <status> */
         final Node statusNode = getChildNode(cibNode, "status");
+        final Set<String> nodePending = new HashSet<String>();
         if (statusNode != null) {
             /* <node_state ...> */
             final NodeList nodes = statusNode.getChildNodes();
@@ -3116,6 +3118,9 @@ public class CRMXML extends XML {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "yes");
                     } else {
                         nodeOnline.put(uname.toLowerCase(Locale.US), "no");
+                    }
+                    if ("pending".equals(join)) {
+                        nodePending.add(uname.toLowerCase(Locale.US));
                     }
                     final NodeList nodeStates = nodeStateNode.getChildNodes();
                     /* transient attributes. */
@@ -3176,6 +3181,7 @@ public class CRMXML extends XML {
         cibQueryData.setMetaAttrsRefs(metaAttrsRefs);
         cibQueryData.setResOpIds(resOpIdsMap);
         cibQueryData.setNodeOnline(nodeOnline);
+        cibQueryData.setNodePending(nodePending);
         cibQueryData.setGroupsToResources(groupsToResourcesMap);
         cibQueryData.setCloneToResource(cloneToResourceMap);
         cibQueryData.setMasterList(masterList);

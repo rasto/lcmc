@@ -571,6 +571,12 @@ public class ClusterStatus {
     public final void setOnlineNode(final String node, final String online) {
         cibQueryMap.getNodeOnline().put(node.toLowerCase(Locale.US), online);
     }
+    
+    /** Returns true if if node is pending. */
+    public final boolean isPendingNode(final String node) {
+        return cibQueryMap.getNodePending().contains(
+                                                 node.toLowerCase(Locale.US));
+    }
 
 
     /** Returns fail count of the service on the specified node. */

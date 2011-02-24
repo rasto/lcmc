@@ -1810,7 +1810,10 @@ public class SSH {
                                 }
                                 public void doneError(final String ans,
                                                       final int exitCode) {
-                                    Tools.sshError(host, "scp", ans, exitCode);
+                                    Tools.sshError(host,
+                                                   "scp " + remoteFilename,
+                                                   ans,
+                                                   exitCode);
                                 }
                             },
                             false,
