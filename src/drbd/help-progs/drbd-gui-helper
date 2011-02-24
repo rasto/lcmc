@@ -162,7 +162,6 @@ sub print_debug {
 sub net_info_error {
 	my $error = shift;
 	print STDERR "cannot parse ifconfig: $error\n";
-	exit 1;
 }
 
 # Returns all bridges as an array.
@@ -190,7 +189,7 @@ sub get_net_info {
 		if (!$dev) {
 			($dev) = /^(\S+)/ or net_info_error("no dev");
 			next if $dev eq "lo";
-			($mac) = /\sHWaddr\s+(\S+)/ or net_info_error("no mac address ($dev)");
+			($mac) = /\sHWaddr\s+(\S+)/;
 		} else {
 			if (/^\s+inet addr:(\S+).*?\s+Mask:(\S+)/) {
 				$ip = $1;
@@ -214,7 +213,6 @@ sub get_net_info {
 sub disk_info_error {
 	my $error = shift;
 	print STDERR "ERROR: problem getting disk info: $error\n";
-	exit 1;
 }
 
 sub disk_info_warning {
