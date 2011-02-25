@@ -1375,6 +1375,8 @@ public class VMSXML extends XML {
                                 readonly = true;
                             } else if ("shareable".equals(nodeName)) {
                                 shareable = true;
+                            } else if ("address".equals(nodeName)) {
+                                /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown disk option: "
                                                  + nodeName);
@@ -1416,6 +1418,8 @@ public class VMSXML extends XML {
                                                           "address");
                             } else if ("model".equals(nodeName)) {
                                 modelType = getAttribute(optionNode, "type");
+                            } else if ("address".equals(nodeName)) {
+                                /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown interface option: "
                                                  + nodeName);
@@ -1437,7 +1441,9 @@ public class VMSXML extends XML {
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
-                            if (!"#text".equals(nodeName)) {
+                            if ("address".equals(nodeName)) {
+                                /* it's generated, ignoring. */
+                            } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown sound option: "
                                                  + nodeName);
                             }
@@ -1486,6 +1492,8 @@ public class VMSXML extends XML {
                                 protocolType = getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
                                 targetPort = getAttribute(optionNode, "port");
+                            } else if ("address".equals(nodeName)) {
+                                /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown serial option: "
                                                  + nodeName);
@@ -1548,6 +1556,8 @@ public class VMSXML extends XML {
                                 protocolType = getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
                                 targetPort = getAttribute(optionNode, "port");
+                            } else if ("address".equals(nodeName)) {
+                                /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown parallel option: "
                                                  + nodeName);
@@ -1583,6 +1593,8 @@ public class VMSXML extends XML {
                                 modelType = getAttribute(optionNode, "type");
                                 modelVRAM = getAttribute(optionNode, "vram");
                                 modelHeads = getAttribute(optionNode, "heads");
+                            } else if ("address".equals(nodeName)) {
+                                /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown video option: "
                                                  + nodeName);
@@ -1595,6 +1607,10 @@ public class VMSXML extends XML {
                                                                modelHeads);
                             videoMap.put(modelType, videoData);
                         }
+                    } else if ("controller".equals(deviceNode.getNodeName())) {
+                        /* it's generated, ignore */
+                    } else if ("memballoon".equals(deviceNode.getNodeName())) {
+                        /* it's generated, ignore */
                     } else if (!"#text".equals(deviceNode.getNodeName())) {
                         Tools.appWarning("unknown device: "
                                          + deviceNode.getNodeName());

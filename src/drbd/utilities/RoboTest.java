@@ -502,13 +502,13 @@ public final class RoboTest {
                         }
                     }
                 } else if ("VMs".equals(selected)) {
-                    if ("1".equals(index)) {
+                    if ("1".equals(index) || "2".equals(index)) {
                         /* VMs */
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startVMTest1(robot, host);
+                            startVMTest1and2("vm-test" + index, robot, host);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -2702,11 +2702,13 @@ public final class RoboTest {
     }
 
     /** VM Test 1. */
-    private static void startVMTest1(final Robot robot, final Host host) {
+    private static void startVMTest1and2(final String vmTest,
+                                         final Robot robot,
+                                         final Host host) {
         slowFactor = 0.2f;
         host.getSSH().installTestFiles();
         aborted = false;
-        checkVMTest(host, "vm-test1", 1);
+        checkVMTest(host, vmTest, 1);
 
         moveTo(robot, 56, 252); /* popup */
         rightClick(robot);
@@ -2755,7 +2757,7 @@ public final class RoboTest {
         moveTo(robot, 560, 423); /* create config */
         leftClick(robot);
 
-        checkVMTest(host, "vm-test1", 2);
+        checkVMTest(host, vmTest, 2);
 
         moveTo(robot, 814, 581); /* finish */
         leftClick(robot);
