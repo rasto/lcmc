@@ -1775,7 +1775,7 @@ public class SSH {
         }
         String modeString = "";
         if (mode != null) {
-            modeString = ";chmod " + mode + " " + remoteFilename;
+            modeString = " && chmod " + mode + " " + remoteFilename + ".new";
         }
         String postCommandString = "";
         if (postCommand != null) {
@@ -1788,22 +1788,29 @@ public class SSH {
             backupString.append("{,.bak}>/dev/null 2>&1; then ");
             backupString.append("mv ");
             backupString.append(remoteFilename);
-            backupString.append("{.bak,.`date +'%s'`} 2>/dev/null;");
+            backupString.append("{.bak,.`date +'%s'`} 2>/dev/null;true;");
             backupString.append(" else ");
-            backupString.append("rm ");
+            backupString.append("rm -f ");
             backupString.append(remoteFilename);
-            backupString.append(".bak 2>/dev/null;");
+            backupString.append(".bak;");
             backupString.append(" fi");
         }
+        final String stacktrace = Tools.getStackTrace();
+        final String commandTail = "\">" + remoteFilename + ".new"
+                                   + modeString
+                                   + "&& mv " + remoteFilename + ".new "
+                                   + remoteFilename
+                                   + postCommandString
+                                   + backupString.toString();
+        Tools.debug(this, commands.toString()
+                          + "echo \""
+                          + "..."
+                          + commandTail, 1);
         final Thread t = execCommand(
                             commands.toString()
                             + "echo \""
                             + host.escapeQuotes(fileContent, 1)
-                            + "\">" + remoteFilename + ".new && "
-                            + "mv " + remoteFilename + ".new " + remoteFilename
-                            + modeString
-                            + postCommandString
-                            + backupString.toString(),
+                            + commandTail,
                             new ExecCallback() {
                                 public void done(final String ans) {
                                     /* ok */
@@ -1813,6 +1820,7 @@ public class SSH {
                                     Tools.sshError(host,
                                                    "scp " + remoteFilename,
                                                    ans,
+                                                   stacktrace,
                                                    exitCode);
                                 }
                             },

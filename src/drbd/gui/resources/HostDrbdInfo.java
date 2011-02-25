@@ -132,6 +132,7 @@ public class HostDrbdInfo extends Info {
         final JTextArea ta = new JTextArea();
         ta.setFont(f);
 
+        final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
             new ExecCallback() {
                 public void done(final String ans) {
@@ -141,7 +142,7 @@ public class HostDrbdInfo extends Info {
                 public void doneError(final String ans,
                                       final int exitCode) {
                     ta.setText("error");
-                    Tools.sshError(host, "", ans, exitCode);
+                    Tools.sshError(host, "", ans, stacktrace, exitCode);
                 }
 
             };

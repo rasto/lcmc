@@ -399,6 +399,7 @@ public final class Tools {
     public static void sshError(final Host host,
                                 final String command,
                                 final String ans,
+                                final String stacktrace,
                                 final int exitCode) {
         final StringBuffer onHost = new StringBuffer("");
         if (host != null) {
@@ -410,12 +411,12 @@ public final class Tools {
             }
             onHost.append(host.getName());
         }
-        Tools.printStackTrace();
         Tools.appWarning(Tools.getString("Tools.sshError.command")
                          + " '" + command + "'" + onHost.toString() + "\n"
                          + Tools.getString("Tools.sshError.returned")
                          + " " + exitCode + "\n"
-                         + ans);
+                         + ans + "\n"
+                         + stacktrace);
     }
 
     /**
@@ -450,6 +451,7 @@ public final class Tools {
         final StringBuffer output = new StringBuffer("");
         final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
+            final String stacktrace = getStackTrace();
             ec = new ExecCallback() {
                              public void done(final String ans) {
                                  output.append(ans);
@@ -466,6 +468,7 @@ public final class Tools {
                                     Tools.sshError(host,
                                                    command,
                                                    ans,
+                                                   stacktrace,
                                                    exitCode);
                                  }
                                  exitCodeHolder[0] = exitCode;
@@ -504,6 +507,7 @@ public final class Tools {
         final StringBuffer output = new StringBuffer("");
         final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
+            final String stacktrace = getStackTrace();
             ec = new ExecCallback() {
                              public void done(final String ans) {
                                  output.append(ans);
@@ -515,6 +519,7 @@ public final class Tools {
                                     Tools.sshError(host,
                                                    command,
                                                    ans,
+                                                   stacktrace,
                                                    exitCode);
                                  }
                                  exitCodeHolder[0] = exitCode;
@@ -745,17 +750,22 @@ public final class Tools {
         System.out.println(text);
         printStackTrace();
     }
-    /**
-     * Prints stack trace.
-     */
+
+    /** Prints stack trace. */
     public static void printStackTrace() {
+        System.out.println(getStackTrace());
+    }
+
+    /** Returns stack trace. */
+    public static String getStackTrace() {
         final Throwable th = new Throwable();
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
         th.printStackTrace(pw);
         pw.close();
-        System.out.println(sw.toString());
+        return sw.toString();
     }
+
 
     /**
      * Loads the save file and returns its content as string. Return null, if

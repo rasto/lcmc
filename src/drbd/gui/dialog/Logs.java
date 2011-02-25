@@ -167,6 +167,7 @@ public class Logs extends ConfigDialog {
         replaceHash.put("@GREPPATTERN@", grepPattern());
 
         int i = 0;
+        final String stacktrace = Tools.getStackTrace();
         for (final Host host : hosts) {
             final int index = i;
             final String command = host.getDistCommand(logFileCommand(),
@@ -185,6 +186,7 @@ public class Logs extends ConfigDialog {
                                          Tools.sshError(host,
                                                         command,
                                                         ans,
+                                                        stacktrace,
                                                         exitCode);
                                      }
                                  }, false, false, 30000);
