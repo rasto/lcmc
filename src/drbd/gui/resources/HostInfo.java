@@ -92,6 +92,9 @@ public class HostInfo extends Info {
     /** Pending subtext. */
     private static final Subtext PENDING_SUBTEXT =
                                       new Subtext("pending", null, Color.BLUE);
+    /** Fenced/unclean subtext. */
+    private static final Subtext FENCED_SUBTEXT =
+                                      new Subtext("FENCED", null, Color.RED);
     /** Stopped subtext. */
     private static final Subtext STOPPED_SUBTEXT =
                                       new Subtext("stopped", null, Color.RED);
@@ -828,7 +831,10 @@ public class HostInfo extends Info {
         } else if (getHost().isCommLayerStarting()) {
             return STARTING_SUBTEXT;
         }
-        if (getHost().isClStatus()) {
+        final ClusterStatus cs = getClusterStatus();
+        if (cs != null && cs.isFencedNode(host.getName())) {
+            return FENCED_SUBTEXT;
+        } else if (getHost().isClStatus()) {
             if (isStandby(testOnly)) {
                 return STANDBY_SUBTEXT;
             } else {
@@ -841,7 +847,6 @@ public class HostInfo extends Info {
             } else if (!running) {
                 return STOPPED_SUBTEXT;
             }
-            final ClusterStatus cs = getClusterStatus();
             if (cs != null && cs.isPendingNode(host.getName())) {
                 return PENDING_SUBTEXT;
             } else if (cs != null

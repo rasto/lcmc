@@ -853,11 +853,14 @@ sub get_resource_status {
 	my %running;
 	my %unmanaged;
 	my %resources;
+	my @fenced_nodes;
 	for my $line (`/usr/sbin/ptest -VVVV -L 2>&1`) {
 		my $what;
 		my $on;
 		my $res;
-		if ($line =~
+		if ($line =~ /pe_fence_node:\s+Node\s+(\S+)/) {
+			push @fenced_nodes, $1;
+		} elsif ($line =~
 		    /Leave\s+(?:resource\s+)?(\S+)\s+\((.*?)\)/) {
 		  	# managed: Started, Master, Slave, Stopped
 			$res = $1;
@@ -930,6 +933,14 @@ sub get_resource_status {
 			}
 		}
 	}
+	my $fenced_nodes_ret = "";
+	if (@fenced_nodes > 0) {
+		$fenced_nodes_ret .= "<fenced>\n";
+		for my $n (@fenced_nodes) {
+			$fenced_nodes_ret .= " <node>$n</node>\n"
+		}
+		$fenced_nodes_ret .= "</fenced>\n";
+	}
 	my $info = "";
 	for my $res (sort keys %resources) {
 		my $running = "running";
@@ -950,20 +961,22 @@ sub get_resource_status {
 		$info.= "  </resource>\n";
 	}
 	if ($info) {
-		return "<resource_status>\n$info</resource_status>\n";
+		return ("<resource_status>\n$info</resource_status>\n",
+			$fenced_nodes_ret);
 	}
-	return "";
+	return ("", $fenced_nodes_ret);
 }
 
 sub get_cluster_info {
-	my $info = get_resource_status();
+	my ($info, $fenced_nodes) = get_resource_status();
 	# TODO: use cib.xml if cibadmin can't connect
 	my $cibinfo = `/usr/sbin/cibadmin -Ql || cat /var/lib/heartbeat/crm/cib.xml 2>/dev/null`;
 	if ($cibinfo) {
 		my $res_status = "res_status";
 		my $cibquery = "cibadmin";
 		return "$res_status\nok\n$info\n>>>$res_status\n"
-		       ."$cibquery\nok\n$cibinfo\n>>>$cibquery\n";
+		       ."$cibquery\nok\n<pcmk>\n$fenced_nodes$cibinfo</pcmk>\n"
+		       .">>>$cibquery\n";
 	}
 	return "";
 }
@@ -1874,4 +1887,5 @@ sub gui_drbd_test {
 		exit 2;
 	}
 }
+
 

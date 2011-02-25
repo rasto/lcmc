@@ -2358,9 +2358,7 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Returns a hash with resource information. (running_on)
-     */
+    /** Returns a hash with resource information. (running_on) */
     public final Map<String, ResStatus> parseResStatus(final String resStatus) {
         final Map<String, ResStatus> resStatusMap =
                                            new HashMap<String, ResStatus>();
@@ -2610,9 +2608,31 @@ public class CRMXML extends XML {
             Tools.appWarning("cib error: " + query);
             return cibQueryData;
         }
+        /* get root <pacemaker> */
+        final Node pcmkNode = getChildNode(document, "pcmk");
+        if (pcmkNode == null) {
+            Tools.appWarning("there is no pcmk node");
+            return cibQueryData;
+        }
 
-        /* get root <cib> */
-        final Node cibNode = getChildNode(document, "cib");
+        /* get fenced nodes */
+        final Set<String> fencedNodes = new HashSet<String>();
+        final Node fencedNode = getChildNode(pcmkNode, "fenced");
+        if (fencedNode != null) {
+            final NodeList nodes = fencedNode.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                final Node hostNode = nodes.item(i);
+                if (hostNode.getNodeName().equals("node")) {
+                    final String host = getText(hostNode);
+                    if (host != null) {
+                        fencedNodes.add(host.toLowerCase(Locale.US));
+                    }
+                }
+            }
+        }
+
+        /* get <cib> */
+        final Node cibNode = getChildNode(pcmkNode, "cib");
         if (cibNode == null) {
             Tools.appWarning("there is no cib node");
             return cibQueryData;
@@ -3192,6 +3212,7 @@ public class CRMXML extends XML {
         cibQueryData.setRscDefaultsParams(rscDefaultsParams);
         cibQueryData.setRscDefaultsParamsNvpairIds(rscDefaultsParamsNvpairIds);
         cibQueryData.setOpDefaultsParams(opDefaultsParams);
+        cibQueryData.setFencedNodes(fencedNodes);
         return cibQueryData;
     }
 

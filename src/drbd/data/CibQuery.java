@@ -110,6 +110,8 @@ public class CibQuery {
     private Map<String, String> nodeOnline = new HashMap<String, String>();
     /** If node is pending. */
     private Set<String> nodePending = new HashSet<String>();
+    /** If node is fenced. */
+    private Set<String> fencedNodes = new HashSet<String>();
     /** Group to resources map. */
     private Map<String, List<String>> groupsToResources =
                                            new HashMap<String, List<String>>();
@@ -507,6 +509,16 @@ public class CibQuery {
     /** Gets map whith nodes that are pending. */
     public final Set<String> getNodePending() {
         return nodePending;
+    }
+
+    /** Sets map with nodes that are fenced. */
+    public final void setFencedNodes(final Set<String> fencedNodes) {
+        this.fencedNodes = fencedNodes;
+    }
+
+    /** Gets map whith nodes that are fenced. */
+    public final Set<String> getFencedNodes() {
+        return fencedNodes;
     }
 
     /**

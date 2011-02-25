@@ -578,6 +578,11 @@ public class ClusterStatus {
                                                  node.toLowerCase(Locale.US));
     }
 
+    /** Returns true if if node was fenced. */
+    public final boolean isFencedNode(final String node) {
+        return cibQueryMap.getFencedNodes().contains(
+                                                 node.toLowerCase(Locale.US));
+    }
 
     /** Returns fail count of the service on the specified node. */
     public final String getFailCount(final String node,
@@ -629,7 +634,9 @@ public class ClusterStatus {
         final String cmd = commands[0];
 
         if (commands.length == 1) {
-            if ("res_status".equals(cmd)) {
+            if ("fenced_nodes".equals(cmd)) {
+
+            } else if ("res_status".equals(cmd)) {
                 final String status = Tools.join("\n", data.toArray(
                                                      new String[data.size()]));
                 if (!status.equals(oldStatus)) {
