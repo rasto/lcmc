@@ -759,7 +759,7 @@ public class SSH {
                 // don't execute after error
                 if (exitCode != 0) {
                     if (execCallback != null) {
-                        if (outputVisible && commandVisible) {
+                        if (outputVisible) {
                             Tools.getGUIData().expandTerminalSplitPane(0);
                         }
                         execCallback.doneError(ans.toString(), exitCode);
@@ -1685,7 +1685,7 @@ public class SSH {
             final String fileName = "/help-progs/drbd-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
-                scp(file, "@GUI-HELPER@", "0700", false, null, null);
+                scp(file, "@GUI-HELPER@", "0700", false, null, null, null);
             }
         }
     }
@@ -1736,7 +1736,13 @@ public class SSH {
                                    final boolean makeBackup,
                                    final String preCommand,
                                    final String postCommand) {
-        scp(config, dir + fileName, mode, makeBackup, preCommand, postCommand);
+        scp(config,
+            dir + fileName,
+            mode,
+            makeBackup,
+            null, /* install command */
+            preCommand,
+            postCommand);
     }
 
     /**
@@ -1751,6 +1757,7 @@ public class SSH {
                           final String remoteFilename,
                           final String mode,
                           final boolean makeBackup,
+                          String installCommand,
                           final String preCommand,
                           final String postCommand) {
         final StringBuffer commands = new StringBuffer(40);
@@ -1779,11 +1786,11 @@ public class SSH {
         }
         String postCommandString = "";
         if (postCommand != null) {
-            postCommandString = ";" + postCommand;
+            postCommandString = " && " + postCommand;
         }
-        final StringBuffer backupString = new StringBuffer("");
+        final StringBuffer backupString = new StringBuffer(50);
         if (makeBackup) {
-            backupString.append(";if ! diff ");
+            backupString.append(" && if ! diff ");
             backupString.append(remoteFilename);
             backupString.append("{,.bak}>/dev/null 2>&1; then ");
             backupString.append("mv ");
@@ -1793,13 +1800,18 @@ public class SSH {
             backupString.append("rm -f ");
             backupString.append(remoteFilename);
             backupString.append(".bak;");
-            backupString.append(" fi");
+            backupString.append(" fi ");
         }
         final String stacktrace = Tools.getStackTrace();
+        if (installCommand == null) {
+            installCommand = "mv " + remoteFilename + ".new " + remoteFilename;
+        }
         final String commandTail = "\">" + remoteFilename + ".new"
                                    + modeString
-                                   + "&& mv " + remoteFilename + ".new "
-                                   + remoteFilename
+
+                                   + "&& "
+                                   + installCommand
+
                                    + postCommandString
                                    + backupString.toString();
         Tools.debug(this, commands.toString()
@@ -1817,15 +1829,30 @@ public class SSH {
                                 }
                                 public void doneError(final String ans,
                                                       final int exitCode) {
-                                    Tools.sshError(host,
-                                                   "scp " + remoteFilename,
-                                                   ans,
-                                                   stacktrace,
-                                                   exitCode);
+                                    if (ans == null) {
+                                        return;
+                                    }
+                                    for (final String line
+                                                   : ans.split("\n")) {
+                                        if (line.indexOf(
+                                                    "error:") != 0) {
+                                            continue;
+                                        }
+                                        final Thread t = new Thread(
+                                        new Runnable() {
+                                            public void run() {
+                                                Tools.progressIndicatorFailed(
+                                                                host.getName(),
+                                                                line,
+                                                                3000);
+                                            }
+                                        });
+                                        t.start();
+                                    }
                                 }
                             },
-                            false,
                             true,
+                            false,
                             10000); /* smaller timeout */
         try {
             t.join();
@@ -1834,9 +1861,7 @@ public class SSH {
         }
     }
 
-    /**
-     * Starts port forwarding for vnc.
-     */
+    /** Starts port forwarding for vnc. */
     public final void startVncPortForwarding(final String remoteHost,
                                              final int remotePort)
         throws java.io.IOException {

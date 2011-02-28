@@ -390,7 +390,9 @@ public class VMSXML extends XML {
     }
 
     /** Convert xml node to the string. */
-    private void saveDomainXML(final String configName, final Node node) {
+    private void saveDomainXML(final String configName,
+                               final Node node,
+                               final String defineCommand) {
         String xml = null;
         try {
             final Transformer transformer =
@@ -404,7 +406,13 @@ public class VMSXML extends XML {
             return;
         }
         if (xml != null) {
-            host.getSSH().scp(xml, configName, "0600", true, null, null);
+            host.getSSH().scp(xml,
+                              configName,
+                              "0600",
+                              true,
+                              defineCommand,
+                              null,
+                              null);
         }
     }
 
@@ -837,8 +845,10 @@ public class VMSXML extends XML {
     public final void saveAndDefine(final Node domainNode,
                                     final String domainName) {
         final String configName = namesConfigsMap.get(domainName);
-        saveDomainXML(configName, domainNode);
-        VIRSH.define(host, configName);
+        final String defineCommand =
+                            VIRSH.getDefineCommand(host, configName + ".new"
+                            + " && rm " + configName + ".new");
+        saveDomainXML(configName, domainNode, defineCommand);
         host.setVMInfoMD5(null);
     }
 

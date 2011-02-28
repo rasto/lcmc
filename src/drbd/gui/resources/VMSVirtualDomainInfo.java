@@ -524,6 +524,16 @@ public class VMSVirtualDomainInfo extends EditableInfo {
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_APIC, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_PAE, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_HAP, "False");
+
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPU_MATCH, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_MODEL, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_VENDOR, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES, "");
+
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_MEMORY, true);
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_CURRENTMEMORY, true);
         // TODO: no virsh command for os-boot
@@ -1628,7 +1638,9 @@ public class VMSVirtualDomainInfo extends EditableInfo {
                 if (vmsxml != null) {
                     final String savedValue =
                                        vmsxml.getValue(getDomainName(), param);
-                    if (savedValue != null) {
+                    if (savedValue == null) {
+                        value = getParamDefault(param);
+                    } else {
                         value = savedValue;
                     }
                 }

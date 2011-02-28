@@ -1409,20 +1409,30 @@ public final class Tools {
         stopProgressIndicator(name + ": " + text);
     }
 
-    /**
-     * Stops progress indicator with failure message.
-     */
+    /** Progress indicator with failure message. */
     public static void progressIndicatorFailed(final String text) {
         getGUIData().getMainGlassPane().failure(text);
     }
 
-    /**
-     * Stops progress indicator with failure message for host or cluster
-     * command.
-     */
+    /** Progress indicator with failure message for host or cluster command. */
     public static void progressIndicatorFailed(final String name,
                                                final String text) {
         progressIndicatorFailed(name + ": " + text);
+    }
+
+    /** Progress indicator with failure message that shows for n seconds. */
+    public static void progressIndicatorFailed(final String text, final int n) {
+        getGUIData().getMainGlassPane().failure(text, n);
+    }
+
+    /**
+     * Progress indicator with failure message for host or cluster command,
+     * that show for n seconds.
+     */
+    public static void progressIndicatorFailed(final String name,
+                                               final String text,
+                                               final int n) {
+        progressIndicatorFailed(name + ": " + text, n);
     }
 
     /**

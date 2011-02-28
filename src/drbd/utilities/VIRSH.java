@@ -182,6 +182,16 @@ public final class VIRSH {
         return execCommand(new Host[]{host}, command, true);
     }
 
+    /** Returns command that defines virtual domain. */
+    public static String getDefineCommand(final Host host,
+                                          final String config) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@CONFIG@", config);
+        final String command = host.getDistCommand("VIRSH.Define",
+                                                   replaceHash);
+        return command;
+    }
+
     /** Undefines virtual domain. It removes the config. */
     public static boolean undefine(final Host host, final String domain) {
         final Map<String, String> replaceHash = new HashMap<String, String>();

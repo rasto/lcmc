@@ -194,12 +194,18 @@ public class ProgressIndicatorPanel extends JComponent
                                cancelButton.getPreferredSize().height);
     }
 
-    /**
-     * Is called upan a failure.
-     */
+    /** Is called upan a failure. */
     public final void failure(final String text) {
         failuresMap.add(text);
         start(text, null, false);
+        stop(text);
+    }
+
+    /** Is called upan a failure and shows it for n seconds. */
+    public final void failure(final String text, final int n) {
+        failuresMap.add(text);
+        start(text, null, false);
+        Tools.sleep(n);
         stop(text);
     }
 
